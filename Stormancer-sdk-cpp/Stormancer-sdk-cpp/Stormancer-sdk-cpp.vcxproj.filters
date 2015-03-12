@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="MsgPack">
+      <UniqueIdentifier>{15482231-45ae-4f4c-a03e-aaab98048614}</UniqueIdentifier>
+      <Extensions>MsgPack/*</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ApiClient.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ISerializer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Infrastructure\MsgPackSerializer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MsgPack\MsgPackSocket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MsgPack\MsgPack.h">
+      <Filter>MsgPack</Filter>
+    </ClInclude>
+    <ClInclude Include="MsgPack\Container.h">
+      <Filter>MsgPack</Filter>
+    </ClInclude>
+    <ClInclude Include="MsgPack\Data.h">
+      <Filter>MsgPack</Filter>
+    </ClInclude>
+    <ClInclude Include="MsgPack\Element.h">
+      <Filter>MsgPack</Filter>
+    </ClInclude>
+    <ClInclude Include="MsgPack\Number.h">
+      <Filter>MsgPack</Filter>
+    </ClInclude>
+    <ClInclude Include="MsgPack\Primitive.h">
+      <Filter>MsgPack</Filter>
+    </ClInclude>
+    <ClInclude Include="MsgPack\StreamManager.h">
+      <Filter>MsgPack</Filter>
+    </ClInclude>
+    <ClInclude Include="MsgPack\Header.h">
+      <Filter>MsgPack</Filter>
+    </ClInclude>
+    <ClInclude Include="MsgPack\ContainerHeader.h">
+      <Filter>MsgPack</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormancer-sdk-cpp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ApiClient.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Infrastructure\MsgPackSerializer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MsgPack\MsgPack.cpp">
+      <Filter>MsgPack</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
