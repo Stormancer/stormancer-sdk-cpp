@@ -1,16 +1,5 @@
 /*
-    netLink: c++ 11 networking library
     Copyright 2014 Alexander Meißner (lichtso@gamefortec.net)
-
-    This software is provided 'as-is', without any express or implied warranty.
-    In no event will the authors be held liable for any damages arising from the use of this software.
-    Permission is granted to anyone to use this software for any purpose,
-    including commercial applications, and to alter it and redistribute it freely,
-    subject to the following restrictions:
-
-    1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
-    2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
-    3. This notice may not be removed or altered from any source distribution.
 */
 #include "stdafx.h"
 #include "MsgPack.h"
@@ -225,11 +214,11 @@ namespace MsgPack {
     }
 
     uint32_t Header::getSizeInBytes() const {
-        return getHeaderLength()+getEndPos();
+		return static_cast<uint32_t>(getHeaderLength() + getEndPos());
     }
 
     uint32_t Header::getLength() const {
-        return getEndPos();
+		return static_cast<uint32_t>(getEndPos());
     }
 
 
@@ -254,7 +243,7 @@ namespace MsgPack {
             int64_t dataLen = getEndPos();
             if(dataLen > 0) {
                 if(!data)
-                    data.reset(new uint8_t[dataLen]);
+					data.reset(new uint8_t[static_cast<uint32_t>(dataLen)]);
 
                 bytes = std::min(bytes, (std::streamsize)(dataLen-pos));
                 bytes = streamBuffer->sgetn(data.get()+pos, bytes);
@@ -313,7 +302,7 @@ namespace MsgPack {
     }
 
     void Binary::toJSON(std::ostream& stream) const {
-        uint32_t len = getEndPos();
+		uint32_t len = static_cast<uint32_t>(getEndPos());
         stream << "< Buffer length=" << len << " data: ";
         for(uint32_t i = 0; i < len; i ++)
             stream << (uint16_t)data[i] << " ";
@@ -405,7 +394,7 @@ namespace MsgPack {
     }
 
     void Extended::toJSON(std::ostream& stream) const {
-        uint32_t len = getEndPos();
+		uint32_t len = static_cast<uint32_t>(getEndPos());
         stream << "< Extended type=" << (uint16_t)data[0];
         stream << " length=" << (len-1) << " data: ";
         for(uint32_t i = 1; i < len; i ++)
@@ -422,7 +411,7 @@ namespace MsgPack {
     }
 
     uint32_t Extended::getLength() const {
-        return getEndPos()-1;
+		return static_cast<uint32_t>(getEndPos() - 1);
     }
 
 
@@ -494,7 +483,7 @@ namespace MsgPack {
     }
 
     std::string String::stdString() const {
-        return std::string(reinterpret_cast<const char*>(data.get()), getEndPos());
+		return std::string(reinterpret_cast<const char*>(data.get()), static_cast<std::basic_string<char>::size_type>(getEndPos()));
     }
 
     std::unique_ptr<Element> Factory(const char* str) {
@@ -509,16 +498,16 @@ namespace MsgPack {
 
     Number::Number(uint64_t value) {
         if(value < 0x80ULL)
-            data[0] = value;
+			data[0] = static_cast<uint8_t>(value);
         else if(value <= 0xFFULL) {
             data[0] = Type::UINT_8;
-            storeUint8(data+1, value);
+			storeUint8(data + 1, static_cast<uint8_t>(value));
         }else if(value <= 0xFFFFULL) {
             data[0] = Type::UINT_16;
-            storeUint16(data+1, value);
+			storeUint16(data + 1, static_cast<uint16_t>(value));
         }else if(value <= 0xFFFFFFFFULL) {
             data[0] = Type::UINT_32;
-            storeUint32(data+1, value);
+			storeUint32(data + 1, static_cast<uint32_t>(value));
         }else{
             data[0] = Type::UINT_64;
             storeUint64(data+1, value);
@@ -527,16 +516,16 @@ namespace MsgPack {
 
     Number::Number(int64_t value) {
         if(value >= -0x20LL && value < 0x80LL)
-            storeInt8(data, value);
+			storeInt8(data, static_cast<int8_t>(value));
         else if(value >= -0x80LL && value < 0x80LL) {
             data[0] = Type::INT_8;
-            storeInt8(data+1, value);
+			storeInt8(data + 1, static_cast<int8_t>(value));
         }else if(value >= -0x8000LL && value < 0x8000LL) {
             data[0] = Type::INT_16;
-            storeInt16(data+1, value);
+			storeInt16(data + 1, static_cast<int16_t>(value));
         }else if(value >= -0x80000000LL && value < 0x80000000LL) {
             data[0] = Type::INT_32;
-            storeInt32(data+1, value);
+			storeInt32(data + 1, static_cast<int32_t>(value));
         }else{
             data[0] = Type::INT_64;
             storeInt64(data+1, value);
@@ -701,7 +690,7 @@ namespace MsgPack {
     }
 
     uint32_t ArrayHeader::getSizeInBytes() const {
-        return getHeaderLength();
+		return static_cast<uint32_t>(getHeaderLength());
     }
 
 
@@ -751,7 +740,7 @@ namespace MsgPack {
     }
 
     uint32_t MapHeader::getSizeInBytes() const {
-        return getHeaderLength();
+		return static_cast<uint32_t>(getHeaderLength());
     }
 
 
@@ -792,7 +781,7 @@ namespace MsgPack {
         uint32_t len = elements.size();
         for(uint32_t i = 1; i < len; i ++)
             size += elements[i]->getSizeInBytes();
-        return size;
+		return static_cast<uint32_t>(size);
     }
 
 
@@ -825,9 +814,9 @@ namespace MsgPack {
             elements[1]->toJSON(stream);
             for(uint64_t i = 2; i < len; i += 2) {
                 stream << ", ";
-                elements[i]->toJSON(stream);
+				elements[static_cast<std::vector<void*>::size_type>(i)]->toJSON(stream);
                 stream << ": ";
-                elements[i+1]->toJSON(stream);
+				elements[static_cast<std::vector<void*>::size_type>(i + 1)]->toJSON(stream);
             }
         }
         stream << "}";
@@ -838,7 +827,7 @@ namespace MsgPack {
         uint32_t len = elements.size();
         for(uint32_t i = 1; i < len; i ++)
             size += elements[i]->getSizeInBytes();
-        return size;
+		return static_cast<uint32_t>(size);
     }
 
 
@@ -892,7 +881,8 @@ namespace MsgPack {
                     //Container is not done yet. move to next element
                     int64_t pos = ++ stackPointer->second;
                     stackPointer = &stack[++ stackIndex];
-                    stackPointer->first = (container->begin()+pos)->get();
+					_w64 int c = 1;
+                    stackPointer->first = (container->begin()+static_cast<_w64 int>(pos))->get();
                     stackPointer->second = stackPointer->first->startSerialize();
                     stackIndex ++;
                     break;
@@ -1008,7 +998,7 @@ namespace MsgPack {
                 //Put element in parent container
                 if(stack.size() > 0) {
                     std::vector<std::unique_ptr<Element>>* container = stackPointer->first->getContainer();
-                    *(container->begin()+stackPointer->second) = std::move(std::unique_ptr<Element>(element));
+                    *(container->begin()+static_cast<_w64 int>(stackPointer->second)) = std::move(std::unique_ptr<Element>(element));
                 }else
                     rootElement.reset(element);
 

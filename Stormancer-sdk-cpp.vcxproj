@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="packages\cpprestsdk.2.4.0.1\build\native\cpprestsdk.props" Condition="Exists('packages\cpprestsdk.2.4.0.1\build\native\cpprestsdk.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -38,7 +39,9 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Label="UserMacros">
+    <NuGetPackageImportStamp>b8eed755</NuGetPackageImportStamp>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
@@ -52,6 +55,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(ProjectPath);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -80,15 +84,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApiClient.h" />
-    <ClInclude Include="Core\ISerializer.h" />
-    <ClInclude Include="Infrastructure\MsgPackSerializer.h" />
+    <ClInclude Include="Client.h" />
+    <ClInclude Include="Configuration\ClientConfiguration.h" />
+    <ClInclude Include="Helpers.h" />
     <ClInclude Include="MsgPack\Container.h" />
     <ClInclude Include="MsgPack\ContainerHeader.h" />
     <ClInclude Include="MsgPack\Data.h" />
     <ClInclude Include="MsgPack\Element.h" />
     <ClInclude Include="MsgPack\Header.h" />
     <ClInclude Include="MsgPack\MsgPack.h" />
-    <ClInclude Include="MsgPack\MsgPackSocket.h" />
     <ClInclude Include="MsgPack\Number.h" />
     <ClInclude Include="MsgPack\Primitive.h" />
     <ClInclude Include="MsgPack\StreamManager.h" />
@@ -97,15 +101,28 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ApiClient.cpp" />
-    <ClCompile Include="Infrastructure\MsgPackSerializer.cpp" />
+    <ClCompile Include="Client.cpp" />
+    <ClCompile Include="Configuration\ClientConfiguration.cpp" />
+    <ClCompile Include="Helpers.cpp" />
     <ClCompile Include="MsgPack\MsgPack.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Stormancer-sdk-cpp.cpp" />
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="packages\cpprestsdk.2.4.0.1\build\native\cpprestsdk.targets" Condition="Exists('packages\cpprestsdk.2.4.0.1\build\native\cpprestsdk.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\cpprestsdk.2.4.0.1\build\native\cpprestsdk.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\cpprestsdk.2.4.0.1\build\native\cpprestsdk.props'))" />
+    <Error Condition="!Exists('packages\cpprestsdk.2.4.0.1\build\native\cpprestsdk.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\cpprestsdk.2.4.0.1\build\native\cpprestsdk.targets'))" />
+  </Target>
 </Project>

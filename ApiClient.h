@@ -1,18 +1,18 @@
 #pragma once
-
 #include <iostream>
+#include "Configuration/ClientConfiguration.h"
 
-class Configuration{};
-class ITokenHandler{};
-
-class ApiClient
+namespace Stormancer
 {
-public:
-	ApiClient(Configuration config, ITokenHandler tokenHandler);
-	~ApiClient();
+	//class ApiClient
+	//{
+	//public:
+	//	ApiClient(Configuration config, ITokenHandler tokenHandler);
+	//	~ApiClient();
 
-private:
-	Configuration _config;
-	const std::string _createTokenUri;
-	const ITokenHandler _tokenHandler;
+	//private:
+	//	ClientConfiguration _config;
+	//	const std::string _createTokenUri;
+	//	const ITokenHandler _tokenHandler;
+	//};
 };

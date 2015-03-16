@@ -31,15 +31,6 @@
     <ClInclude Include="ApiClient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Core\ISerializer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Infrastructure\MsgPackSerializer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MsgPack\MsgPackSocket.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MsgPack\MsgPack.h">
       <Filter>MsgPack</Filter>
     </ClInclude>
@@ -67,22 +58,40 @@
     <ClInclude Include="MsgPack\ContainerHeader.h">
       <Filter>MsgPack</Filter>
     </ClInclude>
+    <ClInclude Include="Configuration\ClientConfiguration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Client.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Stormancer-sdk-cpp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ApiClient.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Infrastructure\MsgPackSerializer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MsgPack\MsgPack.cpp">
       <Filter>MsgPack</Filter>
     </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Configuration\ClientConfiguration.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Client.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Helpers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
