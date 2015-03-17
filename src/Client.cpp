@@ -1,7 +1,4 @@
-#include "stdafx.h"
 #include "Client.h"
-#include <list>
-#include <map>
 #include "Helpers.h"
 
 namespace Stormancer

@@ -1,6 +1,4 @@
-#include "stdafx.h"
 #include "Helpers.h"
-#include <sstream>
 
 namespace Stormancer
 {

@@ -1,5 +1,5 @@
 #pragma once
-#include <iostream>
+#include "stdafx.h"
 #include "Configuration/ClientConfiguration.h"
 
 namespace Stormancer

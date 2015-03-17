@@ -1,10 +1,6 @@
 #include "stdafx.h"
-#include <iostream>
-#include <cpprest/http_client.h>
-#include <cpprest/filestream.h>
 #include "MsgPack/MsgPack.h"
-#include "Configuration/ClientConfiguration.h"
-#include "Client.h"
+#include "Stormancer.h"
 
 using namespace Stormancer;
 
@@ -31,11 +27,11 @@ void testMsgPack()
 	serializer << MsgPack__Factory(ArrayHeader(0));
 	serializer << MsgPack::Factory("Hello World!");
 
-	//serializer << MsgPack__Factory(MapHeader(2));
-	//serializer << MsgPack::Factory("type");
-	//serializer << MsgPack::Factory("post");
-	//serializer << MsgPack::Factory("message");
-	//serializer << MsgPack::Factory("Hello World!");
+	serializer << MsgPack__Factory(MapHeader(2));
+	serializer << MsgPack::Factory("type");
+	serializer << MsgPack::Factory("post");
+	serializer << MsgPack::Factory("message");
+	serializer << MsgPack::Factory("Hello World!");
 
 	std::cout << "SERIALIZED: " << stream.str() << std::endl;
 

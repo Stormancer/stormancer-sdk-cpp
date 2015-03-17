@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "ApiClient.h"
 
 namespace Stormancer

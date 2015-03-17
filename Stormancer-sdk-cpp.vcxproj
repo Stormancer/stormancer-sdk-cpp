@@ -86,7 +86,20 @@
     <ClInclude Include="ApiClient.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="Configuration\ClientConfiguration.h" />
+    <ClInclude Include="Core\ConnectionState.h" />
+    <ClInclude Include="Core\ILogger.h" />
+    <ClInclude Include="Core\IScene.h" />
+    <ClInclude Include="Core\PacketReliability.h" />
+    <ClInclude Include="Core\IConnection.h" />
+    <ClInclude Include="Core\ISerializer.h" />
+    <ClInclude Include="Core\Models\RouteDto.h" />
+    <ClInclude Include="Core\Models\stdafx.h" />
+    <ClInclude Include="Core\PacketPriority.h" />
+    <ClInclude Include="Core\stdafx.h" />
+    <ClInclude Include="typedef.h" />
     <ClInclude Include="Helpers.h" />
+    <ClInclude Include="Infrastructure\MsgPackSerializer.h" />
+    <ClInclude Include="Infrastructure\stdafx.h" />
     <ClInclude Include="MsgPack\Container.h" />
     <ClInclude Include="MsgPack\ContainerHeader.h" />
     <ClInclude Include="MsgPack\Data.h" />
@@ -95,15 +108,22 @@
     <ClInclude Include="MsgPack\MsgPack.h" />
     <ClInclude Include="MsgPack\Number.h" />
     <ClInclude Include="MsgPack\Primitive.h" />
+    <ClInclude Include="MsgPack\stdafx.h" />
     <ClInclude Include="MsgPack\StreamManager.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Stormancer.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ApiClient.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="Configuration\ClientConfiguration.cpp" />
+    <ClCompile Include="Core\IConnection.cpp" />
+    <ClCompile Include="Core\ILogger.cpp" />
+    <ClCompile Include="Core\IScene.cpp" />
+    <ClCompile Include="Core\ISerializer.cpp" />
     <ClCompile Include="Helpers.cpp" />
+    <ClCompile Include="Infrastructure\MsgPackSerializer.cpp" />
     <ClCompile Include="MsgPack\MsgPack.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -112,6 +132,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".gitignore" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
