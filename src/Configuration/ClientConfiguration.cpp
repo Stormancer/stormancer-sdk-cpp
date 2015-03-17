@@ -1,8 +1,12 @@
-#include "stdafx.h"
-#include "ClientConfiguration.h"
+#include "Configuration/ClientConfiguration.h"
 
 namespace Stormancer
 {
+	ClientConfiguration ClientConfiguration::forAccount(std::string account, std::string application)
+	{
+		return ClientConfiguration(account, application, false);
+	}
+
 	ClientConfiguration::ClientConfiguration()
 		: isLocalDev(false)
 	{
@@ -17,12 +21,5 @@ namespace Stormancer
 
 	ClientConfiguration::~ClientConfiguration()
 	{
-	}
-
-	ClientConfiguration ClientConfiguration::forAccount(std::string account, std::string application)
-	{
-		ClientConfiguration config = ClientConfiguration(account, application);
-		config.isLocalDev = false;
-		return config;
 	}
 };

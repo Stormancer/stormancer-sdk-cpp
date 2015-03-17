@@ -1,22 +1,23 @@
 #pragma once
-#include <string>
+#include "stdafx.h"
 
 namespace Stormancer
 {
 	class ClientConfiguration
 	{
-	private:
-
 	public:
-		std::string account;
-		std::string application;
-		std::string serverEndpoint;
-		bool isLocalDev;
-
-		ClientConfiguration();
-		ClientConfiguration(std::string account, std::string application, bool isLocalDev = false);
 		~ClientConfiguration();
 
-		static ClientConfiguration forAccount(std::string account, std::string application);
+		static ClientConfiguration forAccount(string account, string application);
+
+	private:
+		ClientConfiguration();
+		ClientConfiguration(string account, string application, bool isLocalDev = false);
+
+	public:
+		string account;
+		string application;
+		string serverEndpoint;
+		bool isLocalDev;
 	};
 };

@@ -1,6 +1,6 @@
 #include "stdafx.h"
-#include "MsgPack/MsgPack.h"
-#include "Stormancer.h"
+#include <MsgPack.h>
+#include <stormancer>
 
 using namespace Stormancer;
 
@@ -8,13 +8,35 @@ int _tmain(int argc, _TCHAR* argv[])
 {
 	//testMsgPack();
 
-	auto config = ClientConfiguration("test", "echo");
+	testClient();
+
+	return 0;
+}
+
+void testClient()
+{
+	auto config = ClientConfiguration::forAccount("test", "echo");
 	config.serverEndpoint = "http://localhost:8081";
 
 	auto client = new Client(config);
-	//client.getPublicScene("test-scene", "hello").then
+	/*auto task = client.getPublicScene("test-scene", "hello").then([&](t) {
+	auto scene = t.result;
+	scene.addRoute("echo.out", [&](p) {
+	cout << p.readObject<string>() << endl;
+	});
 
-	return 0;
+	scene.connect().then([&](t2) {
+	if (t2.isCompleted)
+	{
+	scene.send("echo.in", "hello");
+	}
+	else
+	{
+	cout << "Bad stuff happened..." << endl;
+	}
+	});
+	});
+	task.Wait();*/
 }
 
 void testMsgPack()

@@ -1,6 +1,9 @@
 #pragma once
 #include "stdafx.h"
 #include "Configuration/ClientConfiguration.h"
+#include "Core/ISerializer.h"
+#include "ApiClient.h"
+#include "Infrastructure/ITokenHandler.h"
 
 namespace Stormancer
 {
@@ -13,10 +16,10 @@ namespace Stormancer
 		void initialize();
 
 	private:
-		std::map<std::string, ISerializer&> _serializers;
-		std::map<std::string, std::string> _metadata;
-		std::string _accountId;
-		std::string _applicationName;
+		map<string, ISerializer&> _serializers;
+		map<string, string> _metadata;
+		string _accountId;
+		string _applicationName;
 		ApiClient _apiClient;
 		ItokenHandler _tokenHandler;
 		_transport;
