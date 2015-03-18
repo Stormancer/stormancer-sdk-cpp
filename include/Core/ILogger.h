@@ -28,6 +28,6 @@ namespace Stormancer
 		virtual ~ILogger();
 
 		// Logs a string message
-		virtual void Log(LogLevel level, string category, string message, string data);
+		virtual void Log(LogLevel level, string category, string message, string data) = 0;
 	};
 };

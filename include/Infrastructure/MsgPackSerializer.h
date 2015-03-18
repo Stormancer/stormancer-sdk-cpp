@@ -9,8 +9,8 @@ namespace Stormancer
 		MsgPackSerializer();
 		~MsgPackSerializer();
 
-		std::string serialize(std::string data);
+		string serialize(string data);
 
-		std::string deserialize(std::string bytes);
+		string deserialize(string bytes);
 	};
 };

@@ -1,12 +1,13 @@
 #pragma once
 #include "stdafx.h"
+#include "IPacketDispatcher.h"
 
 namespace Stormancer
 {
-	class ClassName
+	class DefaultPacketDispatcher : public IPacketDispatcher
 	{
 	public:
-		ClassName();
-		virtual ~ClassName();
+		DefaultPacketDispatcher();
+		virtual ~DefaultPacketDispatcher();
 	};
 };

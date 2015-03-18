@@ -3,10 +3,10 @@
 
 namespace Stormancer
 {
-	class ClassName
+	class ITransport
 	{
 	public:
-		ClassName();
-		virtual ~ClassName();
+		ITransport();
+		virtual ~ITransport();
 	};
 };

@@ -1,12 +1,12 @@
-#include "ClassName.h"
+#include "Infrastructure/DefaultPacketDispatcher.h"
 
 namespace Stormancer
 {
-	ClassName::ClassName()
+	DefaultPacketDispatcher::DefaultPacketDispatcher()
 	{
 	}
 
-	ClassName::~ClassName()
+	DefaultPacketDispatcher::~DefaultPacketDispatcher()
 	{
 	}
 };

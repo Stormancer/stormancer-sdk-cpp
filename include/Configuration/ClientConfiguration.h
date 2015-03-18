@@ -1,5 +1,8 @@
 #pragma once
 #include "stdafx.h"
+#include "Infrastructure/IPacketDispatcher.h"
+#include "ITransport.h"
+#include "Core/ISerializer.h"
 
 namespace Stormancer
 {
@@ -12,12 +15,18 @@ namespace Stormancer
 
 	private:
 		ClientConfiguration();
-		ClientConfiguration(string account, string application, bool isLocalDev = false);
+		ClientConfiguration(string account = "", string application = "");
 
 	public:
 		string account;
 		string application;
 		string serverEndpoint;
 		bool isLocalDev;
+		IPacketDispatcher dispatcher;
+		ITransport transport;
+		list<ISerializer> serializers;
+		list<IClientPlugin> plugins;
+		uint16 maxPeers;
+		ILogger& logger;
 	};
 };

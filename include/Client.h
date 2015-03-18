@@ -21,7 +21,7 @@ namespace Stormancer
 		string _accountId;
 		string _applicationName;
 		ApiClient _apiClient;
-		ItokenHandler _tokenHandler;
+		ITokenHandler _tokenHandler;
 		_transport;
 		_dispatcher;
 		_requestProcessor;

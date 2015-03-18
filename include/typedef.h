@@ -9,3 +9,4 @@ using uint32 = uint32_t;
 using uint64 = uint64_t;
 
 using StringMap = map < string, string > ;
+using AnyMap = map < string, void* > ;

@@ -1,12 +1,18 @@
 #pragma once
 #include "stdafx.h"
+#include "ITransport.h"
+#include "Core/ILogger.h"
 
 namespace Stormancer
 {
-	class ClassName
+	class RaknetTransport : public ITransport
 	{
 	public:
-		ClassName();
-		virtual ~ClassName();
+		RaknetTransport(ILogger& logger);
+		virtual ~RaknetTransport();
+
+	private:
+		ILogger& _logger;
 	};
+
 };

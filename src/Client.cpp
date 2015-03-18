@@ -1,5 +1,6 @@
 #include "Client.h"
 #include "Helpers.h"
+#include "Infrastructure/ITokenHandler.h"
 
 namespace Stormancer
 {

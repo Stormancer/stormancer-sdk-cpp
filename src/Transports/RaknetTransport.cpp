@@ -1,12 +1,13 @@
-#include "ClassName.h"
+#include "Transports/RaknetTransport.h"
 
 namespace Stormancer
 {
-	ClassName::ClassName()
+	RaknetTransport::RaknetTransport(ILogger& logger)
+		: _logger(logger)
 	{
 	}
 
-	ClassName::~ClassName()
+	RaknetTransport::~RaknetTransport()
 	{
 	}
 };
