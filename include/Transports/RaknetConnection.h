@@ -1,12 +1,12 @@
 #pragma once
-#include "stdafx.h"
+#include "libs.h"
 
 namespace Stormancer
 {
-	class ClassName
+	class RaknetConnection
 	{
 	public:
-		ClassName();
-		virtual ~ClassName();
+		RaknetConnection();
+		virtual ~RaknetConnection();
 	};
 };

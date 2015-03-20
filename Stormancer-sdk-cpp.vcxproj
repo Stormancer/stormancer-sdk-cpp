@@ -50,7 +50,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -68,7 +68,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -127,6 +127,7 @@
     <ClInclude Include="include\Infrastructure\Modules\IModule.h" />
     <ClInclude Include="include\Infrastructure\MsgPackSerializer.h" />
     <ClInclude Include="include\Infrastructure\stdafx.h" />
+    <ClInclude Include="include\Infrastructure\TokenHandler.h" />
     <ClInclude Include="include\IPacketProcessor.h" />
     <ClInclude Include="include\IRequest.h" />
     <ClInclude Include="include\ITransport.h" />
@@ -144,12 +145,11 @@
     <ClInclude Include="include\Scene.h" />
     <ClInclude Include="include\SceneEndpoint.h" />
     <ClInclude Include="include\ScenePeer.h" />
-    <ClInclude Include="include\stdafx.h" />
+    <ClInclude Include="include\libs.h" />
     <ClInclude Include="include\SystemMessages\ConnectedToSceneMsg.h" />
     <ClInclude Include="include\SystemMessages\ConnectionResult.h" />
     <ClInclude Include="include\SystemMessages\SceneInfosDto.h" />
     <ClInclude Include="include\SystemMessages\SceneInfosRequestDto.h" />
-    <ClInclude Include="include\targetver.h" />
     <ClInclude Include="include\Transports\RaknetConnection.h" />
     <ClInclude Include="include\Transports\RaknetTransport.h" />
     <ClInclude Include="include\typedef.h" />
@@ -204,6 +204,7 @@
     <ClCompile Include="src\Infrastructure\ITokenHandler.cpp" />
     <ClCompile Include="src\Infrastructure\Modules\IModule.cpp" />
     <ClCompile Include="src\Infrastructure\MsgPackSerializer.cpp" />
+    <ClCompile Include="src\Infrastructure\TokenHandler.cpp" />
     <ClCompile Include="src\IPacketProcessor.cpp" />
     <ClCompile Include="src\IRequest.cpp" />
     <ClCompile Include="src\ITransport.cpp" />
@@ -221,7 +222,6 @@
     <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\SceneEndpoint.cpp" />
     <ClCompile Include="src\ScenePeer.cpp" />
-    <ClCompile Include="src\stdafx.cpp" />
     <ClCompile Include="src\Transports\RaknetConnection.cpp" />
     <ClCompile Include="src\Transports\RaknetTransport.cpp" />
   </ItemGroup>

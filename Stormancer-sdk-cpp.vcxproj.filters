@@ -100,12 +100,6 @@
     <ClInclude Include="include\Helpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\targetver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\typedef.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -277,6 +271,12 @@
     <ClInclude Include="include\Plugins\RpcService.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Infrastructure\TokenHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\libs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MsgPack\MsgPack.cpp">
@@ -310,9 +310,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Configuration\ClientConfiguration.cpp">
@@ -418,6 +415,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Plugins\RpcService.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Infrastructure\TokenHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

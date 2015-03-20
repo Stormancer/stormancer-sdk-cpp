@@ -1,3 +1,4 @@
+#include "libs.h"
 #include "ClassName.h"
 
 namespace Stormancer

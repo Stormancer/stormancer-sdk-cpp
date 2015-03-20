@@ -27,7 +27,7 @@ Stormancer-sdk-cpp.cpp
 /////////////////////////////////////////////////////////////////////////////
 Other standard files:
 
-StdAfx.h, StdAfx.cpp
+libs.h, StdAfx.cpp
     These files are used to build a precompiled header (PCH) file
     named Stormancer-sdk-cpp.pch and a precompiled types file named StdAfx.obj.
 

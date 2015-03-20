@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "libs.h"
 #include "ISerializer.h"
 
 namespace Stormancer

@@ -1,7 +1,7 @@
 /*
     Copyright 2014 Alexander Meißner (lichtso@gamefortec.net)
 */
-#include "stdafx.h"
+#include "libs.h"
 #include "MsgPack.h"
 
 #ifdef WIN32

@@ -1,9 +1,10 @@
 #pragma once
-#include "stdafx.h"
+#include "libs.h"
 #include "Configuration/ClientConfiguration.h"
 #include "Core/ISerializer.h"
 #include "ApiClient.h"
 #include "Infrastructure/ITokenHandler.h"
+#include "IConnectionManager.h"
 
 namespace Stormancer
 {
@@ -12,25 +13,14 @@ namespace Stormancer
 	private:
 		class ConnectionHandler : public IConnectionManager
 		{
+		public:
+			uint64 generateNewConnectionId();
+			void newConnection(shared_ptr<IConnection*> connection);
+			shared_ptr<IConnection*> getConnection(uint64 id);
+			void closeConnection(shared_ptr<IConnection*>, string reason);
+
 		private:
 			uint64 _current = 0;
-			uint64 generateNewConnectionId()
-			{
-				// TODO
-				return _current++;
-			}
-			void newConnection(IConnection& connection)
-			{
-
-			}
-			IConnection& getConnection(uint64 id)
-			{
-				throw new exception("Not Implemented");
-			}
-			void closeConnection(IConnection& connection, string reason)
-			{
-
-			}
 		};
 
 	public:
@@ -38,16 +28,21 @@ namespace Stormancer
 		~Client();
 
 		void initialize();
+		string applicationName();
 
 	private:
+		const ApiClient _apiClient;
+		const string _accountId;
+		const string _applicationName;
+		const PluginBuildContext _pluginCtx;
+		shared_ptr<IConnection*> _serverConnection;
+		shared_ptr<ITransport*> _transport;
+		shared_ptr<IPacketDispatcher*> _dispatcher;
+		bool _initialized;
+		shared_ptr<ITokenHandler*> _tokenHandler;
+		map<string, TaskCompletionSource<bool>> _pendingTasksTcs;
 		map<string, ISerializer&> _serializers;
 		map<string, string> _metadata;
-		string _accountId;
-		string _applicationName;
-		ApiClient _apiClient;
-		ITokenHandler _tokenHandler;
-		_transport;
-		_dispatcher;
 		_requestProcessor;
 		_scenesDispatcher;
 		_maxPeers;

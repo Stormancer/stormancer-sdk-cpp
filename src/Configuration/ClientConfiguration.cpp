@@ -1,3 +1,4 @@
+#include "libs.h"
 #include "Configuration/ClientConfiguration.h"
 #include "Infrastructure/MsgPackSerializer.h"
 #include "Infrastructure/DefaultPacketDispatcher.h"

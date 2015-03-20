@@ -1,12 +1,13 @@
-#include "ClassName.h"
+#include "libs.h"
+#include "SceneEndpoint.h"
 
 namespace Stormancer
 {
-	ClassName::ClassName()
+	SceneEndpoint::SceneEndpoint()
 	{
 	}
 
-	ClassName::~ClassName()
+	SceneEndpoint::~SceneEndpoint()
 	{
 	}
 };

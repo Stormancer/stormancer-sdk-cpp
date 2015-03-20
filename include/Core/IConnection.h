@@ -1,5 +1,5 @@
 #pragma once
-#include "stdafx.h"
+#include "libs.h"
 #include "ConnectionState.h"
 #include "PacketPriority.h"
 #include "PacketReliability.h"

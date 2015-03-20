@@ -1,13 +1,41 @@
+#include "libs.h"
 #include "Client.h"
 #include "Helpers.h"
 #include "Infrastructure/ITokenHandler.h"
+#include "Infrastructure/TokenHandler.h"
 
 namespace Stormancer
 {
-	Client::Client(ClientConfiguration config)
+	// ConnectionHandler
+
+	uint64 Client::ConnectionHandler::generateNewConnectionId()
+	{
+		// TODO
+		return _current++;
+	}
+
+	void Client::ConnectionHandler::newConnection(shared_ptr<IConnection*> connection)
+	{
+		throw new exception("Not Implemented");
+	}
+
+	shared_ptr<IConnection*> Client::ConnectionHandler::getConnection(uint64 id)
+	{
+		throw new exception("Not Implemented");
+	}
+
+	void Client::ConnectionHandler::closeConnection(shared_ptr<IConnection*> connection, string reason)
+	{
+		throw new exception("Not Implemented");
+	}
+
+
+	// Client
+
+	Client::Client(ClientConfiguration& config)
 		: _accountId(config.account),
 		_applicationName(config.application),
-		_tokenHandler(TokenHandler()),
+		_tokenHandler(make_shared<ITokenHandler*>(new TokenHandler())),
 		_apiClient(ApiClient(config, _tokenHandler)),
 		_transport(config.transport),
 		_dispatcher(config.dispatcher),
@@ -31,5 +59,15 @@ namespace Stormancer
 
 	Client::~Client()
 	{
+	}
+
+	void Client::initialize()
+	{
+
+	}
+
+	string Client::applicationName()
+	{
+		return _applicationName;
 	}
 };

@@ -1,3 +1,4 @@
+#include "libs.h"
 #include "Helpers.h"
 
 namespace Stormancer
@@ -5,9 +6,9 @@ namespace Stormancer
 	namespace Helpers
 	{
 		template<typename T>
-		std::vector<std::string> mapKeys(std::map<std::string, T> map)
+		vector<string> mapKeys(map<string, T> map)
 		{
-			auto vec = std::vector<std::string>();
+			auto vec = vector<string>();
 			for (auto it = map.begin(); it != map.end(); ++it)
 			{
 				vec.push_back(it->first);
@@ -15,9 +16,15 @@ namespace Stormancer
 			return vec;
 		}
 
-		std::string vectorJoin(std::vector<std::string> vector, std::string glue)
+		template<typename T, typename U>
+		bool mapContains(map<T, U> map, T& key)
 		{
-			std::stringstream ss;
+			return (map.find(key) != map.end) ? true : false;
+		}
+
+		string vectorJoin(vector<string> vector, string glue)
+		{
+			stringstream ss;
 			for (size_t i = 0; i < vector.size(); ++i)
 			{
 				if (i != 0)
@@ -50,6 +57,11 @@ namespace Stormancer
 		StringFormat::operator string() const
 		{
 			return stream.str();
+		}
+
+		StringFormat::operator const char*() const
+		{
+			return stream.str().c_str();
 		}
 	};
 };

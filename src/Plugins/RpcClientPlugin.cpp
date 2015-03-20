@@ -1,3 +1,4 @@
+#include "libs.h"
 #include "Plugins/RpcClientPlugin.h"
 #include "Helpers.h"
 #include "Plugins/RpcService.h"

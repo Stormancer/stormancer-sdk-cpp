@@ -1,3 +1,4 @@
+#include "libs.h"
 #include "IConnection.h"
 
 namespace Stormancer

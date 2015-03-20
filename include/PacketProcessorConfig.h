@@ -1,5 +1,5 @@
 #pragma once
-#include "stdafx.h"
+#include "libs.h"
 #include "Core/Packet.h"
 #include "IPacketProcessor.h"
 

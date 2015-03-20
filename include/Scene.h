@@ -1,5 +1,6 @@
 #pragma once
-#include "stdafx.h"
+#include "libs.h"
+#include "Core/IScene.h"
 
 namespace Stormancer
 {

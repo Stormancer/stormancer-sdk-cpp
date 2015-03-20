@@ -1,5 +1,5 @@
 #pragma once
-#include "stdafx.h"
+#include "libs.h"
 
 namespace Stormancer
 {
@@ -18,5 +18,5 @@ namespace Stormancer
 		// The packets arrive at destination in order. If a packet arrive out of order, it is ignored.
 		// That mean that packets may disappear, but the last one always reach destination.
 		RELIABLE_SEQUENCED = 4
-	}
+	};
 };

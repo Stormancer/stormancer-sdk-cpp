@@ -1,5 +1,5 @@
 #pragma once
-#include "stdafx.h"
+#include "libs.h"
 #include "Configuration/ClientConfiguration.h"
 #include "Infrastructure/ITokenHandler.h"
 
