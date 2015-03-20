@@ -1,12 +1,12 @@
-#include "ClassName.h"
+#include "IConnectionManager.h"
 
 namespace Stormancer
 {
-	ClassName::ClassName()
+	IConnectionManager::IConnectionManager()
 	{
 	}
 
-	ClassName::~ClassName()
+	IConnectionManager::~IConnectionManager()
 	{
 	}
 };

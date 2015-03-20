@@ -265,6 +265,18 @@
     <ClInclude Include="include\Plugins\IClientPlugin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\PacketProcessorConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Plugins\RpcClientPlugin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Plugins\RpcRequestContext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Plugins\RpcService.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MsgPack\MsgPack.cpp">
@@ -394,6 +406,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ScenePeer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PacketProcessorConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Plugins\RpcClientPlugin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Plugins\RpcRequestContext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Plugins\RpcService.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

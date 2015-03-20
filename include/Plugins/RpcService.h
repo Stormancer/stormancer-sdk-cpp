@@ -1,0 +1,18 @@
+#pragma once
+#include "stdafx.h"
+#include "Scene.h"
+
+namespace Stormancer
+{
+	class RpcService
+	{
+	public:
+		RpcService(Scene& scene);
+		virtual ~RpcService();
+
+		// TODO
+
+	private:
+		const Scene& _scene;
+	};
+};

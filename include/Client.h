@@ -9,8 +9,32 @@ namespace Stormancer
 {
 	class Client
 	{
+	private:
+		class ConnectionHandler : public IConnectionManager
+		{
+		private:
+			uint64 _current = 0;
+			uint64 generateNewConnectionId()
+			{
+				// TODO
+				return _current++;
+			}
+			void newConnection(IConnection& connection)
+			{
+
+			}
+			IConnection& getConnection(uint64 id)
+			{
+				throw new exception("Not Implemented");
+			}
+			void closeConnection(IConnection& connection, string reason)
+			{
+
+			}
+		};
+
 	public:
-		Client(ClientConfiguration config);
+		Client(ClientConfiguration& config);
 		~Client();
 
 		void initialize();

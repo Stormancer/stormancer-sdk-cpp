@@ -3,30 +3,32 @@
 #include "Infrastructure/IPacketDispatcher.h"
 #include "ITransport.h"
 #include "Core/ISerializer.h"
+#include "Plugins/IClientPlugin.h"
 
 namespace Stormancer
 {
 	class ClientConfiguration
 	{
 	public:
+		ClientConfiguration(string account, string application);
 		~ClientConfiguration();
 
-		static ClientConfiguration forAccount(string account, string application);
-
-	private:
-		ClientConfiguration();
-		ClientConfiguration(string account = "", string application = "");
+		string getApiEndpoint();
+		ClientConfiguration& metadata(string key, string value);
+		void addPlugin(shared_ptr<IClientPlugin*> plugin);
 
 	public:
 		string account;
-		string application;
 		string serverEndpoint;
-		bool isLocalDev;
-		IPacketDispatcher dispatcher;
+		string application;
+		shared_ptr<IPacketDispatcher*> dispatcher;
 		ITransport transport;
 		list<ISerializer> serializers;
-		list<IClientPlugin> plugins;
 		uint16 maxPeers;
-		ILogger& logger;
+		list<shared_ptr<IClientPlugin*>> plugins;
+
+	private:
+		const string apiEndpoint = "http://localhost:23469/";
+		StringMap _metadata;
 	};
 };

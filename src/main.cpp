@@ -4,7 +4,7 @@
 
 using namespace Stormancer;
 
-int _tmain(int argc, _TCHAR* argv[])
+int main(int argc, char* argv[])
 {
 	//testMsgPack();
 
@@ -15,10 +15,10 @@ int _tmain(int argc, _TCHAR* argv[])
 
 void testClient()
 {
-	auto config = ClientConfiguration::forAccount("test", "echo");
+	ClientConfiguration config("test", "echo");
 	config.serverEndpoint = "http://localhost:8081";
 
-	auto client = new Client(config);
+	Client client(config);
 	/*auto task = client.getPublicScene("test-scene", "hello").then([&](t) {
 	auto scene = t.result;
 	scene.addRoute("echo.out", [&](p) {
@@ -41,7 +41,7 @@ void testClient()
 
 void testMsgPack()
 {
-	std::stringbuf stream = std::stringbuf();
+	byteStream stream;
 	MsgPack::Serializer serializer = MsgPack::Serializer(&stream);
 
 	serializer << MsgPack__Factory(ArrayHeader(3)); //Next 3 elements belong in this array
@@ -55,33 +55,33 @@ void testMsgPack()
 	serializer << MsgPack::Factory("message");
 	serializer << MsgPack::Factory("Hello World!");
 
-	std::cout << "SERIALIZED: " << stream.str() << std::endl;
+	cout << "SERIALIZED: " << stream.str() << endl;
 
-	//stream = std::stringbuf(stream.str());
+	//stream = stringbuf(stream.str());
 	MsgPack::Deserializer deserializer = MsgPack::Deserializer(&stream);
 
-	std::cout << "DESERIALIZED: ";
+	cout << "DESERIALIZED: ";
 
-	std::unique_ptr<MsgPack::Element> element;
+	unique_ptr<MsgPack::Element> element;
 
 	deserializer >> element;
 
-	std::cout << *element << std::endl;
-	//std::cout << "type: " << (int)element->getType() << std::endl;
-	//element->toJSON(std::cout);
+	cout << *element << endl;
+	//cout << "type: " << (int)element->getType() << endl;
+	//element->toJSON(cout);
 
 	MsgPack::Array& array = dynamic_cast<MsgPack::Array&>(*element);
 	for (int i = 0; i < array.getContainer()->size(); i++)
 	{
-		std::cout << *(array.getContainer()->at(i)) << std::endl;
+		cout << *(array.getContainer()->at(i)) << endl;
 	}
 
 	MsgPack::Primitive& pri = dynamic_cast<MsgPack::Primitive&>(*(array.getContainer()->at(0)));
-	std::cout << pri.getValue() << std::endl;
+	cout << pri.getValue() << endl;
 
 	MsgPack::Array& arr = dynamic_cast<MsgPack::Array&>(*(array.getContainer()->at(1)));
-	std::cout << arr << std::endl;
+	cout << arr << endl;
 
 	MsgPack::String& str = dynamic_cast<MsgPack::String&>(*(array.getContainer()->at(2)));
-	std::cout << str.stdString() << std::endl;
+	cout << str.stdString() << endl;
 }

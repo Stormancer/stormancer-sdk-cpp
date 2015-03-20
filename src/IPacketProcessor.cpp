@@ -1,12 +1,12 @@
-#include "ClassName.h"
+#include "IPacketProcessor.h"
 
 namespace Stormancer
 {
-	ClassName::ClassName()
+	IPacketProcessor::IPacketProcessor()
 	{
 	}
 
-	ClassName::~ClassName()
+	IPacketProcessor::~IPacketProcessor()
 	{
 	}
 };

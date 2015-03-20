@@ -3,10 +3,10 @@
 
 namespace Stormancer
 {
-	class ClassName
+	class IConnectionManager
 	{
 	public:
-		ClassName();
-		virtual ~ClassName();
+		IConnectionManager();
+		virtual ~IConnectionManager();
 	};
 };

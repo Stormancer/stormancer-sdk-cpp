@@ -1,6 +1,7 @@
 #pragma once
 #include "stdafx.h"
 #include "IPacketDispatcher.h"
+#include "IPacketProcessor.h"
 
 namespace Stormancer
 {
@@ -9,5 +10,12 @@ namespace Stormancer
 	public:
 		DefaultPacketDispatcher();
 		virtual ~DefaultPacketDispatcher();
+
+		void dispatchPacket(Packet2 packet);
+		void addProcessor(shared_ptr<IPacketProcessor*> processor);
+
+	private:
+		map<byte, handlerFunction> _handlers;
+		list<processorFunction> _defaultProcessors;
 	};
 };

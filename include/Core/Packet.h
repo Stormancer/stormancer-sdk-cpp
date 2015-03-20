@@ -8,7 +8,7 @@ namespace Stormancer
 	class Packet
 	{
 	public:
-		Packet(T& source, stringbuf& stream, StringMap metadata = AnyMap());
+		Packet(shared_ptr<T*> source, byteStream& stream, StringMap metadata = AnyMap());
 		virtual ~Packet();
 
 		template<typename TData>
@@ -20,8 +20,8 @@ namespace Stormancer
 		void removeMetadata(string key);
 
 	public:
-		stringbuf& stream;
-		T& connection;
+		byteStream& stream;
+		shared_ptr<T*> connection;
 
 	private:
 		AnyMap metadata;
@@ -30,6 +30,6 @@ namespace Stormancer
 	class Packet2 : public Packet < IConnection >
 	{
 	public:
-		Packet2(IConnection& source, stringbuf& stream);
+		Packet2(shared_ptr<IConnection*> source, byteStream& stream);
 	};
 };

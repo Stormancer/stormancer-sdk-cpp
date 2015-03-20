@@ -13,6 +13,7 @@
 
 // standart
 #include <stdint.h>
+#include <streambuf>
 #include <iostream>
 #include <string>
 #include <map>
@@ -22,6 +23,9 @@
 #include <ctime>
 #include <functional>
 #include <iomanip>
+#include <memory>
+#include <future>
+#include <regex>
 
 // libs
 #include <cpprest/http_client.h>

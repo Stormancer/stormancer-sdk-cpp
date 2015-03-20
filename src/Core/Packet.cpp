@@ -5,7 +5,7 @@ namespace Stormancer
 	// Packet
 
 	template<typename T>
-	Packet::Packet(T& source, stringbuf& stream, StringMap metadata)
+	Packet::Packet(shared_ptr<T*> source, byteStream& stream, StringMap metadata)
 		: connection(source),
 		stream(stream),
 		metadata(metadata)
@@ -32,7 +32,6 @@ namespace Stormancer
 	}
 
 	template<typename T>
-	template<typename TData>
 	void Packet::removeMetadata(string key)
 	{
 		auto it = metadata.find(key);
@@ -41,7 +40,7 @@ namespace Stormancer
 
 	// Packet2
 
-	Packet2::Packet2(IConnection& source, stringbuf& stream)
+	Packet2::Packet2(shared_ptr<IConnection*> source, byteStream& stream)
 		: Packet(source, stream)
 	{
 	}

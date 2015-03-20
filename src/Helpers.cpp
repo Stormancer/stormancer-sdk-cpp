@@ -28,5 +28,28 @@ namespace Stormancer
 			}
 			return ss.str();
 		}
+
+		template<typename T>
+		StringFormat& StringFormat::operator << (T data)
+		{
+			stream << data;
+			return *this;
+		}
+
+		template<typename T>
+		void StringFormat::operator >> (T& data)
+		{
+			stream >> data;
+		}
+
+		string StringFormat::str() const
+		{
+			return stream.str();
+		}
+
+		StringFormat::operator string() const
+		{
+			return stream.str();
+		}
 	};
 };
