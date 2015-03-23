@@ -13,22 +13,22 @@ namespace Stormancer
 		ClientConfiguration(string account, string application);
 		~ClientConfiguration();
 
-		string getApiEndpoint();
+		/*string getApiEndpoint();
 		ClientConfiguration& metadata(string key, string value);
-		void addPlugin(shared_ptr<IClientPlugin*> plugin);
+		void addPlugin(shared_ptr<IClientPlugin*> plugin);*/
 
 	public:
 		string account;
-		string serverEndpoint;
 		string application;
+		/*string serverEndpoint;
 		shared_ptr<IPacketDispatcher*> dispatcher;
 		ITransport transport;
 		list<ISerializer> serializers;
 		uint16 maxPeers;
 		list<shared_ptr<IClientPlugin*>> plugins;
 
-	private:
+		private:
 		const string apiEndpoint = "http://localhost:23469/";
-		StringMap _metadata;
+		StringMap _metadata; */
 	};
 };

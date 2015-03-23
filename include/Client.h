@@ -5,6 +5,10 @@
 #include "ApiClient.h"
 #include "Infrastructure/ITokenHandler.h"
 #include "IConnectionManager.h"
+#include "Processors/RequestProcessor.h"
+#include "Processors/SceneDispatcher.h"
+#include "DefaultLogger.h"
+#include "Plugins/PluginBuildContext.h"
 
 namespace Stormancer
 {
@@ -24,11 +28,13 @@ namespace Stormancer
 		};
 
 	public:
-		Client(ClientConfiguration& config);
+		Client(/*ClientConfiguration config*/);
 		~Client();
 
 		void initialize();
 		string applicationName();
+		shared_ptr<ILogger*> logger();
+		void setLogger(shared_ptr<ILogger*> logger);
 
 	private:
 		const ApiClient _apiClient;
@@ -40,11 +46,13 @@ namespace Stormancer
 		shared_ptr<IPacketDispatcher*> _dispatcher;
 		bool _initialized;
 		shared_ptr<ITokenHandler*> _tokenHandler;
-		map<string, TaskCompletionSource<bool>> _pendingTasksTcs;
-		map<string, ISerializer&> _serializers;
-		map<string, string> _metadata;
-		_requestProcessor;
-		_scenesDispatcher;
-		_maxPeers;
+		shared_ptr<ISerializer*> _systemSerializer;
+		RequestProcessor _requestProcessor;
+		SceneDispatcher _sceneDispatcher;
+		map<string, shared_ptr<ISerializer*>> _serializers;
+		pplx::cancellation_token_source _cts;
+		uint16 _maxPeers;
+		StringMap _metadata;
+		shared_ptr<ILogger*> _logger;
 	};
 };

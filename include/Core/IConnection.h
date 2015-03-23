@@ -12,8 +12,12 @@ namespace Stormancer
 		IConnection();
 		virtual ~IConnection();
 
-		template<typename T> virtual void registerComponent(T component) = 0;
-		template<typename T> virtual T getComponent() = 0;
+		template<typename T>
+		void registerComponent(T component);
+
+		template<typename T>
+		T getComponent();
+
 		virtual void close() = 0;
 		virtual void sendSystem(char msgId, function < void(stringbuf) > writer) = 0;
 		virtual void sendToScene(char sceneIndex, uint16_t route, function < void(stringbuf) > writer, PacketPriority priority, PacketReliability reliability) = 0;

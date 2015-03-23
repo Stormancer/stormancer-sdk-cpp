@@ -1,5 +1,5 @@
 #include "libs.h"
-#include "IConnection.h"
+#include "Core/IConnection.h"
 
 namespace Stormancer
 {
@@ -9,5 +9,16 @@ namespace Stormancer
 
 	IConnection::~IConnection()
 	{
+	}
+
+	template<typename T>
+	void IConnection::registerComponent(T component)
+	{
+	}
+
+	template<typename T>
+	T IConnection::getComponent()
+	{
+		return T();
 	}
 };

@@ -5,6 +5,11 @@ namespace Stormancer
 {
 	namespace Helpers
 	{
+		bool ensureSuccessStatusCode(int statusCode)
+		{
+			return (statusCode >= 200 && statusCode < 300);
+		}
+
 		template<typename T>
 		vector<string> mapKeys(map<string, T> map)
 		{

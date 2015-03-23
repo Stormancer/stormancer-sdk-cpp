@@ -1,35 +1,24 @@
 ========================================================================
-    CONSOLE APPLICATION : Stormancer-sdk-cpp Project Overview
+    STATIC LIBRARY : stormancer-sdk-cpp Project Overview
 ========================================================================
 
-AppWizard has created this Stormancer-sdk-cpp application for you.
+AppWizard has created this stormancer-sdk-cpp library project for you.
 
-This file contains a summary of what you will find in each of the files that
-make up your Stormancer-sdk-cpp application.
+No source files were created as part of your project.
 
 
-Stormancer-sdk-cpp.vcxproj
+stormancer-sdk-cpp.vcxproj
     This is the main project file for VC++ projects generated using an Application Wizard.
     It contains information about the version of Visual C++ that generated the file, and
     information about the platforms, configurations, and project features selected with the
     Application Wizard.
 
-Stormancer-sdk-cpp.vcxproj.filters
+stormancer-sdk-cpp.vcxproj.filters
     This is the filters file for VC++ projects generated using an Application Wizard. 
     It contains information about the association between the files in your project 
     and the filters. This association is used in the IDE to show grouping of files with
     similar extensions under a specific node (for e.g. ".cpp" files are associated with the
     "Source Files" filter).
-
-Stormancer-sdk-cpp.cpp
-    This is the main application source file.
-
-/////////////////////////////////////////////////////////////////////////////
-Other standard files:
-
-libs.h, StdAfx.cpp
-    These files are used to build a precompiled header (PCH) file
-    named Stormancer-sdk-cpp.pch and a precompiled types file named StdAfx.obj.
 
 /////////////////////////////////////////////////////////////////////////////
 Other notes:

@@ -5,6 +5,8 @@ namespace Stormancer
 {
 	namespace Helpers
 	{
+		bool ensureSuccessStatusCode(int statusCode);
+
 		template<typename T>
 		string mapKeys(map<string, T> map);
 

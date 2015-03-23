@@ -3,10 +3,10 @@
 
 namespace Stormancer
 {
-	class ClassName
+	class RequestContext
 	{
 	public:
-		ClassName();
-		virtual ~ClassName();
+		RequestContext();
+		virtual ~RequestContext();
 	};
 };

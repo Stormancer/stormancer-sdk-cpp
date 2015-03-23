@@ -3,9 +3,9 @@
 
 namespace Stormancer
 {
-	DefaultLogger& DefaultLogger::instance()
+	shared_ptr<ILogger*> DefaultLogger::instance()
 	{
-		static DefaultLogger defaultLogger = DefaultLogger();
+		static shared_ptr<ILogger*> defaultLogger = make_shared<ILogger*>(new DefaultLogger());
 		return defaultLogger;
 	}
 

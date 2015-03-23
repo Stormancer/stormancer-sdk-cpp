@@ -1,30 +1,50 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="packages\cpprestsdk.2.4.0.1\build\native\cpprestsdk.props" Condition="Exists('packages\cpprestsdk.2.4.0.1\build\native\cpprestsdk.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{274AC605-7876-4711-B253-0528134DABBD}</ProjectGuid>
+    <ProjectGuid>{597F12E7-04EF-4FCC-AC51-5EA9F3D542B4}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>Stormancersdkcpp</RootNamespace>
+    <RootNamespace>stormancersdkcpp</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -36,209 +56,98 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <PropertyGroup Label="UserMacros">
-    <NuGetPackageImportStamp>b8eed755</NuGetPackageImportStamp>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>false</LinkIncremental>
-  </PropertyGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)MsgPack/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PrecompiledHeaderFile>$(ProjectDir)include/stdafx.h</PrecompiledHeaderFile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Raknet/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Raknet_LibStatic_Debug_x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)MsgPack\include;$(ProjectDir)RakNet\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>LibStatic_vc9_LibStatic_Debug_x64.lib</AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>$(ProjectDir)RakNet\Lib\LibStatic\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)MsgPack/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PrecompiledHeaderFile>$(ProjectDir)include/stdafx.h</PrecompiledHeaderFile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(SolutionDir)Raknet/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Raknet_LibStatic_Debug_x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)MsgPack\include;$(ProjectDir)RakNet\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>LibStatic_vc9_LibStatic_Debug_x64.lib</AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>$(ProjectDir)RakNet\Lib\LibStatic\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Configuration\ClientConfiguration.h" />
-    <ClInclude Include="Core\ConnectionState.h" />
-    <ClInclude Include="Core\ILogger.h" />
-    <ClInclude Include="Core\IScene.h" />
-    <ClInclude Include="Core\PacketReliability.h" />
-    <ClInclude Include="Core\IConnection.h" />
-    <ClInclude Include="Core\ISerializer.h" />
-    <ClInclude Include="Core\Models\RouteDto.h" />
-    <ClInclude Include="Core\Models\stdafx.h" />
-    <ClInclude Include="Core\PacketPriority.h" />
-    <ClInclude Include="Core\stdafx.h" />
-    <ClInclude Include="include\ApiClient.h" />
-    <ClInclude Include="include\Client.h" />
-    <ClInclude Include="include\Configuration\ClientConfiguration.h" />
-    <ClInclude Include="include\Configuration\stdafx.h" />
-    <ClInclude Include="include\Core\ConnectionState.h" />
-    <ClInclude Include="include\Core\IConnection.h" />
-    <ClInclude Include="include\Core\ILogger.h" />
-    <ClInclude Include="include\Core\IScene.h" />
-    <ClInclude Include="include\Core\IScenePeer.h" />
-    <ClInclude Include="include\Core\ISerializer.h" />
-    <ClInclude Include="include\Core\Models\RouteDto.h" />
-    <ClInclude Include="include\Core\Models\stdafx.h" />
-    <ClInclude Include="include\Core\Packet.h" />
-    <ClInclude Include="include\Core\PacketPriority.h" />
-    <ClInclude Include="include\Core\PacketReliability.h" />
-    <ClInclude Include="include\Core\Route.h" />
-    <ClInclude Include="include\Core\stdafx.h" />
-    <ClInclude Include="include\DefaultLogger.h" />
-    <ClInclude Include="include\Helpers.h" />
-    <ClInclude Include="include\IConnectionManager.h" />
-    <ClInclude Include="include\Infrastructure\DefaultPacketDispatcher.h" />
-    <ClInclude Include="include\Infrastructure\IPacketDispatcher.h" />
-    <ClInclude Include="include\Infrastructure\ITokenHandler.h" />
-    <ClInclude Include="include\Infrastructure\Modules\IModule.h" />
-    <ClInclude Include="include\Infrastructure\MsgPackSerializer.h" />
-    <ClInclude Include="include\Infrastructure\stdafx.h" />
-    <ClInclude Include="include\Infrastructure\TokenHandler.h" />
-    <ClInclude Include="include\IPacketProcessor.h" />
-    <ClInclude Include="include\IRequest.h" />
-    <ClInclude Include="include\ITransport.h" />
-    <ClInclude Include="include\MessageIDTypes.h" />
-    <ClInclude Include="include\PacketProcessorConfig.h" />
-    <ClInclude Include="include\Plugins\IClientPlugin.h" />
-    <ClInclude Include="include\Plugins\PluginBuildContext.h" />
-    <ClInclude Include="include\Plugins\Request.h" />
-    <ClInclude Include="include\Plugins\RequestContext.h" />
-    <ClInclude Include="include\Plugins\RpcClientPlugin.h" />
-    <ClInclude Include="include\Plugins\RpcRequestContext.h" />
-    <ClInclude Include="include\Plugins\RpcService.h" />
-    <ClInclude Include="include\Processors\RequestProcessor.h" />
-    <ClInclude Include="include\Processors\SceneDispatcher.h" />
-    <ClInclude Include="include\Scene.h" />
-    <ClInclude Include="include\SceneEndpoint.h" />
-    <ClInclude Include="include\ScenePeer.h" />
-    <ClInclude Include="include\libs.h" />
-    <ClInclude Include="include\SystemMessages\ConnectedToSceneMsg.h" />
-    <ClInclude Include="include\SystemMessages\ConnectionResult.h" />
-    <ClInclude Include="include\SystemMessages\SceneInfosDto.h" />
-    <ClInclude Include="include\SystemMessages\SceneInfosRequestDto.h" />
-    <ClInclude Include="include\Transports\RaknetConnection.h" />
-    <ClInclude Include="include\Transports\RaknetTransport.h" />
-    <ClInclude Include="include\typedef.h" />
-    <ClInclude Include="Infrastructure\MsgPackSerializer.h" />
-    <ClInclude Include="Infrastructure\stdafx.h" />
-    <ClInclude Include="MsgPack\Container.h" />
-    <ClInclude Include="MsgPack\ContainerHeader.h" />
-    <ClInclude Include="MsgPack\Data.h" />
-    <ClInclude Include="MsgPack\Element.h" />
-    <ClInclude Include="MsgPack\Header.h" />
-    <ClInclude Include="MsgPack\include\Container.h" />
-    <ClInclude Include="MsgPack\include\ContainerHeader.h" />
-    <ClInclude Include="MsgPack\include\Data.h" />
-    <ClInclude Include="MsgPack\include\Element.h" />
-    <ClInclude Include="MsgPack\include\Header.h" />
-    <ClInclude Include="MsgPack\include\MsgPack.h" />
-    <ClInclude Include="MsgPack\include\Number.h" />
-    <ClInclude Include="MsgPack\include\Primitive.h" />
-    <ClInclude Include="MsgPack\include\stdafx.h" />
-    <ClInclude Include="MsgPack\include\StreamManager.h" />
-    <ClInclude Include="MsgPack\MsgPack.h" />
-    <ClInclude Include="MsgPack\Number.h" />
-    <ClInclude Include="MsgPack\Primitive.h" />
-    <ClInclude Include="MsgPack\stdafx.h" />
-    <ClInclude Include="MsgPack\StreamManager.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Configuration\ClientConfiguration.cpp" />
-    <ClCompile Include="Core\IConnection.cpp" />
-    <ClCompile Include="Core\ILogger.cpp" />
-    <ClCompile Include="Core\IScene.cpp" />
-    <ClCompile Include="Core\ISerializer.cpp" />
-    <ClCompile Include="Infrastructure\MsgPackSerializer.cpp" />
-    <ClCompile Include="MsgPack\MsgPack.cpp" />
-    <ClCompile Include="MsgPack\src\MsgPack.cpp" />
-    <ClCompile Include="src\ApiClient.cpp" />
-    <ClCompile Include="src\Client.cpp" />
-    <ClCompile Include="src\Configuration\ClientConfiguration.cpp" />
-    <ClCompile Include="src\Core\IConnection.cpp" />
-    <ClCompile Include="src\Core\ILogger.cpp" />
-    <ClCompile Include="src\Core\IScene.cpp" />
-    <ClCompile Include="src\Core\IScenePeer.cpp" />
-    <ClCompile Include="src\Core\ISerializer.cpp" />
-    <ClCompile Include="src\Core\Models\RouteDto.cpp" />
-    <ClCompile Include="src\Core\Packet.cpp" />
-    <ClCompile Include="src\Core\Route.cpp" />
-    <ClCompile Include="src\DefaultLogger.cpp" />
-    <ClCompile Include="src\Helpers.cpp" />
-    <ClCompile Include="src\IConnectionManager.cpp" />
-    <ClCompile Include="src\Infrastructure\DefaultPacketDispatcher.cpp" />
-    <ClCompile Include="src\Infrastructure\IPacketDispatcher.cpp" />
-    <ClCompile Include="src\Infrastructure\ITokenHandler.cpp" />
-    <ClCompile Include="src\Infrastructure\Modules\IModule.cpp" />
-    <ClCompile Include="src\Infrastructure\MsgPackSerializer.cpp" />
-    <ClCompile Include="src\Infrastructure\TokenHandler.cpp" />
-    <ClCompile Include="src\IPacketProcessor.cpp" />
-    <ClCompile Include="src\IRequest.cpp" />
-    <ClCompile Include="src\ITransport.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\PacketProcessorConfig.cpp" />
-    <ClCompile Include="src\Plugins\IClientPlugin.cpp" />
-    <ClCompile Include="src\Plugins\PluginBuildContext.cpp" />
-    <ClCompile Include="src\Plugins\Request.cpp" />
-    <ClCompile Include="src\Plugins\RequestContext.cpp" />
-    <ClCompile Include="src\Plugins\RpcClientPlugin.cpp" />
-    <ClCompile Include="src\Plugins\RpcRequestContext.cpp" />
-    <ClCompile Include="src\Plugins\RpcService.cpp" />
-    <ClCompile Include="src\Processors\RequestProcessor.cpp" />
-    <ClCompile Include="src\Processors\SceneDispatcher.cpp" />
-    <ClCompile Include="src\Scene.cpp" />
-    <ClCompile Include="src\SceneEndpoint.cpp" />
-    <ClCompile Include="src\ScenePeer.cpp" />
-    <ClCompile Include="src\Transports\RaknetConnection.cpp" />
-    <ClCompile Include="src\Transports\RaknetTransport.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include=".gitignore" />
-    <None Include="include\stormancer" />
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="packages\cpprestsdk.2.4.0.1\build\native\cpprestsdk.targets" Condition="Exists('packages\cpprestsdk.2.4.0.1\build\native\cpprestsdk.targets')" />
   </ImportGroup>
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('packages\cpprestsdk.2.4.0.1\build\native\cpprestsdk.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\cpprestsdk.2.4.0.1\build\native\cpprestsdk.props'))" />
-    <Error Condition="!Exists('packages\cpprestsdk.2.4.0.1\build\native\cpprestsdk.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\cpprestsdk.2.4.0.1\build\native\cpprestsdk.targets'))" />
-  </Target>
 </Project>

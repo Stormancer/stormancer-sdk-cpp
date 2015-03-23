@@ -1,13 +1,13 @@
 #include "libs.h"
-#include "ClassName.h"
+#include "Processors/SceneDispatcher.h"
 
 namespace Stormancer
 {
-	ClassName::ClassName()
+	SceneDispatcher::SceneDispatcher()
 	{
 	}
 
-	ClassName::~ClassName()
+	SceneDispatcher::~SceneDispatcher()
 	{
 	}
 };

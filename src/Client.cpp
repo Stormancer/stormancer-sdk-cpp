@@ -3,6 +3,7 @@
 #include "Helpers.h"
 #include "Infrastructure/ITokenHandler.h"
 #include "Infrastructure/TokenHandler.h"
+#include "Infrastructure/Modules/IRequestModule.h"
 
 namespace Stormancer
 {
@@ -39,7 +40,7 @@ namespace Stormancer
 		_apiClient(ApiClient(config, _tokenHandler)),
 		_transport(config.transport),
 		_dispatcher(config.dispatcher),
-		_requestProcessor(RequestProcessor(_logger, list<IRequestModule>())),
+		_requestProcessor(RequestProcessor(_logger, list<shared_ptr<IRequestModule*>>())),
 		_scenesDispatcher(SceneDispatcher()),
 		_metadata(config.metadata),
 		_maxPeers(config.maxPeers)
@@ -69,5 +70,22 @@ namespace Stormancer
 	string Client::applicationName()
 	{
 		return _applicationName;
+	}
+
+	shared_ptr<ILogger*> Client::logger()
+	{
+		return _logger;
+	}
+
+	void Client::setLogger(shared_ptr<ILogger*> logger)
+	{
+		if ((*logger) != nullptr)
+		{
+			_logger = logger;
+		}
+		else
+		{
+			_logger = DefaultLogger::instance();
+		}
 	}
 };

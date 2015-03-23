@@ -1,13 +1,10 @@
 #pragma once
 #include "libs.h"
+#include "CustomTypes.h"
 #include "PacketProcessorConfig.h"
 
 namespace Stormancer
 {
-	using handlerFunction = function < bool(byte, Packet2) >;
-	using processorFunction = function < bool(byte, Packet2) >;
-	using handlerMap = map < byte, handlerFunction >;
-
 	class IPacketProcessor
 	{
 	public:

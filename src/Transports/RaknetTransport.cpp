@@ -3,7 +3,7 @@
 
 namespace Stormancer
 {
-	RaknetTransport::RaknetTransport(ILogger& logger)
+	RaknetTransport::RaknetTransport(shared_ptr<ILogger*> logger)
 		: _logger(logger)
 	{
 	}

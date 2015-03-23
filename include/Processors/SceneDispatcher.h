@@ -3,10 +3,10 @@
 
 namespace Stormancer
 {
-	class ClassName
+	class SceneDispatcher
 	{
 	public:
-		ClassName();
-		virtual ~ClassName();
+		SceneDispatcher();
+		virtual ~SceneDispatcher();
 	};
 };

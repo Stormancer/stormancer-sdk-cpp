@@ -8,11 +8,11 @@ namespace Stormancer
 	class RaknetTransport : public ITransport
 	{
 	public:
-		RaknetTransport(ILogger& logger);
+		RaknetTransport(shared_ptr<ILogger*> logger);
 		virtual ~RaknetTransport();
 
 	private:
-		ILogger& _logger;
+		shared_ptr<ILogger*> _logger;
 	};
 
 };
