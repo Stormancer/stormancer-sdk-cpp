@@ -5,6 +5,13 @@ VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "stormancer-sdk-cpp", "stormancer-sdk-cpp.vcxproj", "{597F12E7-04EF-4FCC-AC51-5EA9F3D542B4}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{CAF00EAB-8E9D-442B-B086-7E59415F3AE7}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Echo", "Samples\Echo\Echo.vcxproj", "{72E8554F-47F1-4C29-AA8E-9D0C06873585}"
+	ProjectSection(ProjectDependencies) = postProject
+		{597F12E7-04EF-4FCC-AC51-5EA9F3D542B4} = {597F12E7-04EF-4FCC-AC51-5EA9F3D542B4}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -21,8 +28,18 @@ Global
 		{597F12E7-04EF-4FCC-AC51-5EA9F3D542B4}.Release|Win32.Build.0 = Release|Win32
 		{597F12E7-04EF-4FCC-AC51-5EA9F3D542B4}.Release|x64.ActiveCfg = Release|x64
 		{597F12E7-04EF-4FCC-AC51-5EA9F3D542B4}.Release|x64.Build.0 = Release|x64
+		{72E8554F-47F1-4C29-AA8E-9D0C06873585}.Debug|Win32.ActiveCfg = Debug|Win32
+		{72E8554F-47F1-4C29-AA8E-9D0C06873585}.Debug|Win32.Build.0 = Debug|Win32
+		{72E8554F-47F1-4C29-AA8E-9D0C06873585}.Debug|x64.ActiveCfg = Debug|x64
+		{72E8554F-47F1-4C29-AA8E-9D0C06873585}.Debug|x64.Build.0 = Debug|x64
+		{72E8554F-47F1-4C29-AA8E-9D0C06873585}.Release|Win32.ActiveCfg = Release|Win32
+		{72E8554F-47F1-4C29-AA8E-9D0C06873585}.Release|Win32.Build.0 = Release|Win32
+		{72E8554F-47F1-4C29-AA8E-9D0C06873585}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{72E8554F-47F1-4C29-AA8E-9D0C06873585} = {CAF00EAB-8E9D-442B-B086-7E59415F3AE7}
 	EndGlobalSection
 EndGlobal

@@ -1,10 +1,10 @@
-//#include <stormancer>
+#include <stormancer.h>
 
 //using namespace Stormancer;
 
 void testMsgPack()
 {
-	/*byteStream stream;
+	/*std::basic_streambuf<unsigned char> stream;
 	MsgPack::Serializer serializer = MsgPack::Serializer(&stream);
 
 	serializer << MsgPack__Factory(ArrayHeader(3)); //Next 3 elements belong in this array
@@ -18,7 +18,7 @@ void testMsgPack()
 	serializer << MsgPack::Factory("message");
 	serializer << MsgPack::Factory("Hello World!");
 
-	cout << "SERIALIZED: " << stream.str() << endl;
+	//cout << "SERIALIZED: " << stream.str() << endl;
 
 	//stream = stringbuf(stream.str());
 	MsgPack::Deserializer deserializer = MsgPack::Deserializer(&stream);
@@ -36,7 +36,7 @@ void testMsgPack()
 	MsgPack::Array& array = dynamic_cast<MsgPack::Array&>(*element);
 	for (int i = 0; i < array.getContainer()->size(); i++)
 	{
-	cout << *(array.getContainer()->at(i)) << endl;
+		cout << *(array.getContainer()->at(i)) << endl;
 	}
 
 	MsgPack::Primitive& pri = dynamic_cast<MsgPack::Primitive&>(*(array.getContainer()->at(0)));
@@ -77,7 +77,7 @@ void testClient()
 
 int main(int argc, char* argv[])
 {
-	//testMsgPack();
+	testMsgPack();
 
 	//testClient();
 

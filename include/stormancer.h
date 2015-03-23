@@ -22,8 +22,13 @@
 #include <cpprest/http_client.h>
 #include <cpprest/filestream.h>
 
+#include <MsgPack.h>
+
 // using namespaces
 using namespace std;
 
 // custom types
 #include "typedef.h"
+
+//#include "Configuration/ClientConfiguration.h"
+//#include "Client.h"
