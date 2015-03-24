@@ -1,13 +1,12 @@
-#include "libs.h"
-#include "ClassName.h"
+
 
 namespace Stormancer
 {
-	ClassName::ClassName()
+	RpcRequestContext::RpcRequestContext()
 	{
 	}
 
-	ClassName::~ClassName()
+	RpcRequestContext::~RpcRequestContext()
 	{
 	}
 };

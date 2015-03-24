@@ -1,9 +1,5 @@
 #pragma once
-#include "libs.h"
-#include "Infrastructure/IPacketDispatcher.h"
-#include "ITransport.h"
-#include "Core/ISerializer.h"
-#include "Plugins/IClientPlugin.h"
+#include "headers.h"
 
 namespace Stormancer
 {
@@ -13,22 +9,22 @@ namespace Stormancer
 		ClientConfiguration(string account, string application);
 		~ClientConfiguration();
 
-		/*string getApiEndpoint();
-		ClientConfiguration& metadata(string key, string value);
-		void addPlugin(shared_ptr<IClientPlugin*> plugin);*/
+		string getApiEndpoint();
+		ClientConfiguration& setMetadata(string key, string value);
+		//void addPlugin(shared_ptr<IClientPlugin*> plugin);
 
 	public:
 		string account;
 		string application;
-		/*string serverEndpoint;
-		shared_ptr<IPacketDispatcher*> dispatcher;
-		ITransport transport;
-		list<ISerializer> serializers;
+		string serverEndpoint;
+		//shared_ptr<IPacketDispatcher*> dispatcher;
+		//ITransport transport;
+		//list<ISerializer> serializers;
 		uint16 maxPeers;
-		list<shared_ptr<IClientPlugin*>> plugins;
+		//list<shared_ptr<IClientPlugin*>> plugins;
+		StringMap metadata;
 
-		private:
+	private:
 		const string apiEndpoint = "http://localhost:23469/";
-		StringMap _metadata; */
 	};
 };

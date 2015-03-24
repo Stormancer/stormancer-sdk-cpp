@@ -1,5 +1,4 @@
-#include "libs.h"
-#include "IScene.h"
+#include "stormancer.h"
 
 namespace Stormancer
 {

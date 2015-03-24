@@ -1,12 +1,12 @@
 #pragma once
-#include "libs.h"
+#include "headers.h"
 
 namespace Stormancer
 {
-	class ClassName
+	class SceneInfosDto
 	{
 	public:
-		ClassName();
-		virtual ~ClassName();
+		SceneInfosDto();
+		virtual ~SceneInfosDto();
 	};
 };

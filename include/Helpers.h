@@ -1,8 +1,16 @@
 #pragma once
-#include "libs.h"
+#include "headers.h"
 
 namespace Stormancer
 {
+	// vector flux operators
+
+	template<typename T>
+	vector<T>& operator<<(vector<T>& v, const T data);
+
+	template<typename T>
+	vector<T>& operator>>(vector<T>& v, T& data);
+
 	namespace Helpers
 	{
 		bool ensureSuccessStatusCode(int statusCode);
@@ -15,24 +23,13 @@ namespace Stormancer
 
 		string vectorJoin(vector<string> vector, string glue = "");
 
-		vector<string> stringSplit(const string& str, const string& glue)
-		{
-			vector<string> splitted;
-			int cursor = 0, lastCursor = 0;
-			while ((cursor = str.find(glue, cursor)) != string::npos)
-			{
-				splitted << str.substr(lastCursor, cursor - 1 - lastCursor);
-				lastCursor = cursor;
-				cursor++;
-			}
-			splitted << str.substr(lastCursor, str.length() - 1 - lastCursor);
-			return splitted;
-		}
+		vector<string> stringSplit(const string& str, const string& glue);
 
 		class StringFormat
 		{
 		public:
-			StringFormat() {}
+			StringFormat();
+			StringFormat(string format, initializer_list<string> args);
 
 			template<typename T>
 			StringFormat& operator<<(T data);
@@ -49,38 +46,8 @@ namespace Stormancer
 		};
 
 		template<typename T>
-		string stringFormat(string format, initializer_list<string> args)
-		{
-			string regex = "{";
-			for (int i = 0; i < args.size(); i++)
-			{
-				string tmp();
-				tmp << "{" << to_string(i) << "}";
-				replace(format.begin(), format.end(), tmp, args[i]);
-			}
-			return format;
-		}
+		string stringFormat(string format, initializer_list<string> args);
 
-		string stringTrim(string str)
-		{
-			// TODO
-			return str;
-		};
+		string stringTrim(string str);
 	};
-
-	// vector flux operators
-
-	template<typename T, typename U>
-	vector<T>& operator<<(const vector<T>& v, const U data)
-	{
-		v.push_back(data);
-		return v;
-	}
-
-	template<typename T, typename U>
-	vector<T>& operator>>(const vector<T>& v, U& data)
-	{
-		data = v.pop_back();
-		return v;
-	}
 };

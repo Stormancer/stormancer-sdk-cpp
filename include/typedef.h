@@ -1,18 +1,23 @@
 #pragma once
 
-using int8 = int8_t;
-using int16 = int16_t;
-using int32 = int32_t;
-using int64 = int64_t;
+namespace Stormancer
+{
+	using namespace std;
 
-using uint8 = uint8_t;
-using uint16 = uint16_t;
-using uint32 = uint32_t;
-using uint64 = uint64_t;
+	using int8 = int8_t;
+	using int16 = int16_t;
+	using int32 = int32_t;
+	using int64 = int64_t;
 
-using byte = uint8;
+	using uint8 = uint8_t;
+	using uint16 = uint16_t;
+	using uint32 = uint32_t;
+	using uint64 = uint64_t;
 
-using byteStream = basic_streambuf < byte >;
+	using byte = uint8;
 
-using StringMap = map < string, string >;
-using AnyMap = map < string, void* >;
+	using byteStream = stringbuf;
+
+	using StringMap = map < string, string > ;
+	using AnyMap = map < string, void* > ;
+};

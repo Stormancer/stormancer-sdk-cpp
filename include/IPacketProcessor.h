@@ -1,6 +1,6 @@
 #pragma once
-#include "libs.h"
-#include "CustomTypes.h"
+#include "headers.h"
+#include "typedef2.h"
 #include "PacketProcessorConfig.h"
 
 namespace Stormancer

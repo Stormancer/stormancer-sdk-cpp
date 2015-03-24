@@ -1,12 +1,12 @@
 #pragma once
-#include "libs.h"
+#include "headers.h"
 
 namespace Stormancer
 {
-	class ClassName
+	class RpcRequestContext
 	{
 	public:
-		ClassName();
-		virtual ~ClassName();
+		RpcRequestContext();
+		virtual ~RpcRequestContext();
 	};
 };

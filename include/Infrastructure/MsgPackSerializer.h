@@ -1,5 +1,6 @@
 #pragma once
-#include "../Core/ISerializer.h"
+#include "headers.h"
+#include "Core/ISerializer.h"
 
 namespace Stormancer
 {

@@ -1,7 +1,7 @@
 /*
     Copyright 2014 Alexander Meißner (lichtso@gamefortec.net)
 */
-#include "stormancer.h"
+
 #include "MsgPack.h"
 
 #ifdef WIN32
@@ -436,11 +436,11 @@ namespace MsgPack {
         }
     }
 
-	String::String(const char* str) :String(str, strlen(str)) {
+	String::String(const char* str) :String(str, static_cast<uint32_t>(strlen(str))) {
 
     }
 
-	String::String(const std::string& str) :String(str.c_str(), str.size()) {
+	String::String(const std::string& str) :String(str.c_str(), static_cast<uint32_t>(str.size())) {
 
     }
 
@@ -746,7 +746,7 @@ namespace MsgPack {
 
 
 	Array::Array(std::vector<std::unique_ptr<Element>>&& _elements)
-        : ArrayHeader(_elements.size()), elements(std::move(_elements)) {
+		: ArrayHeader(static_cast<uint32_t>(_elements.size())), elements(std::move(_elements)) {
 
     }
 
@@ -764,7 +764,7 @@ namespace MsgPack {
     }
 
     void Array::toJSON(std::ostream& stream) const {
-        uint32_t len = elements.size();
+		uint32_t len = static_cast<uint32_t>(elements.size());
         stream << "[";
         if(len > 0) {
             elements[0]->toJSON(stream);
@@ -778,7 +778,7 @@ namespace MsgPack {
 
     uint32_t Array::getSizeInBytes() const {
         int64_t size = getHeaderLength();
-        uint32_t len = elements.size();
+		uint32_t len = static_cast<uint32_t>(elements.size());
         for(uint32_t i = 1; i < len; i ++)
             size += elements[i]->getSizeInBytes();
 		return static_cast<uint32_t>(size);
@@ -787,7 +787,7 @@ namespace MsgPack {
 
 
     Map::Map(std::vector<std::unique_ptr<Element>>&& _elements)
-        : MapHeader(_elements.size()/2), elements(std::move(_elements)) {
+		: MapHeader(static_cast<uint32_t>(_elements.size()) / 2), elements(std::move(_elements)) {
         if(elements.size()%2 == 1)
             elements.erase(elements.end()-1);
     }
@@ -824,7 +824,7 @@ namespace MsgPack {
 
     uint32_t Map::getSizeInBytes() const {
         int64_t size = getHeaderLength();
-        uint32_t len = elements.size();
+		uint32_t len = static_cast<uint32_t>(elements.size());
         for(uint32_t i = 1; i < len; i ++)
             size += elements[i]->getSizeInBytes();
 		return static_cast<uint32_t>(size);
@@ -873,11 +873,11 @@ namespace MsgPack {
             }
 
             //Find lowest done container in stack
-            uint32_t stackIndex = stack.size()-1;
+			uint32_t stackIndex = static_cast<uint32_t>(stack.size()) - 1;
             while(true) {
                 stackPointer = &stack[stackIndex];
                 container = stackPointer->first->getContainer();
-                if(container && stackPointer->second+1 < container->size()) {
+				if (container && static_cast<uint32_t>(stackPointer->second) + 1 < container->size()) {
                     //Container is not done yet. move to next element
                     int64_t pos = ++ stackPointer->second;
                     stackPointer = &stack[++ stackIndex];
@@ -1013,11 +1013,11 @@ namespace MsgPack {
             //Element done
             if(stack.size() > 0) {
                 //Pop all done containers from stack
-                uint32_t stackIndex = stack.size()-1;
+				uint32_t stackIndex = static_cast<uint32_t>(stack.size()) - 1;
                 std::vector<std::unique_ptr<Element>>* container;
                 while(true) {
                     container = stack[stackIndex].first->getContainer();
-                    if(container && stack[stackIndex].second+1 < container->size()) {
+					if (container && static_cast<uint32_t>(stack[stackIndex].second) + 1 < container->size()) {
                         stack[stackIndex ++].second ++;
                         break;
                     }

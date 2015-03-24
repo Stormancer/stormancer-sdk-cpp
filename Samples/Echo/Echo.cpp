@@ -1,10 +1,48 @@
 #include <stormancer.h>
 
-//using namespace Stormancer;
+using namespace Stormancer;
+
+void testClient();
+void testMsgPack();
+
+int main(int argc, char* argv[])
+{
+	//testMsgPack();
+
+	testClient();
+
+	return 0;
+}
+
+void testClient()
+{
+	Stormancer::ClientConfiguration config("test", "echo");
+	config.serverEndpoint = "http://localhost:8081";
+
+	Client client(config);
+	auto task = client.getPublicScene("test-scene", "hello").then([&](Scene t) {
+	/*auto scene = t.result;
+	scene.addRoute("echo.out", [&](p) {
+	cout << p.readObject<string>() << endl;
+	});
+
+	scene.connect().then([&](t2) {
+	if (t2.isCompleted)
+	{
+	scene.send("echo.in", "hello");
+	}
+	else
+	{
+	cout << "Bad stuff happened..." << endl;
+	}
+	});*/
+	});
+	//task.Wait();
+}
 
 void testMsgPack()
 {
-	/*std::basic_streambuf<unsigned char> stream;
+	byteStream stream;
 	MsgPack::Serializer serializer = MsgPack::Serializer(&stream);
 
 	serializer << MsgPack__Factory(ArrayHeader(3)); //Next 3 elements belong in this array
@@ -18,9 +56,9 @@ void testMsgPack()
 	serializer << MsgPack::Factory("message");
 	serializer << MsgPack::Factory("Hello World!");
 
-	//cout << "SERIALIZED: " << stream.str() << endl;
+	cout << "SERIALIZED: " << stream.str() << endl;
 
-	//stream = stringbuf(stream.str());
+	//stream = byteStream(stream.str());
 	MsgPack::Deserializer deserializer = MsgPack::Deserializer(&stream);
 
 	cout << "DESERIALIZED: ";
@@ -46,40 +84,5 @@ void testMsgPack()
 	cout << arr << endl;
 
 	MsgPack::String& str = dynamic_cast<MsgPack::String&>(*(array.getContainer()->at(2)));
-	cout << str.stdString() << endl;*/
-}
-
-void testClient()
-{
-	//ClientConfiguration config("test", "echo");
-	//config.serverEndpoint = "http://localhost:8081";
-
-	//Client client(config);
-	/*auto task = client.getPublicScene("test-scene", "hello").then([&](t) {
-	auto scene = t.result;
-	scene.addRoute("echo.out", [&](p) {
-	cout << p.readObject<string>() << endl;
-	});
-
-	scene.connect().then([&](t2) {
-	if (t2.isCompleted)
-	{
-	scene.send("echo.in", "hello");
-	}
-	else
-	{
-	cout << "Bad stuff happened..." << endl;
-	}
-	});
-	});
-	task.Wait();*/
-}
-
-int main(int argc, char* argv[])
-{
-	testMsgPack();
-
-	//testClient();
-
-	return 0;
+	cout << str.stdString() << endl;
 }

@@ -1,5 +1,5 @@
 #pragma once
-#include "libs.h"
+#include "headers.h"
 #include "SceneEndpoint.h"
 
 namespace Stormancer
@@ -10,6 +10,6 @@ namespace Stormancer
 		ITokenHandler();
 		virtual ~ITokenHandler();
 
-		virtual SceneEndpoint& decodeToken(string token) = 0;
+		virtual SceneEndpoint decodeToken(string token) = 0;
 	};
 };

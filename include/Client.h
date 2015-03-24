@@ -1,21 +1,16 @@
 #pragma once
-#include "libs.h"
+#include "headers.h"
 #include "Configuration/ClientConfiguration.h"
-#include "Core/ISerializer.h"
 #include "ApiClient.h"
-#include "Infrastructure/ITokenHandler.h"
-#include "IConnectionManager.h"
-#include "Processors/RequestProcessor.h"
-#include "Processors/SceneDispatcher.h"
-#include "DefaultLogger.h"
-#include "Plugins/PluginBuildContext.h"
+#include "Scene.h"
+#include "SceneEndpoint.h"
 
 namespace Stormancer
 {
 	class Client
 	{
 	private:
-		class ConnectionHandler : public IConnectionManager
+		/*class ConnectionHandler : public IConnectionManager
 		{
 		public:
 			uint64 generateNewConnectionId();
@@ -25,34 +20,40 @@ namespace Stormancer
 
 		private:
 			uint64 _current = 0;
-		};
+		};*/
 
 	public:
-		Client(/*ClientConfiguration config*/);
+		Client(ClientConfiguration& config);
 		~Client();
 
 		void initialize();
 		string applicationName();
-		shared_ptr<ILogger*> logger();
-		void setLogger(shared_ptr<ILogger*> logger);
+		//shared_ptr<ILogger*> logger();
+		//void setLogger(shared_ptr<ILogger*> logger);
+
+		template<typename T>
+		pplx::task<Scene> getPublicScene(string sceneId, T userData);
+
+	private:
+		pplx::task<Scene> getScene(string sceneId, SceneEndpoint sep);
 
 	private:
 		const ApiClient _apiClient;
 		const string _accountId;
 		const string _applicationName;
-		const PluginBuildContext _pluginCtx;
-		shared_ptr<IConnection*> _serverConnection;
-		shared_ptr<ITransport*> _transport;
-		shared_ptr<IPacketDispatcher*> _dispatcher;
+		//const PluginBuildContext _pluginCtx;
+		//shared_ptr<IConnection*> _serverConnection;
+		//shared_ptr<ITransport*> _transport;
+		//shared_ptr<IPacketDispatcher*> _dispatcher;
 		bool _initialized;
-		shared_ptr<ITokenHandler*> _tokenHandler;
-		shared_ptr<ISerializer*> _systemSerializer;
-		RequestProcessor _requestProcessor;
-		SceneDispatcher _sceneDispatcher;
-		map<string, shared_ptr<ISerializer*>> _serializers;
-		pplx::cancellation_token_source _cts;
+		//shared_ptr<ITokenHandler*> _tokenHandler;
+		//shared_ptr<ISerializer*> _systemSerializer;
+		//RequestProcessor _requestProcessor;
+		//SceneDispatcher _sceneDispatcher;
+		//map<string, shared_ptr<ISerializer*>> _serializers;
+		//pplx::cancellation_token_source _cts;
 		uint16 _maxPeers;
 		StringMap _metadata;
-		shared_ptr<ILogger*> _logger;
+		//shared_ptr<ILogger*> _logger;
 	};
 };

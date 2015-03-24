@@ -1,13 +1,10 @@
-#include "libs.h"
-#include "ApiClient.h"
-#include "Infrastructure/MsgPackSerializer.h"
-#include "Helpers.h"
+#include "stormancer.h"
 
 namespace Stormancer
 {
-	ApiClient::ApiClient(/*ClientConfiguration config, shared_ptr<ITokenHandler*> tokenHandler*/)
-		/*: _config(config),
-		_createTokenUri("{0}/{1}/scenes/{2}/token"),
+	ApiClient::ApiClient(ClientConfiguration& config/*, shared_ptr<ITokenHandler*> tokenHandler*/)
+		: _config(config),
+		_createTokenUri("{0}/{1}/scenes/{2}/token")/*,
 		_tokenHandler(tokenHandler)*/
 	{
 	}
@@ -16,7 +13,7 @@ namespace Stormancer
 	{
 	}
 
-	template<typename T>
+	/*template<typename T>
 	pplx::task<SceneEndpoint> ApiClient::getSceneEndpoint(string accountId, string applicationName, string sceneId, T userData)
 	{
 		MsgPackSerializer serializer;
@@ -44,9 +41,9 @@ namespace Stormancer
 			});
 		});
 
-		/*pplx::task<web::http::http_response> resp = client.request(, U(relative_uri));
-		res.then([=] (pplx::task<web::http_response> task) {
-			web::http::http_response response = task.get();
-		});*/
-	}
+		//pplx::task<web::http::http_response> resp = client.request(, U(relative_uri));
+		//res.then([=] (pplx::task<web::http_response> task) {
+		//	web::http::http_response response = task.get();
+		//});
+	}*/
 };

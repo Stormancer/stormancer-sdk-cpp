@@ -1,13 +1,13 @@
-#include "libs.h"
-#include "ClassName.h"
+
+#include "Plugins/Request.h"
 
 namespace Stormancer
 {
-	ClassName::ClassName()
+	Request::Request()
 	{
 	}
 
-	ClassName::~ClassName()
+	Request::~Request()
 	{
 	}
 };
