@@ -31,16 +31,15 @@ namespace Stormancer
 		//shared_ptr<ILogger*> logger();
 		//void setLogger(shared_ptr<ILogger*> logger);
 
-		template<typename T>
-		pplx::task<Scene> getPublicScene(string sceneId, T userData);
+		pplx::task<Scene> getPublicScene(string sceneId, string userData);
 
 	private:
 		pplx::task<Scene> getScene(string sceneId, SceneEndpoint sep);
 
 	private:
-		const ApiClient _apiClient;
-		const string _accountId;
-		const string _applicationName;
+		ApiClient _apiClient;
+		string _accountId;
+		string _applicationName;
 		//const PluginBuildContext _pluginCtx;
 		//shared_ptr<IConnection*> _serverConnection;
 		//shared_ptr<ITransport*> _transport;

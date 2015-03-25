@@ -187,6 +187,9 @@
     <ClInclude Include="include\Client.h" />
     <ClInclude Include="include\Configuration\ClientConfiguration.h" />
     <ClInclude Include="include\Core\IScene.h" />
+    <ClInclude Include="include\Core\ISerializer.h" />
+    <ClInclude Include="include\Helpers.h" />
+    <ClInclude Include="include\Infrastructure\MsgPackSerializer.h" />
     <ClInclude Include="include\Scene.h" />
     <ClInclude Include="include\SceneEndpoint.h" />
     <ClInclude Include="include\SystemMessages\SceneInfosDto.h" />
@@ -210,6 +213,9 @@
     <ClCompile Include="src\Client.cpp" />
     <ClCompile Include="src\Configuration\ClientConfiguration.cpp" />
     <ClCompile Include="src\Core\IScene.cpp" />
+    <ClCompile Include="src\Core\ISerializer.cpp" />
+    <ClCompile Include="src\Helpers.cpp" />
+    <ClCompile Include="src\Infrastructure\MsgPackSerializer.cpp" />
     <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\SceneEndpoint.cpp" />
   </ItemGroup>

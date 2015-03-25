@@ -9,8 +9,17 @@ namespace Stormancer
 		ISerializer();
 		virtual ~ISerializer();
 
-		virtual string serialize(string data) = 0;
-		virtual string deserialize(string bytes) = 0;
+		template<typename T>
+		void serialize(T data, byteStream& stream)
+		{
+			throw "Not implemented.";
+		}
+
+		template<typename T>
+		T deserialize(byteStream& stream)
+		{
+			throw "Not implemented.";
+		}
 
 	public:
 		const string name;

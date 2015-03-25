@@ -16,34 +16,33 @@ int main(int argc, char* argv[])
 
 void testClient()
 {
-	Stormancer::ClientConfiguration config("test", "echo");
+	ClientConfiguration config("test", "echo");
 	config.serverEndpoint = "http://localhost:8081";
 
 	Client client(config);
-	auto task = client.getPublicScene("test-scene", "hello").then([&](Scene t) {
-	/*auto scene = t.result;
-	scene.addRoute("echo.out", [&](p) {
-	cout << p.readObject<string>() << endl;
-	});
+	auto task = client.getPublicScene("test-scene", "hello").then([&](Scene scene) {
+		/*scene.addRoute("echo.out", [&](p) {
+		cout << p.readObject<string>() << endl;
+		});
 
-	scene.connect().then([&](t2) {
-	if (t2.isCompleted)
-	{
-	scene.send("echo.in", "hello");
-	}
-	else
-	{
-	cout << "Bad stuff happened..." << endl;
-	}
-	});*/
+		scene.connect().then([&](t2) {
+		if (t2.isCompleted)
+		{
+		scene.send("echo.in", "hello");
+		}
+		else
+		{
+		cout << "Bad stuff happened..." << endl;
+		}
+		});*/
 	});
-	//task.Wait();
+	task.wait();
 }
 
 void testMsgPack()
 {
 	byteStream stream;
-	MsgPack::Serializer serializer = MsgPack::Serializer(&stream);
+	MsgPack::Serializer serializer(&stream);
 
 	serializer << MsgPack__Factory(ArrayHeader(3)); //Next 3 elements belong in this array
 	serializer << MsgPack::Factory(true);

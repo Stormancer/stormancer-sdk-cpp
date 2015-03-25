@@ -2,40 +2,9 @@
 
 namespace Stormancer
 {
-	template<typename T>
-	vector<T>& operator<<(vector<T>& v, const T data)
-	{
-		v.push_back(data);
-		return v;
-	}
-
-	template<typename T>
-	vector<T>& operator>>(vector<T>& v, T& data)
-	{
-		data = v.pop_back();
-		return v;
-	}
-
 	bool Helpers::ensureSuccessStatusCode(int statusCode)
 	{
 		return (statusCode >= 200 && statusCode < 300);
-	}
-
-	template<typename T>
-	vector<string> Helpers::mapKeys(map<string, T> map)
-	{
-		auto vec = vector<string>();
-		for (auto it = map.begin(); it != map.end(); ++it)
-		{
-			vec.push_back(it->first);
-		}
-		return vec;
-	}
-
-	template<typename T, typename U>
-	bool Helpers::mapContains(map<T, U> map, T& key)
-	{
-		return (map.find(key) != map.end) ? true : false;
 	}
 
 	string Helpers::vectorJoin(vector<string> vector, string glue)
@@ -70,48 +39,29 @@ namespace Stormancer
 	{
 	}
 
-	Helpers::StringFormat::StringFormat(string format, initializer_list<string> args)
-	{
-		int i = 0;
-		for (auto it = args.begin(); it != args.end(); ++it)
-		{
-			string tmp = "{" + to_string(i) + "}";
-			std::replace(format.begin(), format.end(), tmp, (*it));
-			i++;
-		}
-	}
-
-	template<typename T>
-	StringFormat& Helpers::StringFormat::operator << (T data)
-	{
-		stream << data;
-		return *this;
-	}
-
-	template<typename T>
-	void Helpers::StringFormat::operator >> (T& data)
-	{
-		stream >> data;
-	}
-
-	string Helpers::StringFormat::str() const
+	string Helpers::StringFormat::str()
 	{
 		return stream.str();
 	}
 
-	Helpers::StringFormat::operator string() const
+	/*Helpers::StringFormat::operator string()
 	{
-		return stream.str();
-	}
+		return str();
+	}*/
 
-	Helpers::StringFormat::operator const char*() const
+	Helpers::StringFormat::operator const char*()
 	{
 		return stream.str().c_str();
 	}
 
-	string Helpers::stringTrim(string str)
+	string Helpers::stringTrim(string& str)
 	{
 		// TODO
 		return str;
 	};
+
+	wstring Helpers::to_wstring(string& str)
+	{
+		return wstring(str.begin(), str.end());
+	}
 };

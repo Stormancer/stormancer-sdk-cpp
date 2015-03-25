@@ -1,6 +1,4 @@
-
-
-#include "MsgPackSerializer.h"
+#include "stormancer.h"
 
 namespace Stormancer
 {
@@ -8,18 +6,7 @@ namespace Stormancer
 	{
 	}
 
-
 	MsgPackSerializer::~MsgPackSerializer()
 	{
-	}
-
-	std::string MsgPackSerializer::serialize(std::string data)
-	{
-		return "";
-	}
-
-	std::string MsgPackSerializer::deserialize(std::string bytes)
-	{
-		return "";
 	}
 };
