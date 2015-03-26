@@ -7,9 +7,15 @@ namespace Stormancer
 		return (statusCode >= 200 && statusCode < 300);
 	}
 
-	string Helpers::vectorJoin(vector<string> vector, string glue)
+	void Helpers::displayException(const exception& e)
 	{
-		stringstream ss;
+		string msg(e.what());
+		wcout << Helpers::StringFormat(L"Error exception: {0}", msg).c_str() << endl;
+	}
+
+	wstring Helpers::vectorJoin(vector<wstring> vector, wstring glue)
+	{
+		wstringstream ss;
 		for (size_t i = 0; i < vector.size(); ++i)
 		{
 			if (i != 0)
@@ -21,11 +27,11 @@ namespace Stormancer
 		return ss.str();
 	}
 
-	vector<string> Helpers::stringSplit(const string& str, const string& glue)
+	vector<wstring> Helpers::stringSplit(const wstring& str, const wstring glue)
 	{
-		vector<string> splitted;
+		vector<wstring> splitted;
 		size_t cursor = 0, lastCursor = 0;
-		while ((cursor = str.find(glue, cursor)) != string::npos)
+		while ((cursor = str.find(glue, cursor)) != wstring::npos)
 		{
 			splitted << str.substr(lastCursor, cursor - 1 - lastCursor);
 			lastCursor = cursor;
@@ -35,33 +41,41 @@ namespace Stormancer
 		return splitted;
 	}
 
+	wstring Helpers::stringTrim(wstring str, wchar_t ch)
+	{
+		function<int(int)> ischar = [ch](int c) -> int {
+			if (c == ch)
+			{
+				return 1;
+			}
+			return 0;
+		};
+		str.erase(str.begin(), find_if(str.begin(), str.end(), not1(ischar)));
+		str.erase(find_if(str.rbegin(), str.rend(), not1(ischar)).base(), str.end());
+		return str;
+	};
+
 	Helpers::StringFormat::StringFormat()
 	{
 	}
 
-	string Helpers::StringFormat::str()
+	wstring Helpers::StringFormat::str()
 	{
 		return stream.str();
 	}
 
-	/*Helpers::StringFormat::operator string()
-	{
-		return str();
-	}*/
-
-	Helpers::StringFormat::operator const char*()
+	const wchar_t* Helpers::StringFormat::c_str()
 	{
 		return stream.str().c_str();
 	}
 
-	string Helpers::stringTrim(string& str)
+	Helpers::StringFormat::operator string()
 	{
-		// TODO
-		return str;
-	};
+		return to_string(stream.str());
+	}
 
-	wstring Helpers::to_wstring(string& str)
+	Helpers::StringFormat::operator wstring()
 	{
-		return wstring(str.begin(), str.end());
+		return stream.str();
 	}
 };

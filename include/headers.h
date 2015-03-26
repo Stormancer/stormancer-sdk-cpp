@@ -18,6 +18,10 @@
 #include <future>
 #include <regex>
 #include <cstdarg>
+#include <locale>
+#include <codecvt>
+#include <cctype>
+#include <algorithm>
 
 // custom libs
 

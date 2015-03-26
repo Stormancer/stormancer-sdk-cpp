@@ -11,18 +11,20 @@ int main(int argc, char* argv[])
 
 	testClient();
 
+	cin.get();
+
 	return 0;
 }
 
 void testClient()
 {
-	ClientConfiguration config("test", "echo");
-	config.serverEndpoint = "http://localhost:8081";
+	ClientConfiguration config(L"test", L"echo");
+	config.serverEndpoint = L"http://ipv4.fiddler:8081";
 
 	Client client(config);
-	auto task = client.getPublicScene("test-scene", "hello").then([&](Scene scene) {
+	auto task = client.getPublicScene(L"test-scene", L"hello").then([&](Scene scene) {
 		/*scene.addRoute("echo.out", [&](p) {
-		cout << p.readObject<string>() << endl;
+		cout << p.readObject<wstring>() << endl;
 		});
 
 		scene.connect().then([&](t2) {
@@ -36,7 +38,16 @@ void testClient()
 		}
 		});*/
 	});
-	task.wait();
+
+	try
+	{
+		task.wait();
+	}
+	catch (const exception &e)
+	{
+		printf("Error exception:%s\n", e.what());
+	}
+
 }
 
 void testMsgPack()

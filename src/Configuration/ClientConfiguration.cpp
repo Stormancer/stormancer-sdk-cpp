@@ -2,7 +2,7 @@
 
 namespace Stormancer
 {
-	ClientConfiguration::ClientConfiguration(string account, string application)
+	ClientConfiguration::ClientConfiguration(wstring account, wstring application)
 		: account(account),
 		application(application),
 		//dispatcher(make_shared<IPacketDispatcher*>(new DefaultPacketDispatcher())),
@@ -17,12 +17,12 @@ namespace Stormancer
 	{
 	}
 
-	string ClientConfiguration::getApiEndpoint()
+	wstring ClientConfiguration::getApiEndpoint()
 	{
 		return (serverEndpoint.length() ? serverEndpoint : apiEndpoint);
 	}
 
-	ClientConfiguration& ClientConfiguration::setMetadata(string key, string value)
+	ClientConfiguration& ClientConfiguration::setMetadata(wstring key, wstring value)
 	{
 		metadata[key] = value;
 		return *this;

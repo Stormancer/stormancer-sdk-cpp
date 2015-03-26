@@ -20,7 +20,7 @@ namespace Stormancer
 		throw new exception("Not Implemented");
 	}
 
-	void Client::ConnectionHandler::closeConnection(shared_ptr<IConnection*> connection, string reason)
+	void Client::ConnectionHandler::closeConnection(shared_ptr<IConnection*> connection, wstring reason)
 	{
 		throw new exception("Not Implemented");
 	}*/
@@ -31,8 +31,8 @@ namespace Stormancer
 	Client::Client(ClientConfiguration& config)
 		: _accountId(config.account),
 		_applicationName(config.application),
-		//_tokenHandler(make_shared<ITokenHandler*>(new TokenHandler())),
-		_apiClient(config/*, _tokenHandler*/),
+		_tokenHandler(new TokenHandler()),
+		_apiClient(config, _tokenHandler),
 		//_transport(config.transport),
 		//_dispatcher(config.dispatcher),
 		//_requestProcessor(RequestProcessor(_logger, list<shared_ptr<IRequestModule*>>())),
@@ -47,8 +47,8 @@ namespace Stormancer
 
 		//_metadata["serializers"] = Helpers::vectorJoin(Helpers::mapKeys(_serializers), ",");
 		//_metadata["transport"] = _transport.name;
-		_metadata["version"] = "1.0.0a";
-		_metadata["platform"] = "cpp";
+		_metadata[L"version"] = L"1.0.0a";
+		_metadata[L"platform"] = L"cpp";
 
 		initialize();
 	}
@@ -62,7 +62,7 @@ namespace Stormancer
 
 	}
 
-	string Client::applicationName()
+	wstring Client::applicationName()
 	{
 		return _applicationName;
 	}
@@ -84,15 +84,15 @@ namespace Stormancer
 		}
 	}*/
 
-	pplx::task<Scene> Client::getPublicScene(string sceneId, string userData)
+	task<Scene> Client::getPublicScene(wstring sceneId, wstring userData)
 	{
 		return _apiClient.getSceneEndpoint(_accountId, _applicationName, sceneId, userData).then([&](SceneEndpoint& sep) {
 			return getScene(sceneId, sep);
 		});
 	}
 
-	pplx::task<Scene> Client::getScene(string sceneId, SceneEndpoint sep)
+	task<Scene> Client::getScene(wstring sceneId, SceneEndpoint sep)
 	{
-		throw new exception("Not implemented");
+		throw string("Not implemented");
 	}
 };

@@ -6,17 +6,17 @@ namespace Stormancer
 	class ClientConfiguration
 	{
 	public:
-		ClientConfiguration(string account, string application);
+		ClientConfiguration(wstring account, wstring application);
 		~ClientConfiguration();
 
-		string getApiEndpoint();
-		ClientConfiguration& setMetadata(string key, string value);
+		wstring getApiEndpoint();
+		ClientConfiguration& setMetadata(wstring key, wstring value);
 		//void addPlugin(shared_ptr<IClientPlugin*> plugin);
 
 	public:
-		string account;
-		string application;
-		string serverEndpoint;
+		wstring account;
+		wstring application;
+		wstring serverEndpoint;
 		//shared_ptr<IPacketDispatcher*> dispatcher;
 		//ITransport transport;
 		//list<ISerializer> serializers;
@@ -25,6 +25,6 @@ namespace Stormancer
 		StringMap metadata;
 
 	private:
-		const string apiEndpoint = "http://localhost:23469/";
+		wstring apiEndpoint = L"http://localhost:8081/";
 	};
 };

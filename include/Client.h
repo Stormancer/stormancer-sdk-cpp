@@ -16,7 +16,7 @@ namespace Stormancer
 			uint64 generateNewConnectionId();
 			void newConnection(shared_ptr<IConnection*> connection);
 			shared_ptr<IConnection*> getConnection(uint64 id);
-			void closeConnection(shared_ptr<IConnection*>, string reason);
+			void closeConnection(shared_ptr<IConnection*>, wstring reason);
 
 		private:
 			uint64 _current = 0;
@@ -27,32 +27,32 @@ namespace Stormancer
 		~Client();
 
 		void initialize();
-		string applicationName();
+		wstring applicationName();
 		//shared_ptr<ILogger*> logger();
 		//void setLogger(shared_ptr<ILogger*> logger);
 
-		pplx::task<Scene> getPublicScene(string sceneId, string userData);
+		task<Scene> getPublicScene(wstring sceneId, wstring userData);
 
 	private:
-		pplx::task<Scene> getScene(string sceneId, SceneEndpoint sep);
+		task<Scene> getScene(wstring sceneId, SceneEndpoint sep);
 
 	private:
-		ApiClient _apiClient;
-		string _accountId;
-		string _applicationName;
-		//const PluginBuildContext _pluginCtx;
-		//shared_ptr<IConnection*> _serverConnection;
-		//shared_ptr<ITransport*> _transport;
-		//shared_ptr<IPacketDispatcher*> _dispatcher;
 		bool _initialized;
-		//shared_ptr<ITokenHandler*> _tokenHandler;
+		wstring _accountId;
+		wstring _applicationName;
+		//const PluginBuildContext _pluginCtx;
+		//shared_ptr<IConnection> _serverConnection;
+		//shared_ptr<ITransport> _transport;
+		//shared_ptr<IPacketDispatcher> _dispatcher;
+		shared_ptr<ITokenHandler> _tokenHandler;
+		ApiClient _apiClient;
 		//shared_ptr<ISerializer*> _systemSerializer;
 		//RequestProcessor _requestProcessor;
 		//SceneDispatcher _sceneDispatcher;
-		//map<string, shared_ptr<ISerializer*>> _serializers;
-		//pplx::cancellation_token_source _cts;
+		//map<wstring, shared_ptr<ISerializer*>> _serializers;
+		//cancellation_token_source _cts;
 		uint16 _maxPeers;
 		StringMap _metadata;
-		//shared_ptr<ILogger*> _logger;
+		//shared_ptr<ILogger> _logger;
 	};
 };

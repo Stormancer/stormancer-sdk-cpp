@@ -1,7 +1,6 @@
 #pragma once
 #include "headers.h"
 #include "Core/ISerializer.h"
-#include "Infrastructure/MsgPackSerializer.h"
 
 namespace Stormancer
 {
@@ -30,7 +29,7 @@ namespace Stormancer
 		}
 
 		template<typename T, typename MT>
-		void serialize(map<string, MT> myMap)
+		void serialize(map<wstring, MT> myMap)
 		{
 			MsgPack::Serializer srlz(&stream);
 			srlz << MsgPack__Factory(MapHeader(myMap.size()));

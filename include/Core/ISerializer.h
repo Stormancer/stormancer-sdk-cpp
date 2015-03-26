@@ -12,16 +12,16 @@ namespace Stormancer
 		template<typename T>
 		void serialize(T data, byteStream& stream)
 		{
-			throw "Not implemented.";
+			throw string("Not implemented.");
 		}
 
 		template<typename T>
 		T deserialize(byteStream& stream)
 		{
-			throw "Not implemented.";
+			throw string("Not implemented.");
 		}
 
 	public:
-		const string name;
+		const wstring name;
 	};
 };

@@ -18,6 +18,6 @@ namespace Stormancer
 
 	using byteStream = stringbuf;
 
-	using StringMap = map < string, string > ;
-	using AnyMap = map < string, void* > ;
+	using StringMap = map < wstring, wstring > ;
+	using AnyMap = map < wstring, void* > ;
 };

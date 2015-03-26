@@ -188,8 +188,11 @@
     <ClInclude Include="include\Configuration\ClientConfiguration.h" />
     <ClInclude Include="include\Core\IScene.h" />
     <ClInclude Include="include\Core\ISerializer.h" />
+    <ClInclude Include="include\Core\Models\ConnectionData.h" />
     <ClInclude Include="include\Helpers.h" />
+    <ClInclude Include="include\Infrastructure\ITokenHandler.h" />
     <ClInclude Include="include\Infrastructure\MsgPackSerializer.h" />
+    <ClInclude Include="include\Infrastructure\TokenHandler.h" />
     <ClInclude Include="include\Scene.h" />
     <ClInclude Include="include\SceneEndpoint.h" />
     <ClInclude Include="include\SystemMessages\SceneInfosDto.h" />
@@ -214,8 +217,11 @@
     <ClCompile Include="src\Configuration\ClientConfiguration.cpp" />
     <ClCompile Include="src\Core\IScene.cpp" />
     <ClCompile Include="src\Core\ISerializer.cpp" />
+    <ClCompile Include="src\Core\Models\ConnectionData.cpp" />
     <ClCompile Include="src\Helpers.cpp" />
+    <ClCompile Include="src\Infrastructure\ITokenHandler.cpp" />
     <ClCompile Include="src\Infrastructure\MsgPackSerializer.cpp" />
+    <ClCompile Include="src\Infrastructure\TokenHandler.cpp" />
     <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\SceneEndpoint.cpp" />
   </ItemGroup>

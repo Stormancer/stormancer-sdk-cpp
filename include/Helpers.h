@@ -23,10 +23,12 @@ namespace Stormancer
 	{
 		bool ensureSuccessStatusCode(int statusCode);
 
+		void displayException(const exception& e);
+
 		template<typename T>
-		string mapKeys(map<string, T> map)
+		wstring mapKeys(map<wstring, T> map)
 		{
-			auto vec = vector<string>();
+			auto vec = vector<wstring>();
 			for (auto it = map.begin(); it != map.end(); ++it)
 			{
 				vec.push_back(it->first);
@@ -40,9 +42,43 @@ namespace Stormancer
 			return (map.find(key) != map.end) ? true : false;
 		}
 
-		string vectorJoin(vector<string> vector, string glue = "");
+		wstring vectorJoin(vector<wstring> vector, wstring glue = L"");
 
-		vector<string> stringSplit(const string& str, const string& glue);
+		vector<wstring> stringSplit(const wstring& str, const wstring glue);
+
+		wstring stringTrim(wstring str, wchar_t ch = ' ');
+
+		template<typename T>
+		inline wstring to_wstring(T data)
+		{
+			return to_wstring(to_string(data));
+		}
+
+		template<>
+		inline wstring to_wstring<string>(string str)
+		{
+			wstring_convert<codecvt_utf8<wchar_t>, wchar_t> convert;
+			return convert.from_bytes(str);
+		}
+
+		template<>
+		inline wstring to_wstring<const char*>(const char* str)
+		{
+			return to_wstring(string(str));
+		}
+
+		template<typename T>
+		inline string to_string(T& data)
+		{
+			return std::to_string(data);
+		}
+
+		template<>
+		inline string to_string<wstring>(wstring& str)
+		{
+			wstring_convert<codecvt_utf8<wchar_t>, wchar_t> convert;
+			return convert.to_bytes(str);
+		}
 
 		class StringFormat
 		{
@@ -50,28 +86,29 @@ namespace Stormancer
 			StringFormat();
 
 			template<typename... Args>
-			StringFormat(string format, Args... args)
+			StringFormat(wstring format, Args... args)
 			{
-				int _[] = {0, (replace(format, args), 0)...};
+				int _[] = { 0, (format = replace(format, args), 0)... };
 				stream << format;
 			}
 
 			template<typename T>
-			string& replace(string& format, T replacement)
+			wstring replace(wstring format, T replacement)
 			{
-				return replace(format, to_string(replacement));
+				return replace(format, to_wstring(replacement));
 			}
 
 			template<>
-			string& replace<string>(string& format, string replacement)
+			wstring replace<wstring>(wstring format, wstring replacement)
 			{
-				string toFind = "{" + to_string(formatI) + "}";
-				string::size_type start = format.find(toFind);
-				if (start != string::npos)
+				wstring toFind = L"{" + to_wstring(formatI) + L"}";
+				wstring::size_type start = format.find(toFind);
+				if (start != wstring::npos)
 				{
-					string::size_type end = start + toFind.size();
-					format.replace(start, end, replacement);
+					wstring::size_type size = toFind.size();
+					format.replace(start, size, replacement);
 				}
+				formatI++;
 				return format;
 			}
 
@@ -88,20 +125,18 @@ namespace Stormancer
 				stream >> data;
 			}
 
-			string str();
+			wstring str();
 
-			//operator string();
-			operator const char*();
+			const wchar_t* c_str();
+
+			operator string();
+			operator wstring();
+			//operator const char*();
+			//operator const wchar_t*();
 
 		private:
-			stringstream stream;
+			wstringstream stream;
 			int formatI = 0;
 		};
-
-		//template<typename T>
-		//string stringFormat(string format, initializer_list<string> args);
-
-		string stringTrim(string& str);
-		wstring to_wstring(string& str);
 	};
 };
