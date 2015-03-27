@@ -4,7 +4,7 @@
 
 namespace Stormancer
 {
-	template<typename T>
+	template<typename T = IConnection>
 	class Packet
 	{
 	public:
@@ -27,9 +27,9 @@ namespace Stormancer
 		AnyMap metadata;
 	};
 
-	class Packet2 : public Packet < IConnection >
-	{
-	public:
-		Packet2(shared_ptr<IConnection*> source, byteStream& stream);
-	};
+	//class Packet2 : public Packet < IConnection >
+	//{
+	//public:
+	//	Packet2(shared_ptr<IConnection*> source, byteStream& stream);
+	//};
 };

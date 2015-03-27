@@ -80,6 +80,18 @@ namespace Stormancer
 			return convert.to_bytes(str);
 		}
 
+		template<>
+		inline string to_string<vector<byte>>(vector<byte>& v)
+		{
+			string str;
+			str.resize(v.size());
+			for (size_t i = 0; i < v.size(); i++)
+			{
+				str[i] = v[i];
+			}
+			return str;
+		}
+
 		class StringFormat
 		{
 		public:

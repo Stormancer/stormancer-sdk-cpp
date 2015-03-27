@@ -41,12 +41,12 @@ namespace Stormancer
 
 	// Packet2
 
-	Packet2::Packet2(shared_ptr<IConnection*> source, byteStream& stream)
-		: Packet(source, stream)
-	{
-	}
+	//Packet2::Packet2(shared_ptr<IConnection*> source, byteStream& stream)
+	//	: Packet(source, stream)
+	//{
+	//}
 
-	Packet2::~Packet2()
-	{
-	}
+	//Packet2::~Packet2()
+	//{
+	//}
 };

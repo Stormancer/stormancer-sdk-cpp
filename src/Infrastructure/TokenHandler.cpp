@@ -15,17 +15,16 @@ namespace Stormancer
 	{
 		token = Helpers::stringTrim(token, '"');
 		wstring data = Helpers::stringSplit(token, L"-")[0];
-		auto buffer = utility::conversions::from_base64(data.c_str());
-		string buffer2;
-		buffer2.reserve(buffer.size());
-		for (auto i = 0; i < buffer.size(); i++)
-		{
-			buffer2[i] = buffer[i];
-		}
+		vector<byte> buffer = utility::conversions::from_base64(data);
+		string buffer2 = Helpers::to_string(buffer);
 		
 		byteStream bs(buffer2);
-		wstring result = _tokenSerializer->deserialize<wstring>(bs);
+		auto tknMsgPckSrlz = reinterpret_cast<MsgPackSerializer*>(_tokenSerializer.get());
+		ConnectionData result = tknMsgPckSrlz->deserialize<ConnectionData>(bs);
 
-		return SceneEndpoint();
+		SceneEndpoint sceneEp;
+		sceneEp.token = token;
+		sceneEp.tokenData = result;
+		return sceneEp;
 	}
 };

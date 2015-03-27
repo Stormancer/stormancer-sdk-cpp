@@ -69,7 +69,7 @@ void testMsgPack()
 	cout << "SERIALIZED: " << stream.str() << endl;
 
 	//stream = byteStream(stream.str());
-	MsgPack::Deserializer deserializer = MsgPack::Deserializer(&stream);
+	MsgPack::Deserializer deserializer(&stream);
 
 	cout << "DESERIALIZED: ";
 

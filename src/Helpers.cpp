@@ -9,7 +9,7 @@ namespace Stormancer
 
 	void Helpers::displayException(const exception& e)
 	{
-		string msg(e.what());
+		string msg = e.what();
 		wcout << Helpers::StringFormat(L"Error exception: {0}", msg).c_str() << endl;
 	}
 
@@ -33,11 +33,11 @@ namespace Stormancer
 		size_t cursor = 0, lastCursor = 0;
 		while ((cursor = str.find(glue, cursor)) != wstring::npos)
 		{
-			splitted << str.substr(lastCursor, cursor - 1 - lastCursor);
+			splitted << str.substr(lastCursor, cursor - lastCursor);
 			lastCursor = cursor;
 			cursor++;
 		}
-		splitted << str.substr(lastCursor, str.length() - 1 - lastCursor);
+		splitted << str.substr(lastCursor + 1, str.length() - lastCursor);
 		return splitted;
 	}
 

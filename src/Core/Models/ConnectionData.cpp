@@ -3,11 +3,15 @@
 namespace Stormancer
 {
 	ConnectionData::ConnectionData()
+		: UserData(nullptr)
 	{
 	}
 
 	ConnectionData::~ConnectionData()
 	{
-		delete UserData;
+		if (UserData != nullptr)
+		{
+			delete UserData;
+		}
 	}
 };
