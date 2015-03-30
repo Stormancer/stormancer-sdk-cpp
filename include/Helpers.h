@@ -150,5 +150,40 @@ namespace Stormancer
 			wstringstream stream;
 			int formatI = 0;
 		};
+
+		task<void> taskCompleted()
+		{
+			task_completion_event<void> tce;
+			tce.set();
+			return create_task(tce);
+		}
+
+		template<typename T>
+		task<T> taskCompleted(T& result)
+		{
+			task_completion_event<T> tce;
+			tce.set(result);
+			return create_task(tce);
+		}
+
+		template<typename T>
+		task<T> taskFromException(exception ex)
+		{
+			task_completion_event<T> tce;
+			tce.set_exception(ex);
+			return create_task(tce);
+		}
+
+		task<void> taskIf(bool condition, function<task<void>()> action)
+		{
+			if (condition)
+			{
+				return action();
+			}
+			else
+			{
+				return taskCompleted();
+			}
+		}
 	};
 };

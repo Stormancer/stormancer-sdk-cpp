@@ -11,7 +11,7 @@
 //#include "IPacketProcessor.h"
 //#include "IRequest.h"
 //#include "ITransport.h"
-//#include "MessageIDTypes.h"
+#include "MessageIDTypes.h"
 //#include "PacketProcessorConfig.h"
 #include "Scene.h"
 #include "SceneEndpoint.h"
@@ -31,7 +31,7 @@
 //#include "Core/Route.h"
 
 #include "Core/Models/ConnectionData.h"
-//#include "Core/Models/RouteDto.h"
+#include "Core/Models/RouteDto.h"
 
 //#include "Infrastructure/DefaultPacketDispatcher.h"
 //#include "Infrastructure/IPacketDispatcher.h"
@@ -55,8 +55,8 @@
 
 //#include "SystemMessages/ConnectedToSceneMsg.h"
 //#include "SystemMessages/ConnectionResult.h"
-//#include "SystemMessages/SceneInfosDto.h"
-//#include "SystemMessages/SceneInfosRequestDto.h"
+#include "SystemMessages/SceneInfosDto.h"
+#include "SystemMessages/SceneInfosRequestDto.h"
 
 //#include "Transports/RaknetTransport.h"
 //#include "Transports/RaknetConnection.h"

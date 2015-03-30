@@ -64,51 +64,66 @@ namespace Stormancer
 
 		// Base template
 		template<typename T>
-		T deserialize(byteStream& stream)
+		void deserialize(byteStream& stream, T& data)
 		{
 			MsgPack::Deserializer dsrlz(&stream);
 			unique_ptr<MsgPack::Element> element;
 			dsrlz >> element;
-			T& data = dynamic_cast<T&>(*element);
-			return data;
+			data = dynamic_cast<T&>(*element);
 		}
 
 		// Base template specializations
 
 		// string
 		template<>
-		string deserialize<string>(byteStream& stream)
+		void deserialize<string>(byteStream& stream, string& str)
 		{
 			MsgPack::Deserializer dsrlz(&stream);
 			unique_ptr<MsgPack::Element> element;
 			dsrlz >> element;
-			MsgPack::String& str = dynamic_cast<MsgPack::String&>(*element);
-			return str.stdString();
+			str = dynamic_cast<MsgPack::String&>(*element).stdString();
 		}
 
 		// wstring
 		template<>
-		wstring deserialize<wstring>(byteStream& stream)
+		void deserialize<wstring>(byteStream& stream, wstring& str)
 		{
-			string str = deserialize<string>(stream);
-			return Helpers::to_wstring(str);
+			string strTmp;
+			deserialize<string>(stream, strTmp);
+			str = Helpers::to_wstring(strTmp);
 		}
 
 		// ConnectionData
 		template<>
-		ConnectionData deserialize<ConnectionData>(byteStream& stream)
+		void deserialize<ConnectionData>(byteStream& stream, ConnectionData& data)
 		{
-			ConnectionData data;
-			data.Endpoints = deserialize<StringMap>(stream);
-			data.AccountId = deserialize<wstring>(stream);
-			data.Application = deserialize<wstring>(stream);
-			data.SceneId = deserialize<wstring>(stream);
-			data.Routing = deserialize<wstring>(stream);
-			data.Issued = deserialize<time_t>(stream);
-			data.Expiration = deserialize<time_t>(stream);
-			data.UserData = deserialize<byte*>(stream);
-			data.ContentType = deserialize<wstring>(stream);
-			return data;
+			MsgPack::Deserializer dsrlz(&stream);
+
+			dsrlz.deserialize([](std::unique_ptr<MsgPack::Element> parsed) {
+				std::cout << "Parsed: " << *parsed << "\n";
+				return false;
+			}, true);
+
+			/*unique_ptr<MsgPack::Element> element;
+			dsrlz >> element;
+			dsrlz >> element;
+			dsrlz >> element;
+			dsrlz >> element;
+			dsrlz >> element;
+			dsrlz >> element;
+			dsrlz >> element;
+			cout << "type: " << (int)element->getType() << endl;
+			element->toJSON(cout);
+
+			deserialize(stream, data.Endpoints);
+			deserialize(stream, data.AccountId);
+			deserialize(stream, data.Application);
+			deserialize(stream, data.SceneId);
+			deserialize(stream, data.Routing);
+			deserialize(stream, data.Issued);
+			deserialize(stream, data.Expiration);
+			deserialize(stream, data.UserData);
+			deserialize(stream, data.ContentType);*/
 		}
 
 #pragma endregion Base template
@@ -116,10 +131,9 @@ namespace Stormancer
 
 		// Array template
 		template<typename VT>
-		vector<VT> deserialize(byteStream& stream)
+		void deserialize(byteStream& stream, vector<VT>& v)
 		{
 			// TODO
-			return vector<VT>();
 		}
 
 #pragma endregion Vector template
@@ -127,13 +141,12 @@ namespace Stormancer
 
 		// Map template
 		template<typename MT>
-		map<wstring, MT> deserialize(byteStream& stream)
+		void deserialize(byteStream& stream, map<wstring, MT>& m)
 		{
 			MsgPack::Deserializer dsrlz(&stream);
-			map<wstring, MT> myMap;
-			unique_ptr<MsgPack::MapHeader> mapHeader;
-			dsrlz >> mapHeader;
-			return myMap;
+			unique_ptr<MsgPack::Element> element;
+			dsrlz >> element;
+			// TODO
 		}
 
 #pragma endregion Map template

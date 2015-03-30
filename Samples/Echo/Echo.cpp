@@ -7,7 +7,7 @@ void testMsgPack();
 
 int main(int argc, char* argv[])
 {
-	//testMsgPack();
+	testMsgPack();
 
 	testClient();
 
@@ -55,20 +55,24 @@ void testMsgPack()
 	byteStream stream;
 	MsgPack::Serializer serializer(&stream);
 
-	serializer << MsgPack__Factory(ArrayHeader(3)); //Next 3 elements belong in this array
+	/*serializer << MsgPack__Factory(ArrayHeader(3)); //Next 3 elements belong in this array
 	serializer << MsgPack::Factory(true);
 	serializer << MsgPack__Factory(ArrayHeader(0));
-	serializer << MsgPack::Factory("Hello World!");
+	serializer << MsgPack::Factory("Hello World!");*/
 
-	serializer << MsgPack__Factory(MapHeader(2));
-	serializer << MsgPack::Factory("type");
-	serializer << MsgPack::Factory("post");
-	serializer << MsgPack::Factory("message");
-	serializer << MsgPack::Factory("Hello World!");
+	serializer << MsgPack__Factory(MapHeader(3));
+	serializer << MsgPack::Factory("bool");
+	serializer << MsgPack::Factory(true);
+	serializer << MsgPack::Factory("int64");
+	serializer << MsgPack::Factory((int64)1337);
+	serializer << MsgPack::Factory("string");
+	serializer << MsgPack::Factory("1337");
 
-	cout << "SERIALIZED: " << stream.str() << endl;
+	string str = stream.str();
 
-	//stream = byteStream(stream.str());
+	cout << "SERIALIZED: " << str << endl;
+
+	stream = byteStream(str);
 	MsgPack::Deserializer deserializer(&stream);
 
 	cout << "DESERIALIZED: ";
@@ -78,21 +82,21 @@ void testMsgPack()
 	deserializer >> element;
 
 	cout << *element << endl;
-	//cout << "type: " << (int)element->getType() << endl;
-	//element->toJSON(cout);
+	cout << "type: " << (int)element->getType() << endl;
+	element->toJSON(cout);
 
-	MsgPack::Array& array = dynamic_cast<MsgPack::Array&>(*element);
-	for (int i = 0; i < array.getContainer()->size(); i++)
+	MsgPack::Map& map = dynamic_cast<MsgPack::Map&>(*element);
+	for (int i = 0; i < map.getContainer()->size(); i++)
 	{
-		cout << *(array.getContainer()->at(i)) << endl;
+		cout << *(map.getContainer()->at(i)) << endl;
 	}
 
-	MsgPack::Primitive& pri = dynamic_cast<MsgPack::Primitive&>(*(array.getContainer()->at(0)));
+	/*MsgPack::Primitive& pri = dynamic_cast<MsgPack::Primitive&>(*(map.getContainer()->at(0)));
 	cout << pri.getValue() << endl;
 
-	MsgPack::Array& arr = dynamic_cast<MsgPack::Array&>(*(array.getContainer()->at(1)));
+	MsgPack::Array& arr = dynamic_cast<MsgPack::Array&>(*(map.getContainer()->at(1)));
 	cout << arr << endl;
 
-	MsgPack::String& str = dynamic_cast<MsgPack::String&>(*(array.getContainer()->at(2)));
-	cout << str.stdString() << endl;
+	MsgPack::String& str2 = dynamic_cast<MsgPack::String&>(*(map.getContainer()->at(2)));
+	cout << str2.stdString() << endl;*/
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include "headers.h"
+#include "ITransport.h"
 
 namespace Stormancer
 {
@@ -18,7 +19,7 @@ namespace Stormancer
 		wstring application;
 		wstring serverEndpoint;
 		//shared_ptr<IPacketDispatcher*> dispatcher;
-		//ITransport transport;
+		shared_ptr<ITransport> transport;
 		//list<ISerializer> serializers;
 		uint16 maxPeers;
 		//list<shared_ptr<IClientPlugin*>> plugins;

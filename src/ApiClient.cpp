@@ -40,7 +40,7 @@ namespace Stormancer
 		//wstring relativeUri = L"/search?q=Casablanca%20CodePlex";
 		//request.set_request_uri(relativeUri);
 
-		return client.request(request).then([&](task<http_response> myTask) -> task<SceneEndpoint> {
+		return client.request(request).then([this, accountId, applicationName, sceneId](task<http_response> myTask) -> task<SceneEndpoint> {
 			try
 			{
 				http_response response = myTask.get();
@@ -51,14 +51,13 @@ namespace Stormancer
 				if (Helpers::ensureSuccessStatusCode(statusCode))
 				{
 					concurrency::streams::stringstreambuf ss;
-					return response.body().read_to_end(ss).then([ss, this](task<size_t> myTask2) -> SceneEndpoint {
+					return response.body().read_to_end(ss).then([this, ss](task<size_t> myTask2) -> SceneEndpoint {
 						try
 						{
 							size_t size = myTask2.get();
-							string str = ss.collection();
-							wstring str2 = Helpers::to_wstring(str);
-							wcout << L"HOORA!" << str2 << endl;
-							return _tokenHandler->decodeToken(str2);
+							wstring str = Helpers::to_wstring(ss.collection());
+							wcout << L"HOORA!" << str << endl;
+							return SceneEndpoint(); //_tokenHandler->decodeToken(str);
 						}
 						catch (const exception& e)
 						{

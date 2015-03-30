@@ -3,10 +3,9 @@
 
 namespace Stormancer
 {
-	class ClassName
+	struct SceneInfosRequestDto
 	{
-	public:
-		ClassName();
-		virtual ~ClassName();
+		wstring Token;
+		StringMap Metadata;
 	};
 };

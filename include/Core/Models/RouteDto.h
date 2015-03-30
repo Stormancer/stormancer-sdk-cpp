@@ -5,8 +5,8 @@ namespace Stormancer
 {
 	struct RouteDto
 	{
-		string Name;
+		wstring Name;
 		uint16 Handle;
-		map<string, string> Metadata;
+		StringMap Metadata;
 	};
 };

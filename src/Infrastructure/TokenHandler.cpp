@@ -19,8 +19,10 @@ namespace Stormancer
 		string buffer2 = Helpers::to_string(buffer);
 		
 		byteStream bs(buffer2);
+		bs.pubseekpos(0);
 		auto tknMsgPckSrlz = reinterpret_cast<MsgPackSerializer*>(_tokenSerializer.get());
-		ConnectionData result = tknMsgPckSrlz->deserialize<ConnectionData>(bs);
+		ConnectionData result;
+		tknMsgPckSrlz->deserialize(bs, result);
 
 		SceneEndpoint sceneEp;
 		sceneEp.token = token;

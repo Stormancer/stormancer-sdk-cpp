@@ -10,14 +10,15 @@ namespace Stormancer
 		~ConnectionData();
 
 	public:
-		StringMap Endpoints;
 		wstring AccountId;
 		wstring Application;
-		wstring SceneId;
-		wstring Routing;
-		time_t Issued;
-		time_t Expiration;
-		byte* UserData;
 		wstring ContentType;
+		wstring DeploymentId;
+		StringMap Endpoints;
+		wstring Expiration;
+		wstring Issued;
+		wstring Routing;
+		wstring SceneId;
+		vector<byte> UserData;
 	};
 };

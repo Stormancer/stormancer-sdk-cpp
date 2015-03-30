@@ -1,12 +1,14 @@
 #pragma once
 #include "headers.h"
+#include "Core/Models/RouteDto.h"
 
 namespace Stormancer
 {
-	class SceneInfosDto
+	struct SceneInfosDto
 	{
-	public:
-		SceneInfosDto();
-		virtual ~SceneInfosDto();
+		wstring SceneId;
+		StringMap Metadata;
+		vector<RouteDto> Routes;
+		wstring SelectedSerializer;
 	};
 };
