@@ -46,7 +46,8 @@ namespace Stormancer
 		//_requestProcessor(RequestProcessor(_logger, list<shared_ptr<IRequestModule*>>())),
 		//_scenesDispatcher(SceneDispatcher()),
 		_metadata(config.metadata),
-		_maxPeers(config.maxPeers)
+		_maxPeers(config.maxPeers),
+		_systemSerializer(new MsgPackSerializer)
 	{
 		/*for each (ISerializer& serializer in config.serializers)
 		{
@@ -122,7 +123,7 @@ namespace Stormancer
 		parameter.Metadata = _serverConnection.get()->metadata;
 		parameter.Token = sep.token;
 
-		SceneInfosDto result = sendSystemRequest<SceneInfosRequestDto, SceneInfosDto>((byte)MessageIDTypes.ID_GET_SCENE_INFOS, parameter);
+		SceneInfosDto result = sendSystemRequest<SceneInfosRequestDto, SceneInfosDto>((byte)MessageIDTypes::ID_GET_SCENE_INFOS, parameter).get();
 
 		if (_serverConnection.get()->getComponent<shared_ptr<ISerializer>>().get() == nullptr)
 		{
@@ -137,5 +138,17 @@ namespace Stormancer
 		
 		//_pluginCtx.sceneCreated(scene);
 		return scene;
+	}
+
+	template<typename T, typename U>
+	task<U> Client::sendSystemRequest(byte id, T parameter)
+	{
+		return _requestProcessor.sendSystemRequest(_serverConnection, id, [this](byteStream& stream) {
+			_systemSerializer.serialize(parameter, stream);
+		}).then([this](Packet<> packet) {
+			U res;
+			_systemSerializer.deserialize(stream, res);
+			return res;
+		});
 	}
 };

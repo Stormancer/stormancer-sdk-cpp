@@ -1,4 +1,3 @@
-
 #include "ScenePeer.h"
 
 namespace Stormancer

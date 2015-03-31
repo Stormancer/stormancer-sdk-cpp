@@ -15,7 +15,7 @@
 //#include "PacketProcessorConfig.h"
 #include "Scene.h"
 #include "SceneEndpoint.h"
-//#include "ScenePeer.h"
+#include "ScenePeer.h"
 
 #include "Configuration/ClientConfiguration.h"
 
@@ -23,12 +23,12 @@
 //#include "Core/IConnection.h"
 //#include "Core/ILogger.h"
 #include "Core/IScene.h"
-//#include "Core/IScenePeer.h"
+#include "Core/IScenePeer.h"
 #include "Core/ISerializer.h"
 //#include "Core/Packet.h"
 //#include "Core/PacketPriority.h"
 //#include "Core/PacketReliability.h"
-//#include "Core/Route.h"
+#include "Core/Route.h"
 
 #include "Core/Models/ConnectionData.h"
 #include "Core/Models/RouteDto.h"

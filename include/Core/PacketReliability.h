@@ -4,7 +4,7 @@
 namespace Stormancer
 {
 	// Different available reliability levels when sending a packet.
-	enum PacketReliability
+	enum class PacketReliability
 	{
 		// The packet may be lost, or arrive out of order. There are no guarantees whatsoever.
 		UNRELIABLE = 0,

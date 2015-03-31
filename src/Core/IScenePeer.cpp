@@ -1,13 +1,12 @@
-
-#include "ClassName.h"
+#include "stormancer.h"
 
 namespace Stormancer
 {
-	ClassName::ClassName()
+	IScenePeer::IScenePeer()
 	{
 	}
 
-	ClassName::~ClassName()
+	IScenePeer::~IScenePeer()
 	{
 	}
 };

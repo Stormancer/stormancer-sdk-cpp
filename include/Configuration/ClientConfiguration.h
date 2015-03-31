@@ -23,7 +23,7 @@ namespace Stormancer
 		//list<ISerializer> serializers;
 		uint16 maxPeers;
 		//list<shared_ptr<IClientPlugin*>> plugins;
-		StringMap metadata;
+		stringMap metadata;
 
 	private:
 		wstring apiEndpoint = L"http://localhost:8081/";

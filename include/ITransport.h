@@ -1,6 +1,7 @@
 #pragma once
 #include "headers.h"
 #include "IConnectionManager.h"
+#include "Core/Packet.h"
 
 namespace Stormancer
 {
@@ -10,8 +11,8 @@ namespace Stormancer
 		ITransport();
 		virtual ~ITransport();
 
-		virtual task<void> start(wstring name, shared_ptr<IConnectionManager> handler, cancellation_token token, uint16 port, uint16 maxConnections) = 0;
-		virtual task<IConnection> connect(wstring endpoint) = 0;
+		virtual pplx::task<void> start(wstring name, shared_ptr<IConnectionManager> handler, pplx::cancellation_token token, uint16 port, uint16 maxConnections) = 0;
+		virtual pplx::task<shared_ptr<IConnection>> connect(wstring endpoint) = 0;
 
 	public:
 		bool isRunning;

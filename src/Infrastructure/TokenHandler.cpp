@@ -19,8 +19,12 @@ namespace Stormancer
 		string buffer2 = Helpers::to_string(buffer);
 		
 		byteStream bs(buffer2);
-		bs.pubseekpos(0);
-		auto tknMsgPckSrlz = reinterpret_cast<MsgPackSerializer*>(_tokenSerializer.get());
+		shared_ptr<MsgPackSerializer> tknMsgPckSrlz = dynamic_pointer_cast<MsgPackSerializer>(_tokenSerializer);
+		if (tknMsgPckSrlz.get() == nullptr)
+		{
+			throw string("MsgPack serializer not found in TokenHandler::decodeToken");
+		}
+
 		ConnectionData result;
 		tknMsgPckSrlz->deserialize(bs, result);
 

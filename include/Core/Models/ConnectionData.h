@@ -14,7 +14,7 @@ namespace Stormancer
 		wstring Application;
 		wstring ContentType;
 		wstring DeploymentId;
-		StringMap Endpoints;
+		stringMap Endpoints;
 		wstring Expiration;
 		wstring Issued;
 		wstring Routing;

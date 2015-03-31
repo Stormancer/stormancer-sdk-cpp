@@ -7,6 +7,6 @@ namespace Stormancer
 	{
 		wstring Name;
 		uint16 Handle;
-		StringMap Metadata;
+		stringMap Metadata;
 	};
 };

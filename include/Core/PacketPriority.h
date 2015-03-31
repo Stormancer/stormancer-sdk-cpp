@@ -7,7 +7,7 @@ namespace Stormancer
 	// If packets are in competition for expedition, priority levels work as follow:
 	// 2 HIGH_PRIORITY packets are sent for 1 MEDIUM_PRIORITY packet.
 	// 2 MEDIUM_PRIORITY packets are sent for 1 LOW_PRIORITY packet.
-	enum PacketPriority
+	enum class PacketPriority
 	{
 		// The packet is sent immediately without aggregation.
 		IMMEDIATE_PRIORITY = 0,

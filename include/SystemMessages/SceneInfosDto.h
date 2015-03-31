@@ -7,7 +7,7 @@ namespace Stormancer
 	struct SceneInfosDto
 	{
 		wstring SceneId;
-		StringMap Metadata;
+		stringMap Metadata;
 		vector<RouteDto> Routes;
 		wstring SelectedSerializer;
 	};

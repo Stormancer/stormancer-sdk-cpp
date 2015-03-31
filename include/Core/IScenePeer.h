@@ -3,10 +3,10 @@
 
 namespace Stormancer
 {
-	class ClassName
+	class IScenePeer
 	{
 	public:
-		ClassName();
-		virtual ~ClassName();
+		IScenePeer();
+		virtual ~IScenePeer();
 	};
 };

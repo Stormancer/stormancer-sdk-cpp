@@ -4,6 +4,7 @@
 #include "ApiClient.h"
 #include "Scene.h"
 #include "SceneEndpoint.h"
+#include "Core/ISerializer.h"
 
 namespace Stormancer
 {
@@ -39,6 +40,9 @@ namespace Stormancer
 	private:
 		task<Scene> getScene(wstring sceneId, SceneEndpoint sep);
 
+		template<typename T, typename U>
+		task<U> sendSystemRequest(byte id, T parameter);
+
 	private:
 		bool _initialized;
 		wstring _accountId;
@@ -49,13 +53,13 @@ namespace Stormancer
 		//shared_ptr<IPacketDispatcher> _dispatcher;
 		shared_ptr<ITokenHandler> _tokenHandler;
 		ApiClient _apiClient;
-		//shared_ptr<ISerializer*> _systemSerializer;
+		shared_ptr<ISerializer> _systemSerializer;
 		//RequestProcessor _requestProcessor;
 		//SceneDispatcher _sceneDispatcher;
 		map<wstring, shared_ptr<ISerializer>> _serializers;
 		cancellation_token_source _cts;
 		uint16 _maxPeers;
-		StringMap _metadata;
+		stringMap _metadata;
 		//shared_ptr<ILogger> _logger;
 	};
 };

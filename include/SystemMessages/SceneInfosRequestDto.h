@@ -6,6 +6,6 @@ namespace Stormancer
 	struct SceneInfosRequestDto
 	{
 		wstring Token;
-		StringMap Metadata;
+		stringMap Metadata;
 	};
 };
