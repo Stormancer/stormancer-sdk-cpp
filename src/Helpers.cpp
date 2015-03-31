@@ -27,11 +27,11 @@ namespace Stormancer
 		return ss.str();
 	}
 
-	vector<wstring> Helpers::stringSplit(const wstring& str, const wstring glue)
+	vector<wstring> Helpers::stringSplit(const wstring& str, const wstring separator)
 	{
 		vector<wstring> splitted;
 		size_t cursor = 0, lastCursor = 0;
-		while ((cursor = str.find(glue, cursor)) != wstring::npos)
+		while ((cursor = str.find(separator, cursor)) != wstring::npos)
 		{
 			splitted << str.substr(lastCursor, cursor - lastCursor);
 			lastCursor = cursor;

@@ -2,9 +2,9 @@
 #include "headers.h"
 #include "Configuration/ClientConfiguration.h"
 #include "ApiClient.h"
-#include "Scene.h"
 #include "SceneEndpoint.h"
 #include "Core/ISerializer.h"
+#include "Scene.h"
 
 namespace Stormancer
 {

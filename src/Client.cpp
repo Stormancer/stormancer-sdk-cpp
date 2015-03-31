@@ -132,12 +132,12 @@ namespace Stormancer
 				throw string("No serializer selected.");
 			}
 			_serverConnection.get()->registerComponent(_serializers[result.SelectedSerializer]);
-			_serverConnection.get()->metadata["serializer"] = result.SelectedSerializer;
+			_serverConnection.get()->metadata[L"serializer"] = result.SelectedSerializer;
 		}
 		Scene scene(_serverConnection, this, sceneId, sep.token, result);
 		
-		//_pluginCtx.sceneCreated(scene);
-		return scene;
+		throw string("not implem");
+		//return scene;
 	}
 
 	template<typename T, typename U>

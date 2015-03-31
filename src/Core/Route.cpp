@@ -2,6 +2,12 @@
 
 namespace Stormancer
 {
+	Route::Route()
+		: _scene(nullptr),
+		index(0)
+	{
+	}
+
 	Route::Route(IScene* scene, wstring routeName, uint16 handle, stringMap metadata)
 		: _name(routeName),
 		_scene(scene),

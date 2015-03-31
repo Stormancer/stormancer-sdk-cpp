@@ -4,6 +4,7 @@
 #include "typedef2.h"
 
 #include "ApiClient.h"
+#include "Scene.h"
 #include "Client.h"
 //#include "DefaultLogger.h"
 #include "Helpers.h"
@@ -13,7 +14,6 @@
 //#include "ITransport.h"
 #include "MessageIDTypes.h"
 //#include "PacketProcessorConfig.h"
-#include "Scene.h"
 #include "SceneEndpoint.h"
 #include "ScenePeer.h"
 

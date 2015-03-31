@@ -18,6 +18,7 @@
 #include <future>
 #include <regex>
 #include <cstdarg>
+#include <clocale>
 #include <locale>
 #include <codecvt>
 #include <cctype>
@@ -29,6 +30,12 @@
 #include <cpprest/filestream.h>
 #include <ppltasks.h>
 #include <pplx/pplxtasks.h>
+#include <rx.hpp>
+
+namespace rx = rxcpp;
+namespace rxu = rxcpp::util;
+namespace rxsc = rxcpp::schedulers;
+namespace rxsub = rxcpp::subjects;
 
 // packed libs
 #include <MsgPack.h>

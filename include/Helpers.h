@@ -25,10 +25,22 @@ namespace Stormancer
 
 		void displayException(const exception& e);
 
-		template<typename T>
-		wstring mapKeys(map<wstring, T> map)
+		anyMap stringMapToAnyMap(stringMap sm)
 		{
-			auto vec = vector<wstring>();
+			anyMap am;
+			for (auto it = sm.begin(); it != sm.end(); ++it)
+			{
+				wstring key = it->first;
+				void* ptr = (void*)&it->second;
+				am[key] = ptr;
+			}
+			return am;
+		}
+
+		template<typename TKey, typename TValue>
+		vector<TKey> mapKeys(map<TKey, TValue> map)
+		{
+			vector<TKey> vec;
 			for (auto it = map.begin(); it != map.end(); ++it)
 			{
 				vec.push_back(it->first);
@@ -36,15 +48,26 @@ namespace Stormancer
 			return vec;
 		}
 
-		template<typename T, typename U>
-		bool mapContains(map<T, U> map, T& key)
+		template<typename TKey, typename TValue>
+		vector<TValue> mapValues(map<TKey, TValue> map)
+		{
+			vector<TValue> vec;
+			for (auto it = map.begin(); it != map.end(); ++it)
+			{
+				vec.push_back(it->second);
+			}
+			return vec;
+		}
+
+		template<typename TKey, typename TValue>
+		bool mapContains(map<TKey, TValue> map, TKey& key)
 		{
 			return (map.find(key) != map.end) ? true : false;
 		}
 
 		wstring vectorJoin(vector<wstring> vector, wstring glue = L"");
 
-		vector<wstring> stringSplit(const wstring& str, const wstring glue);
+		vector<wstring> stringSplit(const wstring& str, const wstring separator);
 
 		wstring stringTrim(wstring str, wchar_t ch = ' ');
 
@@ -143,8 +166,6 @@ namespace Stormancer
 
 			operator string();
 			operator wstring();
-			//operator const char*();
-			//operator const wchar_t*();
 
 		private:
 			wstringstream stream;
