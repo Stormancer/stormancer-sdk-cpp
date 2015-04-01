@@ -25,7 +25,7 @@ namespace Stormancer
 
 		void displayException(const exception& e);
 
-		anyMap stringMapToAnyMap(stringMap sm)
+		anyMap stringMapToAnyMap(stringMap& sm)
 		{
 			anyMap am;
 			for (auto it = sm.begin(); it != sm.end(); ++it)
@@ -38,7 +38,7 @@ namespace Stormancer
 		}
 
 		template<typename TKey, typename TValue>
-		vector<TKey> mapKeys(map<TKey, TValue> map)
+		vector<TKey> mapKeys(map<TKey, TValue>& map)
 		{
 			vector<TKey> vec;
 			for (auto it = map.begin(); it != map.end(); ++it)
@@ -49,7 +49,7 @@ namespace Stormancer
 		}
 
 		template<typename TKey, typename TValue>
-		vector<TValue> mapValues(map<TKey, TValue> map)
+		vector<TValue> mapValues(map<TKey, TValue>& map)
 		{
 			vector<TValue> vec;
 			for (auto it = map.begin(); it != map.end(); ++it)
@@ -60,16 +60,16 @@ namespace Stormancer
 		}
 
 		template<typename TKey, typename TValue>
-		bool mapContains(map<TKey, TValue> map, TKey& key)
+		bool mapContains(map<TKey, TValue>& map, TKey& key)
 		{
-			return (map.find(key) != map.end) ? true : false;
+			return (map.find(key) != map.end()) ? true : false;
 		}
 
 		wstring vectorJoin(vector<wstring> vector, wstring glue = L"");
 
 		vector<wstring> stringSplit(const wstring& str, const wstring separator);
 
-		wstring stringTrim(wstring str, wchar_t ch = ' ');
+		wstring stringTrim(wstring& str, wchar_t ch = ' ');
 
 		template<typename T>
 		inline wstring to_wstring(T data)
@@ -121,20 +121,21 @@ namespace Stormancer
 			StringFormat();
 
 			template<typename... Args>
-			StringFormat(wstring format, Args... args)
+			StringFormat(wstring format, Args&... args)
 			{
-				int _[] = { 0, (format = replace(format, args), 0)... };
-				stream << format;
+				wstring& formatTmp = format;
+				int _[] = { 0, (formatTmp = replace(formatTmp, args), 0)... };
+				stream << formatTmp;
 			}
 
 			template<typename T>
-			wstring replace(wstring format, T replacement)
+			wstring replace(wstring& format, T& replacement)
 			{
 				return replace(format, to_wstring(replacement));
 			}
 
 			template<>
-			wstring replace<wstring>(wstring format, wstring replacement)
+			wstring replace<wstring>(wstring& format, wstring& replacement)
 			{
 				wstring toFind = L"{" + to_wstring(formatI) + L"}";
 				wstring::size_type start = format.find(toFind);
@@ -148,7 +149,7 @@ namespace Stormancer
 			}
 
 			template<typename T>
-			StringFormat& operator<<(T data)
+			StringFormat& operator<<(T& data)
 			{
 				stream << data;
 				return *this;
@@ -188,14 +189,14 @@ namespace Stormancer
 		}
 
 		template<typename T>
-		task<T> taskFromException(exception ex)
+		task<T> taskFromException(exception& ex)
 		{
 			task_completion_event<T> tce;
 			tce.set_exception(ex);
 			return create_task(tce);
 		}
 
-		task<void> taskIf(bool condition, function<task<void>()> action)
+		task<void> taskIf(bool condition, function<task<void>()>& action)
 		{
 			if (condition)
 			{
@@ -205,6 +206,16 @@ namespace Stormancer
 			{
 				return taskCompleted();
 			}
+		}
+
+		template<typename T, typename U>
+		void streamCopy(T& fromStream, U& toStream)
+		{
+			streamsize n = fromStream.rdbuf()->in_avail();
+			char* c = new char[n];
+			fromStream.readsome(c, n);
+			toStream.write(c, n);
+			delete[] c;
 		}
 	};
 };

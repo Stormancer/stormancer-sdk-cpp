@@ -107,34 +107,69 @@ namespace Stormancer
 		onMessage(route);
 	}
 
-	void Scene::sendPacket(wstring route, function<void(byteStream&)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE)
+	void Scene::sendPacket(wstring routeName, function<void(byteStream&)> writer, PacketPriority priority, PacketReliability reliability)
 	{
+		if (routeName.length() == 0)
+		{
+			throw string("routeName is empty.");
+		}
+		if (!_connected)
+		{
+			throw string("The scene must be connected to perform this operation.");
+		}
+		if (!Helpers::mapContains(_remoteRoutesMap, routeName))
+		{
+			throw string("The routeName doesn't exist on the scene.");
+		}
+		Route& route = _remoteRoutesMap[routeName];
 
+		_peer.get()->sendToScene(_handle, route.index, writer, priority, reliability);
 	}
 
 	task<void> Scene::connect()
 	{
-
+		return _client->connectToScene(this, _token, _localRoutesMap).then([this]() {
+			_connected = true;
+		});
 	}
 
 	task<void> Scene::disconnect()
 	{
-
+		return _client.disconnect(this, _handle);
 	}
 
 	void Scene::completeConnectionInitialization(ConnectionResult cr)
 	{
+		_handle = cr.SceneHandle;
 
+		for (auto& pair : _localRoutesMap)
+		{
+			pair.second.index = cr.RouteMappings[pair.first];
+			_handlers[pair.second.index] = pair.second.handlers;
+		}
 	}
-	
+
 	void Scene::handleMessage(Packet<> packet)
 	{
+		auto ev = packetReceived;
+		ev(packet);
+		byte tmp[2];
+		tmp[0] = packet.stream.sbumpc();
+		tmp[1] = packet.stream.sbumpc();
+		auto routeId = tmp[0] * 256 + tmp[1];
 
+		packet.metadata["routeId"] = routeId;
+
+		if (_handlers.find(routeId) != _handlers.end())
+		{
+			auto observer = _handlers[routeId];
+			observer(packet);
+		}
 	}
 
-	vector<IScenePeer> Scene::remotePeers()
+	vector<shared_ptr<IScenePeer>> Scene::remotePeers()
 	{
-
+		return vector < shared_ptr<IScenePeer> > { host() };
 	}
 
 	shared_ptr<IScenePeer> Scene::host()

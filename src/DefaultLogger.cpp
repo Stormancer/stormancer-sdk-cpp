@@ -1,11 +1,10 @@
-
-#include "DefaultLogger.h"
+#include "stormancer.h"
 
 namespace Stormancer
 {
-	shared_ptr<ILogger*> DefaultLogger::instance()
+	shared_ptr<ILogger> DefaultLogger::instance()
 	{
-		static shared_ptr<ILogger*> defaultLogger = make_shared<ILogger*>(new DefaultLogger());
+		static shared_ptr<ILogger> defaultLogger = make_shared<ILogger>(new DefaultLogger);
 		return defaultLogger;
 	}
 
@@ -17,23 +16,23 @@ namespace Stormancer
 	{
 	}
 
-	void DefaultLogger::Log(LogLevel level, string category, string message, string data)
+	void DefaultLogger::log(LogLevel level, wstring category, wstring message, wstring data)
 	{
 		time_t t = time(nullptr);
-		cout << put_time(localtime(&t), "%F %T") << endl;
-		cout << "level: " << static_cast<int>(level);
+		wcout << put_time(localtime(&t), "%F %T") << endl;
+		wcout << L"level: " << static_cast<int>(level);
 		if (category.length())
 		{
-			cout << "category: " << category << endl;
+			wcout << L"category: " << category << endl;
 		}
 		if (message.length())
 		{
-			cout << "message: " << message << endl;
+			wcout << L"message: " << message << endl;
 		}
 		if (data.length())
 		{
-			cout << "data: " << data << endl;
+			wcout << L"data: " << data << endl;
 		}
-		cout << endl;
+		wcout << endl;
 	}
 };

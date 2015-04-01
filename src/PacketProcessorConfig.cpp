@@ -1,5 +1,4 @@
-#include "PacketProcessorConfig.h"
-#include "Helpers.h"
+#include "stormancer.h"
 
 namespace Stormancer
 {
@@ -17,9 +16,7 @@ namespace Stormancer
 	{
 		if (Helpers::mapContains(_handlers, msgId))
 		{
-			stringstream sstm;
-			sstm << "An handler is already registered for id " << (int)msgId;
-			throw new exception(sstm.str().c_str());
+			throw string(Helpers::StringFormat(L"An handler is already registered for id {0}.", msgId));
 		}
 		_handlers[msgId] = handler;
 	}

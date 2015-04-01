@@ -7,9 +7,9 @@ namespace Stormancer
 	class DefaultLogger : public ILogger
 	{
 	public:
-		static shared_ptr<ILogger*> instance();
+		static shared_ptr<ILogger> instance();
 
-		void Log(LogLevel level, string category, string message, string data);
+		void log(LogLevel level, wstring category, wstring message, wstring data);
 
 	protected:
 		DefaultLogger();

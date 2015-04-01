@@ -4,7 +4,7 @@
 namespace Stormancer
 {
 	// The available log levels.
-	enum LogLevel
+	enum class LogLevel
 	{
 		// Applies to critical errors that prevent the program from continuing.
 		Fatal,
@@ -28,6 +28,6 @@ namespace Stormancer
 		virtual ~ILogger();
 
 		// Logs a string message
-		virtual void Log(LogLevel level, string category, string message, string data) = 0;
+		virtual void log(LogLevel level, wstring category, wstring message, wstring data) = 0;
 	};
 };

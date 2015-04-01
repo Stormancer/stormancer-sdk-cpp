@@ -51,7 +51,7 @@ namespace Stormancer
 	{
 		/*for each (ISerializer& serializer in config.serializers)
 		{
-			_serializers.insert(serializer.name, serializer);
+		_serializers.insert(serializer.name, serializer);
 		}*/
 
 		//_metadata["serializers"] = Helpers::vectorJoin(Helpers::mapKeys(_serializers), ",");
@@ -78,19 +78,19 @@ namespace Stormancer
 
 	/*shared_ptr<ILogger*> Client::logger()
 	{
-		return _logger;
+	return _logger;
 	}
 
 	void Client::setLogger(shared_ptr<ILogger*> logger)
 	{
-		if ((*logger) != nullptr)
-		{
-			_logger = logger;
-		}
-		else
-		{
-			_logger = DefaultLogger::instance();
-		}
+	if ((*logger) != nullptr)
+	{
+	_logger = logger;
+	}
+	else
+	{
+	_logger = DefaultLogger::instance();
+	}
 	}*/
 
 	task<Scene> Client::getPublicScene(wstring sceneId, wstring userData)
@@ -109,7 +109,7 @@ namespace Stormancer
 			if (!_transport.get()->isRunning)
 			{
 				_cts = cancellation_token_source();
-				_transport.get()->start(L"client", make_shared<IConnectionManager>(new ConnectionHandler()), _cts.get_token(), 0, (_maxPeers+1));
+				_transport.get()->start(L"client", make_shared<IConnectionManager>(new ConnectionHandler()), _cts.get_token(), 0, (_maxPeers + 1));
 			}
 			wstring endpoint = sep.tokenData.Endpoints[_transport.get()->name];
 			_serverConnection = make_shared<IConnection>(_transport.get()->connect(endpoint));
@@ -135,9 +135,30 @@ namespace Stormancer
 			_serverConnection.get()->metadata[L"serializer"] = result.SelectedSerializer;
 		}
 		Scene scene(_serverConnection, this, sceneId, sep.token, result);
-		
+
 		throw string("not implem");
 		//return scene;
+	}
+
+	task<void> Client::connectToScene(Scene& scene, wstring& token, vector<Route&> localRoutes)
+	{
+		ConnectToSceneMsg parameter;
+		parameter.Token = token;
+		for (auto& r : localRoutes)
+		{
+			RouteDto routeDto;
+			routeDto.Handle = r.index;
+			routeDto.Metadata = r.metadata;
+			routeDto.Name = r.name;
+			parameter.Routes << routeDto;
+		}
+		parameter.ConnectionMetadata = _serverConnection.get()->metadata;
+
+		return sendSystemRequest<ConnectToSceneMsg, ConnectionResult>((byte)MessageIDTypes::ID_CONNECT_TO_SCENE, parameter)
+			.then([&](ConnectionResult result) {
+			scene.completeConnectionInitialization(result);
+			_sceneDispatcher.addScene(scene);
+		});
 	}
 
 	template<typename T, typename U>

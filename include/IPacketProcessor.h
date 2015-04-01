@@ -11,6 +11,6 @@ namespace Stormancer
 		IPacketProcessor();
 		virtual ~IPacketProcessor();
 
-		virtual void registerProcessor(PacketProcessorConfig config) = 0;
+		virtual void registerProcessor(PacketProcessorConfig& config) = 0;
 	};
 };

@@ -13,22 +13,28 @@ namespace Stormancer
 		{
 			time_t lastRefresh;
 			uint16 id;
-			Packet2 packet;
-			pplx::task_completion_event<bool> tcs;
+			rx::observer<Packet<>> observer;
+			pplx::task_completion_event<void> tcs;
+			pplx::task<void> task = create_task(tcs);
 		};
 
 	public:
-		RequestProcessor(shared_ptr<ILogger*> logger, vector<shared_ptr<IRequestModule*>> modules);
+		RequestProcessor(shared_ptr<ILogger>& logger, vector<shared_ptr<IRequestModule>> modules);
 		virtual ~RequestProcessor();
 
-		void registerProcessor(PacketProcessorConfig config);
-		void addSystemRequestHandler(byte msgId, function<pplx::task<void>(RequestContext)> handler);
+	public:
+		void registerProcessor(PacketProcessorConfig& config);
+		pplx::task<Packet<>> sendSystemRequest(shared_ptr<IConnection>& peer, byte msgId, function<void(byteStream&)> writer);
+		pplx::task<Packet<>> sendSceneRequest(shared_ptr<IConnection> peer, byte sceneId, uint16 routeId, function<void(byteStream&)> writer);
+		void addSystemRequestHandler(byte msgId, function<pplx::task<void>(RequestContext)>& handler);
+
+	private:
+		Request reserveRequestSlot(rx::observer<Packet<>> observer);
 
 	private:
 		map<uint16, Request> _pendingRequests;
-		shared_ptr<ILogger*> _logger;
-
-		bool _isRegistered;
+		shared_ptr<ILogger> _logger;
+		bool _isRegistered = false;
 		map<byte, function<pplx::task<void>(RequestContext)>> _handlers;
 	};
 };
