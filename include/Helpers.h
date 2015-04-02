@@ -49,9 +49,9 @@ namespace Stormancer
 		}
 
 		template<typename TKey, typename TValue>
-		vector<TValue> mapValues(map<TKey, TValue>& map)
+		vector<TValue&> mapValues(map<TKey, TValue>& map)
 		{
-			vector<TValue> vec;
+			vector<TValue&> vec;
 			for (auto it = map.begin(); it != map.end(); ++it)
 			{
 				vec.push_back(it->second);
@@ -181,7 +181,7 @@ namespace Stormancer
 		}
 
 		template<typename T>
-		task<T> taskCompleted(T& result)
+		task<T> taskCompleted(T result)
 		{
 			task_completion_event<T> tce;
 			tce.set(result);
@@ -196,7 +196,7 @@ namespace Stormancer
 			return create_task(tce);
 		}
 
-		task<void> taskIf(bool condition, function<task<void>()>& action)
+		task<void> taskIf(bool condition, function<task<void>()> action)
 		{
 			if (condition)
 			{

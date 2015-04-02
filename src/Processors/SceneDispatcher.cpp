@@ -15,9 +15,9 @@ namespace Stormancer
 		config.addCatchAllProcessor(handler);
 	}
 
-	void SceneDispatcher::addScene(Scene& scene)
+	void SceneDispatcher::addScene(Scene* scene)
 	{
-		auto index = scene.handle - (byte)MessageIDTypes::ID_SCENES;
+		uint8 index = scene->handle - (byte)MessageIDTypes::ID_SCENES;
 		_scenes[index] = scene;
 	}
 
@@ -46,7 +46,7 @@ namespace Stormancer
 
 		auto& scene = _scenes[toSearch];
 		packet.setMetadata(L"scene", &scene);
-		scene.handleMessage(packet);
+		scene->handleMessage(packet);
 		return true;
 	}
 };

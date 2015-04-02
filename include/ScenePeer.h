@@ -9,7 +9,7 @@ namespace Stormancer
 	class ScenePeer : public IScenePeer
 	{
 	public:
-		ScenePeer(shared_ptr<IConnection>& connection, byte sceneHandle, map<wstring, Route>& routeMapping, Scene& scene);
+		ScenePeer(shared_ptr<IConnection>& connection, byte sceneHandle, map<wstring, Route>& routeMapping, Scene* scene);
 		virtual ~ScenePeer();
 
 	public:
@@ -21,6 +21,6 @@ namespace Stormancer
 		shared_ptr<IConnection> _connection;
 		byte _sceneHandle;
 		map<wstring, Route> _routeMapping;
-		Scene& _scene;
+		Scene* _scene;
 	};
 };

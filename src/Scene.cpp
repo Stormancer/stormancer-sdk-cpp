@@ -44,17 +44,17 @@ namespace Stormancer
 		return _peer;
 	}
 
-	vector<Route> Scene::localRoutes()
+	vector<Route&> Scene::localRoutes()
 	{
 		return Helpers::mapValues(_localRoutesMap);
 	}
 
-	vector<Route> Scene::remoteRoutes()
+	vector<Route&> Scene::remoteRoutes()
 	{
 		return Helpers::mapValues(_remoteRoutesMap);
 	}
 
-	void Scene::addRoute(wstring routeName, function<void(Packet<IScenePeer>)> handler, stringMap metadata)
+	void Scene::addRoute(wstring routeName, function<void(Packet<IScenePeer>&)> handler, stringMap metadata)
 	{
 		if (routeName.length() == 0 || routeName[0] == '@')
 		{
@@ -76,15 +76,15 @@ namespace Stormancer
 
 	rx::observable<Packet<IScenePeer>> Scene::onMessage(Route route)
 	{
-		auto ob = rx::observable<>::create<Packet<IScenePeer>>([this, route](rx::subscriber<Packet<IScenePeer>> observer) {
-			function<void(Packet<>)> action = [this, observer](Packet<> data) {
-				Packet<IScenePeer> packet(host(), data.stream, data.metadata());
+		rx::observable<Packet<IScenePeer>> ob = rx::observable<>::create<Packet<IScenePeer>>([this, &route](rx::subscriber<Packet<IScenePeer>> observer) {
+			function<void(Packet<>&)> handler = [this, &observer](Packet<>& p) {
+				Packet<IScenePeer> packet(host(), p.stream, p.metadata());
 				observer.on_next(packet);
 			};
-			route.handlers.push_back(action);
+			route.handlers.push_back(handler);
 
-			return [route, action]() {
-				auto it = find(route.handlers.begin(), route.handlers.end(), action);
+			return [&route, &handler]() {
+				auto it = find(route.handlers.begin(), route.handlers.end(), handler);
 				route.handlers.erase(it);
 			};
 		});
@@ -117,9 +117,10 @@ namespace Stormancer
 		{
 			throw string("The scene must be connected to perform this operation.");
 		}
+
 		if (!Helpers::mapContains(_remoteRoutesMap, routeName))
 		{
-			throw string("The routeName doesn't exist on the scene.");
+			throw string(Helpers::StringFormat(L"The route '{0}' doesn't exist on the scene.", routeName));
 		}
 		Route& route = _remoteRoutesMap[routeName];
 
@@ -128,14 +129,14 @@ namespace Stormancer
 
 	task<void> Scene::connect()
 	{
-		return _client->connectToScene(this, _token, _localRoutesMap).then([this]() {
+		return _client->connectToScene(this, _token, Helpers::mapValues(_localRoutesMap)).then([this]() {
 			_connected = true;
 		});
 	}
 
 	task<void> Scene::disconnect()
 	{
-		return _client.disconnect(this, _handle);
+		return _client->disconnect(this, _handle);
 	}
 
 	void Scene::completeConnectionInitialization(ConnectionResult cr)
@@ -149,20 +150,23 @@ namespace Stormancer
 		}
 	}
 
-	void Scene::handleMessage(Packet<> packet)
+	void Scene::handleMessage(Packet<>& packet)
 	{
-		auto ev = packetReceived;
-		ev(packet);
-		byte tmp[2];
-		tmp[0] = packet.stream.sbumpc();
-		tmp[1] = packet.stream.sbumpc();
-		auto routeId = tmp[0] * 256 + tmp[1];
+		for (auto& fun : packetReceived)
+		{
+			fun(packet);
+		}
 
-		packet.metadata["routeId"] = routeId;
+		byte tmp[2];
+		packet.stream >> tmp[0];
+		packet.stream >> tmp[1];
+		uint16 routeId = tmp[0] * 256 + tmp[1];
+
+		packet.setMetadata(L"routeId", new uint16(routeId));
 
 		if (_handlers.find(routeId) != _handlers.end())
 		{
-			auto observer = _handlers[routeId];
+			auto& observer = _handlers[routeId];
 			observer(packet);
 		}
 	}

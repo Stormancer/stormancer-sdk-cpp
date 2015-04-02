@@ -22,21 +22,26 @@ void testClient()
 	config.serverEndpoint = L"http://ipv4.fiddler:8081";
 
 	Client client(config);
-	auto task = client.getPublicScene(L"test-scene", L"hello").then([&](Scene scene) {
-		/*scene.addRoute("echo.out", [&](p) {
-		cout << p.readObject<wstring>() << endl;
+	auto task = client.getPublicScene(L"test-scene", L"hello").then([](pplx::task<shared_ptr<Scene>>& t) {
+		auto scene = t.get();
+		scene.get()->addRoute(L"echo.out", [](Packet<IScenePeer>& p) {
+			wstring str;
+			p.serializer().get()->deserialize(p.stream, str);
+			wcout << str << endl;
 		});
 
-		scene.connect().then([&](t2) {
-		if (t2.isCompleted)
-		{
-		scene.send("echo.in", "hello");
-		}
-		else
-		{
-		cout << "Bad stuff happened..." << endl;
-		}
-		});*/
+		scene.get()->connect().then([&scene](pplx::task<void> t2) {
+			if (t2.is_done())
+			{
+				scene.get()->sendPacket(L"echo.in", [](byteStream& stream) {
+					stream << L"hello";
+				});
+			}
+			else
+			{
+				wcout << L"Bad stuff happened..." << endl;
+			}
+		});
 	});
 
 	try
@@ -45,7 +50,7 @@ void testClient()
 	}
 	catch (const exception &e)
 	{
-		printf("Error exception:%s\n", e.what());
+		wcout << L"Error exception:\n" << e.what();
 	}
 
 }

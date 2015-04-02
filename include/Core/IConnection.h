@@ -13,10 +13,10 @@ namespace Stormancer
 		virtual ~IConnection();
 
 		template<typename T>
-		void registerComponent(T component);
+		void registerComponent(T* component);
 
 		template<typename T>
-		T getComponent();
+		bool getComponent(T* component = nullptr);
 
 		virtual void sendSystem(char msgId, function<void(byteStream)> writer) = 0;
 		virtual void sendToScene(char sceneIndex, uint16 route, function<void(byteStream)> writer, PacketPriority priority, PacketReliability reliability) = 0;
@@ -33,5 +33,8 @@ namespace Stormancer
 		ConnectionState state;
 		int ping;
 		function<void(string)> connectionClosed;
+
+	private:
+		map<type_info, void*> _components;
 	};
 };

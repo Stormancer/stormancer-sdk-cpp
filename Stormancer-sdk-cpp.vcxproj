@@ -189,7 +189,6 @@
     <ClInclude Include="include\Core\ConnectionState.h" />
     <ClInclude Include="include\Core\IConnection.h" />
     <ClInclude Include="include\Core\ILogger.h" />
-    <ClInclude Include="include\Core\IScene.h" />
     <ClInclude Include="include\Core\IScenePeer.h" />
     <ClInclude Include="include\Core\ISerializer.h" />
     <ClInclude Include="include\Core\Models\ConnectionData.h" />
@@ -201,10 +200,13 @@
     <ClInclude Include="include\DefaultLogger.h" />
     <ClInclude Include="include\Helpers.h" />
     <ClInclude Include="include\IConnectionManager.h" />
+    <ClInclude Include="include\Infrastructure\DefaultPacketDispatcher.h" />
+    <ClInclude Include="include\Infrastructure\IPacketDispatcher.h" />
     <ClInclude Include="include\Infrastructure\ITokenHandler.h" />
     <ClInclude Include="include\Infrastructure\MsgPackSerializer.h" />
     <ClInclude Include="include\Infrastructure\TokenHandler.h" />
     <ClInclude Include="include\IPacketProcessor.h" />
+    <ClInclude Include="include\IRequest.h" />
     <ClInclude Include="include\ITransport.h" />
     <ClInclude Include="include\MessageIDTypes.h" />
     <ClInclude Include="include\PacketProcessorConfig.h" />
@@ -216,6 +218,7 @@
     <ClInclude Include="include\ScenePeer.h" />
     <ClInclude Include="include\SystemMessages\ConnectToSceneMsg.h" />
     <ClInclude Include="include\SystemMessages\ConnectionResult.h" />
+    <ClInclude Include="include\SystemMessages\EmptyDto.h" />
     <ClInclude Include="include\SystemMessages\SceneInfosDto.h" />
     <ClInclude Include="include\SystemMessages\SceneInfosRequestDto.h" />
     <ClInclude Include="include\typedef2.h" />
@@ -239,7 +242,6 @@
     <ClCompile Include="src\Configuration\ClientConfiguration.cpp" />
     <ClCompile Include="src\Core\IConnection.cpp" />
     <ClCompile Include="src\Core\ILogger.cpp" />
-    <ClCompile Include="src\Core\IScene.cpp" />
     <ClCompile Include="src\Core\IScenePeer.cpp" />
     <ClCompile Include="src\Core\ISerializer.cpp" />
     <ClCompile Include="src\Core\Models\ConnectionData.cpp" />
@@ -247,10 +249,15 @@
     <ClCompile Include="src\DefaultLogger.cpp" />
     <ClCompile Include="src\Helpers.cpp" />
     <ClCompile Include="src\IConnectionManager.cpp" />
+    <ClCompile Include="src\Infrastructure\DefaultPacketDispatcher.cpp" />
+    <ClCompile Include="src\Infrastructure\IPacketDispatcher.cpp" />
     <ClCompile Include="src\Infrastructure\ITokenHandler.cpp" />
+    <ClCompile Include="src\Infrastructure\Modules\IRequestModule.cpp" />
+    <ClCompile Include="src\Infrastructure\Modules\RequestModuleBuilder.cpp" />
     <ClCompile Include="src\Infrastructure\MsgPackSerializer.cpp" />
     <ClCompile Include="src\Infrastructure\TokenHandler.cpp" />
     <ClCompile Include="src\IPacketProcessor.cpp" />
+    <ClCompile Include="src\IRequest.cpp" />
     <ClCompile Include="src\ITransport.cpp" />
     <ClCompile Include="src\PacketProcessorConfig.cpp" />
     <ClCompile Include="src\Processors\RequestContext.cpp" />

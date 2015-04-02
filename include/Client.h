@@ -37,11 +37,15 @@ namespace Stormancer
 	public:
 		void initialize();
 		wstring applicationName();
-		shared_ptr<ILogger*> logger();
-		void setLogger(shared_ptr<ILogger*> logger);
-		task<Scene> getPublicScene(wstring sceneId, wstring userData);
-		task<Scene> getScene(wstring sceneId, SceneEndpoint sep);
-		task<void> connectToScene(Scene& scene, wstring& token, vector<Route&> localRoutes);
+		shared_ptr<ILogger> logger();
+		void setLogger(shared_ptr<ILogger> logger);
+		task<shared_ptr<Scene>> getPublicScene(wstring sceneId, wstring userData);
+		task<shared_ptr<Scene>> getScene(wstring sceneId, SceneEndpoint sep);
+		void disconnect();
+
+	private:
+		task<void> connectToScene(Scene* scene, wstring& token, vector<Route&> localRoutes);
+		task<void> disconnect(Scene* scene, byte sceneHandle);
 
 	private:
 		template<typename T, typename U>
@@ -54,12 +58,12 @@ namespace Stormancer
 		//const PluginBuildContext _pluginCtx;
 		shared_ptr<IConnection> _serverConnection;
 		shared_ptr<ITransport> _transport;
-		//shared_ptr<IPacketDispatcher> _dispatcher;
+		shared_ptr<IPacketDispatcher> _dispatcher;
 		shared_ptr<ITokenHandler> _tokenHandler;
 		ApiClient _apiClient;
 		shared_ptr<ISerializer> _systemSerializer;
 		RequestProcessor _requestProcessor;
-		SceneDispatcher _sceneDispatcher;
+		SceneDispatcher _scenesDispatcher;
 		map<wstring, shared_ptr<ISerializer>> _serializers;
 		cancellation_token_source _cts;
 		uint16 _maxPeers;

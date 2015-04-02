@@ -9,6 +9,7 @@ namespace Stormancer
 		ISerializer();
 		virtual ~ISerializer();
 
+	public:
 		template<typename T>
 		void serialize(T data, byteStream& stream)
 		{
@@ -16,7 +17,7 @@ namespace Stormancer
 		}
 
 		template<typename T>
-		T deserialize(byteStream& stream)
+		void deserialize(byteStream& stream, T& data)
 		{
 			throw string("Not implemented.");
 		}

@@ -23,6 +23,7 @@
 #include <codecvt>
 #include <cctype>
 #include <algorithm>
+#include <typeinfo>
 
 // custom libs
 

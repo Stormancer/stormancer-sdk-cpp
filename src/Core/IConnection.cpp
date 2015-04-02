@@ -1,5 +1,4 @@
-
-#include "Core/IConnection.h"
+#include "stormancer.h"
 
 namespace Stormancer
 {
@@ -12,13 +11,25 @@ namespace Stormancer
 	}
 
 	template<typename T>
-	void IConnection::registerComponent(T component)
+	void IConnection::registerComponent(T* component)
 	{
+		_components[typeid(T)] = dynamic_cast<void*>(component);
 	}
 
 	template<typename T>
-	T IConnection::getComponent()
+	bool IConnection::getComponent(T* component)
 	{
-		return T();
+		uint64 tid = typeid(T);
+		if (Helpers::mapContains(_components, tid))
+		{
+			if (component != nullptr)
+			{
+				component = dynamic_cast<T*>(_components[tid]);
+			}
+			return true;
+		}
+
+		component = nullptr;
+		return false;
 	}
 };

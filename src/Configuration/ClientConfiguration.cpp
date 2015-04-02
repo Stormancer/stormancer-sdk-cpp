@@ -5,11 +5,11 @@ namespace Stormancer
 	ClientConfiguration::ClientConfiguration(wstring account, wstring application)
 		: account(account),
 		application(application),
-		//dispatcher(make_shared<IPacketDispatcher*>(new DefaultPacketDispatcher())),
+		dispatcher(make_shared<IPacketDispatcher>(new DefaultPacketDispatcher)),
 		//transport(RaknetTransport(DefaultLogger::instance())),
 		maxPeers(20)
 	{
-		//serializers.push_back(MsgPackSerializer());
+		serializers.push_back(make_shared<ISerializer>(new MsgPackSerializer));
 		//plugins.push_back(make_shared<IClientPlugin*>(new RpcClientPlugin()));
 	}
 

@@ -24,7 +24,7 @@ namespace Stormancer
 		for (auto& it : _handlers)
 		{
 			config.addProcessor(it.first, [&it](Packet<>& p) {
-				auto context = RequestContext(p);
+				RequestContext context(p);
 				it.second(context).then([&context, &p](pplx::task<void> task) {
 					if (!context.isComplete())
 					{
@@ -46,9 +46,7 @@ namespace Stormancer
 			});
 		}
 
-		auto& _pendingRequests = this->_pendingRequests;
-		auto& _logger = this->_logger;
-		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG, [this, &_pendingRequests, &_logger](Packet<>& p) {
+		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG, [this](Packet<>& p) {
 			byte temp[2];
 			p.stream.readsome((char*)temp, 2);
 			uint16 id = temp[0] * 256 + temp[1];
@@ -69,9 +67,7 @@ namespace Stormancer
 			Request request;
 		});
 
-		auto& _pendingRequests = this->_pendingRequests;
-		auto& _logger = this->_logger;
-		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_COMPLETE, [this, &_pendingRequests, &_logger](Packet<>& p) {
+		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_COMPLETE, [this](Packet<>& p) {
 			byte temp[2];
 			p.stream.readsome((char*)temp, 2);
 			uint16 id = temp[0] * 256 + temp[1];
@@ -108,9 +104,7 @@ namespace Stormancer
 			return true;
 		});
 
-		auto& _pendingRequests = this->_pendingRequests;
-		auto& _logger = this->_logger;
-		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_ERROR, [this, &_pendingRequests, &_logger](Packet<>& p) {
+		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_ERROR, [this](Packet<>& p) {
 			byte temp[2];
 			p.stream.readsome((char*)temp, 2);
 			uint16 id = temp[0] * 256 + temp[1];

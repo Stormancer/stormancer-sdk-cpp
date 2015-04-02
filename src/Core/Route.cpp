@@ -8,7 +8,7 @@ namespace Stormancer
 	{
 	}
 
-	Route::Route(IScene* scene, wstring routeName, uint16 handle, stringMap metadata)
+	Route::Route(Scene* scene, wstring& routeName, uint16 handle, stringMap& metadata)
 		: _name(routeName),
 		_scene(scene),
 		_metadata(metadata),
@@ -16,7 +16,7 @@ namespace Stormancer
 	{
 	}
 
-	Route::Route(IScene* scene, wstring routeName, stringMap metadata)
+	Route::Route(Scene* scene, wstring& routeName, stringMap& metadata)
 		: Route(scene, routeName, 0, metadata)
 	{
 	}
@@ -25,7 +25,7 @@ namespace Stormancer
 	{
 	}
 
-	IScene* Route::scene()
+	Scene* Route::scene()
 	{
 		return _scene;
 	}

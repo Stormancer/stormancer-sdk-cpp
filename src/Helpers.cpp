@@ -41,7 +41,7 @@ namespace Stormancer
 		return splitted;
 	}
 
-	wstring Helpers::stringTrim(wstring str, wchar_t ch)
+	wstring Helpers::stringTrim(wstring& str, wchar_t ch)
 	{
 		function<int(int)> ischar = [ch](int c) -> int {
 			if (c == ch)

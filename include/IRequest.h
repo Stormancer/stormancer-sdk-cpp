@@ -3,10 +3,10 @@
 
 namespace Stormancer
 {
-	class ClassName
+	class IRequest
 	{
 	public:
-		ClassName();
-		virtual ~ClassName();
+		IRequest();
+		virtual ~IRequest();
 	};
 };

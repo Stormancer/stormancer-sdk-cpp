@@ -66,7 +66,7 @@ namespace Stormancer
 		template<typename T>
 		void deserialize(byteStream& stream, T& data)
 		{
-			MsgPack::Deserializer dsrlz(&stream);
+			MsgPack::Deserializer dsrlz(stream.rdbuf());
 			unique_ptr<MsgPack::Element> element;
 			dsrlz >> element;
 			data = dynamic_cast<T&>(*element);
@@ -78,7 +78,7 @@ namespace Stormancer
 		template<>
 		void deserialize<string>(byteStream& stream, string& str)
 		{
-			MsgPack::Deserializer dsrlz(&stream);
+			MsgPack::Deserializer dsrlz(stream.rdbuf());
 			unique_ptr<MsgPack::Element> element;
 			dsrlz >> element;
 			str = dynamic_cast<MsgPack::String&>(*element).stdString();
@@ -97,7 +97,7 @@ namespace Stormancer
 		template<>
 		void deserialize<ConnectionData>(byteStream& stream, ConnectionData& data)
 		{
-			MsgPack::Deserializer dsrlz(&stream);
+			MsgPack::Deserializer dsrlz(stream.rdbuf());
 
 			dsrlz.deserialize([](std::unique_ptr<MsgPack::Element> parsed) {
 				std::cout << "Parsed: " << *parsed << "\n";

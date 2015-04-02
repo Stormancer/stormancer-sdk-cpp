@@ -1,6 +1,7 @@
 #pragma once
 #include "headers.h"
 #include "ITransport.h"
+#include "Infrastructure/IPacketDispatcher.h"
 
 namespace Stormancer
 {
@@ -12,17 +13,17 @@ namespace Stormancer
 
 		wstring getApiEndpoint();
 		ClientConfiguration& setMetadata(wstring key, wstring value);
-		//void addPlugin(shared_ptr<IClientPlugin*> plugin);
+		//void addPlugin(shared_ptr<IClientPlugin> plugin);
 
 	public:
 		wstring account;
 		wstring application;
 		wstring serverEndpoint;
-		//shared_ptr<IPacketDispatcher*> dispatcher;
+		shared_ptr<IPacketDispatcher> dispatcher;
 		shared_ptr<ITransport> transport;
-		//list<ISerializer> serializers;
+		vector<shared_ptr<ISerializer>> serializers;
 		uint16 maxPeers;
-		//list<shared_ptr<IClientPlugin*>> plugins;
+		//vector<shared_ptr<IClientPlugin>> plugins;
 		stringMap metadata;
 
 	private:

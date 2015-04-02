@@ -1,13 +1,12 @@
-
-#include "ClassName.h"
+#include "stormancer.h"
 
 namespace Stormancer
 {
-	ClassName::ClassName()
+	IRequest::IRequest()
 	{
 	}
 
-	ClassName::~ClassName()
+	IRequest::~IRequest()
 	{
 	}
 };

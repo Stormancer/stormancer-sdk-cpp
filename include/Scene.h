@@ -1,6 +1,5 @@
 #pragma once
 #include "headers.h"
-#include "Core/IScene.h"
 #include "Core/Route.h"
 #include "SystemMessages/SceneInfosDto.h"
 #include "SystemMessages/ConnectionResult.h"
@@ -10,9 +9,12 @@ namespace Stormancer
 {
 	class Client;
 
-	class Scene : public IScene
+	class Scene
 	{
-	public:
+		friend class Client;
+		friend class SceneDispatcher;
+
+	private:
 		Scene(shared_ptr<IConnection> connection, Client* client, wstring id, wstring token, SceneInfosDto dto);
 		virtual ~Scene();
 
@@ -22,21 +24,23 @@ namespace Stormancer
 		wstring id();
 		bool connected();
 		shared_ptr<IConnection> hostConnection();
-		vector<Route> localRoutes();
-		vector<Route> remoteRoutes();
-		void addRoute(wstring routeName, function<void(Packet<IScenePeer>)> handler, stringMap metadata = stringMap());
+		vector<Route&> localRoutes();
+		vector<Route&> remoteRoutes();
+		void addRoute(wstring routeName, function<void(Packet<IScenePeer>&)> handler, stringMap metadata = stringMap());
 		rx::observable<Packet<IScenePeer>> onMessage(Route route);
 		rx::observable<Packet<IScenePeer>> onMessage(wstring routeName);
-		void sendPacket(wstring route, function<void(byteStream&)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE);
+		void sendPacket(wstring routeName, function<void(byteStream&)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE);
 		task<void> connect();
 		task<void> disconnect();
-		void completeConnectionInitialization(ConnectionResult cr);
-		void handleMessage(Packet<> packet);
 		vector<shared_ptr<IScenePeer>> remotePeers();
 		shared_ptr<IScenePeer> host();
 
+	private:
+		void completeConnectionInitialization(ConnectionResult cr);
+		void handleMessage(Packet<>& packet);
+
 	public:
-		function<void(Packet<>)> packetReceived;
+		vector<function<void(Packet<>&)>> packetReceived;
 		const bool isHost = false;
 
 	private:
