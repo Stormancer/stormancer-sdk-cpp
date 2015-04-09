@@ -2,7 +2,7 @@
 
 namespace Stormancer
 {
-	ScenePeer::ScenePeer(shared_ptr<IConnection>& connection, byte sceneHandle, map<wstring, Route>& routeMapping, Scene* scene)
+	ScenePeer::ScenePeer(IConnection* connection, byte sceneHandle, map<wstring, Route>& routeMapping, Scene* scene)
 		: _connection(connection),
 		_sceneHandle(sceneHandle),
 		_routeMapping(routeMapping),
@@ -14,14 +14,14 @@ namespace Stormancer
 	{
 	}
 
-	void ScenePeer::send(wstring& routeName, function<void(byteStream&)> writer, PacketPriority priority, PacketReliability reliability)
+	void ScenePeer::send(wstring& routeName, function<void(byteStream*)> writer, PacketPriority priority, PacketReliability reliability)
 	{
 		if (!Helpers::mapContains(_routeMapping, routeName))
 		{
 			throw string(Helpers::StringFormat(L"The routeName '{0}' is not declared on the server.", routeName));
 		}
 		Route& r = _routeMapping[routeName];
-		_connection.get()->sendToScene(_sceneHandle, r.index, writer, priority, reliability);
+		_connection->sendToScene(_sceneHandle, r.index, writer, priority, reliability);
 	}
 
 	void ScenePeer::disconnect()
@@ -31,6 +31,6 @@ namespace Stormancer
 
 	uint64 ScenePeer::id()
 	{
-		return _connection.get()->id;
+		return _connection->id;
 	}
 };

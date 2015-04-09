@@ -14,6 +14,6 @@ namespace Stormancer
 		SceneEndpoint decodeToken(wstring token);
 
 	private:
-		const shared_ptr<ISerializer> _tokenSerializer;
+		const ISerializer* _tokenSerializer;
 	};
 };

@@ -6,19 +6,17 @@
 
 namespace Stormancer
 {
-	using namespace pplx;
-
 	class ApiClient
 	{
 	public:
-		ApiClient(ClientConfiguration& config, shared_ptr<ITokenHandler> tokenHandler);
+		ApiClient(ClientConfiguration* config, ITokenHandler* tokenHandler);
 		~ApiClient();
 
-		task<SceneEndpoint> getSceneEndpoint(wstring accountId, wstring applicationName, wstring sceneId, wstring userData = wstring());
+		pplx::task<SceneEndpoint> getSceneEndpoint(wstring accountId, wstring applicationName, wstring sceneId, wstring userData = wstring());
 
 	private:
-		ClientConfiguration _config;
+		ClientConfiguration* _config;
 		wstring _createTokenUri;
-		const shared_ptr<ITokenHandler> _tokenHandler;
+		const ITokenHandler* _tokenHandler;
 	};
 };

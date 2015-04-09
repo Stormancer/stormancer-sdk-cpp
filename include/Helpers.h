@@ -6,7 +6,7 @@ namespace Stormancer
 	// vector flux operators
 
 	template<typename T>
-	vector<T>& operator<<(vector<T>& v, const T data)
+	vector<T>& operator<<(vector<T>& v, const T& data)
 	{
 		v.push_back(data);
 		return v;
@@ -25,20 +25,21 @@ namespace Stormancer
 
 		void displayException(const exception& e);
 
-		anyMap stringMapToAnyMap(stringMap& sm)
+		anyMap stringMapToAnyMap(stringMap& sm);
+
+		template<typename TKey, typename TValue>
+		vector<TKey*> mapKeysPtr(map<TKey, TValue>& map)
 		{
-			anyMap am;
-			for (auto it = sm.begin(); it != sm.end(); ++it)
+			vector<TKey*> vec;
+			for (auto it = map.begin(); it != map.end(); ++it)
 			{
-				wstring key = it->first;
-				void* ptr = (void*)&it->second;
-				am[key] = ptr;
+				vec.push_back(&it->first);
 			}
-			return am;
+			return vec;
 		}
 
 		template<typename TKey, typename TValue>
-		vector<TKey> mapKeys(map<TKey, TValue>& map)
+		vector<TKey> mapKeysCpy(map<TKey, TValue>& map)
 		{
 			vector<TKey> vec;
 			for (auto it = map.begin(); it != map.end(); ++it)
@@ -49,9 +50,20 @@ namespace Stormancer
 		}
 
 		template<typename TKey, typename TValue>
-		vector<TValue&> mapValues(map<TKey, TValue>& map)
+		vector<TValue*> mapValuesPtr(map<TKey, TValue>& map)
 		{
-			vector<TValue&> vec;
+			vector<TValue*> vec;
+			for (auto it = map.begin(); it != map.end(); ++it)
+			{
+				vec.push_back(&it->second);
+			}
+			return vec;
+		}
+
+		template<typename TKey, typename TValue>
+		vector<TValue> mapValuesCopy(map<TKey, TValue>& map)
+		{
+			vector<TValue> vec;
 			for (auto it = map.begin(); it != map.end(); ++it)
 			{
 				vec.push_back(it->second);
@@ -80,8 +92,9 @@ namespace Stormancer
 		template<>
 		inline wstring to_wstring<string>(string str)
 		{
-			wstring_convert<codecvt_utf8<wchar_t>, wchar_t> convert;
-			return convert.from_bytes(str);
+			return wstring(str.begin(), str.end());
+			//wstring_convert<codecvt_utf8<wchar_t>, wchar_t> convert;
+			//return convert.from_bytes(str);
 		}
 
 		template<>
@@ -99,8 +112,9 @@ namespace Stormancer
 		template<>
 		inline string to_string<wstring>(wstring& str)
 		{
-			wstring_convert<codecvt_utf8<wchar_t>, wchar_t> convert;
-			return convert.to_bytes(str);
+			return string(str.begin(), str.end());
+			//wstring_convert<codecvt_utf8<wchar_t>, wchar_t> convert;
+			//return convert.to_bytes(str);
 		}
 
 		template<>
@@ -173,15 +187,15 @@ namespace Stormancer
 			int formatI = 0;
 		};
 
-		task<void> taskCompleted()
+		pplx::task<void> taskCompleted()
 		{
-			task_completion_event<void> tce;
+			pplx::task_completion_event<void> tce;
 			tce.set();
 			return create_task(tce);
 		}
 
 		template<typename T>
-		task<T> taskCompleted(T result)
+		pplx::task<T> taskCompleted(T result)
 		{
 			task_completion_event<T> tce;
 			tce.set(result);
@@ -189,14 +203,14 @@ namespace Stormancer
 		}
 
 		template<typename T>
-		task<T> taskFromException(exception& ex)
+		pplx::task<T> taskFromException(exception& ex)
 		{
 			task_completion_event<T> tce;
 			tce.set_exception(ex);
 			return create_task(tce);
 		}
 
-		task<void> taskIf(bool condition, function<task<void>()> action)
+		pplx::task<void> taskIf(bool condition, function<pplx::task<void>()> action)
 		{
 			if (condition)
 			{
@@ -209,13 +223,15 @@ namespace Stormancer
 		}
 
 		template<typename T, typename U>
-		void streamCopy(T& fromStream, U& toStream)
+		void streamCopy(T* fromStream, U* toStream)
 		{
-			streamsize n = fromStream.rdbuf()->in_avail();
+			streamsize n = fromStream->rdbuf()->in_avail();
 			char* c = new char[n];
-			fromStream.readsome(c, n);
-			toStream.write(c, n);
+			fromStream->readsome(c, n);
+			toStream->write(c, n);
 			delete[] c;
 		}
+
+		wstring nowStr();
 	};
 };

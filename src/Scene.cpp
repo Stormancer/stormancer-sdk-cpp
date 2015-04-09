@@ -2,7 +2,7 @@
 
 namespace Stormancer
 {
-	Scene::Scene(shared_ptr<IConnection> connection, Client* client, wstring id, wstring token, SceneInfosDto dto)
+	Scene::Scene(IConnection* connection, Client* client, wstring id, wstring token, SceneInfosDto dto)
 		: _id(id),
 		_peer(connection),
 		_token(token),
@@ -39,22 +39,22 @@ namespace Stormancer
 		return _connected;
 	}
 
-	shared_ptr<IConnection> Scene::hostConnection()
+	IConnection* Scene::hostConnection()
 	{
 		return _peer;
 	}
 
-	vector<Route&> Scene::localRoutes()
+	vector<Route*> Scene::localRoutes()
 	{
-		return Helpers::mapValues(_localRoutesMap);
+		return Helpers::mapValuesPtr(_localRoutesMap);
 	}
 
-	vector<Route&> Scene::remoteRoutes()
+	vector<Route*> Scene::remoteRoutes()
 	{
-		return Helpers::mapValues(_remoteRoutesMap);
+		return Helpers::mapValuesPtr(_remoteRoutesMap);
 	}
 
-	void Scene::addRoute(wstring routeName, function<void(Packet<IScenePeer>&)> handler, stringMap metadata)
+	void Scene::addRoute(wstring routeName, function<void(Packet<IScenePeer>*)> handler, stringMap metadata)
 	{
 		if (routeName.length() == 0 || routeName[0] == '@')
 		{
@@ -71,13 +71,14 @@ namespace Stormancer
 			_localRoutesMap[routeName] = Route(this, routeName, metadata);
 		}
 
-		onMessage(routeName).subscribe(handler);
+		onMessage(routeName)->subscribe(handler);
 	}
 
-	rx::observable<Packet<IScenePeer>> Scene::onMessage(Route route)
+	rx::observable<Packet<IScenePeer>*>* Scene::onMessage(Route* route)
 	{
-		rx::observable<Packet<IScenePeer>> ob = rx::observable<>::create<Packet<IScenePeer>>([this, &route](rx::subscriber<Packet<IScenePeer>> observer) {
-			function<void(Packet<>&)> handler = [this, &observer](Packet<>& p) {
+		throw string("LOL");
+		/*rx::observable<Packet<IScenePeer>> ob = rx::observable<>::create<Packet<IScenePeer>>([this, &route](rx::subscriber<Packet<IScenePeer>> observer) {
+			function<void(Packet<>*)> handler = [this, &observer](Packet<>* p) {
 				Packet<IScenePeer> packet(host(), p.stream, p.metadata());
 				observer.on_next(packet);
 			};
@@ -88,10 +89,10 @@ namespace Stormancer
 				route.handlers.erase(it);
 			};
 		});
-		return ob;
+		return ob;*/
 	}
 
-	rx::observable<Packet<IScenePeer>> Scene::onMessage(wstring routeName)
+	rx::observable<Packet<IScenePeer>*>* Scene::onMessage(wstring routeName)
 	{
 		if (_connected)
 		{
@@ -103,11 +104,11 @@ namespace Stormancer
 			_localRoutesMap[routeName] = Route(this, routeName);
 		}
 
-		Route& route = _localRoutesMap[routeName];
-		onMessage(route);
+		Route* route = &_localRoutesMap[routeName];
+		return onMessage(route);
 	}
 
-	void Scene::sendPacket(wstring routeName, function<void(byteStream&)> writer, PacketPriority priority, PacketReliability reliability)
+	void Scene::sendPacket(wstring routeName, function<void(byteStream*)> writer, PacketPriority priority, PacketReliability reliability)
 	{
 		if (routeName.length() == 0)
 		{
@@ -124,60 +125,63 @@ namespace Stormancer
 		}
 		Route& route = _remoteRoutesMap[routeName];
 
-		_peer.get()->sendToScene(_handle, route.index, writer, priority, reliability);
+		_peer->sendToScene(_handle, route.index, writer, priority, reliability);
 	}
 
-	task<void> Scene::connect()
+	pplx::task<void> Scene::connect()
 	{
-		return _client->connectToScene(this, _token, Helpers::mapValues(_localRoutesMap)).then([this]() {
+		return _client->connectToScene(this, _token, Helpers::mapValuesPtr(_localRoutesMap)).then([this]() {
 			_connected = true;
 		});
 	}
 
-	task<void> Scene::disconnect()
+	pplx::task<void> Scene::disconnect()
 	{
 		return _client->disconnect(this, _handle);
 	}
 
-	void Scene::completeConnectionInitialization(ConnectionResult cr)
+	void Scene::completeConnectionInitialization(ConnectionResult& cr)
 	{
 		_handle = cr.SceneHandle;
 
-		for (auto& pair : _localRoutesMap)
+		for (auto pair : _localRoutesMap)
 		{
 			pair.second.index = cr.RouteMappings[pair.first];
 			_handlers[pair.second.index] = pair.second.handlers;
 		}
 	}
 
-	void Scene::handleMessage(Packet<>& packet)
+	void Scene::handleMessage(Packet<>* packet)
 	{
-		for (auto& fun : packetReceived)
+		for (auto fun : packetReceived)
 		{
 			fun(packet);
 		}
 
 		byte tmp[2];
-		packet.stream >> tmp[0];
-		packet.stream >> tmp[1];
+		*packet->stream >> tmp[0];
+		*packet->stream >> tmp[1];
 		uint16 routeId = tmp[0] * 256 + tmp[1];
 
-		packet.setMetadata(L"routeId", new uint16(routeId));
+		packet->setMetadata(L"routeId", new uint16(routeId));
 
 		if (_handlers.find(routeId) != _handlers.end())
 		{
-			auto& observer = _handlers[routeId];
-			observer(packet);
+			auto observer = _handlers[routeId];
+			for (int i = 0; i < observer.size(); i++)
+			{
+				observer[i](packet);
+			}
 		}
 	}
 
-	vector<shared_ptr<IScenePeer>> Scene::remotePeers()
+	vector<IScenePeer*> Scene::remotePeers()
 	{
-		return vector < shared_ptr<IScenePeer> > { host() };
+		return vector<IScenePeer*> { host() };
 	}
 
-	shared_ptr<IScenePeer> Scene::host()
+	IScenePeer* Scene::host()
 	{
-		return make_shared<IScenePeer>(new ScenePeer(_peer, _handle, _remoteRoutesMap, this));
+		return new ScenePeer(_peer, _handle, _remoteRoutesMap, this);
 	}
 };

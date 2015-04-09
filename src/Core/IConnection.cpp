@@ -19,7 +19,7 @@ namespace Stormancer
 	template<typename T>
 	bool IConnection::getComponent(T* component)
 	{
-		uint64 tid = typeid(T);
+		type_info tid = typeid(T);
 		if (Helpers::mapContains(_components, tid))
 		{
 			if (component != nullptr)

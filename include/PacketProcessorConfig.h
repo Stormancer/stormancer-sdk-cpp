@@ -5,21 +5,20 @@
 
 namespace Stormancer
 {
-	using handlerFunction = function < bool(Packet<>) >;
-	using processorFunction = function < bool(byte, Packet<>) >;
-	using handlerMap = map < byte, handlerFunction >;
+	using handlerFunction = function < bool(Packet<>*) > ;
+	using processorFunction = function < bool(byte, Packet<>*) > ;
 
 	class PacketProcessorConfig
 	{
 	public:
-		PacketProcessorConfig(handlerMap handlers, list<processorFunction> defaultProcessors);
+		PacketProcessorConfig(map<byte, handlerFunction>& handlers, vector<processorFunction>& defaultProcessors);
 		virtual ~PacketProcessorConfig();
 
 		void addProcessor(byte msgId, handlerFunction handler);
-		void addCatchAllProcessor(handlerFunction handler);
+		void addCatchAllProcessor(processorFunction processor);
 
 	private:
-		handlerMap _handlers;
-		list<processorFunction> _defaultProcessors;
+		map<byte, handlerFunction> _handlers;
+		vector<processorFunction> _defaultProcessors;
 	};
 };

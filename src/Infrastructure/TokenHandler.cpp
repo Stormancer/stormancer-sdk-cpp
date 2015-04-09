@@ -18,15 +18,15 @@ namespace Stormancer
 		vector<byte> buffer = utility::conversions::from_base64(data);
 		string buffer2 = Helpers::to_string(buffer);
 		
-		byteStream bs(buffer2);
-		shared_ptr<MsgPackSerializer> tknMsgPckSrlz = dynamic_pointer_cast<MsgPackSerializer>(_tokenSerializer);
-		if (tknMsgPckSrlz.get() == nullptr)
+		auto bs = new byteStream(buffer2);
+		MsgPackSerializer* tknMsgPckSrlz = (MsgPackSerializer*)_tokenSerializer;
+		if (tknMsgPckSrlz == nullptr)
 		{
 			throw string("MsgPack serializer not found in TokenHandler::decodeToken");
 		}
 
-		ConnectionData result;
-		tknMsgPckSrlz->deserialize(bs, result);
+		auto result = new ConnectionData;
+		tknMsgPckSrlz->deserialize(bs, *result);
 
 		SceneEndpoint sceneEp;
 		sceneEp.token = token;

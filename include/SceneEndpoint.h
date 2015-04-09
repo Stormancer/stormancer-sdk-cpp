@@ -11,7 +11,7 @@ namespace Stormancer
 		virtual ~SceneEndpoint();
 
 	public:
-		ConnectionData tokenData;
+		ConnectionData* tokenData;
 		wstring token;
 	};
 };

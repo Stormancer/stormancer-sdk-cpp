@@ -7,21 +7,22 @@ namespace Stormancer
 	class RequestContext
 	{
 	public:
-		RequestContext(Packet<>& packet);
+		RequestContext(Packet<>* packet);
 		virtual ~RequestContext();
 
 	public:
-		Packet<>& packet();
-		byteStream& inputStream();
+		Packet<>* packet();
+		byteStream* inputStream();
 		bool isComplete();
-		void send(function<void(byteStream&)> writer);
+		void send(function<void(byteStream*)> writer);
 		void complete();
-		void error(function<void(byteStream&)> writer);
+		void error(function<void(byteStream*)> writer);
 
-	protected:
-		Packet<>& _packet;
+	private:
+		Packet<>* _packet;
 		byte _requestId[2];
-		byteStream _stream;
+		byteBuffer* _buffer;
+		byteStream* _stream;
 		bool _didSendValues = false;
 		bool _isComplete;
 	};

@@ -12,13 +12,17 @@ namespace Stormancer
 			return sInstance;
 		}
 
-	private:
 		EmptyDto()
 		{
 		}
 
 		~EmptyDto()
 		{
+		}
+
+		EmptyDto& operator=(const EmptyDto& other)
+		{
+			return *this;
 		}
 
 	public:

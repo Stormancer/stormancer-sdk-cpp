@@ -9,20 +9,23 @@ namespace Stormancer
 	class Packet
 	{
 	public:
-		Packet(shared_ptr<T>& source, byteStream& stream)
+		Packet(T* source, byteStream* stream)
 			: connection(source),
 			buffer(*(stream.rdbuf())),
 			stream(stream)
 		{
 		}
 
-		Packet(shared_ptr<T>& source, byteStream& stream, anyMap& metadata)
+		Packet(T* source, byteStream* stream, anyMap& metadata)
 			: connection(source),
 			buffer(*(stream.rdbuf())),
 			stream(stream),
 			metadata(metadata)
 		{
 		}
+
+		Packet(const Packet<T>&) = delete;
+		Packet<T>& operator=(const Packet<T>&) = delete;
 
 		virtual ~Packet()
 		{
@@ -52,15 +55,15 @@ namespace Stormancer
 			_metadata.erase(it);
 		}
 
-		shared_ptr<ISerializer> serializer()
+		ISerializer* serializer()
 		{
-			return make_shared<ISerializer>(new MsgPackSerializer);
+			return new MsgPackSerializer;
 		}
 
 	public:
-		byteBuffer& buffer;
-		byteStream& stream;
-		shared_ptr<T> connection;
+		byteBuffer* buffer;
+		byteStream* stream;
+		T* connection;
 
 	private:
 		anyMap _metadata;

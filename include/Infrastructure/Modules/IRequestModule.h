@@ -10,6 +10,6 @@ namespace Stormancer
 		IRequestModule();
 		virtual ~IRequestModule();
 
-		virtual void registerModule(RequestModuleBuilder builder) = 0;
+		virtual void registerModule(RequestModuleBuilder* builder) = 0;
 	};
 };

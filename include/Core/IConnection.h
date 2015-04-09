@@ -18,8 +18,8 @@ namespace Stormancer
 		template<typename T>
 		bool getComponent(T* component = nullptr);
 
-		virtual void sendSystem(char msgId, function<void(byteStream)> writer) = 0;
-		virtual void sendToScene(char sceneIndex, uint16 route, function<void(byteStream)> writer, PacketPriority priority, PacketReliability reliability) = 0;
+		virtual void sendSystem(char msgId, function<void(byteStream*)> writer) = 0;
+		virtual void sendToScene(char sceneIndex, uint16 route, function<void(byteStream*)> writer, PacketPriority priority, PacketReliability reliability) = 0;
 		virtual void setApplication(wstring account, wstring application) = 0;
 		virtual void close() = 0;
 

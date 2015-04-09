@@ -13,28 +13,30 @@ namespace Stormancer
 		{
 			time_t lastRefresh;
 			uint16 id;
-			rx::observer<Packet<>> observer;
+			rx::observer<Packet<>*>* observer;
 			pplx::task_completion_event<void> tcs;
 			pplx::task<void> task = create_task(tcs);
 		};
 
 	public:
-		RequestProcessor(shared_ptr<ILogger>& logger, vector<shared_ptr<IRequestModule>> modules);
+		RequestProcessor(ILogger* logger, vector<IRequestModule*> modules);
 		virtual ~RequestProcessor();
 
 	public:
-		void registerProcessor(PacketProcessorConfig& config);
-		pplx::task<Packet<>> sendSystemRequest(shared_ptr<IConnection>& peer, byte msgId, function<void(byteStream&)> writer);
-		pplx::task<Packet<>> sendSceneRequest(shared_ptr<IConnection> peer, byte sceneId, uint16 routeId, function<void(byteStream&)> writer);
-		void addSystemRequestHandler(byte msgId, function<pplx::task<void>(RequestContext)>& handler);
+		void registerProcessor(PacketProcessorConfig* config);
+		pplx::task<Packet<>*> sendSystemRequest(IConnection* peer, byte msgId, function<void(byteStream*)> writer);
+		pplx::task<Packet<>*> sendSceneRequest(IConnection* peer, byte sceneId, uint16 routeId, function<void(byteStream*)> writer);
 
 	private:
-		Request reserveRequestSlot(rx::observer<Packet<>> observer);
+		Request* reserveRequestSlot(rx::observer<Packet<>*>* observer);
+
+	public:
+		function<void(byte, function<pplx::task<void>(RequestContext*)>)> addSystemRequestHandler;
 
 	private:
-		map<uint16, Request> _pendingRequests;
-		shared_ptr<ILogger> _logger;
+		map<uint16, Request*> _pendingRequests;
+		ILogger* _logger;
 		bool _isRegistered = false;
-		map<byte, function<pplx::task<void>(RequestContext)>> _handlers;
+		map<byte, function<pplx::task<void>(RequestContext*)>> _handlers;
 	};
 };

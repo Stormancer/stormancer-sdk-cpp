@@ -10,43 +10,47 @@ namespace Stormancer
 	{
 	}
 
-	void SceneDispatcher::registerProcessor(PacketProcessorConfig& config)
+	void SceneDispatcher::registerProcessor(PacketProcessorConfig* config)
 	{
-		config.addCatchAllProcessor(handler);
+		processorFunction p = [this](byte sceneHandle, Packet<>* packet) {
+			return this->processor(sceneHandle, packet);
+		};
+		config->addCatchAllProcessor(p);
 	}
 
 	void SceneDispatcher::addScene(Scene* scene)
 	{
-		uint8 index = scene->handle - (byte)MessageIDTypes::ID_SCENES;
+		uint8 index = scene->handle() - (byte)MessageIDTypes::ID_SCENES;
 		_scenes[index] = scene;
 	}
 
 	void SceneDispatcher::removeScene(byte sceneHandle)
 	{
 		auto index = sceneHandle - (byte)MessageIDTypes::ID_SCENES;
-		auto it = find(_scenes.begin(), _scenes.end(), index);
-		if (it != _scenes.end())
+		if (index < _scenes.size())
 		{
-			_scenes.erase(it);
+			_scenes.erase(_scenes.begin() + index);
 		}
 	}
 
-	bool SceneDispatcher::handler(byte sceneHandle, Packet<>& packet)
+	bool SceneDispatcher::processor(byte sceneHandle, Packet<>* packet)
 	{
 		if (sceneHandle < (byte)MessageIDTypes::ID_SCENES)
 		{
 			return false;
 		}
 
-		auto toSearch = sceneHandle - (byte)MessageIDTypes::ID_SCENES;
-		if (find(_scenes.begin(), _scenes.end(), toSearch) == _scenes.end())
+		int sceneIndex = sceneHandle - (byte)MessageIDTypes::ID_SCENES;
+		if (sceneIndex >= _scenes.size())
 		{
 			return false;
 		}
-
-		auto& scene = _scenes[toSearch];
-		packet.setMetadata(L"scene", &scene);
-		scene->handleMessage(packet);
-		return true;
+		else
+		{
+			auto scene = _scenes[sceneIndex];
+			packet->setMetadata(L"scene", scene);
+			scene->handleMessage(packet);
+			return true;
+		}
 	}
 };

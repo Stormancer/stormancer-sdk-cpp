@@ -221,7 +221,6 @@
     <ClInclude Include="include\SystemMessages\EmptyDto.h" />
     <ClInclude Include="include\SystemMessages\SceneInfosDto.h" />
     <ClInclude Include="include\SystemMessages\SceneInfosRequestDto.h" />
-    <ClInclude Include="include\typedef2.h" />
     <ClInclude Include="include\headers.h" />
     <ClInclude Include="include\stormancer.h" />
     <ClInclude Include="include\typedef.h" />

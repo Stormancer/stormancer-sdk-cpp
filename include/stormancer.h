@@ -1,7 +1,6 @@
 #pragma once
 
 #include "headers.h"
-#include "typedef2.h"
 
 #include "ApiClient.h"
 #include "Scene.h"

@@ -68,7 +68,7 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros">
-    <NuGetPackageImportStamp>b102e074</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>4259ebe5</NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
@@ -188,6 +188,7 @@
     <Import Project="..\..\packages\cpprestsdk.v120.winphonesl.msvcstl.dyn.rt-dyn.2.5.0\build\native\cpprestsdk.v120.winphonesl.msvcstl.dyn.rt-dyn.targets" Condition="Exists('..\..\packages\cpprestsdk.v120.winphonesl.msvcstl.dyn.rt-dyn.2.5.0\build\native\cpprestsdk.v120.winphonesl.msvcstl.dyn.rt-dyn.targets')" />
     <Import Project="..\..\packages\cpprestsdk.v120.winxp.msvcstl.dyn.rt-dyn.2.5.0\build\native\cpprestsdk.v120.winxp.msvcstl.dyn.rt-dyn.targets" Condition="Exists('..\..\packages\cpprestsdk.v120.winxp.msvcstl.dyn.rt-dyn.2.5.0\build\native\cpprestsdk.v120.winxp.msvcstl.dyn.rt-dyn.targets')" />
     <Import Project="..\..\packages\cpprestsdk.v140.windesktop.msvcstl.dyn.rt-dyn.2.5.0\build\native\cpprestsdk.v140.windesktop.msvcstl.dyn.rt-dyn.targets" Condition="Exists('..\..\packages\cpprestsdk.v140.windesktop.msvcstl.dyn.rt-dyn.2.5.0\build\native\cpprestsdk.v140.windesktop.msvcstl.dyn.rt-dyn.targets')" />
+    <Import Project="..\..\packages\rxcpp.2.1.1\build\native\rxcpp.targets" Condition="Exists('..\..\packages\rxcpp.2.1.1\build\native\rxcpp.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -200,5 +201,6 @@
     <Error Condition="!Exists('..\..\packages\cpprestsdk.v120.winphonesl.msvcstl.dyn.rt-dyn.2.5.0\build\native\cpprestsdk.v120.winphonesl.msvcstl.dyn.rt-dyn.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\cpprestsdk.v120.winphonesl.msvcstl.dyn.rt-dyn.2.5.0\build\native\cpprestsdk.v120.winphonesl.msvcstl.dyn.rt-dyn.targets'))" />
     <Error Condition="!Exists('..\..\packages\cpprestsdk.v120.winxp.msvcstl.dyn.rt-dyn.2.5.0\build\native\cpprestsdk.v120.winxp.msvcstl.dyn.rt-dyn.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\cpprestsdk.v120.winxp.msvcstl.dyn.rt-dyn.2.5.0\build\native\cpprestsdk.v120.winxp.msvcstl.dyn.rt-dyn.targets'))" />
     <Error Condition="!Exists('..\..\packages\cpprestsdk.v140.windesktop.msvcstl.dyn.rt-dyn.2.5.0\build\native\cpprestsdk.v140.windesktop.msvcstl.dyn.rt-dyn.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\cpprestsdk.v140.windesktop.msvcstl.dyn.rt-dyn.2.5.0\build\native\cpprestsdk.v140.windesktop.msvcstl.dyn.rt-dyn.targets'))" />
+    <Error Condition="!Exists('..\..\packages\rxcpp.2.1.1\build\native\rxcpp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\rxcpp.2.1.1\build\native\rxcpp.targets'))" />
   </Target>
 </Project>

@@ -12,16 +12,16 @@ namespace Stormancer
 	{
 	}
 
-	void DefaultPacketDispatcher::dispatchPacket(Packet2 packet)
+	void DefaultPacketDispatcher::dispatchPacket(Packet<>* packet)
 	{
 		// TODO
-		async(launch::async, [&](Packet2 packet) {
+		/*async(launch::async, [this](Packet<>* packet2) {
 			bool processed = false;
 			int count = 0;
 			byte msgType = 0;
 			while (!processed && count < 40) // Max 40 layers
 			{
-				msgType = packet.stream.sbumpc();
+				*packet2->stream >> msgType;
 				if (Helpers::mapContains(_handlers, msgType))
 				{
 					handlerFunction handler = _handlers[msgType];
@@ -34,7 +34,7 @@ namespace Stormancer
 			}
 			for each (auto processor in _defaultProcessors)
 			{
-				if (processor(msgType, packet))
+				if (processor(msgType, packet2))
 				{
 					processed = true;
 					break;
@@ -46,11 +46,11 @@ namespace Stormancer
 				sstm << "Couldn't process message. msgId: " << msgType;
 				throw new exception(sstm.str().c_str());
 			}
-		});
+		});*/
 	}
 
-	void DefaultPacketDispatcher::addProcessor(shared_ptr<IPacketProcessor*> processor)
+	void DefaultPacketDispatcher::addProcessor(IPacketProcessor* processor)
 	{
-		(*processor)->registerProcessor(PacketProcessorConfig(_handlers, _defaultProcessors));
+		processor->registerProcessor(new PacketProcessorConfig(_handlers, _defaultProcessors));
 	}
 };

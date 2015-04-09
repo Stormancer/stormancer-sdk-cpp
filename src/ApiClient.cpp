@@ -8,9 +8,9 @@ namespace Stormancer
 	using namespace web::http::client;          // HTTP client features
 	//using namespace concurrency;
 	//using namespace concurrency::streams;       // Asynchronous streams
-	using namespace pplx;
+	//using namespace pplx;
 
-	ApiClient::ApiClient(ClientConfiguration& config, shared_ptr<ITokenHandler> tokenHandler)
+	ApiClient::ApiClient(ClientConfiguration* config, ITokenHandler* tokenHandler)
 		: _config(config),
 		_createTokenUri(L"{0}/{1}/scenes/{2}/token"),
 		_tokenHandler(tokenHandler)
@@ -21,11 +21,11 @@ namespace Stormancer
 	{
 	}
 
-	task<SceneEndpoint> ApiClient::getSceneEndpoint(wstring accountId, wstring applicationName, wstring sceneId, wstring userData)
+	pplx::task<SceneEndpoint> ApiClient::getSceneEndpoint(wstring accountId, wstring applicationName, wstring sceneId, wstring userData)
 	{
-		MsgPackSerializer serializer;
+		auto serializer = new MsgPackSerializer;
 		byteStream stream;
-		serializer.serialize(Helpers::to_string(userData), stream);
+		serializer->serialize(Helpers::to_string(userData), &stream);
 		string data = stream.str();
 
 		//wstring baseUri = _config.getApiEndpoint();
@@ -40,10 +40,10 @@ namespace Stormancer
 		//wstring relativeUri = L"/search?q=Casablanca%20CodePlex";
 		//request.set_request_uri(relativeUri);
 
-		return client.request(request).then([this, accountId, applicationName, sceneId](task<http_response> myTask) -> task<SceneEndpoint> {
+		return client.request(request).then([this, accountId, applicationName, sceneId](pplx::task<http_response> t) -> pplx::task<SceneEndpoint> {
 			try
 			{
-				http_response response = myTask.get();
+				http_response response = t.get();
 
 				uint16 statusCode = response.status_code();
 				wcout << Helpers::StringFormat(L"Status code: {0}", statusCode).c_str() << endl;
@@ -51,10 +51,10 @@ namespace Stormancer
 				if (Helpers::ensureSuccessStatusCode(statusCode))
 				{
 					concurrency::streams::stringstreambuf ss;
-					return response.body().read_to_end(ss).then([this, ss](task<size_t> myTask2) -> SceneEndpoint {
+					return response.body().read_to_end(ss).then([this, ss](pplx::task<size_t> t2) -> SceneEndpoint {
 						try
 						{
-							size_t size = myTask2.get();
+							size_t size = t2.get();
 							wstring str = Helpers::to_wstring(ss.collection());
 							wcout << L"HOORA!" << str << endl;
 							return SceneEndpoint(); //_tokenHandler->decodeToken(str);

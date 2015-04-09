@@ -2,9 +2,9 @@
 
 namespace Stormancer
 {
-	shared_ptr<ILogger> DefaultLogger::instance()
+	ILogger* DefaultLogger::instance()
 	{
-		static shared_ptr<ILogger> defaultLogger = make_shared<ILogger>(new DefaultLogger);
+		static ILogger* defaultLogger = new DefaultLogger;
 		return defaultLogger;
 	}
 
@@ -18,8 +18,7 @@ namespace Stormancer
 
 	void DefaultLogger::log(LogLevel level, wstring category, wstring message, wstring data)
 	{
-		time_t t = time(nullptr);
-		wcout << put_time(localtime(&t), "%F %T") << endl;
+		wcout << Helpers::nowStr() << endl;
 		wcout << L"level: " << static_cast<int>(level);
 		if (category.length())
 		{

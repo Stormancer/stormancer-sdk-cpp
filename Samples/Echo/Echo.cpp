@@ -18,23 +18,23 @@ int main(int argc, char* argv[])
 
 void testClient()
 {
-	ClientConfiguration config(L"test", L"echo");
-	config.serverEndpoint = L"http://ipv4.fiddler:8081";
+	auto config = new ClientConfiguration(L"test", L"echo");
+	config->serverEndpoint = L"http://ipv4.fiddler:8081";
 
 	Client client(config);
-	auto task = client.getPublicScene(L"test-scene", L"hello").then([](pplx::task<shared_ptr<Scene>>& t) {
+	auto task = client.getPublicScene(L"test-scene", L"hello").then([](pplx::task<Scene*> t) {
 		auto scene = t.get();
-		scene.get()->addRoute(L"echo.out", [](Packet<IScenePeer>& p) {
+		scene->addRoute(L"echo.out", [](Packet<IScenePeer>* p) {
 			wstring str;
-			p.serializer().get()->deserialize(p.stream, str);
+			p->serializer()->deserialize(p->stream, str);
 			wcout << str << endl;
 		});
 
-		scene.get()->connect().then([&scene](pplx::task<void> t2) {
+		scene->connect().then([&scene](pplx::task<void> t2) {
 			if (t2.is_done())
 			{
-				scene.get()->sendPacket(L"echo.in", [](byteStream& stream) {
-					stream << L"hello";
+				scene->sendPacket(L"echo.in", [](byteStream* stream) {
+					*stream << L"hello";
 				});
 			}
 			else
@@ -58,7 +58,7 @@ void testClient()
 void testMsgPack()
 {
 	byteStream stream;
-	MsgPack::Serializer serializer(&stream);
+	MsgPack::Serializer serializer(stream.rdbuf());
 
 	/*serializer << MsgPack__Factory(ArrayHeader(3)); //Next 3 elements belong in this array
 	serializer << MsgPack::Factory(true);
@@ -78,7 +78,7 @@ void testMsgPack()
 	cout << "SERIALIZED: " << str << endl;
 
 	stream = byteStream(str);
-	MsgPack::Deserializer deserializer(&stream);
+	MsgPack::Deserializer deserializer(stream.rdbuf());
 
 	cout << "DESERIALIZED: ";
 

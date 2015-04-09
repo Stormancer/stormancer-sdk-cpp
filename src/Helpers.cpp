@@ -13,6 +13,16 @@ namespace Stormancer
 		wcout << Helpers::StringFormat(L"Error exception: {0}", msg).c_str() << endl;
 	}
 
+	anyMap Helpers::stringMapToAnyMap(stringMap& sm)
+	{
+		anyMap am;
+		for (auto it = sm.begin(); it != sm.end(); ++it)
+		{
+			am[it->first] = (void*)&it->second;
+		}
+		return am;
+	}
+
 	wstring Helpers::vectorJoin(vector<wstring> vector, wstring glue)
 	{
 		wstringstream ss;
@@ -77,5 +87,13 @@ namespace Stormancer
 	Helpers::StringFormat::operator wstring()
 	{
 		return stream.str();
+	}
+
+	wstring Helpers::nowStr()
+	{
+		stringstream ss;
+		auto now = chrono::system_clock::to_time_t(chrono::system_clock::now());
+		ss << put_time(localtime(&now), "%F %T");
+		return Helpers::to_wstring(ss.str());
 	}
 };

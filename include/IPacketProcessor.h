@@ -1,6 +1,5 @@
 #pragma once
 #include "headers.h"
-#include "typedef2.h"
 #include "PacketProcessorConfig.h"
 
 namespace Stormancer
@@ -11,6 +10,6 @@ namespace Stormancer
 		IPacketProcessor();
 		virtual ~IPacketProcessor();
 
-		virtual void registerProcessor(PacketProcessorConfig& config) = 0;
+		virtual void registerProcessor(PacketProcessorConfig* config) = 0;
 	};
 };

@@ -11,12 +11,10 @@ namespace Stormancer
 		virtual ~SceneDispatcher();
 
 	public:
-		void registerProcessor(PacketProcessorConfig& config);
+		void registerProcessor(PacketProcessorConfig* config);
 		void addScene(Scene* scene);
 		void removeScene(byte sceneHandle);
-
-	private:
-		bool handler(byte sceneHandle, Packet<>& packet);
+		bool processor(byte sceneHandle, Packet<>* packet);
 
 	private:
 		vector<Scene*> _scenes;
