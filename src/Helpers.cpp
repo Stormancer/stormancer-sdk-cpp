@@ -108,9 +108,19 @@ namespace Stormancer
 		}
 	}
 
+	time_t nowTime_t()
+	{
+		return chrono::system_clock::to_time_t(chrono::system_clock::now());
+	}
+
 	wstring Helpers::nowStr()
 	{
-		auto now = chrono::system_clock::to_time_t(chrono::system_clock::now());
+		time_t now = Helpers::nowTime_t();
+		return Helpers::time_tToStr(now);
+	}
+
+	wstring Helpers::time_tToStr(time_t now)
+	{
 		struct tm timeinfo;
 		localtime_s(&timeinfo, &now);
 		stringstream ss;

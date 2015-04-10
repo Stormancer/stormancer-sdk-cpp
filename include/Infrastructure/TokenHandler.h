@@ -11,7 +11,7 @@ namespace Stormancer
 		TokenHandler();
 		virtual ~TokenHandler();
 
-		SceneEndpoint decodeToken(wstring token);
+		SceneEndpoint* decodeToken(wstring token);
 
 	private:
 		const ISerializer* _tokenSerializer;

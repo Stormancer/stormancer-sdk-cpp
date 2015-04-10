@@ -7,7 +7,7 @@ void testMsgPack();
 
 int main(int argc, char* argv[])
 {
-	testMsgPack();
+	//testMsgPack();
 
 	testClient();
 
@@ -18,12 +18,12 @@ int main(int argc, char* argv[])
 
 void testClient()
 {
-	auto config = new ClientConfiguration(L"test", L"echo");
+	auto config = new ClientConfiguration(L"905f108e-18bc-0d56-45c2-0907de336e65", L"test");
 	config->serverEndpoint = L"http://ipv4.fiddler:8081";
 
 	Client client(config);
 	auto task = client.getPublicScene(L"test-scene", L"hello").then([](pplx::task<Scene*> t) {
-		auto scene = t.get();
+		/*auto scene = t.get();
 		scene->addRoute(L"echo.out", [](Packet<IScenePeer>* p) {
 			wstring str;
 			p->serializer()->deserialize(p->stream, str);
@@ -41,7 +41,8 @@ void testClient()
 			{
 				wcout << L"Bad stuff happened..." << endl;
 			}
-		});
+		});*/
+		return pplx::create_task([](){});
 	});
 
 	try
@@ -91,7 +92,7 @@ void testMsgPack()
 	element->toJSON(cout);
 
 	MsgPack::Map& map = dynamic_cast<MsgPack::Map&>(*element);
-	for (int i = 0; i < map.getContainer()->size(); i++)
+	for (size_t i = 0; i < map.getContainer()->size(); i++)
 	{
 		cout << *(map.getContainer()->at(i)) << endl;
 	}

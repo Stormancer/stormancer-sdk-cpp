@@ -21,7 +21,7 @@ namespace Stormancer
 	{
 	}
 
-	pplx::task<SceneEndpoint> ApiClient::getSceneEndpoint(wstring accountId, wstring applicationName, wstring sceneId, wstring userData)
+	pplx::task<SceneEndpoint*> ApiClient::getSceneEndpoint(wstring accountId, wstring applicationName, wstring sceneId, wstring userData)
 	{
 		auto serializer = new MsgPackSerializer;
 		byteStream stream;
@@ -40,7 +40,7 @@ namespace Stormancer
 		//wstring relativeUri = L"/search?q=Casablanca%20CodePlex";
 		//request.set_request_uri(relativeUri);
 
-		return client.request(request).then([this, accountId, applicationName, sceneId](pplx::task<http_response> t) -> pplx::task<SceneEndpoint> {
+		return client.request(request).then([this, accountId, applicationName, sceneId](pplx::task<http_response> t) {
 			try
 			{
 				http_response response = t.get();
@@ -50,14 +50,16 @@ namespace Stormancer
 
 				if (Helpers::ensureSuccessStatusCode(statusCode))
 				{
-					concurrency::streams::stringstreambuf ss;
-					return response.body().read_to_end(ss).then([this, ss](pplx::task<size_t> t2) -> SceneEndpoint {
+					auto ss = new concurrency::streams::stringstreambuf;
+					return response.body().read_to_end(*ss).then([this, ss](pplx::task<size_t> t2) {
 						try
 						{
 							size_t size = t2.get();
-							wstring str = Helpers::to_wstring(ss.collection());
+							string strTmp = ss->collection();
+							wstring str = Helpers::to_wstring(strTmp);
 							wcout << L"HOORA!" << str << endl;
-							return SceneEndpoint(); //_tokenHandler->decodeToken(str);
+							return _tokenHandler->decodeToken(str);
+							//return new SceneEndpoint();
 						}
 						catch (const exception& e)
 						{

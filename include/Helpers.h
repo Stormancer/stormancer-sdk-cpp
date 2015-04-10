@@ -217,6 +217,8 @@ namespace Stormancer
 			delete[] c;
 		}
 
+		time_t nowTime_t();
 		wstring nowStr();
+		wstring time_tToStr(time_t now);
 	};
 };

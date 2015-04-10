@@ -95,8 +95,8 @@ namespace Stormancer
 
 	pplx::task<Scene*> Client::getPublicScene(wstring sceneId, wstring userData)
 	{
-		return _apiClient->getSceneEndpoint(_accountId, _applicationName, sceneId, userData).then([&](SceneEndpoint& sep) {
-			return getScene(sceneId, &sep);
+		return _apiClient->getSceneEndpoint(_accountId, _applicationName, sceneId, userData).then([this, sceneId](SceneEndpoint* sep) {
+			return this->getScene(sceneId, sep);
 		});
 	}
 

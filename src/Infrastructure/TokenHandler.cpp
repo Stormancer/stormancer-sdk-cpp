@@ -11,7 +11,7 @@ namespace Stormancer
 	{
 	}
 
-	SceneEndpoint TokenHandler::decodeToken(wstring token)
+	SceneEndpoint* TokenHandler::decodeToken(wstring token)
 	{
 		token = Helpers::stringTrim(token, '"');
 		wstring data = Helpers::stringSplit(token, L"-")[0];
@@ -28,9 +28,9 @@ namespace Stormancer
 		auto result = new ConnectionData;
 		tknMsgPckSrlz->deserialize(bs, *result);
 
-		SceneEndpoint sceneEp;
-		sceneEp.token = token;
-		sceneEp.tokenData = result;
+		auto sceneEp = new SceneEndpoint;
+		sceneEp->token = token;
+		sceneEp->tokenData = result;
 		return sceneEp;
 	}
 };

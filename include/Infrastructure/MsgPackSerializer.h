@@ -99,10 +99,10 @@ namespace Stormancer
 		{
 			MsgPack::Deserializer dsrlz(stream->rdbuf());
 
-			dsrlz.deserialize([](std::unique_ptr<MsgPack::Element> parsed) {
+			/*dsrlz.deserialize([](std::unique_ptr<MsgPack::Element> parsed) {
 				std::cout << "Parsed: " << *parsed << "\n";
 				return false;
-			}, true);
+			}, true);*/
 
 			/*unique_ptr<MsgPack::Element> element;
 			dsrlz >> element;

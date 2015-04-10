@@ -12,6 +12,7 @@ namespace Stormancer
 		IConnection();
 		virtual ~IConnection();
 
+	public:
 		template<typename T>
 		void registerComponent(T* component)
 		{
@@ -39,19 +40,24 @@ namespace Stormancer
 		virtual void sendToScene(char sceneIndex, uint16 route, function<void(byteStream*)> writer, PacketPriority priority, PacketReliability reliability) = 0;
 		virtual void setApplication(wstring account, wstring application) = 0;
 		virtual void close() = 0;
+		virtual wstring ipAddress() = 0;
+		virtual int ping() = 0;
+		virtual int64 id();
+		virtual time_t connectionDate();
+		virtual wstring account();
+		virtual wstring application();
+		virtual ConnectionState state();
 
 	public:
-		uint64_t id;
-		wstring ipAddress;
-		time_t connectionDate;
 		stringMap metadata;
-		wstring account;
-		wstring application;
-		ConnectionState state;
-		int ping;
 		function<void(string)> connectionClosed;
 
-	private:
+	protected:
+		ConnectionState _state;
+		wstring _account;
+		wstring _application;
+		int64 _id;
+		time_t _connectionDate;
 		map<size_t, void*> _components;
 	};
 };
