@@ -187,12 +187,7 @@ namespace Stormancer
 			int formatI = 0;
 		};
 
-		pplx::task<void> taskCompleted()
-		{
-			pplx::task_completion_event<void> tce;
-			tce.set();
-			return create_task(tce);
-		}
+		pplx::task<void> taskCompleted();
 
 		template<typename T>
 		pplx::task<T> taskCompleted(T result)
@@ -210,17 +205,7 @@ namespace Stormancer
 			return create_task(tce);
 		}
 
-		pplx::task<void> taskIf(bool condition, function<pplx::task<void>()> action)
-		{
-			if (condition)
-			{
-				return action();
-			}
-			else
-			{
-				return taskCompleted();
-			}
-		}
+		pplx::task<void> taskIf(bool condition, function<pplx::task<void>()> action);
 
 		template<typename T, typename U>
 		void streamCopy(T* fromStream, U* toStream)

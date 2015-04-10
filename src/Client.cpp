@@ -130,7 +130,7 @@ namespace Stormancer
 					{
 						throw string("No serializer selected.");
 					}
-					_serverConnection->registerComponent(&_serializers[result.SelectedSerializer]);
+					_serverConnection->registerComponent(_serializers[result.SelectedSerializer]);
 					_serverConnection->metadata[L"serializer"] = result.SelectedSerializer;
 				}
 				return new Scene(_serverConnection, this, sceneId, sep->token, result);

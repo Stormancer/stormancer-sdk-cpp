@@ -13,10 +13,27 @@ namespace Stormancer
 		virtual ~IConnection();
 
 		template<typename T>
-		void registerComponent(T* component);
+		void registerComponent(T* component)
+		{
+			_components[typeid(T).hash_code()] = (void*)component;
+		}
 
 		template<typename T>
-		bool getComponent(T* component = nullptr);
+		bool getComponent(T* component = nullptr)
+		{
+			size_t hash_code = typeid(T).hash_code();
+			if (Helpers::mapContains(_components, hash_code))
+			{
+				if (component != nullptr)
+				{
+					component = (T*)(_components[hash_code]);
+				}
+				return true;
+			}
+
+			component = nullptr;
+			return false;
+		}
 
 		virtual void sendSystem(char msgId, function<void(byteStream*)> writer) = 0;
 		virtual void sendToScene(char sceneIndex, uint16 route, function<void(byteStream*)> writer, PacketPriority priority, PacketReliability reliability) = 0;
@@ -35,6 +52,6 @@ namespace Stormancer
 		function<void(string)> connectionClosed;
 
 	private:
-		map<type_info, void*> _components;
+		map<size_t, void*> _components;
 	};
 };

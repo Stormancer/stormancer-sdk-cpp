@@ -89,11 +89,32 @@ namespace Stormancer
 		return stream.str();
 	}
 
+	pplx::task<void> Helpers::taskCompleted()
+	{
+		pplx::task_completion_event<void> tce;
+		tce.set();
+		return create_task(tce);
+	}
+
+	pplx::task<void> Helpers::taskIf(bool condition, function<pplx::task<void>()> action)
+	{
+		if (condition)
+		{
+			return action();
+		}
+		else
+		{
+			return taskCompleted();
+		}
+	}
+
 	wstring Helpers::nowStr()
 	{
-		stringstream ss;
 		auto now = chrono::system_clock::to_time_t(chrono::system_clock::now());
-		ss << put_time(localtime(&now), "%F %T");
+		struct tm timeinfo;
+		localtime_s(&timeinfo, &now);
+		stringstream ss;
+		ss << put_time(&timeinfo, "%F %T");
 		return Helpers::to_wstring(ss.str());
 	}
 };
