@@ -11,15 +11,20 @@ namespace Stormancer
 		ITransport();
 		virtual ~ITransport();
 
-		virtual pplx::task<void> start(wstring name, IConnectionManager* handler, pplx::cancellation_token token, uint16 port, uint16 maxConnections) = 0;
+		virtual pplx::task<void> start(wstring name, IConnectionManager* handler, pplx::cancellation_token token, uint16 port = 0, uint16 maxConnections = 0) = 0;
 		virtual pplx::task<IConnection*> connect(wstring endpoint) = 0;
+		bool isRunning();
+		wstring name();
+		uint64 id();
 
 	public:
-		bool isRunning;
 		function<void(Packet<>*)> packetReceived;
 		function<void(IConnection*)> connectionOpened;
 		function<void(IConnection*)> connectionClosed;
-		wstring name;
-		uint64 id;
+
+	protected:
+		bool _isRunning;
+		wstring _name;
+		uint64 _id;
 	};
 };

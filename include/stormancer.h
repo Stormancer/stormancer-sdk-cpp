@@ -57,5 +57,5 @@
 #include "SystemMessages/SceneInfosDto.h"
 #include "SystemMessages/SceneInfosRequestDto.h"
 
-//#include "Transports/RaknetTransport.h"
-//#include "Transports/RaknetConnection.h"
+#include "Transports/RakNetTransport.h"
+#include "Transports/RakNetConnection.h"

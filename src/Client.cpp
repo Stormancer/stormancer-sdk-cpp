@@ -55,7 +55,7 @@ namespace Stormancer
 		}
 
 		_metadata[L"serializers"] = Helpers::vectorJoin(Helpers::mapKeysCpy(_serializers), L",");
-		_metadata[L"transport"] = _transport->name;
+		_metadata[L"transport"] = _transport->name();
 		_metadata[L"version"] = L"1.0.0";
 		_metadata[L"platform"] = L"cpp";
 
@@ -103,11 +103,11 @@ namespace Stormancer
 	pplx::task<Scene*> Client::getScene(wstring sceneId, SceneEndpoint* sep)
 	{
 		return Helpers::taskIf(_serverConnection == nullptr, [this, sep]() {
-			return Helpers::taskIf(!_transport->isRunning, [this]() {
+			return Helpers::taskIf(!_transport->isRunning(), [this]() {
 				_cts = pplx::cancellation_token_source();
 				return _transport->start(L"client", new ConnectionHandler(), _cts.get_token(), 0, (uint16)(_maxPeers + 1));
 			}).then([this, sep]() {
-				wstring endpoint = sep->tokenData->Endpoints[_transport->name];
+				wstring endpoint = sep->tokenData->Endpoints[_transport->name()];
 				return _transport->connect(endpoint).then([this](IConnection* connection) {
 					_serverConnection = connection;
 

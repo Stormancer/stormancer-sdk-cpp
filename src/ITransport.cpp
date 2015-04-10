@@ -10,4 +10,19 @@ namespace Stormancer
 	ITransport::~ITransport()
 	{
 	}
+
+	bool ITransport::isRunning()
+	{
+		return _isRunning;
+	}
+
+	wstring ITransport::name()
+	{
+		return _name;
+	}
+
+	uint64 ITransport::id()
+	{
+		return _id;
+	}
 };

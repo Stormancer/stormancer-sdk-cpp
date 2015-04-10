@@ -3,10 +3,10 @@
 
 namespace Stormancer
 {
-	class RaknetConnection
+	class RakNetConnection
 	{
 	public:
-		RaknetConnection();
-		virtual ~RaknetConnection();
+		RakNetConnection();
+		virtual ~RakNetConnection();
 	};
 };

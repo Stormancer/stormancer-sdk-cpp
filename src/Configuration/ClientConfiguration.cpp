@@ -6,11 +6,11 @@ namespace Stormancer
 		: account(account),
 		application(application),
 		dispatcher(new DefaultPacketDispatcher),
-		//transport(RaknetTransport(DefaultLogger::instance())),
+		transport(new RakNetTransport(DefaultLogger::instance())),
 		maxPeers(20)
 	{
 		serializers.push_back(new MsgPackSerializer);
-		//plugins.push_back(make_shared<IClientPlugin*>(new RpcClientPlugin()));
+		//plugins.push_back(new RpcClientPlugin());
 	}
 
 	ClientConfiguration::~ClientConfiguration()

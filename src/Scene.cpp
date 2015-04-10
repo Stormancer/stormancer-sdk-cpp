@@ -168,7 +168,7 @@ namespace Stormancer
 		if (_handlers.find(routeId) != _handlers.end())
 		{
 			auto observer = _handlers[routeId];
-			for (int i = 0; i < observer.size(); i++)
+			for (size_t i = 0; i < observer.size(); i++)
 			{
 				observer[i](packet);
 			}

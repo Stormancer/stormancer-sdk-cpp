@@ -1,13 +1,12 @@
-
-#include "Transports/RaknetConnection.h"
+#include "stormancer.h"
 
 namespace Stormancer
 {
-	RaknetConnection::RaknetConnection()
+	RakNetConnection::RakNetConnection()
 	{
 	}
 
-	RaknetConnection::~RaknetConnection()
+	RakNetConnection::~RakNetConnection()
 	{
 	}
 };

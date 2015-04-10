@@ -6,7 +6,7 @@ namespace Stormancer
 		: _logger(logger)
 	{
 		auto builder = new RequestModuleBuilder(RequestProcessor::addSystemRequestHandler);
-		for (int i = 0; i < modules.size(); i++)
+		for (size_t i = 0; i < modules.size(); i++)
 		{
 			auto module = modules[i];
 			module->registerModule(builder);

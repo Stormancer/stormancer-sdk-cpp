@@ -223,6 +223,8 @@
     <ClInclude Include="include\SystemMessages\SceneInfosRequestDto.h" />
     <ClInclude Include="include\headers.h" />
     <ClInclude Include="include\stormancer.h" />
+    <ClInclude Include="include\Transports\RakNetConnection.h" />
+    <ClInclude Include="include\Transports\RakNetTransport.h" />
     <ClInclude Include="include\typedef.h" />
     <ClInclude Include="MsgPack\include\Container.h" />
     <ClInclude Include="MsgPack\include\ContainerHeader.h" />
@@ -265,6 +267,8 @@
     <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\SceneEndpoint.cpp" />
     <ClCompile Include="src\ScenePeer.cpp" />
+    <ClCompile Include="src\Transports\RakNetConnection.cpp" />
+    <ClCompile Include="src\Transports\RakNetTransport.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

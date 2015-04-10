@@ -26,7 +26,7 @@ namespace Stormancer
 
 	void SceneDispatcher::removeScene(byte sceneHandle)
 	{
-		auto index = sceneHandle - (byte)MessageIDTypes::ID_SCENES;
+		size_t index = sceneHandle - (byte)MessageIDTypes::ID_SCENES;
 		if (index < _scenes.size())
 		{
 			_scenes.erase(_scenes.begin() + index);
@@ -40,7 +40,7 @@ namespace Stormancer
 			return false;
 		}
 
-		int sceneIndex = sceneHandle - (byte)MessageIDTypes::ID_SCENES;
+		size_t sceneIndex = sceneHandle - (byte)MessageIDTypes::ID_SCENES;
 		if (sceneIndex >= _scenes.size())
 		{
 			return false;

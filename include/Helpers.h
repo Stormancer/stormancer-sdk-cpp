@@ -210,7 +210,7 @@ namespace Stormancer
 		template<typename T, typename U>
 		void streamCopy(T* fromStream, U* toStream)
 		{
-			streamsize n = fromStream->rdbuf()->in_avail();
+			uint32 n = static_cast<uint32>(fromStream->rdbuf()->in_avail());
 			char* c = new char[n];
 			fromStream->readsome(c, n);
 			toStream->write(c, n);
