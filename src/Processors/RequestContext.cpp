@@ -22,7 +22,7 @@ namespace Stormancer
 		return _packet;
 	}
 
-	byteStream* RequestContext::inputStream()
+	bytestream* RequestContext::inputStream()
 	{
 		return _stream;
 	}
@@ -32,14 +32,14 @@ namespace Stormancer
 		return _isComplete;
 	}
 
-	void RequestContext::send(function<void(byteStream*)> writer)
+	void RequestContext::send(function<void(bytestream*)> writer)
 	{
 		if (_isComplete)
 		{
 			throw string("The request is already completed.");
 		}
 		_didSendValues = true;
-		_packet->connection->sendSystem((byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG, [this, &writer](byteStream* stream) {
+		_packet->connection->sendSystem((byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG, [this, &writer](bytestream* stream) {
 			stream->write((char*)this->_requestId, 2);
 			writer(stream);
 		});
@@ -47,16 +47,16 @@ namespace Stormancer
 
 	void RequestContext::complete()
 	{
-		_packet->connection->sendSystem((byte)MessageIDTypes::ID_REQUEST_RESPONSE_COMPLETE, [this](byteStream* stream) {
+		_packet->connection->sendSystem((byte)MessageIDTypes::ID_REQUEST_RESPONSE_COMPLETE, [this](bytestream* stream) {
 			stream->write((char*)_requestId, 2);
 			char c = (this->_didSendValues ? 1 : 0);
 			stream->write(&c, 1);
 		});
 	}
 
-	void RequestContext::error(function<void(byteStream*)> writer)
+	void RequestContext::error(function<void(bytestream*)> writer)
 	{
-		_packet->connection->sendSystem((byte)MessageIDTypes::ID_REQUEST_RESPONSE_ERROR, [this, &writer](byteStream* stream) {
+		_packet->connection->sendSystem((byte)MessageIDTypes::ID_REQUEST_RESPONSE_ERROR, [this, &writer](bytestream* stream) {
 			stream->write((char*)_requestId, 2);
 			writer(stream);
 		});

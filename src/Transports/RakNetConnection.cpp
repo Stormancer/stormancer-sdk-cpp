@@ -2,7 +2,7 @@
 
 namespace Stormancer
 {
-	RakNetConnection::RakNetConnection(RakNetGUID* guid, int64 id, RakPeerInterface* peer, function<void(RakNetConnection*)> closeAction)
+	RakNetConnection::RakNetConnection(RakNetGUID guid, int64 id, RakPeerInterface* peer, function<void(RakNetConnection*)> closeAction)
 		: _lastActivityDate(Helpers::nowTime_t()),
 		_guid(guid),
 		_rakPeer(peer),
@@ -15,7 +15,7 @@ namespace Stormancer
 	{
 	}
 
-	RakNetGUID* RakNetConnection::guid()
+	RakNetGUID RakNetConnection::guid()
 	{
 		return _guid;
 	}
@@ -27,7 +27,7 @@ namespace Stormancer
 
 	wstring RakNetConnection::ipAddress()
 	{
-		string str = _rakPeer->GetSystemAddressFromGuid(*_guid).ToString();
+		string str = _rakPeer->GetSystemAddressFromGuid(_guid).ToString();
 		return Helpers::to_wstring(str);
 	}
 
@@ -53,21 +53,39 @@ namespace Stormancer
 
 	int RakNetConnection::ping()
 	{
-		return _rakPeer->GetLastPing(*_guid);
+		return _rakPeer->GetLastPing(_guid);
 	}
 
-	void RakNetConnection::sendSystem(byte msgId, function<void(byteStream*)> writer)
+	void RakNetConnection::sendSystem(byte msgId, function<void(BitStream*)> writer)
 	{
-		// TODO
+		sendRaw([msgId, &writer](BitStream* stream) {
+			stream->Write(msgId);
+			writer(stream);
+		}, PacketPriority::HIGH_PRIORITY, PacketReliability::RELIABLE_ORDERED, (uint8)0);
 	}
 
-	void RakNetConnection::sendRaw(function<void(byteStream*)> writer, PacketPriority priority, PacketReliability reliability, uint8 channel)
+	void RakNetConnection::sendRaw(function<void(BitStream*)> writer, PacketPriority priority, PacketReliability reliability, char channel)
 	{
-		// TODO
+		BitStream stream;
+		writer(&stream);
+		auto result = _rakPeer->Send(&stream, (PacketPriority)priority, (PacketReliability)reliability, channel, _guid, false);
+		if (result == 0)
+		{
+			throw string("Failed to send message.");
+		}
 	}
 
-	void RakNetConnection::sendToScene(byte sceneIndex, uint16 route, function<void(byteStream*)> writer, PacketPriority priority, PacketReliability reliability)
+	void RakNetConnection::sendToScene(byte sceneIndex, uint16 route, function<void(BitStream*)> writer, PacketPriority priority, PacketReliability reliability)
 	{
-		// TODO
+		BitStream stream;
+		stream.Write(sceneIndex);
+		stream.Write(route);
+		writer(&stream);
+		auto result = _rakPeer->Send(&stream, priority, reliability, 0, _guid, false);
+
+		if (result == 0)
+		{
+			throw string("Failed to send message.");
+		}
 	}
 };

@@ -24,8 +24,8 @@
 #include "Core/IScenePeer.h"
 #include "Core/ISerializer.h"
 #include "Core/Packet.h"
-#include "Core/PacketPriority.h"
-#include "Core/PacketReliability.h"
+//#include "Core/PacketPriority.h"
+//#include "Core/PacketReliability.h"
 #include "Core/Route.h"
 
 #include "Core/Models/ConnectionData.h"
@@ -57,5 +57,5 @@
 #include "SystemMessages/SceneInfosDto.h"
 #include "SystemMessages/SceneInfosRequestDto.h"
 
-#include "Transports/RakNetTransport.h"
 #include "Transports/RakNetConnection.h"
+#include "Transports/RakNetTransport.h"

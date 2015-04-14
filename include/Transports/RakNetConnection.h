@@ -2,6 +2,7 @@
 #include "headers.h"
 #include "Core/IConnection.h"
 #include <RakPeerInterface.h>
+#include <RakNetTypes.h>
 
 namespace Stormancer
 {
@@ -11,26 +12,26 @@ namespace Stormancer
 	{
 
 	public:
-		RakNetConnection(RakNetGUID* guid, int64 id, RakPeerInterface* peer, function<void(RakNetConnection*)> closeAction);
+		RakNetConnection(RakNetGUID guid, int64 id, RakPeerInterface* peer, function<void(RakNetConnection*)> closeAction);
 		virtual ~RakNetConnection();
 
 	public:
-		RakNetGUID* guid();
+		RakNetGUID guid();
 		time_t lastActivityDate();
 		wstring ipAddress();
 		bool operator==(RakNetConnection& other);
 		bool operator!=(RakNetConnection& other);
 		stringMap metadata();
 		void close();
-		void sendSystem(byte msgId, function<void(byteStream*)> writer);
-		void sendRaw(function<void(byteStream*)> writer, PacketPriority priority, PacketReliability reliability, uint8 channel);
-		void sendToScene(byte sceneIndex, uint16 route, function<void(byteStream*)> writer, PacketPriority priority, PacketReliability reliability);
+		void sendSystem(byte msgId, function<void(BitStream*)> writer);
+		void sendRaw(function<void(BitStream*)> writer, PacketPriority priority, PacketReliability reliability, char channel);
+		void sendToScene(byte sceneIndex, uint16 route, function<void(BitStream*)> writer, PacketPriority priority, PacketReliability reliability);
 		int ping();
 
 		template<typename T>
 		void registerComponent(T* component)
 		{
-			_localData[typeid(T).hash_code()] = (void*)component;
+			_localData[typeid(T).hash_code()] = static_cast<void*>(component);
 		}
 
 		template<typename T>
@@ -41,7 +42,7 @@ namespace Stormancer
 			{
 				if (component != nullptr)
 				{
-					component = (T*)(_localData[hash_code]);
+					component = static_cast<T*>(_localData[hash_code]);
 				}
 				return true;
 			}
@@ -52,7 +53,7 @@ namespace Stormancer
 
 	private:
 		RakPeerInterface* _rakPeer;
-		RakNetGUID* _guid;
+		RakNetGUID _guid;
 		function<void(RakNetConnection*)> _closeAction;
 		stringMap _metadata;
 		time_t _lastActivityDate;

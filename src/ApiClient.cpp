@@ -24,7 +24,7 @@ namespace Stormancer
 	pplx::task<SceneEndpoint*> ApiClient::getSceneEndpoint(wstring accountId, wstring applicationName, wstring sceneId, wstring userData)
 	{
 		auto serializer = new MsgPackSerializer;
-		byteStream stream;
+		bytestream stream;
 		serializer->serialize(Helpers::to_string(userData), &stream);
 		string data = stream.str();
 

@@ -1,8 +1,8 @@
 #pragma once
 #include "headers.h"
 #include "ConnectionState.h"
-#include "PacketPriority.h"
-#include "PacketReliability.h"
+#include <PacketPriority.h>
+#include "Infrastructure/bytestream.h"
 
 namespace Stormancer
 {
@@ -16,7 +16,7 @@ namespace Stormancer
 		template<typename T>
 		void registerComponent(T* component)
 		{
-			_components[typeid(T).hash_code()] = (void*)component;
+			_components[typeid(T).hash_code()] = static_cast<void*>(component);
 		}
 
 		template<typename T>
@@ -27,7 +27,7 @@ namespace Stormancer
 			{
 				if (component != nullptr)
 				{
-					component = (T*)(_components[hash_code]);
+					component = static_cast<T*>(_components[hash_code]);
 				}
 				return true;
 			}
@@ -36,8 +36,8 @@ namespace Stormancer
 			return false;
 		}
 
-		virtual void sendSystem(char msgId, function<void(byteStream*)> writer) = 0;
-		virtual void sendToScene(char sceneIndex, uint16 route, function<void(byteStream*)> writer, PacketPriority priority, PacketReliability reliability) = 0;
+		virtual void sendSystem(char msgId, function<void(bytestream*)> writer) = 0;
+		virtual void sendToScene(char sceneIndex, uint16 route, function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability) = 0;
 		virtual void setApplication(wstring account, wstring application) = 0;
 		virtual void close() = 0;
 		virtual wstring ipAddress() = 0;

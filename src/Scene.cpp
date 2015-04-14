@@ -108,7 +108,7 @@ namespace Stormancer
 		return onMessage(route);
 	}
 
-	void Scene::sendPacket(wstring routeName, function<void(byteStream*)> writer, PacketPriority priority, PacketReliability reliability)
+	void Scene::sendPacket(wstring routeName, function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability)
 	{
 		if (routeName.length() == 0)
 		{

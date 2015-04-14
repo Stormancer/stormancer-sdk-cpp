@@ -16,7 +16,7 @@ namespace Stormancer
 
 		// Base template
 		template<typename T>
-		void serialize(T data, byteStream* stream)
+		void serialize(T data, bytestream* stream)
 		{
 			MsgPack::Serializer srlz(stream->rdbuf());
 			srlz << MsgPack::Factory(data);
@@ -27,7 +27,7 @@ namespace Stormancer
 
 		// Array template
 		template<typename T>
-		void serialize(vector<T> data, byteStream* stream)
+		void serialize(vector<T> data, bytestream* stream)
 		{
 			MsgPack::Serializer srlz(stream->rdbuf());
 			srlz << MsgPack__Factory(ArrayHeader(data.size()));
@@ -42,7 +42,7 @@ namespace Stormancer
 
 		// Map template
 		template<typename MT>
-		void serialize(map<wstring, MT> data, byteStream* stream)
+		void serialize(map<wstring, MT> data, bytestream* stream)
 		{
 			MsgPack::Serializer srlz(stream);
 			srlz << MsgPack__Factory(MapHeader(myMap.size()));
@@ -64,7 +64,7 @@ namespace Stormancer
 
 		// Base template
 		template<typename T>
-		void deserialize(byteStream* stream, T& data)
+		void deserialize(bytestream* stream, T& data)
 		{
 			MsgPack::Deserializer dsrlz(stream->rdbuf());
 			unique_ptr<MsgPack::Element> element;
@@ -76,7 +76,7 @@ namespace Stormancer
 
 		// string
 		template<>
-		void deserialize<string>(byteStream* stream, string& str)
+		void deserialize<string>(bytestream* stream, string& str)
 		{
 			MsgPack::Deserializer dsrlz(stream->rdbuf());
 			unique_ptr<MsgPack::Element> element;
@@ -86,7 +86,7 @@ namespace Stormancer
 
 		// wstring
 		template<>
-		void deserialize<wstring>(byteStream* stream, wstring& str)
+		void deserialize<wstring>(bytestream* stream, wstring& str)
 		{
 			string strTmp;
 			deserialize<string>(stream, strTmp);
@@ -95,7 +95,7 @@ namespace Stormancer
 
 		// ConnectionData
 		template<>
-		void deserialize<ConnectionData>(byteStream* stream, ConnectionData& data)
+		void deserialize<ConnectionData>(bytestream* stream, ConnectionData& data)
 		{
 			MsgPack::Deserializer dsrlz(stream->rdbuf());
 
@@ -131,7 +131,7 @@ namespace Stormancer
 
 		// Array template
 		template<typename VT>
-		void deserialize(byteStream* stream, vector<VT>& v)
+		void deserialize(bytestream* stream, vector<VT>& v)
 		{
 			// TODO
 		}
@@ -141,7 +141,7 @@ namespace Stormancer
 
 		// Map template
 		template<typename MT>
-		void deserialize(byteStream* stream, map<wstring, MT>& m)
+		void deserialize(bytestream* stream, map<wstring, MT>& m)
 		{
 			MsgPack::Deserializer dsrlz(stream);
 			unique_ptr<MsgPack::Element> element;

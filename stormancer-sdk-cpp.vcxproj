@@ -194,8 +194,6 @@
     <ClInclude Include="include\Core\Models\ConnectionData.h" />
     <ClInclude Include="include\Core\Models\RouteDto.h" />
     <ClInclude Include="include\Core\Packet.h" />
-    <ClInclude Include="include\Core\PacketPriority.h" />
-    <ClInclude Include="include\Core\PacketReliability.h" />
     <ClInclude Include="include\Core\Route.h" />
     <ClInclude Include="include\DefaultLogger.h" />
     <ClInclude Include="include\Helpers.h" />

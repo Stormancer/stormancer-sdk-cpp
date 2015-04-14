@@ -14,7 +14,7 @@ namespace Stormancer
 	{
 	}
 
-	void ScenePeer::send(wstring& routeName, function<void(byteStream*)> writer, PacketPriority priority, PacketReliability reliability)
+	void ScenePeer::send(wstring& routeName, function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability)
 	{
 		if (!Helpers::mapContains(_routeMapping, routeName))
 		{

@@ -12,17 +12,16 @@ namespace Stormancer
 
 	public:
 		Packet<>* packet();
-		byteStream* inputStream();
+		bytestream* inputStream();
 		bool isComplete();
-		void send(function<void(byteStream*)> writer);
+		void send(function<void(bytestream*)> writer);
 		void complete();
-		void error(function<void(byteStream*)> writer);
+		void error(function<void(bytestream*)> writer);
 
 	private:
 		Packet<>* _packet;
 		byte _requestId[2];
-		byteBuffer* _buffer;
-		byteStream* _stream;
+		bytestream* _stream;
 		bool _didSendValues = false;
 		bool _isComplete;
 	};

@@ -177,7 +177,7 @@ namespace Stormancer
 	template<typename T, typename U>
 	pplx::task<U> Client::sendSystemRequest(byte id, T& parameter)
 	{
-		return _requestProcessor->sendSystemRequest(_serverConnection, id, [this, &parameter](byteStream* stream) {
+		return _requestProcessor->sendSystemRequest(_serverConnection, id, [this, &parameter](bytestream* stream) {
 			this->_systemSerializer->serialize(parameter, stream);
 		}).then([this](Packet<>* packet) {
 			U res;

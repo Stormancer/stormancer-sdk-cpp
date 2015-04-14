@@ -12,24 +12,130 @@ namespace Stormancer
 	{
 	}
 
-	pplx::task<void> RakNetTransport::start(wstring type, IConnectionManager* handler, pplx::cancellation_token token, uint16 serverPort, uint16 maxConnections)
+	pplx::task<void> RakNetTransport::start(wstring type, IConnectionManager* handler, pplx::cancellation_token token, uint16 maxConnections, uint16 serverPort)
 	{
-		throw string("no implem");
-		//return pplx::create_task([]() {});
+		if (handler == nullptr && serverPort > 0)
+		{
+			throw string("Handler is null.");
+		}
+		_type = type;
+
+		auto tce = pplx::task_completion_event<void>();
+		pplx::task<void>([this, &token, &tce, maxConnections]() {
+			this->run(token, tce, maxConnections);
+		});
+
+		_handler = handler;
+		return pplx::create_task(tce);
 	}
 
-	void RakNetTransport::run(pplx::cancellation_token token, pplx::task_completion_event<bool> startupTcs, uint16 serverPort, uint16 maxConnections)
+	void RakNetTransport::run(pplx::cancellation_token token, pplx::task_completion_event<void> startupTce, uint16 maxConnections, uint16 serverPort)
 	{
-		throw string("no implem");
+		_isRunning = true;
+		_logger->log(LogLevel::Info, L"", Helpers::StringFormat(L"Starting raknet transport {0}", _type), L"");
+		auto server = RakPeerInterface::GetInstance();
+		auto socketDescriptor = (serverPort != 0 ? new SocketDescriptor(serverPort, nullptr) : new SocketDescriptor());
+		auto startupResult = server->Startup(maxConnections, socketDescriptor, 1);
+		if (startupResult != StartupResult::RAKNET_STARTED)
+		{
+			throw string(Helpers::StringFormat(L"Couldn't start raknet peer : {0}", startupResult));
+		}
+		server->SetMaximumIncomingConnections(maxConnections);
+
+		_peer = server;
+		startupTce.set();
+		_logger->log(LogLevel::Info, L"", Helpers::StringFormat(L"Raknet transport started {0}", _type), L"");
+		while (!token.is_canceled())
+		{
+			RakNet::Packet* packet;
+			while ((packet = server->Receive()) != nullptr)
+			{
+				if (packet->length == 0)
+				{
+					continue;
+				}
+
+				wstring packetSystemAddressStr = Helpers::to_wstring(packet->systemAddress.ToString());
+				switch (packet->data[0])
+				{
+				case (int)DefaultMessageIDTypes::ID_CONNECTION_REQUEST_ACCEPTED:
+				{
+					if (Helpers::mapContains(_pendingConnections, packetSystemAddressStr))
+					{
+						auto tce = _pendingConnections[packetSystemAddressStr];
+						auto c = createNewConnection(packet->guid, server);
+						tce.set(c);
+					}
+					_logger->log(LogLevel::Debug, L"", Helpers::StringFormat(L"Connection request to {0} accepted.", packetSystemAddressStr), L"");
+					onConnection(packet, server);
+					break;
+				}
+				case (int)DefaultMessageIDTypes::ID_NEW_INCOMING_CONNECTION:
+				{
+					_logger->log(LogLevel::Trace, L"", Helpers::StringFormat(L"Icoming connection from {0}.", packetSystemAddressStr), L"");
+					onConnection(packet, server);
+					break;
+				}
+				case (int)DefaultMessageIDTypes::ID_DISCONNECTION_NOTIFICATION:
+				{
+					_logger->log(LogLevel::Trace, L"", Helpers::StringFormat(L"{0} disconnected.", packetSystemAddressStr), L"");
+					onDisconnection(packet, server, L"CLIENT_DISCONNECTED");
+					break;
+				}
+				case (int)DefaultMessageIDTypes::ID_CONNECTION_LOST:
+				{
+					_logger->log(LogLevel::Trace, L"", Helpers::StringFormat(L"{0} lost the connection.", packetSystemAddressStr), L"");
+					onDisconnection(packet, server, L"CONNECTION_LOST");
+					break;
+				}
+				case (int)MessageIDTypes::ID_CONNECTION_RESULT:
+				{
+					onConnectionIdReceived(*(static_cast<int64*>(static_cast<void*>(packet->data + 1))));
+					break;
+				}
+				case (int)DefaultMessageIDTypes::ID_CONNECTION_ATTEMPT_FAILED:
+					if (Helpers::mapContains(_pendingConnections, packetSystemAddressStr))
+					{
+						auto tce = _pendingConnections[packetSystemAddressStr];
+						exception_ptr eptr = make_exception_ptr("Connection attempt failed.");
+						tce.set_exception(eptr);
+					}
+					break;
+				default:
+				{
+					onMessageReceived(packet);
+					break;
+				}
+				}
+			}
+			Sleep(0);
+		}
+		server->Shutdown(1000);
+		_isRunning = false;
+		_logger->log(LogLevel::Info, L"", L"Stopped raknet server.", L"");
+	}
+
+	void RakNetTransport::onConnectionIdReceived(uint64 p)
+	{
+		_id = p;
 	}
 
 	pplx::task<IConnection*> RakNetTransport::connect(wstring endpoint)
 	{
-		throw string("no implem");
-	}
+		if (_peer == nullptr || !_peer->IsActive())
+		{
+			throw string("Transport not started. Call start before connect.");
+		}
+		auto infos = Helpers::stringSplit(endpoint, L":");
+		auto host = Helpers::to_string(infos[0]).c_str();
+		uint16 port = infos[1][0] * 256 + infos[1][1];
+		_peer->Connect(host, port, nullptr, 0);
 
-	void RakNetTransport::onConnectionReceived(uint64 p)
-	{
-		_id = p;
+		auto addressStr = Helpers::to_wstring(SystemAddress(host, port).ToString());
+
+		_pendingConnections[addressStr] = pplx::task_completion_event<IConnection*>();
+		auto& tce = _pendingConnections[addressStr];
+
+		return pplx::task<IConnection*>(tce);
 	}
 };

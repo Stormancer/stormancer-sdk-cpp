@@ -16,11 +16,6 @@ namespace Stormancer
 
 	using byte = uint8;
 
-	using byteBuffer = stringbuf;
-	using byteStream = stringstream;
-	using ibyteStream = istringstream;
-	using obytestream = ostringstream;
-
 	using stringMap = map < wstring, wstring > ;
 	using anyMap = map < wstring, void* > ;
 };

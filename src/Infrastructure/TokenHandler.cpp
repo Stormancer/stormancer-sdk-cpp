@@ -18,7 +18,7 @@ namespace Stormancer
 		vector<byte> buffer = utility::conversions::from_base64(data);
 		string buffer2 = Helpers::to_string(buffer);
 		
-		auto bs = new byteStream(buffer2);
+		auto bs = new bytestream(buffer2);
 		MsgPackSerializer* tknMsgPckSrlz = (MsgPackSerializer*)_tokenSerializer;
 		if (tknMsgPckSrlz == nullptr)
 		{

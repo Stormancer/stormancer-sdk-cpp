@@ -33,7 +33,7 @@ void testClient()
 		scene->connect().then([&scene](pplx::task<void> t2) {
 			if (t2.is_done())
 			{
-				scene->sendPacket(L"echo.in", [](byteStream* stream) {
+				scene->sendPacket(L"echo.in", [](bytestream* stream) {
 					*stream << L"hello";
 				});
 			}
@@ -58,7 +58,7 @@ void testClient()
 
 void testMsgPack()
 {
-	byteStream stream;
+	bytestream stream;
 	MsgPack::Serializer serializer(stream.rdbuf());
 
 	/*serializer << MsgPack__Factory(ArrayHeader(3)); //Next 3 elements belong in this array
@@ -78,7 +78,7 @@ void testMsgPack()
 
 	cout << "SERIALIZED: " << str << endl;
 
-	stream = byteStream(str);
+	stream = bytestream(str);
 	MsgPack::Deserializer deserializer(stream.rdbuf());
 
 	cout << "DESERIALIZED: ";

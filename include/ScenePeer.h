@@ -13,7 +13,7 @@ namespace Stormancer
 		virtual ~ScenePeer();
 
 	public:
-		void send(wstring& routeName, function<void(byteStream*)> writer, PacketPriority priority, PacketReliability reliability);
+		void send(wstring& routeName, function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability);
 		void disconnect();
 		uint64 id();
 

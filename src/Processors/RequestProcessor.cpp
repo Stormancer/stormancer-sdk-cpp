@@ -39,7 +39,7 @@ namespace Stormancer
 					{
 						if (false)
 						{
-							context.error([&p](byteStream* stream) {
+							context.error([&p](bytestream* stream) {
 								auto MsgPackSrlz = dynamic_cast<MsgPackSerializer*>(p->serializer());
 								string msg = "An error occured on the server.";
 								MsgPackSrlz->serialize(msg, stream);
@@ -142,7 +142,7 @@ namespace Stormancer
 		});
 	}
 
-	pplx::task<Packet<>*> RequestProcessor::sendSystemRequest(IConnection* peer, byte msgId, function<void(byteStream*)> writer)
+	pplx::task<Packet<>*> RequestProcessor::sendSystemRequest(IConnection* peer, byte msgId, function<void(bytestream*)> writer)
 	{
 		//auto tcs = task_completion_event<Packet<>>();
 		//auto request = reserveRequestSlot(rx::observer<>);
@@ -150,7 +150,7 @@ namespace Stormancer
 		throw string("Not implem");
 	}
 
-	pplx::task<Packet<>*> RequestProcessor::sendSceneRequest(IConnection* peer, byte sceneId, uint16 routeId, function<void(byteStream*)> writer)
+	pplx::task<Packet<>*> RequestProcessor::sendSceneRequest(IConnection* peer, byte sceneId, uint16 routeId, function<void(bytestream*)> writer)
 	{
 		throw string("Not implem");
 		/*return rx::observable<>::create<Packet<>>([](rx::subscriber<Packet<>> dest) {

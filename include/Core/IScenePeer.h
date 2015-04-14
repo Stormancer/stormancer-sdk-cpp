@@ -10,6 +10,6 @@ namespace Stormancer
 		virtual ~IScenePeer();
 
 	public:
-		virtual void send(wstring& routeName, function<void(byteStream*)> writer, PacketPriority priority, PacketReliability reliability) = 0;
+		virtual void send(wstring& routeName, function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability) = 0;
 	};
 };

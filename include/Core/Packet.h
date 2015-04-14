@@ -2,6 +2,7 @@
 #include "headers.h"
 #include "Core/IConnection.h"
 #include "Core/ISerializer.h"
+#include <RakNetTypes.h>
 
 namespace Stormancer
 {
@@ -9,17 +10,17 @@ namespace Stormancer
 	class Packet
 	{
 	public:
-		Packet(T* source, byteStream* stream)
+		Packet(T* source, RakNet::Packet* packet)
 			: connection(source),
-			buffer(*(stream.rdbuf())),
-			stream(stream)
+			_packet(packet)
 		{
+			_data = _packet->data;
+			_length = _packet->length;
 		}
 
-		Packet(T* source, byteStream* stream, anyMap& metadata)
+		Packet(T* source, RakNet::Packet* packet, anyMap& metadata)
 			: connection(source),
-			buffer(*(stream.rdbuf())),
-			stream(stream),
+			_packet(packet),
 			metadata(metadata)
 		{
 		}
@@ -29,6 +30,13 @@ namespace Stormancer
 
 		virtual ~Packet()
 		{
+			if (_packet != nullptr)
+			{
+				delete[] _packet->data;
+				_packet->data = nullptr;
+				delete _packet;
+				_packet = nullptr;
+			}
 		}
 
 	public:
@@ -40,13 +48,13 @@ namespace Stormancer
 		template<typename TData>
 		void setMetadata(wstring key, TData* data)
 		{
-			_metadata[key] = (void*)data;
+			_metadata[key] = static_cast<void*>(data);
 		}
 
 		template<typename TData>
 		TData* getMetadata(wstring key)
 		{
-			return (TData*)_metadata[key];
+			return static_cast<TData*>(_metadata[key]);
 		}
 
 		void removeMetadata(wstring key)
@@ -61,11 +69,12 @@ namespace Stormancer
 		}
 
 	public:
-		byteBuffer* buffer;
-		byteStream* stream;
 		T* connection;
+		byte* data;
+		uint32 length;
 
 	private:
+		RakNet::Packet* _packet;
 		anyMap _metadata;
 	};
 };
