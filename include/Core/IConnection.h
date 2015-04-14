@@ -36,8 +36,8 @@ namespace Stormancer
 			return false;
 		}
 
-		virtual void sendSystem(char msgId, function<void(RakNet::BitStream*)> writer) = 0;
-		virtual void sendToScene(char sceneIndex, uint16 route, function<void(RakNet::BitStream*)> writer, PacketPriority priority, PacketReliability reliability) = 0;
+		virtual void sendSystem(byte msgId, function<void(RakNet::BitStream*)> writer) = 0;
+		virtual void sendToScene(byte sceneIndex, uint16 route, function<void(RakNet::BitStream*)> writer, PacketPriority priority, PacketReliability reliability) = 0;
 		virtual void setApplication(wstring account, wstring application) = 0;
 		virtual void close() = 0;
 		virtual wstring ipAddress() = 0;

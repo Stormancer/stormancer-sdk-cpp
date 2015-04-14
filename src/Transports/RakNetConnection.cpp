@@ -88,4 +88,13 @@ namespace Stormancer
 			throw string("Failed to send message.");
 		}
 	}
+
+	void RakNetConnection::setApplication(wstring account, wstring application)
+	{
+		if (account.length() > 0)
+		{
+			this->_account = account;
+			this->_application = application;
+		}
+	}
 };

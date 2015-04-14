@@ -25,6 +25,7 @@ namespace Stormancer
 		void sendRaw(function<void(RakNet::BitStream*)> writer, PacketPriority priority, PacketReliability reliability, char channel);
 		void sendToScene(byte sceneIndex, uint16 route, function<void(RakNet::BitStream*)> writer, PacketPriority priority, PacketReliability reliability);
 		int ping();
+		void setApplication(wstring account, wstring application);
 
 		template<typename T>
 		void registerComponent(T* component)
