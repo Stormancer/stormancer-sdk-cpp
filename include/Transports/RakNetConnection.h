@@ -6,26 +6,24 @@
 
 namespace Stormancer
 {
-	using namespace RakNet;
-
 	class RakNetConnection : public IConnection
 	{
 
 	public:
-		RakNetConnection(RakNetGUID guid, int64 id, RakPeerInterface* peer, function<void(RakNetConnection*)> closeAction);
+		RakNetConnection(RakNet::RakNetGUID guid, int64 id, RakNet::RakPeerInterface* peer, function<void(RakNetConnection*)> closeAction);
 		virtual ~RakNetConnection();
 
 	public:
-		RakNetGUID guid();
+		RakNet::RakNetGUID guid();
 		time_t lastActivityDate();
 		wstring ipAddress();
 		bool operator==(RakNetConnection& other);
 		bool operator!=(RakNetConnection& other);
 		stringMap metadata();
 		void close();
-		void sendSystem(byte msgId, function<void(BitStream*)> writer);
-		void sendRaw(function<void(BitStream*)> writer, PacketPriority priority, PacketReliability reliability, char channel);
-		void sendToScene(byte sceneIndex, uint16 route, function<void(BitStream*)> writer, PacketPriority priority, PacketReliability reliability);
+		void sendSystem(byte msgId, function<void(RakNet::BitStream*)> writer);
+		void sendRaw(function<void(RakNet::BitStream*)> writer, PacketPriority priority, PacketReliability reliability, char channel);
+		void sendToScene(byte sceneIndex, uint16 route, function<void(RakNet::BitStream*)> writer, PacketPriority priority, PacketReliability reliability);
 		int ping();
 
 		template<typename T>
@@ -52,8 +50,8 @@ namespace Stormancer
 		}
 
 	private:
-		RakPeerInterface* _rakPeer;
-		RakNetGUID _guid;
+		RakNet::RakPeerInterface* _rakPeer;
+		RakNet::RakNetGUID _guid;
 		function<void(RakNetConnection*)> _closeAction;
 		stringMap _metadata;
 		time_t _lastActivityDate;

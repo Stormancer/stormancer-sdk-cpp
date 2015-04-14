@@ -33,10 +33,10 @@ namespace Stormancer
 	{
 		_isRunning = true;
 		_logger->log(LogLevel::Info, L"", Helpers::StringFormat(L"Starting raknet transport {0}", _type), L"");
-		auto server = RakPeerInterface::GetInstance();
-		auto socketDescriptor = (serverPort != 0 ? new SocketDescriptor(serverPort, nullptr) : new SocketDescriptor());
+		auto server = RakNet::RakPeerInterface::GetInstance();
+		auto socketDescriptor = (serverPort != 0 ? new RakNet::SocketDescriptor(serverPort, nullptr) : new RakNet::SocketDescriptor());
 		auto startupResult = server->Startup(maxConnections, socketDescriptor, 1);
-		if (startupResult != StartupResult::RAKNET_STARTED)
+		if (startupResult != RakNet::StartupResult::RAKNET_STARTED)
 		{
 			throw string(Helpers::StringFormat(L"Couldn't start raknet peer : {0}", startupResult));
 		}
@@ -131,11 +131,80 @@ namespace Stormancer
 		uint16 port = infos[1][0] * 256 + infos[1][1];
 		_peer->Connect(host, port, nullptr, 0);
 
-		auto addressStr = Helpers::to_wstring(SystemAddress(host, port).ToString());
+		auto addressStr = Helpers::to_wstring(RakNet::SystemAddress(host, port).ToString());
 
 		_pendingConnections[addressStr] = pplx::task_completion_event<IConnection*>();
 		auto& tce = _pendingConnections[addressStr];
 
 		return pplx::task<IConnection*>(tce);
+	}
+
+	void RakNetTransport::onConnection(RakNet::Packet* packet, RakNet::RakPeerInterface* server)
+	{
+		_logger->log(LogLevel::Trace, L"", Helpers::StringFormat(L"{0} connected.", packet->systemAddress), L"");
+
+		auto c = createNewConnection(packet->guid, server);
+		server->DeallocatePacket(packet);
+		_handler->newConnection(c);
+		if (connectionOpened != nullptr)
+		{
+			connectionOpened(c);
+		}
+
+		auto id = c->id;
+		c->sendSystem((byte)MessageIDTypes::ID_CONNECTION_RESULT, [&c, id](RakNet::BitStream* stream) {
+			uint8* data = static_cast<uint8*>(static_cast<void*>(&id));
+			stream->WriteAlignedBytes(data, 8);
+		});
+	}
+
+	void RakNetTransport::onDisconnection(RakNet::Packet* packet, RakNet::RakPeerInterface* server, wstring reason)
+	{
+		_logger->log(LogLevel::Trace, L"", Helpers::StringFormat(L"{0} disconnected.", packet->systemAddress), L"");
+		auto c = removeConnection(packet->guid);
+		server->DeallocatePacket(packet);
+
+		_handler->closeConnection(c, reason);
+
+		if (connectionClosed != nullptr)
+		{
+			connectionClosed(c);
+		}
+		c->connectionClosed(reason);
+	}
+
+	void RakNetTransport::onMessageReceived(RakNet::Packet* packet)
+	{
+		auto connection = getConnection(packet->guid);
+		auto p = new Packet<>(connection, packet);
+		p->server = _peer;
+		_logger->log(LogLevel::Trace, L"", Helpers::StringFormat(L"Message with id {0} arrived.", (byte)packet->data[0]), L"");
+
+		packetReceived(p);
+	}
+
+	RakNetConnection* RakNetTransport::getConnection(RakNet::RakNetGUID guid)
+	{
+		return _connections[guid.g];
+	}
+
+	RakNetConnection* RakNetTransport::createNewConnection(RakNet::RakNetGUID raknetGuid, RakNet::RakPeerInterface* peer)
+	{
+		auto cid = _handler->generateNewConnectionId();
+		auto c = new RakNetConnection(raknetGuid, cid, peer, onRequestClose);
+		_connections[raknetGuid.g] = c;
+		return c;
+	}
+
+	RakNetConnection* RakNetTransport::removeConnection(RakNet::RakNetGUID guid)
+	{
+		RakNetConnection* connection = _connections[guid.g];
+		_connections.erase(guid.g);
+		return connection;
+	}
+
+	void RakNetTransport::onRequestClose(RakNetConnection* c)
+	{
+		_peer->CloseConnection(c->guid, true);
 	}
 };

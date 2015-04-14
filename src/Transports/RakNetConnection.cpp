@@ -2,7 +2,7 @@
 
 namespace Stormancer
 {
-	RakNetConnection::RakNetConnection(RakNetGUID guid, int64 id, RakPeerInterface* peer, function<void(RakNetConnection*)> closeAction)
+	RakNetConnection::RakNetConnection(RakNet::RakNetGUID guid, int64 id, RakNet::RakPeerInterface* peer, function<void(RakNetConnection*)> closeAction)
 		: _lastActivityDate(Helpers::nowTime_t()),
 		_guid(guid),
 		_rakPeer(peer),
@@ -15,7 +15,7 @@ namespace Stormancer
 	{
 	}
 
-	RakNetGUID RakNetConnection::guid()
+	RakNet::RakNetGUID RakNetConnection::guid()
 	{
 		return _guid;
 	}
@@ -56,17 +56,17 @@ namespace Stormancer
 		return _rakPeer->GetLastPing(_guid);
 	}
 
-	void RakNetConnection::sendSystem(byte msgId, function<void(BitStream*)> writer)
+	void RakNetConnection::sendSystem(byte msgId, function<void(RakNet::BitStream*)> writer)
 	{
-		sendRaw([msgId, &writer](BitStream* stream) {
+		sendRaw([msgId, &writer](RakNet::BitStream* stream) {
 			stream->Write(msgId);
 			writer(stream);
 		}, PacketPriority::HIGH_PRIORITY, PacketReliability::RELIABLE_ORDERED, (uint8)0);
 	}
 
-	void RakNetConnection::sendRaw(function<void(BitStream*)> writer, PacketPriority priority, PacketReliability reliability, char channel)
+	void RakNetConnection::sendRaw(function<void(RakNet::BitStream*)> writer, PacketPriority priority, PacketReliability reliability, char channel)
 	{
-		BitStream stream;
+		RakNet::BitStream stream;
 		writer(&stream);
 		auto result = _rakPeer->Send(&stream, (PacketPriority)priority, (PacketReliability)reliability, channel, _guid, false);
 		if (result == 0)
@@ -75,9 +75,9 @@ namespace Stormancer
 		}
 	}
 
-	void RakNetConnection::sendToScene(byte sceneIndex, uint16 route, function<void(BitStream*)> writer, PacketPriority priority, PacketReliability reliability)
+	void RakNetConnection::sendToScene(byte sceneIndex, uint16 route, function<void(RakNet::BitStream*)> writer, PacketPriority priority, PacketReliability reliability)
 	{
-		BitStream stream;
+		RakNet::BitStream stream;
 		stream.Write(sceneIndex);
 		stream.Write(route);
 		writer(&stream);

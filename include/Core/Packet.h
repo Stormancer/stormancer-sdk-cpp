@@ -32,9 +32,16 @@ namespace Stormancer
 		{
 			if (_packet != nullptr)
 			{
-				delete[] _packet->data;
-				_packet->data = nullptr;
-				delete _packet;
+				if (server != nullptr)
+				{
+					server->DeallocatePacket(_packet);
+				}
+				else
+				{
+					delete[] _packet->data;
+					_packet->data = nullptr;
+					delete _packet;
+				}
 				_packet = nullptr;
 			}
 		}
@@ -72,6 +79,7 @@ namespace Stormancer
 		T* connection;
 		byte* data;
 		uint32 length;
+		RakNet::RakPeerInterface* server = nullptr;
 
 	private:
 		RakNet::Packet* _packet;

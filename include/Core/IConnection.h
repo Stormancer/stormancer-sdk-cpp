@@ -2,7 +2,7 @@
 #include "headers.h"
 #include "ConnectionState.h"
 #include <PacketPriority.h>
-#include "Infrastructure/bytestream.h"
+#include "headers.h"
 
 namespace Stormancer
 {
@@ -36,8 +36,8 @@ namespace Stormancer
 			return false;
 		}
 
-		virtual void sendSystem(char msgId, function<void(bytestream*)> writer) = 0;
-		virtual void sendToScene(char sceneIndex, uint16 route, function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability) = 0;
+		virtual void sendSystem(char msgId, function<void(RakNet::BitStream*)> writer) = 0;
+		virtual void sendToScene(char sceneIndex, uint16 route, function<void(RakNet::BitStream*)> writer, PacketPriority priority, PacketReliability reliability) = 0;
 		virtual void setApplication(wstring account, wstring application) = 0;
 		virtual void close() = 0;
 		virtual wstring ipAddress() = 0;
@@ -50,7 +50,7 @@ namespace Stormancer
 
 	public:
 		stringMap metadata;
-		function<void(string)> connectionClosed;
+		function<void(wstring)> connectionClosed;
 
 	protected:
 		ConnectionState _state;
