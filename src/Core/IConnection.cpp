@@ -31,4 +31,9 @@ namespace Stormancer
 	{
 		return _application;
 	}
+
+	ConnectionState IConnection::state()
+	{
+		return _state;
+	}
 };

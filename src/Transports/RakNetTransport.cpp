@@ -141,7 +141,8 @@ namespace Stormancer
 
 	void RakNetTransport::onConnection(RakNet::Packet* packet, RakNet::RakPeerInterface* server)
 	{
-		_logger->log(LogLevel::Trace, L"", Helpers::StringFormat(L"{0} connected.", packet->systemAddress), L"");
+		wstring sysAddr = Helpers::to_wstring(packet->systemAddress.ToString());
+		_logger->log(LogLevel::Trace, L"", Helpers::StringFormat(L"{0} connected.", sysAddr), L"");
 
 		auto c = createNewConnection(packet->guid, server);
 		server->DeallocatePacket(packet);
@@ -151,16 +152,15 @@ namespace Stormancer
 			connectionOpened(c);
 		}
 
-		auto id = c->id;
-		c->sendSystem((byte)MessageIDTypes::ID_CONNECTION_RESULT, [&c, id](RakNet::BitStream* stream) {
-			uint8* data = static_cast<uint8*>(static_cast<void*>(&id));
-			stream->WriteAlignedBytes(data, 8);
+		c->sendSystem((byte)MessageIDTypes::ID_CONNECTION_RESULT, [c](bytestream* stream) {
+			*stream << c->id();
 		});
 	}
 
 	void RakNetTransport::onDisconnection(RakNet::Packet* packet, RakNet::RakPeerInterface* server, wstring reason)
 	{
-		_logger->log(LogLevel::Trace, L"", Helpers::StringFormat(L"{0} disconnected.", packet->systemAddress), L"");
+		wstring sysAddr = Helpers::to_wstring(packet->systemAddress.ToString());
+		_logger->log(LogLevel::Trace, L"", Helpers::StringFormat(L"{0} disconnected.", sysAddr), L"");
 		auto c = removeConnection(packet->guid);
 		server->DeallocatePacket(packet);
 
@@ -176,8 +176,15 @@ namespace Stormancer
 	void RakNetTransport::onMessageReceived(RakNet::Packet* packet)
 	{
 		auto connection = getConnection(packet->guid);
-		auto p = new Packet<>(connection, packet);
-		p->server = _peer;
+		stringstream* stream = Helpers::convertRakNetPacketToStringStream(packet, _peer);
+		auto p = new Packet<>(connection, stream);
+		p->clean = [this, &packet]() {
+			if (this->_peer != nullptr && packet != nullptr)
+			{
+				this->_peer->DeallocatePacket(packet);
+			}
+		};
+
 		_logger->log(LogLevel::Trace, L"", Helpers::StringFormat(L"Message with id {0} arrived.", (byte)packet->data[0]), L"");
 
 		packetReceived(p);
@@ -190,8 +197,11 @@ namespace Stormancer
 
 	RakNetConnection* RakNetTransport::createNewConnection(RakNet::RakNetGUID raknetGuid, RakNet::RakPeerInterface* peer)
 	{
-		auto cid = _handler->generateNewConnectionId();
-		auto c = new RakNetConnection(raknetGuid, cid, peer, onRequestClose);
+		int64 cid = _handler->generateNewConnectionId();
+		function<void(RakNetConnection*)> lambdaOnRequestClose = [this](RakNetConnection* c) {
+			this->onRequestClose(c);
+		};
+		auto c = new RakNetConnection(raknetGuid, cid, peer, lambdaOnRequestClose);
 		_connections[raknetGuid.g] = c;
 		return c;
 	}
@@ -205,6 +215,6 @@ namespace Stormancer
 
 	void RakNetTransport::onRequestClose(RakNetConnection* c)
 	{
-		_peer->CloseConnection(c->guid, true);
+		_peer->CloseConnection(c->guid(), true);
 	}
 };

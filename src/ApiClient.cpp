@@ -28,8 +28,7 @@ namespace Stormancer
 		serializer->serialize(Helpers::to_string(userData), &stream);
 		string data = stream.str();
 
-		//wstring baseUri = _config.getApiEndpoint();
-		wstring baseUri = L"http://localhost:8888";
+		wstring baseUri = _config->getApiEndpoint();
 		http_client client(baseUri);
 		http_request request(methods::POST);
 		request.headers().add(L"Content-Type", L"application/msgpack");
@@ -37,8 +36,6 @@ namespace Stormancer
 		request.headers().add(L"x-version", L"1.0.0");
 		wstring relativeUri = Helpers::StringFormat(_createTokenUri, accountId, applicationName, sceneId);
 		request.set_request_uri(L"/" + relativeUri);
-		//wstring relativeUri = L"/search?q=Casablanca%20CodePlex";
-		//request.set_request_uri(relativeUri);
 
 		return client.request(request).then([this, accountId, applicationName, sceneId](pplx::task<http_response> t) {
 			try

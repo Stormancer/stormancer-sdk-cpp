@@ -4,7 +4,6 @@ namespace Stormancer
 {
 	RequestContext::RequestContext(Packet<>* packet)
 		: _packet(packet),
-		_buffer(packet->buffer),
 		_stream(packet->stream)
 	{
 		(*packet->stream) >> _requestId[0];

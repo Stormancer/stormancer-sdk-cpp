@@ -29,7 +29,7 @@ namespace Stormancer
 		void addRoute(wstring routeName, function<void(Packet<IScenePeer>*)> handler, stringMap metadata = stringMap());
 		rx::observable<Packet<IScenePeer>*>* onMessage(Route* route);
 		rx::observable<Packet<IScenePeer>*>* onMessage(wstring routeName);
-		void sendPacket(wstring routeName, function<void(RakNet::BitStream*)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE);
+		void sendPacket(wstring routeName, function<void(bytestream*)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE);
 		pplx::task<void> connect();
 		pplx::task<void> disconnect();
 		vector<IScenePeer*> remotePeers();

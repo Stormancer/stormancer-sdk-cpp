@@ -56,32 +56,34 @@ namespace Stormancer
 		return _rakPeer->GetLastPing(_guid);
 	}
 
-	void RakNetConnection::sendSystem(byte msgId, function<void(RakNet::BitStream*)> writer)
+	void RakNetConnection::sendSystem(byte msgId, function<void(bytestream*)> writer)
 	{
-		sendRaw([msgId, &writer](RakNet::BitStream* stream) {
-			stream->Write(msgId);
+		sendRaw([msgId, &writer](bytestream* stream) {
+			*stream << msgId;
 			writer(stream);
 		}, PacketPriority::HIGH_PRIORITY, PacketReliability::RELIABLE_ORDERED, (uint8)0);
 	}
 
-	void RakNetConnection::sendRaw(function<void(RakNet::BitStream*)> writer, PacketPriority priority, PacketReliability reliability, char channel)
+	void RakNetConnection::sendRaw(function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability, char channel)
 	{
-		RakNet::BitStream stream;
+		bytestream stream;
 		writer(&stream);
-		auto result = _rakPeer->Send(&stream, (PacketPriority)priority, (PacketReliability)reliability, channel, _guid, false);
+		auto data = stream.rdbuf()->str();
+		auto result = _rakPeer->Send(data.c_str(), data.length(), (PacketPriority)priority, (PacketReliability)reliability, channel, _guid, false);
 		if (result == 0)
 		{
 			throw string("Failed to send message.");
 		}
 	}
 
-	void RakNetConnection::sendToScene(byte sceneIndex, uint16 route, function<void(RakNet::BitStream*)> writer, PacketPriority priority, PacketReliability reliability)
+	void RakNetConnection::sendToScene(byte sceneIndex, uint16 route, function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability)
 	{
-		RakNet::BitStream stream;
-		stream.Write(sceneIndex);
-		stream.Write(route);
+		bytestream stream;
+		stream << sceneIndex;
+		stream << route;
 		writer(&stream);
-		auto result = _rakPeer->Send(&stream, priority, reliability, 0, _guid, false);
+		auto data = stream.rdbuf()->str();
+		auto result = _rakPeer->Send(data.c_str(), data.length(), priority, reliability, 0, _guid, false);
 
 		if (result == 0)
 		{

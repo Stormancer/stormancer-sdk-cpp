@@ -2,6 +2,34 @@
 
 namespace Stormancer
 {
+	/*bytestream* Helpers::convertRakNetBitStreamToByteStream(RakNet::BitStream* stream)
+	{
+		auto bs = new bytestream;
+		if (stream != nullptr)
+		{
+			auto buf = bs->rdbuf();
+			char* data = static_cast<char*>(static_cast<void*>(stream->GetData()));
+			buf->pubsetbuf(data, stream->GetNumberOfBytesUsed());
+			stream->SetData(nullptr);
+			stream->SetNumberOfBitsAllocated(0);
+			RakNet::BitStream::DestroyInstance(stream);
+			delete stream;
+		}
+		return bs;
+	}*/
+
+	stringstream* Helpers::convertRakNetPacketToStringStream(RakNet::Packet* packet, RakNet::RakPeerInterface* peer)
+	{
+		auto ss = new stringstream;
+		if (packet != nullptr)
+		{
+			auto sb = ss->rdbuf();
+			char* data = static_cast<char*>(static_cast<void*>(packet->data));
+			sb->pubsetbuf(data, packet->length);
+		}
+		return ss;
+	}
+
 	bool Helpers::ensureSuccessStatusCode(int statusCode)
 	{
 		return (statusCode >= 200 && statusCode < 300);
@@ -108,7 +136,7 @@ namespace Stormancer
 		}
 	}
 
-	time_t nowTime_t()
+	time_t Helpers::nowTime_t()
 	{
 		return chrono::system_clock::to_time_t(chrono::system_clock::now());
 	}

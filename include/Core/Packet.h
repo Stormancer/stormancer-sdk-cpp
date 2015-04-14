@@ -10,17 +10,15 @@ namespace Stormancer
 	class Packet
 	{
 	public:
-		Packet(T* source, RakNet::Packet* packet)
+		Packet(T* source, bytestream* stream)
 			: connection(source),
-			_packet(packet)
+			stream(stream)
 		{
-			_data = _packet->data;
-			_length = _packet->length;
 		}
 
-		Packet(T* source, RakNet::Packet* packet, anyMap& metadata)
+		Packet(T* source, bytestream* stream, anyMap& metadata)
 			: connection(source),
-			_packet(packet),
+			stream(stream),
 			metadata(metadata)
 		{
 		}
@@ -30,19 +28,9 @@ namespace Stormancer
 
 		virtual ~Packet()
 		{
-			if (_packet != nullptr)
+			if (clean != nullptr)
 			{
-				if (server != nullptr)
-				{
-					server->DeallocatePacket(_packet);
-				}
-				else
-				{
-					delete[] _packet->data;
-					_packet->data = nullptr;
-					delete _packet;
-				}
-				_packet = nullptr;
+				clean();
 			}
 		}
 
@@ -77,12 +65,11 @@ namespace Stormancer
 
 	public:
 		T* connection;
-		byte* data;
-		uint32 length;
-		RakNet::RakPeerInterface* server = nullptr;
+		bytestream* stream;
+
+		function<void(void)> clean;
 
 	private:
-		RakNet::Packet* _packet;
 		anyMap _metadata;
 	};
 };

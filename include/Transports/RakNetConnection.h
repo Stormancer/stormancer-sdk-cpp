@@ -21,9 +21,9 @@ namespace Stormancer
 		bool operator!=(RakNetConnection& other);
 		stringMap metadata();
 		void close();
-		void sendSystem(byte msgId, function<void(RakNet::BitStream*)> writer);
-		void sendRaw(function<void(RakNet::BitStream*)> writer, PacketPriority priority, PacketReliability reliability, char channel);
-		void sendToScene(byte sceneIndex, uint16 route, function<void(RakNet::BitStream*)> writer, PacketPriority priority, PacketReliability reliability);
+		void sendSystem(byte msgId, function<void(bytestream*)> writer);
+		void sendRaw(function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability, char channel);
+		void sendToScene(byte sceneIndex, uint16 route, function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability);
 		int ping();
 		void setApplication(wstring account, wstring application);
 

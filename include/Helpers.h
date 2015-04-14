@@ -3,6 +3,8 @@
 
 namespace Stormancer
 {
+#pragma region flux
+
 	// vector flux operators
 
 	template<typename T>
@@ -19,11 +21,11 @@ namespace Stormancer
 		return v;
 	}
 
+#pragma endregion
+
 	namespace Helpers
 	{
-		bool ensureSuccessStatusCode(int statusCode);
-
-		void displayException(const exception& e);
+#pragma region map
 
 		anyMap stringMapToAnyMap(stringMap& sm);
 
@@ -76,6 +78,10 @@ namespace Stormancer
 		{
 			return (map.find(key) != map.end()) ? true : false;
 		}
+
+#pragma endregion
+
+#pragma region string
 
 		wstring vectorJoin(vector<wstring> vector, wstring glue = L"");
 
@@ -187,6 +193,10 @@ namespace Stormancer
 			int formatI = 0;
 		};
 
+#pragma endregion
+
+#pragma region task
+
 		pplx::task<void> taskCompleted();
 
 		template<typename T>
@@ -207,6 +217,16 @@ namespace Stormancer
 
 		pplx::task<void> taskIf(bool condition, function<pplx::task<void>()> action);
 
+#pragma endregion
+
+#pragma region stream
+
+		//bytestream* convertRakNetBitStreamToByteStream(RakNet::BitStream* stream);
+
+		stringstream* convertRakNetPacketToStringStream(RakNet::Packet* packet, RakNet::RakPeerInterface* peer = nullptr);
+
+		void deleteStringBuf(stringbuf* sb);
+
 		template<typename T, typename U>
 		void streamCopy(T* fromStream, U* toStream)
 		{
@@ -217,8 +237,22 @@ namespace Stormancer
 			delete[] c;
 		}
 
+#pragma endregion
+
+#pragma region time
+
 		time_t nowTime_t();
 		wstring nowStr();
 		wstring time_tToStr(time_t now);
+
+#pragma endregion
+
+#pragma region other
+
+		bool ensureSuccessStatusCode(int statusCode);
+
+		void displayException(const exception& e);
+
+#pragma endregion
 	};
 };

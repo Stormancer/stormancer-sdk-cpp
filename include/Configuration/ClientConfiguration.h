@@ -27,6 +27,6 @@ namespace Stormancer
 		stringMap metadata;
 
 	private:
-		wstring apiEndpoint = L"http://localhost:8081/";
+		wstring apiEndpoint = L"http://localhost:8888";// L"http://localhost:8081/";
 	};
 };

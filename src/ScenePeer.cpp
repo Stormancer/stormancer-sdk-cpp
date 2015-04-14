@@ -31,6 +31,6 @@ namespace Stormancer
 
 	uint64 ScenePeer::id()
 	{
-		return _connection->id;
+		return _connection->id();
 	}
 };

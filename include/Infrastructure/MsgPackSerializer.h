@@ -22,7 +22,7 @@ namespace Stormancer
 			srlz << MsgPack::Factory(data);
 		}
 
-#pragma endregion Base template
+#pragma endregion
 #pragma region Vector template
 
 		// Array template
@@ -37,7 +37,7 @@ namespace Stormancer
 			}
 		}
 
-#pragma endregion Vector template
+#pragma endregion
 #pragma region Map template
 
 		// Map template
@@ -56,7 +56,7 @@ namespace Stormancer
 
 #pragma endregion Map template
 
-#pragma endregion serialization
+#pragma endregion
 
 #pragma region deserialization
 
@@ -126,7 +126,7 @@ namespace Stormancer
 			deserialize(stream, data.ContentType);*/
 		}
 
-#pragma endregion Base template
+#pragma endregion
 #pragma region Vector template
 
 		// Array template
@@ -136,7 +136,7 @@ namespace Stormancer
 			// TODO
 		}
 
-#pragma endregion Vector template
+#pragma endregion
 #pragma region Map template
 
 		// Map template
@@ -149,8 +149,8 @@ namespace Stormancer
 			// TODO
 		}
 
-#pragma endregion Map template
+#pragma endregion
 
-#pragma endregion deserialization
+#pragma endregion
 	};
 };
