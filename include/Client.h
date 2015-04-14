@@ -48,13 +48,22 @@ namespace Stormancer
 	private:
 		pplx::task<void> connectToScene(Scene* scene, wstring& token, vector<Route*> localRoutes);
 		pplx::task<void> disconnect(Scene* scene, byte sceneHandle);
+		void transport_packetReceived(Packet<>* packet);
 
-	private:
 		template<typename T, typename U>
-		pplx::task<U> sendSystemRequest(byte id, T& parameter);
+		pplx::task<U> sendSystemRequest(byte id, T& parameter)
+		{
+			return _requestProcessor->sendSystemRequest(_serverConnection, id, [this, &parameter](bytestream* stream) {
+				this->_systemSerializer->serialize(parameter, stream);
+			}).then([this](Packet<>* packet) {
+				U res;
+				this->_systemSerializer->deserialize(packet->stream, res);
+				return res;
+			});
+		}
 
 	private:
-		bool _initialized;
+		bool _initialized = false;
 		wstring _accountId;
 		wstring _applicationName;
 		//const PluginBuildContext _pluginCtx;

@@ -68,7 +68,13 @@ namespace Stormancer
 
 	void Client::initialize()
 	{
-
+		if (!_initialized)
+		{
+			_initialized = true;
+			_transport->packetReceived << (function<void(Packet<>*)>)([this](Packet<>* packet) {
+				this->transport_packetReceived(packet);
+			});
+		}
 	}
 
 	wstring Client::applicationName()
@@ -174,15 +180,10 @@ namespace Stormancer
 		});
 	}
 
-	template<typename T, typename U>
-	pplx::task<U> Client::sendSystemRequest(byte id, T& parameter)
+	void Client::transport_packetReceived(Packet<>* packet)
 	{
-		return _requestProcessor->sendSystemRequest(_serverConnection, id, [this, &parameter](bytestream* stream) {
-			this->_systemSerializer->serialize(parameter, stream);
-		}).then([this](Packet<>* packet) {
-			U res;
-			this->_systemSerializer->deserialize(packet->stream, res);
-			return res;
-		});
+		// TODO plugins
+
+		_dispatcher->dispatchPacket(packet);
 	}
 };

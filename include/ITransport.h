@@ -18,9 +18,9 @@ namespace Stormancer
 		uint64 id();
 
 	public:
-		function<void(Packet<>*)> packetReceived;
-		function<void(IConnection*)> connectionOpened;
-		function<void(IConnection*)> connectionClosed;
+		vector<function<void(Packet<>*)>> packetReceived;
+		vector<function<void(IConnection*)>> connectionOpened;
+		vector<function<void(IConnection*)>> connectionClosed;
 
 	protected:
 		bool _isRunning;

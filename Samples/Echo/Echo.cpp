@@ -23,8 +23,8 @@ void testClient()
 
 	Client client(config);
 	auto task = client.getPublicScene(L"test-scene", L"hello").then([](pplx::task<Scene*> t) {
-		/*auto scene = t.get();
-		scene->addRoute(L"echo.out", [](Packet<IScenePeer>* p) {
+		auto scene = t.get();
+		/*scene->addRoute(L"echo.out", [](Packet<IScenePeer>* p) {
 			wstring str;
 			p->serializer()->deserialize(p->stream, str);
 			wcout << str << endl;

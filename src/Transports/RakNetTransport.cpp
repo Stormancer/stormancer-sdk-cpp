@@ -147,10 +147,7 @@ namespace Stormancer
 		auto c = createNewConnection(packet->guid, server);
 		server->DeallocatePacket(packet);
 		_handler->newConnection(c);
-		if (connectionOpened != nullptr)
-		{
-			connectionOpened(c);
-		}
+		Helpers::vectorExec(connectionOpened, dynamic_cast<IConnection*>(c));
 
 		c->sendSystem((byte)MessageIDTypes::ID_CONNECTION_RESULT, [c](bytestream* stream) {
 			*stream << c->id();
@@ -166,10 +163,7 @@ namespace Stormancer
 
 		_handler->closeConnection(c, reason);
 
-		if (connectionClosed != nullptr)
-		{
-			connectionClosed(c);
-		}
+		Helpers::vectorExec(connectionClosed, dynamic_cast<IConnection*>(c));
 		c->connectionClosed(reason);
 	}
 
@@ -187,7 +181,7 @@ namespace Stormancer
 
 		_logger->log(LogLevel::Trace, L"", Helpers::StringFormat(L"Message with id {0} arrived.", (byte)packet->data[0]), L"");
 
-		packetReceived(p);
+		Helpers::vectorExec(packetReceived, p);
 	}
 
 	RakNetConnection* RakNetTransport::getConnection(RakNet::RakNetGUID guid)

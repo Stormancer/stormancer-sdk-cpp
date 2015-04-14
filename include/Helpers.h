@@ -81,6 +81,19 @@ namespace Stormancer
 
 #pragma endregion
 
+#pragma region functional
+
+		template<typename TData>
+		void vectorExec(vector<function<void(TData*)>>& v, TData* data)
+		{
+			for (uint32 i = 0; i < v.size(); i++)
+			{
+				v[i](data);
+			}
+		}
+
+#pragma endregion
+
 #pragma region string
 
 		wstring vectorJoin(vector<wstring> vector, wstring glue = L"");
