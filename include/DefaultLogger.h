@@ -1,6 +1,6 @@
 #pragma once
 #include "headers.h"
-#include "Core/ILogger.h"
+#include "ILogger.h"
 
 namespace Stormancer
 {

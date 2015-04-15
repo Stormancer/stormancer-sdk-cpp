@@ -1,7 +1,7 @@
 #pragma once
 #include "headers.h"
 #include "IConnectionManager.h"
-#include "Core/Packet.h"
+#include "Packet.h"
 
 namespace Stormancer
 {

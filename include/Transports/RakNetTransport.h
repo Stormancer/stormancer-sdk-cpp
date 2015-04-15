@@ -1,7 +1,7 @@
 #pragma once
 #include "headers.h"
 #include "ITransport.h"
-#include "Core/ILogger.h"
+#include "ILogger.h"
 #include "Transports/RaknetConnection.h"
 #include <RakPeerInterface.h>
 

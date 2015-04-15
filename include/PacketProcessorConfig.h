@@ -1,6 +1,6 @@
 #pragma once
 #include "headers.h"
-#include "Core/Packet.h"
+#include "Packet.h"
 #include "IPacketProcessor.h"
 
 namespace Stormancer

@@ -28,26 +28,26 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -98,15 +98,19 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)MsgPack\include;$(SolutionDir)RakNet\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PreprocessorDefinitions>WIN32;STORMANCER_DLL_EXPORT;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)MsgPack;$(SolutionDir)RakNet\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <StringPooling>false</StringPooling>
-      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <MinimalRebuild>true</MinimalRebuild>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)RakNet\Lib\DLL\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>DLL_vc9_DLL_$(Configuration)_$(Platform).lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)RakNet\Lib\LibStatic\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -120,15 +124,19 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)MsgPack\include;$(SolutionDir)RakNet\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PreprocessorDefinitions>WIN32;STORMANCER_DLL_EXPORT;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)MsgPack;$(SolutionDir)RakNet\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <StringPooling>false</StringPooling>
-      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <MinimalRebuild>true</MinimalRebuild>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)RakNet\Lib\DLL\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>DLL_vc9_DLL_$(Configuration)_$(Platform).lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Lib>
       <AdditionalDependencies>LibStatic_vc9_LibStatic_$(Configuration)_$(Platform).lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -146,19 +154,21 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)MsgPack\include;$(SolutionDir)RakNet\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PreprocessorDefinitions>WIN32;STORMANCER_DLL_EXPORT;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)MsgPack;$(SolutionDir)RakNet\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <StringPooling>false</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(SolutionDir)RakNet\Lib\DLL\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>DLL_vc9_DLL_$(Configuration)_$(Platform).lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)RakNet\Lib\LibStatic\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -174,19 +184,21 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)MsgPack\include;$(SolutionDir)RakNet\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PreprocessorDefinitions>WIN32;STORMANCER_DLL_EXPORT;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)MsgPack;$(SolutionDir)RakNet\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <StringPooling>false</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(SolutionDir)RakNet\Lib\DLL\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>DLL_vc9_DLL_$(Configuration)_$(Platform).lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Lib>
       <AdditionalDependencies>LibStatic_vc9_LibStatic_$(Configuration)_$(Platform).lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -205,86 +217,88 @@
   <ItemGroup>
     <ClInclude Include="include\ApiClient.h" />
     <ClInclude Include="include\Client.h" />
-    <ClInclude Include="include\Configuration\ClientConfiguration.h" />
-    <ClInclude Include="include\Core\ConnectionState.h" />
-    <ClInclude Include="include\Core\IConnection.h" />
-    <ClInclude Include="include\Core\ILogger.h" />
-    <ClInclude Include="include\Core\IScenePeer.h" />
-    <ClInclude Include="include\Core\ISerializer.h" />
-    <ClInclude Include="include\Core\Models\ConnectionData.h" />
-    <ClInclude Include="include\Core\Models\RouteDto.h" />
-    <ClInclude Include="include\Core\Packet.h" />
-    <ClInclude Include="include\Core\Route.h" />
+    <ClInclude Include="include\ClientConfiguration.h" />
+    <ClInclude Include="include\ConnectionState.h" />
     <ClInclude Include="include\DefaultLogger.h" />
+    <ClInclude Include="include\DefaultPacketDispatcher.h" />
+    <ClInclude Include="include\Dto\ConnectionData.h" />
+    <ClInclude Include="include\Dto\ConnectionResult.h" />
+    <ClInclude Include="include\Dto\ConnectToSceneMsg.h" />
+    <ClInclude Include="include\Dto\EmptyDto.h" />
+    <ClInclude Include="include\Dto\RouteDto.h" />
+    <ClInclude Include="include\Dto\SceneInfosDto.h" />
+    <ClInclude Include="include\Dto\SceneInfosRequestDto.h" />
+    <ClInclude Include="include\headers.h" />
     <ClInclude Include="include\Helpers.h" />
+    <ClInclude Include="include\IConnection.h" />
     <ClInclude Include="include\IConnectionManager.h" />
-    <ClInclude Include="include\Infrastructure\DefaultPacketDispatcher.h" />
-    <ClInclude Include="include\Infrastructure\IPacketDispatcher.h" />
-    <ClInclude Include="include\Infrastructure\ITokenHandler.h" />
-    <ClInclude Include="include\Infrastructure\MsgPackSerializer.h" />
-    <ClInclude Include="include\Infrastructure\TokenHandler.h" />
+    <ClInclude Include="include\ILogger.h" />
+    <ClInclude Include="include\IPacketDispatcher.h" />
     <ClInclude Include="include\IPacketProcessor.h" />
     <ClInclude Include="include\IRequest.h" />
+    <ClInclude Include="include\IRequestModule.h" />
+    <ClInclude Include="include\IScenePeer.h" />
+    <ClInclude Include="include\ISerializer.h" />
+    <ClInclude Include="include\ITokenHandler.h" />
     <ClInclude Include="include\ITransport.h" />
     <ClInclude Include="include\MessageIDTypes.h" />
+    <ClInclude Include="include\MsgPackSerializer.h" />
+    <ClInclude Include="include\Packet.h" />
     <ClInclude Include="include\PacketProcessorConfig.h" />
-    <ClInclude Include="include\Processors\RequestContext.h" />
-    <ClInclude Include="include\Processors\RequestProcessor.h" />
-    <ClInclude Include="include\Processors\SceneDispatcher.h" />
+    <ClInclude Include="include\RequestContext.h" />
+    <ClInclude Include="include\RequestModuleBuilder.h" />
+    <ClInclude Include="include\RequestProcessor.h" />
+    <ClInclude Include="include\Route.h" />
     <ClInclude Include="include\Scene.h" />
+    <ClInclude Include="include\SceneDispatcher.h" />
     <ClInclude Include="include\SceneEndpoint.h" />
     <ClInclude Include="include\ScenePeer.h" />
-    <ClInclude Include="include\SystemMessages\ConnectToSceneMsg.h" />
-    <ClInclude Include="include\SystemMessages\ConnectionResult.h" />
-    <ClInclude Include="include\SystemMessages\EmptyDto.h" />
-    <ClInclude Include="include\SystemMessages\SceneInfosDto.h" />
-    <ClInclude Include="include\SystemMessages\SceneInfosRequestDto.h" />
-    <ClInclude Include="include\headers.h" />
     <ClInclude Include="include\stormancer.h" />
+    <ClInclude Include="include\TokenHandler.h" />
     <ClInclude Include="include\Transports\RakNetConnection.h" />
     <ClInclude Include="include\Transports\RakNetTransport.h" />
     <ClInclude Include="include\typedef.h" />
-    <ClInclude Include="MsgPack\include\Container.h" />
-    <ClInclude Include="MsgPack\include\ContainerHeader.h" />
-    <ClInclude Include="MsgPack\include\Data.h" />
-    <ClInclude Include="MsgPack\include\Element.h" />
-    <ClInclude Include="MsgPack\include\Header.h" />
-    <ClInclude Include="MsgPack\include\MsgPack.h" />
-    <ClInclude Include="MsgPack\include\Number.h" />
-    <ClInclude Include="MsgPack\include\Primitive.h" />
-    <ClInclude Include="MsgPack\include\StreamManager.h" />
+    <ClInclude Include="MsgPack\Container.h" />
+    <ClInclude Include="MsgPack\ContainerHeader.h" />
+    <ClInclude Include="MsgPack\Data.h" />
+    <ClInclude Include="MsgPack\Element.h" />
+    <ClInclude Include="MsgPack\Header.h" />
+    <ClInclude Include="MsgPack\MsgPack.h" />
+    <ClInclude Include="MsgPack\Number.h" />
+    <ClInclude Include="MsgPack\Primitive.h" />
+    <ClInclude Include="MsgPack\StreamManager.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="MsgPack\src\MsgPack.cpp" />
+    <ClCompile Include="MsgPack\MsgPack.cpp" />
     <ClCompile Include="src\ApiClient.cpp" />
     <ClCompile Include="src\Client.cpp" />
-    <ClCompile Include="src\Configuration\ClientConfiguration.cpp" />
-    <ClCompile Include="src\Core\IConnection.cpp" />
-    <ClCompile Include="src\Core\ILogger.cpp" />
-    <ClCompile Include="src\Core\IScenePeer.cpp" />
-    <ClCompile Include="src\Core\ISerializer.cpp" />
-    <ClCompile Include="src\Core\Models\ConnectionData.cpp" />
-    <ClCompile Include="src\Core\Route.cpp" />
+    <ClCompile Include="src\ClientConfiguration.cpp" />
     <ClCompile Include="src\DefaultLogger.cpp" />
+    <ClCompile Include="src\DefaultPacketDispatcher.cpp" />
+    <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\Helpers.cpp" />
+    <ClCompile Include="src\IConnection.cpp" />
     <ClCompile Include="src\IConnectionManager.cpp" />
-    <ClCompile Include="src\Infrastructure\DefaultPacketDispatcher.cpp" />
-    <ClCompile Include="src\Infrastructure\IPacketDispatcher.cpp" />
-    <ClCompile Include="src\Infrastructure\ITokenHandler.cpp" />
-    <ClCompile Include="src\Infrastructure\Modules\IRequestModule.cpp" />
-    <ClCompile Include="src\Infrastructure\Modules\RequestModuleBuilder.cpp" />
-    <ClCompile Include="src\Infrastructure\MsgPackSerializer.cpp" />
-    <ClCompile Include="src\Infrastructure\TokenHandler.cpp" />
+    <ClCompile Include="src\ILogger.cpp" />
+    <ClCompile Include="src\IPacketDispatcher.cpp" />
     <ClCompile Include="src\IPacketProcessor.cpp" />
     <ClCompile Include="src\IRequest.cpp" />
+    <ClCompile Include="src\IRequestModule.cpp" />
+    <ClCompile Include="src\IScenePeer.cpp" />
+    <ClCompile Include="src\ISerializer.cpp" />
+    <ClCompile Include="src\ITokenHandler.cpp" />
     <ClCompile Include="src\ITransport.cpp" />
+    <ClCompile Include="src\MsgPackSerializer.cpp" />
     <ClCompile Include="src\PacketProcessorConfig.cpp" />
-    <ClCompile Include="src\Processors\RequestContext.cpp" />
-    <ClCompile Include="src\Processors\RequestProcessor.cpp" />
-    <ClCompile Include="src\Processors\SceneDispatcher.cpp" />
+    <ClCompile Include="src\RequestContext.cpp" />
+    <ClCompile Include="src\RequestModuleBuilder.cpp" />
+    <ClCompile Include="src\RequestProcessor.cpp" />
+    <ClCompile Include="src\Route.cpp" />
     <ClCompile Include="src\Scene.cpp" />
+    <ClCompile Include="src\SceneDispatcher.cpp" />
     <ClCompile Include="src\SceneEndpoint.cpp" />
     <ClCompile Include="src\ScenePeer.cpp" />
+    <ClCompile Include="src\TokenHandler.cpp" />
     <ClCompile Include="src\Transports\RakNetConnection.cpp" />
     <ClCompile Include="src\Transports\RakNetTransport.cpp" />
   </ItemGroup>

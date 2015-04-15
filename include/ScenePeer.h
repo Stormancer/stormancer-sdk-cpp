@@ -1,8 +1,8 @@
 #pragma once
 #include "headers.h"
-#include "Core/IScenePeer.h"
+#include "IScenePeer.h"
 #include "Scene.h"
-#include "Core/Route.h"
+#include "Route.h"
 
 namespace Stormancer
 {

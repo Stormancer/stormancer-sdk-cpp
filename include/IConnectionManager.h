@@ -1,6 +1,6 @@
 #pragma once
 #include "headers.h"
-#include "Core/IConnection.h"
+#include "IConnection.h"
 
 namespace Stormancer
 {

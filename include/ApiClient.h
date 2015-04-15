@@ -1,8 +1,8 @@
 #pragma once
 #include "headers.h"
-#include "Configuration/ClientConfiguration.h"
+#include "ClientConfiguration.h"
 #include "SceneEndpoint.h"
-#include "Infrastructure/ITokenHandler.h"
+#include "ITokenHandler.h"
 
 namespace Stormancer
 {

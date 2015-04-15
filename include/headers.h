@@ -1,5 +1,12 @@
 #pragma once
 
+// DLL IMPORT / EXPORT
+#ifdef STORMANCER_DLL_EXPORT
+#define STORMANCER_DLL_API __declspec(dllexport) 
+#else
+#define STORMANCER_DLL_API __declspec(dllimport) 
+#endif
+
 // standart libs
 #include <algorithm>
 #include <clocale>

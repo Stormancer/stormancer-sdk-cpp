@@ -18,12 +18,12 @@ int main(int argc, char* argv[])
 
 void testClient()
 {
-	auto config = new ClientConfiguration(L"905f108e-18bc-0d56-45c2-0907de336e65", L"test");
-	config->serverEndpoint = L"http://ipv4.fiddler:8081";
+	ClientConfiguration config(L"905f108e-18bc-0d56-45c2-0907de336e65", L"test");
+	config.serverEndpoint = L"http://ipv4.fiddler:8081";
 
-	Client client(config);
+	Client client(&config);
 	auto task = client.getPublicScene(L"test-scene", L"hello").then([](pplx::task<Scene*> t) {
-		auto scene = t.get();
+		Scene* scene = t.get();
 		/*scene->addRoute(L"echo.out", [](Packet<IScenePeer>* p) {
 			wstring str;
 			p->serializer()->deserialize(p->stream, str);

@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\ApiClient.h" />
+    <ClInclude Include="include\Client.h" />
+    <ClInclude Include="include\ClientConfiguration.h" />
+    <ClInclude Include="include\ConnectionState.h" />
+    <ClInclude Include="include\DefaultLogger.h" />
+    <ClInclude Include="include\DefaultPacketDispatcher.h" />
+    <ClInclude Include="include\headers.h" />
+    <ClInclude Include="include\Helpers.h" />
+    <ClInclude Include="include\IConnection.h" />
+    <ClInclude Include="include\IConnectionManager.h" />
+    <ClInclude Include="include\ILogger.h" />
+    <ClInclude Include="include\IPacketDispatcher.h" />
+    <ClInclude Include="include\IPacketProcessor.h" />
+    <ClInclude Include="include\IRequest.h" />
+    <ClInclude Include="include\IRequestModule.h" />
+    <ClInclude Include="include\IScenePeer.h" />
+    <ClInclude Include="include\ISerializer.h" />
+    <ClInclude Include="include\ITokenHandler.h" />
+    <ClInclude Include="include\ITransport.h" />
+    <ClInclude Include="include\MessageIDTypes.h" />
+    <ClInclude Include="include\MsgPackSerializer.h" />
+    <ClInclude Include="include\Packet.h" />
+    <ClInclude Include="include\PacketProcessorConfig.h" />
+    <ClInclude Include="include\RequestContext.h" />
+    <ClInclude Include="include\RequestModuleBuilder.h" />
+    <ClInclude Include="include\RequestProcessor.h" />
+    <ClInclude Include="include\Route.h" />
+    <ClInclude Include="include\Scene.h" />
+    <ClInclude Include="include\SceneDispatcher.h" />
+    <ClInclude Include="include\SceneEndpoint.h" />
+    <ClInclude Include="include\ScenePeer.h" />
+    <ClInclude Include="include\stormancer.h" />
+    <ClInclude Include="include\TokenHandler.h" />
+    <ClInclude Include="include\typedef.h" />
+    <ClInclude Include="include\Transports\RakNetConnection.h" />
+    <ClInclude Include="include\Transports\RakNetTransport.h" />
+    <ClInclude Include="include\Dto\ConnectionData.h" />
+    <ClInclude Include="include\Dto\ConnectionResult.h" />
+    <ClInclude Include="include\Dto\ConnectToSceneMsg.h" />
+    <ClInclude Include="include\Dto\EmptyDto.h" />
+    <ClInclude Include="include\Dto\RouteDto.h" />
+    <ClInclude Include="include\Dto\SceneInfosDto.h" />
+    <ClInclude Include="include\Dto\SceneInfosRequestDto.h" />
+    <ClInclude Include="MsgPack\Container.h" />
+    <ClInclude Include="MsgPack\ContainerHeader.h" />
+    <ClInclude Include="MsgPack\Data.h" />
+    <ClInclude Include="MsgPack\Element.h" />
+    <ClInclude Include="MsgPack\Header.h" />
+    <ClInclude Include="MsgPack\MsgPack.h" />
+    <ClInclude Include="MsgPack\Number.h" />
+    <ClInclude Include="MsgPack\Primitive.h" />
+    <ClInclude Include="MsgPack\StreamManager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\ApiClient.cpp" />
+    <ClCompile Include="src\Client.cpp" />
+    <ClCompile Include="src\ClientConfiguration.cpp" />
+    <ClCompile Include="src\DefaultLogger.cpp" />
+    <ClCompile Include="src\DefaultPacketDispatcher.cpp" />
+    <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\Helpers.cpp" />
+    <ClCompile Include="src\IConnection.cpp" />
+    <ClCompile Include="src\IConnectionManager.cpp" />
+    <ClCompile Include="src\ILogger.cpp" />
+    <ClCompile Include="src\IPacketDispatcher.cpp" />
+    <ClCompile Include="src\IPacketProcessor.cpp" />
+    <ClCompile Include="src\IRequest.cpp" />
+    <ClCompile Include="src\IRequestModule.cpp" />
+    <ClCompile Include="src\IScenePeer.cpp" />
+    <ClCompile Include="src\ISerializer.cpp" />
+    <ClCompile Include="src\ITokenHandler.cpp" />
+    <ClCompile Include="src\ITransport.cpp" />
+    <ClCompile Include="src\MsgPackSerializer.cpp" />
+    <ClCompile Include="src\PacketProcessorConfig.cpp" />
+    <ClCompile Include="src\RequestContext.cpp" />
+    <ClCompile Include="src\RequestModuleBuilder.cpp" />
+    <ClCompile Include="src\RequestProcessor.cpp" />
+    <ClCompile Include="src\Route.cpp" />
+    <ClCompile Include="src\Scene.cpp" />
+    <ClCompile Include="src\SceneDispatcher.cpp" />
+    <ClCompile Include="src\SceneEndpoint.cpp" />
+    <ClCompile Include="src\ScenePeer.cpp" />
+    <ClCompile Include="src\TokenHandler.cpp" />
+    <ClCompile Include="src\Transports\RakNetConnection.cpp" />
+    <ClCompile Include="src\Transports\RakNetTransport.cpp" />
+    <ClCompile Include="MsgPack\MsgPack.cpp" />
+  </ItemGroup>
+</Project>

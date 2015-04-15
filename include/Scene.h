@@ -1,9 +1,9 @@
 #pragma once
 #include "headers.h"
-#include "Core/Route.h"
-#include "SystemMessages/SceneInfosDto.h"
-#include "SystemMessages/ConnectionResult.h"
-#include "Core/IScenePeer.h"
+#include "Dto/ConnectionResult.h"
+#include "Dto/SceneInfosDto.h"
+#include "Route.h"
+#include "IScenePeer.h"
 
 namespace Stormancer
 {
@@ -26,11 +26,11 @@ namespace Stormancer
 		IConnection* hostConnection();
 		vector<Route*> localRoutes();
 		vector<Route*> remoteRoutes();
-		void addRoute(wstring routeName, function<void(Packet<IScenePeer>*)> handler, stringMap metadata = stringMap());
+		STORMANCER_DLL_API void addRoute(wstring routeName, function<void(Packet<IScenePeer>*)> handler, stringMap metadata = stringMap());
 		rx::observable<Packet<IScenePeer>*>* onMessage(Route* route);
 		rx::observable<Packet<IScenePeer>*>* onMessage(wstring routeName);
-		void sendPacket(wstring routeName, function<void(bytestream*)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE);
-		pplx::task<void> connect();
+		STORMANCER_DLL_API void sendPacket(wstring routeName, function<void(bytestream*)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE);
+		STORMANCER_DLL_API pplx::task<void> connect();
 		pplx::task<void> disconnect();
 		vector<IScenePeer*> remotePeers();
 		IScenePeer* host();

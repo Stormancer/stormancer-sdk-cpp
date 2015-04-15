@@ -1,13 +1,14 @@
 #pragma once
 #include "headers.h"
-#include "Configuration/ClientConfiguration.h"
+#include "ClientConfiguration.h"
 #include "ApiClient.h"
 #include "SceneEndpoint.h"
-#include "Core/ISerializer.h"
+#include "ISerializer.h"
 #include "Scene.h"
-#include "Core/ILogger.h"
-#include "Processors/SceneDispatcher.h"
-#include "Processors/RequestProcessor.h"
+#include "ILogger.h"
+#include "SceneDispatcher.h"
+#include "RequestProcessor.h"
+#include "IConnection.h"
 
 namespace Stormancer
 {
@@ -33,15 +34,15 @@ namespace Stormancer
 		};
 
 	public:
-		Client(ClientConfiguration* config);
-		~Client();
+		STORMANCER_DLL_API Client(ClientConfiguration* config);
+		STORMANCER_DLL_API ~Client();
 
 	public:
 		void initialize();
 		wstring applicationName();
 		ILogger* logger();
 		void setLogger(ILogger* logger);
-		pplx::task<Scene*> getPublicScene(wstring sceneId, wstring userData);
+		STORMANCER_DLL_API pplx::task<Scene*> getPublicScene(wstring sceneId, wstring userData);
 		pplx::task<Scene*> getScene(wstring sceneId, SceneEndpoint* sep);
 		void disconnect();
 

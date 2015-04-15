@@ -1,6 +1,6 @@
 #pragma once
 #include "headers.h"
-#include "Core/Models/ConnectionData.h"
+#include "Dto/ConnectionData.h"
 
 namespace Stormancer
 {

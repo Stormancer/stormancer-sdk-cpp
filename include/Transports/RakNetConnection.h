@@ -1,6 +1,6 @@
 #pragma once
 #include "headers.h"
-#include "Core/IConnection.h"
+#include "IConnection.h"
 #include <RakPeerInterface.h>
 #include <RakNetTypes.h>
 
