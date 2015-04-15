@@ -72,7 +72,7 @@ namespace Stormancer
 		auto result = _rakPeer->Send(data.c_str(), data.length(), (PacketPriority)priority, (PacketReliability)reliability, channel, _guid, false);
 		if (result == 0)
 		{
-			throw string("Failed to send message.");
+			throw exception("Failed to send message.");
 		}
 	}
 
@@ -87,7 +87,7 @@ namespace Stormancer
 
 		if (result == 0)
 		{
-			throw string("Failed to send message.");
+			throw exception("Failed to send message.");
 		}
 	}
 

@@ -37,8 +37,7 @@ namespace Stormancer
 
 	void Helpers::displayException(const exception& e)
 	{
-		string msg = e.what();
-		wcout << Helpers::StringFormat(L"Error exception: {0}", msg).c_str() << endl;
+		wcout << Helpers::StringFormat(L"Exception: {0}", string(e.what())).c_str() << endl;
 	}
 
 	anyMap Helpers::stringMapToAnyMap(stringMap& sm)

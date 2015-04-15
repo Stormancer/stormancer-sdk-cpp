@@ -16,7 +16,7 @@ namespace Stormancer
 		{
 			if (_isRegistered)
 			{
-				throw string("Can only add handler before 'RegisterProcessor' is called.");
+				throw exception("Can only add handler before 'RegisterProcessor' is called.");
 			}
 			_handlers[msgId] = handler;
 		};
@@ -147,12 +147,12 @@ namespace Stormancer
 		//auto tcs = task_completion_event<Packet<>>();
 		//auto request = reserveRequestSlot(rx::observer<>);
 		// TODO
-		throw string("Not implem");
+		throw exception("Not implem");
 	}
 
 	pplx::task<Packet<>*> RequestProcessor::sendSceneRequest(IConnection* peer, byte sceneId, uint16 routeId, function<void(bytestream*)> writer)
 	{
-		throw string("Not implem");
+		throw exception("Not implem");
 		/*return rx::observable<>::create<Packet<>>([](rx::subscriber<Packet<>> dest) {
 			//auto request = reserveRequestSlot(dest);
 			// TODO
@@ -176,6 +176,6 @@ namespace Stormancer
 			id++;
 		}
 		_logger->log(LogLevel::Error, L"", L"Unable to create a new request: Too many pending requests.", L"");
-		throw string("Unable to create a new request: Too many pending requests.");
+		throw exception("Unable to create a new request: Too many pending requests.");
 	}
 };

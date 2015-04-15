@@ -13,13 +13,13 @@ namespace Stormancer
 		template<typename T>
 		void serialize(T data, bytestream* stream)
 		{
-			throw string("Not implemented.");
+			throw exception("Not implemented.");
 		}
 
 		template<typename T>
 		void deserialize(bytestream* stream, T& data)
 		{
-			throw string("Not implemented.");
+			throw exception("Not implemented.");
 		}
 
 	public:

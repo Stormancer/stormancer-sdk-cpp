@@ -25,7 +25,7 @@ namespace Stormancer
 
 	IConnection* Client::ConnectionHandler::getConnection(uint64 id)
 	{
-		throw string("Not Implemented.");
+		throw exception("Not Implemented.");
 	}
 
 	void Client::ConnectionHandler::closeConnection(IConnection* connection, wstring reason)
@@ -134,7 +134,7 @@ namespace Stormancer
 				{
 					if (result.SelectedSerializer.size() == 0)
 					{
-						throw string("No serializer selected.");
+						throw exception("No serializer selected.");
 					}
 					_serverConnection->registerComponent(_serializers[result.SelectedSerializer]);
 					_serverConnection->metadata[L"serializer"] = result.SelectedSerializer;

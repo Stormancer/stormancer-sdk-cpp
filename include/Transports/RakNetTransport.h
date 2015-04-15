@@ -29,9 +29,9 @@ namespace Stormancer
 		void onRequestClose(RakNetConnection* c);
 
 	private:
-		IConnectionManager* _handler;
-		RakNet::RakPeerInterface* _peer;
-		ILogger* _logger;
+		IConnectionManager* _handler = nullptr;
+		RakNet::RakPeerInterface* _peer = nullptr;
+		ILogger* _logger = nullptr;
 		wstring _type;
 		map<uint64, RakNetConnection*> _connections;
 		const int connectionTimeout = 5000;

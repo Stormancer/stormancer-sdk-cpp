@@ -58,12 +58,12 @@ namespace Stormancer
 	{
 		if (routeName.length() == 0 || routeName[0] == '@')
 		{
-			throw string("A route cannot be empty or start with the '@' character.");
+			throw exception("A route cannot be empty or start with the '@' character.");
 		}
 
 		if (_connected)
 		{
-			throw string("You cannot register handles once the scene is connected.");
+			throw exception("You cannot register handles once the scene is connected.");
 		}
 
 		if (!Helpers::mapContains(_localRoutesMap, routeName))
@@ -76,7 +76,7 @@ namespace Stormancer
 
 	rx::observable<Packet<IScenePeer>*>* Scene::onMessage(Route* route)
 	{
-		throw string("LOL");
+		throw exception("LOL");
 		/*rx::observable<Packet<IScenePeer>> ob = rx::observable<>::create<Packet<IScenePeer>>([this, &route](rx::subscriber<Packet<IScenePeer>> observer) {
 			function<void(Packet<>*)> handler = [this, &observer](Packet<>* p) {
 				Packet<IScenePeer> packet(host(), p.stream, p.metadata());
@@ -96,7 +96,7 @@ namespace Stormancer
 	{
 		if (_connected)
 		{
-			throw string("You cannot register handles once the scene is connected.");
+			throw exception("You cannot register handles once the scene is connected.");
 		}
 
 		if (!Helpers::mapContains(_localRoutesMap, routeName))
@@ -112,16 +112,16 @@ namespace Stormancer
 	{
 		if (routeName.length() == 0)
 		{
-			throw string("routeName is empty.");
+			throw exception("routeName is empty.");
 		}
 		if (!_connected)
 		{
-			throw string("The scene must be connected to perform this operation.");
+			throw exception("The scene must be connected to perform this operation.");
 		}
 
 		if (!Helpers::mapContains(_remoteRoutesMap, routeName))
 		{
-			throw string(Helpers::StringFormat(L"The route '{0}' doesn't exist on the scene.", routeName));
+			throw exception(string(Helpers::StringFormat(L"The route '{0}' doesn't exist on the scene.", routeName)).c_str());
 		}
 		Route& route = _remoteRoutesMap[routeName];
 

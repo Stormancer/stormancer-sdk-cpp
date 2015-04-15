@@ -52,9 +52,9 @@ namespace Stormancer
 						try
 						{
 							size_t size = t2.get();
-							string strTmp = ss->collection();
-							wstring str = Helpers::to_wstring(strTmp);
+							wstring str = Helpers::to_wstring(ss->collection());
 							wcout << L"HOORA!" << str << endl;
+							wcout.flush();
 							return _tokenHandler->decodeToken(str);
 							//return new SceneEndpoint();
 						}
@@ -67,7 +67,7 @@ namespace Stormancer
 				}
 				else if (statusCode == 404)
 				{
-					throw wstring(Helpers::StringFormat(L"Unable to get scene {0}/{1}/{2}. Please check you used the correct account id, application name and scene id.", accountId, applicationName, sceneId));
+					throw exception(string(Helpers::StringFormat(L"Unable to get scene {0}/{1}/{2}. Please check you used the correct account id, application name and scene id.", accountId, applicationName, sceneId)).c_str());
 				}
 			}
 			catch (const exception& e)
@@ -76,12 +76,12 @@ namespace Stormancer
 				throw e;
 			}
 
-			/*cout << Helpers::StringFormat(L"Server returned status code {0}.", (int)response.status_code()).c_str();
+			/*wcout << Helpers::StringFormat(L"Server returned status code {0}.", (int)response.status_code()).c_str();
 
 			web::http::status_code statusCode = response.status_code();
 			if (!Helpers::ensureSuccessStatusCode(statusCode))
 			{
-				throw wstring(Helpers::StringFormat(L"Unable to get scene {0}/{1}/{2}. Please check you used the correct account id, application name and scene id.", accountId, applicationName, sceneId));
+				throw exception(string(Helpers::StringFormat(L"Unable to get scene {0}/{1}/{2}. Please check you used the correct account id, application name and scene id.", accountId, applicationName, sceneId)).c_str());
 			}
 
 			//concurrency::streams::streambuf<uint8> sb;
@@ -91,7 +91,7 @@ namespace Stormancer
 				wcout << L"HOURA!" << str << endl;
 				return SceneEndpoint();
 			});*/
-			throw string("Not implemented");
+			throw exception("Not implemented");
 		});
 
 		/*return create_task([]() -> SceneEndpoint {

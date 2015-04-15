@@ -42,7 +42,7 @@ namespace Stormancer
 			{
 				stringstream sstm;
 				sstm << "Couldn't process message. msgId: " << msgType;
-				throw new exception(sstm.str().c_str());
+				throw exception(sstm.str().c_str());
 			}
 		});*/
 	}

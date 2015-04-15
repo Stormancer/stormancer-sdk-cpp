@@ -4,9 +4,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="include\ApiClient.h" />
     <ClInclude Include="include\Client.h" />
     <ClInclude Include="include\ClientConfiguration.h" />

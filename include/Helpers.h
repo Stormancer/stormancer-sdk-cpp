@@ -151,14 +151,13 @@ namespace Stormancer
 		class StringFormat
 		{
 		public:
-			StringFormat();
+			STORMANCER_DLL_API StringFormat();
 
 			template<typename... Args>
 			StringFormat(wstring format, Args&... args)
 			{
-				wstring& formatTmp = format;
-				int _[] = { 0, (formatTmp = replace(formatTmp, args), 0)... };
-				stream << formatTmp;
+				int _[] = { 0, (format = replace(format, args), 0)... };
+				stream << format;
 			}
 
 			template<typename T>
@@ -194,12 +193,12 @@ namespace Stormancer
 				stream >> data;
 			}
 
-			wstring str();
+			STORMANCER_DLL_API wstring str();
 
-			const wchar_t* c_str();
+			STORMANCER_DLL_API const wchar_t* c_str();
 
-			operator string();
-			operator wstring();
+			STORMANCER_DLL_API operator string();
+			STORMANCER_DLL_API operator wstring();
 
 		private:
 			wstringstream stream;

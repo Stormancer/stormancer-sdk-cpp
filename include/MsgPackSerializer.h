@@ -97,33 +97,7 @@ namespace Stormancer
 		template<>
 		void deserialize<ConnectionData>(bytestream* stream, ConnectionData& data)
 		{
-			MsgPack::Deserializer dsrlz(stream->rdbuf());
-
-			/*dsrlz.deserialize([](std::unique_ptr<MsgPack::Element> parsed) {
-				std::cout << "Parsed: " << *parsed << "\n";
-				return false;
-			}, true);*/
-
-			/*unique_ptr<MsgPack::Element> element;
-			dsrlz >> element;
-			dsrlz >> element;
-			dsrlz >> element;
-			dsrlz >> element;
-			dsrlz >> element;
-			dsrlz >> element;
-			dsrlz >> element;
-			cout << "type: " << (int)element->getType() << endl;
-			element->toJSON(cout);
-
-			deserialize(stream, data.Endpoints);
-			deserialize(stream, data.AccountId);
-			deserialize(stream, data.Application);
-			deserialize(stream, data.SceneId);
-			deserialize(stream, data.Routing);
-			deserialize(stream, data.Issued);
-			deserialize(stream, data.Expiration);
-			deserialize(stream, data.UserData);
-			deserialize(stream, data.ContentType);*/
+			// TODO
 		}
 
 #pragma endregion

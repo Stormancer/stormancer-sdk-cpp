@@ -16,7 +16,7 @@ namespace Stormancer
 	{
 		if (handler == nullptr && serverPort > 0)
 		{
-			throw string("Handler is null.");
+			throw exception("Handler is null.");
 		}
 		_type = type;
 
@@ -38,7 +38,7 @@ namespace Stormancer
 		auto startupResult = server->Startup(maxConnections, socketDescriptor, 1);
 		if (startupResult != RakNet::StartupResult::RAKNET_STARTED)
 		{
-			throw string(Helpers::StringFormat(L"Couldn't start raknet peer : {0}", startupResult));
+			throw exception(string(Helpers::StringFormat(L"Couldn't start raknet peer : {0}", startupResult)).c_str());
 		}
 		server->SetMaximumIncomingConnections(maxConnections);
 
@@ -124,7 +124,7 @@ namespace Stormancer
 	{
 		if (_peer == nullptr || !_peer->IsActive())
 		{
-			throw string("Transport not started. Call start before connect.");
+			throw exception("Transport not started. Call start before connect.");
 		}
 		auto infos = Helpers::stringSplit(endpoint, L":");
 		auto host = Helpers::to_string(infos[0]).c_str();

@@ -18,8 +18,10 @@ int main(int argc, char* argv[])
 
 void testClient()
 {
+	wcout << L"Starting echo..." << endl;
+
 	ClientConfiguration config(L"905f108e-18bc-0d56-45c2-0907de336e65", L"test");
-	config.serverEndpoint = L"http://ipv4.fiddler:8081";
+	config.serverEndpoint = L"http://localhost:8888";
 
 	Client client(&config);
 	auto task = client.getPublicScene(L"test-scene", L"hello").then([](pplx::task<Scene*> t) {
@@ -54,55 +56,4 @@ void testClient()
 		wcout << L"Error exception:\n" << e.what();
 	}
 
-}
-
-void testMsgPack()
-{
-	bytestream stream;
-	MsgPack::Serializer serializer(stream.rdbuf());
-
-	/*serializer << MsgPack__Factory(ArrayHeader(3)); //Next 3 elements belong in this array
-	serializer << MsgPack::Factory(true);
-	serializer << MsgPack__Factory(ArrayHeader(0));
-	serializer << MsgPack::Factory("Hello World!");*/
-
-	serializer << MsgPack__Factory(MapHeader(3));
-	serializer << MsgPack::Factory("bool");
-	serializer << MsgPack::Factory(true);
-	serializer << MsgPack::Factory("int64");
-	serializer << MsgPack::Factory((int64)1337);
-	serializer << MsgPack::Factory("string");
-	serializer << MsgPack::Factory("1337");
-
-	string str = stream.str();
-
-	cout << "SERIALIZED: " << str << endl;
-
-	stream = bytestream(str);
-	MsgPack::Deserializer deserializer(stream.rdbuf());
-
-	cout << "DESERIALIZED: ";
-
-	unique_ptr<MsgPack::Element> element;
-
-	deserializer >> element;
-
-	cout << *element << endl;
-	cout << "type: " << (int)element->getType() << endl;
-	element->toJSON(cout);
-
-	MsgPack::Map& map = dynamic_cast<MsgPack::Map&>(*element);
-	for (size_t i = 0; i < map.getContainer()->size(); i++)
-	{
-		cout << *(map.getContainer()->at(i)) << endl;
-	}
-
-	/*MsgPack::Primitive& pri = dynamic_cast<MsgPack::Primitive&>(*(map.getContainer()->at(0)));
-	cout << pri.getValue() << endl;
-
-	MsgPack::Array& arr = dynamic_cast<MsgPack::Array&>(*(map.getContainer()->at(1)));
-	cout << arr << endl;
-
-	MsgPack::String& str2 = dynamic_cast<MsgPack::String&>(*(map.getContainer()->at(2)));
-	cout << str2.stdString() << endl;*/
 }
