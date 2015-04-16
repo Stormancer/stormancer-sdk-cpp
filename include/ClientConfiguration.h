@@ -19,14 +19,14 @@ namespace Stormancer
 		wstring account;
 		wstring application;
 		wstring serverEndpoint;
-		IPacketDispatcher* dispatcher;
-		ITransport* transport;
+		IPacketDispatcher* dispatcher = nullptr;
+		ITransport* transport = nullptr;
 		vector<ISerializer*> serializers;
-		uint16 maxPeers;
+		uint16 maxPeers = 0;
 		//vector<IClientPlugin*> plugins;
 		stringMap metadata;
 
 	private:
-		wstring apiEndpoint = L"http://localhost:8081/";
+		wstring apiEndpoint;
 	};
 };

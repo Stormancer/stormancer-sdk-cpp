@@ -12,6 +12,8 @@ namespace Stormancer
 
 #pragma region serialization
 
+	public:
+
 #pragma region Base template
 
 		// Base template
@@ -60,6 +62,8 @@ namespace Stormancer
 
 #pragma region deserialization
 
+	public:
+
 #pragma region Base template
 
 		// Base template
@@ -93,13 +97,6 @@ namespace Stormancer
 			str = Helpers::to_wstring(strTmp);
 		}
 
-		// ConnectionData
-		template<>
-		void deserialize<ConnectionData>(bytestream* stream, ConnectionData& data)
-		{
-			// TODO
-		}
-
 #pragma endregion
 #pragma region Vector template
 
@@ -122,6 +119,39 @@ namespace Stormancer
 			dsrlz >> element;
 			// TODO
 		}
+
+#pragma endregion
+#pragma region custom structures
+
+		// ConnectionData
+		template<>
+		void deserialize<ConnectionData>(bytestream* stream, ConnectionData& data)
+		{
+			MsgPack::Deserializer deserializer(stream->rdbuf());
+			unique_ptr<MsgPack::Element> element;
+			deserializer >> element;
+
+			data.AccountId = stringFromMsgPackMap(element, L"AccountId");
+			data.Application = stringFromMsgPackMap(element, L"Application");
+			data.ContentType = stringFromMsgPackMap(element, L"ContentType");
+			data.DeploymentId = stringFromMsgPackMap(element, L"DeploymentId");
+			data.Endpoints = stringMapFromMsgPackMap(element, L"Endpoints");
+			data.Expiration = int64FromMsgPackMap(element, L"Expiration");
+			data.Issued = int64FromMsgPackMap(element, L"Issued");
+			data.Routing = stringFromMsgPackMap(element, L"Routing");
+			data.SceneId = stringFromMsgPackMap(element, L"SceneId");
+			data.UserData = stringFromMsgPackMap(element, L"UserData");
+		}
+
+#pragma endregion
+#pragma region private serialization functions
+
+	private:
+		unique_ptr<MsgPack::Element>& valueFromMsgPackMapKey(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
+		int64 int64FromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
+		wstring stringFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
+		stringMap elementToStringMap(unique_ptr<MsgPack::Element>& msgPackMap);
+		stringMap stringMapFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
 
 #pragma endregion
 

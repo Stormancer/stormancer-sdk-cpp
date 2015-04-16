@@ -23,8 +23,8 @@ namespace Stormancer
 		vector<function<void(IConnection*)>> connectionClosed;
 
 	protected:
-		bool _isRunning;
+		bool _isRunning = false;
 		wstring _name;
-		uint64 _id;
+		uint64 _id = 0;
 	};
 };

@@ -4,6 +4,7 @@
 namespace Stormancer
 {
 	ITransport::ITransport()
+		: _isRunning(false)
 	{
 	}
 

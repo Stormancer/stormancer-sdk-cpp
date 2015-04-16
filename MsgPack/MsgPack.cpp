@@ -10,7 +10,7 @@
 #define __builtin_bswap64 _byteswap_uint64
 #endif
 
-#if BYTE_ORDER == BIG_ENDIAN
+#ifdef _IS_BIG_ENDIAN
 #define storeBSwap(bits) \
     memcpy(target, &source, sizeof(source));
 #define loadBSwap(bits) \

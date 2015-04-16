@@ -10,10 +10,10 @@ namespace Stormancer
 		wstring ContentType;
 		wstring DeploymentId;
 		stringMap Endpoints;
-		wstring Expiration;
-		wstring Issued;
+		time_t Expiration;
+		time_t Issued;
 		wstring Routing;
 		wstring SceneId;
-		vector<byte> UserData;
+		wstring UserData;
 	};
 };

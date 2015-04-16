@@ -36,11 +36,11 @@ namespace Stormancer
 	// Client
 
 	Client::Client(ClientConfiguration* config)
-		: _accountId(config->account),
+		: _initialized(false),
+		_accountId(config->account),
 		_applicationName(config->application),
 		_tokenHandler(new TokenHandler()),
 		_apiClient(new ApiClient(config, _tokenHandler)),
-		_serverConnection(nullptr),
 		_transport(config->transport),
 		_dispatcher(config->dispatcher),
 		_requestProcessor(new RequestProcessor(_logger, vector<IRequestModule*>())),
@@ -102,6 +102,9 @@ namespace Stormancer
 	pplx::task<Scene*> Client::getPublicScene(wstring sceneId, wstring userData)
 	{
 		return _apiClient->getSceneEndpoint(_accountId, _applicationName, sceneId, userData).then([this, sceneId](SceneEndpoint* sep) {
+			/*return pplx::create_task([](){
+				return new Scene(nullptr, nullptr, L"1337", L"token", SceneInfosDto());
+			});*/
 			return this->getScene(sceneId, sep);
 		});
 	}

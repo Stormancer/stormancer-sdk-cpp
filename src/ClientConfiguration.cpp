@@ -7,7 +7,8 @@ namespace Stormancer
 		application(application),
 		dispatcher(new DefaultPacketDispatcher),
 		transport(new RakNetTransport(DefaultLogger::instance())),
-		maxPeers(20)
+		maxPeers(20),
+		apiEndpoint(L"http://localhost:8081/")
 	{
 		serializers.push_back(new MsgPackSerializer);
 		//plugins.push_back(new RpcClientPlugin());
