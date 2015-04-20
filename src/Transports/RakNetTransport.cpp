@@ -127,11 +127,12 @@ namespace Stormancer
 			throw exception("Transport not started. Call start before connect.");
 		}
 		auto infos = Helpers::stringSplit(endpoint, L":");
-		auto host = Helpers::to_string(infos[0]).c_str();
-		uint16 port = infos[1][0] * 256 + infos[1][1];
-		_peer->Connect(host, port, nullptr, 0);
+		auto host = Helpers::to_string(infos[0]);
+		auto hostCStr = host.c_str();
+		uint16 port = static_cast<uint16>(stoi(infos[1]));
+		_peer->Connect(hostCStr, port, nullptr, 0);
 
-		auto addressStr = Helpers::to_wstring(RakNet::SystemAddress(host, port).ToString());
+		auto addressStr = Helpers::to_wstring(RakNet::SystemAddress(hostCStr, port).ToString());
 
 		_pendingConnections[addressStr] = pplx::task_completion_event<IConnection*>();
 		auto& tce = _pendingConnections[addressStr];

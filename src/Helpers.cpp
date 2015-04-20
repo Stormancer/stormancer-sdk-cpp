@@ -4,19 +4,31 @@ namespace Stormancer
 {
 	/*bytestream* Helpers::convertRakNetBitStreamToByteStream(RakNet::BitStream* stream)
 	{
-		auto bs = new bytestream;
-		if (stream != nullptr)
-		{
-			auto buf = bs->rdbuf();
-			char* data = static_cast<char*>(static_cast<void*>(stream->GetData()));
-			buf->pubsetbuf(data, stream->GetNumberOfBytesUsed());
-			stream->SetData(nullptr);
-			stream->SetNumberOfBitsAllocated(0);
-			RakNet::BitStream::DestroyInstance(stream);
-			delete stream;
-		}
-		return bs;
+	auto bs = new bytestream;
+	if (stream != nullptr)
+	{
+	auto buf = bs->rdbuf();
+	char* data = static_cast<char*>(static_cast<void*>(stream->GetData()));
+	buf->pubsetbuf(data, stream->GetNumberOfBytesUsed());
+	stream->SetData(nullptr);
+	stream->SetNumberOfBitsAllocated(0);
+	RakNet::BitStream::DestroyInstance(stream);
+	delete stream;
+	}
+	return bs;
 	}*/
+
+	template<>
+	vector<byte> Helpers::convert<string, vector<byte>>(string& str)
+	{
+		vector<byte> v;
+		v.resize(str.size());
+		for (uint32 i = 0; v.size(); i++)
+		{
+			v[i] = str[i];
+		}
+		return v;
+	}
 
 	stringstream* Helpers::convertRakNetPacketToStringStream(RakNet::Packet* packet, RakNet::RakPeerInterface* peer)
 	{
@@ -140,18 +152,54 @@ namespace Stormancer
 		return chrono::system_clock::to_time_t(chrono::system_clock::now());
 	}
 
-	wstring Helpers::nowStr()
-	{
-		time_t now = Helpers::nowTime_t();
-		return Helpers::time_tToStr(now);
-	}
-
-	wstring Helpers::time_tToStr(time_t now)
+	wstring Helpers::time_tToStr(time_t& time, bool local)
 	{
 		struct tm timeinfo;
-		localtime_s(&timeinfo, &now);
+#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
+		localtime_s(&timeinfo, &time);
+#else
+		localtime_r(&time, &timeinfo); // POSIX
+#endif
+		const char* format = local ? "%x %X" : "%Y-%m-%dT%H:%M:%SZ";
 		stringstream ss;
-		ss << put_time(&timeinfo, "%F %T");
+		ss << put_time(const_cast<tm*>(&timeinfo), format);
 		return Helpers::to_wstring(ss.str());
+	}
+
+	wstring Helpers::nowStr(bool local)
+	{
+		time_t now = nowTime_t();
+		return time_tToStr(now, local);
+	}
+
+	template<>
+	wstring Helpers::to_wstring<string>(string str)
+	{
+		return wstring(str.begin(), str.end());
+	}
+
+	template<>
+	wstring Helpers::to_wstring<const char*>(const char* str)
+	{
+		return to_wstring(string(str));
+	}
+
+	template<>
+	string Helpers::to_string<wstring>(wstring& str)
+	{
+		string str2 = string(str.begin(), str.end());
+		return str2;
+	}
+
+	template<>
+	string Helpers::to_string<vector<byte>>(vector<byte>& v)
+	{
+		string str;
+		str.resize(v.size());
+		for (size_t i = 0; i < v.size(); i++)
+		{
+			str[i] = v[i];
+		}
+		return str;
 	}
 };

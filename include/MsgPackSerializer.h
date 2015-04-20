@@ -150,7 +150,7 @@ namespace Stormancer
 		unique_ptr<MsgPack::Element>& valueFromMsgPackMapKey(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
 		int64 int64FromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
 		wstring stringFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
-		stringMap elementToStringMap(unique_ptr<MsgPack::Element>& msgPackMap);
+		stringMap elementToStringMap(MsgPack::Map* msgPackMap);
 		stringMap stringMapFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
 
 #pragma endregion

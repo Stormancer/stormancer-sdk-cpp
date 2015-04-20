@@ -26,16 +26,17 @@ namespace Stormancer
 				return v->at(i + 1);
 			}
 		}
-		return unique_ptr<MsgPack::Element>(nullptr);
+
+		throw exception("valueFromMsgPackMapKey error: Not found.");
 	}
 
 	int64 MsgPackSerializer::int64FromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key)
 	{
 		auto& element = valueFromMsgPackMapKey(msgPackMap, key);
 
-		if (element.get() != nullptr && element->getType() != MsgPack::Type::NIL)
+		if (auto* number = dynamic_cast<MsgPack::Number*>(element.get()))
 		{
-			return dynamic_cast<MsgPack::Number*>(element.get())->getValue<int64>();
+			return number->getValue<int64>();
 		}
 		else
 		{
@@ -47,9 +48,9 @@ namespace Stormancer
 	{
 		auto& element = valueFromMsgPackMapKey(msgPackMap, key);
 
-		if (element.get() != nullptr && element->getType() != MsgPack::Type::NIL)
+		if (auto* str = dynamic_cast<MsgPack::String*>(element.get()))
 		{
-			return Helpers::to_wstring((dynamic_cast<MsgPack::String*>(element.get()))->stdString());
+			return Helpers::to_wstring(str->stdString());
 		}
 		else
 		{
@@ -57,11 +58,11 @@ namespace Stormancer
 		}
 	}
 
-	stringMap MsgPackSerializer::elementToStringMap(unique_ptr<MsgPack::Element>& msgPackMap)
+	stringMap MsgPackSerializer::elementToStringMap(MsgPack::Map* msgPackMap)
 	{
 		stringMap strMap;
 
-		auto v = dynamic_cast<MsgPack::Map*>(msgPackMap.get())->getContainer();
+		auto v = msgPackMap->getContainer();
 
 		if (v->size() % 2)
 		{
@@ -82,9 +83,9 @@ namespace Stormancer
 	{
 		auto& element = valueFromMsgPackMapKey(msgPackMap, key);
 
-		if (element.get() != nullptr && element->getType() != MsgPack::Type::NIL)
+		if (auto* strMap = dynamic_cast<MsgPack::Map*>(element.get()))
 		{
-			return elementToStringMap(element);
+			return elementToStringMap(strMap);
 		}
 		else
 		{

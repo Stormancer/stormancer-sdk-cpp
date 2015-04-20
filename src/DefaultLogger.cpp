@@ -18,8 +18,9 @@ namespace Stormancer
 
 	void DefaultLogger::log(LogLevel level, wstring category, wstring message, wstring data)
 	{
+		wcout << endl;
 		wcout << Helpers::nowStr() << endl;
-		wcout << L"level: " << static_cast<int>(level);
+		wcout << L"level: " << static_cast<int>(level) << endl;
 		if (category.length())
 		{
 			wcout << L"category: " << category << endl;

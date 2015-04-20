@@ -7,6 +7,10 @@ void testMsgPack();
 
 int main(int argc, char* argv[])
 {
+	std::set_terminate([]() {
+		int termin = 1;
+	});
+
 	//testMsgPack();
 
 	testClient();

@@ -102,9 +102,6 @@ namespace Stormancer
 	pplx::task<Scene*> Client::getPublicScene(wstring sceneId, wstring userData)
 	{
 		return _apiClient->getSceneEndpoint(_accountId, _applicationName, sceneId, userData).then([this, sceneId](SceneEndpoint* sep) {
-			/*return pplx::create_task([](){
-				return new Scene(nullptr, nullptr, L"1337", L"token", SceneInfosDto());
-			});*/
 			return this->getScene(sceneId, sep);
 		});
 	}
@@ -114,13 +111,13 @@ namespace Stormancer
 		return Helpers::taskIf(_serverConnection == nullptr, [this, sep]() {
 			return Helpers::taskIf(!_transport->isRunning(), [this]() {
 				_cts = pplx::cancellation_token_source();
-				return _transport->start(L"client", new ConnectionHandler(), _cts.get_token(), 0, (uint16)(_maxPeers + 1));
+				return _transport->start(L"client", new ConnectionHandler(), _cts.get_token(), 11, (uint16)(_maxPeers + 1));
 			}).then([this, sep]() {
 				wstring endpoint = sep->tokenData->Endpoints[_transport->name()];
 				return _transport->connect(endpoint).then([this](IConnection* connection) {
 					_serverConnection = connection;
 
-					for (auto& it : _metadata)
+					for (auto& it : this->_metadata)
 					{
 						_serverConnection->metadata[it.first] = it.second;
 					}

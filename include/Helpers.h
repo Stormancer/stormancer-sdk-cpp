@@ -103,50 +103,39 @@ namespace Stormancer
 		wstring stringTrim(wstring& str, wchar_t ch = ' ');
 
 		template<typename T>
-		inline wstring to_wstring(T data)
+		wstring to_wstring(T data)
 		{
 			return to_wstring(to_string(data));
 		}
 
 		template<>
-		inline wstring to_wstring<string>(string str)
-		{
-			return wstring(str.begin(), str.end());
-			//wstring_convert<codecvt_utf8<wchar_t>, wchar_t> convert;
-			//return convert.from_bytes(str);
-		}
+		wstring to_wstring<string>(string str);
 
 		template<>
-		inline wstring to_wstring<const char*>(const char* str)
-		{
-			return to_wstring(string(str));
-		}
+		wstring to_wstring<const char*>(const char* str);
 
 		template<typename T>
-		inline string to_string(T& data)
+		string to_string(T& data)
 		{
 			return std::to_string(data);
 		}
 
 		template<>
-		inline string to_string<wstring>(wstring& str)
+		string to_string<wstring>(wstring& str);
+
+		template<>
+		string to_string<vector<byte>>(vector<byte>& v);
+
+		// Template conversion function
+
+		template<typename T1, typename T2>
+		T2 convert(T1& data)
 		{
-			return string(str.begin(), str.end());
-			//wstring_convert<codecvt_utf8<wchar_t>, wchar_t> convert;
-			//return convert.to_bytes(str);
+			return T2(T1);
 		}
 
 		template<>
-		inline string to_string<vector<byte>>(vector<byte>& v)
-		{
-			string str;
-			str.resize(v.size());
-			for (size_t i = 0; i < v.size(); i++)
-			{
-				str[i] = v[i];
-			}
-			return str;
-		}
+		vector<byte> convert<string, vector<byte>>(string& str);
 
 		class StringFormat
 		{
@@ -254,8 +243,8 @@ namespace Stormancer
 #pragma region time
 
 		time_t nowTime_t();
-		wstring nowStr();
-		wstring time_tToStr(time_t now);
+		wstring time_tToStr(time_t& now, bool local = false);
+		wstring nowStr(bool local = false);
 
 #pragma endregion
 
