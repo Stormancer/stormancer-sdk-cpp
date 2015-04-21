@@ -21,7 +21,6 @@ namespace Stormancer
 		wstring serverEndpoint;
 		IPacketDispatcher* dispatcher = nullptr;
 		ITransport* transport = nullptr;
-		vector<ISerializer*> serializers;
 		uint16 maxPeers = 0;
 		//vector<IClientPlugin*> plugins;
 		stringMap metadata;

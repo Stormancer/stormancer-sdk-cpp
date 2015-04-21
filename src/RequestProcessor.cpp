@@ -40,9 +40,8 @@ namespace Stormancer
 						if (false)
 						{
 							context.error([&p](bytestream* stream) {
-								auto MsgPackSrlz = dynamic_cast<MsgPackSerializer*>(p->serializer());
 								string msg = "An error occured on the server.";
-								MsgPackSrlz->serialize(msg, stream);
+								ISerializable::serialize(msg, stream);
 							});
 						}
 						else
@@ -126,9 +125,8 @@ namespace Stormancer
 				auto it = _pendingRequests.find(id);
 				_pendingRequests.erase(it);
 
-				auto MsgPckSrlz = dynamic_cast<MsgPackSerializer*>(p->serializer());
 				wstring msg;
-				MsgPckSrlz->deserialize(p->stream, msg);
+				ISerializable::deserialize(p->stream, msg);
 
 				exception_ptr eptr = make_exception_ptr(new exception(Helpers::to_string(msg).c_str()));
 				request->observer->on_error(eptr);

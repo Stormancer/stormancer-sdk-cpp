@@ -79,9 +79,6 @@
     <ClInclude Include="include\IScenePeer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ISerializer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\ITokenHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -95,9 +92,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MsgPack\Number.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\MsgPackSerializer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Packet.h">
@@ -160,6 +154,9 @@
     <ClInclude Include="include\typedef.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\ISerializable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ApiClient.cpp">
@@ -207,9 +204,6 @@
     <ClCompile Include="src\IScenePeer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ISerializer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\ITokenHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -217,9 +211,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MsgPack\MsgPack.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\MsgPackSerializer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\PacketProcessorConfig.cpp">
@@ -258,6 +249,28 @@
     <ClCompile Include="src\TokenHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="include\Dto\ConnectionData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ISerializable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IMsgPackSerializable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Dto\ConnectionResult.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Dto\ConnectToSceneMsg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Dto\SceneInfosDto.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Dto\SceneInfosRequestDto.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Dto\EmptyDto.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">

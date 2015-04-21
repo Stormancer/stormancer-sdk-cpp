@@ -23,7 +23,7 @@
 #include "IPacketProcessor.h"
 #include "IRequest.h"
 #include "IScenePeer.h"
-#include "ISerializer.h"
+#include "ISerializable.h"
 #include "ITransport.h"
 #include "MessageIDTypes.h"
 #include "Packet.h"
@@ -39,7 +39,6 @@
 #include "IPacketDispatcher.h"
 #include "IRequestModule.h"
 #include "ITokenHandler.h"
-#include "MsgPackSerializer.h"
 #include "TokenHandler.h"
 
 //#include "Plugins/IClientPlugin.h"

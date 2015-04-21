@@ -3,7 +3,6 @@
 namespace Stormancer
 {
 	TokenHandler::TokenHandler()
-		: _tokenSerializer(new MsgPackSerializer())
 	{
 	}
 
@@ -11,25 +10,16 @@ namespace Stormancer
 	{
 	}
 
-	SceneEndpoint* TokenHandler::decodeToken(wstring token)
+	SceneEndpoint* TokenHandler::decodeToken(wstring& token)
 	{
 		token = Helpers::stringTrim(token, '"');
 		wstring data = Helpers::stringSplit(token, L"-")[0];
 		string buffer = Helpers::to_string(utility::conversions::from_base64(data));
-
 		bytestream bs(buffer);
-		MsgPackSerializer* tknMsgPckSrlz = dynamic_cast<MsgPackSerializer*>(_tokenSerializer);
-		if (tknMsgPckSrlz == nullptr)
-		{
-			throw exception("MsgPack serializer not found in TokenHandler::decodeToken");
-		}
-
-		auto result = new ConnectionData;
-		tknMsgPckSrlz->deserialize(&bs, *result);
 
 		auto sceneEp = new SceneEndpoint;
 		sceneEp->token = token;
-		sceneEp->tokenData = result;
+		sceneEp->tokenData = new ConnectionData(&bs);
 		return sceneEp;
 	}
 };

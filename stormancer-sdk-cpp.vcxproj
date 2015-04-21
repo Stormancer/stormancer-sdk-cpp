@@ -235,11 +235,10 @@
     <ClInclude Include="include\IRequest.h" />
     <ClInclude Include="include\IRequestModule.h" />
     <ClInclude Include="include\IScenePeer.h" />
-    <ClInclude Include="include\ISerializer.h" />
+    <ClInclude Include="include\ISerializable.h" />
     <ClInclude Include="include\ITokenHandler.h" />
     <ClInclude Include="include\ITransport.h" />
     <ClInclude Include="include\MessageIDTypes.h" />
-    <ClInclude Include="include\MsgPackSerializer.h" />
     <ClInclude Include="include\Packet.h" />
     <ClInclude Include="include\PacketProcessorConfig.h" />
     <ClInclude Include="include\RequestContext.h" />
@@ -266,6 +265,7 @@
     <ClInclude Include="MsgPack\StreamManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="include\Dto\ConnectionData.cpp" />
     <ClCompile Include="MsgPack\MsgPack.cpp" />
     <ClCompile Include="src\ApiClient.cpp" />
     <ClCompile Include="src\Client.cpp" />
@@ -273,6 +273,11 @@
     <ClCompile Include="src\DefaultLogger.cpp" />
     <ClCompile Include="src\DefaultPacketDispatcher.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\Dto\ConnectionResult.cpp" />
+    <ClCompile Include="src\Dto\ConnectToSceneMsg.cpp" />
+    <ClCompile Include="src\Dto\EmptyDto.cpp" />
+    <ClCompile Include="src\Dto\SceneInfosDto.cpp" />
+    <ClCompile Include="src\Dto\SceneInfosRequestDto.cpp" />
     <ClCompile Include="src\Helpers.cpp" />
     <ClCompile Include="src\IConnection.cpp" />
     <ClCompile Include="src\IConnectionManager.cpp" />
@@ -282,10 +287,10 @@
     <ClCompile Include="src\IRequest.cpp" />
     <ClCompile Include="src\IRequestModule.cpp" />
     <ClCompile Include="src\IScenePeer.cpp" />
-    <ClCompile Include="src\ISerializer.cpp" />
+    <ClCompile Include="src\ISerializable.cpp" />
     <ClCompile Include="src\ITokenHandler.cpp" />
     <ClCompile Include="src\ITransport.cpp" />
-    <ClCompile Include="src\MsgPackSerializer.cpp" />
+    <ClCompile Include="src\IMsgPackSerializable.cpp" />
     <ClCompile Include="src\PacketProcessorConfig.cpp" />
     <ClCompile Include="src\RequestContext.cpp" />
     <ClCompile Include="src\RequestModuleBuilder.cpp" />

@@ -1,7 +1,6 @@
 #pragma once
 #include "headers.h"
 #include "IConnection.h"
-#include "ISerializer.h"
 #include <RakNetTypes.h>
 
 namespace Stormancer
@@ -56,11 +55,6 @@ namespace Stormancer
 		{
 			auto it = _metadata.find(key);
 			_metadata.erase(it);
-		}
-
-		ISerializer* serializer()
-		{
-			return new MsgPackSerializer;
 		}
 
 	public:

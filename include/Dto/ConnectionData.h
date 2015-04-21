@@ -1,10 +1,21 @@
 #pragma once
 #include "headers.h"
+#include "ISerializable.h"
 
 namespace Stormancer
 {
-	struct ConnectionData
+	class ConnectionData : public ISerializable
 	{
+	public:
+		ConnectionData();
+		ConnectionData(bytestream* stream);
+		virtual ~ConnectionData();
+
+	public:
+		void serialize(bytestream* stream);
+		void deserialize(bytestream* stream);
+
+	public:
 		wstring AccountId;
 		wstring Application;
 		wstring ContentType;

@@ -3,7 +3,6 @@
 #include "ClientConfiguration.h"
 #include "ApiClient.h"
 #include "SceneEndpoint.h"
-#include "ISerializer.h"
 #include "Scene.h"
 #include "ILogger.h"
 #include "SceneDispatcher.h"
@@ -55,10 +54,26 @@ namespace Stormancer
 		pplx::task<U> sendSystemRequest(byte id, T& parameter)
 		{
 			return _requestProcessor->sendSystemRequest(_serverConnection, id, [this, &parameter](bytestream* stream) {
-				this->_systemSerializer->serialize(parameter, stream);
+				// serialize
+				ISerializable::serialize(parameter, stream);
 			}).then([this](Packet<>* packet) {
+				// deserialize
 				U res;
-				this->_systemSerializer->deserialize(packet->stream, res);
+				ISerializable::deserialize(packet->stream, res);
+				return res;
+			});
+		}
+
+		template<typename U>
+		pplx::task<U> sendSystemRequest(byte id, ISerializable* parameter)
+		{
+			return _requestProcessor->sendSystemRequest(_serverConnection, id, [this, parameter](bytestream* stream) {
+				// serialize
+				ISerializable::serialize(parameter, stream);
+			}).then([this](Packet<>* packet) {
+				// deserialize
+				U res;
+				ISerializable::deserialize(packet->stream, res);
 				return res;
 			});
 		}
@@ -73,10 +88,8 @@ namespace Stormancer
 		IPacketDispatcher* _dispatcher = nullptr;
 		ITokenHandler* _tokenHandler = nullptr;
 		ApiClient* _apiClient = nullptr;
-		ISerializer* _systemSerializer = nullptr;
 		RequestProcessor* _requestProcessor = nullptr;
 		SceneDispatcher* _scenesDispatcher = nullptr;
-		map<wstring, ISerializer*> _serializers;
 		pplx::cancellation_token_source _cts;
 		uint16 _maxPeers = 0;
 		stringMap _metadata;

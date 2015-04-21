@@ -46,15 +46,9 @@ namespace Stormancer
 		_requestProcessor(new RequestProcessor(_logger, vector<IRequestModule*>())),
 		_scenesDispatcher(),
 		_metadata(config->metadata),
-		_maxPeers(config->maxPeers),
-		_systemSerializer(new MsgPackSerializer)
+		_maxPeers(config->maxPeers)
 	{
-		for (auto serializer : config->serializers)
-		{
-			_serializers[serializer->name] = serializer;
-		}
-
-		_metadata[L"serializers"] = Helpers::vectorJoin(Helpers::mapKeysCpy(_serializers), L",");
+		_metadata[L"serializers"] = L"msgpack/map";
 		_metadata[L"transport"] = _transport->name();
 		_metadata[L"version"] = L"1.0.0";
 		_metadata[L"platform"] = L"cpp";
@@ -128,17 +122,8 @@ namespace Stormancer
 				parameter.Metadata = _serverConnection->metadata;
 				parameter.Token = sep->token;
 
-				return sendSystemRequest<SceneInfosRequestDto, SceneInfosDto>((byte)MessageIDTypes::ID_GET_SCENE_INFOS, parameter);
+				return sendSystemRequest<SceneInfosDto>((byte)MessageIDTypes::ID_GET_SCENE_INFOS, &parameter);
 			}).then([this, sep, sceneId](SceneInfosDto result) {
-				if (!_serverConnection->getComponent<MsgPackSerializer>())
-				{
-					if (result.SelectedSerializer.size() == 0)
-					{
-						throw exception("No serializer selected.");
-					}
-					_serverConnection->registerComponent(_serializers[result.SelectedSerializer]);
-					_serverConnection->metadata[L"serializer"] = result.SelectedSerializer;
-				}
 				return new Scene(_serverConnection, this, sceneId, sep->token, result);
 			});
 	}
@@ -157,10 +142,10 @@ namespace Stormancer
 		}
 		parameter.ConnectionMetadata = _serverConnection->metadata;
 
-		return Client::sendSystemRequest<ConnectToSceneMsg, ConnectionResult>((byte)MessageIDTypes::ID_CONNECT_TO_SCENE, parameter)
-			.then([&](ConnectionResult result) {
+		return Client::sendSystemRequest<ConnectionResult>((byte)MessageIDTypes::ID_CONNECT_TO_SCENE, &parameter)
+			.then([this, scene](ConnectionResult result) {
 			scene->completeConnectionInitialization(result);
-			_scenesDispatcher->addScene(scene);
+			this->_scenesDispatcher->addScene(scene);
 		});
 	}
 

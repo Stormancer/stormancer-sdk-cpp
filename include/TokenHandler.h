@@ -1,7 +1,6 @@
 #pragma once
 #include "headers.h"
 #include "ITokenHandler.h"
-#include "ISerializer.h"
 
 namespace Stormancer
 {
@@ -11,9 +10,6 @@ namespace Stormancer
 		TokenHandler();
 		virtual ~TokenHandler();
 
-		SceneEndpoint* decodeToken(wstring token);
-
-	private:
-		ISerializer* _tokenSerializer;
+		SceneEndpoint* decodeToken(wstring& token);
 	};
 };

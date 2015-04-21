@@ -23,8 +23,6 @@ namespace Stormancer
 
 	pplx::task<SceneEndpoint*> ApiClient::getSceneEndpoint(wstring accountId, wstring applicationName, wstring sceneId, wstring userData)
 	{
-		auto serializer = new MsgPackSerializer;
-
 		wstring baseUri = _config->getApiEndpoint();
 		http_client client(baseUri);
 		http_request request(methods::POST);

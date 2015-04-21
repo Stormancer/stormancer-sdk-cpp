@@ -2,15 +2,50 @@
 
 namespace Stormancer
 {
-	MsgPackSerializer::MsgPackSerializer()
+	ISerializable::ISerializable()
 	{
 	}
 
-	MsgPackSerializer::~MsgPackSerializer()
+	ISerializable::ISerializable(bytestream* stream)
+	{
+		deserialize(stream);
+	}
+
+	ISerializable::~ISerializable()
 	{
 	}
 
-	unique_ptr<MsgPack::Element>& MsgPackSerializer::valueFromMsgPackMapKey(unique_ptr<MsgPack::Element>& msgPackMap, wstring key)
+
+	void ISerializable::serialize(ISerializable* serializable, bytestream* stream)
+	{
+		serializable->serialize(stream);
+	}
+
+	void ISerializable::deserialize(bytestream* stream, ISerializable* serializable)
+	{
+		serializable->deserialize(stream);
+	}
+
+
+	template<>
+	static void ISerializable::deserialize<string>(bytestream* stream, string& str)
+	{
+		MsgPack::Deserializer dsrlz(stream->rdbuf());
+		unique_ptr<MsgPack::Element> element;
+		dsrlz >> element;
+		str = dynamic_cast<MsgPack::String&>(*element).stdString();
+	}
+
+	template<>
+	static void ISerializable::deserialize<wstring>(bytestream* stream, wstring& str)
+	{
+		string strTmp;
+		deserialize<string>(stream, strTmp);
+		str = Helpers::to_wstring(strTmp);
+	}
+
+
+	unique_ptr<MsgPack::Element>& ISerializable::valueFromMsgPackMapKey(unique_ptr<MsgPack::Element>& msgPackMap, wstring key)
 	{
 		auto v = dynamic_cast<MsgPack::Map*>(msgPackMap.get())->getContainer();
 
@@ -30,7 +65,7 @@ namespace Stormancer
 		throw exception("valueFromMsgPackMapKey error: Not found.");
 	}
 
-	int64 MsgPackSerializer::int64FromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key)
+	int64 ISerializable::int64FromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key)
 	{
 		auto& element = valueFromMsgPackMapKey(msgPackMap, key);
 
@@ -44,7 +79,7 @@ namespace Stormancer
 		}
 	}
 
-	wstring MsgPackSerializer::stringFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key)
+	wstring ISerializable::stringFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key)
 	{
 		auto& element = valueFromMsgPackMapKey(msgPackMap, key);
 
@@ -58,7 +93,7 @@ namespace Stormancer
 		}
 	}
 
-	stringMap MsgPackSerializer::elementToStringMap(MsgPack::Map* msgPackMap)
+	stringMap ISerializable::elementToStringMap(MsgPack::Map* msgPackMap)
 	{
 		stringMap strMap;
 
@@ -79,7 +114,7 @@ namespace Stormancer
 		return strMap;
 	}
 
-	stringMap MsgPackSerializer::stringMapFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key)
+	stringMap ISerializable::stringMapFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key)
 	{
 		auto& element = valueFromMsgPackMapKey(msgPackMap, key);
 
