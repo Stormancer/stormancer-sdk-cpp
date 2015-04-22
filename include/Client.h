@@ -50,31 +50,23 @@ namespace Stormancer
 		pplx::task<void> disconnect(Scene* scene, byte sceneHandle);
 		void transport_packetReceived(Packet<>* packet);
 
-		template<typename T, typename U>
-		pplx::task<U> sendSystemRequest(byte id, T& parameter)
+		template<typename T1, typename T2>
+		pplx::task<T2> sendSystemRequest(byte id, T1& parameter)
 		{
 			return _requestProcessor->sendSystemRequest(_serverConnection, id, [this, &parameter](bytestream* stream) {
-				// serialize
-				ISerializable::serialize(parameter, stream);
+				parameter.serialize(stream); // serialize request dto
 			}).then([this](Packet<>* packet) {
-				// deserialize
-				U res;
-				ISerializable::deserialize(packet->stream, res);
-				return res;
+				return T2(packet->stream); // deserialize result dto
 			});
 		}
 
-		template<typename U>
-		pplx::task<U> sendSystemRequest(byte id, ISerializable* parameter)
+		template<>
+		pplx::task<EmptyDto> sendSystemRequest<byte, EmptyDto>(byte id, byte& parameter)
 		{
-			return _requestProcessor->sendSystemRequest(_serverConnection, id, [this, parameter](bytestream* stream) {
-				// serialize
-				ISerializable::serialize(parameter, stream);
+			return _requestProcessor->sendSystemRequest(_serverConnection, id, [this, &parameter](bytestream* stream) {
+				ISerializable::serialize(byte(parameter), stream); // serialize byte
 			}).then([this](Packet<>* packet) {
-				// deserialize
-				U res;
-				ISerializable::deserialize(packet->stream, res);
-				return res;
+				return EmptyDto(packet->stream); // deserialize result dto
 			});
 		}
 

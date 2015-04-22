@@ -122,7 +122,7 @@ namespace Stormancer
 				parameter.Metadata = _serverConnection->metadata;
 				parameter.Token = sep->token;
 
-				return sendSystemRequest<SceneInfosDto>((byte)MessageIDTypes::ID_GET_SCENE_INFOS, &parameter);
+				return sendSystemRequest<SceneInfosRequestDto, SceneInfosDto>((byte)MessageIDTypes::ID_GET_SCENE_INFOS, parameter);
 			}).then([this, sep, sceneId](SceneInfosDto result) {
 				return new Scene(_serverConnection, this, sceneId, sep->token, result);
 			});
@@ -142,7 +142,7 @@ namespace Stormancer
 		}
 		parameter.ConnectionMetadata = _serverConnection->metadata;
 
-		return Client::sendSystemRequest<ConnectionResult>((byte)MessageIDTypes::ID_CONNECT_TO_SCENE, &parameter)
+		return Client::sendSystemRequest<ConnectToSceneMsg, ConnectionResult>((byte)MessageIDTypes::ID_CONNECT_TO_SCENE, parameter)
 			.then([this, scene](ConnectionResult result) {
 			scene->completeConnectionInitialization(result);
 			this->_scenesDispatcher->addScene(scene);

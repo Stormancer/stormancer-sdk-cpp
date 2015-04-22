@@ -28,6 +28,14 @@ namespace Stormancer
 
 
 	template<>
+	static void ISerializable::serialize<byte>(byte& data, bytestream* stream)
+	{
+		MsgPack::Serializer srlz(stream->rdbuf());
+		srlz << MsgPack::Factory(static_cast<uint64>(data));
+	}
+
+
+	template<>
 	static void ISerializable::deserialize<string>(bytestream* stream, string& str)
 	{
 		MsgPack::Deserializer dsrlz(stream->rdbuf());

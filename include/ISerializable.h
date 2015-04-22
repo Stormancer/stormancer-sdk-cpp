@@ -53,6 +53,10 @@ namespace Stormancer
 			srlz << MsgPack::Factory(data);
 		}
 
+		// Base template ref specializations
+		template<>
+		static void serialize<byte>(byte& data, bytestream* stream);
+
 		// Vector template
 		template<typename T>
 		static void serialize(vector<T>& data, bytestream* stream)
