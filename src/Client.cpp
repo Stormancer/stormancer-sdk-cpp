@@ -6,7 +6,7 @@ namespace Stormancer
 
 	Client::ConnectionHandler::ConnectionHandler()
 	{
-		connectionCount = 0;
+		IConnectionManager::connectionCount = 0;
 	}
 
 	Client::ConnectionHandler::~ConnectionHandler()
@@ -15,7 +15,6 @@ namespace Stormancer
 
 	uint64 Client::ConnectionHandler::generateNewConnectionId()
 	{
-		// TODO
 		return _current++;
 	}
 
@@ -25,7 +24,7 @@ namespace Stormancer
 
 	IConnection* Client::ConnectionHandler::getConnection(uint64 id)
 	{
-		throw exception("Not Implemented.");
+		throw exception("Client::ConnectionHandler::getConnection not implemented.");
 	}
 
 	void Client::ConnectionHandler::closeConnection(IConnection* connection, wstring reason)

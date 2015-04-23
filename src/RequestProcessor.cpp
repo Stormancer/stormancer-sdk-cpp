@@ -142,22 +142,38 @@ namespace Stormancer
 
 	pplx::task<Packet<>*> RequestProcessor::sendSystemRequest(IConnection* peer, byte msgId, function<void(bytestream*)> writer)
 	{
-		//auto tcs = task_completion_event<Packet<>>();
-		//auto request = reserveRequestSlot(rx::observer<>);
-		// TODO
-		throw exception("Not implem");
+		auto tce = pplx::task_completion_event<Packet<>*>();
+		ObserverPacketHandler onNext = [&tce](Packet<>* p) {
+			tce.set(p);
+		};
+		ObserverExceptionHandler onError = [&tce](exception_ptr ex) {
+			tce.set_exception(ex);
+		};
+		PacketObserver* observer = new PacketObserver(rx::make_observer<Packet<>*>(onNext, onError));
+		auto request = reserveRequestSlot(observer);
+
+		peer->sendSystem(msgId, [&request, &writer](bytestream* bs) {
+			*bs << request->id;
+			bs->flush();
+			writer(bs);
+		});
+
+		auto task = pplx::create_task(tce);
+		task.then([this, request](pplx::task<Packet<>*> t) {
+			if (Helpers::mapContains(this->_pendingRequests, request->id))
+			{
+				auto r = this->_pendingRequests[request->id];
+				if (r == request)
+				{
+					this->_pendingRequests.erase(request->id);
+				}
+			}
+		});
+
+		return task;
 	}
 
-	pplx::task<Packet<>*> RequestProcessor::sendSceneRequest(IConnection* peer, byte sceneId, uint16 routeId, function<void(bytestream*)> writer)
-	{
-		throw exception("Not implem");
-		/*return rx::observable<>::create<Packet<>>([](rx::subscriber<Packet<>> dest) {
-			//auto request = reserveRequestSlot(dest);
-			// TODO
-		});*/
-	}
-
-	RequestProcessor::Request* RequestProcessor::reserveRequestSlot(rx::observer<Packet<>*>* observer)
+	RequestProcessor::Request* RequestProcessor::reserveRequestSlot(PacketObserver* observer)
 	{
 		static uint16 id = 0;
 		while (id < UINT16_MAX)

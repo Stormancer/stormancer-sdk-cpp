@@ -6,11 +6,6 @@ namespace Stormancer
 	{
 	}
 
-	ISerializable::ISerializable(bytestream* stream)
-	{
-		deserialize(stream);
-	}
-
 	ISerializable::~ISerializable()
 	{
 	}
@@ -24,32 +19,6 @@ namespace Stormancer
 	void ISerializable::deserialize(bytestream* stream, ISerializable* serializable)
 	{
 		serializable->deserialize(stream);
-	}
-
-
-	template<>
-	static void ISerializable::serialize<byte>(byte& data, bytestream* stream)
-	{
-		MsgPack::Serializer srlz(stream->rdbuf());
-		srlz << MsgPack::Factory(static_cast<uint64>(data));
-	}
-
-
-	template<>
-	static void ISerializable::deserialize<string>(bytestream* stream, string& str)
-	{
-		MsgPack::Deserializer dsrlz(stream->rdbuf());
-		unique_ptr<MsgPack::Element> element;
-		dsrlz >> element;
-		str = dynamic_cast<MsgPack::String&>(*element).stdString();
-	}
-
-	template<>
-	static void ISerializable::deserialize<wstring>(bytestream* stream, wstring& str)
-	{
-		string strTmp;
-		deserialize<string>(stream, strTmp);
-		str = Helpers::to_wstring(strTmp);
 	}
 
 

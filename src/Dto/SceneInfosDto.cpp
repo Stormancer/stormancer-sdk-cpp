@@ -7,8 +7,8 @@ namespace Stormancer
 	}
 
 	SceneInfosDto::SceneInfosDto(bytestream* stream)
-		: ISerializable(stream)
 	{
+		deserialize(stream);
 	}
 
 	SceneInfosDto::~SceneInfosDto()

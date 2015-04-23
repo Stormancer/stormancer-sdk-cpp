@@ -18,7 +18,7 @@ namespace Stormancer
 		Packet(T* source, bytestream* stream, anyMap& metadata)
 			: connection(source),
 			stream(stream),
-			metadata(metadata)
+			_metadata(metadata)
 		{
 		}
 

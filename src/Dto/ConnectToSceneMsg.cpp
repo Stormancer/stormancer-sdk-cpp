@@ -7,8 +7,8 @@ namespace Stormancer
 	}
 
 	ConnectToSceneMsg::ConnectToSceneMsg(bytestream* stream)
-		: ISerializable(stream)
 	{
+		deserialize(stream);
 	}
 
 	ConnectToSceneMsg::~ConnectToSceneMsg()

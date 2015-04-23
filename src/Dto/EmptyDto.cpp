@@ -7,8 +7,8 @@ namespace Stormancer
 	}
 
 	EmptyDto::EmptyDto(bytestream* stream)
-		: ISerializable(stream)
 	{
+		deserialize(stream);
 	}
 
 	EmptyDto::~EmptyDto()

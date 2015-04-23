@@ -71,28 +71,28 @@ namespace Stormancer
 			_localRoutesMap[routeName] = Route(this, routeName, metadata);
 		}
 
-		onMessage(routeName)->subscribe(handler);
+		auto truc = onMessage(routeName).subscribe(handler);		
 	}
 
-	rx::observable<Packet<IScenePeer>*>* Scene::onMessage(Route* route)
+	rx::observable<Packet<IScenePeer>*> Scene::onMessage(Route* route)
 	{
-		throw exception("LOL");
-		/*rx::observable<Packet<IScenePeer>> ob = rx::observable<>::create<Packet<IScenePeer>>([this, &route](rx::subscriber<Packet<IScenePeer>> observer) {
-			function<void(Packet<>*)> handler = [this, &observer](Packet<>* p) {
-				Packet<IScenePeer> packet(host(), p.stream, p.metadata());
-				observer.on_next(packet);
-			};
-			route.handlers.push_back(handler);
+		auto observable = rx::observable<>::create<Packet<IScenePeer>*>([this, route](rx::subscriber<Packet<IScenePeer>*> subscriber) {
+			route->handlers.push_back([this, &subscriber](Packet<>* p) {
+				Packet<IScenePeer>* packet = new Packet<IScenePeer>(host(), p->stream, p->metadata());
+				subscriber.on_next(packet);
+			});
+			function<void(Packet<>*)>& handler = route->handlers[route->handlers.size() - 1];
 
-			return [&route, &handler]() {
-				auto it = find(route.handlers.begin(), route.handlers.end(), handler);
-				route.handlers.erase(it);
+			function<void(void)> ret = [route, &handler]() {
+				auto it = find(route->handlers.begin(), route->handlers.end(), handler);
+				route->handlers.erase(it);
 			};
+			return ret;
 		});
-		return ob;*/
+		return observable.as_dynamic();
 	}
 
-	rx::observable<Packet<IScenePeer>*>* Scene::onMessage(wstring routeName)
+	rx::observable<Packet<IScenePeer>*> Scene::onMessage(wstring routeName)
 	{
 		if (_connected)
 		{
@@ -177,7 +177,7 @@ namespace Stormancer
 
 	vector<IScenePeer*> Scene::remotePeers()
 	{
-		return vector<IScenePeer*> { host() };
+		return vector < IScenePeer* > { host() };
 	}
 
 	IScenePeer* Scene::host()

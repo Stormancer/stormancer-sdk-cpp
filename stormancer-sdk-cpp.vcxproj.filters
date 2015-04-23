@@ -249,9 +249,6 @@
     <ClCompile Include="src\TokenHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="include\Dto\ConnectionData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\ISerializable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -271,6 +268,10 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Dto\EmptyDto.cpp" />
+    <ClCompile Include="src\Dto\ConnectionData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Dto\RouteDto.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">

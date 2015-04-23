@@ -1,5 +1,6 @@
 #pragma once
 #include "headers.h"
+#include "Helpers.h"
 
 namespace Stormancer
 {
@@ -7,7 +8,6 @@ namespace Stormancer
 	{
 	public:
 		ISerializable();
-		ISerializable(bytestream* stream);
 		virtual ~ISerializable();
 
 	public:
@@ -55,7 +55,11 @@ namespace Stormancer
 
 		// Base template ref specializations
 		template<>
-		static void serialize<byte>(byte& data, bytestream* stream);
+		static void serialize<byte>(byte& data, bytestream* stream)
+		{
+			MsgPack::Serializer srlz(stream->rdbuf());
+			srlz << MsgPack::Factory(static_cast<uint64>(data));
+		}
 
 		// Vector template
 		template<typename T>
@@ -98,11 +102,22 @@ namespace Stormancer
 		// Base template specializations
 		// string
 		template<>
-		static void deserialize<string>(bytestream* stream, string& str);
+		static void deserialize<string>(bytestream* stream, string& str)
+		{
+			MsgPack::Deserializer dsrlz(stream->rdbuf());
+			unique_ptr<MsgPack::Element> element;
+			dsrlz >> element;
+			str = dynamic_cast<MsgPack::String&>(*element).stdString();
+		}
 
 		// wstring
 		template<>
-		static void deserialize<wstring>(bytestream* stream, wstring& str);
+		static void deserialize<wstring>(bytestream* stream, wstring& str)
+		{
+			string strTmp;
+			deserialize<string>(stream, strTmp);
+			str = Helpers::to_wstring(strTmp);
+		}
 
 		// Vector template
 		template<typename VT>

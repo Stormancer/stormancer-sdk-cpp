@@ -265,7 +265,7 @@
     <ClInclude Include="MsgPack\StreamManager.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="include\Dto\ConnectionData.cpp" />
+    <ClCompile Include="src\Dto\ConnectionData.cpp" />
     <ClCompile Include="MsgPack\MsgPack.cpp" />
     <ClCompile Include="src\ApiClient.cpp" />
     <ClCompile Include="src\Client.cpp" />
@@ -276,6 +276,7 @@
     <ClCompile Include="src\Dto\ConnectionResult.cpp" />
     <ClCompile Include="src\Dto\ConnectToSceneMsg.cpp" />
     <ClCompile Include="src\Dto\EmptyDto.cpp" />
+    <ClCompile Include="src\Dto\RouteDto.cpp" />
     <ClCompile Include="src\Dto\SceneInfosDto.cpp" />
     <ClCompile Include="src\Dto\SceneInfosRequestDto.cpp" />
     <ClCompile Include="src\Helpers.cpp" />

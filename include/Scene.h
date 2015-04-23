@@ -4,9 +4,12 @@
 #include "Dto/SceneInfosDto.h"
 #include "Route.h"
 #include "IScenePeer.h"
+#include "Packet.h"
 
 namespace Stormancer
 {
+	typedef rx::observable<Packet<>*> PacketObservable;
+
 	class Client;
 
 	class Scene
@@ -27,8 +30,8 @@ namespace Stormancer
 		vector<Route*> localRoutes();
 		vector<Route*> remoteRoutes();
 		STORMANCER_DLL_API void addRoute(wstring routeName, function<void(Packet<IScenePeer>*)> handler, stringMap metadata = stringMap());
-		rx::observable<Packet<IScenePeer>*>* onMessage(Route* route);
-		rx::observable<Packet<IScenePeer>*>* onMessage(wstring routeName);
+		rx::observable<Packet<IScenePeer>*> onMessage(Route* route);
+		rx::observable<Packet<IScenePeer>*> onMessage(wstring routeName);
 		STORMANCER_DLL_API void sendPacket(wstring routeName, function<void(bytestream*)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE);
 		STORMANCER_DLL_API pplx::task<void> connect();
 		pplx::task<void> disconnect();

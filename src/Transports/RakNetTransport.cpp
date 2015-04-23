@@ -21,7 +21,7 @@ namespace Stormancer
 		_type = type;
 
 		auto tce = pplx::task_completion_event<void>();
-		pplx::task<void>([this, &token, &tce, maxConnections]() {
+		pplx::task<void>([this, token, tce, maxConnections]() {
 			this->run(token, tce, maxConnections);
 		});
 
