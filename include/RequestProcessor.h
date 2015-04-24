@@ -8,18 +8,21 @@ namespace Stormancer
 {
 	class RequestProcessor : public IPacketProcessor
 	{
-		typedef function<void(Packet<>*)> ObserverPacketHandler;
-		typedef function<void(exception_ptr)> ObserverExceptionHandler;
-		typedef rx::observer<Packet<>*, rx::static_observer<Packet<>*, ObserverPacketHandler, ObserverExceptionHandler, rxcpp::detail::OnCompletedEmpty>> PacketObserver;
+		using PacketObserver = rx::observer < Packet<>* > ;
 
 	private:
-		struct Request
+		class Request
 		{
+		public:
+			Request(PacketObserver&& observer);
+			virtual ~Request();
+
+		public:
 			time_t lastRefresh;
 			uint16 id;
-			PacketObserver* observer;
+			PacketObserver observer;
 			pplx::task_completion_event<void> tcs;
-			pplx::task<void> task = create_task(tcs);
+			pplx::task<void> task;
 		};
 
 	public:
@@ -31,7 +34,7 @@ namespace Stormancer
 		pplx::task<Packet<>*> sendSystemRequest(IConnection* peer, byte msgId, function<void(bytestream*)> writer);
 
 	private:
-		Request* reserveRequestSlot(PacketObserver* observer);
+		Request* reserveRequestSlot(PacketObserver&& observer);
 
 	public:
 		function<void(byte, function<pplx::task<void>(RequestContext*)>)> addSystemRequestHandler;

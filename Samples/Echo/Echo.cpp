@@ -30,13 +30,13 @@ void testClient()
 	Client client(&config);
 	auto task = client.getPublicScene(L"test-scene", L"hello").then([](pplx::task<Scene*> t) {
 		Scene* scene = t.get();
-		/*scene->addRoute(L"echo.out", [](Packet<IScenePeer>* p) {
+		scene->addRoute(L"echo.out", [](Packet<IScenePeer>* p) {
 			wstring str;
-			p->serializer()->deserialize(p->stream, str);
+			ISerializable::deserialize(p->stream, str);
 			wcout << str << endl;
 		});
 
-		scene->connect().then([&scene](pplx::task<void> t2) {
+		return scene->connect().then([&scene](pplx::task<void> t2) {
 			if (t2.is_done())
 			{
 				scene->sendPacket(L"echo.in", [](bytestream* stream) {
@@ -47,8 +47,7 @@ void testClient()
 			{
 				wcout << L"Bad stuff happened..." << endl;
 			}
-		});*/
-		return pplx::create_task([](){});
+		});
 	});
 
 	try

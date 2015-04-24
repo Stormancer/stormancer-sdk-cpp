@@ -47,7 +47,7 @@ namespace Stormancer
 		_metadata(config->metadata),
 		_maxPeers(config->maxPeers)
 	{
-		_metadata[L"serializers"] = L"msgpack/map";
+		_metadata[L"serializers"] = L"msgpack/array";
 		_metadata[L"transport"] = _transport->name();
 		_metadata[L"version"] = L"1.0.0";
 		_metadata[L"platform"] = L"cpp";

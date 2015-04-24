@@ -61,6 +61,10 @@ namespace Stormancer
 				{
 					throw exception(string(Helpers::StringFormat(L"Unable to get scene {0}/{1}/{2}. Please check you used the correct account id, application name and scene id.", accountId, applicationName, sceneId)).c_str());
 				}
+				else
+				{
+					throw exception("Request to get scene endpoint failed.");
+				}
 			}
 			catch (const exception& e)
 			{

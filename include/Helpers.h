@@ -156,18 +156,7 @@ namespace Stormancer
 			}
 
 			template<>
-			wstring replace<wstring>(wstring& format, wstring& replacement)
-			{
-				wstring toFind = L"{" + to_wstring(formatI) + L"}";
-				wstring::size_type start = format.find(toFind);
-				if (start != wstring::npos)
-				{
-					wstring::size_type size = toFind.size();
-					format.replace(start, size, replacement);
-				}
-				formatI++;
-				return format;
-			}
+			wstring replace<wstring>(wstring& format, wstring& replacement);
 
 			template<typename T>
 			StringFormat& operator<<(T& data)

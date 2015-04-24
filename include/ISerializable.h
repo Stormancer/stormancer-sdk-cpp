@@ -34,8 +34,8 @@ namespace Stormancer
 			}
 			else
 			{
-				MsgPack::Serializer srlz(stream->rdbuf());
-				srlz << MsgPack::Factory(*data);
+				MsgPack::Serializer srlzr(stream->rdbuf());
+				srlzr << MsgPack::Factory(*data);
 			}
 		}
 
@@ -49,41 +49,59 @@ namespace Stormancer
 		template<typename T>
 		static void serialize(T& data, bytestream* stream)
 		{
-			MsgPack::Serializer srlz(stream->rdbuf());
-			srlz << MsgPack::Factory(data);
+			MsgPack::Serializer srlzr(stream->rdbuf());
+			srlzr << MsgPack::Factory(data);
 		}
 
 		// Base template ref specializations
 		template<>
 		static void serialize<byte>(byte& data, bytestream* stream)
 		{
-			MsgPack::Serializer srlz(stream->rdbuf());
-			srlz << MsgPack::Factory(static_cast<uint64>(data));
+			MsgPack::Serializer srlzr(stream->rdbuf());
+			srlzr << MsgPack::Factory(static_cast<uint64>(data));
+		}
+
+		template<>
+		static void serialize<string>(string& data, bytestream* stream)
+		{
+			MsgPack::Serializer srlzr(stream->rdbuf());
+			srlzr << MsgPack::Factory(data);
+		}
+
+		template<>
+		static void serialize<wstring>(wstring& data, bytestream* stream)
+		{
+			serialize<string>(Helpers::to_string(data), stream);
+		}
+
+		template<>
+		static void serialize<stringMap>(stringMap& data, bytestream* stream)
+		{
+			serializeMap<wstring, wstring>(data, stream);
 		}
 
 		// Vector template
 		template<typename T>
-		static void serialize(vector<T>& data, bytestream* stream)
+		static void serializeVector(vector<T>& data, bytestream* stream)
 		{
-			MsgPack::Serializer srlz(stream->rdbuf());
-			srlz << MsgPack__Factory(ArrayHeader(data.size()));
+			MsgPack::Serializer srlzr(stream->rdbuf());
+			srlzr << MsgPack__Factory(ArrayHeader(data.size()));
 			for (int i = 0; i < data.size(); i++)
 			{
-				srlz << MsgPack::Factory(data[i]);
+				srlzr << MsgPack::Factory(data[i]);
 			}
 		}
 
 		// Map template
-		template<typename MT>
-		static void serialize(map<wstring, MT>& data, bytestream* stream)
+		template<typename MT1, typename MT2>
+		static void serializeMap(map<MT1, MT2>& data, bytestream* stream)
 		{
-			MsgPack::Serializer srlz(stream);
-			srlz << MsgPack__Factory(MapHeader(myMap.size()));
-			for (auto it = data.begin(); it != data.end(); ++it)
+			MsgPack::Serializer srlzr(stream->rdbuf());
+			srlzr << MsgPack__Factory(MapHeader(data.size()));
+			for (auto it : data)
 			{
-				srlz << MsgPack::Factory(it->first);
-				//srlz << MsgPack::Factory(it->second);
-				serialize<MT>(it->second, stream);
+				serialize<MT1>(MT1(it.first), stream); // TOIMPROVE (copying object because of key of iterator is const)
+				serialize<MT2>(it.second, stream);
 			}
 		}
 
@@ -93,9 +111,9 @@ namespace Stormancer
 		template<typename T>
 		static void deserialize(bytestream* stream, T& data)
 		{
-			MsgPack::Deserializer dsrlz(stream->rdbuf());
+			MsgPack::Deserializer dsrlzr(stream->rdbuf());
 			unique_ptr<MsgPack::Element> element;
-			dsrlz >> element;
+			dsrlzr >> element;
 			data = dynamic_cast<T&>(*element);
 		}
 
@@ -104,9 +122,9 @@ namespace Stormancer
 		template<>
 		static void deserialize<string>(bytestream* stream, string& str)
 		{
-			MsgPack::Deserializer dsrlz(stream->rdbuf());
+			MsgPack::Deserializer dsrlzr(stream->rdbuf());
 			unique_ptr<MsgPack::Element> element;
-			dsrlz >> element;
+			dsrlzr >> element;
 			str = dynamic_cast<MsgPack::String&>(*element).stdString();
 		}
 
@@ -121,18 +139,18 @@ namespace Stormancer
 
 		// Vector template
 		template<typename VT>
-		static void deserialize(bytestream* stream, vector<VT>& v)
+		static void deserializeVector(bytestream* stream, vector<VT>& v)
 		{
 			// TODO
 		}
 
 		// Map template
 		template<typename MT>
-		static void deserialize(bytestream* stream, map<wstring, MT>& m)
+		static void deserializeMap(bytestream* stream, map<wstring, MT>& m)
 		{
-			MsgPack::Deserializer dsrlz(stream);
+			MsgPack::Deserializer dsrlzr(stream);
 			unique_ptr<MsgPack::Element> element;
-			dsrlz >> element;
+			dsrlzr >> element;
 			// TODO
 		}
 

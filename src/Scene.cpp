@@ -71,23 +71,23 @@ namespace Stormancer
 			_localRoutesMap[routeName] = Route(this, routeName, metadata);
 		}
 
-		auto truc = onMessage(routeName).subscribe(handler);		
+		auto truc = onMessage(routeName).subscribe(handler);
 	}
 
 	rx::observable<Packet<IScenePeer>*> Scene::onMessage(Route* route)
 	{
 		auto observable = rx::observable<>::create<Packet<IScenePeer>*>([this, route](rx::subscriber<Packet<IScenePeer>*> subscriber) {
-			route->handlers.push_back([this, &subscriber](Packet<>* p) {
+			auto handler = new function<void(Packet<>*)>([this, &subscriber](Packet<>* p) {
 				Packet<IScenePeer>* packet = new Packet<IScenePeer>(host(), p->stream, p->metadata());
 				subscriber.on_next(packet);
 			});
-			function<void(Packet<>*)>& handler = route->handlers[route->handlers.size() - 1];
+			route->handlers.push_back(handler);
 
-			function<void(void)> ret = [route, &handler]() {
+			subscriber.add([route, handler]() {
 				auto it = find(route->handlers.begin(), route->handlers.end(), handler);
 				route->handlers.erase(it);
-			};
-			return ret;
+				delete handler;
+			});
 		});
 		return observable.as_dynamic();
 	}
@@ -165,12 +165,12 @@ namespace Stormancer
 
 		packet->setMetadata(L"routeId", new uint16(routeId));
 
-		if (_handlers.find(routeId) != _handlers.end())
+		if (Helpers::mapContains(_handlers, routeId))
 		{
-			auto observer = _handlers[routeId];
-			for (size_t i = 0; i < observer.size(); i++)
+			auto observers = _handlers[routeId];
+			for (size_t i = 0; i < observers.size(); i++)
 			{
-				observer[i](packet);
+				(*(observers[i]))(packet);
 			}
 		}
 	}

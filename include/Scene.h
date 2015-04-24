@@ -8,7 +8,7 @@
 
 namespace Stormancer
 {
-	typedef rx::observable<Packet<>*> PacketObservable;
+	using PacketObservable = rx::observable < Packet<>* > ;
 
 	class Client;
 
@@ -55,7 +55,7 @@ namespace Stormancer
 		bool _connected;
 		map<wstring, Route> _localRoutesMap;
 		map<wstring, Route> _remoteRoutesMap;
-		map<uint16, vector<function<void(Packet<>*)>>> _handlers;
+		map<uint16, vector<function<void(Packet<>*)>*>> _handlers;
 		Client* _client;
 	};
 };

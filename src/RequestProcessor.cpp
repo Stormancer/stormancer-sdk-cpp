@@ -2,6 +2,16 @@
 
 namespace Stormancer
 {
+	RequestProcessor::Request::Request(PacketObserver&& observer)
+		: observer(observer),
+		task(std::move(create_task(tcs)))
+	{
+	}
+
+	RequestProcessor::Request::~Request()
+	{
+	}
+
 	RequestProcessor::RequestProcessor(ILogger* logger, vector<IRequestModule*> modules)
 		: _logger(logger)
 	{
@@ -63,7 +73,7 @@ namespace Stormancer
 			{
 				Request* request = _pendingRequests[id];
 				time(&request->lastRefresh);
-				request->observer->on_next(p);
+				request->observer.on_next(p);
 				request->tcs.set();
 				p->setMetadata(L"request", request);
 			}
@@ -96,12 +106,12 @@ namespace Stormancer
 				if (hasValues)
 				{
 					request->task.then([request](pplx::task<void> t) {
-						return request->observer->on_completed();
+						return request->observer.on_completed();
 					});
 				}
 				else
 				{
-					request->observer->on_completed();
+					request->observer.on_completed();
 				}
 			}
 			else
@@ -129,7 +139,7 @@ namespace Stormancer
 				ISerializable::deserialize(p->stream, msg);
 
 				exception_ptr eptr = make_exception_ptr(new exception(Helpers::to_string(msg).c_str()));
-				request->observer->on_error(eptr);
+				request->observer.on_error(eptr);
 			}
 			else
 			{
@@ -143,14 +153,12 @@ namespace Stormancer
 	pplx::task<Packet<>*> RequestProcessor::sendSystemRequest(IConnection* peer, byte msgId, function<void(bytestream*)> writer)
 	{
 		auto tce = pplx::task_completion_event<Packet<>*>();
-		ObserverPacketHandler onNext = [&tce](Packet<>* p) {
+		auto observer = rx::make_observer<Packet<>*>([&tce](Packet<>* p) {
 			tce.set(p);
-		};
-		ObserverExceptionHandler onError = [&tce](exception_ptr ex) {
+		}, [&tce](exception_ptr ex) {
 			tce.set_exception(ex);
-		};
-		PacketObserver* observer = new PacketObserver(rx::make_observer<Packet<>*>(onNext, onError));
-		auto request = reserveRequestSlot(observer);
+		});
+		auto request = reserveRequestSlot(observer.as_dynamic());
 
 		peer->sendSystem(msgId, [&request, &writer](bytestream* bs) {
 			*bs << request->id;
@@ -173,19 +181,18 @@ namespace Stormancer
 		return task;
 	}
 
-	RequestProcessor::Request* RequestProcessor::reserveRequestSlot(PacketObserver* observer)
+	RequestProcessor::Request* RequestProcessor::reserveRequestSlot(PacketObserver&& observer)
 	{
 		static uint16 id = 0;
 		while (id < UINT16_MAX)
 		{
 			if (!Helpers::mapContains(_pendingRequests, id))
 			{
-				_pendingRequests[id] = new Request();
+				_pendingRequests[id] = new Request(std::move(observer));
 				Request* request = _pendingRequests[id];
 				time(&request->lastRefresh);
 				request->id = id;
-				request->observer = observer;
-				return request;
+				return request; 
 			}
 			id++;
 		}

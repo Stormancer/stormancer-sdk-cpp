@@ -5,8 +5,8 @@
 
 namespace Stormancer
 {
-	using handlerFunction = function < bool(Packet<>*) > ;
-	using processorFunction = function < bool(byte, Packet<>*) > ;
+	using handlerFunction = function < bool(Packet<>*) >;
+	using processorFunction = function < bool(byte, Packet<>*) >;
 
 	class PacketProcessorConfig
 	{

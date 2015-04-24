@@ -202,4 +202,18 @@ namespace Stormancer
 		}
 		return str;
 	}
+
+	template<>
+	wstring Helpers::StringFormat::replace<wstring>(wstring& format, wstring& replacement)
+	{
+		wstring toFind = L"{" + to_wstring(formatI) + L"}";
+		wstring::size_type start = format.find(toFind);
+		if (start != wstring::npos)
+		{
+			wstring::size_type size = toFind.size();
+			format.replace(start, size, replacement);
+		}
+		formatI++;
+		return format;
+	}
 };

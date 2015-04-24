@@ -20,7 +20,7 @@ namespace Stormancer
 
 	public:
 		uint16 index;
-		vector< function<void(Packet<>*)> > handlers;
+		vector< function<void(Packet<>*)>* > handlers;
 
 	private:
 		Scene* _scene;
