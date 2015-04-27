@@ -30,6 +30,17 @@ namespace Stormancer
 		anyMap stringMapToAnyMap(stringMap& sm);
 
 		template<typename TKey, typename TValue>
+		vector<TKey> mapKeys(map<TKey, TValue>& map)
+		{
+			vector<TKey> vec;
+			for (auto it = map.begin(); it != map.end(); ++it)
+			{
+				vec.push_back(it->first);
+			}
+			return vec;
+		}
+
+		template<typename TKey, typename TValue>
 		vector<TKey*> mapKeysPtr(map<TKey, TValue>& map)
 		{
 			vector<TKey*> vec;
@@ -41,12 +52,12 @@ namespace Stormancer
 		}
 
 		template<typename TKey, typename TValue>
-		vector<TKey> mapKeysCpy(map<TKey, TValue>& map)
+		vector<TValue> mapValues(map<TKey, TValue>& map)
 		{
-			vector<TKey> vec;
+			vector<TValue> vec;
 			for (auto it = map.begin(); it != map.end(); ++it)
 			{
-				vec.push_back(it->first);
+				vec.push_back(it->second);
 			}
 			return vec;
 		}
@@ -63,17 +74,6 @@ namespace Stormancer
 		}
 
 		template<typename TKey, typename TValue>
-		vector<TValue> mapValuesCopy(map<TKey, TValue>& map)
-		{
-			vector<TValue> vec;
-			for (auto it = map.begin(); it != map.end(); ++it)
-			{
-				vec.push_back(it->second);
-			}
-			return vec;
-		}
-
-		template<typename TKey, typename TValue>
 		bool mapContains(map<TKey, TValue>& map, TKey& key)
 		{
 			return (map.find(key) != map.end()) ? true : false;
@@ -83,24 +83,103 @@ namespace Stormancer
 
 #pragma region functional
 
-		template<typename TData>
-		void vectorExec(vector<function<void(TData*)>>& v, TData* data)
+		template<typename TParam>
+		class Action
 		{
-			for (uint32 i = 0; i < v.size(); i++)
+			using TFunction = function<void(TParam)>;
+
+		public:
+			Action()
 			{
-				v[i](data);
 			}
-		}
+
+			Action(const Action& other)
+				: _functions(other._functions)
+			{
+			}
+
+			Action(Action&& right)
+				: _functions(move(right._functions))
+			{
+			}
+
+			virtual ~Action()
+			{
+				for (auto* f : _functions)
+				{
+					delete f;
+				}
+			}
+
+		public:
+			Action& operator+=(TFunction* function)
+			{
+				_functions.push_back(function);
+				return *this;
+			}
+
+			Action& operator+=(TFunction& function)
+			{
+				return ((*this) += new TFunction(function));
+			}
+
+			Action& operator+=(TFunction&& function)
+			{
+				return ((*this) += new TFunction(function));
+			}
+
+			Action& operator<<(TFunction* function)
+			{
+				return ((*this) += function);
+			}
+
+			Action& operator<<(TFunction& function)
+			{
+				return ((*this) += function);
+			}
+
+			Action& operator<<(TFunction&& function)
+			{
+				return ((*this) += function);
+			}
+
+			Action& operator=(TFunction* function)
+			{
+				_functions.clear();
+				return ((*this) += function);
+			}
+			Action& operator=(TFunction& function)
+			{
+				return ((*this) = new TFunction(function));
+			}
+
+			Action& operator=(TFunction&& function)
+			{
+				return ((*this) = new TFunction(function));
+			}
+
+			Action& operator()(TParam data)
+			{
+				for (auto* f : _functions)
+				{
+					(*f)(data);
+				}
+				return *this;
+			}
+
+		private:
+			vector<TFunction*> _functions;
+		};
 
 #pragma endregion
 
 #pragma region string
 
-		wstring vectorJoin(vector<wstring> vector, wstring glue = L"");
+		wstring STORMANCER_DLL_API vectorJoin(vector<wstring> vector, wstring glue = L"");
 
-		vector<wstring> stringSplit(const wstring& str, const wstring separator);
+		vector<wstring> STORMANCER_DLL_API stringSplit(const wstring& str, const wstring separator);
 
-		wstring stringTrim(wstring& str, wchar_t ch = ' ');
+		wstring STORMANCER_DLL_API stringTrim(wstring& str, wchar_t ch = ' ');
 
 		template<typename T>
 		wstring to_wstring(T data)
@@ -108,8 +187,7 @@ namespace Stormancer
 			return to_wstring(to_string(data));
 		}
 
-		template<>
-		wstring to_wstring<string>(string str);
+		template<> STORMANCER_DLL_API wstring to_wstring<string>(string str);
 
 		template<>
 		wstring to_wstring<const char*>(const char* str);
@@ -126,12 +204,10 @@ namespace Stormancer
 		template<>
 		string to_string<vector<byte>>(vector<byte>& v);
 
-		// Template conversion function
-
 		template<typename T1, typename T2>
 		T2 convert(T1& data)
 		{
-			return T2(T1);
+			return T2(data);
 		}
 
 		template<>
@@ -211,7 +287,7 @@ namespace Stormancer
 
 #pragma region stream
 
-		//bytestream* convertRakNetBitStreamToByteStream(RakNet::BitStream* stream);
+		bytestream* convertRakNetBitStreamToByteStream(RakNet::BitStream* stream);
 
 		stringstream* convertRakNetPacketToStringStream(RakNet::Packet* packet, RakNet::RakPeerInterface* peer = nullptr);
 
@@ -231,9 +307,9 @@ namespace Stormancer
 
 #pragma region time
 
-		time_t nowTime_t();
-		wstring time_tToStr(time_t& now, bool local = false);
-		wstring nowStr(bool local = false);
+		time_t STORMANCER_DLL_API nowTime_t();
+		wstring STORMANCER_DLL_API time_tToStr(time_t& now, bool local = false);
+		wstring STORMANCER_DLL_API nowStr(bool local = false);
 
 #pragma endregion
 

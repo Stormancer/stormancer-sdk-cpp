@@ -2,21 +2,21 @@
 
 namespace Stormancer
 {
-	/*bytestream* Helpers::convertRakNetBitStreamToByteStream(RakNet::BitStream* stream)
+	bytestream* Helpers::convertRakNetBitStreamToByteStream(RakNet::BitStream* stream)
 	{
-	auto bs = new bytestream;
-	if (stream != nullptr)
-	{
-	auto buf = bs->rdbuf();
-	char* data = static_cast<char*>(static_cast<void*>(stream->GetData()));
-	buf->pubsetbuf(data, stream->GetNumberOfBytesUsed());
-	stream->SetData(nullptr);
-	stream->SetNumberOfBitsAllocated(0);
-	RakNet::BitStream::DestroyInstance(stream);
-	delete stream;
+		auto bs = new bytestream;
+		if (stream != nullptr)
+		{
+			auto buf = bs->rdbuf();
+			char* data = static_cast<char*>(static_cast<void*>(stream->GetData()));
+			buf->pubsetbuf(data, stream->GetNumberOfBytesUsed());
+			stream->SetData(nullptr);
+			stream->SetNumberOfBitsAllocated(0);
+			RakNet::BitStream::DestroyInstance(stream);
+			delete stream;
+		}
+		return bs;
 	}
-	return bs;
-	}*/
 
 	template<>
 	vector<byte> Helpers::convert<string, vector<byte>>(string& str)
@@ -104,30 +104,6 @@ namespace Stormancer
 		return str;
 	};
 
-	Helpers::StringFormat::StringFormat()
-	{
-	}
-
-	wstring Helpers::StringFormat::str()
-	{
-		return stream.str();
-	}
-
-	const wchar_t* Helpers::StringFormat::c_str()
-	{
-		return stream.str().c_str();
-	}
-
-	Helpers::StringFormat::operator string()
-	{
-		return to_string(stream.str());
-	}
-
-	Helpers::StringFormat::operator wstring()
-	{
-		return stream.str();
-	}
-
 	pplx::task<void> Helpers::taskCompleted()
 	{
 		pplx::task_completion_event<void> tce;
@@ -187,8 +163,7 @@ namespace Stormancer
 	template<>
 	string Helpers::to_string<wstring>(wstring& str)
 	{
-		string str2 = string(str.begin(), str.end());
-		return str2;
+		return string(str.begin(), str.end());
 	}
 
 	template<>
@@ -201,6 +176,30 @@ namespace Stormancer
 			str[i] = v[i];
 		}
 		return str;
+	}
+
+	Helpers::StringFormat::StringFormat()
+	{
+	}
+
+	wstring Helpers::StringFormat::str()
+	{
+		return stream.str();
+	}
+
+	const wchar_t* Helpers::StringFormat::c_str()
+	{
+		return stream.str().c_str();
+	}
+
+	Helpers::StringFormat::operator string()
+	{
+		return to_string(stream.str());
+	}
+
+	Helpers::StringFormat::operator wstring()
+	{
+		return stream.str();
 	}
 
 	template<>

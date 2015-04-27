@@ -2,6 +2,7 @@
 #include "headers.h"
 #include "IConnectionManager.h"
 #include "Packet.h"
+#include "Helpers.h"
 
 namespace Stormancer
 {
@@ -18,9 +19,9 @@ namespace Stormancer
 		uint64 id();
 
 	public:
-		vector<function<void(Packet<>*)>> packetReceived;
-		vector<function<void(IConnection*)>> connectionOpened;
-		vector<function<void(IConnection*)>> connectionClosed;
+		Helpers::Action<Packet<>*> packetReceived;
+		Helpers::Action<IConnection*> connectionOpened;
+		Helpers::Action<IConnection*> connectionClosed;
 
 	protected:
 		bool _isRunning = false;

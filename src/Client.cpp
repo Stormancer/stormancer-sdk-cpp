@@ -64,9 +64,9 @@ namespace Stormancer
 		if (!_initialized)
 		{
 			_initialized = true;
-			_transport->packetReceived << (function<void(Packet<>*)>)([this](Packet<>* packet) {
+			_transport->packetReceived << new function<void(Packet<>*)>(([this](Packet<>* packet) {
 				this->transport_packetReceived(packet);
-			});
+			}));
 		}
 	}
 
