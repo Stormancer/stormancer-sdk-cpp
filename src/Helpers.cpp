@@ -30,16 +30,15 @@ namespace Stormancer
 		return v;
 	}
 
-	stringstream* Helpers::convertRakNetPacketToStringStream(RakNet::Packet* packet, RakNet::RakPeerInterface* peer)
+	bytestream* Helpers::convertRakNetPacketToStream(RakNet::Packet* packet)
 	{
-		auto ss = new stringstream;
+		auto bb = new bytebuf;
 		if (packet != nullptr)
 		{
-			auto sb = ss->rdbuf();
 			char* data = static_cast<char*>(static_cast<void*>(packet->data));
-			sb->pubsetbuf(data, packet->length);
+			bb->pubsetbuf(data, packet->length);
 		}
-		return ss;
+		return new bytestream(bb);
 	}
 
 	bool Helpers::ensureSuccessStatusCode(int statusCode)

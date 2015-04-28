@@ -1,7 +1,7 @@
 #pragma once
 #include "headers.h"
 #include "IConnection.h"
-#include <RakNetTypes.h>
+#include "Helpers.h"
 
 namespace Stormancer
 {
@@ -27,9 +27,13 @@ namespace Stormancer
 
 		virtual ~Packet()
 		{
-			if (clean != nullptr)
+			cleanup();
+
+			if (stream)
 			{
-				clean();
+				auto sb = stream->rdbuf();
+				sb->pubsetbuf(nullptr, 0);
+				delete stream;
 			}
 		}
 
@@ -61,7 +65,7 @@ namespace Stormancer
 		T* connection;
 		bytestream* stream;
 
-		function<void(void)> clean;
+		Helpers::Action<void> cleanup;
 
 	private:
 		anyMap _metadata;

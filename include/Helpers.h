@@ -83,7 +83,9 @@ namespace Stormancer
 
 #pragma region functional
 
-		template<typename TParam>
+#pragma region action template
+
+		template<typename TParam = void>
 		class Action
 		{
 			using TFunction = function<void(TParam)>;
@@ -112,50 +114,26 @@ namespace Stormancer
 			}
 
 		public:
+			Action& operator=(TFunction* function)
+			{
+				_functions.clear();
+				_functions.push_back(function);
+				return *this;
+			}
+
 			Action& operator+=(TFunction* function)
 			{
 				_functions.push_back(function);
 				return *this;
 			}
 
-			Action& operator+=(TFunction& function)
+			Action& operator-=(TFunction* function)
 			{
-				return ((*this) += new TFunction(function));
-			}
-
-			Action& operator+=(TFunction&& function)
-			{
-				return ((*this) += new TFunction(function));
-			}
-
-			Action& operator<<(TFunction* function)
-			{
-				return ((*this) += function);
-			}
-
-			Action& operator<<(TFunction& function)
-			{
-				return ((*this) += function);
-			}
-
-			Action& operator<<(TFunction&& function)
-			{
-				return ((*this) += function);
-			}
-
-			Action& operator=(TFunction* function)
-			{
-				_functions.clear();
-				return ((*this) += function);
-			}
-			Action& operator=(TFunction& function)
-			{
-				return ((*this) = new TFunction(function));
-			}
-
-			Action& operator=(TFunction&& function)
-			{
-				return ((*this) = new TFunction(function));
+				auto it = find(_functions.begin(), _functions.end(), function);
+				if (it != _functions.end())
+				{
+					_functions.erase(it);
+				}
 			}
 
 			Action& operator()(TParam data)
@@ -170,6 +148,76 @@ namespace Stormancer
 		private:
 			vector<TFunction*> _functions;
 		};
+
+#pragma endregion
+
+#pragma region void action
+
+		template<>
+		class Action<void>
+		{
+			using TFunction = function<void(void)>;
+
+		public:
+			Action()
+			{
+			}
+
+			Action(const Action& other)
+				: _functions(other._functions)
+			{
+			}
+
+			Action(Action&& right)
+				: _functions(move(right._functions))
+			{
+			}
+
+			virtual ~Action()
+			{
+				for (auto* f : _functions)
+				{
+					delete f;
+				}
+			}
+
+		public:
+			Action& operator=(TFunction* function)
+			{
+				_functions.clear();
+				_functions.push_back(function);
+				return *this;
+			}
+
+			Action& operator+=(TFunction* function)
+			{
+				_functions.push_back(function);
+				return *this;
+			}
+
+			Action& operator-=(TFunction* function)
+			{
+				auto it = find(_functions.begin(), _functions.end(), function);
+				if (it != _functions.end())
+				{
+					_functions.erase(it);
+				}
+			}
+
+			Action& operator()()
+			{
+				for (auto* f : _functions)
+				{
+					(*f)();
+				}
+				return *this;
+			}
+
+		private:
+			vector<TFunction*> _functions;
+		};
+
+#pragma endregion
 
 #pragma endregion
 
@@ -289,7 +337,7 @@ namespace Stormancer
 
 		bytestream* convertRakNetBitStreamToByteStream(RakNet::BitStream* stream);
 
-		stringstream* convertRakNetPacketToStringStream(RakNet::Packet* packet, RakNet::RakPeerInterface* peer = nullptr);
+		bytestream* convertRakNetPacketToStream(RakNet::Packet* packet);
 
 		void deleteStringBuf(stringbuf* sb);
 

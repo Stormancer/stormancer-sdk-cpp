@@ -212,6 +212,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="bytebuf.h" />
     <ClInclude Include="include\ApiClient.h" />
     <ClInclude Include="include\Client.h" />
     <ClInclude Include="include\ClientConfiguration.h" />
@@ -265,6 +266,7 @@
     <ClInclude Include="MsgPack\StreamManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="bytebuf.cpp" />
     <ClCompile Include="src\Dto\ConnectionData.cpp" />
     <ClCompile Include="MsgPack\MsgPack.cpp" />
     <ClCompile Include="src\ApiClient.cpp" />

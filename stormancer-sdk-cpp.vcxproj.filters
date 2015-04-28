@@ -157,6 +157,9 @@
     <ClInclude Include="include\ISerializable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="bytebuf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ApiClient.cpp">
@@ -267,11 +270,18 @@
     <ClCompile Include="src\Dto\SceneInfosRequestDto.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Dto\EmptyDto.cpp" />
     <ClCompile Include="src\Dto\ConnectionData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Dto\RouteDto.cpp" />
+    <ClCompile Include="src\Dto\EmptyDto.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Dto\RouteDto.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bytebuf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">

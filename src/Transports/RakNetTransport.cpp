@@ -94,6 +94,7 @@ namespace Stormancer
 					break;
 				}
 				case (int)DefaultMessageIDTypes::ID_CONNECTION_ATTEMPT_FAILED:
+				{
 					if (Helpers::mapContains(_pendingConnections, packetSystemAddressStr))
 					{
 						auto tce = _pendingConnections[packetSystemAddressStr];
@@ -101,6 +102,7 @@ namespace Stormancer
 						tce.set_exception(eptr);
 					}
 					break;
+				}
 				default:
 				{
 					onMessageReceived(packet);
@@ -170,17 +172,18 @@ namespace Stormancer
 
 	void RakNetTransport::onMessageReceived(RakNet::Packet* packet)
 	{
-		auto connection = getConnection(packet->guid);
-		stringstream* stream = Helpers::convertRakNetPacketToStringStream(packet, _peer);
-		auto p = new Packet<>(connection, stream);
-		p->clean = [this, &packet]() {
-			if (this->_peer != nullptr && packet != nullptr)
-			{
-				this->_peer->DeallocatePacket(packet);
-			}
-		};
-
 		_logger->log(LogLevel::Trace, L"", Helpers::StringFormat(L"Message with id {0} arrived.", (byte)packet->data[0]), L"");
+
+		auto connection = getConnection(packet->guid);
+		bytestream* stream = Helpers::convertRakNetPacketToStream(packet);
+		auto p = new Packet<>(connection, stream);
+		auto peer = this->_peer;
+		p->cleanup += new function<void(void)>([peer, packet]() {
+			if (peer != nullptr && packet != nullptr)
+			{
+				peer->DeallocatePacket(packet);
+			}
+		});
 
 		packetReceived(p);
 	}
