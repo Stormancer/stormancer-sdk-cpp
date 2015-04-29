@@ -157,9 +157,11 @@
     <ClInclude Include="include\ISerializable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="bytebuf.h">
+    <ClInclude Include="include\bytebuf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\basic_bytebuf.h" />
+    <ClInclude Include="include\basic_bytestream.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ApiClient.cpp">
@@ -277,9 +279,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Dto\RouteDto.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="bytebuf.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

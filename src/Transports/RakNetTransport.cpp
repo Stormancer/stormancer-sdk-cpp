@@ -179,7 +179,7 @@ namespace Stormancer
 		auto p = new Packet<>(connection, stream);
 		auto peer = this->_peer;
 		p->cleanup += new function<void(void)>([peer, packet]() {
-			if (peer != nullptr && packet != nullptr)
+			if (peer && packet)
 			{
 				peer->DeallocatePacket(packet);
 			}

@@ -1,5 +1,7 @@
 #pragma once
 #include "headers.h"
+#include "basic_bytebuf.h"
+#include "basic_bytestream.h"
 
 namespace Stormancer
 {
@@ -368,5 +370,11 @@ namespace Stormancer
 		void displayException(const exception& e);
 
 #pragma endregion
+
+		template<typename T>
+		uint64 ptrToUint64(T* ptr)
+		{
+			return *static_cast<uint64*>(static_cast<void*>(ptr));
+		}
 	};
 };

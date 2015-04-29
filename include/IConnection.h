@@ -2,7 +2,7 @@
 #include "headers.h"
 #include "ConnectionState.h"
 #include <PacketPriority.h>
-#include "headers.h"
+#include "basic_bytestream.h"
 
 namespace Stormancer
 {

@@ -72,12 +72,12 @@ namespace Stormancer
 
 	private:
 		bool _initialized = false;
+		ILogger* _logger = nullptr;
 		wstring _accountId;
 		wstring _applicationName;
 		//const PluginBuildContext _pluginCtx;
 		IConnection* _serverConnection = nullptr;
 		ITransport* _transport = nullptr;
-		IPacketDispatcher* _dispatcher = nullptr;
 		ITokenHandler* _tokenHandler = nullptr;
 		ApiClient* _apiClient = nullptr;
 		RequestProcessor* _requestProcessor = nullptr;
@@ -85,6 +85,6 @@ namespace Stormancer
 		pplx::cancellation_token_source _cts;
 		uint16 _maxPeers = 0;
 		stringMap _metadata;
-		ILogger* _logger = nullptr;
+		IPacketDispatcher* _dispatcher = nullptr;
 	};
 };

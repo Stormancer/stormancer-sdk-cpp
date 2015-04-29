@@ -15,7 +15,7 @@ namespace Stormancer
 		void addProcessor(IPacketProcessor* processor);
 
 	private:
-		map<byte, handlerFunction> _handlers;
-		vector<processorFunction> _defaultProcessors;
+		map<byte, handlerFunction*> _handlers;
+		vector<processorFunction*> _defaultProcessors;
 	};
 };

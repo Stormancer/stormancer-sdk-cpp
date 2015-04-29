@@ -12,10 +12,9 @@ namespace Stormancer
 
 	void SceneDispatcher::registerProcessor(PacketProcessorConfig* config)
 	{
-		processorFunction p = [this](byte sceneHandle, Packet<>* packet) {
+		config->addCatchAllProcessor(new processorFunction([this](byte sceneHandle, Packet<>* packet) {
 			return this->processor(sceneHandle, packet);
-		};
-		config->addCatchAllProcessor(p);
+		}));
 	}
 
 	void SceneDispatcher::addScene(Scene* scene)

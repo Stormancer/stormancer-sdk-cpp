@@ -32,13 +32,13 @@ namespace Stormancer
 
 	bytestream* Helpers::convertRakNetPacketToStream(RakNet::Packet* packet)
 	{
-		auto bb = new bytebuf;
+		auto bs = new bytestream();
 		if (packet != nullptr)
 		{
 			char* data = static_cast<char*>(static_cast<void*>(packet->data));
-			bb->pubsetbuf(data, packet->length);
+			bs->rdbuf()->pubsetbuf(data, packet->length);
 		}
-		return new bytestream(bb);
+		return bs;
 	}
 
 	bool Helpers::ensureSuccessStatusCode(int statusCode)

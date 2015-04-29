@@ -42,7 +42,7 @@ namespace Stormancer
 
 		for (auto it : _handlers)
 		{
-			config->addProcessor(it.first, [it](Packet<>* p) {
+			config->addProcessor(it.first, new handlerFunction([it](Packet<>* p) {
 				RequestContext context(p);
 				it.second(&context).then([&context, &p](pplx::task<void> task) {
 					if (!context.isComplete())
@@ -61,10 +61,10 @@ namespace Stormancer
 					}
 				});
 				return true;
-			});
+			}));
 		}
 
-		config->addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG, [this](Packet<>* p) {
+		config->addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG, new handlerFunction([this](Packet<>* p) {
 			byte temp[2];
 			p->stream->readsome((char*)temp, 2);
 			uint16 id = temp[0] * 256 + temp[1];
@@ -83,9 +83,9 @@ namespace Stormancer
 			}
 
 			return true;
-		});
+		}));
 
-		config->addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_COMPLETE, [this](Packet<>* p) {
+		config->addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_COMPLETE, new handlerFunction([this](Packet<>* p) {
 			byte temp[2];
 			p->stream->readsome((char*)temp, 2);
 			uint16 id = temp[0] * 256 + temp[1];
@@ -120,9 +120,9 @@ namespace Stormancer
 			}
 
 			return true;
-		});
+		}));
 
-		config->addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_ERROR, [this](Packet<>* p) {
+		config->addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_ERROR, new handlerFunction([this](Packet<>* p) {
 			byte temp[2];
 			p->stream->readsome((char*)temp, 2);
 			uint16 id = temp[0] * 256 + temp[1];
@@ -147,7 +147,7 @@ namespace Stormancer
 			}
 
 			return true;
-		});
+		}));
 	}
 
 	pplx::task<Packet<>*> RequestProcessor::sendSystemRequest(IConnection* peer, byte msgId, function<void(bytestream*)> writer)

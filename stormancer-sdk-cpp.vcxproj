@@ -212,8 +212,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="bytebuf.h" />
     <ClInclude Include="include\ApiClient.h" />
+    <ClInclude Include="include\basic_bytebuf.h" />
+    <ClInclude Include="include\basic_bytestream.h" />
+    <ClInclude Include="include\bytebuf.h" />
     <ClInclude Include="include\Client.h" />
     <ClInclude Include="include\ClientConfiguration.h" />
     <ClInclude Include="include\ConnectionState.h" />
@@ -266,7 +268,6 @@
     <ClInclude Include="MsgPack\StreamManager.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="bytebuf.cpp" />
     <ClCompile Include="src\Dto\ConnectionData.cpp" />
     <ClCompile Include="MsgPack\MsgPack.cpp" />
     <ClCompile Include="src\ApiClient.cpp" />

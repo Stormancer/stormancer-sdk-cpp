@@ -2,6 +2,9 @@
 
 #include "headers.h"
 
+#include "basic_bytebuf.h"
+#include "basic_bytestream.h"
+
 #include "Dto/ConnectionData.h"
 #include "Dto/ConnectToSceneMsg.h"
 #include "Dto/ConnectionResult.h"

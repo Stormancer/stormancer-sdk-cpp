@@ -36,6 +36,7 @@ namespace Stormancer
 
 	Client::Client(ClientConfiguration* config)
 		: _initialized(false),
+		_logger(DefaultLogger::instance()),
 		_accountId(config->account),
 		_applicationName(config->application),
 		_tokenHandler(new TokenHandler()),
@@ -53,10 +54,13 @@ namespace Stormancer
 		_metadata[L"platform"] = L"cpp";
 
 		initialize();
+
+		_logger->log(LogLevel::Info, L"", L"Client created", to_wstring(Helpers::ptrToUint64(this)));
 	}
 
 	Client::~Client()
 	{
+		_logger->log(LogLevel::Info, L"", L"Client destroyed", to_wstring(Helpers::ptrToUint64(this)));
 	}
 
 	void Client::initialize()
@@ -64,6 +68,7 @@ namespace Stormancer
 		if (!_initialized)
 		{
 			_initialized = true;
+			auto d2 = this->_dispatcher;
 			_transport->packetReceived += new function<void(Packet<>*)>(([this](Packet<>* packet) {
 				this->transport_packetReceived(packet);
 			}));
@@ -94,6 +99,8 @@ namespace Stormancer
 
 	pplx::task<Scene*> Client::getPublicScene(wstring sceneId, wstring userData)
 	{
+		_logger->log(LogLevel::Trace, L"", L"Client::getPublicScene", sceneId);
+
 		return _apiClient->getSceneEndpoint(_accountId, _applicationName, sceneId, userData).then([this, sceneId](SceneEndpoint* sep) {
 			return this->getScene(sceneId, sep);
 		});
@@ -101,6 +108,8 @@ namespace Stormancer
 
 	pplx::task<Scene*> Client::getScene(wstring sceneId, SceneEndpoint* sep)
 	{
+		_logger->log(LogLevel::Trace, L"", L"Client::getScene", sceneId);
+
 		return Helpers::taskIf(_serverConnection == nullptr, [this, sep]() {
 			return Helpers::taskIf(!_transport->isRunning(), [this]() {
 				_cts = pplx::cancellation_token_source();
@@ -168,6 +177,6 @@ namespace Stormancer
 	{
 		// TODO plugins
 
-		_dispatcher->dispatchPacket(packet);
+		this->_dispatcher->dispatchPacket(packet);
 	}
 };

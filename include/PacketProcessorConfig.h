@@ -11,14 +11,14 @@ namespace Stormancer
 	class PacketProcessorConfig
 	{
 	public:
-		PacketProcessorConfig(map<byte, handlerFunction>& handlers, vector<processorFunction>& defaultProcessors);
+		PacketProcessorConfig(map<byte, handlerFunction*>& handlers, vector<processorFunction*>& defaultProcessors);
 		virtual ~PacketProcessorConfig();
 
-		void addProcessor(byte msgId, handlerFunction handler);
-		void addCatchAllProcessor(processorFunction processor);
+		void addProcessor(byte msgId, handlerFunction* handler);     
+		void addCatchAllProcessor(processorFunction* processor);
 
 	private:
-		map<byte, handlerFunction> _handlers;
-		vector<processorFunction> _defaultProcessors;
+		map<byte, handlerFunction*> _handlers;
+		vector<processorFunction*> _defaultProcessors;
 	};
 };

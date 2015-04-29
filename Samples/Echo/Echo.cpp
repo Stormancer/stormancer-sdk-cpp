@@ -2,26 +2,14 @@
 
 using namespace Stormancer;
 
-void testClient();
-void testMsgPack();
-
 int main(int argc, char* argv[])
 {
+	std::srand(std::time(0));
+
 	std::set_terminate([]() {
 		int termin = 1;
 	});
 
-	//testMsgPack();
-
-	testClient();
-
-	cin.get();
-
-	return 0;
-}
-
-void testClient()
-{
 	wcout << L"Starting echo..." << endl;
 
 	ClientConfiguration config(L"905f108e-18bc-0d56-45c2-0907de336e65", L"test");
@@ -59,4 +47,7 @@ void testClient()
 		wcout << L"Error exception:\n" << e.what();
 	}
 
+	cin.ignore();
+
+	return 0;
 }

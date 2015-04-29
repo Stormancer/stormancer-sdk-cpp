@@ -16,8 +16,6 @@ namespace Stormancer
 
 	using byte = uint8;
 
-	using bytestream = stringstream;
-
 	using stringMap = map < wstring, wstring > ;
 	using anyMap = map < wstring, void* > ;
 };

@@ -2,7 +2,7 @@
 
 namespace Stormancer
 {
-	PacketProcessorConfig::PacketProcessorConfig(map<byte, handlerFunction>& handlers, vector<processorFunction>& defaultProcessors)
+	PacketProcessorConfig::PacketProcessorConfig(map<byte, handlerFunction*>& handlers, vector<processorFunction*>& defaultProcessors)
 		: _handlers(handlers),
 		_defaultProcessors(defaultProcessors)
 	{
@@ -12,7 +12,7 @@ namespace Stormancer
 	{
 	}
 
-	void PacketProcessorConfig::addProcessor(byte msgId, handlerFunction handler)
+	void PacketProcessorConfig::addProcessor(byte msgId, handlerFunction* handler)
 	{
 		if (Helpers::mapContains(_handlers, msgId))
 		{
@@ -21,7 +21,7 @@ namespace Stormancer
 		_handlers[msgId] = handler;
 	}
 
-	void PacketProcessorConfig::addCatchAllProcessor(processorFunction processor)
+	void PacketProcessorConfig::addCatchAllProcessor(processorFunction* processor)
 	{
 		_defaultProcessors.push_back(processor);
 	}

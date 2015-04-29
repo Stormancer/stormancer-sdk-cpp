@@ -21,8 +21,8 @@ namespace Stormancer
 				*(packet->stream) >> msgType;
 				if (Helpers::mapContains(this->_handlers, msgType))
 				{
-					handlerFunction handler = this->_handlers[msgType];
-					processed = handler(packet);
+					handlerFunction* handler = this->_handlers[msgType];
+					processed = (*handler)(packet);
 					count++;
 				}
 				else
@@ -32,7 +32,7 @@ namespace Stormancer
 			}
 			for (auto processor : this->_defaultProcessors)
 			{
-				if (processor(msgType, packet))
+				if ((*processor)(msgType, packet))
 				{
 					processed = true;
 					break;

@@ -23,6 +23,8 @@ namespace Stormancer
 
 	pplx::task<SceneEndpoint*> ApiClient::getSceneEndpoint(wstring accountId, wstring applicationName, wstring sceneId, wstring userData)
 	{
+		DefaultLogger::instance()->log(LogLevel::Trace, L"", L"Client::getSceneEndpoint", accountId + L" " + applicationName + L" " + sceneId + L" " + userData);
+
 		wstring baseUri = _config->getApiEndpoint();
 		http_client client(baseUri);
 		http_request request(methods::POST);
@@ -39,6 +41,8 @@ namespace Stormancer
 				http_response response = t.get();
 
 				uint16 statusCode = response.status_code();
+
+				DefaultLogger::instance()->log(LogLevel::Trace, L"", L"Client::getSceneEndpoint::client.request", L"statusCode = " + to_wstring(statusCode));
 
 				if (Helpers::ensureSuccessStatusCode(statusCode))
 				{
