@@ -215,7 +215,6 @@
     <ClInclude Include="include\ApiClient.h" />
     <ClInclude Include="include\basic_bytebuf.h" />
     <ClInclude Include="include\basic_bytestream.h" />
-    <ClInclude Include="include\bytebuf.h" />
     <ClInclude Include="include\Client.h" />
     <ClInclude Include="include\ClientConfiguration.h" />
     <ClInclude Include="include\ConnectionState.h" />
@@ -294,7 +293,6 @@
     <ClCompile Include="src\ISerializable.cpp" />
     <ClCompile Include="src\ITokenHandler.cpp" />
     <ClCompile Include="src\ITransport.cpp" />
-    <ClCompile Include="src\IMsgPackSerializable.cpp" />
     <ClCompile Include="src\PacketProcessorConfig.cpp" />
     <ClCompile Include="src\RequestContext.cpp" />
     <ClCompile Include="src\RequestModuleBuilder.cpp" />

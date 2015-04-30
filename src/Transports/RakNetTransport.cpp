@@ -90,7 +90,7 @@ namespace Stormancer
 				}
 				case (int)MessageIDTypes::ID_CONNECTION_RESULT:
 				{
-					onConnectionIdReceived(*(static_cast<int64*>(static_cast<void*>(packet->data + 1))));
+					onConnectionIdReceived(*((int64*)(packet->data + 1)));
 					break;
 				}
 				case (int)DefaultMessageIDTypes::ID_CONNECTION_ATTEMPT_FAILED:
@@ -141,7 +141,7 @@ namespace Stormancer
 
 		return pplx::task<IConnection*>(tce);
 	}
-
+	
 	void RakNetTransport::onConnection(RakNet::Packet* packet, RakNet::RakPeerInterface* server)
 	{
 		wstring sysAddr = Helpers::to_wstring(packet->systemAddress.ToString());
@@ -154,6 +154,7 @@ namespace Stormancer
 
 		c->sendSystem((byte)MessageIDTypes::ID_CONNECTION_RESULT, [c](bytestream* stream) {
 			*stream << c->id();
+			auto str = stream->str();
 		});
 	}
 

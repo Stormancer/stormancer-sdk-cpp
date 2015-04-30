@@ -214,4 +214,33 @@ namespace Stormancer
 		formatI++;
 		return format;
 	}
+
+	bytestream& operator<<(bytestream& bs, const char* data)
+	{
+#ifdef _IS_BIG_ENDIAN
+		size_t len = strlen(data);
+		char* data2 = new char[len];
+		reverse_copy(data, data + len, data2);
+		data = data2;
+		bs.write((char*)&data, len);
+		delete[] data2;
+#else
+		bs.write((char*)&data, strlen(data));
+#endif
+		return bs;
+	}
+
+	bytestream& operator<<(bytestream& bs, const wchar_t* data)
+	{
+#ifdef _IS_BIG_ENDIAN
+		size_t len = wcslen(data);
+		char* data2 = new char[len];
+		reverse_copy(data, data + len, data2);
+		bs.write((char*)&data, len);
+		delete[] data2;
+#else
+		bs.write((char*)&data, wcslen(data));
+#endif
+		return bs;
+	}
 };

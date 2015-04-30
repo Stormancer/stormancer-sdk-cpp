@@ -4,8 +4,6 @@ using namespace Stormancer;
 
 int main(int argc, char* argv[])
 {
-	std::srand(std::time(0));
-
 	std::set_terminate([]() {
 		int termin = 1;
 	});

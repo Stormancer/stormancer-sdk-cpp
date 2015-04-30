@@ -10,6 +10,7 @@ namespace Stormancer
 		IPacketProcessor();
 		virtual ~IPacketProcessor();
 
+	public:
 		virtual void registerProcessor(PacketProcessorConfig* config) = 0;
 	};
 };

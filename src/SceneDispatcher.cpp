@@ -4,6 +4,9 @@ namespace Stormancer
 {
 	SceneDispatcher::SceneDispatcher()
 	{
+		handler = new processorFunction([this](byte sceneHandle, Packet<>* packet) {
+			return this->handler_impl(sceneHandle, packet);
+		});
 	}
 
 	SceneDispatcher::~SceneDispatcher()
@@ -12,9 +15,7 @@ namespace Stormancer
 
 	void SceneDispatcher::registerProcessor(PacketProcessorConfig* config)
 	{
-		config->addCatchAllProcessor(new processorFunction([this](byte sceneHandle, Packet<>* packet) {
-			return this->processor(sceneHandle, packet);
-		}));
+		config->addCatchAllProcessor(handler);
 	}
 
 	void SceneDispatcher::addScene(Scene* scene)
@@ -32,7 +33,7 @@ namespace Stormancer
 		}
 	}
 
-	bool SceneDispatcher::processor(byte sceneHandle, Packet<>* packet)
+	bool SceneDispatcher::handler_impl(byte sceneHandle, Packet<>* packet)
 	{
 		if (sceneHandle < (byte)MessageIDTypes::ID_SCENES)
 		{

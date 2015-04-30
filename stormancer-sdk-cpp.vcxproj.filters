@@ -157,11 +157,12 @@
     <ClInclude Include="include\ISerializable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\bytebuf.h">
+    <ClInclude Include="include\basic_bytebuf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\basic_bytebuf.h" />
-    <ClInclude Include="include\basic_bytestream.h" />
+    <ClInclude Include="include\basic_bytestream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ApiClient.cpp">
@@ -255,9 +256,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ISerializable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\IMsgPackSerializable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Dto\ConnectionResult.cpp">

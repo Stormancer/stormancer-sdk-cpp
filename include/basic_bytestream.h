@@ -94,7 +94,7 @@ public:
 	{	// replace character array from string
 		_Stringbuffer.str(_Newstr);
 	}
-
+	
 private:
 	_Mysb _Stringbuffer;	// the string buffer
 };

@@ -17,10 +17,60 @@ namespace Stormancer
 	}
 
 	template<typename T>
+	vector<T>& operator<<(vector<T>& v, const T&& data)
+	{
+		v.push_back(data);
+		return v;
+	}
+
+	template<typename T>
 	vector<T>& operator>>(vector<T>& v, T& data)
 	{
 		data = v.pop_back();
 		return v;
+	}
+
+	template<typename T>
+	bytestream& STORMANCER_DLL_API operator<<(bytestream& bs, T& data)
+	{
+#ifdef _IS_BIG_ENDIAN
+		T tmp(data);
+		reverseByteOrder(&tmp);
+		bs.write((char*)&tmp, sizeof(T));
+#else
+		bs.write((char*)&data, sizeof(T));
+#endif
+		return bs;
+	}
+
+	template<typename T>
+	bytestream& STORMANCER_DLL_API operator<<(bytestream& bs, T&& data)
+	{
+		T tmp(data);
+		return (bs << tmp);
+	}
+
+	bytestream& STORMANCER_DLL_API operator<<(bytestream& bs, const char* data);
+
+	bytestream& STORMANCER_DLL_API operator<<(bytestream& bs, const wchar_t* data);
+
+	template<typename T>
+	bytestream& STORMANCER_DLL_API operator>>(bytestream& bs, T& data)
+	{
+		char* tmp = (char*)&data;
+		bs.read(tmp, sizeof(T));
+#ifdef _IS_BIG_ENDIAN
+		reverseByteOrder(&data);
+#endif
+		return bs;
+	}
+
+	template<typename T>
+	T* reverseByteOrder(T* data, size_t n = -1)
+	{
+		char* tmp = (char*)data;
+		std::reverse(tmp, tmp + (n >= 0 ? n : sizeof(T)));
+		return data;
 	}
 
 #pragma endregion
@@ -90,7 +140,7 @@ namespace Stormancer
 		template<typename TParam = void>
 		class Action
 		{
-			using TFunction = function<void(TParam)>;
+			using TFunction = function < void(TParam) > ;
 
 		public:
 			Action()
@@ -156,9 +206,9 @@ namespace Stormancer
 #pragma region void action
 
 		template<>
-		class Action<void>
+		class Action < void >
 		{
-			using TFunction = function<void(void)>;
+			using TFunction = function < void(void) > ;
 
 		public:
 			Action()

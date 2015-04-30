@@ -55,6 +55,7 @@ namespace Stormancer
 		{
 			return _requestProcessor->sendSystemRequest(_serverConnection, id, [this, &parameter](bytestream* stream) {
 				parameter.serialize(stream); // serialize request dto
+				auto str = stream->str();
 			}).then([this](Packet<>* packet) {
 				return T2(packet->stream); // deserialize result dto
 			});
