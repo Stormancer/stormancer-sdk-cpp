@@ -51,7 +51,7 @@ namespace Stormancer
 		_dispatcher->addProcessor(_requestProcessor);
 		_dispatcher->addProcessor(_scenesDispatcher);
 
-		_metadata[L"serializers"] = L"msgpack/array";
+		_metadata[L"serializers"] = L"msgpack/map";
 		_metadata[L"transport"] = _transport->name();
 		_metadata[L"version"] = L"1.0.0";
 		_metadata[L"platform"] = L"cpp";

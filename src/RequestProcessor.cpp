@@ -66,6 +66,7 @@ namespace Stormancer
 
 		config->addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG, new handlerFunction([this](Packet<>* p) {
 			byte temp[2];
+			auto str = p->stream->str();
 			p->stream->readsome((char*)temp, 2);
 			uint16 id = temp[0] * 256 + temp[1];
 
@@ -162,7 +163,6 @@ namespace Stormancer
 
 		peer->sendSystem(msgId, [&request, &writer](bytestream* bs) {
 			*bs << request->id;
-			bs->flush();
 			writer(bs);
 		});
 

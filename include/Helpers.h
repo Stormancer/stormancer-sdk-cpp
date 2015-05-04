@@ -31,7 +31,7 @@ namespace Stormancer
 	}
 
 	template<typename T>
-	bytestream& STORMANCER_DLL_API operator<<(bytestream& bs, T& data)
+	bytestream& operator<<(bytestream& bs, T& data)
 	{
 #ifdef _IS_BIG_ENDIAN
 		T tmp(data);
@@ -44,18 +44,18 @@ namespace Stormancer
 	}
 
 	template<typename T>
-	bytestream& STORMANCER_DLL_API operator<<(bytestream& bs, T&& data)
+	bytestream& operator<<(bytestream& bs, T&& data)
 	{
 		T tmp(data);
 		return (bs << tmp);
 	}
 
-	bytestream& STORMANCER_DLL_API operator<<(bytestream& bs, const char* data);
+	STORMANCER_DLL_API bytestream& operator<<(bytestream& bs, const char* data);
 
-	bytestream& STORMANCER_DLL_API operator<<(bytestream& bs, const wchar_t* data);
+	STORMANCER_DLL_API bytestream& operator<<(bytestream& bs, const wchar_t* data);
 
 	template<typename T>
-	bytestream& STORMANCER_DLL_API operator>>(bytestream& bs, T& data)
+	bytestream& operator>>(bytestream& bs, T& data)
 	{
 		char* tmp = (char*)&data;
 		bs.read(tmp, sizeof(T));

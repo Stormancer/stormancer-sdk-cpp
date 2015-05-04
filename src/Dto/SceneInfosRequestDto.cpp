@@ -19,15 +19,16 @@ namespace Stormancer
 	{
 		MsgPack::Serializer srlzr(stream->rdbuf());
 
-		srlzr << MsgPack__Factory(ArrayHeader(2));
+		srlzr << MsgPack__Factory(MapHeader(2));
 
+		srlzr << MsgPack::Factory("Token");
 		srlzr << MsgPack::Factory(Helpers::to_string(Token));
 
+		srlzr << MsgPack::Factory("Metadata");
 		ISerializable::serialize<stringMap>(Metadata, stream);
 	}
 
 	void SceneInfosRequestDto::deserialize(bytestream* stream)
 	{
-		// TODO
 	}
 }

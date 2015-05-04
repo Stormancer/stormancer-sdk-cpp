@@ -18,8 +18,8 @@ namespace Stormancer
 			virtual ~Request();
 
 		public:
-			time_t lastRefresh;
-			uint16 id;
+			time_t lastRefresh = time(NULL);
+			uint16 id = 0;
 			PacketObserver observer;
 			pplx::task_completion_event<void> tcs;
 			pplx::task<void> task;

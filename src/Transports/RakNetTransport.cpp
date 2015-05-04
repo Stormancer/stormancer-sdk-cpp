@@ -154,7 +154,6 @@ namespace Stormancer
 
 		c->sendSystem((byte)MessageIDTypes::ID_CONNECTION_RESULT, [c](bytestream* stream) {
 			*stream << c->id();
-			auto str = stream->str();
 		});
 	}
 

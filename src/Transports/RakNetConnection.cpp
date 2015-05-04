@@ -60,7 +60,9 @@ namespace Stormancer
 	{
 		sendRaw([msgId, &writer](bytestream* stream) {
 			*stream << msgId;
+			auto str1 = stream->str();
 			writer(stream);
+			auto str2 = stream->str();
 		}, PacketPriority::HIGH_PRIORITY, PacketReliability::RELIABLE_ORDERED, (uint8)0);
 	}
 
@@ -68,7 +70,9 @@ namespace Stormancer
 	{
 		bytestream stream;
 		writer(&stream);
-		auto data = stream.rdbuf()->str();
+		stream.flush();
+		auto data = stream.str();
+		auto length = data.length();
 		auto result = _rakPeer->Send(data.c_str(), data.length(), (PacketPriority)priority, (PacketReliability)reliability, channel, _guid, false);
 		if (result == 0)
 		{
@@ -82,7 +86,7 @@ namespace Stormancer
 		stream << sceneIndex;
 		stream << route;
 		writer(&stream);
-		auto data = stream.rdbuf()->str();
+		auto data = stream.str();
 		auto result = _rakPeer->Send(data.c_str(), data.length(), priority, reliability, 0, _guid, false);
 
 		if (result == 0)

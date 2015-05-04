@@ -11,7 +11,7 @@ int main(int argc, char* argv[])
 	wcout << L"Starting echo..." << endl;
 
 	ClientConfiguration config(L"905f108e-18bc-0d56-45c2-0907de336e65", L"test");
-	config.serverEndpoint = L"http://localhost:8888";
+	config.serverEndpoint = L"http://localhost:8081";
 
 	Client client(&config);
 	auto task = client.getPublicScene(L"test-scene", L"hello").then([](pplx::task<Scene*> t) {
