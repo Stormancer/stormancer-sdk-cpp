@@ -100,17 +100,33 @@ namespace Stormancer
 				Request* request = this->_pendingRequests[id];
 				p->setMetadata(L"request", request);
 
-				auto it = this->_pendingRequests.find(id);
-				this->_pendingRequests.erase(it);
 
 				if (hasValues)
 				{
-					request->task.then([request](pplx::task<void> t) {
-						return request->observer.on_completed();
+					request->task.then([this, request, id](pplx::task<void> t) {
+						if (Helpers::mapContains(this->_pendingRequests, request->id))
+						{
+							auto* r = this->_pendingRequests[request->id];
+							if (r == request)
+							{
+								this->_pendingRequests.erase(request->id);
+								delete r;
+							}
+						}
+						request->observer.on_completed();
 					});
 				}
 				else
 				{
+					if (Helpers::mapContains(this->_pendingRequests, request->id))
+					{
+						auto* r = this->_pendingRequests[request->id];
+						if (r == request)
+						{
+							this->_pendingRequests.erase(request->id);
+							delete r;
+						}
+					}
 					request->observer.on_completed();
 				}
 			}
@@ -132,8 +148,15 @@ namespace Stormancer
 				Request* request = _pendingRequests[id];
 				p->setMetadata(L"request", request);
 
-				auto it = _pendingRequests.find(id);
-				_pendingRequests.erase(it);
+				if (Helpers::mapContains(this->_pendingRequests, request->id))
+				{
+					auto* r = this->_pendingRequests[request->id];
+					if (r == request)
+					{
+						this->_pendingRequests.erase(request->id);
+						delete r;
+					}
+				}
 
 				wstring msg;
 				ISerializable::deserialize(p->stream, msg);
@@ -160,21 +183,13 @@ namespace Stormancer
 		});
 		auto request = reserveRequestSlot(observer.as_dynamic());
 
-		peer->sendSystem(msgId, [&request, &writer](bytestream* bs) {
+		peer->sendSystem(msgId, [request, &writer](bytestream* bs) {
 			*bs << request->id;
 			writer(bs);
 		});
 
 		auto task = pplx::create_task(*tce);
-		task.then([this, request, tce](pplx::task<Packet<>*> t) {
-			if (Helpers::mapContains(this->_pendingRequests, request->id))
-			{
-				auto r = this->_pendingRequests[request->id];
-				if (r == request)
-				{
-					this->_pendingRequests.erase(request->id);
-				}
-			}
+		task.then([this, tce](pplx::task<Packet<>*> t) {
 			if (tce)
 			{
 				delete tce;
