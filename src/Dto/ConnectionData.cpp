@@ -17,7 +17,6 @@ namespace Stormancer
 
 	void ConnectionData::serialize(bytestream* stream)
 	{
-		// TODO
 	}
 
 	void ConnectionData::deserialize(bytestream* stream)

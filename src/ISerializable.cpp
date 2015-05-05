@@ -104,4 +104,27 @@ namespace Stormancer
 			return stringMap();
 		}
 	}
+
+	vector<RouteDto> ISerializable::routeDtoVectorFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key)
+	{
+		auto& element = valueFromMsgPackMapKey(msgPackMap, key);
+
+		if (auto* arr = dynamic_cast<MsgPack::Array*>(element.get()))
+		{
+			auto* vdata = arr->getContainer();
+
+			vector<RouteDto> vres;
+
+			for (uint32 i = 0; i < vdata->size(); i++)
+			{
+				vres.push_back(RouteDto(vdata->at(i).get()));
+			}
+
+			return vres;
+		}
+		else
+		{
+			return vector<RouteDto>();
+		}
+	}
 };

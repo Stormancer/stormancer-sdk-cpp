@@ -1,6 +1,7 @@
 #pragma once
 #include "headers.h"
 #include "Helpers.h"
+#include "Dto/RouteDto.h"
 
 namespace Stormancer
 {
@@ -159,5 +160,6 @@ namespace Stormancer
 		static wstring stringFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
 		static stringMap elementToStringMap(MsgPack::Map* msgPackMap);
 		static stringMap stringMapFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
+		static vector<RouteDto> routeDtoVectorFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
 	};
 };

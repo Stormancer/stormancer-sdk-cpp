@@ -70,9 +70,9 @@ namespace Stormancer
 			p->stream->readsome((char*)temp, 2);
 			uint16 id = temp[0] * 256 + temp[1];
 
-			if (Helpers::mapContains(_pendingRequests, id))
+			if (Helpers::mapContains(this->_pendingRequests, id))
 			{
-				Request* request = _pendingRequests[id];
+				Request* request = this->_pendingRequests[id];
 				time(&request->lastRefresh);
 				request->observer.on_next(p);
 				request->tcs.set();
@@ -95,14 +95,13 @@ namespace Stormancer
 			p->stream->readsome(&c, 1);
 			bool hasValues = (c == 1);
 
-			if (Helpers::mapContains(_pendingRequests, id))
+			if (Helpers::mapContains(this->_pendingRequests, id))
 			{
-				Request* request = _pendingRequests[id];
+				Request* request = this->_pendingRequests[id];
 				p->setMetadata(L"request", request);
 
-				auto it = _pendingRequests.find(id);
-				_pendingRequests.erase(it);
-
+				auto it = this->_pendingRequests.find(id);
+				this->_pendingRequests.erase(it);
 
 				if (hasValues)
 				{
@@ -153,11 +152,11 @@ namespace Stormancer
 
 	pplx::task<Packet<>*> RequestProcessor::sendSystemRequest(IConnection* peer, byte msgId, function<void(bytestream*)> writer)
 	{
-		auto tce = pplx::task_completion_event<Packet<>*>();
-		auto observer = rx::make_observer<Packet<>*>([&tce](Packet<>* p) {
-			tce.set(p);
-		}, [&tce](exception_ptr ex) {
-			tce.set_exception(ex);
+		auto tce = new pplx::task_completion_event<Packet<>*>();
+		auto observer = rx::make_observer<Packet<>*>([tce](Packet<>* p) {
+			tce->set(p);
+		}, [tce](exception_ptr ex) {
+			tce->set_exception(ex);
 		});
 		auto request = reserveRequestSlot(observer.as_dynamic());
 
@@ -166,8 +165,8 @@ namespace Stormancer
 			writer(bs);
 		});
 
-		auto task = pplx::create_task(tce);
-		task.then([this, request](pplx::task<Packet<>*> t) {
+		auto task = pplx::create_task(*tce);
+		task.then([this, request, tce](pplx::task<Packet<>*> t) {
 			if (Helpers::mapContains(this->_pendingRequests, request->id))
 			{
 				auto r = this->_pendingRequests[request->id];
@@ -175,6 +174,10 @@ namespace Stormancer
 				{
 					this->_pendingRequests.erase(request->id);
 				}
+			}
+			if (tce)
+			{
+				delete tce;
 			}
 		});
 
@@ -188,11 +191,11 @@ namespace Stormancer
 		{
 			if (!Helpers::mapContains(_pendingRequests, id))
 			{
-				_pendingRequests[id] = new Request(std::move(observer));
-				Request* request = _pendingRequests[id];
+				auto request = new Request(std::move(observer));
 				time(&request->lastRefresh);
 				request->id = id;
-				return request; 
+				_pendingRequests[id] = request;
+				return request;
 			}
 			id++;
 		}

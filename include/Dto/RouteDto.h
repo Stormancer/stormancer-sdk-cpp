@@ -8,6 +8,7 @@ namespace Stormancer
 	public:
 		RouteDto();
 		RouteDto(bytestream* stream);
+		RouteDto(MsgPack::Element* element);
 		virtual ~RouteDto();
 
 	public:

@@ -17,11 +17,17 @@ namespace Stormancer
 
 	void SceneInfosDto::serialize(bytestream* stream)
 	{
-		// TODO
 	}
 
 	void SceneInfosDto::deserialize(bytestream* stream)
 	{
-		// TODO
+		MsgPack::Deserializer deserializer(stream->rdbuf());
+		unique_ptr<MsgPack::Element> element;
+		deserializer >> element;
+
+		SceneId = stringFromMsgPackMap(element, L"SceneId");
+		Metadata = stringMapFromMsgPackMap(element, L"Metadata");
+		Routes = routeDtoVectorFromMsgPackMap(element, L"Routes");
+		SelectedSerializer = stringFromMsgPackMap(element, L"SelectedSerializer");
 	}
 }
