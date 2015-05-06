@@ -141,7 +141,7 @@ namespace Stormancer
 
 		return pplx::task<IConnection*>(tce);
 	}
-	
+
 	void RakNetTransport::onConnection(RakNet::Packet* packet, RakNet::RakPeerInterface* server)
 	{
 		wstring sysAddr = Helpers::to_wstring(packet->systemAddress.ToString());
@@ -175,7 +175,8 @@ namespace Stormancer
 		_logger->log(LogLevel::Trace, L"", Helpers::StringFormat(L"Message with id {0} arrived.", (byte)packet->data[0]), L"");
 
 		auto connection = getConnection(packet->guid);
-		bytestream* stream = Helpers::convertRakNetPacketToStream(packet);
+		auto stream = new bytestream;
+		stream->rdbuf()->pubsetbuf((char*)packet->data, packet->length);
 		auto p = new Packet<>(connection, stream);
 		auto peer = this->_peer;
 		p->cleanup += new function<void(void)>([peer, packet]() {

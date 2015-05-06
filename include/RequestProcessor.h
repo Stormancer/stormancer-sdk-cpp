@@ -3,28 +3,12 @@
 #include "IPacketProcessor.h"
 #include "ILogger.h"
 #include "IRequestModule.h"
+#include "Request.h"
 
 namespace Stormancer
 {
 	class RequestProcessor : public IPacketProcessor
 	{
-		using PacketObserver = rx::observer < Packet<>* > ;
-
-	private:
-		class Request
-		{
-		public:
-			Request(PacketObserver&& observer);
-			virtual ~Request();
-
-		public:
-			time_t lastRefresh = time(NULL);
-			uint16 id = 0;
-			PacketObserver observer;
-			pplx::task_completion_event<void> tcs;
-			pplx::task<void> task;
-		};
-
 	public:
 		RequestProcessor(ILogger* logger, vector<IRequestModule*> modules);
 		virtual ~RequestProcessor();
@@ -34,13 +18,14 @@ namespace Stormancer
 		pplx::task<Packet<>*> sendSystemRequest(IConnection* peer, byte msgId, function<void(bytestream*)> writer);
 
 	private:
-		Request* reserveRequestSlot(PacketObserver&& observer);
+		shared_ptr<Request> reserveRequestSlot(PacketObserver&& observer);
+		bool freeRequestSlot(uint16 requestId);
 
 	public:
 		function<void(byte, function<pplx::task<void>(RequestContext*)>)> addSystemRequestHandler;
 
 	protected:
-		map<uint16, Request*> _pendingRequests;
+		map<uint16, shared_ptr<Request>> _pendingRequests;
 		ILogger* _logger;
 		bool _isRegistered = false;
 		map<byte, function<pplx::task<void>(RequestContext*)>> _handlers;

@@ -2,22 +2,6 @@
 
 namespace Stormancer
 {
-	bytestream* Helpers::convertRakNetBitStreamToByteStream(RakNet::BitStream* stream)
-	{
-		auto bs = new bytestream;
-		if (stream != nullptr)
-		{
-			auto buf = bs->rdbuf();
-			char* data = static_cast<char*>(static_cast<void*>(stream->GetData()));
-			buf->pubsetbuf(data, stream->GetNumberOfBytesUsed());
-			stream->SetData(nullptr);
-			stream->SetNumberOfBitsAllocated(0);
-			RakNet::BitStream::DestroyInstance(stream);
-			delete stream;
-		}
-		return bs;
-	}
-
 	template<>
 	vector<byte> Helpers::convert<string, vector<byte>>(string& str)
 	{
@@ -28,17 +12,6 @@ namespace Stormancer
 			v[i] = str[i];
 		}
 		return v;
-	}
-
-	bytestream* Helpers::convertRakNetPacketToStream(RakNet::Packet* packet)
-	{
-		auto bs = new bytestream();
-		if (packet != nullptr)
-		{
-			char* data = static_cast<char*>(static_cast<void*>(packet->data));
-			bs->rdbuf()->pubsetbuf(data, packet->length);
-		}
-		return bs;
 	}
 
 	bool Helpers::ensureSuccessStatusCode(int statusCode)

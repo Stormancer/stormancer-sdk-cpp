@@ -243,6 +243,7 @@
     <ClInclude Include="include\MessageIDTypes.h" />
     <ClInclude Include="include\Packet.h" />
     <ClInclude Include="include\PacketProcessorConfig.h" />
+    <ClInclude Include="include\Request.h" />
     <ClInclude Include="include\RequestContext.h" />
     <ClInclude Include="include\RequestModuleBuilder.h" />
     <ClInclude Include="include\RequestProcessor.h" />
@@ -294,6 +295,7 @@
     <ClCompile Include="src\ITokenHandler.cpp" />
     <ClCompile Include="src\ITransport.cpp" />
     <ClCompile Include="src\PacketProcessorConfig.cpp" />
+    <ClCompile Include="src\Request.cpp" />
     <ClCompile Include="src\RequestContext.cpp" />
     <ClCompile Include="src\RequestModuleBuilder.cpp" />
     <ClCompile Include="src\RequestProcessor.cpp" />

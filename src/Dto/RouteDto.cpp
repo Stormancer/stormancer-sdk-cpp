@@ -18,7 +18,7 @@ namespace Stormancer
 			if (auto* m = dynamic_cast<MsgPack::Map*>(element))
 			{
 				auto* v = m->getContainer();
-				for (auto i = 0; i + 1 < v->size(); i += 2)
+				for (uint32 i = 0; i + 1 < v->size(); i += 2)
 				{
 					auto* keyPtr = dynamic_cast<MsgPack::String*>(v->at(i).get());
 					if (keyPtr)

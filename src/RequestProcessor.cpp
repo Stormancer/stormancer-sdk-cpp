@@ -2,16 +2,6 @@
 
 namespace Stormancer
 {
-	RequestProcessor::Request::Request(PacketObserver&& observer)
-		: observer(observer),
-		task(std::move(create_task(tcs)))
-	{
-	}
-
-	RequestProcessor::Request::~Request()
-	{
-	}
-
 	RequestProcessor::RequestProcessor(ILogger* logger, vector<IRequestModule*> modules)
 		: _logger(logger)
 	{
@@ -65,18 +55,16 @@ namespace Stormancer
 		}
 
 		config->addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG, new handlerFunction([this](Packet<>* p) {
-			byte temp[2];
-			auto str = p->stream->str();
-			p->stream->readsome((char*)temp, 2);
-			uint16 id = temp[0] * 256 + temp[1];
+			uint16 id;
+			*(p->stream) >> id;
 
 			if (Helpers::mapContains(this->_pendingRequests, id))
 			{
-				Request* request = this->_pendingRequests[id];
+				auto request = this->_pendingRequests[id];
 				time(&request->lastRefresh);
 				request->observer.on_next(p);
 				request->tcs.set();
-				p->setMetadata(L"request", request);
+				p->request = request;
 			}
 			else
 			{
@@ -87,46 +75,28 @@ namespace Stormancer
 		}));
 
 		config->addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_COMPLETE, new handlerFunction([this](Packet<>* p) {
-			byte temp[2];
-			p->stream->readsome((char*)temp, 2);
-			uint16 id = temp[0] * 256 + temp[1];
+			uint16 id;
+			*(p->stream) >> id;
 
 			char c;
-			p->stream->readsome(&c, 1);
+			*(p->stream) >> c;
 			bool hasValues = (c == 1);
 
 			if (Helpers::mapContains(this->_pendingRequests, id))
 			{
-				Request* request = this->_pendingRequests[id];
-				p->setMetadata(L"request", request);
-
+				auto request = this->_pendingRequests[id];
+				p->request = request;
 
 				if (hasValues)
 				{
 					request->task.then([this, request, id](pplx::task<void> t) {
-						if (Helpers::mapContains(this->_pendingRequests, request->id))
-						{
-							auto* r = this->_pendingRequests[request->id];
-							if (r == request)
-							{
-								this->_pendingRequests.erase(request->id);
-								delete r;
-							}
-						}
+						freeRequestSlot(request->id);
 						request->observer.on_completed();
 					});
 				}
 				else
 				{
-					if (Helpers::mapContains(this->_pendingRequests, request->id))
-					{
-						auto* r = this->_pendingRequests[request->id];
-						if (r == request)
-						{
-							this->_pendingRequests.erase(request->id);
-							delete r;
-						}
-					}
+					freeRequestSlot(request->id);
 					request->observer.on_completed();
 				}
 			}
@@ -139,30 +109,20 @@ namespace Stormancer
 		}));
 
 		config->addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_ERROR, new handlerFunction([this](Packet<>* p) {
-			byte temp[2];
-			p->stream->readsome((char*)temp, 2);
-			uint16 id = temp[0] * 256 + temp[1];
+			uint16 id;
+			*(p->stream) >> id;
 
 			if (Helpers::mapContains(_pendingRequests, id))
 			{
-				Request* request = _pendingRequests[id];
-				p->setMetadata(L"request", request);
+				p->request = _pendingRequests[id];
 
-				if (Helpers::mapContains(this->_pendingRequests, request->id))
-				{
-					auto* r = this->_pendingRequests[request->id];
-					if (r == request)
-					{
-						this->_pendingRequests.erase(request->id);
-						delete r;
-					}
-				}
+				freeRequestSlot(id);
 
 				wstring msg;
 				ISerializable::deserialize(p->stream, msg);
 
 				exception_ptr eptr = make_exception_ptr(new exception(Helpers::to_string(msg).c_str()));
-				request->observer.on_error(eptr);
+				p->request->observer.on_error(eptr);
 			}
 			else
 			{
@@ -199,14 +159,14 @@ namespace Stormancer
 		return task;
 	}
 
-	RequestProcessor::Request* RequestProcessor::reserveRequestSlot(PacketObserver&& observer)
+	shared_ptr<Request> RequestProcessor::reserveRequestSlot(PacketObserver&& observer)
 	{
 		static uint16 id = 0;
 		while (id < UINT16_MAX)
 		{
 			if (!Helpers::mapContains(_pendingRequests, id))
 			{
-				auto request = new Request(std::move(observer));
+				shared_ptr<Request> request( new Request(std::move(observer)) );
 				time(&request->lastRefresh);
 				request->id = id;
 				_pendingRequests[id] = request;
@@ -216,5 +176,15 @@ namespace Stormancer
 		}
 		_logger->log(LogLevel::Error, L"", L"Unable to create a new request: Too many pending requests.", L"");
 		throw exception("Unable to create a new request: Too many pending requests.");
+	}
+
+	bool RequestProcessor::freeRequestSlot(uint16 requestId)
+	{
+		if (Helpers::mapContains(this->_pendingRequests, requestId))
+		{
+			this->_pendingRequests.erase(requestId);
+			return true;
+		}
+		return false;
 	}
 };

@@ -5,6 +5,8 @@
 
 namespace Stormancer
 {
+	class Request;
+
 	template<typename T = IConnection>
 	class Packet
 	{
@@ -31,8 +33,7 @@ namespace Stormancer
 
 			if (stream)
 			{
-				auto sb = stream->rdbuf();
-				sb->pubsetbuf(nullptr, 0);
+				stream->rdbuf()->pubsetbuf(nullptr, 0);
 				delete stream;
 			}
 		}
@@ -52,7 +53,7 @@ namespace Stormancer
 		template<typename TData>
 		TData* getMetadata(wstring key)
 		{
-			return static_cast<TData*>(_metadata[key]);
+			return (TData*)_metadata[key];
 		}
 
 		void removeMetadata(wstring key)
@@ -64,6 +65,8 @@ namespace Stormancer
 	public:
 		T* connection;
 		bytestream* stream;
+
+		shared_ptr<Request> request = nullptr;
 
 		Helpers::Action<void> cleanup;
 

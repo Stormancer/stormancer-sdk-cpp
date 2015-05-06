@@ -387,8 +387,6 @@ namespace Stormancer
 
 #pragma region stream
 
-		bytestream* convertRakNetBitStreamToByteStream(RakNet::BitStream* stream);
-
 		bytestream* convertRakNetPacketToStream(RakNet::Packet* packet);
 
 		void deleteStringBuf(stringbuf* sb);
