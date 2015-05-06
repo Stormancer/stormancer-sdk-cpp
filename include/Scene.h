@@ -47,12 +47,12 @@ namespace Stormancer
 		const bool isHost = false;
 
 	private:
+		bool _connected = false;
 		IConnection* _peer;
 		wstring _token;
 		byte _handle;
 		stringMap _metadata;
 		wstring _id;
-		bool _connected;
 		map<wstring, Route> _localRoutesMap;
 		map<wstring, Route> _remoteRoutesMap;
 		map<uint16, vector<function<void(Packet<>*)>*>> _handlers;

@@ -93,6 +93,17 @@ namespace Stormancer
 			}
 		}
 
+		template<>
+		static void serializeVector(vector<RouteDto>& data, bytestream* stream)
+		{
+			MsgPack::Serializer srlzr(stream->rdbuf());
+			srlzr << MsgPack__Factory(ArrayHeader(data.size()));
+			for (int i = 0; i < data.size(); i++)
+			{
+				data[i].serialize(stream);
+			}
+		}
+
 		// Map template
 		template<typename MT1, typename MT2>
 		static void serializeMap(map<MT1, MT2>& data, bytestream* stream)
