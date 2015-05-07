@@ -71,7 +71,7 @@ namespace Stormancer
 			_localRoutesMap[routeName] = Route(this, routeName, metadata);
 		}
 
-		auto truc = onMessage(routeName).subscribe(handler);
+		onMessage(routeName).subscribe(handler);
 	}
 
 	rx::observable<Packet<IScenePeer>*> Scene::onMessage(Route* route)

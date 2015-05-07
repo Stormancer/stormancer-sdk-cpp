@@ -16,7 +16,7 @@ namespace Stormancer
 		uint16 id = 0;
 		time_t lastRefresh = time(NULL);
 		PacketObserver observer;
-		pplx::task_completion_event<void> tcs;
-		pplx::task<void> task;
+		//pplx::task_completion_event<void> tcs;
+		//pplx::task<void> task;
 	};
 };

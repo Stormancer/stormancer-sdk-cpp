@@ -5,7 +5,7 @@ using namespace Stormancer;
 int main(int argc, char* argv[])
 {
 	std::set_terminate([]() {
-		int termin = 1;
+		bool termin = true;
 	});
 
 	wcout << L"Starting echo..." << endl;
@@ -17,16 +17,18 @@ int main(int argc, char* argv[])
 	auto task = client.getPublicScene(L"test-scene", L"hello").then([](pplx::task<Scene*> t) {
 		Scene* scene = t.get();
 		scene->addRoute(L"echo.out", [](Packet<IScenePeer>* p) {
-			wstring str;
-			ISerializable::deserialize(p->stream, str);
-			wcout << str << endl;
+			string str;
+			*p->stream >> str;
+			wstring str2 = Helpers::to_wstring(str);
+			wcout << str2 << endl;
 		});
 
-		return scene->connect().then([&scene](pplx::task<void> t2) {
+		return scene->connect().then([scene](pplx::task<void> t2) {
 			if (t2.is_done())
 			{
+				wcout << L"Connected to scene!" << endl;
 				scene->sendPacket(L"echo.in", [](bytestream* stream) {
-					*stream << L"hello";
+					*stream << "hello";
 				});
 			}
 			else

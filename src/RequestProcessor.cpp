@@ -63,8 +63,9 @@ namespace Stormancer
 				auto request = this->_pendingRequests[id];
 				time(&request->lastRefresh);
 				request->observer.on_next(p);
-				request->tcs.set();
+				request->observer.on_completed();
 				p->request = request;
+				freeRequestSlot(request->id);
 			}
 			else
 			{
@@ -82,28 +83,23 @@ namespace Stormancer
 			*(p->stream) >> c;
 			bool hasValues = (c == 1);
 
-			if (Helpers::mapContains(this->_pendingRequests, id))
+			if (!hasValues)
 			{
-				auto request = this->_pendingRequests[id];
-				p->request = request;
-
-				if (hasValues)
+				if (Helpers::mapContains(this->_pendingRequests, id))
 				{
-					request->task.then([this, request, id](pplx::task<void> t) {
-						freeRequestSlot(request->id);
-						request->observer.on_completed();
-					});
+					auto request = this->_pendingRequests[id];
+					p->request = request;
+
+					request->observer.on_completed();
+					freeRequestSlot(request->id);
 				}
 				else
 				{
-					freeRequestSlot(request->id);
-					request->observer.on_completed();
+					_logger->log(LogLevel::Trace, L"", L"Unknow request id.", L"");
 				}
 			}
-			else
-			{
-				_logger->log(LogLevel::Trace, L"", L"Unknow request id.", L"");
-			}
+
+
 
 			return true;
 		}));
@@ -116,13 +112,13 @@ namespace Stormancer
 			{
 				p->request = _pendingRequests[id];
 
-				freeRequestSlot(id);
-
 				wstring msg;
 				ISerializable::deserialize(p->stream, msg);
 
 				exception_ptr eptr = make_exception_ptr(new exception(Helpers::to_string(msg).c_str()));
 				p->request->observer.on_error(eptr);
+
+				freeRequestSlot(id);
 			}
 			else
 			{
@@ -149,7 +145,7 @@ namespace Stormancer
 		});
 
 		auto task = pplx::create_task(*tce);
-		task.then([this, tce](pplx::task<Packet<>*> t) {
+		task.then([tce](pplx::task<Packet<>*> t) {
 			if (tce)
 			{
 				delete tce;
@@ -166,7 +162,7 @@ namespace Stormancer
 		{
 			if (!Helpers::mapContains(_pendingRequests, id))
 			{
-				shared_ptr<Request> request( new Request(std::move(observer)) );
+				shared_ptr<Request> request(new Request(std::move(observer)));
 				time(&request->lastRefresh);
 				request->id = id;
 				_pendingRequests[id] = request;

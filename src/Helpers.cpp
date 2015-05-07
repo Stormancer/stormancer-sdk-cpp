@@ -190,30 +190,35 @@ namespace Stormancer
 
 	bytestream& operator<<(bytestream& bs, const char* data)
 	{
-#ifdef _IS_BIG_ENDIAN
-		size_t len = strlen(data);
-		char* data2 = new char[len];
-		reverse_copy(data, data + len, data2);
-		data = data2;
-		bs.write((char*)&data, len);
-		delete[] data2;
-#else
-		bs.write((char*)&data, strlen(data));
-#endif
+		bs.write((char*)data, strlen(data));
 		return bs;
 	}
 
 	bytestream& operator<<(bytestream& bs, const wchar_t* data)
 	{
-#ifdef _IS_BIG_ENDIAN
-		size_t len = wcslen(data);
-		char* data2 = new char[len];
-		reverse_copy(data, data + len, data2);
-		bs.write((char*)&data, len);
-		delete[] data2;
-#else
-		bs.write((char*)&data, wcslen(data));
-#endif
+		bs.write((char*)data, 2 * wcslen(data));
+		return bs;
+	}
+
+	bytestream& operator>>(bytestream& bs, string& str)
+	{
+		streamsize len = bs.rdbuf()->in_avail();
+		str.reserve(len);
+		char* data = new char[len];
+		bs.read(data, len);
+		str.assign(data, len);
+		delete[] data;
+		return bs;
+	}
+
+	bytestream& operator>>(bytestream& bs, wstring& str)
+	{
+		streamsize len = bs.rdbuf()->in_avail();
+		str.reserve(len);
+		char* data = new char[2 * len];
+		bs.read(data, 2 * len);
+		str.assign((wchar_t*)data, len);
+		delete[] data;
 		return bs;
 	}
 };

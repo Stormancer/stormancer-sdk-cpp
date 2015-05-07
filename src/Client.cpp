@@ -135,6 +135,7 @@ namespace Stormancer
 
 				return sendSystemRequest<SceneInfosRequestDto, SceneInfosDto>((byte)MessageIDTypes::ID_GET_SCENE_INFOS, parameter);
 			}).then([this, sep, sceneId](SceneInfosDto result) {
+				this->_serverConnection->metadata[L"serializer"] = result.SelectedSerializer;
 				return new Scene(_serverConnection, this, sceneId, sep->token, result);
 			});
 	}

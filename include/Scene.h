@@ -22,6 +22,9 @@ namespace Stormancer
 		virtual ~Scene();
 
 	public:
+		STORMANCER_DLL_API void addRoute(wstring routeName, function<void(Packet<IScenePeer>*)> handler, stringMap metadata = stringMap());
+		STORMANCER_DLL_API void sendPacket(wstring routeName, function<void(bytestream*)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE);
+		STORMANCER_DLL_API pplx::task<void> connect();
 		wstring getHostMetadata(wstring key);
 		byte handle();
 		wstring id();
@@ -29,11 +32,8 @@ namespace Stormancer
 		IConnection* hostConnection();
 		vector<Route*> localRoutes();
 		vector<Route*> remoteRoutes();
-		STORMANCER_DLL_API void addRoute(wstring routeName, function<void(Packet<IScenePeer>*)> handler, stringMap metadata = stringMap());
 		rx::observable<Packet<IScenePeer>*> onMessage(Route* route);
 		rx::observable<Packet<IScenePeer>*> onMessage(wstring routeName);
-		STORMANCER_DLL_API void sendPacket(wstring routeName, function<void(bytestream*)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE);
-		STORMANCER_DLL_API pplx::task<void> connect();
 		pplx::task<void> disconnect();
 		vector<IScenePeer*> remotePeers();
 		IScenePeer* host();

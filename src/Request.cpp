@@ -3,8 +3,8 @@
 namespace Stormancer
 {
 	Request::Request(PacketObserver&& observer)
-		: observer(observer),
-		task(std::move(create_task(tcs)))
+		: observer(observer)/*,
+		task(std::move(create_task(tcs)))*/
 	{
 	}
 

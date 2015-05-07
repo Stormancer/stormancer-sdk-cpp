@@ -87,7 +87,7 @@ namespace Stormancer
 		{
 			MsgPack::Serializer srlzr(stream->rdbuf());
 			srlzr << MsgPack__Factory(ArrayHeader(data.size()));
-			for (int i = 0; i < data.size(); i++)
+			for (uint32 i = 0; i < data.size(); i++)
 			{
 				srlzr << MsgPack::Factory(data[i]);
 			}
@@ -98,7 +98,7 @@ namespace Stormancer
 		{
 			MsgPack::Serializer srlzr(stream->rdbuf());
 			srlzr << MsgPack__Factory(ArrayHeader(data.size()));
-			for (int i = 0; i < data.size(); i++)
+			for (uint32 i = 0; i < data.size(); i++)
 			{
 				data[i].serialize(stream);
 			}

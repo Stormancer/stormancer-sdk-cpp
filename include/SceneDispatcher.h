@@ -13,10 +13,10 @@ namespace Stormancer
 	public:
 		void registerProcessor(PacketProcessorConfig* config);
 		void addScene(Scene* scene);
-		void removeScene(byte sceneHandle);
+		void removeScene(uint8 sceneHandle);
 
 	private:
-		bool handler_impl(byte sceneHandle, Packet<>* packet);
+		bool handler_impl(uint8 sceneHandle, Packet<>* packet);
 
 	private:
 		processorFunction* handler = nullptr;

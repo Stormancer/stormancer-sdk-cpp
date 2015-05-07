@@ -37,11 +37,11 @@ namespace Stormancer
 		STORMANCER_DLL_API ~Client();
 
 	public:
+		STORMANCER_DLL_API pplx::task<Scene*> getPublicScene(wstring sceneId, wstring userData);
 		void initialize();
 		wstring applicationName();
 		ILogger* logger();
 		void setLogger(ILogger* logger);
-		STORMANCER_DLL_API pplx::task<Scene*> getPublicScene(wstring sceneId, wstring userData);
 		pplx::task<Scene*> getScene(wstring sceneId, SceneEndpoint* sep);
 		void disconnect();
 
@@ -53,6 +53,7 @@ namespace Stormancer
 		template<typename T1, typename T2>
 		pplx::task<T2> sendSystemRequest(byte id, T1& parameter)
 		{
+			int a = 0;
 			return _requestProcessor->sendSystemRequest(_serverConnection, id, [this, &parameter](bytestream* stream) {
 				parameter.serialize(stream); // serialize request dto
 			}).then([this](Packet<>* packet) {

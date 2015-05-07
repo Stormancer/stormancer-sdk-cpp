@@ -65,6 +65,10 @@ namespace Stormancer
 		return bs;
 	}
 
+	STORMANCER_DLL_API bytestream& operator>>(bytestream& bs, string& data);
+
+	STORMANCER_DLL_API bytestream& operator>>(bytestream& bs, wstring& data);
+
 	template<typename T>
 	T* reverseByteOrder(T* data, size_t n = -1)
 	{
@@ -325,6 +329,14 @@ namespace Stormancer
 				stream << format;
 			}
 
+		public:
+			STORMANCER_DLL_API wstring str();
+
+			STORMANCER_DLL_API const wchar_t* c_str();
+
+			STORMANCER_DLL_API operator string();
+			STORMANCER_DLL_API operator wstring();
+
 			template<typename T>
 			wstring replace(wstring& format, T& replacement)
 			{
@@ -346,13 +358,6 @@ namespace Stormancer
 			{
 				stream >> data;
 			}
-
-			STORMANCER_DLL_API wstring str();
-
-			STORMANCER_DLL_API const wchar_t* c_str();
-
-			STORMANCER_DLL_API operator string();
-			STORMANCER_DLL_API operator wstring();
 
 		private:
 			wstringstream stream;
