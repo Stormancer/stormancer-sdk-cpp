@@ -21,7 +21,7 @@ namespace Stormancer
 			throw exception(string(Helpers::StringFormat(L"The routeName '{0}' is not declared on the server.", routeName)).c_str());
 		}
 		Route& r = _routeMapping[routeName];
-		_connection->sendToScene(_sceneHandle, r.index, writer, priority, reliability);
+		_connection->sendToScene(_sceneHandle, r._handle, writer, priority, reliability);
 	}
 
 	void ScenePeer::disconnect()

@@ -11,7 +11,7 @@ namespace Stormancer
 	{
 		for (auto routeDto : dto.Routes)
 		{
-			_remoteRoutesMap[routeDto.Name] = Route(this, routeDto.Name, routeDto.Metadata);
+			_remoteRoutesMap[routeDto.Name] = Route(this, routeDto.Name, routeDto.Handle, routeDto.Metadata);
 		}
 	}
 
@@ -125,7 +125,7 @@ namespace Stormancer
 		}
 		Route& route = _remoteRoutesMap[routeName];
 
-		_peer->sendToScene(_handle, route.index, writer, priority, reliability);
+		_peer->sendToScene(_handle, route._handle, writer, priority, reliability);
 	}
 
 	pplx::task<void> Scene::connect()
@@ -146,8 +146,8 @@ namespace Stormancer
 
 		for (auto pair : _localRoutesMap)
 		{
-			pair.second.index = cr.RouteMappings[pair.first];
-			_handlers[pair.second.index] = pair.second.handlers;
+			pair.second._handle = cr.RouteMappings[pair.first];
+			_handlers[pair.second._handle] = pair.second.handlers;
 		}
 	}
 
@@ -158,10 +158,8 @@ namespace Stormancer
 			fun(packet);
 		}
 
-		byte tmp[2];
-		*packet->stream >> tmp[0];
-		*packet->stream >> tmp[1];
-		uint16 routeId = tmp[0] * 256 + tmp[1];
+		uint16 routeId;
+		*packet->stream >> routeId;
 
 		packet->setMetadata(L"routeId", new uint16(routeId));
 

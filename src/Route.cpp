@@ -4,7 +4,7 @@ namespace Stormancer
 {
 	Route::Route()
 		: _scene(nullptr),
-		index(0)
+		_handle(0)
 	{
 	}
 
@@ -12,7 +12,7 @@ namespace Stormancer
 		: _name(routeName),
 		_scene(scene),
 		_metadata(metadata),
-		index(handle)
+		_handle(handle)
 	{
 	}
 

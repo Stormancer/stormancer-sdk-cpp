@@ -30,8 +30,8 @@ namespace Stormancer
 		ContentType = stringFromMsgPackMap(element, L"ContentType");
 		DeploymentId = stringFromMsgPackMap(element, L"DeploymentId");
 		Endpoints = stringMapFromMsgPackMap(element, L"Endpoints");
-		Expiration = int64FromMsgPackMap(element, L"Expiration");
-		Issued = int64FromMsgPackMap(element, L"Issued");
+		Expiration = numberFromMsgPackMap<int64>(element, L"Expiration");
+		Issued = numberFromMsgPackMap<int64>(element, L"Issued");
 		Routing = stringFromMsgPackMap(element, L"Routing");
 		SceneId = stringFromMsgPackMap(element, L"SceneId");
 		UserData = stringFromMsgPackMap(element, L"UserData");

@@ -10,7 +10,7 @@ int main(int argc, char* argv[])
 
 	wcout << L"Starting echo..." << endl;
 
-	ClientConfiguration config(L"905f108e-18bc-0d56-45c2-0907de336e65", L"test");
+	ClientConfiguration config(L"test", L"echo");
 	config.serverEndpoint = L"http://localhost:8081";
 
 	Client client(&config);

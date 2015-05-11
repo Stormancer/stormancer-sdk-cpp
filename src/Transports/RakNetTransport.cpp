@@ -170,23 +170,23 @@ namespace Stormancer
 		c->connectionClosed(reason);
 	}
 
-	void RakNetTransport::onMessageReceived(RakNet::Packet* packet)
+	void RakNetTransport::onMessageReceived(RakNet::Packet* raknetPacket)
 	{
-		_logger->log(LogLevel::Trace, L"", Helpers::StringFormat(L"Message with id {0} arrived.", (byte)packet->data[0]), L"");
+		_logger->log(LogLevel::Trace, L"", Helpers::StringFormat(L"Message with id {0} arrived.", (byte)raknetPacket->data[0]), L"");
 
-		auto connection = getConnection(packet->guid);
+		auto connection = getConnection(raknetPacket->guid);
 		auto stream = new bytestream;
-		stream->rdbuf()->pubsetbuf((char*)packet->data, packet->length);
-		auto p = new Packet<>(connection, stream);
+		stream->rdbuf()->pubsetbuf((char*)raknetPacket->data, raknetPacket->length);
+		auto packet = new Packet<>(connection, stream);
 		auto peer = this->_peer;
-		p->cleanup += new function<void(void)>([peer, packet]() {
-			if (peer && packet)
+		packet->cleanup += new function<void(void)>([peer, raknetPacket]() {
+			if (peer && raknetPacket)
 			{
-				peer->DeallocatePacket(packet);
+				peer->DeallocatePacket(raknetPacket);
 			}
 		});
 
-		packetReceived(p);
+		packetReceived(packet);
 	}
 
 	RakNetConnection* RakNetTransport::getConnection(RakNet::RakNetGUID guid)

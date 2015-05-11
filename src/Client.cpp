@@ -147,7 +147,7 @@ namespace Stormancer
 		for (auto r : localRoutes)
 		{
 			RouteDto routeDto;
-			routeDto.Handle = r->index;
+			routeDto.Handle = r->_handle;
 			routeDto.Metadata = r->metadata();
 			routeDto.Name = r->name();
 			parameter.Routes << routeDto;

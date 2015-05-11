@@ -24,28 +24,6 @@ namespace Stormancer
 		
 		// SERIALIZE
 
-		// Base template ptr
-		/*template<typename T>
-		static void serialize(T* data, bytestream* stream)
-		{
-			if (std::is_base_of<ISerializable, T>::value)
-			{
-				auto* a = dynamic_cast<ISerializable*>(data);
-				serialize(a, stream);
-			}
-			else
-			{
-				MsgPack::Serializer srlzr(stream->rdbuf());
-				srlzr << MsgPack::Factory(*data);
-			}
-		}
-
-		template<>
-		static void serialize<byte>(byte* data, bytestream* stream);
-
-		template<>
-		static void serialize<ISerializable>(ISerializable* data, bytestream* stream);*/
-
 		// Base template ref
 		template<typename T>
 		static void serialize(T& data, bytestream* stream)
@@ -153,24 +131,43 @@ namespace Stormancer
 		template<typename VT>
 		static void deserializeVector(bytestream* stream, vector<VT>& v)
 		{
-			// TODO
+			throw string("not implemented.");
 		}
 
 		// Map template
 		template<typename MT>
 		static void deserializeMap(bytestream* stream, map<wstring, MT>& m)
 		{
-			MsgPack::Deserializer dsrlzr(stream);
-			unique_ptr<MsgPack::Element> element;
-			dsrlzr >> element;
-			// TODO
+			throw string("not implemented.");
 		}
 
 		static unique_ptr<MsgPack::Element>& valueFromMsgPackMapKey(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
-		static int64 int64FromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
+
+		template<typename T>
+		static T numberFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key)
+		{
+			auto& element = valueFromMsgPackMapKey(msgPackMap, key);
+
+			if (auto* number = dynamic_cast<MsgPack::Number*>(element.get()))
+			{
+				return number->getValue<T>();
+			}
+			else
+			{
+				return 0;
+			}
+		}
+
 		static wstring stringFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
+
+		static map<wstring, uint16> elementToUInt16Map(MsgPack::Map* msgPackMap);
+
 		static stringMap elementToStringMap(MsgPack::Map* msgPackMap);
+
+		static map<wstring, uint16> uint16MapFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
+
 		static stringMap stringMapFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
+
 		static vector<RouteDto> routeDtoVectorFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
 	};
 };

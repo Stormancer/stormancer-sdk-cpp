@@ -33,27 +33,14 @@ namespace Stormancer
 
 		for (uint32 i = 0; i < v->size(); i += 2)
 		{
-			if (Helpers::to_wstring(dynamic_cast<MsgPack::String*>(v->at(i).get())->stdString()) == key)
+			auto key2 = Helpers::to_wstring(dynamic_cast<MsgPack::String*>(v->at(i).get())->stdString());
+			if (key2 == key)
 			{
 				return v->at(i + 1);
 			}
 		}
 
 		throw exception("valueFromMsgPackMapKey error: Not found.");
-	}
-
-	int64 ISerializable::int64FromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key)
-	{
-		auto& element = valueFromMsgPackMapKey(msgPackMap, key);
-
-		if (auto* number = dynamic_cast<MsgPack::Number*>(element.get()))
-		{
-			return number->getValue<int64>();
-		}
-		else
-		{
-			return 0;
-		}
 	}
 
 	wstring ISerializable::stringFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key)
@@ -68,6 +55,27 @@ namespace Stormancer
 		{
 			return L"";
 		}
+	}
+
+	map<wstring, uint16> ISerializable::elementToUInt16Map(MsgPack::Map* msgPackMap)
+	{
+		map<wstring, uint16> myMap;
+
+		auto v = msgPackMap->getContainer();
+
+		if (v->size() % 2)
+		{
+			throw exception("elementToStringMap error: size must be multiple of 2.");
+		}
+
+		for (uint32 i = 0; i < v->size(); i += 2)
+		{
+			wstring key = Helpers::to_wstring(((MsgPack::String*)v->at(i).get())->stdString());
+			uint16 value = ((MsgPack::Number*)v->at(i + 1).get())->getValue<uint16>();
+			myMap[key] = value;
+		}
+
+		return myMap;
 	}
 
 	stringMap ISerializable::elementToStringMap(MsgPack::Map* msgPackMap)
@@ -91,13 +99,27 @@ namespace Stormancer
 		return strMap;
 	}
 
-	stringMap ISerializable::stringMapFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key)
+	map<wstring, uint16> ISerializable::uint16MapFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackElement, wstring key)
 	{
-		auto& element = valueFromMsgPackMapKey(msgPackMap, key);
+		auto& element = valueFromMsgPackMapKey(msgPackElement, key);
 
-		if (auto* strMap = dynamic_cast<MsgPack::Map*>(element.get()))
+		if (auto* msgPackMap = dynamic_cast<MsgPack::Map*>(element.get()))
 		{
-			return elementToStringMap(strMap);
+			return elementToUInt16Map(msgPackMap);
+		}
+		else
+		{
+			return map<wstring, uint16>();
+		}
+	}
+
+	stringMap ISerializable::stringMapFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackElement, wstring key)
+	{
+		auto& element = valueFromMsgPackMapKey(msgPackElement, key);
+
+		if (auto* msgPackMap = dynamic_cast<MsgPack::Map*>(element.get()))
+		{
+			return elementToStringMap(msgPackMap);
 		}
 		else
 		{
@@ -105,26 +127,23 @@ namespace Stormancer
 		}
 	}
 
-	vector<RouteDto> ISerializable::routeDtoVectorFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key)
+	vector<RouteDto> ISerializable::routeDtoVectorFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackElement, wstring key)
 	{
-		auto& element = valueFromMsgPackMapKey(msgPackMap, key);
+		auto& element = valueFromMsgPackMapKey(msgPackElement, key);
+
+		vector<RouteDto> vres;
 
 		if (auto* arr = dynamic_cast<MsgPack::Array*>(element.get()))
 		{
 			auto* vdata = arr->getContainer();
-
-			vector<RouteDto> vres;
 
 			for (uint32 i = 0; i < vdata->size(); i++)
 			{
 				vres.push_back(RouteDto(vdata->at(i).get()));
 			}
 
-			return vres;
 		}
-		else
-		{
-			return vector<RouteDto>();
-		}
+
+		return vres;
 	}
 };

@@ -19,12 +19,10 @@ namespace Stormancer
 		stringMap metadata();
 
 	public:
-		uint16 index;
-		vector< function<void(Packet<>*)>* > handlers;
-
-	private:
-		Scene* _scene;
 		wstring _name;
+		uint16 _handle;
+		Scene* _scene;
 		stringMap _metadata;
+		vector< function<void(Packet<>*)>* > handlers;
 	};
 };

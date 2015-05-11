@@ -17,11 +17,15 @@ namespace Stormancer
 
 	void ConnectionResult::serialize(bytestream* stream)
 	{
-		// TODO
 	}
 
 	void ConnectionResult::deserialize(bytestream* stream)
 	{
-		// TODO
+		MsgPack::Deserializer deserializer(stream->rdbuf());
+		unique_ptr<MsgPack::Element> element;
+		deserializer >> element;
+
+		SceneHandle = numberFromMsgPackMap<uint8>(element, L"SceneHandle");
+		RouteMappings = uint16MapFromMsgPackMap(element, L"RouteMappings");
 	}
 }

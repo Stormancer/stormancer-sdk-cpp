@@ -29,13 +29,13 @@ namespace Stormancer
 
 		virtual ~Packet()
 		{
-			cleanup();
-
 			if (stream)
 			{
 				stream->rdbuf()->pubsetbuf(nullptr, 0);
 				delete stream;
 			}
+
+			cleanup();
 		}
 
 	public:
