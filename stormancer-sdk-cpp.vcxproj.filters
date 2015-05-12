@@ -34,9 +34,6 @@
     <ClInclude Include="MsgPack\Data.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\DefaultLogger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\DefaultPacketDispatcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -166,6 +163,12 @@
     <ClInclude Include="include\Request.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\NullLogger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FileLogger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ApiClient.cpp">
@@ -175,9 +178,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ClientConfiguration.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DefaultLogger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\DefaultPacketDispatcher.cpp">
@@ -283,6 +283,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Request.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NullLogger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FileLogger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

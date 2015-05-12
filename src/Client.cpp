@@ -36,7 +36,7 @@ namespace Stormancer
 
 	Client::Client(ClientConfiguration* config)
 		: _initialized(false),
-		_logger(DefaultLogger::instance()),
+		_logger(ILogger::instance()),
 		_accountId(config->account),
 		_applicationName(config->application),
 		_tokenHandler(new TokenHandler()),
@@ -96,7 +96,7 @@ namespace Stormancer
 		}
 		else
 		{
-			_logger = DefaultLogger::instance();
+			_logger = ILogger::instance();
 		}
 	}
 

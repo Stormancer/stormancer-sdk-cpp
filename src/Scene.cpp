@@ -77,7 +77,7 @@ namespace Stormancer
 	rx::observable<Packet<IScenePeer>*> Scene::onMessage(Route* route)
 	{
 		auto observable = rx::observable<>::create<Packet<IScenePeer>*>([this, route](rx::subscriber<Packet<IScenePeer>*> subscriber) {
-			auto handler = new function<void(Packet<>*)>([this, &subscriber](Packet<>* p) {
+			auto handler = new function<void(Packet<>*)>([this, subscriber](Packet<>* p) {
 				Packet<IScenePeer>* packet = new Packet<IScenePeer>(host(), p->stream, p->metadata());
 				subscriber.on_next(packet);
 			});

@@ -1,4 +1,5 @@
 #include <stormancer.h>
+#include "ConsoleLogger.h"
 
 using namespace Stormancer;
 
@@ -8,7 +9,11 @@ int main(int argc, char* argv[])
 		bool termin = true;
 	});
 
-	wcout << L"Starting echo..." << endl;
+	cout << "Starting echo..." << endl;
+	cout.flush();
+
+	ILogger::instance(new ConsoleLogger);
+	//ILogger::instance(new FileLogger);
 
 	ClientConfiguration config(L"test", L"echo");
 	config.serverEndpoint = L"http://localhost:8081";
@@ -16,24 +21,36 @@ int main(int argc, char* argv[])
 	Client client(&config);
 	auto task = client.getPublicScene(L"test-scene", L"hello").then([](pplx::task<Scene*> t) {
 		Scene* scene = t.get();
-		scene->addRoute(L"echo.out", [](Packet<IScenePeer>* p) {
-			string str;
-			*p->stream >> str;
-			wstring str2 = Helpers::to_wstring(str);
-			wcout << str2 << endl;
+		scene->addRoute(L"echo.out", [scene](Packet<IScenePeer>* p) {
+			string message;
+			*p->stream >> message;
+			cout << "Received message: " << message << endl;
+			cout.flush();
+
+			if (message == "hello")
+			{
+				cout << "Test successful. Disconnecting..." << endl;
+				cout.flush();
+				scene->disconnect();
+			}
 		});
 
 		return scene->connect().then([scene](pplx::task<void> t2) {
 			if (t2.is_done())
 			{
-				wcout << L"Connected to scene!" << endl;
+				cout << "Connected to scene!" << endl;
+				cout.flush();
 				scene->sendPacket(L"echo.in", [](bytestream* stream) {
-					*stream << "hello";
+					string message = "hello";
+					cout << "Sending message: " << message << endl;
+					cout.flush();
+					*stream << message;
 				});
 			}
 			else
 			{
-				wcout << L"Bad stuff happened..." << endl;
+				cout << "Bad stuff happened..." << endl;
+				cout.flush();
 			}
 		});
 	});
@@ -44,7 +61,8 @@ int main(int argc, char* argv[])
 	}
 	catch (const exception &e)
 	{
-		wcout << L"Error exception:\n" << e.what();
+		cout << "Error exception:\n" << e.what();
+		cout.flush();
 	}
 
 	cin.ignore();

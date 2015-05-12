@@ -6,7 +6,7 @@ namespace Stormancer
 		: account(account),
 		application(application),
 		dispatcher(new DefaultPacketDispatcher),
-		transport(new RakNetTransport(DefaultLogger::instance())),
+		transport(new RakNetTransport(ILogger::instance())),
 		maxPeers(20),
 		apiEndpoint(L"http://localhost:8081/")
 	{

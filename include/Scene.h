@@ -25,6 +25,7 @@ namespace Stormancer
 		STORMANCER_DLL_API void addRoute(wstring routeName, function<void(Packet<IScenePeer>*)> handler, stringMap metadata = stringMap());
 		STORMANCER_DLL_API void sendPacket(wstring routeName, function<void(bytestream*)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE);
 		STORMANCER_DLL_API pplx::task<void> connect();
+		STORMANCER_DLL_API pplx::task<void> disconnect();
 		wstring getHostMetadata(wstring key);
 		byte handle();
 		wstring id();
@@ -34,7 +35,6 @@ namespace Stormancer
 		vector<Route*> remoteRoutes();
 		rx::observable<Packet<IScenePeer>*> onMessage(Route* route);
 		rx::observable<Packet<IScenePeer>*> onMessage(wstring routeName);
-		pplx::task<void> disconnect();
 		vector<IScenePeer*> remotePeers();
 		IScenePeer* host();
 

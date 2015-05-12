@@ -46,13 +46,13 @@ namespace Stormancer
 	template<typename T>
 	bytestream& operator<<(bytestream& bs, T&& data)
 	{
-		T tmp(data);
-		return (bs << tmp);
+		return (bs << T(data));
 	}
 
 	STORMANCER_DLL_API bytestream& operator<<(bytestream& bs, const char* data);
-
+	STORMANCER_DLL_API bytestream& operator<<(bytestream& bs, string& data);
 	STORMANCER_DLL_API bytestream& operator<<(bytestream& bs, const wchar_t* data);
+	STORMANCER_DLL_API bytestream& operator<<(bytestream& bs, wstring& data);
 
 	template<typename T>
 	bytestream& operator>>(bytestream& bs, T& data)
@@ -411,8 +411,12 @@ namespace Stormancer
 #pragma region time
 
 		time_t STORMANCER_DLL_API nowTime_t();
-		wstring STORMANCER_DLL_API time_tToStr(time_t& now, bool local = false);
+		wstring STORMANCER_DLL_API time_tToStr(time_t& time, bool local = false);
+		wstring STORMANCER_DLL_API time_tToStr(time_t& time, string format);
 		wstring STORMANCER_DLL_API nowStr(bool local = false);
+		wstring STORMANCER_DLL_API nowStr(string format);
+		wstring STORMANCER_DLL_API nowDateStr(bool local = false);
+		wstring STORMANCER_DLL_API nowTimeStr(bool local = false);
 
 #pragma endregion
 

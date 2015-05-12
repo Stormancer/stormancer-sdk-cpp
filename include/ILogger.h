@@ -24,10 +24,20 @@ namespace Stormancer
 	class ILogger
 	{
 	public:
-		ILogger();
-		virtual ~ILogger();
+		STORMANCER_DLL_API static ILogger* instance();
+		STORMANCER_DLL_API static ILogger* instance(ILogger* logger);
 
+	public:
 		// Logs a string message
 		virtual void log(LogLevel level, wstring category, wstring message, wstring data) = 0;
+
+		STORMANCER_DLL_API virtual wstring format(LogLevel level, wstring& category, wstring& message, wstring& data);
+
+	protected:
+		STORMANCER_DLL_API ILogger();
+		STORMANCER_DLL_API virtual ~ILogger();
+
+	private:
+		static ILogger* _logger;
 	};
 };

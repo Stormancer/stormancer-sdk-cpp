@@ -4,15 +4,13 @@
 
 namespace Stormancer
 {
-	class DefaultLogger : public ILogger
+	class NullLogger : public ILogger
 	{
 	public:
-		static ILogger* instance();
+		NullLogger();
+		virtual ~NullLogger();
 
+	public:
 		void log(LogLevel level, wstring category, wstring message, wstring data);
-
-	protected:
-		DefaultLogger();
-		virtual ~DefaultLogger();
 	};
 };
