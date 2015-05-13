@@ -2,6 +2,7 @@
 #include "headers.h"
 #include "IConnection.h"
 #include "Helpers.h"
+#include "Action.h"
 
 namespace Stormancer
 {
@@ -68,7 +69,7 @@ namespace Stormancer
 
 		shared_ptr<Request> request = nullptr;
 
-		Helpers::Action<void> cleanup;
+		Action<void> cleanup;
 
 	private:
 		anyMap _metadata;

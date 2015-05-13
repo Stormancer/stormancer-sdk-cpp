@@ -32,19 +32,19 @@ namespace Stormancer
 	void RakNetTransport::run(pplx::cancellation_token token, pplx::task_completion_event<void> startupTce, uint16 maxConnections, uint16 serverPort)
 	{
 		_isRunning = true;
-		_logger->log(LogLevel::Info, L"", Helpers::StringFormat(L"Starting raknet transport {0}", _type), L"");
+		_logger->log(LogLevel::Info, L"", StringFormat(L"Starting raknet transport {0}", _type), L"");
 		auto server = RakNet::RakPeerInterface::GetInstance();
 		auto socketDescriptor = (serverPort != 0 ? new RakNet::SocketDescriptor(serverPort, nullptr) : new RakNet::SocketDescriptor());
 		auto startupResult = server->Startup(maxConnections, socketDescriptor, 1);
 		if (startupResult != RakNet::StartupResult::RAKNET_STARTED)
 		{
-			throw exception(string(Helpers::StringFormat(L"Couldn't start raknet peer : {0}", startupResult)).c_str());
+			throw exception(string(StringFormat(L"Couldn't start raknet peer : {0}", startupResult)).c_str());
 		}
 		server->SetMaximumIncomingConnections(maxConnections);
 
 		_peer = server;
 		startupTce.set();
-		_logger->log(LogLevel::Info, L"", Helpers::StringFormat(L"Raknet transport started {0}", _type), L"");
+		_logger->log(LogLevel::Info, L"", StringFormat(L"Raknet transport started {0}", _type), L"");
 		while (!token.is_canceled())
 		{
 			RakNet::Packet* packet;
@@ -66,25 +66,25 @@ namespace Stormancer
 						auto c = createNewConnection(packet->guid, server);
 						tce.set(c);
 					}
-					_logger->log(LogLevel::Debug, L"", Helpers::StringFormat(L"Connection request to {0} accepted.", packetSystemAddressStr), L"");
+					_logger->log(LogLevel::Debug, L"", StringFormat(L"Connection request to {0} accepted.", packetSystemAddressStr), L"");
 					onConnection(packet, server);
 					break;
 				}
 				case (int)DefaultMessageIDTypes::ID_NEW_INCOMING_CONNECTION:
 				{
-					_logger->log(LogLevel::Trace, L"", Helpers::StringFormat(L"Icoming connection from {0}.", packetSystemAddressStr), L"");
+					_logger->log(LogLevel::Trace, L"", StringFormat(L"Icoming connection from {0}.", packetSystemAddressStr), L"");
 					onConnection(packet, server);
 					break;
 				}
 				case (int)DefaultMessageIDTypes::ID_DISCONNECTION_NOTIFICATION:
 				{
-					_logger->log(LogLevel::Trace, L"", Helpers::StringFormat(L"{0} disconnected.", packetSystemAddressStr), L"");
+					_logger->log(LogLevel::Trace, L"", StringFormat(L"{0} disconnected.", packetSystemAddressStr), L"");
 					onDisconnection(packet, server, L"CLIENT_DISCONNECTED");
 					break;
 				}
 				case (int)DefaultMessageIDTypes::ID_CONNECTION_LOST:
 				{
-					_logger->log(LogLevel::Trace, L"", Helpers::StringFormat(L"{0} lost the connection.", packetSystemAddressStr), L"");
+					_logger->log(LogLevel::Trace, L"", StringFormat(L"{0} lost the connection.", packetSystemAddressStr), L"");
 					onDisconnection(packet, server, L"CONNECTION_LOST");
 					break;
 				}
@@ -145,7 +145,7 @@ namespace Stormancer
 	void RakNetTransport::onConnection(RakNet::Packet* packet, RakNet::RakPeerInterface* server)
 	{
 		wstring sysAddr = Helpers::to_wstring(packet->systemAddress.ToString());
-		_logger->log(LogLevel::Trace, L"", Helpers::StringFormat(L"{0} connected.", sysAddr), L"");
+		_logger->log(LogLevel::Trace, L"", StringFormat(L"{0} connected.", sysAddr), L"");
 
 		auto c = createNewConnection(packet->guid, server);
 		server->DeallocatePacket(packet);
@@ -160,7 +160,7 @@ namespace Stormancer
 	void RakNetTransport::onDisconnection(RakNet::Packet* packet, RakNet::RakPeerInterface* server, wstring reason)
 	{
 		wstring sysAddr = Helpers::to_wstring(packet->systemAddress.ToString());
-		_logger->log(LogLevel::Trace, L"", Helpers::StringFormat(L"{0} disconnected.", sysAddr), L"");
+		_logger->log(LogLevel::Trace, L"", StringFormat(L"{0} disconnected.", sysAddr), L"");
 		auto c = removeConnection(packet->guid);
 		server->DeallocatePacket(packet);
 
@@ -172,7 +172,7 @@ namespace Stormancer
 
 	void RakNetTransport::onMessageReceived(RakNet::Packet* raknetPacket)
 	{
-		_logger->log(LogLevel::Trace, L"", Helpers::StringFormat(L"Message with id {0} arrived.", (byte)raknetPacket->data[0]), L"");
+		_logger->log(LogLevel::Trace, L"", StringFormat(L"Message with id {0} arrived.", (byte)raknetPacket->data[0]), L"");
 
 		auto connection = getConnection(raknetPacket->guid);
 		auto stream = new bytestream;

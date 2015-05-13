@@ -40,7 +40,7 @@ namespace Stormancer
 			}
 			if (!processed)
 			{
-				throw exception(string(Helpers::StringFormat(L"Couldn't process message. msgId: ", msgType)).c_str());
+				throw exception(string(StringFormat(L"Couldn't process message. msgId: ", msgType)).c_str());
 			}
 		});
 	}

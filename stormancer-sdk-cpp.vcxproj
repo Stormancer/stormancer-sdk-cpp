@@ -212,6 +212,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Action.h" />
     <ClInclude Include="include\FileLogger.h" />
     <ClInclude Include="include\ApiClient.h" />
     <ClInclude Include="include\basic_bytebuf.h" />
@@ -219,7 +220,6 @@
     <ClInclude Include="include\Client.h" />
     <ClInclude Include="include\ClientConfiguration.h" />
     <ClInclude Include="include\ConnectionState.h" />
-    <ClInclude Include="include\NullLogger.h" />
     <ClInclude Include="include\DefaultPacketDispatcher.h" />
     <ClInclude Include="include\Dto\ConnectionData.h" />
     <ClInclude Include="include\Dto\ConnectionResult.h" />
@@ -254,6 +254,7 @@
     <ClInclude Include="include\SceneEndpoint.h" />
     <ClInclude Include="include\ScenePeer.h" />
     <ClInclude Include="include\stormancer.h" />
+    <ClInclude Include="include\StringFormat.h" />
     <ClInclude Include="include\TokenHandler.h" />
     <ClInclude Include="include\Transports\RakNetConnection.h" />
     <ClInclude Include="include\Transports\RakNetTransport.h" />
@@ -275,7 +276,6 @@
     <ClCompile Include="src\ApiClient.cpp" />
     <ClCompile Include="src\Client.cpp" />
     <ClCompile Include="src\ClientConfiguration.cpp" />
-    <ClCompile Include="src\NullLogger.cpp" />
     <ClCompile Include="src\DefaultPacketDispatcher.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\Dto\ConnectionResult.cpp" />
@@ -306,6 +306,7 @@
     <ClCompile Include="src\SceneDispatcher.cpp" />
     <ClCompile Include="src\SceneEndpoint.cpp" />
     <ClCompile Include="src\ScenePeer.cpp" />
+    <ClCompile Include="src\StringFormat.cpp" />
     <ClCompile Include="src\TokenHandler.cpp" />
     <ClCompile Include="src\Transports\RakNetConnection.cpp" />
     <ClCompile Include="src\Transports\RakNetTransport.cpp" />

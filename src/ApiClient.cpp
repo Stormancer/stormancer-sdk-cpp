@@ -31,7 +31,7 @@ namespace Stormancer
 		request.headers().add(L"Content-Type", L"application/msgpack");
 		request.headers().add(L"Accept", L"application/json");
 		request.headers().add(L"x-version", L"1.0.0");
-		wstring relativeUri = Helpers::StringFormat(_createTokenUri, accountId, applicationName, sceneId);
+		wstring relativeUri = StringFormat(_createTokenUri, accountId, applicationName, sceneId);
 		request.set_request_uri(L"/" + relativeUri);
 		request.set_body(userData);
 
@@ -56,14 +56,14 @@ namespace Stormancer
 						}
 						catch (const exception& e)
 						{
-							Helpers::displayException(e);
+							ILogger::instance()->log(e);
 							throw e;
 						}
 					});
 				}
 				else if (statusCode == 404)
 				{
-					throw exception(string(Helpers::StringFormat(L"Unable to get scene {0}/{1}/{2}. Please check you used the correct account id, application name and scene id.", accountId, applicationName, sceneId)).c_str());
+					throw exception(string(StringFormat(L"Unable to get scene {0}/{1}/{2}. Please check you used the correct account id, application name and scene id.", accountId, applicationName, sceneId)).c_str());
 				}
 				else
 				{
@@ -72,7 +72,7 @@ namespace Stormancer
 			}
 			catch (const exception& e)
 			{
-				Helpers::displayException(e);
+				ILogger::instance()->log(e);
 				throw e;
 			}
 			return pplx::create_task([]() {

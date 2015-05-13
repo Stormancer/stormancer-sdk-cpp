@@ -163,10 +163,13 @@
     <ClInclude Include="include\Request.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\NullLogger.h">
+    <ClInclude Include="include\FileLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\FileLogger.h">
+    <ClInclude Include="include\Action.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\StringFormat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -285,10 +288,10 @@
     <ClCompile Include="src\Request.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\NullLogger.cpp">
+    <ClCompile Include="src\FileLogger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\FileLogger.cpp">
+    <ClCompile Include="src\StringFormat.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

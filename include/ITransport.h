@@ -3,6 +3,7 @@
 #include "IConnectionManager.h"
 #include "Packet.h"
 #include "Helpers.h"
+#include "Action.h"
 
 namespace Stormancer
 {
@@ -19,9 +20,9 @@ namespace Stormancer
 		uint64 id();
 
 	public:
-		Helpers::Action<Packet<>*> packetReceived;
-		Helpers::Action<IConnection*> connectionOpened;
-		Helpers::Action<IConnection*> connectionClosed;
+		Action<Packet<>*> packetReceived;
+		Action<IConnection*> connectionOpened;
+		Action<IConnection*> connectionClosed;
 
 	protected:
 		bool _isRunning = false;

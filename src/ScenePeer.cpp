@@ -18,7 +18,7 @@ namespace Stormancer
 	{
 		if (!Helpers::mapContains(_routeMapping, routeName))
 		{
-			throw exception(string(Helpers::StringFormat(L"The routeName '{0}' is not declared on the server.", routeName)).c_str());
+			throw exception(string(StringFormat(L"The routeName '{0}' is not declared on the server.", routeName)).c_str());
 		}
 		Route& r = _routeMapping[routeName];
 		_connection->sendToScene(_sceneHandle, r._handle, writer, priority, reliability);

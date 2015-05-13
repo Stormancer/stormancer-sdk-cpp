@@ -66,7 +66,6 @@ namespace Stormancer
 	}
 
 	STORMANCER_DLL_API bytestream& operator>>(bytestream& bs, string& data);
-
 	STORMANCER_DLL_API bytestream& operator>>(bytestream& bs, wstring& data);
 
 	template<typename T>
@@ -137,153 +136,13 @@ namespace Stormancer
 
 #pragma endregion
 
-#pragma region functional
-
-#pragma region action template
-
-		template<typename TParam = void>
-		class Action
-		{
-			using TFunction = function < void(TParam) > ;
-
-		public:
-			Action()
-			{
-			}
-
-			Action(const Action& other)
-				: _functions(other._functions)
-			{
-			}
-
-			Action(Action&& right)
-				: _functions(move(right._functions))
-			{
-			}
-
-			virtual ~Action()
-			{
-				for (auto* f : _functions)
-				{
-					delete f;
-				}
-			}
-
-		public:
-			Action& operator=(TFunction* function)
-			{
-				_functions.clear();
-				_functions.push_back(function);
-				return *this;
-			}
-
-			Action& operator+=(TFunction* function)
-			{
-				_functions.push_back(function);
-				return *this;
-			}
-
-			Action& operator-=(TFunction* function)
-			{
-				auto it = find(_functions.begin(), _functions.end(), function);
-				if (it != _functions.end())
-				{
-					_functions.erase(it);
-				}
-			}
-
-			Action& operator()(TParam data)
-			{
-				for (auto* f : _functions)
-				{
-					(*f)(data);
-				}
-				return *this;
-			}
-
-		private:
-			vector<TFunction*> _functions;
-		};
-
-#pragma endregion
-
-#pragma region void action
-
-		template<>
-		class Action < void >
-		{
-			using TFunction = function < void(void) > ;
-
-		public:
-			Action()
-			{
-			}
-
-			Action(const Action& other)
-				: _functions(other._functions)
-			{
-			}
-
-			Action(Action&& right)
-				: _functions(move(right._functions))
-			{
-			}
-
-			virtual ~Action()
-			{
-				for (auto* f : _functions)
-				{
-					delete f;
-				}
-			}
-
-		public:
-			Action& operator=(TFunction* function)
-			{
-				_functions.clear();
-				_functions.push_back(function);
-				return *this;
-			}
-
-			Action& operator+=(TFunction* function)
-			{
-				_functions.push_back(function);
-				return *this;
-			}
-
-			Action& operator-=(TFunction* function)
-			{
-				auto it = find(_functions.begin(), _functions.end(), function);
-				if (it != _functions.end())
-				{
-					_functions.erase(it);
-				}
-			}
-
-			Action& operator()()
-			{
-				for (auto* f : _functions)
-				{
-					(*f)();
-				}
-				return *this;
-			}
-
-		private:
-			vector<TFunction*> _functions;
-		};
-
-#pragma endregion
-
-#pragma endregion
-
 #pragma region string
 
-		wstring STORMANCER_DLL_API vectorJoin(vector<wstring> vector, wstring glue = L"");
+		STORMANCER_DLL_API wstring vectorJoin(vector<wstring> vector, wstring glue = L"");
 
-		vector<wstring> STORMANCER_DLL_API stringSplit(const wstring& str, const wstring separator);
+		STORMANCER_DLL_API vector<wstring> stringSplit(const wstring& str, const wstring separator);
 
-		wstring STORMANCER_DLL_API stringTrim(wstring& str, wchar_t ch = ' ');
+		STORMANCER_DLL_API wstring stringTrim(wstring& str, wchar_t ch = ' ');
 
 		template<typename T>
 		wstring to_wstring(T data)
@@ -291,10 +150,9 @@ namespace Stormancer
 			return to_wstring(to_string(data));
 		}
 
-		template<> STORMANCER_DLL_API wstring to_wstring<string>(string str);
+		STORMANCER_DLL_API wstring to_wstring(const char* str);
 
-		template<>
-		wstring to_wstring<const char*>(const char* str);
+		STORMANCER_DLL_API wstring to_wstring(string str);
 
 		template<typename T>
 		string to_string(T& data)
@@ -302,11 +160,9 @@ namespace Stormancer
 			return std::to_string(data);
 		}
 
-		template<>
-		string to_string<wstring>(wstring& str);
+		string to_string(wstring& str);
 
-		template<>
-		string to_string<vector<byte>>(vector<byte>& v);
+		string to_string(vector<byte>& v);
 
 		template<typename T1, typename T2>
 		T2 convert(T1& data)
@@ -316,53 +172,6 @@ namespace Stormancer
 
 		template<>
 		vector<byte> convert<string, vector<byte>>(string& str);
-
-		class StringFormat
-		{
-		public:
-			STORMANCER_DLL_API StringFormat();
-
-			template<typename... Args>
-			StringFormat(wstring format, Args&... args)
-			{
-				int _[] = { 0, (format = replace(format, args), 0)... };
-				stream << format;
-			}
-
-		public:
-			STORMANCER_DLL_API wstring str();
-
-			STORMANCER_DLL_API const wchar_t* c_str();
-
-			STORMANCER_DLL_API operator string();
-			STORMANCER_DLL_API operator wstring();
-
-			template<typename T>
-			wstring replace(wstring& format, T& replacement)
-			{
-				return replace(format, to_wstring(replacement));
-			}
-
-			template<>
-			wstring replace<wstring>(wstring& format, wstring& replacement);
-
-			template<typename T>
-			StringFormat& operator<<(T& data)
-			{
-				stream << data;
-				return *this;
-			}
-
-			template<typename T>
-			void operator>>(T& data)
-			{
-				stream >> data;
-			}
-
-		private:
-			wstringstream stream;
-			int formatI = 0;
-		};
 
 #pragma endregion
 
@@ -424,14 +233,12 @@ namespace Stormancer
 
 		bool ensureSuccessStatusCode(int statusCode);
 
-		void displayException(const exception& e);
-
-#pragma endregion
-
 		template<typename T>
 		uint64 ptrToUint64(T* ptr)
 		{
 			return *static_cast<uint64*>(static_cast<void*>(ptr));
 		}
+
+#pragma endregion
 	};
 };

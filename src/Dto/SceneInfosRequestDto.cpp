@@ -25,7 +25,7 @@ namespace Stormancer
 		srlzr << MsgPack::Factory(Helpers::to_string(Token));
 
 		srlzr << MsgPack::Factory("Metadata");
-		ISerializable::serialize<stringMap>(Metadata, stream);
+		ISerializable::serialize(Metadata, stream);
 	}
 
 	void SceneInfosRequestDto::deserialize(bytestream* stream)

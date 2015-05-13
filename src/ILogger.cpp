@@ -28,15 +28,27 @@ namespace Stormancer
 	{
 	}
 
+	void ILogger::log(wstring message)
+	{
+	}
+
+	void ILogger::log(LogLevel level, wstring category, wstring message, wstring data)
+	{
+	}
+
+	void ILogger::log(const std::exception& e)
+	{
+	}
+
 	wstring ILogger::format(LogLevel level, wstring& category, wstring& message, wstring& data)
 	{
 		wstringstream ss;
 
 		ss << L'[' << Helpers::nowStr() << L']';
-		ss << L'[' << static_cast<int>(level) << L']';
+		ss << L" [" << static_cast<int>(level) << L']';
 		if (category.length())
 		{
-			ss << L'[' << category << L']';
+			ss << L" [" << category << L']';
 		}
 		if (message.length())
 		{
@@ -46,7 +58,17 @@ namespace Stormancer
 		{
 			ss << L" [" << data << L']';
 		}
-		ss << endl;
+
+		return ss.str();
+	}
+
+	wstring ILogger::formatException(const std::exception& e)
+	{
+		wstringstream ss;
+
+		ss << L'[' << Helpers::nowStr() << L']';
+		ss << L"[exception]";
+		ss << L' ' << e.what();
 
 		return ss.str();
 	}

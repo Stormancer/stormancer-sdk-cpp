@@ -8,6 +8,8 @@
 #endif
 
 // standart libs
+#include <mutex>
+#include <atomic>
 #include <algorithm>
 #include <clocale>
 #include <ctime>

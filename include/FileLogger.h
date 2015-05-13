@@ -12,6 +12,7 @@ namespace Stormancer
 
 	public:
 		void log(LogLevel level, wstring category, wstring message, wstring data);
+		void log(const std::exception& e);
 
 	private:
 		bool tryOpenFile();

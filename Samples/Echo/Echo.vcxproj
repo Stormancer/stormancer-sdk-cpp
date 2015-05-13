@@ -196,7 +196,6 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\MsgPack\MsgPack.cpp" />
     <ClCompile Include="ConsoleLogger.cpp" />
     <ClCompile Include="Echo.cpp" />
   </ItemGroup>
@@ -209,15 +208,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\MsgPack\Container.h" />
-    <ClInclude Include="..\..\MsgPack\ContainerHeader.h" />
-    <ClInclude Include="..\..\MsgPack\Data.h" />
-    <ClInclude Include="..\..\MsgPack\Element.h" />
-    <ClInclude Include="..\..\MsgPack\Header.h" />
-    <ClInclude Include="..\..\MsgPack\MsgPack.h" />
-    <ClInclude Include="..\..\MsgPack\Number.h" />
-    <ClInclude Include="..\..\MsgPack\Primitive.h" />
-    <ClInclude Include="..\..\MsgPack\StreamManager.h" />
     <ClInclude Include="ConsoleLogger.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

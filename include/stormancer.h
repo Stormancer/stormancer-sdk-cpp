@@ -2,6 +2,9 @@
 
 #include "headers.h"
 
+#include "StringFormat.h"
+#include "Action.h"
+
 #include "basic_bytebuf.h"
 #include "basic_bytestream.h"
 
@@ -18,7 +21,6 @@
 #include "ClientConfiguration.h"
 #include "ConnectionState.h"
 #include "ILogger.h"
-#include "NullLogger.h"
 #include "FileLogger.h"
 #include "DefaultPacketDispatcher.h"
 #include "Helpers.h"

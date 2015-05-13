@@ -33,31 +33,10 @@ namespace Stormancer
 		}
 
 		// Base template ref specializations
-		template<>
-		static void serialize<byte>(byte& data, bytestream* stream)
-		{
-			MsgPack::Serializer srlzr(stream->rdbuf());
-			srlzr << MsgPack::Factory(static_cast<uint64>(data));
-		}
-
-		template<>
-		static void serialize<string>(string& data, bytestream* stream)
-		{
-			MsgPack::Serializer srlzr(stream->rdbuf());
-			srlzr << MsgPack::Factory(data);
-		}
-
-		template<>
-		static void serialize<wstring>(wstring& data, bytestream* stream)
-		{
-			serialize<string>(Helpers::to_string(data), stream);
-		}
-
-		template<>
-		static void serialize<stringMap>(stringMap& data, bytestream* stream)
-		{
-			serializeMap<wstring, wstring>(data, stream);
-		}
+		static void serialize(byte& data, bytestream* stream);
+		static void serialize(string& data, bytestream* stream);
+		static void serialize(wstring& data, bytestream* stream);
+		static void serialize(stringMap& data, bytestream* stream);
 
 		// Vector template
 		template<typename T>
@@ -71,16 +50,7 @@ namespace Stormancer
 			}
 		}
 
-		template<>
-		static void serializeVector(vector<RouteDto>& data, bytestream* stream)
-		{
-			MsgPack::Serializer srlzr(stream->rdbuf());
-			srlzr << MsgPack__Factory(ArrayHeader(data.size()));
-			for (uint32 i = 0; i < data.size(); i++)
-			{
-				data[i].serialize(stream);
-			}
-		}
+		static void serializeVector(vector<RouteDto>& data, bytestream* stream);
 
 		// Map template
 		template<typename MT1, typename MT2>
@@ -90,8 +60,8 @@ namespace Stormancer
 			srlzr << MsgPack__Factory(MapHeader(data.size()));
 			for (auto it : data)
 			{
-				serialize<MT1>(MT1(it.first), stream); // TOIMPROVE (copying object because of key of iterator is const)
-				serialize<MT2>(it.second, stream);
+				serialize(MT1(it.first), stream); // TOIMPROVE (copying object because of key of iterator is const)
+				serialize(it.second, stream);
 			}
 		}
 
@@ -109,23 +79,10 @@ namespace Stormancer
 
 		// Base template specializations
 		// string
-		template<>
-		static void deserialize<string>(bytestream* stream, string& str)
-		{
-			MsgPack::Deserializer dsrlzr(stream->rdbuf());
-			unique_ptr<MsgPack::Element> element;
-			dsrlzr >> element;
-			str = dynamic_cast<MsgPack::String&>(*element).stdString();
-		}
+		static void deserialize(bytestream* stream, string& str);
 
 		// wstring
-		template<>
-		static void deserialize<wstring>(bytestream* stream, wstring& str)
-		{
-			string strTmp;
-			deserialize<string>(stream, strTmp);
-			str = Helpers::to_wstring(strTmp);
-		}
+		static void deserialize(bytestream* stream, wstring& str);
 
 		// Vector template
 		template<typename VT>

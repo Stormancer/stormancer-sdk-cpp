@@ -28,7 +28,7 @@ namespace Stormancer
 		ISerializable::serializeVector(Routes, stream);
 
 		srlzr << MsgPack::Factory("ConnectionMetadata");
-		ISerializable::serialize<stringMap>(ConnectionMetadata, stream);
+		ISerializable::serialize(ConnectionMetadata, stream);
 	}
 
 	void ConnectToSceneMsg::deserialize(bytestream* stream)

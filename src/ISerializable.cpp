@@ -22,6 +22,56 @@ namespace Stormancer
 	}
 
 
+	void ISerializable::serialize(byte& data, bytestream* stream)
+	{
+		MsgPack::Serializer srlzr(stream->rdbuf());
+		srlzr << MsgPack::Factory(static_cast<uint64>(data));
+	}
+
+	void ISerializable::serialize(string& data, bytestream* stream)
+	{
+		MsgPack::Serializer srlzr(stream->rdbuf());
+		srlzr << MsgPack::Factory(data);
+	}
+
+	void ISerializable::serialize(wstring& data, bytestream* stream)
+	{
+		serialize<string>(Helpers::to_string(data), stream);
+	}
+
+	void ISerializable::serialize(stringMap& data, bytestream* stream)
+	{
+		serializeMap<wstring, wstring>(data, stream);
+	}
+
+
+	void ISerializable::serializeVector(vector<RouteDto>& data, bytestream* stream)
+	{
+		MsgPack::Serializer srlzr(stream->rdbuf());
+		srlzr << MsgPack__Factory(ArrayHeader(data.size()));
+		for (uint32 i = 0; i < data.size(); i++)
+		{
+			data[i].serialize(stream);
+		}
+	}
+
+
+	void ISerializable::deserialize(bytestream* stream, string& str)
+	{
+		MsgPack::Deserializer dsrlzr(stream->rdbuf());
+		unique_ptr<MsgPack::Element> element;
+		dsrlzr >> element;
+		str = dynamic_cast<MsgPack::String&>(*element).stdString();
+	}
+
+	void ISerializable::deserialize(bytestream* stream, wstring& str)
+	{
+		string strTmp;
+		deserialize<string>(stream, strTmp);
+		str = Helpers::to_wstring(strTmp);
+	}
+
+
 	unique_ptr<MsgPack::Element>& ISerializable::valueFromMsgPackMapKey(unique_ptr<MsgPack::Element>& msgPackMap, wstring key)
 	{
 		auto v = dynamic_cast<MsgPack::Map*>(msgPackMap.get())->getContainer();

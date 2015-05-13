@@ -14,12 +14,24 @@ namespace Stormancer
 
 	void FileLogger::log(LogLevel level, wstring category, wstring message, wstring data)
 	{
+		_mutex.lock();
 		if (tryOpenFile())
 		{
-			wstring str = format(level, category, message, data);
-			_myfile << str;
+			_myfile << format(level, category, message, data);
 			_myfile.close();
 		}
+		_mutex.unlock();
+	}
+	
+	void FileLogger::log(const std::exception& e)
+	{
+		_mutex.lock();
+		if (tryOpenFile())
+		{
+			_myfile << formatException(e);
+			_myfile.close();
+		}
+		_mutex.unlock();
 	}
 
 	bool FileLogger::tryOpenFile()

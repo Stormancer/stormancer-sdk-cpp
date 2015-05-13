@@ -121,7 +121,7 @@ namespace Stormancer
 
 		if (!Helpers::mapContains(_remoteRoutesMap, routeName))
 		{
-			throw exception(string(Helpers::StringFormat(L"The route '{0}' doesn't exist on the scene.", routeName)).c_str());
+			throw exception(string(StringFormat(L"The route '{0}' doesn't exist on the scene.", routeName)).c_str());
 		}
 		Route& route = _remoteRoutesMap[routeName];
 

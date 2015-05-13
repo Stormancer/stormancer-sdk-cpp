@@ -68,7 +68,7 @@ namespace Stormancer
 		srlzr << MsgPack::Factory((uint64)Handle);
 
 		srlzr << MsgPack::Factory("Metadata");
-		ISerializable::serialize<stringMap>(Metadata, stream);
+		ISerializable::serialize(Metadata, stream);
 	}
 
 	void RouteDto::deserialize(bytestream* stream)

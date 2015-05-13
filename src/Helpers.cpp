@@ -2,26 +2,9 @@
 
 namespace Stormancer
 {
-	template<>
-	vector<byte> Helpers::convert<string, vector<byte>>(string& str)
-	{
-		vector<byte> v;
-		v.resize(str.size());
-		for (uint32 i = 0; v.size(); i++)
-		{
-			v[i] = str[i];
-		}
-		return v;
-	}
-
 	bool Helpers::ensureSuccessStatusCode(int statusCode)
 	{
 		return (statusCode >= 200 && statusCode < 300);
-	}
-
-	void Helpers::displayException(const exception& e)
-	{
-		wcout << Helpers::StringFormat(L"Exception: {0}", string(e.what())).c_str() << endl;
 	}
 
 	anyMap Helpers::stringMapToAnyMap(stringMap& sm)
@@ -142,74 +125,6 @@ namespace Stormancer
 		return time_tToStr(now, "%H:%M:%S");
 	}
 
-	template<>
-	wstring Helpers::to_wstring<string>(string str)
-	{
-		return wstring(str.begin(), str.end());
-	}
-
-	template<>
-	wstring Helpers::to_wstring<const char*>(const char* str)
-	{
-		return to_wstring(string(str));
-	}
-
-	template<>
-	string Helpers::to_string<wstring>(wstring& str)
-	{
-		return string(str.begin(), str.end());
-	}
-
-	template<>
-	string Helpers::to_string<vector<byte>>(vector<byte>& v)
-	{
-		string str;
-		str.resize(v.size());
-		for (size_t i = 0; i < v.size(); i++)
-		{
-			str[i] = v[i];
-		}
-		return str;
-	}
-
-	Helpers::StringFormat::StringFormat()
-	{
-	}
-
-	wstring Helpers::StringFormat::str()
-	{
-		return stream.str();
-	}
-
-	const wchar_t* Helpers::StringFormat::c_str()
-	{
-		return stream.str().c_str();
-	}
-
-	Helpers::StringFormat::operator string()
-	{
-		return to_string(stream.str());
-	}
-
-	Helpers::StringFormat::operator wstring()
-	{
-		return stream.str();
-	}
-
-	template<>
-	wstring Helpers::StringFormat::replace<wstring>(wstring& format, wstring& replacement)
-	{
-		wstring toFind = L"{" + to_wstring(formatI) + L"}";
-		wstring::size_type start = format.find(toFind);
-		if (start != wstring::npos)
-		{
-			wstring::size_type size = toFind.size();
-			format.replace(start, size, replacement);
-		}
-		formatI++;
-		return format;
-	}
-
 	bytestream& operator<<(bytestream& bs, const char* data)
 	{
 		bs.write((char*)data, strlen(data));
@@ -246,11 +161,50 @@ namespace Stormancer
 	bytestream& operator>>(bytestream& bs, wstring& str)
 	{
 		uint32 len = (uint32)bs.rdbuf()->in_avail();
-		str.reserve(len);
-		char* data = new char[2 * len];
-		bs.read(data, 2 * len);
-		str.assign((wchar_t*)data, len);
+		uint32 nbChars = len / 2;
+		str.reserve(nbChars);
+		char* data = new char[len];
+		bs.read(data, len);
+		str.assign((wchar_t*)data, nbChars);
 		delete[] data;
 		return bs;
+	}
+
+	wstring Helpers::to_wstring(const char* str)
+	{
+		return to_wstring(string(str));
+	}
+
+	wstring Helpers::to_wstring(string str)
+	{
+		return wstring(str.begin(), str.end());
+	}
+
+	string Helpers::to_string(wstring& str)
+	{
+		return string(str.begin(), str.end());
+	}
+
+	string Helpers::to_string(vector<byte>& v)
+	{
+		string str;
+		str.resize(v.size());
+		for (size_t i = 0; i < v.size(); i++)
+		{
+			str[i] = v[i];
+		}
+		return str;
+	}
+
+	template<>
+	vector<byte> Helpers::convert<string, vector<byte>>(string& str)
+	{
+		vector<byte> v;
+		v.resize(str.size());
+		for (uint32 i = 0; v.size(); i++)
+		{
+			v[i] = str[i];
+		}
+		return v;
 	}
 };
