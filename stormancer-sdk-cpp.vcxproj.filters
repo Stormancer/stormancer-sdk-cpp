@@ -172,6 +172,9 @@
     <ClInclude Include="include\StringFormat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\IMetadata.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ApiClient.cpp">
@@ -292,6 +295,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\StringFormat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IMetadatacpp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -171,6 +171,8 @@ namespace Stormancer
 				(*(observers[i]))(packet);
 			}
 		}
+
+		delete packet;
 	}
 
 	vector<IScenePeer*> Scene::remotePeers()

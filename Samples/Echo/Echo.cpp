@@ -80,7 +80,7 @@ Concurrency::task<void> test2(Client* client)
 			if (t2.is_done())
 			{
 				logger->log(L"Connected to scene!");
-				for (int i = 0; i < 10; i++)
+				while(1)// for (int i = 0; i < 10; i++)
 				{
 					scene->sendPacket(L"echo.in", [](bytestream* stream) {
 						int32 number = rand();
