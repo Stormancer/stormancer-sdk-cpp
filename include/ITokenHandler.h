@@ -10,6 +10,6 @@ namespace Stormancer
 		ITokenHandler();
 		virtual ~ITokenHandler();
 
-		virtual SceneEndpoint* decodeToken(wstring& token) = 0;
+		virtual SceneEndpoint decodeToken(wstring& token) = 0;
 	};
 };

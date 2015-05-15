@@ -7,17 +7,17 @@ namespace Stormancer
 	enum class LogLevel
 	{
 		// Applies to critical errors that prevent the program from continuing.
-		Fatal,
+		Fatal = 0,
 		// Applies to non critical errors
-		Error,
+		Error = 1,
 		// Applies to warnings
-		Warn,
+		Warn = 2,
 		// Applies to information messages about the execution of the application
-		Info,
+		Info = 3,
 		// Applies to detailed informations useful when debugging
-		Debug,
+		Debug = 4,
 		// Applies to very detailed informations about the execution
-		Trace
+		Trace = 5
 	};
 
 	// Contract for a Logger in Stormancer.

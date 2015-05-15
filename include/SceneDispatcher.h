@@ -11,7 +11,7 @@ namespace Stormancer
 		virtual ~SceneDispatcher();
 
 	public:
-		void registerProcessor(PacketProcessorConfig* config);
+		void registerProcessor(PacketProcessorConfig& config);
 		void addScene(Scene* scene);
 		void removeScene(uint8 sceneHandle);
 

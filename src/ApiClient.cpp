@@ -21,18 +21,18 @@ namespace Stormancer
 	{
 	}
 
-	pplx::task<SceneEndpoint*> ApiClient::getSceneEndpoint(wstring accountId, wstring applicationName, wstring sceneId, wstring userData)
+	pplx::task<SceneEndpoint> ApiClient::getSceneEndpoint(wstring accountId, wstring applicationName, wstring sceneId, wstring userData)
 	{
 		ILogger::instance()->log(LogLevel::Trace, L"", L"Client::getSceneEndpoint", accountId + L" " + applicationName + L" " + sceneId + L" " + userData);
 
 		wstring baseUri = _config->getApiEndpoint();
 		http_client client(baseUri);
 		http_request request(methods::POST);
+		wstring relativeUri = StringFormat(_createTokenUri, accountId, applicationName, sceneId);
+		request.set_request_uri(L"/" + relativeUri);
 		request.headers().add(L"Content-Type", L"application/msgpack");
 		request.headers().add(L"Accept", L"application/json");
 		request.headers().add(L"x-version", L"1.0.0");
-		wstring relativeUri = StringFormat(_createTokenUri, accountId, applicationName, sceneId);
-		request.set_request_uri(L"/" + relativeUri);
 		request.set_body(userData);
 
 		return client.request(request).then([this, accountId, applicationName, sceneId](pplx::task<http_response> t) {
@@ -47,7 +47,7 @@ namespace Stormancer
 				if (Helpers::ensureSuccessStatusCode(statusCode))
 				{
 					auto ss = new concurrency::streams::stringstreambuf;
-					return response.body().read_to_end(*ss).then([this, ss](pplx::task<size_t> t2) {
+					auto result = response.body().read_to_end(*ss).then([this, ss](pplx::task<size_t> t2) {
 						try
 						{
 							size_t size = t2.get();
@@ -60,6 +60,13 @@ namespace Stormancer
 							throw e;
 						}
 					});
+
+					result.then([ss](pplx::task<Stormancer::SceneEndpoint> t3)
+					{
+						delete ss;
+					});
+
+					return result;
 				}
 				else if (statusCode == 404)
 				{
@@ -67,7 +74,7 @@ namespace Stormancer
 				}
 				else
 				{
-					throw exception("Request to get scene endpoint failed.");
+					throw exception("Request to get scene failed.");
 				}
 			}
 			catch (const exception& e)
@@ -75,9 +82,6 @@ namespace Stormancer
 				ILogger::instance()->log(e);
 				throw e;
 			}
-			return pplx::create_task([]() {
-				return new SceneEndpoint();
-			});
 		});
 	}
 };

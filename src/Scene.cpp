@@ -13,10 +13,13 @@ namespace Stormancer
 		{
 			_remoteRoutesMap[routeDto.Name] = Route(this, routeDto.Name, routeDto.Handle, routeDto.Metadata);
 		}
+
+		ILogger::instance()->log(LogLevel::Debug, L"", L"Scene " + _id + L" created", to_wstring(Helpers::ptrToUint64(this)));
 	}
 
 	Scene::~Scene()
 	{
+		ILogger::instance()->log(LogLevel::Debug, L"", L"Scene " + _id + L" deleted", to_wstring(Helpers::ptrToUint64(this)));
 	}
 
 	wstring Scene::getHostMetadata(wstring key)
@@ -78,8 +81,8 @@ namespace Stormancer
 	{
 		auto observable = rx::observable<>::create<Packet<IScenePeer>*>([this, route](rx::subscriber<Packet<IScenePeer>*> subscriber) {
 			auto handler = new function<void(Packet<>*)>([this, subscriber](Packet<>* p) {
-				Packet<IScenePeer>* packet = new Packet<IScenePeer>(host(), p->stream, p->metadata());
-				subscriber.on_next(packet);
+				Packet<IScenePeer> packet(host(), p->stream, p->metadata());
+				subscriber.on_next(&packet);
 			});
 			route->handlers.push_back(handler);
 
@@ -153,10 +156,7 @@ namespace Stormancer
 
 	void Scene::handleMessage(Packet<>* packet)
 	{
-		for (auto fun : packetReceived)
-		{
-			fun(packet);
-		}
+		packetReceived(packet);
 
 		uint16 routeId;
 		*packet->stream >> routeId;
@@ -172,12 +172,13 @@ namespace Stormancer
 			}
 		}
 
+		delete packet->getMetadata<uint16>(L"routeId");
 		delete packet;
 	}
 
 	vector<IScenePeer*> Scene::remotePeers()
 	{
-		return vector < IScenePeer* > { host() };
+		return vector < IScenePeer* > {host()};
 	}
 
 	IScenePeer* Scene::host()

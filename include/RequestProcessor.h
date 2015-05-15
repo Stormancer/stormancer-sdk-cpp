@@ -14,7 +14,7 @@ namespace Stormancer
 		virtual ~RequestProcessor();
 
 	public:
-		void registerProcessor(PacketProcessorConfig* config);
+		void registerProcessor(PacketProcessorConfig& config);
 		pplx::task<Packet<>*> sendSystemRequest(IConnection* peer, byte msgId, function<void(bytestream*)> writer);
 
 	private:
@@ -29,5 +29,8 @@ namespace Stormancer
 		ILogger* _logger;
 		bool _isRegistered = false;
 		map<byte, function<pplx::task<void>(RequestContext*)>> _handlers;
+
+	private:
+		PacketProcessorConfig* _requestProcessorConfig;
 	};
 };

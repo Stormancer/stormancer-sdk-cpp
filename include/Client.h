@@ -42,7 +42,7 @@ namespace Stormancer
 		wstring applicationName();
 		ILogger* logger();
 		void setLogger(ILogger* logger);
-		pplx::task<Scene*> getScene(wstring sceneId, SceneEndpoint* sep);
+		pplx::task<Scene*> getScene(wstring sceneId, SceneEndpoint sep);
 		void disconnect();
 
 	private:

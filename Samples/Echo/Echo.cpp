@@ -5,18 +5,19 @@ using namespace Stormancer;
 
 auto ilogger = ILogger::instance(new ConsoleLogger(Stormancer::LogLevel::Trace));
 auto logger = (ConsoleLogger*)ilogger;
+Scene* scene = nullptr;
 
 //auto logger = new ConsoleLogger(Stormancer::LogLevel::Trace);
 
-Concurrency::task<void> test1(Client* client)
+Concurrency::task<void> test1(Client& client)
 {
 	logger->logWhite(L"Get scene");
-	return client->getPublicScene(L"test-scene", L"hello").then([](pplx::task<Scene*> t) {
-		Scene* scene = t.get();
+	return client.getPublicScene(L"test-scene", L"hello").then([](pplx::task<Scene*> t) {
+		scene = t.get();
 		logger->logGreen(L"Done");
 
 		logger->logWhite(L"Add 'echo.out' route");
-		scene->addRoute(L"echo.out", [scene](Packet<IScenePeer>* p) {
+		scene->addRoute(L"echo.out", [](Packet<IScenePeer>* p) {
 			wstring message;
 			*p->stream >> message;
 
@@ -44,7 +45,7 @@ Concurrency::task<void> test1(Client* client)
 		logger->logGreen(L"Done");
 
 		logger->logWhite(L"Connect");
-		return scene->connect().then([scene](pplx::task<void> t2) {
+		return scene->connect().then([](pplx::task<void> t2) {
 			if (t2.is_done())
 			{
 				logger->logGreen(L"Done");
@@ -65,9 +66,9 @@ Concurrency::task<void> test1(Client* client)
 	});
 }
 
-Concurrency::task<void> test2(Client* client)
+Concurrency::task<void> test2(Client& client)
 {
-	return client->getPublicScene(L"test-scene", L"hello").then([](pplx::task<Scene*> t) {
+	return client.getPublicScene(L"test-scene", L"hello").then([](pplx::task<Scene*> t) {
 		Scene* scene = t.get();
 		scene->addRoute(L"echo.out", [scene](Packet<IScenePeer>* p) {
 			int32 number;
@@ -106,13 +107,13 @@ int main(int argc, char* argv[])
 	});
 
 	logger->logWhite(L"Creating client");
-	auto config = new ClientConfiguration(L"test", L"echo");
-	config->serverEndpoint = L"http://localhost:8081";
-	auto client = new Client(config);
+	ClientConfiguration config(L"test", L"echo");
+	config.serverEndpoint = L"http://localhost:8081";
+	Client client(&config);
 	logger->logGreen(L"Done");
 
-	//auto task = test1(client);
-	auto task = test2(client);
+	auto task = test1(client);
+	//auto task = test2(client);
 
 	try
 	{

@@ -15,7 +15,6 @@ namespace Stormancer
 
 	ILogger* ILogger::instance(ILogger* logger)
 	{
-		delete _logger;
 		_logger = logger;
 		return _logger;
 	}

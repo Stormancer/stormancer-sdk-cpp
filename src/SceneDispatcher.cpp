@@ -14,9 +14,9 @@ namespace Stormancer
 	{
 	}
 
-	void SceneDispatcher::registerProcessor(PacketProcessorConfig* config)
+	void SceneDispatcher::registerProcessor(PacketProcessorConfig& config)
 	{
-		config->addCatchAllProcessor(handler);
+		config.addCatchAllProcessor(handler);
 	}
 
 	void SceneDispatcher::addScene(Scene* scene)

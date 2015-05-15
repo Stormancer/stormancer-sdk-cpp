@@ -30,12 +30,6 @@ namespace Stormancer
 
 		virtual ~Packet()
 		{
-			if (stream)
-			{
-				stream->rdbuf()->pubsetbuf(nullptr, 0);
-				delete stream;
-			}
-
 			cleanup();
 		}
 
@@ -64,12 +58,12 @@ namespace Stormancer
 		}
 
 	public:
-		T* connection;
-		bytestream* stream;
+		T* connection = nullptr;
+		bytestream* stream = nullptr;
 
 		shared_ptr<Request> request = nullptr;
 
-		Action<void> cleanup;
+		Action<> cleanup;
 
 	private:
 		anyMap _metadata;

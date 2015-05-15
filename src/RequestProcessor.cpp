@@ -5,13 +5,6 @@ namespace Stormancer
 	RequestProcessor::RequestProcessor(ILogger* logger, vector<IRequestModule*> modules)
 		: _logger(logger)
 	{
-		auto builder = new RequestModuleBuilder(RequestProcessor::addSystemRequestHandler);
-		for (size_t i = 0; i < modules.size(); i++)
-		{
-			auto module = modules[i];
-			module->registerModule(builder);
-		}
-
 		addSystemRequestHandler = [this](byte msgId, function<pplx::task<void>(RequestContext*)> handler)
 		{
 			if (_isRegistered)
@@ -20,19 +13,26 @@ namespace Stormancer
 			}
 			_handlers[msgId] = handler;
 		};
+
+		RequestModuleBuilder builder(addSystemRequestHandler);
+		for (size_t i = 0; i < modules.size(); i++)
+		{
+			auto module = modules[i];
+			module->registerModule(&builder);
+		}
 	}
 
 	RequestProcessor::~RequestProcessor()
 	{
 	}
 
-	void RequestProcessor::registerProcessor(PacketProcessorConfig* config)
+	void RequestProcessor::registerProcessor(PacketProcessorConfig& config)
 	{
 		_isRegistered = true;
 
 		for (auto it : _handlers)
 		{
-			config->addProcessor(it.first, new handlerFunction([it](Packet<>* p) {
+			config.addProcessor(it.first, new handlerFunction([it](Packet<>* p) {
 				RequestContext context(p);
 				it.second(&context).then([&context, &p](pplx::task<void> task) {
 					if (!context.isComplete())
@@ -54,7 +54,7 @@ namespace Stormancer
 			}));
 		}
 
-		config->addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG, new handlerFunction([this](Packet<>* p) {
+		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG, new handlerFunction([this](Packet<>* p) {
 			uint16 id;
 			*(p->stream) >> id;
 
@@ -75,7 +75,7 @@ namespace Stormancer
 			return true;
 		}));
 
-		config->addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_COMPLETE, new handlerFunction([this](Packet<>* p) {
+		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_COMPLETE, new handlerFunction([this](Packet<>* p) {
 			uint16 id;
 			*(p->stream) >> id;
 
@@ -104,7 +104,7 @@ namespace Stormancer
 			return true;
 		}));
 
-		config->addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_ERROR, new handlerFunction([this](Packet<>* p) {
+		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_ERROR, new handlerFunction([this](Packet<>* p) {
 			uint16 id;
 			*(p->stream) >> id;
 

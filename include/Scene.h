@@ -17,33 +17,31 @@ namespace Stormancer
 		friend class Client;
 		friend class SceneDispatcher;
 
-	private:
+	public:
 		Scene(IConnection* connection, Client* client, wstring id, wstring token, SceneInfosDto dto);
 		virtual ~Scene();
 
 	public:
-		STORMANCER_DLL_API void addRoute(wstring routeName, function<void(Packet<IScenePeer>*)> handler, stringMap metadata = stringMap());
-		STORMANCER_DLL_API void sendPacket(wstring routeName, function<void(bytestream*)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE);
 		STORMANCER_DLL_API pplx::task<void> connect();
 		STORMANCER_DLL_API pplx::task<void> disconnect();
-		wstring getHostMetadata(wstring key);
-		byte handle();
-		wstring id();
-		bool connected();
-		IConnection* hostConnection();
-		vector<Route*> localRoutes();
-		vector<Route*> remoteRoutes();
-		rx::observable<Packet<IScenePeer>*> onMessage(Route* route);
-		rx::observable<Packet<IScenePeer>*> onMessage(wstring routeName);
-		vector<IScenePeer*> remotePeers();
-		IScenePeer* host();
-
-	private:
+		STORMANCER_DLL_API void addRoute(wstring routeName, function<void(Packet<IScenePeer>*)> handler, stringMap metadata = stringMap());
+		STORMANCER_DLL_API void sendPacket(wstring routeName, function<void(bytestream*)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE);
+		STORMANCER_DLL_API bool connected();
+		STORMANCER_DLL_API wstring id();
+		STORMANCER_DLL_API byte handle();
+		STORMANCER_DLL_API wstring getHostMetadata(wstring key);
+		STORMANCER_DLL_API IConnection* hostConnection();
+		STORMANCER_DLL_API vector<Route*> localRoutes();
+		STORMANCER_DLL_API vector<Route*> remoteRoutes();
+		STORMANCER_DLL_API rx::observable<Packet<IScenePeer>*> onMessage(Route* route);
+		STORMANCER_DLL_API rx::observable<Packet<IScenePeer>*> onMessage(wstring routeName);
+		STORMANCER_DLL_API vector<IScenePeer*> remotePeers();
+		STORMANCER_DLL_API IScenePeer* host();
 		void completeConnectionInitialization(ConnectionResult& cr);
 		void handleMessage(Packet<>* packet);
 
 	public:
-		vector<function<void(Packet<>*)>> packetReceived;
+		Action<Packet<>*> packetReceived;
 		const bool isHost = false;
 
 	private:

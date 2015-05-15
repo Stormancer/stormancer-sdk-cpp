@@ -58,12 +58,32 @@ namespace Stormancer
 
 		initialize();
 
-		_logger->log(LogLevel::Info, L"", L"Client created", to_wstring(Helpers::ptrToUint64(this)));
+		_logger->log(LogLevel::Debug, L"", L"Client created", to_wstring(Helpers::ptrToUint64(this)));
 	}
 
 	Client::~Client()
 	{
-		_logger->log(LogLevel::Info, L"", L"Client destroyed", to_wstring(Helpers::ptrToUint64(this)));
+		delete _scenesDispatcher;
+		delete _requestProcessor;
+		delete _apiClient;
+		delete _tokenHandler;
+
+		if (_serverConnection)
+		{
+			delete _serverConnection;
+		}
+
+		if (_dispatcher)
+		{
+			delete _dispatcher;
+		}
+
+		if (_transport)
+		{
+			delete _transport;
+		}
+
+		_logger->log(LogLevel::Debug, L"", L"Client destroyed", to_wstring(Helpers::ptrToUint64(this)));
 	}
 
 	void Client::initialize()
@@ -104,12 +124,12 @@ namespace Stormancer
 	{
 		_logger->log(LogLevel::Trace, L"", L"Client::getPublicScene", sceneId);
 
-		return _apiClient->getSceneEndpoint(_accountId, _applicationName, sceneId, userData).then([this, sceneId](SceneEndpoint* sep) {
+		return _apiClient->getSceneEndpoint(_accountId, _applicationName, sceneId, userData).then([this, sceneId](SceneEndpoint& sep) {
 			return this->getScene(sceneId, sep);
 		});
 	}
 
-	pplx::task<Scene*> Client::getScene(wstring sceneId, SceneEndpoint* sep)
+	pplx::task<Scene*> Client::getScene(wstring sceneId, SceneEndpoint sep)
 	{
 		_logger->log(LogLevel::Trace, L"", L"Client::getScene", sceneId);
 
@@ -118,7 +138,7 @@ namespace Stormancer
 				_cts = pplx::cancellation_token_source();
 				return _transport->start(L"client", new ConnectionHandler(), _cts.get_token(), 11, (uint16)(_maxPeers + 1));
 			}).then([this, sep]() {
-				wstring endpoint = sep->tokenData->Endpoints[_transport->name()];
+				wstring endpoint = sep.tokenData.Endpoints.at(_transport->name());
 				return _transport->connect(endpoint).then([this](IConnection* connection) {
 					_serverConnection = connection;
 
@@ -129,15 +149,15 @@ namespace Stormancer
 				});
 			});
 		}).then([this, sep]() {
-				SceneInfosRequestDto parameter;
-				parameter.Metadata = _serverConnection->metadata;
-				parameter.Token = sep->token;
+			SceneInfosRequestDto parameter;
+			parameter.Metadata = _serverConnection->metadata;
+			parameter.Token = sep.token;
 
-				return sendSystemRequest<SceneInfosRequestDto, SceneInfosDto>((byte)MessageIDTypes::ID_GET_SCENE_INFOS, parameter);
-			}).then([this, sep, sceneId](SceneInfosDto result) {
-				this->_serverConnection->metadata[L"serializer"] = result.SelectedSerializer;
-				return new Scene(_serverConnection, this, sceneId, sep->token, result);
-			});
+			return sendSystemRequest<SceneInfosRequestDto, SceneInfosDto>((byte)MessageIDTypes::ID_GET_SCENE_INFOS, parameter);
+		}).then([this, sep, sceneId](SceneInfosDto result) {
+			this->_serverConnection->metadata[L"serializer"] = result.SelectedSerializer;
+			return new Scene(_serverConnection, this, sceneId, sep.token, result);
+		});
 	}
 
 	pplx::task<void> Client::connectToScene(Scene* scene, wstring& token, vector<Route*> localRoutes)
@@ -172,8 +192,9 @@ namespace Stormancer
 	pplx::task<void> Client::disconnect(Scene* scene, byte sceneHandle)
 	{
 		auto _scenesDispatcher = this->_scenesDispatcher;
-		return sendSystemRequest<byte, EmptyDto>((byte)MessageIDTypes::ID_DISCONNECT_FROM_SCENE, sceneHandle).then([this, _scenesDispatcher, sceneHandle](pplx::task<EmptyDto> t) {
+		return sendSystemRequest<byte, EmptyDto>((byte)MessageIDTypes::ID_DISCONNECT_FROM_SCENE, sceneHandle).then([this, _scenesDispatcher, sceneHandle, scene](pplx::task<EmptyDto> t) {
 			_scenesDispatcher->removeScene(sceneHandle);
+			delete scene;
 		});
 	}
 

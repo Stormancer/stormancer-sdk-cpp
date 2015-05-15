@@ -7,6 +7,12 @@ namespace Stormancer
 	{
 	}
 
+	SceneEndpoint::SceneEndpoint(wstring& token, ConnectionData& tokenData)
+		: token(token),
+		tokenData(tokenData)
+	{
+	}
+
 	SceneEndpoint::~SceneEndpoint()
 	{
 	}

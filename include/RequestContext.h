@@ -19,9 +19,9 @@ namespace Stormancer
 		void error(function<void(bytestream*)> writer);
 
 	private:
-		Packet<>* _packet;
 		byte _requestId[2];
-		bytestream* _stream;
+		Packet<>* _packet = nullptr;
+		bytestream* _stream = nullptr;
 		bool _didSendValues = false;
 		bool _isComplete;
 	};
