@@ -3,7 +3,7 @@
 
 using namespace Stormancer;
 
-auto ilogger = ILogger::instance(new ConsoleLogger(Stormancer::LogLevel::Trace));
+auto ilogger = ILogger::instance(new ConsoleLogger(Stormancer::LogLevel::Info));
 auto logger = (ConsoleLogger*)ilogger;
 Scene* scene = nullptr;
 
@@ -17,7 +17,7 @@ Concurrency::task<void> test1(Client& client)
 		logger->logGreen(L"Done");
 
 		logger->logWhite(L"Add 'echo.out' route");
-		scene->addRoute(L"echo.out", [](Packet<IScenePeer>* p) {
+		scene->addRoute(L"echo.out", [](shared_ptr<Packet<IScenePeer>> p) {
 			wstring message;
 			*p->stream >> message;
 
@@ -26,6 +26,9 @@ Concurrency::task<void> test1(Client& client)
 				logger->logGreen(L"Done");
 
 				logger->logWhite(L"Disconnect");
+
+				//client->disconnect(scene);
+			    //delete scene;
 				scene->disconnect().then([](pplx::task<void> t3) {
 					if (t3.is_done())
 					{
@@ -69,24 +72,25 @@ Concurrency::task<void> test1(Client& client)
 Concurrency::task<void> test2(Client& client)
 {
 	return client.getPublicScene(L"test-scene", L"hello").then([](pplx::task<Scene*> t) {
-		Scene* scene = t.get();
-		scene->addRoute(L"echo.out", [scene](Packet<IScenePeer>* p) {
+		scene = t.get();
+		scene->addRoute(L"echo.out", [](shared_ptr<Packet<IScenePeer>> p) {
 			int32 number;
 			*p->stream >> number;
-			logger->logGreen(L"Received message: " + to_wstring(number));
+			//logger->logGreen(L"Received message: " + to_wstring(number));
 		});
 
 		logger->log(L"Connecting to scene!");
-		return scene->connect().then([scene](pplx::task<void> t2) {
+		return scene->connect().then([](pplx::task<void> t2) {
 			if (t2.is_done())
 			{
 				logger->log(L"Connected to scene!");
-				while(1)// for (int i = 0; i < 10; i++)
+				while(1)
+				//for (int i = 0; i < 100; i++)
 				{
 					scene->sendPacket(L"echo.in", [](bytestream* stream) {
 						int32 number = rand();
 						*stream << number;
-						logger->logWhite(L"Sending message: " + to_wstring(number));
+						//logger->logWhite(L"Sending message: " + to_wstring(number));
 					});
 				}
 			}
@@ -100,6 +104,8 @@ Concurrency::task<void> test2(Client& client)
 
 int main(int argc, char* argv[])
 {
+	cin.ignore();
+
 	srand(time(NULL));
 
 	std::set_terminate([]() {
@@ -112,8 +118,8 @@ int main(int argc, char* argv[])
 	Client client(&config);
 	logger->logGreen(L"Done");
 
-	auto task = test1(client);
-	//auto task = test2(client);
+	//auto task = test1(client);
+	auto task = test2(client);
 
 	try
 	{
@@ -125,6 +131,11 @@ int main(int argc, char* argv[])
 	}
 
 	cin.ignore();
+
+	if (scene)
+	{
+		delete scene;
+	}
 
 	return 0;
 }

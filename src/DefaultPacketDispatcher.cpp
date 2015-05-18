@@ -21,7 +21,7 @@ namespace Stormancer
 		_defaultProcessors.clear();
 	}
 
-	void DefaultPacketDispatcher::dispatchPacket(Packet<>* packet)
+	void DefaultPacketDispatcher::dispatchPacket(shared_ptr<Packet<>> packet)
 	{
 		pplx::create_task([this, packet]() {
 			bool processed = false;

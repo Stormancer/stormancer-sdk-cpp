@@ -20,7 +20,7 @@ namespace Stormancer
 		uint64 id();
 
 	public:
-		Action<Packet<>*> packetReceived;
+		Action<shared_ptr<Packet<>>> packetReceived;
 		Action<IConnection*> connectionOpened;
 		Action<IConnection*> connectionClosed;
 

@@ -23,6 +23,6 @@ namespace Stormancer
 		uint16 _handle;
 		Scene* _scene;
 		stringMap _metadata;
-		vector< function<void(Packet<>*)>* > handlers;
+		vector< function<void(shared_ptr<Packet<>>)>* > handlers;
 	};
 };

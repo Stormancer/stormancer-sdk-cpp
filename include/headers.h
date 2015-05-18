@@ -55,8 +55,6 @@ namespace rxsub = rxcpp::subjects;
 #include <PacketPriority.h>
 #include <RakNetTypes.h>
 
-#include <vld.h>
-
 // packed libs
 #include <MsgPack.h>
 

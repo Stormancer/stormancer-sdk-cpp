@@ -19,6 +19,16 @@ namespace Stormancer
 
 	Scene::~Scene()
 	{
+		if (_host)
+		{
+			delete _host;
+		}
+
+		for (auto sub : subscriptions)
+		{
+			sub.unsubscribe();
+		}
+
 		ILogger::instance()->log(LogLevel::Debug, L"", L"Scene " + _id + L" deleted", to_wstring(Helpers::ptrToUint64(this)));
 	}
 
@@ -57,7 +67,7 @@ namespace Stormancer
 		return Helpers::mapValuesPtr(_remoteRoutesMap);
 	}
 
-	void Scene::addRoute(wstring routeName, function<void(Packet<IScenePeer>*)> handler, stringMap metadata)
+	void Scene::addRoute(wstring routeName, function<void(shared_ptr<Packet<IScenePeer>>)> handler, stringMap metadata)
 	{
 		if (routeName.length() == 0 || routeName[0] == '@')
 		{
@@ -74,15 +84,15 @@ namespace Stormancer
 			_localRoutesMap[routeName] = Route(this, routeName, metadata);
 		}
 
-		onMessage(routeName).subscribe(handler);
+		subscriptions.push_back( onMessage(routeName).subscribe(handler) );
 	}
 
-	rx::observable<Packet<IScenePeer>*> Scene::onMessage(Route* route)
+	rx::observable<shared_ptr<Packet<IScenePeer>>> Scene::onMessage(Route* route)
 	{
-		auto observable = rx::observable<>::create<Packet<IScenePeer>*>([this, route](rx::subscriber<Packet<IScenePeer>*> subscriber) {
-			auto handler = new function<void(Packet<>*)>([this, subscriber](Packet<>* p) {
-				Packet<IScenePeer> packet(host(), p->stream, p->metadata());
-				subscriber.on_next(&packet);
+		auto observable = rx::observable<>::create<shared_ptr<Packet<IScenePeer>>>([this, route](rx::subscriber<shared_ptr<Packet<IScenePeer>>> subscriber) {
+			auto handler = new function<void(shared_ptr<Packet<>>)>([this, subscriber](shared_ptr<Packet<>> p) {
+				shared_ptr<Packet<IScenePeer>> packet( new Packet<IScenePeer>( host(), p->stream, p->metadata() ) );
+				subscriber.on_next(packet);
 			});
 			route->handlers.push_back(handler);
 
@@ -95,7 +105,7 @@ namespace Stormancer
 		return observable.as_dynamic();
 	}
 
-	rx::observable<Packet<IScenePeer>*> Scene::onMessage(wstring routeName)
+	rx::observable<shared_ptr<Packet<IScenePeer>>> Scene::onMessage(wstring routeName)
 	{
 		if (_connected)
 		{
@@ -154,7 +164,7 @@ namespace Stormancer
 		}
 	}
 
-	void Scene::handleMessage(Packet<>* packet)
+	void Scene::handleMessage(shared_ptr<Packet<>> packet)
 	{
 		packetReceived(packet);
 
@@ -173,7 +183,6 @@ namespace Stormancer
 		}
 
 		delete packet->getMetadata<uint16>(L"routeId");
-		delete packet;
 	}
 
 	vector<IScenePeer*> Scene::remotePeers()
@@ -183,6 +192,10 @@ namespace Stormancer
 
 	IScenePeer* Scene::host()
 	{
-		return new ScenePeer(_peer, _handle, _remoteRoutesMap, this);
+		if (!_host)
+		{
+			_host = new ScenePeer(_peer, _handle, _remoteRoutesMap, this);
+		}
+		return _host;
 	}
 };

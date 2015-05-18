@@ -15,7 +15,7 @@ namespace Stormancer
 
 	public:
 		void registerProcessor(PacketProcessorConfig& config);
-		pplx::task<Packet<>*> sendSystemRequest(IConnection* peer, byte msgId, function<void(bytestream*)> writer);
+		pplx::task<shared_ptr<Packet<>>> sendSystemRequest(IConnection* peer, byte msgId, function<void(bytestream*)> writer);
 
 	private:
 		shared_ptr<Request> reserveRequestSlot(PacketObserver&& observer);

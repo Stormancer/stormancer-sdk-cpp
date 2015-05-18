@@ -48,7 +48,7 @@ namespace Stormancer
 	private:
 		pplx::task<void> connectToScene(Scene* scene, wstring& token, vector<Route*> localRoutes);
 		pplx::task<void> disconnect(Scene* scene, byte sceneHandle);
-		void transport_packetReceived(Packet<>* packet);
+		void transport_packetReceived(shared_ptr<Packet<>> packet);
 
 		template<typename T1, typename T2>
 		pplx::task<T2> sendSystemRequest(byte id, T1& parameter)
@@ -56,7 +56,7 @@ namespace Stormancer
 			int a = 0;
 			return _requestProcessor->sendSystemRequest(_serverConnection, id, [this, &parameter](bytestream* stream) {
 				parameter.serialize(stream); // serialize request dto
-			}).then([this](Packet<>* packet) {
+			}).then([this](shared_ptr<Packet<>> packet) {
 				auto r = T2(packet->stream); // deserialize result dto
 				return r;
 			});
@@ -67,7 +67,7 @@ namespace Stormancer
 		{
 			return _requestProcessor->sendSystemRequest(_serverConnection, id, [this, &parameter](bytestream* stream) {
 				ISerializable::serialize(byte(parameter), stream); // serialize byte
-			}).then([this](Packet<>* packet) {
+			}).then([this](shared_ptr<Packet<>> packet) {
 				return EmptyDto(packet->stream); // deserialize result dto
 			});
 		}

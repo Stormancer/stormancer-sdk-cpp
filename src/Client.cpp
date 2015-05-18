@@ -63,6 +63,7 @@ namespace Stormancer
 
 	Client::~Client()
 	{
+		_cts.cancel();
 		delete _scenesDispatcher;
 		delete _requestProcessor;
 		delete _apiClient;
@@ -92,7 +93,7 @@ namespace Stormancer
 		{
 			_initialized = true;
 			auto d2 = this->_dispatcher;
-			_transport->packetReceived += new function<void(Packet<>*)>(([this](Packet<>* packet) {
+			_transport->packetReceived += new function<void(shared_ptr<Packet<>>)>(([this](shared_ptr<Packet<>> packet) {
 				this->transport_packetReceived(packet);
 			}));
 		}
@@ -198,7 +199,7 @@ namespace Stormancer
 		});
 	}
 
-	void Client::transport_packetReceived(Packet<>* packet)
+	void Client::transport_packetReceived(shared_ptr<Packet<>> packet)
 	{
 		// TODO plugins
 

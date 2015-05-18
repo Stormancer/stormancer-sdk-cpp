@@ -32,7 +32,7 @@ namespace Stormancer
 
 		for (auto it : _handlers)
 		{
-			config.addProcessor(it.first, new handlerFunction([it](Packet<>* p) {
+			config.addProcessor(it.first, new handlerFunction([it](shared_ptr<Packet<>> p) {
 				RequestContext context(p);
 				it.second(&context).then([&context, &p](pplx::task<void> task) {
 					if (!context.isComplete())
@@ -54,7 +54,7 @@ namespace Stormancer
 			}));
 		}
 
-		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG, new handlerFunction([this](Packet<>* p) {
+		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG, new handlerFunction([this](shared_ptr<Packet<>> p) {
 			uint16 id;
 			*(p->stream) >> id;
 
@@ -75,7 +75,7 @@ namespace Stormancer
 			return true;
 		}));
 
-		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_COMPLETE, new handlerFunction([this](Packet<>* p) {
+		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_COMPLETE, new handlerFunction([this](shared_ptr<Packet<>> p) {
 			uint16 id;
 			*(p->stream) >> id;
 
@@ -104,7 +104,7 @@ namespace Stormancer
 			return true;
 		}));
 
-		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_ERROR, new handlerFunction([this](Packet<>* p) {
+		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_ERROR, new handlerFunction([this](shared_ptr<Packet<>> p) {
 			uint16 id;
 			*(p->stream) >> id;
 
@@ -129,10 +129,10 @@ namespace Stormancer
 		}));
 	}
 
-	pplx::task<Packet<>*> RequestProcessor::sendSystemRequest(IConnection* peer, byte msgId, function<void(bytestream*)> writer)
+	pplx::task<shared_ptr<Packet<>>> RequestProcessor::sendSystemRequest(IConnection* peer, byte msgId, function<void(bytestream*)> writer)
 	{
-		auto tce = new pplx::task_completion_event<Packet<>*>();
-		auto observer = rx::make_observer<Packet<>*>([tce](Packet<>* p) {
+		auto tce = new pplx::task_completion_event<shared_ptr<Packet<>>>();
+		auto observer = rx::make_observer<shared_ptr<Packet<>>>([tce](shared_ptr<Packet<>> p) {
 			tce->set(p);
 		}, [tce](exception_ptr ex) {
 			tce->set_exception(ex);
@@ -145,7 +145,7 @@ namespace Stormancer
 		});
 
 		auto task = pplx::create_task(*tce);
-		task.then([tce](pplx::task<Packet<>*> t) {
+		task.then([tce](pplx::task<shared_ptr<Packet<>>> t) {
 			if (tce)
 			{
 				delete tce;

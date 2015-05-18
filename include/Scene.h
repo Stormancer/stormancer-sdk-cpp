@@ -8,7 +8,7 @@
 
 namespace Stormancer
 {
-	using PacketObservable = rx::observable < Packet<>* > ;
+	using PacketObservable = rx::observable < shared_ptr<Packet<>> > ;
 
 	class Client;
 
@@ -21,10 +21,12 @@ namespace Stormancer
 		Scene(IConnection* connection, Client* client, wstring id, wstring token, SceneInfosDto dto);
 		virtual ~Scene();
 
+		Scene(Scene& sc);
+
 	public:
 		STORMANCER_DLL_API pplx::task<void> connect();
 		STORMANCER_DLL_API pplx::task<void> disconnect();
-		STORMANCER_DLL_API void addRoute(wstring routeName, function<void(Packet<IScenePeer>*)> handler, stringMap metadata = stringMap());
+		STORMANCER_DLL_API void addRoute(wstring routeName, function<void(shared_ptr<Packet<IScenePeer>>)> handler, stringMap metadata = stringMap());
 		STORMANCER_DLL_API void sendPacket(wstring routeName, function<void(bytestream*)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE);
 		STORMANCER_DLL_API bool connected();
 		STORMANCER_DLL_API wstring id();
@@ -33,15 +35,15 @@ namespace Stormancer
 		STORMANCER_DLL_API IConnection* hostConnection();
 		STORMANCER_DLL_API vector<Route*> localRoutes();
 		STORMANCER_DLL_API vector<Route*> remoteRoutes();
-		STORMANCER_DLL_API rx::observable<Packet<IScenePeer>*> onMessage(Route* route);
-		STORMANCER_DLL_API rx::observable<Packet<IScenePeer>*> onMessage(wstring routeName);
+		STORMANCER_DLL_API rx::observable<shared_ptr<Packet<IScenePeer>>> onMessage(Route* route);
+		STORMANCER_DLL_API rx::observable<shared_ptr<Packet<IScenePeer>>> onMessage(wstring routeName);
 		STORMANCER_DLL_API vector<IScenePeer*> remotePeers();
 		STORMANCER_DLL_API IScenePeer* host();
 		void completeConnectionInitialization(ConnectionResult& cr);
-		void handleMessage(Packet<>* packet);
+		void handleMessage(shared_ptr<Packet<>> packet);
 
 	public:
-		Action<Packet<>*> packetReceived;
+		Action<shared_ptr<Packet<>>> packetReceived;
 		const bool isHost = false;
 
 	private:
@@ -53,7 +55,9 @@ namespace Stormancer
 		wstring _id;
 		map<wstring, Route> _localRoutesMap;
 		map<wstring, Route> _remoteRoutesMap;
-		map<uint16, vector<function<void(Packet<>*)>*>> _handlers;
+		map<uint16, vector<function<void(shared_ptr<Packet<>>)>*>> _handlers;
 		Client* _client;
+		vector<rxcpp::composite_subscription> subscriptions;
+		IScenePeer* _host = nullptr;
 	};
 };

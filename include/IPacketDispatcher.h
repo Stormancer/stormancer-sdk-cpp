@@ -11,7 +11,7 @@ namespace Stormancer
 		IPacketDispatcher();
 		virtual ~IPacketDispatcher();
 
-		virtual void dispatchPacket(Packet<>* packet) = 0;
+		virtual void dispatchPacket(shared_ptr<Packet<>> packet) = 0;
 
 		virtual void addProcessor(IPacketProcessor* processor) = 0;
 	};

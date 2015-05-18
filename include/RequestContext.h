@@ -7,11 +7,11 @@ namespace Stormancer
 	class RequestContext
 	{
 	public:
-		RequestContext(Packet<>* packet);
+		RequestContext(shared_ptr<Packet<>> packet);
 		virtual ~RequestContext();
 
 	public:
-		Packet<>* packet();
+		shared_ptr<Packet<>> packet();
 		bytestream* inputStream();
 		bool isComplete();
 		void send(function<void(bytestream*)> writer);
@@ -20,7 +20,7 @@ namespace Stormancer
 
 	private:
 		byte _requestId[2];
-		Packet<>* _packet = nullptr;
+		shared_ptr<Packet<>> _packet = nullptr;
 		bytestream* _stream = nullptr;
 		bool _didSendValues = false;
 		bool _isComplete;
