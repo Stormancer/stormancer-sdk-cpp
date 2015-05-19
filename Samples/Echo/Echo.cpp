@@ -3,100 +3,63 @@
 
 using namespace Stormancer;
 
-auto ilogger = ILogger::instance(new ConsoleLogger(Stormancer::LogLevel::Info));
+auto ilogger = ILogger::instance(new ConsoleLogger(Stormancer::LogLevel::Trace));
 auto logger = (ConsoleLogger*)ilogger;
-Scene* scene = nullptr;
 
-//auto logger = new ConsoleLogger(Stormancer::LogLevel::Trace);
-
-Concurrency::task<void> test1(Client& client)
+Concurrency::task<void> test(Client& client)
 {
 	logger->logWhite(L"Get scene");
 	return client.getPublicScene(L"test-scene", L"hello").then([](pplx::task<Scene*> t) {
-		scene = t.get();
+		Scene* scene = t.get();
 		logger->logGreen(L"Done");
+		int nbMsgToSend = 10;
+		auto nbMsgReceived = new int(0);
 
-		logger->logWhite(L"Add 'echo.out' route");
-		scene->addRoute(L"echo.out", [](shared_ptr<Packet<IScenePeer>> p) {
-			wstring message;
-			*p->stream >> message;
-
-			if (message == L"hello world!")
+		logger->logWhite(L"Add route");
+		scene->addRoute(L"echo.out", [scene, nbMsgToSend, nbMsgReceived](shared_ptr<Packet<IScenePeer>> p) {
+			int32 number1, number2, number3;
+			*p->stream >> number1 >> number2 >> number3;
+			logger->logGreen(L"Received message: [ " + to_wstring(number1) + L" ; " + to_wstring(number2) + L" ; " + to_wstring(number3) + L" ]");
+			
+			(*nbMsgReceived)++;
+			if (*nbMsgReceived == nbMsgToSend)
 			{
 				logger->logGreen(L"Done");
 
 				logger->logWhite(L"Disconnect");
-
-				//client->disconnect(scene);
-			    //delete scene;
-				scene->disconnect().then([](pplx::task<void> t3) {
+				scene->disconnect().then([scene, nbMsgReceived](pplx::task<void> t3) {
 					if (t3.is_done())
 					{
 						logger->logGreen(L"Done");
 					}
 					else
 					{
-						logger->logRed(L"Failed");
+						logger->logRed(L"Fail");
 					}
+					delete nbMsgReceived;
+					logger->logWhite(L"Type 'Enter' to finish the sample");
 				});
-			}
-			else
-			{
-				logger->logRed(L"Bad data received");
 			}
 		});
 		logger->logGreen(L"Done");
 
-		logger->logWhite(L"Connect");
-		return scene->connect().then([](pplx::task<void> t2) {
+		logger->logWhite(L"Connect to scene");
+		return scene->connect().then([scene, nbMsgToSend](pplx::task<void> t2) {
 			if (t2.is_done())
 			{
 				logger->logGreen(L"Done");
-
-				logger->logWhite(L"Send Message");
-				scene->sendPacket(L"echo.in", [](bytestream* stream) {
-					*stream << L"hello world!";
-				});
-				logger->logGreen(L"Done");
-
-				logger->logWhite(L"Receive Message");
-			}
-			else
-			{
-				logger->logRed(L"Bad stuff happened...");
-			}
-		});
-	});
-}
-
-Concurrency::task<void> test2(Client& client)
-{
-	return client.getPublicScene(L"test-scene", L"hello").then([](pplx::task<Scene*> t) {
-		scene = t.get();
-		scene->addRoute(L"echo.out", [](shared_ptr<Packet<IScenePeer>> p) {
-			int32 number;
-			*p->stream >> number;
-			//logger->logGreen(L"Received message: " + to_wstring(number));
-		});
-
-		logger->log(L"Connecting to scene!");
-		return scene->connect().then([](pplx::task<void> t2) {
-			if (t2.is_done())
-			{
-				logger->log(L"Connected to scene!");
-				while(1)
-				//for (int i = 0; i < 100; i++)
+				for (int i = 0; i < nbMsgToSend; i++)
 				{
 					scene->sendPacket(L"echo.in", [](bytestream* stream) {
-						int32 number = rand();
-						*stream << number;
-						//logger->logWhite(L"Sending message: " + to_wstring(number));
+						int32 number1(rand()), number2(rand()), number3(rand());
+						*stream << number1 << number2 << number3;
+						logger->logWhite(L"Sending message: [ " + to_wstring(number1) + L" ; " + to_wstring(number2) + L" ; " + to_wstring(number3) + L" ]");
 					});
 				}
 			}
 			else
 			{
-				logger->logRed(L"Bad stuff happened...");
+				logger->logRed(L"Fail");
 			}
 		});
 	});
@@ -104,22 +67,18 @@ Concurrency::task<void> test2(Client& client)
 
 int main(int argc, char* argv[])
 {
-	cin.ignore();
-
 	srand(time(NULL));
 
-	std::set_terminate([]() {
-		bool termin = true;
-	});
+	//logger->logWhite(L"Type 'Enter' to start the sample");
+	//cin.ignore();
 
-	logger->logWhite(L"Creating client");
+	logger->logWhite(L"Create client");
 	ClientConfiguration config(L"test", L"echo");
 	config.serverEndpoint = L"http://localhost:8081";
 	Client client(&config);
 	logger->logGreen(L"Done");
 
-	//auto task = test1(client);
-	auto task = test2(client);
+	auto task = test(client);
 
 	try
 	{
@@ -131,11 +90,6 @@ int main(int argc, char* argv[])
 	}
 
 	cin.ignore();
-
-	if (scene)
-	{
-		delete scene;
-	}
 
 	return 0;
 }

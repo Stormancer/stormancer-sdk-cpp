@@ -12,11 +12,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Echo", "Samples\Echo\Echo.v
 		{597F12E7-04EF-4FCC-AC51-5EA9F3D542B4} = {597F12E7-04EF-4FCC-AC51-5EA9F3D542B4}
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AF1A5868-C9DC-4043-A36D-9B230507BBBB}"
-	ProjectSection(SolutionItems) = preProject
-		Performance3.psess = Performance3.psess
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -46,8 +41,5 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{72E8554F-47F1-4C29-AA8E-9D0C06873585} = {CAF00EAB-8E9D-442B-B086-7E59415F3AE7}
-	EndGlobalSection
-	GlobalSection(Performance) = preSolution
-		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal
