@@ -1,7 +1,5 @@
 #include "stormancer.h"
 
-//#include <vld.h>
-
 namespace Stormancer
 {
 	RakNetTransport::RakNetTransport(ILogger* logger)

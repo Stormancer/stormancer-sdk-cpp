@@ -3,8 +3,8 @@ Stormancer SDK C++
 Configuration help  
 
 NuGet packages to install :  
-- C++ REST SDK (by searching casablanca)  
-- RXCPP
+- C++ REST SDK (or cpprestsdk) (by searching casablanca)  
+- Reactive Extensions for C++ (or rxcpp)  
 
 Bundled libraries :  
 - RakNet  
@@ -15,6 +15,6 @@ Add RakNet and the Stormancer SDK to your environment path (in visual studio onl
 Go to Project Properties > Configuration Properties > Debugging  
 Select All Configurations and All Platforms on top of the property window.  
 Change the Environment option and add this line :  
-PATH=$(SolutionDir)RakNet\Lib\DLL\Lib;$(SolutionDir)bin;%PATH%
+PATH=$(SolutionDir)RakNet\Lib\DLL\Lib;$(SolutionDir)bin;%PATH%  
 
 And don't forget to set Echo as startup project.  

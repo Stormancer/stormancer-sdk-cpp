@@ -27,7 +27,7 @@ Concurrency::task<void> test(Client& client)
 				logger->logGreen(L"Done");
 
 				logger->logWhite(L"Disconnect");
-				scene->disconnect().then([scene, nbMsgReceived](pplx::task<void> t3) {
+				scene->disconnect().then([nbMsgReceived](pplx::task<void> t3) {
 					if (t3.is_done())
 					{
 						logger->logGreen(L"Done");

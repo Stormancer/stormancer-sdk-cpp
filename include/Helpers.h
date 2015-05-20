@@ -50,8 +50,10 @@ namespace Stormancer
 	}
 
 	STORMANCER_DLL_API bytestream& operator<<(bytestream& bs, const char* data);
+	STORMANCER_DLL_API bytestream& operator<<(bytestream& bs, const string& data);
 	STORMANCER_DLL_API bytestream& operator<<(bytestream& bs, string& data);
 	STORMANCER_DLL_API bytestream& operator<<(bytestream& bs, const wchar_t* data);
+	STORMANCER_DLL_API bytestream& operator<<(bytestream& bs, const wstring& data);
 	STORMANCER_DLL_API bytestream& operator<<(bytestream& bs, wstring& data);
 
 	template<typename T>
@@ -160,9 +162,9 @@ namespace Stormancer
 			return std::to_string(data);
 		}
 
-		string to_string(wstring& str);
+		STORMANCER_DLL_API string to_string(wstring& str);
 
-		string to_string(vector<byte>& v);
+		STORMANCER_DLL_API string to_string(vector<byte>& v);
 
 		template<typename T1, typename T2>
 		T2 convert(T1& data)

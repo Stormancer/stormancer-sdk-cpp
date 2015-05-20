@@ -131,6 +131,11 @@ namespace Stormancer
 		return bs;
 	}
 
+	bytestream& operator<<(bytestream& bs, const string& data)
+	{
+		return bs << data.c_str();
+	}
+
 	bytestream& operator<<(bytestream& bs, string& data)
 	{
 		return bs << data.c_str();
@@ -140,6 +145,11 @@ namespace Stormancer
 	{
 		bs.write((char*)data, 2 * wcslen(data));
 		return bs;
+	}
+
+	bytestream& operator<<(bytestream& bs, const wstring& data)
+	{
+		return bs << data.c_str();
 	}
 
 	bytestream& operator<<(bytestream& bs, wstring& data)

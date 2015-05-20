@@ -12,6 +12,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Echo", "Samples\Echo\Echo.v
 		{597F12E7-04EF-4FCC-AC51-5EA9F3D542B4} = {597F12E7-04EF-4FCC-AC51-5EA9F3D542B4}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Chat", "Samples\Chat\Chat.vcxproj", "{83ADE124-5C4E-473E-8691-B78899C89C80}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -35,11 +37,18 @@ Global
 		{72E8554F-47F1-4C29-AA8E-9D0C06873585}.Release|Win32.ActiveCfg = Release|Win32
 		{72E8554F-47F1-4C29-AA8E-9D0C06873585}.Release|Win32.Build.0 = Release|Win32
 		{72E8554F-47F1-4C29-AA8E-9D0C06873585}.Release|x64.ActiveCfg = Release|Win32
+		{83ADE124-5C4E-473E-8691-B78899C89C80}.Debug|Win32.ActiveCfg = Debug|Win32
+		{83ADE124-5C4E-473E-8691-B78899C89C80}.Debug|Win32.Build.0 = Debug|Win32
+		{83ADE124-5C4E-473E-8691-B78899C89C80}.Debug|x64.ActiveCfg = Debug|Win32
+		{83ADE124-5C4E-473E-8691-B78899C89C80}.Release|Win32.ActiveCfg = Release|Win32
+		{83ADE124-5C4E-473E-8691-B78899C89C80}.Release|Win32.Build.0 = Release|Win32
+		{83ADE124-5C4E-473E-8691-B78899C89C80}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{72E8554F-47F1-4C29-AA8E-9D0C06873585} = {CAF00EAB-8E9D-442B-B086-7E59415F3AE7}
+		{83ADE124-5C4E-473E-8691-B78899C89C80} = {CAF00EAB-8E9D-442B-B086-7E59415F3AE7}
 	EndGlobalSection
 EndGlobal
