@@ -2,33 +2,33 @@
 
 namespace Stormancer
 {
-	ClientConfiguration::ClientConfiguration(wstring account, wstring application)
+	Configuration::Configuration(wstring account, wstring application)
 		: account(account),
 		application(application),
 		dispatcher(new DefaultPacketDispatcher),
 		transport(new RakNetTransport(ILogger::instance())),
 		maxPeers(20),
-		apiEndpoint(L"http://localhost:8081/")
+		apiEndpoint(L"https://api.stormancer.com/")
 	{
 		//plugins.push_back(new RpcClientPlugin());
 	}
 
-	ClientConfiguration::~ClientConfiguration()
+	Configuration::~Configuration()
 	{
 	}
 
-	wstring ClientConfiguration::getApiEndpoint()
+	wstring Configuration::getApiEndpoint()
 	{
 		return (serverEndpoint.length() ? serverEndpoint : apiEndpoint);
 	}
 
-	ClientConfiguration& ClientConfiguration::setMetadata(wstring key, wstring value)
+	Configuration& Configuration::setMetadata(wstring key, wstring value)
 	{
 		metadata[key] = value;
 		return *this;
 	}
 
-	/*void ClientConfiguration::addPlugin(IClientPlugin* plugin)
+	/*void Configuration::addPlugin(IClientPlugin* plugin)
 	{
 		plugins.push_back(plugin);
 	}*/

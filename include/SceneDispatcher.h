@@ -6,6 +6,8 @@ namespace Stormancer
 {
 	class SceneDispatcher : public IPacketProcessor
 	{
+		friend class Client;
+
 	public:
 		SceneDispatcher();
 		virtual ~SceneDispatcher();

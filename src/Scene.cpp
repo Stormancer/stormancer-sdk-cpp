@@ -13,12 +13,12 @@ namespace Stormancer
 		{
 			_remoteRoutesMap[routeDto.Name] = Route(this, routeDto.Name, routeDto.Handle, routeDto.Metadata);
 		}
-
-		ILogger::instance()->log(LogLevel::Debug, L"", L"Scene " + _id + L" created", to_wstring(Helpers::ptrToUint64(this)));
 	}
 
 	Scene::~Scene()
 	{
+		disconnect();
+
 		if (_host)
 		{
 			delete _host;
@@ -28,8 +28,6 @@ namespace Stormancer
 		{
 			sub.unsubscribe();
 		}
-
-		ILogger::instance()->log(LogLevel::Debug, L"", L"Scene " + _id + L" deleted", to_wstring(Helpers::ptrToUint64(this)));
 	}
 
 	wstring Scene::getHostMetadata(wstring key)
@@ -84,14 +82,14 @@ namespace Stormancer
 			_localRoutesMap[routeName] = Route(this, routeName, metadata);
 		}
 
-		subscriptions.push_back( onMessage(routeName).subscribe(handler) );
+		subscriptions.push_back(onMessage(routeName).subscribe(handler));
 	}
 
 	rx::observable<shared_ptr<Packet<IScenePeer>>> Scene::onMessage(Route* route)
 	{
 		auto observable = rx::observable<>::create<shared_ptr<Packet<IScenePeer>>>([this, route](rx::subscriber<shared_ptr<Packet<IScenePeer>>> subscriber) {
 			auto handler = new function<void(shared_ptr<Packet<>>)>([this, subscriber](shared_ptr<Packet<>> p) {
-				shared_ptr<Packet<IScenePeer>> packet( new Packet<IScenePeer>( host(), p->stream, p->metadata() ) );
+				shared_ptr<Packet<IScenePeer>> packet(new Packet<IScenePeer>(host(), p->stream, p->metadata()));
 				subscriber.on_next(packet);
 			});
 			route->handlers.push_back(handler);
@@ -143,14 +141,26 @@ namespace Stormancer
 
 	pplx::task<void> Scene::connect()
 	{
-		return _client->connectToScene(this, _token, Helpers::mapValuesPtr(_localRoutesMap)).then([this]() {
-			_connected = true;
-		});
+		if (!_connected && !connectCalled)
+		{
+			connectCalled = true;
+			connectTask = _client->connectToScene(this, _token, Helpers::mapValuesPtr(_localRoutesMap));
+			connectTask.then([this]() {
+				this->_connected = true;
+			});
+		}
+		return connectTask;
 	}
 
 	pplx::task<void> Scene::disconnect()
 	{
-		return _client->disconnect(this, _handle);
+		if (_connected && !disconnectCalled)
+		{
+			disconnectCalled = true;
+			disconnectTask = _client->disconnect(this, _handle);
+			this->_connected = false;
+		}
+		return disconnectTask;
 	}
 
 	void Scene::completeConnectionInitialization(ConnectionResult& cr)

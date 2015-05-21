@@ -28,10 +28,7 @@ namespace Stormancer
 	void SceneDispatcher::removeScene(uint8 sceneHandle)
 	{
 		size_t index = sceneHandle - (uint8)MessageIDTypes::ID_SCENES;
-		if (index < _scenes.size())
-		{
-			_scenes.erase(_scenes.begin() + index);
-		}
+		_scenes[index] = nullptr;
 	}
 
 	bool SceneDispatcher::handler_impl(uint8 sceneHandle, shared_ptr<Packet<>> packet)

@@ -1,6 +1,6 @@
 #pragma once
 #include "headers.h"
-#include "ClientConfiguration.h"
+#include "Configuration.h"
 #include "ApiClient.h"
 #include "SceneEndpoint.h"
 #include "Scene.h"
@@ -33,21 +33,25 @@ namespace Stormancer
 		};
 
 	public:
-		STORMANCER_DLL_API Client(ClientConfiguration* config);
+		STORMANCER_DLL_API Client(Configuration* config);
 		STORMANCER_DLL_API ~Client();
 
+		Client(Client& other) = delete;
+		Client& operator=(Client& other) = delete;
+
 	public:
-		STORMANCER_DLL_API pplx::task<Scene*> getPublicScene(wstring sceneId, wstring userData);
+		STORMANCER_DLL_API pplx::task<shared_ptr<Scene>> getPublicScene(wstring sceneId, wstring userData = L"");
 		void initialize();
 		wstring applicationName();
 		ILogger* logger();
 		void setLogger(ILogger* logger);
-		pplx::task<Scene*> getScene(wstring sceneId, SceneEndpoint sep);
+		pplx::task<shared_ptr<Scene>> getScene(wstring sceneId, SceneEndpoint sep);
 		void disconnect();
 
 	private:
 		pplx::task<void> connectToScene(Scene* scene, wstring& token, vector<Route*> localRoutes);
 		pplx::task<void> disconnect(Scene* scene, byte sceneHandle);
+		void disconnectAllScenes();
 		void transport_packetReceived(shared_ptr<Packet<>> packet);
 
 		template<typename T1, typename T2>

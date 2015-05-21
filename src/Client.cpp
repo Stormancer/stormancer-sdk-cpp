@@ -34,7 +34,7 @@ namespace Stormancer
 
 	// Client
 
-	Client::Client(ClientConfiguration* config)
+	Client::Client(Configuration* config)
 		: _initialized(false),
 		_logger(ILogger::instance()),
 		_accountId(config->account),
@@ -57,12 +57,12 @@ namespace Stormancer
 		_metadata[L"platform"] = L"cpp";
 
 		initialize();
-
-		_logger->log(LogLevel::Debug, L"", L"Client created", to_wstring(Helpers::ptrToUint64(this)));
 	}
 
 	Client::~Client()
 	{
+		disconnect();
+
 		_cts.cancel();
 		delete _scenesDispatcher;
 		delete _requestProcessor;
@@ -83,8 +83,6 @@ namespace Stormancer
 		{
 			delete _transport;
 		}
-
-		_logger->log(LogLevel::Debug, L"", L"Client destroyed", to_wstring(Helpers::ptrToUint64(this)));
 	}
 
 	void Client::initialize()
@@ -121,7 +119,7 @@ namespace Stormancer
 		}
 	}
 
-	pplx::task<Scene*> Client::getPublicScene(wstring sceneId, wstring userData)
+	pplx::task<shared_ptr<Scene>> Client::getPublicScene(wstring sceneId, wstring userData)
 	{
 		_logger->log(LogLevel::Trace, L"", L"Client::getPublicScene", sceneId);
 
@@ -130,7 +128,7 @@ namespace Stormancer
 		});
 	}
 
-	pplx::task<Scene*> Client::getScene(wstring sceneId, SceneEndpoint sep)
+	pplx::task<shared_ptr<Scene>> Client::getScene(wstring sceneId, SceneEndpoint sep)
 	{
 		_logger->log(LogLevel::Trace, L"", L"Client::getScene", sceneId);
 
@@ -157,7 +155,7 @@ namespace Stormancer
 			return sendSystemRequest<SceneInfosRequestDto, SceneInfosDto>((byte)MessageIDTypes::ID_GET_SCENE_INFOS, parameter);
 		}).then([this, sep, sceneId](SceneInfosDto result) {
 			this->_serverConnection->metadata[L"serializer"] = result.SelectedSerializer;
-			return new Scene(_serverConnection, this, sceneId, sep.token, result);
+			return shared_ptr<Scene>( new Scene(_serverConnection, this, sceneId, sep.token, result) );
 		});
 	}
 
@@ -175,8 +173,7 @@ namespace Stormancer
 		}
 		parameter.ConnectionMetadata = _serverConnection->metadata;
 
-		return Client::sendSystemRequest<ConnectToSceneMsg, ConnectionResult>((byte)MessageIDTypes::ID_CONNECT_TO_SCENE, parameter)
-			.then([this, scene](ConnectionResult result) {
+		return Client::sendSystemRequest<ConnectToSceneMsg, ConnectionResult>((byte)MessageIDTypes::ID_CONNECT_TO_SCENE, parameter).then([this, scene](ConnectionResult result) {
 			scene->completeConnectionInitialization(result);
 			this->_scenesDispatcher->addScene(scene);
 		});
@@ -184,6 +181,8 @@ namespace Stormancer
 
 	void Client::disconnect()
 	{
+		disconnectAllScenes();
+
 		if (_serverConnection != nullptr)
 		{
 			_serverConnection->close();
@@ -195,8 +194,18 @@ namespace Stormancer
 		auto _scenesDispatcher = this->_scenesDispatcher;
 		return sendSystemRequest<byte, EmptyDto>((byte)MessageIDTypes::ID_DISCONNECT_FROM_SCENE, sceneHandle).then([this, _scenesDispatcher, sceneHandle, scene](pplx::task<EmptyDto> t) {
 			_scenesDispatcher->removeScene(sceneHandle);
-			delete scene;
 		});
+	}
+
+	void Client::disconnectAllScenes()
+	{
+		for (auto scene : _scenesDispatcher->_scenes)
+		{
+			if (scene)
+			{
+				scene->disconnect();
+			}
+		}
 	}
 
 	void Client::transport_packetReceived(shared_ptr<Packet<>> packet)

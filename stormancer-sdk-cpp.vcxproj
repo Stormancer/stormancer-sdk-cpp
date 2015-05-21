@@ -218,7 +218,7 @@
     <ClInclude Include="include\basic_bytebuf.h" />
     <ClInclude Include="include\basic_bytestream.h" />
     <ClInclude Include="include\Client.h" />
-    <ClInclude Include="include\ClientConfiguration.h" />
+    <ClInclude Include="include\Configuration.h" />
     <ClInclude Include="include\ConnectionState.h" />
     <ClInclude Include="include\DefaultPacketDispatcher.h" />
     <ClInclude Include="include\Dto\ConnectionData.h" />
@@ -276,7 +276,7 @@
     <ClCompile Include="MsgPack\MsgPack.cpp" />
     <ClCompile Include="src\ApiClient.cpp" />
     <ClCompile Include="src\Client.cpp" />
-    <ClCompile Include="src\ClientConfiguration.cpp" />
+    <ClCompile Include="src\Configuration.cpp" />
     <ClCompile Include="src\DefaultPacketDispatcher.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\Dto\ConnectionResult.cpp" />

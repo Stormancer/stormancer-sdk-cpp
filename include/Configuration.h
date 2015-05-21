@@ -5,14 +5,17 @@
 
 namespace Stormancer
 {
-	class ClientConfiguration
+	class Configuration
 	{
 	public:
-		STORMANCER_DLL_API ClientConfiguration(wstring account, wstring application);
-		STORMANCER_DLL_API ~ClientConfiguration();
+		STORMANCER_DLL_API Configuration(wstring account, wstring application);
+		STORMANCER_DLL_API ~Configuration();
+
+		Configuration(Configuration& other) = delete;
+		Configuration& operator=(Configuration& other) = delete;
 
 		wstring getApiEndpoint();
-		ClientConfiguration& setMetadata(wstring key, wstring value);
+		Configuration& setMetadata(wstring key, wstring value);
 		//void addPlugin(IClientPlugin* plugin);
 
 	public:

@@ -21,7 +21,8 @@ namespace Stormancer
 		Scene(IConnection* connection, Client* client, wstring id, wstring token, SceneInfosDto dto);
 		virtual ~Scene();
 
-		Scene(Scene& sc);
+		Scene(Scene& other) = delete;
+		Scene& operator=(Scene& other) = delete;
 
 	public:
 		STORMANCER_DLL_API pplx::task<void> connect();
@@ -59,5 +60,9 @@ namespace Stormancer
 		Client* _client;
 		vector<rxcpp::composite_subscription> subscriptions;
 		IScenePeer* _host = nullptr;
+		bool connectCalled = false;
+		pplx::task<void> connectTask;
+		bool disconnectCalled = false;
+		pplx::task<void> disconnectTask;
 	};
 };

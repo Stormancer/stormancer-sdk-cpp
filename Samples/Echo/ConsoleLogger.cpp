@@ -11,10 +11,7 @@ ConsoleLogger::~ConsoleLogger()
 
 void ConsoleLogger::log(wstring message)
 {
-	_mutex.lock();
-	setConsoleColorWhite();
-	wclog << message << endl;
-	_mutex.unlock();
+	logWhite(message);
 }
 
 void ConsoleLogger::log(Stormancer::LogLevel level, wstring category, wstring message, wstring data)
@@ -24,35 +21,31 @@ void ConsoleLogger::log(Stormancer::LogLevel level, wstring category, wstring me
 		return;
 	}
 
-	wstring str = format(level, category, message, data);
-	_mutex.lock();
+	wstring message2 = format(level, category, message, data);
 	switch (level)
 	{
 	case Stormancer::LogLevel::Trace:
-		setConsoleColorGrey();
+		logGrey(message2);
 		break;
 	case Stormancer::LogLevel::Debug:
-		setConsoleColorWhite();
+		logWhite(message2);
 		break;
 	case Stormancer::LogLevel::Info:
-		setConsoleColorBlue();
+		logBlue(message2);
 		break;
 	case Stormancer::LogLevel::Warn:
-		setConsoleColorYellow();
+		logYellow(message2);
 		break;
 	case Stormancer::LogLevel::Error:
-		setConsoleColorDarkRed();
+		logDarkRed(message2);
 		break;
 	case Stormancer::LogLevel::Fatal:
-		setConsoleColorRed();
+		logRed(message2);
 		break;
 	default:
-		setConsoleColorWhite();
+		logWhite(message2);
 		break;
 	}
-	wclog << str << endl;
-	setConsoleColorWhite();
-	_mutex.unlock();
 }
 
 void ConsoleLogger::log(const std::exception& e)
@@ -77,6 +70,7 @@ void ConsoleLogger::logGrey(wstring message)
 	_mutex.lock();
 	setConsoleColorGrey();
 	wclog << message << endl;
+	setConsoleColorWhite();
 	_mutex.unlock();
 }
 
@@ -85,6 +79,7 @@ void ConsoleLogger::logGreen(wstring message)
 	_mutex.lock();
 	setConsoleColorGreen();
 	wclog << message << endl;
+	setConsoleColorWhite();
 	_mutex.unlock();
 }
 
@@ -93,6 +88,7 @@ void ConsoleLogger::logRed(wstring message)
 	_mutex.lock();
 	setConsoleColorRed();
 	wclog << message << endl;
+	setConsoleColorWhite();
 	_mutex.unlock();
 }
 
@@ -101,6 +97,7 @@ void ConsoleLogger::logBlue(wstring message)
 	_mutex.lock();
 	setConsoleColorBlue();
 	wclog << message << endl;
+	setConsoleColorWhite();
 	_mutex.unlock();
 }
 
@@ -109,6 +106,7 @@ void ConsoleLogger::logDarkRed(wstring message)
 	_mutex.lock();
 	setConsoleColorDarkRed();
 	wclog << message << endl;
+	setConsoleColorWhite();
 	_mutex.unlock();
 }
 
@@ -117,6 +115,7 @@ void ConsoleLogger::logYellow(wstring message)
 	_mutex.lock();
 	setConsoleColorYellow();
 	wclog << message << endl;
+	setConsoleColorWhite();
 	_mutex.unlock();
 }
 

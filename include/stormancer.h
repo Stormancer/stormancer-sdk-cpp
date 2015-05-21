@@ -19,7 +19,7 @@
 #include "IMetadata.h"
 #include "ApiClient.h"
 #include "Client.h"
-#include "ClientConfiguration.h"
+#include "Configuration.h"
 #include "ConnectionState.h"
 #include "ILogger.h"
 #include "FileLogger.h"
