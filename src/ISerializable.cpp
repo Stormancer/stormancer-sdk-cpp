@@ -78,7 +78,7 @@ namespace Stormancer
 
 		if (v->size() % 2)
 		{
-			throw exception("valueFromMsgPackMapKey error: size must be multiple of 2.");
+			throw exception("ISerializable: valueFromMsgPackMapKey error: size must be multiple of 2.");
 		}
 
 		for (uint32 i = 0; i < v->size(); i += 2)
@@ -90,7 +90,146 @@ namespace Stormancer
 			}
 		}
 
-		throw exception("valueFromMsgPackMapKey error: Not found.");
+		throw exception("ISerializable: valueFromMsgPackMapKey error: Not found.");
+	}
+
+	bool ISerializable::isNullFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key)
+	{
+		auto& element = valueFromMsgPackMapKey(msgPackMap, key);
+
+		return (element->getType() == 0xC0);
+	}
+
+	bool ISerializable::boolFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key)
+	{
+		auto& element = valueFromMsgPackMapKey(msgPackMap, key);
+
+		if (auto* prim = dynamic_cast<MsgPack::Primitive*>(element.get()))
+		{
+			return prim->getValue();
+		}
+
+		throw exception("ISerializable: This element is not a primitive");
+	}
+
+	int8 ISerializable::int8FromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key)
+	{
+		auto& element = valueFromMsgPackMapKey(msgPackMap, key);
+
+		if (auto* numb = dynamic_cast<MsgPack::Number*>(element.get()))
+		{
+			return numb->getValue<int8>();
+		}
+
+		throw exception("ISerializable: This element is not a number");
+	}
+
+	int16 ISerializable::int16FromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key)
+	{
+		auto& element = valueFromMsgPackMapKey(msgPackMap, key);
+
+		if (auto* numb = dynamic_cast<MsgPack::Number*>(element.get()))
+		{
+			return numb->getValue<int16>();
+		}
+
+		throw exception("ISerializable: This element is not a number");
+	}
+
+	int32 ISerializable::int32FromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key)
+	{
+		auto& element = valueFromMsgPackMapKey(msgPackMap, key);
+
+		if (auto* numb = dynamic_cast<MsgPack::Number*>(element.get()))
+		{
+			return numb->getValue<int32>();
+		}
+
+		throw exception("ISerializable: This element is not a number");
+	}
+
+	int64 ISerializable::int64FromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key)
+	{
+		auto& element = valueFromMsgPackMapKey(msgPackMap, key);
+
+		if (auto* numb = dynamic_cast<MsgPack::Number*>(element.get()))
+		{
+			return numb->getValue<int64>();
+		}
+
+		throw exception("ISerializable: This element is not a number");
+	}
+
+	uint8 ISerializable::uint8FromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key)
+	{
+		auto& element = valueFromMsgPackMapKey(msgPackMap, key);
+
+		if (auto* numb = dynamic_cast<MsgPack::Number*>(element.get()))
+		{
+			return numb->getValue<uint8>();
+		}
+
+		throw exception("ISerializable: This element is not a number");
+	}
+
+	uint16 ISerializable::uint16FromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key)
+	{
+		auto& element = valueFromMsgPackMapKey(msgPackMap, key);
+
+		if (auto* numb = dynamic_cast<MsgPack::Number*>(element.get()))
+		{
+			return numb->getValue<uint16>();
+		}
+
+		throw exception("ISerializable: This element is not a number");
+	}
+
+	uint32 ISerializable::uint32FromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key)
+	{
+		auto& element = valueFromMsgPackMapKey(msgPackMap, key);
+
+		if (auto* numb = dynamic_cast<MsgPack::Number*>(element.get()))
+		{
+			return numb->getValue<uint32>();
+		}
+
+		throw exception("ISerializable: This element is not a number");
+	}
+
+	uint64 ISerializable::uint64FromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key)
+	{
+		auto& element = valueFromMsgPackMapKey(msgPackMap, key);
+
+		if (auto* numb = dynamic_cast<MsgPack::Number*>(element.get()))
+		{
+			return numb->getValue<uint64>();
+		}
+
+		throw exception("ISerializable: This element is not a number");
+	}
+
+	float ISerializable::floatFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key)
+	{
+		auto& element = valueFromMsgPackMapKey(msgPackMap, key);
+
+		if (auto* numb = dynamic_cast<MsgPack::Number*>(element.get()))
+		{
+			return numb->getValue<float>();
+		}
+
+		throw exception("ISerializable: This element is not a number");
+	}
+
+	double ISerializable::doubleFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key)
+	{
+		auto& element = valueFromMsgPackMapKey(msgPackMap, key);
+
+		if (auto* numb = dynamic_cast<MsgPack::Number*>(element.get()))
+		{
+			return numb->getValue<double>();
+		}
+
+		throw exception("ISerializable: This element is not a number");
 	}
 
 	wstring ISerializable::stringFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key)
@@ -101,10 +240,8 @@ namespace Stormancer
 		{
 			return Helpers::to_wstring(str->stdString());
 		}
-		else
-		{
-			return L"";
-		}
+
+		throw exception("ISerializable: This element is not a string");
 	}
 
 	map<wstring, uint16> ISerializable::elementToUInt16Map(MsgPack::Map* msgPackMap)
@@ -115,7 +252,7 @@ namespace Stormancer
 
 		if (v->size() % 2)
 		{
-			throw exception("elementToStringMap error: size must be multiple of 2.");
+			throw exception("ISerializable: elementToStringMap error: size must be multiple of 2.");
 		}
 
 		for (uint32 i = 0; i < v->size(); i += 2)
@@ -136,7 +273,7 @@ namespace Stormancer
 
 		if (v->size() % 2)
 		{
-			throw exception("elementToStringMap error: size must be multiple of 2.");
+			throw exception("ISerializable: elementToStringMap error: size must be multiple of 2.");
 		}
 
 		for (uint32 i = 0; i < v->size(); i += 2)

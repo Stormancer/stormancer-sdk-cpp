@@ -1,4 +1,5 @@
 #include "stormancer.h"
+#include "NullLogger.h"
 
 namespace Stormancer
 {
@@ -24,18 +25,6 @@ namespace Stormancer
 	}
 
 	ILogger::~ILogger()
-	{
-	}
-
-	void ILogger::log(wstring message)
-	{
-	}
-
-	void ILogger::log(LogLevel level, wstring category, wstring message, wstring data)
-	{
-	}
-
-	void ILogger::log(const std::exception& e)
 	{
 	}
 
@@ -66,7 +55,7 @@ namespace Stormancer
 		wstringstream ss;
 
 		ss << L'[' << Helpers::nowStr() << L']';
-		ss << L"[exception]";
+		ss << L" [exception]";
 		ss << L' ' << e.what();
 
 		return ss.str();

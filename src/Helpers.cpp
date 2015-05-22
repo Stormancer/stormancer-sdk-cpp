@@ -85,10 +85,10 @@ namespace Stormancer
 
 	wstring Helpers::time_tToStr(time_t& time, bool local)
 	{
-		return time_tToStr(time, string(local ? "%x %X" : "%Y-%m-%dT%H:%M:%SZ"));
+		return time_tToStr(time, (local ? "%x %X" : "%Y-%m-%dT%H:%M:%SZ"));
 	}
 
-	wstring Helpers::time_tToStr(time_t& time, string format)
+	wstring Helpers::time_tToStr(time_t& time, const char* format)
 	{
 		struct tm timeinfo;
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
@@ -97,7 +97,7 @@ namespace Stormancer
 		localtime_r(&time, &timeinfo); // POSIX
 #endif
 		stringstream ss;
-		ss << put_time(const_cast<tm*>(&timeinfo), format.c_str());
+		ss << put_time((tm*)&timeinfo, format);
 		return Helpers::to_wstring(ss.str());
 	}
 
@@ -107,7 +107,7 @@ namespace Stormancer
 		return time_tToStr(now, local);
 	}
 
-	wstring Helpers::nowStr(string format)
+	wstring Helpers::nowStr(const char* format)
 	{
 		time_t now = nowTime_t();
 		return time_tToStr(now, format);

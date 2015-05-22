@@ -32,7 +32,10 @@ namespace Stormancer
 		Endpoints = stringMapFromMsgPackMap(element, L"Endpoints");
 		Expiration = numberFromMsgPackMap<int64>(element, L"Expiration");
 		Issued = numberFromMsgPackMap<int64>(element, L"Issued");
-		Routing = stringFromMsgPackMap(element, L"Routing");
+		if (!isNullFromMsgPackMap(element, L"Routing"))
+		{
+			Routing = stringFromMsgPackMap(element, L"Routing");
+		}
 		SceneId = stringFromMsgPackMap(element, L"SceneId");
 		UserData = stringFromMsgPackMap(element, L"UserData");
 	}

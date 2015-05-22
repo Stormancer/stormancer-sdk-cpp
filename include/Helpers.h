@@ -223,9 +223,9 @@ namespace Stormancer
 
 		time_t STORMANCER_DLL_API nowTime_t();
 		wstring STORMANCER_DLL_API time_tToStr(time_t& time, bool local = false);
-		wstring STORMANCER_DLL_API time_tToStr(time_t& time, string format);
+		wstring STORMANCER_DLL_API time_tToStr(time_t& time, const char* format);
 		wstring STORMANCER_DLL_API nowStr(bool local = false);
-		wstring STORMANCER_DLL_API nowStr(string format);
+		wstring STORMANCER_DLL_API nowStr(const char* format);
 		wstring STORMANCER_DLL_API nowDateStr(bool local = false);
 		wstring STORMANCER_DLL_API nowTimeStr(bool local = false);
 

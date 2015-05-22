@@ -8,8 +8,8 @@ namespace Stormancer
 	class ISerializable
 	{
 	public:
-		ISerializable();
-		virtual ~ISerializable();
+		STORMANCER_DLL_API ISerializable();
+		STORMANCER_DLL_API virtual ~ISerializable();
 
 	public:
 		virtual void serialize(bytestream* stream) = 0;
@@ -115,15 +115,30 @@ namespace Stormancer
 			}
 		}
 
-		static wstring stringFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
+		STORMANCER_DLL_API static bool isNullFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
+
+		STORMANCER_DLL_API static bool boolFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
+
+		STORMANCER_DLL_API static int8 int8FromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
+		STORMANCER_DLL_API static int16 int16FromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
+		STORMANCER_DLL_API static int32 int32FromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
+		STORMANCER_DLL_API static int64 int64FromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
+
+		STORMANCER_DLL_API static uint8 uint8FromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
+		STORMANCER_DLL_API static uint16 uint16FromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
+		STORMANCER_DLL_API static uint32 uint32FromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
+		STORMANCER_DLL_API static uint64 uint64FromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
+
+		STORMANCER_DLL_API static float floatFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
+		STORMANCER_DLL_API static double doubleFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
+
+		STORMANCER_DLL_API static wstring stringFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
 
 		static map<wstring, uint16> elementToUInt16Map(MsgPack::Map* msgPackMap);
+		STORMANCER_DLL_API static map<wstring, uint16> uint16MapFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
 
 		static stringMap elementToStringMap(MsgPack::Map* msgPackMap);
-
-		static map<wstring, uint16> uint16MapFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
-
-		static stringMap stringMapFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
+		STORMANCER_DLL_API static stringMap stringMapFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
 
 		static vector<RouteDto> routeDtoVectorFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
 	};

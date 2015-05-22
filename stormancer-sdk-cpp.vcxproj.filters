@@ -175,6 +175,9 @@
     <ClInclude Include="include\Configuration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\NullLogger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ApiClient.cpp">
@@ -298,6 +301,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Configuration.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NullLogger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

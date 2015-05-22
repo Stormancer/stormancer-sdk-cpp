@@ -29,9 +29,9 @@ namespace Stormancer
 
 	public:
 		// Logs a string message
-		virtual void log(wstring message);
-		virtual void log(LogLevel level, wstring category, wstring message, wstring data);
-		virtual void log(const std::exception& e);
+		virtual void log(wstring message) = 0;
+		virtual void log(LogLevel level, wstring category, wstring message, wstring data) = 0;
+		virtual void log(const std::exception& e) = 0;
 
 		STORMANCER_DLL_API virtual wstring format(LogLevel level, wstring& category, wstring& message, wstring& data);
 		STORMANCER_DLL_API virtual wstring formatException(const std::exception& e);
@@ -46,6 +46,4 @@ namespace Stormancer
 	private:
 		static ILogger* _logger;
 	};
-
-	using NullLogger = ILogger;
 };

@@ -22,6 +22,7 @@
 #include "Configuration.h"
 #include "ConnectionState.h"
 #include "ILogger.h"
+#include "NullLogger.h"
 #include "FileLogger.h"
 #include "DefaultPacketDispatcher.h"
 #include "Helpers.h"
