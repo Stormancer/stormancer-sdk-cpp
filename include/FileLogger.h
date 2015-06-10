@@ -4,10 +4,18 @@
 
 namespace Stormancer
 {
+	/*! A Logger class which writes in a file.
+	*/
 	class FileLogger : public ILogger
 	{
 	public:
+
+		/*! Constructor.
+		*/
 		STORMANCER_DLL_API FileLogger();
+
+		/*! Destructor.
+		*/
 		STORMANCER_DLL_API virtual ~FileLogger();
 
 	public:

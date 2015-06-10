@@ -99,6 +99,7 @@ namespace Stormancer
 		}
 
 		static unique_ptr<MsgPack::Element>& valueFromMsgPackMapKey(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
+		static unique_ptr<MsgPack::Element>& valueFromMsgPackArrayKey(unique_ptr<MsgPack::Element>& msgPackArray, uint32 key);
 
 		template<typename T>
 		static T numberFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key)

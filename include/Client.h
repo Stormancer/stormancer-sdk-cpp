@@ -9,8 +9,12 @@
 #include "RequestProcessor.h"
 #include "IConnection.h"
 
+/*! The main Stormancer namespace.
+*/
 namespace Stormancer
 {
+	/*! The client class can connect to a scene of an application.
+	*/
 	class Client
 	{
 		friend class Scene;
@@ -33,14 +37,28 @@ namespace Stormancer
 		};
 
 	public:
+
+		/*! Constructor.
+		\param config A pointer to a client configuration.
+		*/
 		STORMANCER_DLL_API Client(Configuration* config);
+
+		/*! Destructor.
+		*/
 		STORMANCER_DLL_API ~Client();
 
 		Client(Client& other) = delete;
 		Client& operator=(Client& other) = delete;
 
 	public:
+
+		/*! Get a public scene.
+		\param sceneId The scene Id as a string.
+		\param userData Some custom user data as a string.
+		\return a task to the connection to the scene.
+		*/
 		STORMANCER_DLL_API pplx::task<shared_ptr<Scene>> getPublicScene(wstring sceneId, wstring userData = L"");
+
 		void initialize();
 		wstring applicationName();
 		ILogger* logger();

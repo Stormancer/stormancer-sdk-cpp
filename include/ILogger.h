@@ -3,28 +3,33 @@
 
 namespace Stormancer
 {
-	// The available log levels.
+	/*! Enumeration of the available log levels.
+	*/
 	enum class LogLevel
 	{
-		// Applies to critical errors that prevent the program from continuing.
-		Fatal = 0,
-		// Applies to non critical errors
-		Error = 1,
-		// Applies to warnings
-		Warn = 2,
-		// Applies to information messages about the execution of the application
-		Info = 3,
-		// Applies to detailed informations useful when debugging
-		Debug = 4,
-		// Applies to very detailed informations about the execution
-		Trace = 5
+		Fatal = 0,	/// Critical error that prevent the program from continuing.
+		Error = 1,	/// Non critical errors
+		Warn = 2,	/// Warning
+		Info = 3,	/// Information message about the execution of the application
+		Debug = 4,	/// Applies to detailed informations useful when debugging
+		Trace = 5	/// Very detailed informations about the execution
 	};
 
-	// Contract for a Logger in Stormancer.
+	/*! Interface of a logger to implement.
+	*/
 	class ILogger
 	{
 	public:
+
+		/*! Get the current instance of the logger.
+		\return The instance of the current logger.
+		*/
 		STORMANCER_DLL_API static ILogger* instance();
+
+		/*! Set the instance of the current logger.
+		\param logger The instance of the logger to set as the current logger.
+		\return The set instance of the current logger.
+		*/
 		STORMANCER_DLL_API static ILogger* instance(ILogger* logger);
 
 	public:
@@ -33,14 +38,35 @@ namespace Stormancer
 		virtual void log(LogLevel level, wstring category, wstring message, wstring data) = 0;
 		virtual void log(const std::exception& e) = 0;
 
-		STORMANCER_DLL_API virtual wstring format(LogLevel level, wstring& category, wstring& message, wstring& data);
-		STORMANCER_DLL_API virtual wstring formatException(const std::exception& e);
+		/*! A basic format of the log message.
+		\param level The log level.
+		\param category The category of the log (the source).
+		\param message The message of the log.
+		\param data Some additional data.
+		\return The formated message.
+		*/
+		STORMANCER_DLL_API static wstring format(LogLevel level, wstring& category, wstring& message, wstring& data);
+
+		/*! A basic format of an exception.
+		\param e The exception.
+		\return The formated message.
+		*/
+		STORMANCER_DLL_API static wstring formatException(const std::exception& e);
 
 	protected:
+
+		/*! Constructor.
+		*/
 		STORMANCER_DLL_API ILogger();
+
+		/*! Destructor.
+		*/
 		STORMANCER_DLL_API virtual ~ILogger();
 
 	protected:
+
+		/*! The mutex for using the logger.
+		*/
 		mutex _mutex;
 
 	private:

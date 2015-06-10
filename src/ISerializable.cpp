@@ -93,6 +93,18 @@ namespace Stormancer
 		throw exception("ISerializable: valueFromMsgPackMapKey error: Not found.");
 	}
 
+	static unique_ptr<MsgPack::Element>& valueFromMsgPackArrayKey(unique_ptr<MsgPack::Element>& msgPackArray, uint32 key)
+	{
+		auto v = dynamic_cast<MsgPack::Map*>(msgPackArray.get())->getContainer();
+
+		if (key >= v->size())
+		{
+			throw exception("ISerializable: key out of bounds.");
+		}
+
+		return v->at(key);
+	}
+
 	bool ISerializable::isNullFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key)
 	{
 		auto& element = valueFromMsgPackMapKey(msgPackMap, key);

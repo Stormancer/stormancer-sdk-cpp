@@ -208,9 +208,9 @@ namespace Stormancer
 	RakNetConnection* RakNetTransport::createNewConnection(RakNet::RakNetGUID raknetGuid, RakNet::RakPeerInterface* peer)
 	{
 		int64 cid = _handler->generateNewConnectionId();
-		function<void(RakNetConnection*)> lambdaOnRequestClose = [this](RakNetConnection* c) {
+		auto lambdaOnRequestClose = new function<void(RakNetConnection*)>([this](RakNetConnection* c) {
 			this->onRequestClose(c);
-		};
+		});
 		auto c = new RakNetConnection(raknetGuid, cid, peer, lambdaOnRequestClose);
 		_connections[raknetGuid.g] = c;
 		return c;

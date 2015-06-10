@@ -2,13 +2,13 @@
 
 namespace Stormancer
 {
-	RakNetConnection::RakNetConnection(RakNet::RakNetGUID guid, int64 id, RakNet::RakPeerInterface* peer, function<void(RakNetConnection*)> closeAction)
+	RakNetConnection::RakNetConnection(RakNet::RakNetGUID guid, int64 id, RakNet::RakPeerInterface* peer, function<void(RakNetConnection*)>* lambdaOnRequestClose)
 		: _lastActivityDate(Helpers::nowTime_t()),
 		_guid(guid),
-		_rakPeer(peer),
-		_closeAction(closeAction)
+		_rakPeer(peer)
 	{
 		IConnection::_id = id;
+		_closeAction += lambdaOnRequestClose;
 	}
 
 	RakNetConnection::~RakNetConnection()

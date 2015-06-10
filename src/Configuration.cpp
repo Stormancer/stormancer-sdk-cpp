@@ -6,9 +6,7 @@ namespace Stormancer
 		: account(account),
 		application(application),
 		dispatcher(new DefaultPacketDispatcher),
-		transport(new RakNetTransport(ILogger::instance())),
-		maxPeers(20),
-		apiEndpoint(L"https://api.stormancer.com/")
+		transport(new RakNetTransport(ILogger::instance()))
 	{
 		//plugins.push_back(new RpcClientPlugin());
 	}

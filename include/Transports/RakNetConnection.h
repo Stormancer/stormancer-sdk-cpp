@@ -10,7 +10,7 @@ namespace Stormancer
 	{
 
 	public:
-		RakNetConnection(RakNet::RakNetGUID guid, int64 id, RakNet::RakPeerInterface* peer, function<void(RakNetConnection*)> closeAction);
+		RakNetConnection(RakNet::RakNetGUID guid, int64 id, RakNet::RakPeerInterface* peer, function<void(RakNetConnection*)>* lambdaOnRequestClose);
 		virtual ~RakNetConnection();
 
 	public:
@@ -50,10 +50,12 @@ namespace Stormancer
 			return false;
 		}
 
+	public:
+		Action<RakNetConnection*> _closeAction;
+
 	private:
 		RakNet::RakPeerInterface* _rakPeer;
 		RakNet::RakNetGUID _guid;
-		function<void(RakNetConnection*)> _closeAction;
 		stringMap _metadata;
 		time_t _lastActivityDate;
 		map<size_t, void*> _localData;
