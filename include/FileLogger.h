@@ -4,30 +4,45 @@
 
 namespace Stormancer
 {
-	/*! A Logger class which writes in a file.
-	*/
+	/// Logger which writing in a file.
 	class FileLogger : public ILogger
 	{
 	public:
 
-		/*! Constructor.
-		*/
+		/// Constructor.
 		STORMANCER_DLL_API FileLogger();
 
-		/*! Destructor.
-		*/
+		/// Destructor.
 		STORMANCER_DLL_API virtual ~FileLogger();
 
 	public:
+	
+		/// A basic message log.
+		/// \message The message to log.
 		void log(wstring message);
+		
+		/// A detailed message log.
+		/// \param level The level.
+		/// \param category The category (typically the source).
+		/// \param message The message.
+		/// \param data Some extra data.
 		void log(LogLevel level, wstring category, wstring message, wstring data);
+		
+		/// Log details about an exception.
+		/// \param e The exception.
 		void log(const std::exception& e);
 
 	private:
+	
+		/// tries to open the log file on disk.
 		bool tryOpenFile();
 
 	private:
+	
+		/// Name of the log file.
 		string _fileName;
+		
+		/// Stream to the log file.
 		wofstream _myfile;
 	};
 };

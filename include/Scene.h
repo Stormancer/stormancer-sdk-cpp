@@ -11,9 +11,9 @@ namespace Stormancer
 	using PacketObservable = rx::observable < shared_ptr<Packet<>> > ;
 
 	class Client;
-
-	/*! The scene class for communicating with the server scene.
-	*/
+	
+	/// Communicates with the server scene.
+	/// Get a scene by calling Client::getPublicScene or Client::getScene.
 	class Scene
 	{
 		friend class Client;

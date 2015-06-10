@@ -55,7 +55,8 @@ namespace Stormancer
 				throw exception(string(StringFormat(L"Couldn't process message. msgId: ", msgType)).c_str());
 			}
 
-		});	}
+		});
+	}
 
 	void DefaultPacketDispatcher::addProcessor(IPacketProcessor* processor)
 	{

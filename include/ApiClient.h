@@ -6,6 +6,7 @@
 
 namespace Stormancer
 {
+	/// Retrieve informations from the Api.
 	class ApiClient
 	{
 	public:

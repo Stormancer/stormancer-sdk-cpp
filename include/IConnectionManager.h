@@ -4,6 +4,7 @@
 
 namespace Stormancer
 {
+	/// Manages the network connections.
 	class IConnectionManager
 	{
 	public:

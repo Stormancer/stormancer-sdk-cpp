@@ -20,6 +20,11 @@ namespace Stormancer
 		return _guid;
 	}
 
+	time_t RakNetConnection::connectionDate()
+	{
+		return _connectionDate;
+	}
+	
 	time_t RakNetConnection::lastActivityDate()
 	{
 		return _lastActivityDate;

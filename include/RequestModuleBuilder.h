@@ -4,6 +4,8 @@
 
 namespace Stormancer
 {
+	/// Allows modules to add handlers to system requests.
+	/// Object passed to the IRequestModule::register method to allow modules to add handlers to system requests.
 	class RequestModuleBuilder
 	{
 	public:

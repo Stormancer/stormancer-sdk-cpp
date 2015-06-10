@@ -4,6 +4,7 @@
 
 namespace Stormancer
 {
+	/// Inactive logger (Used by default).
 	class NullLogger : public ILogger
 	{
 	public:

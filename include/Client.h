@@ -9,12 +9,9 @@
 #include "RequestProcessor.h"
 #include "IConnection.h"
 
-/*! The main Stormancer namespace.
-*/
 namespace Stormancer
 {
-	/*! The client class can connect to a scene of an application.
-	*/
+	/// Manage the connection to the scenes of an application.
 	class Client
 	{
 		friend class Scene;

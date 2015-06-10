@@ -4,6 +4,7 @@
 
 namespace Stormancer
 {
+	/// Manade a token.
 	class TokenHandler : public ITokenHandler
 	{
 	public:

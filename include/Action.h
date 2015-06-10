@@ -3,6 +3,7 @@
 
 namespace Stormancer
 {
+	/// Aggregates procedure pointers to be run simultaneously.
 	template<typename TParam = void>
 	class Action
 	{
@@ -67,6 +68,7 @@ namespace Stormancer
 		vector<TFunction*> _functions;
 	};
 
+	/// Aggregates procedure pointers to be run simultaneously.
 	template<>
 	class Action < void >
 	{

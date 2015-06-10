@@ -4,6 +4,7 @@
 
 namespace Stormancer
 {
+	/// Interface for a token handler
 	class ITokenHandler
 	{
 	public:

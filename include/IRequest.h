@@ -3,6 +3,7 @@
 
 namespace Stormancer
 {
+	/// Interface for a http request.
 	class IRequest
 	{
 	public:

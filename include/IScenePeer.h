@@ -3,6 +3,7 @@
 
 namespace Stormancer
 {
+	/// Remote scene
 	class IScenePeer
 	{
 	public:

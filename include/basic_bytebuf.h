@@ -4,6 +4,7 @@
 using namespace std;
 
 // TEMPLATE CLASS basic_bytebuf
+/// Byte array buffer.
 template<class _Elem,
 class _Traits,
 class _Alloc>

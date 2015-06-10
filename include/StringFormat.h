@@ -3,6 +3,7 @@
 
 namespace Stormancer
 {
+	/// String format helper.
 	class StringFormat
 	{
 	public:

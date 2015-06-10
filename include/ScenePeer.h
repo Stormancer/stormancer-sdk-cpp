@@ -6,6 +6,7 @@
 
 namespace Stormancer
 {
+	/// Remote scene connection.
 	class ScenePeer : public IScenePeer
 	{
 	public:

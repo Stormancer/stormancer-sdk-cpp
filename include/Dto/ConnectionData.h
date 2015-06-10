@@ -4,6 +4,7 @@
 
 namespace Stormancer
 {
+	/// Connection informations to send to the server.
 	class ConnectionData : public ISerializable
 	{
 	public:

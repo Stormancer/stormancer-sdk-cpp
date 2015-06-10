@@ -8,6 +8,7 @@ namespace Stormancer
 {
 	class Request;
 
+	/// Expose a stream for reading data received through the network.
 	template<typename T = IConnection>
 	class Packet
 	{

@@ -5,6 +5,7 @@ namespace Stormancer
 {
 	class Scene;
 
+	/// Represents a route on a scene.
 	class Route
 	{
 	public:

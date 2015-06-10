@@ -5,19 +5,15 @@
 
 namespace Stormancer
 {
-	/*! Configuration object for a Stormancer client.
-	Client configurations can be further customized afterwards.
-    For instance to target a custom Stormancer cluster change the ServerEndoint property to the http API endpoint of your custom cluster.
-	*/
+	/// Used by a Client for initialization.
+    /// For instance to target a custom Stormancer cluster change the ServerEndoint property to the http API endpoint of your custom cluster.
 	class Configuration
 	{
-
 	public:
 
-		/*! Constructor.
-		\param account The account id.
-		\param application The application name.
-		*/
+		/// Constructor.
+		/// \param account The account id.
+		/// \param application The application name.
 		STORMANCER_DLL_API Configuration(wstring account, wstring application);
 
 		/// Destructor.

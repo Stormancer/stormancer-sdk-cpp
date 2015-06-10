@@ -4,6 +4,7 @@
 
 namespace Stormancer
 {
+	/// Interface describing a packet processor.
 	class IPacketProcessor
 	{
 	public:

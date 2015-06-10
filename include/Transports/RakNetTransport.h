@@ -7,6 +7,7 @@
 
 namespace Stormancer
 {
+	/// Core functions for communicating over the network using RakNet.
 	class RakNetTransport : public ITransport
 	{
 	public:

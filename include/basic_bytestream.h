@@ -5,6 +5,7 @@
 using namespace std;
 
 // TEMPLATE CLASS basic_bytestream
+/// Byte array stream.
 template<class _Elem, class _Traits, class _Alloc>
 class basic_bytestream
 	: public basic_iostream<_Elem, _Traits>

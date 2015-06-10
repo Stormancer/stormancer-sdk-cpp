@@ -36,4 +36,9 @@ namespace Stormancer
 	{
 		return _state;
 	}
+	
+	wstring IConnection::getMetadata(wstring key)
+	{
+		return _metadata[key];
+	}
 };

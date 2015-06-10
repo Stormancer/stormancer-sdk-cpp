@@ -4,6 +4,7 @@
 
 namespace Stormancer
 {
+	/// Handle system requests.
 	class IRequestModule
 	{
 	public:

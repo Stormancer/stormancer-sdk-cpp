@@ -5,6 +5,7 @@
 
 namespace Stormancer
 {
+	/// Interface for a serializable object.
 	class ISerializable
 	{
 	public:

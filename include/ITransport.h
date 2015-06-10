@@ -7,6 +7,7 @@
 
 namespace Stormancer
 {
+	/// Interface for a network transport.
 	class ITransport
 	{
 	public:

@@ -3,6 +3,7 @@
 
 namespace Stormancer
 {
+	/// Information about a scene route.
 	struct RouteDto
 	{
 	public:

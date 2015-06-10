@@ -3,8 +3,7 @@
 
 namespace Stormancer
 {
-	/*! Enumeration of the available log levels.
-	*/
+	/// Enumeration of the available log levels.
 	enum class LogLevel
 	{
 		Fatal = 0,	/// Critical error that prevent the program from continuing.
@@ -15,8 +14,7 @@ namespace Stormancer
 		Trace = 5	/// Very detailed informations about the execution
 	};
 
-	/*! Interface of a logger to implement.
-	*/
+	/// Interface for the loggers.
 	class ILogger
 	{
 	public:

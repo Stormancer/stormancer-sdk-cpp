@@ -5,6 +5,7 @@
 
 namespace Stormancer
 {
+	/// Dispatch the packets to the handlers based on their id.
 	class DefaultPacketDispatcher : public IPacketDispatcher
 	{
 	public:

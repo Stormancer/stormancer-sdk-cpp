@@ -4,6 +4,7 @@
 
 namespace Stormancer
 {
+	/// Informations to connect to a scene.
 	class SceneEndpoint
 	{
 	public:

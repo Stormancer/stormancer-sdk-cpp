@@ -8,6 +8,8 @@ namespace Stormancer
 	using handlerFunction = function < bool(shared_ptr<Packet<>>) >;
 	using processorFunction = function < bool(byte, shared_ptr<Packet<>>) >;
 
+	/// Contains methods to register messages handlers based on message type.
+	/// Pass it to the IPacketProcessor::RegisterProcessor method.
 	class PacketProcessorConfig
 	{
 	public:

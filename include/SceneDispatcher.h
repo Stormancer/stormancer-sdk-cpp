@@ -4,6 +4,7 @@
 
 namespace Stormancer
 {
+	/// Dispatch the network messages to the right scene.
 	class SceneDispatcher : public IPacketProcessor
 	{
 		friend class Client;
