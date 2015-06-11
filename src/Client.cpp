@@ -90,7 +90,6 @@ namespace Stormancer
 		if (!_initialized)
 		{
 			_initialized = true;
-			auto d2 = this->_dispatcher;
 			_transport->packetReceived += new function<void(shared_ptr<Packet<>>)>(([this](shared_ptr<Packet<>> packet) {
 				this->transport_packetReceived(packet);
 			}));
@@ -186,6 +185,7 @@ namespace Stormancer
 		if (_serverConnection != nullptr)
 		{
 			_serverConnection->close();
+			_serverConnection = nullptr;
 		}
 	}
 

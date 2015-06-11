@@ -19,21 +19,14 @@ namespace Stormancer
 		/// Destructor.
 		STORMANCER_DLL_API ~Configuration();
 
-		/// The copy constructor is deleted.
+		/// Copy constructor deleted.
 		Configuration(Configuration& other) = delete;
 
-		/// The copy is deleted.
+		/// Copy deleted.
 		Configuration& operator=(Configuration& other) = delete;
 
+		/// Get the Api endpoint.
 		wstring getApiEndpoint();
-
-		/*! Adds metadata to connections created by the client.
-		\param key A string containing the metadata key.
-		\param value A string containing the metadata value.
-		\return The current configuration.
-		The metadata you provides here will be available on the server to customize its behavior.
-		*/
-		Configuration& setMetadata(wstring key, wstring value);
 
 		//void addPlugin(IClientPlugin* plugin);
 
@@ -57,12 +50,14 @@ namespace Stormancer
 		/// Maximum number of remote peers that can connect with this client.
 		uint16 maxPeers = 20;
 
+		/// Client metadatas.
 		stringMap metadata;
 
 	private:
+		
+		/// Api endpoint.
 		wstring apiEndpoint = L"https://api.stormancer.com/";
-
+		
 		//vector<IClientPlugin*> plugins;
-
 	};
 };

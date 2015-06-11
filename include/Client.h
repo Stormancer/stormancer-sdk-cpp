@@ -14,6 +14,7 @@ namespace Stormancer
 	/// Manage the connection to the scenes of an application.
 	class Client
 	{
+		/// The scene need to access some private method of the client.
 		friend class Scene;
 
 	private:
@@ -35,40 +36,75 @@ namespace Stormancer
 
 	public:
 
-		/*! Constructor.
-		\param config A pointer to a client configuration.
-		*/
+		/// Constructor.
+		/// \param config A pointer to a Configuration.
 		STORMANCER_DLL_API Client(Configuration* config);
 
-		/*! Destructor.
-		*/
+		/// Destructor.
 		STORMANCER_DLL_API ~Client();
 
+		/// Copy constructor deleted.
 		Client(Client& other) = delete;
+		
+		/// Copy operator deleted.
 		Client& operator=(Client& other) = delete;
 
 	public:
 
-		/*! Get a public scene.
-		\param sceneId The scene Id as a string.
-		\param userData Some custom user data as a string.
-		\return a task to the connection to the scene.
-		*/
+		/// Get a public scene.
+		/// \param sceneId The scene Id as a string.
+		/// \param userData Some custom user data as a string.
+		/// \return a task to the connection to the scene.
 		STORMANCER_DLL_API pplx::task<shared_ptr<Scene>> getPublicScene(wstring sceneId, wstring userData = L"");
 
+		/// Initialize packets reception from the right transport.
 		void initialize();
+		
+		/// Returns the name of the application.
 		wstring applicationName();
+		
+		/// Returns the used logger.
 		ILogger* logger();
+		
+		/// Set the logger
 		void setLogger(ILogger* logger);
+		
+		/// Get scene informations for connection.
+		/// \param sceneId Scene id.
+		/// \param sep Scene Endpoint retrieved by ApiClient::getSceneEndpoint
+		/// \return A task which complete when the scene informations are retrieved.
 		pplx::task<shared_ptr<Scene>> getScene(wstring sceneId, SceneEndpoint sep);
+		
+		/// Disconnect and close all connections.
+		/// this method returns nothing. So it's useful for application close.
 		void disconnect();
 
 	private:
+	
+		/// Connect to a scene
+		/// \param scene The scene to connect to.
+		/// \param token Application token.
+		/// \param localRoutes Local routes declared.
+		/// \return A task which complete when the connection is done.
 		pplx::task<void> connectToScene(Scene* scene, wstring& token, vector<Route*> localRoutes);
+		
+		/// Disconnect from a scene.
+		/// \param scene The scene.
+		/// \param sceneHandle Scene handle.
+		/// \return A task which complete when the disconnection is done.
 		pplx::task<void> disconnect(Scene* scene, byte sceneHandle);
+		
+		/// Disconnect from all scenes.
 		void disconnectAllScenes();
+		
+		/// Called by the transport when a packet has been received.
+		/// \param packet Received packet.
 		void transport_packetReceived(shared_ptr<Packet<>> packet);
 
+		/// Send a system request to the server for important operations.
+		/// \param id Request id.
+		/// \param parameter Data to send with the request.
+		/// \return A task which complete when the response is available (As result of the task).
 		template<typename T1, typename T2>
 		pplx::task<T2> sendSystemRequest(byte id, T1& parameter)
 		{
@@ -81,13 +117,17 @@ namespace Stormancer
 			});
 		}
 
+		/// Send a system request by providing one byte and receiving empty response.
+		/// \param id Request id.
+		/// \param parameter Byte parameter.
+		/// \return A task which complete when empty response is received.
 		template<>
 		pplx::task<EmptyDto> sendSystemRequest<byte, EmptyDto>(byte id, byte& parameter)
 		{
 			return _requestProcessor->sendSystemRequest(_serverConnection, id, [this, &parameter](bytestream* stream) {
 				ISerializable::serialize(byte(parameter), stream); // serialize byte
 			}).then([this](shared_ptr<Packet<>> packet) {
-				return EmptyDto(packet->stream); // deserialize result dto
+				return EmptyDto(packet->stream); // empty dto
 			});
 		}
 

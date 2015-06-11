@@ -98,28 +98,33 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00008"></a><span class="lineno"><a class="line" href="class_stormancer_1_1_null_logger.html">    8</a></span>&#160;    <span class="keyword">class </span><a class="code" href="class_stormancer_1_1_null_logger.html">NullLogger</a> : <span class="keyword">public</span> <a class="code" href="class_stormancer_1_1_i_logger.html">ILogger</a></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;    {</div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;        <a class="code" href="class_stormancer_1_1_null_logger.html#ae6415b20db1182e2d709afa012eec78c">NullLogger</a>();</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;        <a class="code" href="class_stormancer_1_1_null_logger.html#a96bdba6cb50051bd08c4c0a0d2b90848">~NullLogger</a>();</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="class_stormancer_1_1_null_logger.html#a17efd3de6562bb63afa1a435e8e292bc">log</a>(wstring message);</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="class_stormancer_1_1_null_logger.html#a17efd3de6562bb63afa1a435e8e292bc">log</a>(<a class="code" href="namespace_stormancer.html#aa800286ad29ad0da2c197aae3c08f889">LogLevel</a> level, wstring category, wstring message, wstring data);</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="class_stormancer_1_1_null_logger.html#a17efd3de6562bb63afa1a435e8e292bc">log</a>(<span class="keyword">const</span> std::exception&amp; e);</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    };</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;};</div>
-<div class="ttc" id="class_stormancer_1_1_null_logger_html_a17efd3de6562bb63afa1a435e8e292bc"><div class="ttname"><a href="class_stormancer_1_1_null_logger.html#a17efd3de6562bb63afa1a435e8e292bc">Stormancer::NullLogger::log</a></div><div class="ttdeci">void log(wstring message)</div></div>
-<div class="ttc" id="class_stormancer_1_1_null_logger_html_a96bdba6cb50051bd08c4c0a0d2b90848"><div class="ttname"><a href="class_stormancer_1_1_null_logger.html#a96bdba6cb50051bd08c4c0a0d2b90848">Stormancer::NullLogger::~NullLogger</a></div><div class="ttdeci">~NullLogger()</div></div>
-<div class="ttc" id="class_stormancer_1_1_null_logger_html_ae6415b20db1182e2d709afa012eec78c"><div class="ttname"><a href="class_stormancer_1_1_null_logger.html#ae6415b20db1182e2d709afa012eec78c">Stormancer::NullLogger::NullLogger</a></div><div class="ttdeci">NullLogger()</div></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;        </div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;        <a class="code" href="class_stormancer_1_1_null_logger.html#ae6415b20db1182e2d709afa012eec78c">NullLogger</a>();</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;        </div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;        <a class="code" href="class_stormancer_1_1_null_logger.html#a96bdba6cb50051bd08c4c0a0d2b90848">~NullLogger</a>();</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    </div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="class_stormancer_1_1_null_logger.html#a17efd3de6562bb63afa1a435e8e292bc">log</a>(wstring message);</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;        </div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="class_stormancer_1_1_null_logger.html#a17efd3de6562bb63afa1a435e8e292bc">log</a>(<a class="code" href="namespace_stormancer.html#aa800286ad29ad0da2c197aae3c08f889">LogLevel</a> level, wstring category, wstring message, wstring data);</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;        </div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="class_stormancer_1_1_null_logger.html#a17efd3de6562bb63afa1a435e8e292bc">log</a>(<span class="keyword">const</span> std::exception&amp; e);</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    };</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;};</div>
+<div class="ttc" id="class_stormancer_1_1_null_logger_html_a17efd3de6562bb63afa1a435e8e292bc"><div class="ttname"><a href="class_stormancer_1_1_null_logger.html#a17efd3de6562bb63afa1a435e8e292bc">Stormancer::NullLogger::log</a></div><div class="ttdeci">void log(wstring message)</div><div class="ttdoc">Empty implementation. </div></div>
+<div class="ttc" id="class_stormancer_1_1_null_logger_html_a96bdba6cb50051bd08c4c0a0d2b90848"><div class="ttname"><a href="class_stormancer_1_1_null_logger.html#a96bdba6cb50051bd08c4c0a0d2b90848">Stormancer::NullLogger::~NullLogger</a></div><div class="ttdeci">~NullLogger()</div><div class="ttdoc">Destructor. </div></div>
+<div class="ttc" id="class_stormancer_1_1_null_logger_html_ae6415b20db1182e2d709afa012eec78c"><div class="ttname"><a href="class_stormancer_1_1_null_logger.html#ae6415b20db1182e2d709afa012eec78c">Stormancer::NullLogger::NullLogger</a></div><div class="ttdeci">NullLogger()</div><div class="ttdoc">Constructor. </div></div>
 <div class="ttc" id="namespace_stormancer_html"><div class="ttname"><a href="namespace_stormancer.html">Stormancer</a></div><div class="ttdef"><b>Definition:</b> Action.h:4</div></div>
 <div class="ttc" id="headers_8h_html"><div class="ttname"><a href="headers_8h.html">headers.h</a></div></div>
-<div class="ttc" id="namespace_stormancer_html_aa800286ad29ad0da2c197aae3c08f889"><div class="ttname"><a href="namespace_stormancer.html#aa800286ad29ad0da2c197aae3c08f889">Stormancer::LogLevel</a></div><div class="ttdeci">LogLevel</div><div class="ttdoc">Enumeration of the available log levels. </div><div class="ttdef"><b>Definition:</b> ILogger.h:7</div></div>
+<div class="ttc" id="namespace_stormancer_html_aa800286ad29ad0da2c197aae3c08f889"><div class="ttname"><a href="namespace_stormancer.html#aa800286ad29ad0da2c197aae3c08f889">Stormancer::LogLevel</a></div><div class="ttdeci">LogLevel</div><div class="ttdoc">Available log levels. </div><div class="ttdef"><b>Definition:</b> ILogger.h:7</div></div>
 <div class="ttc" id="_i_logger_8h_html"><div class="ttname"><a href="_i_logger_8h.html">ILogger.h</a></div></div>
-<div class="ttc" id="class_stormancer_1_1_i_logger_html"><div class="ttname"><a href="class_stormancer_1_1_i_logger.html">Stormancer::ILogger</a></div><div class="ttdoc">Interface for the loggers. </div><div class="ttdef"><b>Definition:</b> ILogger.h:18</div></div>
+<div class="ttc" id="class_stormancer_1_1_i_logger_html"><div class="ttname"><a href="class_stormancer_1_1_i_logger.html">Stormancer::ILogger</a></div><div class="ttdoc">Interface for the loggers. </div><div class="ttdef"><b>Definition:</b> ILogger.h:24</div></div>
 <div class="ttc" id="class_stormancer_1_1_null_logger_html"><div class="ttname"><a href="class_stormancer_1_1_null_logger.html">Stormancer::NullLogger</a></div><div class="ttdoc">Inactive logger (Used by default). </div><div class="ttdef"><b>Definition:</b> NullLogger.h:8</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jun 10 2015 18:07:27 for Stormancer-sdk-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jun 11 2015 14:26:51 for Stormancer-sdk-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.9.1
 </small></address>

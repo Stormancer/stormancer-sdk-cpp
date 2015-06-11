@@ -49,52 +49,45 @@ namespace Stormancer
 		return (bs << T(data));
 	}
 
-	/*! Write a c-string in a byte stream.
-	\param bs The byte stream we want to write in.
-	\param data The c-string to write.
-	\return The byte stream.
-	*/
+	/// Write a c-string in a byte stream.
+	/// \param bs The byte stream we want to write in.
+	/// \param data The c-string to write.
+	///	\return The byte stream.
 	STORMANCER_DLL_API bytestream& operator<<(bytestream& bs, const char* data);
 
-	/*! Write a constant std-string in a byte stream.
-	\param bs The byte stream we want to write in.
-	\param data The std-string to write.
-	\return The byte stream.
-	*/
+	/// Write a constant std::string in a byte stream.
+	/// \param bs The byte stream we want to write in.
+	/// \param data The std::string to write.
+	/// \return The byte stream.
 	STORMANCER_DLL_API bytestream& operator<<(bytestream& bs, const string& data);
 
-	/*! Write a c-string in a byte stream.
-	\param bs The byte stream we want to write in.
-	\param data The c-string to write.
-	\return The byte stream.
-	*/
+	/// Write a c-string in a byte stream.
+	/// \param bs The byte stream we want to write in.
+	/// \param data The c-string to write.
+	/// \return The byte stream.
 	STORMANCER_DLL_API bytestream& operator<<(bytestream& bs, string& data);
 
-	/*! Write a wide c-string in a byte stream.
-	\param bs The byte stream we want to write in.
-	\param data The wide c-string to write.
-	\return The byte stream.
-	*/
+	/// Write a wide c-string in a byte stream.
+	/// \param bs The byte stream we want to write in.
+	/// \param data The wide c-string to write.
+	/// \return The byte stream.
 	STORMANCER_DLL_API bytestream& operator<<(bytestream& bs, const wchar_t* data);
 
-	/*! Write a constant wide std-string in a byte stream.
-	\param bs The byte stream we want to write in.
-	\param data The wide std-string to write.
-	\return The byte stream.
-	*/
+	/// Write a constant std::wstring in a byte stream.
+	/// \param bs The byte stream we want to write in.
+	/// \param data The std::wstring to write.
+	/// \return The byte stream.
 	STORMANCER_DLL_API bytestream& operator<<(bytestream& bs, const wstring& data);
 
-	/*! Write a wide std-string in a byte stream.
-	\param bs The byte stream we want to write in.
-	\param data The wide std-string to write.
-	\return The byte stream.
-	*/
+	/// Write a std::wstring in a byte stream.
+	/// \param bs The byte stream we want to write in.
+	/// \param data The std::wstring to write.
+	/// \return The byte stream.
 	STORMANCER_DLL_API bytestream& operator<<(bytestream& bs, wstring& data);
 
-	/*! Template for reading any data type from the byte stream.
-	\param bs The byte stream we want to read.
-	\param data A ref to a variable for puting the read data.
-	*/
+	/// Template for reading any data type from the byte stream.
+	/// \param bs The byte stream we want to read.
+	/// \param data A ref to a variable for puting the read data.
 	template<typename T>
 	bytestream& operator>>(bytestream& bs, T& data)
 	{
@@ -106,16 +99,14 @@ namespace Stormancer
 		return bs;
 	}
 
-	/*! Read a std-string from a byte stream.
-	\param bs The byte stream we want to read.
-	\param data A ref to a std-string where we get the data.
-	*/
+	/// Read a std::string from a byte stream.
+	/// \param bs The byte stream we want to read.
+	/// \param data A ref to a std::string where we get the data.
 	STORMANCER_DLL_API bytestream& operator>>(bytestream& bs, string& data);
 
-	/*! Read a wide std-string from a byte stream.
-	\param bs The byte stream we want to read.
-	\param data A ref to a wide std-string where we get the data.
-	*/
+	/// Read a std::wstring from a byte stream.
+	/// \param bs The byte stream we want to read.
+	/// \param data A ref to a std::wstring where we get the data.
 	STORMANCER_DLL_API bytestream& operator>>(bytestream& bs, wstring& data);
 
 	template<typename T>
@@ -178,6 +169,7 @@ namespace Stormancer
 			return vec;
 		}
 
+		/// Returns a boolean indicating if the map contains the key.
 		template<typename TKey, typename TValue>
 		bool mapContains(map<TKey, TValue>& map, TKey& key)
 		{
@@ -188,60 +180,59 @@ namespace Stormancer
 
 #pragma region string
 		
-		/*! Join a string vector by using a glue string.
-		\param vector The vector containing the strings to join.
-		\param glue A glue string. Default is an empty string.
-		*/
+		/// Join a string vector by using a glue string.
+		/// \param vector The vector containing the strings to join.
+		/// \param glue A glue string. Default is an empty string.
 		STORMANCER_DLL_API wstring vectorJoin(vector<wstring>& vector, wstring glue = L"");
 
-		/*! Split a string to a vector by using a separator string.
-		\param str The string to split.
-		\param separator the separator to detect in the string.
-		*/
+		/// Split a string to a vector by using a separator string.
+		/// \param str The string to split.
+		/// \param separator the separator to detect in the string.
 		STORMANCER_DLL_API vector<wstring> stringSplit(const wstring& str, const wstring separator);
 
-		/*! Trim a specific character from a string.
-		\param str The string to trim.
-		\param ch the character to remove from the string. Default is space.
-		*/
+		/// Trim a specific character from a string.
+		/// \param str The string to trim.
+		/// \param ch the character to remove from the string. Default is space.
 		STORMANCER_DLL_API wstring stringTrim(wstring& str, wchar_t ch = ' ');
 
-		/*! Convert any type of data to a wide std-string.
-		\param data Data to convert.
-		\return The Converter wide std-string.
-		*/
+		/// Convert any type of data to a std::wstring.
+		/// \param data Data to convert.
+		/// \return The Converter std::wstring.
 		template<typename T>
 		wstring to_wstring(T data)
 		{
 			return to_wstring(to_string(data));
 		}
 
-		/*! Convert a c-string to a wide std-string.
-		\param str A c-string.
-		*/
+		/// Convert a c-string to a std::wstring.
+		/// \param str A c-string.
 		STORMANCER_DLL_API wstring to_wstring(const char* str);
 
-		/*! Convert a std-string to a wide std-string.
-		\param str A std-string.
-		*/
+		/// Convert a std::string to a std::wstring.
+		/// \param str A std::string.
 		STORMANCER_DLL_API wstring to_wstring(string str);
 
+		/// Convert any type of data to a std::string.
 		template<typename T>
 		string to_string(T& data)
 		{
 			return std::to_string(data);
 		}
 
+		/// Convert a std::wstring to a std::string.
 		STORMANCER_DLL_API string to_string(wstring& str);
 
+		/// Convert a vector of bytes to a std::string.
 		STORMANCER_DLL_API string to_string(vector<byte>& v);
 
+		/// Convert one data type to another data type by using the constructor.
 		template<typename T1, typename T2>
 		T2 convert(T1& data)
 		{
 			return T2(data);
 		}
 
+		/// Convert a std::string to a vector of bytes.
 		template<>
 		vector<byte> convert<string, vector<byte>>(string& str);
 

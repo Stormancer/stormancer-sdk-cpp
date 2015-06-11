@@ -41,7 +41,7 @@ var searchData=
   ['setapplication',['setApplication',['../class_stormancer_1_1_i_connection.html#ae45e45b7ee1fcf1372ee96e5cf4e3764',1,'Stormancer::IConnection::setApplication()'],['../class_stormancer_1_1_rak_net_connection.html#a895924d43fd315e568a1597956e4b1f4',1,'Stormancer::RakNetConnection::setApplication()']]],
   ['setbuf',['setbuf',['../classbasic__bytebuf.html#a0341bf599c58dc76f3e8b35db29bfaf5',1,'basic_bytebuf']]],
   ['setlogger',['setLogger',['../class_stormancer_1_1_client.html#ae0664074667b49ee78795115c58098bd',1,'Stormancer::Client']]],
-  ['setmetadata',['setMetadata',['../class_stormancer_1_1_configuration.html#ac2ef350c8ce44ab23e7b42b9b20782a8',1,'Stormancer::Configuration::setMetadata()'],['../class_stormancer_1_1_packet.html#adbf341249b6a82fb35c596f1c62922b7',1,'Stormancer::Packet::setMetadata()']]],
+  ['setmetadata',['setMetadata',['../class_stormancer_1_1_packet.html#adbf341249b6a82fb35c596f1c62922b7',1,'Stormancer::Packet']]],
   ['start',['start',['../class_stormancer_1_1_i_transport.html#a1cf300a8b3ef5d492b7db42bfe9aaf18',1,'Stormancer::ITransport::start()'],['../class_stormancer_1_1_rak_net_transport.html#a37e4d20bd8bf7d67ef8aa8465b30b1d8',1,'Stormancer::RakNetTransport::start()']]],
   ['state',['state',['../class_stormancer_1_1_i_connection.html#a35003f1512980c276b8af75878f140cb',1,'Stormancer::IConnection']]],
   ['stormancer',['Stormancer',['../namespace_stormancer.html',1,'']]],

@@ -171,7 +171,7 @@ Classes</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inactive logger (Used by default).  <a href="class_stormancer_1_1_null_logger.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_stormancer_1_1_packet.html">Packet</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expose a stream for reading data received through the network.  <a href="class_stormancer_1_1_packet.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expose a stream for reading data received from the network.  <a href="class_stormancer_1_1_packet.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_stormancer_1_1_packet_processor_config.html">PacketProcessorConfig</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Contains methods to register messages handlers based on message type.  <a href="class_stormancer_1_1_packet_processor_config.html#details">More...</a><br /></td></tr>
@@ -272,6 +272,7 @@ Enumerations</h2></td></tr>
 <a class="el" href="namespace_stormancer.html#a494a608d9bebc060d631d35c33decaf5a9a27316fbc5ef38b2a19c202dbdc29b7">ConnectionState::connecting</a>, 
 <a class="el" href="namespace_stormancer.html#a494a608d9bebc060d631d35c33decaf5a06aa6fa8bdc2078e7e1bd903e70c8f6a">ConnectionState::connected</a>
  }</td></tr>
+<tr class="memdesc:a494a608d9bebc060d631d35c33decaf5"><td class="mdescLeft">&#160;</td><td class="mdescRight">State of a network connection.  <a href="namespace_stormancer.html#a494a608d9bebc060d631d35c33decaf5">More...</a><br /></td></tr>
 <tr class="separator:a494a608d9bebc060d631d35c33decaf5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa800286ad29ad0da2c197aae3c08f889"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_stormancer.html#aa800286ad29ad0da2c197aae3c08f889">LogLevel</a> { <br />
 &#160;&#160;<a class="el" href="namespace_stormancer.html#aa800286ad29ad0da2c197aae3c08f889a882384ec38ce8d9582b57e70861730e4">LogLevel::Fatal</a> = 0, 
@@ -283,7 +284,7 @@ Enumerations</h2></td></tr>
 <a class="el" href="namespace_stormancer.html#aa800286ad29ad0da2c197aae3c08f889add4ec0ac4e58f7c32a01244ae91150b1">LogLevel::Trace</a> = 5
 <br />
  }</td></tr>
-<tr class="memdesc:aa800286ad29ad0da2c197aae3c08f889"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enumeration of the available log levels.  <a href="namespace_stormancer.html#aa800286ad29ad0da2c197aae3c08f889">More...</a><br /></td></tr>
+<tr class="memdesc:aa800286ad29ad0da2c197aae3c08f889"><td class="mdescLeft">&#160;</td><td class="mdescRight">Available log levels.  <a href="namespace_stormancer.html#aa800286ad29ad0da2c197aae3c08f889">More...</a><br /></td></tr>
 <tr class="separator:aa800286ad29ad0da2c197aae3c08f889"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a12bda042bf6257d1e38f4e9bb4556f17"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_stormancer.html#a12bda042bf6257d1e38f4e9bb4556f17">MessageIDTypes</a> { <br />
 &#160;&#160;<a class="el" href="namespace_stormancer.html#a12bda042bf6257d1e38f4e9bb4556f17a9f61d472d1fbb16bcf629f9ebb6b787a">MessageIDTypes::ID_CONNECT_TO_SCENE</a> = DefaultMessageIDTypes::ID_USER_PACKET_ENUM, 
@@ -297,6 +298,7 @@ Enumerations</h2></td></tr>
 <a class="el" href="namespace_stormancer.html#a12bda042bf6257d1e38f4e9bb4556f17a682ae843846aaa41a16d2d99920bbd8d">MessageIDTypes::ID_SCENES</a> = 141
 <br />
  }</td></tr>
+<tr class="memdesc:a12bda042bf6257d1e38f4e9bb4556f17"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used by the protocol for identifying the nature of the system messages.  <a href="namespace_stormancer.html#a12bda042bf6257d1e38f4e9bb4556f17">More...</a><br /></td></tr>
 <tr class="separator:a12bda042bf6257d1e38f4e9bb4556f17"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
@@ -317,23 +319,32 @@ Functions</h2></td></tr>
 <tr class="memitem:a9b3a1335db5b512afb37ec96c5ae8f80"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="basic__bytestream_8h.html#af5ae0c1445ac609216f2f54999403cdb">bytestream</a> &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_stormancer.html#a9b3a1335db5b512afb37ec96c5ae8f80">operator&lt;&lt;</a> (<a class="el" href="basic__bytestream_8h.html#af5ae0c1445ac609216f2f54999403cdb">bytestream</a> &amp;bs, T &amp;&amp;data)</td></tr>
 <tr class="separator:a9b3a1335db5b512afb37ec96c5ae8f80"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6d93623c21c8e00bda20d3a4a39f579b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="headers_8h.html#a54b4cbced84fc5b159dc8ce8c4d71702">STORMANCER_DLL_API</a> <a class="el" href="basic__bytestream_8h.html#af5ae0c1445ac609216f2f54999403cdb">bytestream</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_stormancer.html#a6d93623c21c8e00bda20d3a4a39f579b">operator&lt;&lt;</a> (<a class="el" href="basic__bytestream_8h.html#af5ae0c1445ac609216f2f54999403cdb">bytestream</a> &amp;bs, const char *data)</td></tr>
+<tr class="memdesc:a6d93623c21c8e00bda20d3a4a39f579b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a c-string in a byte stream.  <a href="#a6d93623c21c8e00bda20d3a4a39f579b">More...</a><br /></td></tr>
 <tr class="separator:a6d93623c21c8e00bda20d3a4a39f579b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acf4b93c382fc5937a7d561398b4a2894"><td class="memItemLeft" align="right" valign="top"><a class="el" href="headers_8h.html#a54b4cbced84fc5b159dc8ce8c4d71702">STORMANCER_DLL_API</a> <a class="el" href="basic__bytestream_8h.html#af5ae0c1445ac609216f2f54999403cdb">bytestream</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_stormancer.html#acf4b93c382fc5937a7d561398b4a2894">operator&lt;&lt;</a> (<a class="el" href="basic__bytestream_8h.html#af5ae0c1445ac609216f2f54999403cdb">bytestream</a> &amp;bs, const string &amp;data)</td></tr>
+<tr class="memdesc:acf4b93c382fc5937a7d561398b4a2894"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a constant std::string in a byte stream.  <a href="#acf4b93c382fc5937a7d561398b4a2894">More...</a><br /></td></tr>
 <tr class="separator:acf4b93c382fc5937a7d561398b4a2894"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a79aec3112523e137d8c29b446dbdef66"><td class="memItemLeft" align="right" valign="top"><a class="el" href="headers_8h.html#a54b4cbced84fc5b159dc8ce8c4d71702">STORMANCER_DLL_API</a> <a class="el" href="basic__bytestream_8h.html#af5ae0c1445ac609216f2f54999403cdb">bytestream</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_stormancer.html#a79aec3112523e137d8c29b446dbdef66">operator&lt;&lt;</a> (<a class="el" href="basic__bytestream_8h.html#af5ae0c1445ac609216f2f54999403cdb">bytestream</a> &amp;bs, string &amp;data)</td></tr>
+<tr class="memdesc:a79aec3112523e137d8c29b446dbdef66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a c-string in a byte stream.  <a href="#a79aec3112523e137d8c29b446dbdef66">More...</a><br /></td></tr>
 <tr class="separator:a79aec3112523e137d8c29b446dbdef66"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a979d036f651eb11f75132baf3082ae74"><td class="memItemLeft" align="right" valign="top"><a class="el" href="headers_8h.html#a54b4cbced84fc5b159dc8ce8c4d71702">STORMANCER_DLL_API</a> <a class="el" href="basic__bytestream_8h.html#af5ae0c1445ac609216f2f54999403cdb">bytestream</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_stormancer.html#a979d036f651eb11f75132baf3082ae74">operator&lt;&lt;</a> (<a class="el" href="basic__bytestream_8h.html#af5ae0c1445ac609216f2f54999403cdb">bytestream</a> &amp;bs, const wchar_t *data)</td></tr>
+<tr class="memdesc:a979d036f651eb11f75132baf3082ae74"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a wide c-string in a byte stream.  <a href="#a979d036f651eb11f75132baf3082ae74">More...</a><br /></td></tr>
 <tr class="separator:a979d036f651eb11f75132baf3082ae74"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2f7920d5d00251ca92473652d0a53a33"><td class="memItemLeft" align="right" valign="top"><a class="el" href="headers_8h.html#a54b4cbced84fc5b159dc8ce8c4d71702">STORMANCER_DLL_API</a> <a class="el" href="basic__bytestream_8h.html#af5ae0c1445ac609216f2f54999403cdb">bytestream</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_stormancer.html#a2f7920d5d00251ca92473652d0a53a33">operator&lt;&lt;</a> (<a class="el" href="basic__bytestream_8h.html#af5ae0c1445ac609216f2f54999403cdb">bytestream</a> &amp;bs, const wstring &amp;data)</td></tr>
+<tr class="memdesc:a2f7920d5d00251ca92473652d0a53a33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a constant std::wstring in a byte stream.  <a href="#a2f7920d5d00251ca92473652d0a53a33">More...</a><br /></td></tr>
 <tr class="separator:a2f7920d5d00251ca92473652d0a53a33"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af4ae19969bcd0877dd334b587539871d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="headers_8h.html#a54b4cbced84fc5b159dc8ce8c4d71702">STORMANCER_DLL_API</a> <a class="el" href="basic__bytestream_8h.html#af5ae0c1445ac609216f2f54999403cdb">bytestream</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_stormancer.html#af4ae19969bcd0877dd334b587539871d">operator&lt;&lt;</a> (<a class="el" href="basic__bytestream_8h.html#af5ae0c1445ac609216f2f54999403cdb">bytestream</a> &amp;bs, wstring &amp;data)</td></tr>
+<tr class="memdesc:af4ae19969bcd0877dd334b587539871d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a std::wstring in a byte stream.  <a href="#af4ae19969bcd0877dd334b587539871d">More...</a><br /></td></tr>
 <tr class="separator:af4ae19969bcd0877dd334b587539871d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad5456dc025146f8cbeabe1a9e6ac44e4"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:ad5456dc025146f8cbeabe1a9e6ac44e4"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="basic__bytestream_8h.html#af5ae0c1445ac609216f2f54999403cdb">bytestream</a> &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_stormancer.html#ad5456dc025146f8cbeabe1a9e6ac44e4">operator&gt;&gt;</a> (<a class="el" href="basic__bytestream_8h.html#af5ae0c1445ac609216f2f54999403cdb">bytestream</a> &amp;bs, T &amp;data)</td></tr>
+<tr class="memdesc:ad5456dc025146f8cbeabe1a9e6ac44e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Template for reading any data type from the byte stream.  <a href="#ad5456dc025146f8cbeabe1a9e6ac44e4">More...</a><br /></td></tr>
 <tr class="separator:ad5456dc025146f8cbeabe1a9e6ac44e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5231abef79e38b7e4bc6ed1fa89d936f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="headers_8h.html#a54b4cbced84fc5b159dc8ce8c4d71702">STORMANCER_DLL_API</a> <a class="el" href="basic__bytestream_8h.html#af5ae0c1445ac609216f2f54999403cdb">bytestream</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_stormancer.html#a5231abef79e38b7e4bc6ed1fa89d936f">operator&gt;&gt;</a> (<a class="el" href="basic__bytestream_8h.html#af5ae0c1445ac609216f2f54999403cdb">bytestream</a> &amp;bs, string &amp;data)</td></tr>
+<tr class="memdesc:a5231abef79e38b7e4bc6ed1fa89d936f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a std::string from a byte stream.  <a href="#a5231abef79e38b7e4bc6ed1fa89d936f">More...</a><br /></td></tr>
 <tr class="separator:a5231abef79e38b7e4bc6ed1fa89d936f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae6cb626f65d4f796debe12485d9a63aa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="headers_8h.html#a54b4cbced84fc5b159dc8ce8c4d71702">STORMANCER_DLL_API</a> <a class="el" href="basic__bytestream_8h.html#af5ae0c1445ac609216f2f54999403cdb">bytestream</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_stormancer.html#ae6cb626f65d4f796debe12485d9a63aa">operator&gt;&gt;</a> (<a class="el" href="basic__bytestream_8h.html#af5ae0c1445ac609216f2f54999403cdb">bytestream</a> &amp;bs, wstring &amp;data)</td></tr>
+<tr class="memdesc:ae6cb626f65d4f796debe12485d9a63aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a std::wstring from a byte stream.  <a href="#ae6cb626f65d4f796debe12485d9a63aa">More...</a><br /></td></tr>
 <tr class="separator:ae6cb626f65d4f796debe12485d9a63aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a41f2be06643b3f26b233991638c8014c"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a41f2be06643b3f26b233991638c8014c"><td class="memTemplItemLeft" align="right" valign="top">T *&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_stormancer.html#a41f2be06643b3f26b233991638c8014c">reverseByteOrder</a> (T *data, size_t n=-1)</td></tr>
@@ -538,12 +549,17 @@ Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>State of a network connection. </p>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a class="anchor" id="a494a608d9bebc060d631d35c33decaf5a3a561116f0c9675a3c83d21fa365050d"></a>disconnected&#160;</td><td class="fielddoc">
+<p>disconnected. </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="a494a608d9bebc060d631d35c33decaf5a9a27316fbc5ef38b2a19c202dbdc29b7"></a>connecting&#160;</td><td class="fielddoc">
+<p>Connecting. </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="a494a608d9bebc060d631d35c33decaf5a06aa6fa8bdc2078e7e1bd903e70c8f6a"></a>connected&#160;</td><td class="fielddoc">
+<p>Connected. </p>
 </td></tr>
 </table>
 
@@ -567,24 +583,25 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Enumeration of the available log levels. </p>
+<p>Available log levels. </p>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a class="anchor" id="aa800286ad29ad0da2c197aae3c08f889a882384ec38ce8d9582b57e70861730e4"></a>Fatal&#160;</td><td class="fielddoc">
-</td></tr>
-<tr><td class="fieldname"><a class="anchor" id="aa800286ad29ad0da2c197aae3c08f889a902b0d55fddef6f8d651fe1035b7d4bd"></a>Error&#160;</td><td class="fielddoc">
 <p>Critical error that prevent the program from continuing. </p>
 </td></tr>
-<tr><td class="fieldname"><a class="anchor" id="aa800286ad29ad0da2c197aae3c08f889a56525ae64d370c0b448ac0d60710ef17"></a>Warn&#160;</td><td class="fielddoc">
+<tr><td class="fieldname"><a class="anchor" id="aa800286ad29ad0da2c197aae3c08f889a902b0d55fddef6f8d651fe1035b7d4bd"></a>Error&#160;</td><td class="fielddoc">
 <p>Non critical errors. </p>
 </td></tr>
-<tr><td class="fieldname"><a class="anchor" id="aa800286ad29ad0da2c197aae3c08f889a4059b0251f66a18cb56f544728796875"></a>Info&#160;</td><td class="fielddoc">
+<tr><td class="fieldname"><a class="anchor" id="aa800286ad29ad0da2c197aae3c08f889a56525ae64d370c0b448ac0d60710ef17"></a>Warn&#160;</td><td class="fielddoc">
 <p>Warning. </p>
 </td></tr>
-<tr><td class="fieldname"><a class="anchor" id="aa800286ad29ad0da2c197aae3c08f889aa603905470e2a5b8c13e96b579ef0dba"></a>Debug&#160;</td><td class="fielddoc">
+<tr><td class="fieldname"><a class="anchor" id="aa800286ad29ad0da2c197aae3c08f889a4059b0251f66a18cb56f544728796875"></a>Info&#160;</td><td class="fielddoc">
 <p>Information message about the execution of the application. </p>
 </td></tr>
-<tr><td class="fieldname"><a class="anchor" id="aa800286ad29ad0da2c197aae3c08f889add4ec0ac4e58f7c32a01244ae91150b1"></a>Trace&#160;</td><td class="fielddoc">
+<tr><td class="fieldname"><a class="anchor" id="aa800286ad29ad0da2c197aae3c08f889aa603905470e2a5b8c13e96b579ef0dba"></a>Debug&#160;</td><td class="fielddoc">
 <p>Applies to detailed informations useful when debugging. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="aa800286ad29ad0da2c197aae3c08f889add4ec0ac4e58f7c32a01244ae91150b1"></a>Trace&#160;</td><td class="fielddoc">
+<p>Very detailed informations about the execution. </p>
 </td></tr>
 </table>
 
@@ -607,22 +624,32 @@ Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Used by the protocol for identifying the nature of the system messages. </p>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a class="anchor" id="a12bda042bf6257d1e38f4e9bb4556f17a9f61d472d1fbb16bcf629f9ebb6b787a"></a>ID_CONNECT_TO_SCENE&#160;</td><td class="fielddoc">
+<p>Connect to a scene. </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="a12bda042bf6257d1e38f4e9bb4556f17af00a3ba2e4a67d1751a21a80c41445e0"></a>ID_DISCONNECT_FROM_SCENE&#160;</td><td class="fielddoc">
+<p>Disconnect from a scene. </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="a12bda042bf6257d1e38f4e9bb4556f17af18a65323d78e2154a42c0e612a712fc"></a>ID_GET_SCENE_INFOS&#160;</td><td class="fielddoc">
+<p>Retrieve scene informations. </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="a12bda042bf6257d1e38f4e9bb4556f17a47d774d5b7b329e4ccc3e5916028e182"></a>ID_REQUEST_RESPONSE_MSG&#160;</td><td class="fielddoc">
+<p>Response to a request. </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="a12bda042bf6257d1e38f4e9bb4556f17a62c9d0882e5b9a171f5af1135361823e"></a>ID_REQUEST_RESPONSE_COMPLETE&#160;</td><td class="fielddoc">
+<p><a class="el" href="class_stormancer_1_1_request.html" title="System request. ">Request</a> completed. </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="a12bda042bf6257d1e38f4e9bb4556f17a5f16e50eb0a2c4dc85605e4b79111642"></a>ID_REQUEST_RESPONSE_ERROR&#160;</td><td class="fielddoc">
+<p>Response failed. </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="a12bda042bf6257d1e38f4e9bb4556f17a10d1ddafb0ef6c0d9f5b3652d46ed225"></a>ID_CONNECTION_RESULT&#160;</td><td class="fielddoc">
+<p>Connection informations. </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="a12bda042bf6257d1e38f4e9bb4556f17a682ae843846aaa41a16d2d99920bbd8d"></a>ID_SCENES&#160;</td><td class="fielddoc">
+<p>Scenes. </p>
 </td></tr>
 </table>
 
@@ -764,7 +791,9 @@ template&lt;typename T &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Write a c-string in a byte stream. </p><dl class="params"><dt>Parameters</dt><dd>
+
+<p>Write a c-string in a byte stream. </p>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">bs</td><td>The byte stream we want to write in. </td></tr>
     <tr><td class="paramname">data</td><td>The c-string to write. </td></tr>
@@ -798,10 +827,12 @@ template&lt;typename T &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Write a constant std-string in a byte stream. </p><dl class="params"><dt>Parameters</dt><dd>
+
+<p>Write a constant std::string in a byte stream. </p>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">bs</td><td>The byte stream we want to write in. </td></tr>
-    <tr><td class="paramname">data</td><td>The std-string to write. </td></tr>
+    <tr><td class="paramname">data</td><td>The std::string to write. </td></tr>
   </table>
   </dd>
 </dl>
@@ -832,7 +863,9 @@ template&lt;typename T &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Write a c-string in a byte stream. </p><dl class="params"><dt>Parameters</dt><dd>
+
+<p>Write a c-string in a byte stream. </p>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">bs</td><td>The byte stream we want to write in. </td></tr>
     <tr><td class="paramname">data</td><td>The c-string to write. </td></tr>
@@ -866,7 +899,9 @@ template&lt;typename T &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Write a wide c-string in a byte stream. </p><dl class="params"><dt>Parameters</dt><dd>
+
+<p>Write a wide c-string in a byte stream. </p>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">bs</td><td>The byte stream we want to write in. </td></tr>
     <tr><td class="paramname">data</td><td>The wide c-string to write. </td></tr>
@@ -900,10 +935,12 @@ template&lt;typename T &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Write a constant wide std-string in a byte stream. </p><dl class="params"><dt>Parameters</dt><dd>
+
+<p>Write a constant std::wstring in a byte stream. </p>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">bs</td><td>The byte stream we want to write in. </td></tr>
-    <tr><td class="paramname">data</td><td>The wide std-string to write. </td></tr>
+    <tr><td class="paramname">data</td><td>The std::wstring to write. </td></tr>
   </table>
   </dd>
 </dl>
@@ -934,10 +971,12 @@ template&lt;typename T &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Write a wide std-string in a byte stream. </p><dl class="params"><dt>Parameters</dt><dd>
+
+<p>Write a std::wstring in a byte stream. </p>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">bs</td><td>The byte stream we want to write in. </td></tr>
-    <tr><td class="paramname">data</td><td>The wide std-string to write. </td></tr>
+    <tr><td class="paramname">data</td><td>The std::wstring to write. </td></tr>
   </table>
   </dd>
 </dl>
@@ -998,7 +1037,9 @@ template&lt;typename T &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Template for reading any data type from the byte stream. </p><dl class="params"><dt>Parameters</dt><dd>
+
+<p>Template for reading any data type from the byte stream. </p>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">bs</td><td>The byte stream we want to read. </td></tr>
     <tr><td class="paramname">data</td><td>A ref to a variable for puting the read data. </td></tr>
@@ -1031,10 +1072,12 @@ template&lt;typename T &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Read a std-string from a byte stream. </p><dl class="params"><dt>Parameters</dt><dd>
+
+<p>Read a std::string from a byte stream. </p>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">bs</td><td>The byte stream we want to read. </td></tr>
-    <tr><td class="paramname">data</td><td>A ref to a std-string where we get the data. </td></tr>
+    <tr><td class="paramname">data</td><td>A ref to a std::string where we get the data. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1064,10 +1107,12 @@ template&lt;typename T &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Read a wide std-string from a byte stream. </p><dl class="params"><dt>Parameters</dt><dd>
+
+<p>Read a std::wstring from a byte stream. </p>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">bs</td><td>The byte stream we want to read. </td></tr>
-    <tr><td class="paramname">data</td><td>A ref to a wide std-string where we get the data. </td></tr>
+    <tr><td class="paramname">data</td><td>A ref to a std::wstring where we get the data. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1105,7 +1150,7 @@ template&lt;typename T &gt; </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jun 10 2015 18:07:27 for Stormancer-sdk-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jun 11 2015 14:26:51 for Stormancer-sdk-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.9.1
 </small></address>

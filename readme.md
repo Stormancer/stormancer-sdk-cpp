@@ -1,5 +1,9 @@
 Stormancer SDK C++  
-  
+
+Documentation  
+http://stormancer.github.io/stormancer-sdk-cpp/documentation/  
+
+
 Configuration help  
 
 NuGet packages to install :  

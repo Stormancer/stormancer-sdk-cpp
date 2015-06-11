@@ -97,24 +97,27 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00007"></a><span class="lineno"><a class="line" href="class_stormancer_1_1_i_scene_peer.html">    7</a></span>&#160;    <span class="keyword">class </span><a class="code" href="class_stormancer_1_1_i_scene_peer.html">IScenePeer</a></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;    {</div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;        <a class="code" href="class_stormancer_1_1_i_scene_peer.html#a8ddb6e4405a3ac4a2468c752011f57cf">IScenePeer</a>();</div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;        <span class="keyword">virtual</span> <a class="code" href="class_stormancer_1_1_i_scene_peer.html#ad9e132b43f3db87067304a094a3cd313">~IScenePeer</a>();</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;        <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="class_stormancer_1_1_i_scene_peer.html#ada5e528978c90751392f9b9c5f1a8eef">send</a>(wstring&amp; routeName, <span class="keyword">function</span>&lt;<span class="keywordtype">void</span>(<a class="code" href="classbasic__bytestream.html">bytestream</a>*)&gt; writer, PacketPriority priority, PacketReliability reliability) = 0;</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;    };</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;};</div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;    </div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;        <a class="code" href="class_stormancer_1_1_i_scene_peer.html#a8ddb6e4405a3ac4a2468c752011f57cf">IScenePeer</a>();</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;        </div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;        <span class="keyword">virtual</span> <a class="code" href="class_stormancer_1_1_i_scene_peer.html#ad9e132b43f3db87067304a094a3cd313">~IScenePeer</a>();</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    </div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;        <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="class_stormancer_1_1_i_scene_peer.html#ada5e528978c90751392f9b9c5f1a8eef">send</a>(wstring&amp; routeName, <span class="keyword">function</span>&lt;<span class="keywordtype">void</span>(<a class="code" href="classbasic__bytestream.html">bytestream</a>*)&gt; writer, PacketPriority priority, PacketReliability reliability) = 0;</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    };</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;};</div>
 <div class="ttc" id="classbasic__bytestream_html"><div class="ttname"><a href="classbasic__bytestream.html">basic_bytestream</a></div><div class="ttdoc">Byte array stream. </div><div class="ttdef"><b>Definition:</b> basic_bytestream.h:10</div></div>
-<div class="ttc" id="class_stormancer_1_1_i_scene_peer_html_ada5e528978c90751392f9b9c5f1a8eef"><div class="ttname"><a href="class_stormancer_1_1_i_scene_peer.html#ada5e528978c90751392f9b9c5f1a8eef">Stormancer::IScenePeer::send</a></div><div class="ttdeci">virtual void send(wstring &amp;routeName, function&lt; void(bytestream *)&gt; writer, PacketPriority priority, PacketReliability reliability)=0</div></div>
-<div class="ttc" id="class_stormancer_1_1_i_scene_peer_html_a8ddb6e4405a3ac4a2468c752011f57cf"><div class="ttname"><a href="class_stormancer_1_1_i_scene_peer.html#a8ddb6e4405a3ac4a2468c752011f57cf">Stormancer::IScenePeer::IScenePeer</a></div><div class="ttdeci">IScenePeer()</div></div>
+<div class="ttc" id="class_stormancer_1_1_i_scene_peer_html_ada5e528978c90751392f9b9c5f1a8eef"><div class="ttname"><a href="class_stormancer_1_1_i_scene_peer.html#ada5e528978c90751392f9b9c5f1a8eef">Stormancer::IScenePeer::send</a></div><div class="ttdeci">virtual void send(wstring &amp;routeName, function&lt; void(bytestream *)&gt; writer, PacketPriority priority, PacketReliability reliability)=0</div><div class="ttdoc">Sends a message to the remote scene. </div></div>
+<div class="ttc" id="class_stormancer_1_1_i_scene_peer_html_a8ddb6e4405a3ac4a2468c752011f57cf"><div class="ttname"><a href="class_stormancer_1_1_i_scene_peer.html#a8ddb6e4405a3ac4a2468c752011f57cf">Stormancer::IScenePeer::IScenePeer</a></div><div class="ttdeci">IScenePeer()</div><div class="ttdoc">Constructor. </div></div>
 <div class="ttc" id="namespace_stormancer_html"><div class="ttname"><a href="namespace_stormancer.html">Stormancer</a></div><div class="ttdef"><b>Definition:</b> Action.h:4</div></div>
-<div class="ttc" id="class_stormancer_1_1_i_scene_peer_html_ad9e132b43f3db87067304a094a3cd313"><div class="ttname"><a href="class_stormancer_1_1_i_scene_peer.html#ad9e132b43f3db87067304a094a3cd313">Stormancer::IScenePeer::~IScenePeer</a></div><div class="ttdeci">virtual ~IScenePeer()</div></div>
+<div class="ttc" id="class_stormancer_1_1_i_scene_peer_html_ad9e132b43f3db87067304a094a3cd313"><div class="ttname"><a href="class_stormancer_1_1_i_scene_peer.html#ad9e132b43f3db87067304a094a3cd313">Stormancer::IScenePeer::~IScenePeer</a></div><div class="ttdeci">virtual ~IScenePeer()</div><div class="ttdoc">Destructor. </div></div>
 <div class="ttc" id="headers_8h_html"><div class="ttname"><a href="headers_8h.html">headers.h</a></div></div>
 <div class="ttc" id="class_stormancer_1_1_i_scene_peer_html"><div class="ttname"><a href="class_stormancer_1_1_i_scene_peer.html">Stormancer::IScenePeer</a></div><div class="ttdoc">Remote scene. </div><div class="ttdef"><b>Definition:</b> IScenePeer.h:7</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jun 10 2015 18:07:27 for Stormancer-sdk-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jun 11 2015 14:26:51 for Stormancer-sdk-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.9.1
 </small></address>

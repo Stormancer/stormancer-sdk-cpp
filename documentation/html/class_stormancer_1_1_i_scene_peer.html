@@ -112,10 +112,13 @@ Inheritance diagram for Stormancer::IScenePeer:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a8ddb6e4405a3ac4a2468c752011f57cf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_stormancer_1_1_i_scene_peer.html#a8ddb6e4405a3ac4a2468c752011f57cf">IScenePeer</a> ()</td></tr>
+<tr class="memdesc:a8ddb6e4405a3ac4a2468c752011f57cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#a8ddb6e4405a3ac4a2468c752011f57cf">More...</a><br /></td></tr>
 <tr class="separator:a8ddb6e4405a3ac4a2468c752011f57cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad9e132b43f3db87067304a094a3cd313"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_stormancer_1_1_i_scene_peer.html#ad9e132b43f3db87067304a094a3cd313">~IScenePeer</a> ()</td></tr>
+<tr class="memdesc:ad9e132b43f3db87067304a094a3cd313"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor.  <a href="#ad9e132b43f3db87067304a094a3cd313">More...</a><br /></td></tr>
 <tr class="separator:ad9e132b43f3db87067304a094a3cd313"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ada5e528978c90751392f9b9c5f1a8eef"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_stormancer_1_1_i_scene_peer.html#ada5e528978c90751392f9b9c5f1a8eef">send</a> (wstring &amp;routeName, function&lt; void(<a class="el" href="basic__bytestream_8h.html#af5ae0c1445ac609216f2f54999403cdb">bytestream</a> *)&gt; writer, PacketPriority priority, PacketReliability reliability)=0</td></tr>
+<tr class="memdesc:ada5e528978c90751392f9b9c5f1a8eef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sends a message to the remote scene.  <a href="#ada5e528978c90751392f9b9c5f1a8eef">More...</a><br /></td></tr>
 <tr class="separator:ada5e528978c90751392f9b9c5f1a8eef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -133,6 +136,8 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Constructor. </p>
 
 </div>
 </div>
@@ -156,6 +161,8 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Destructor. </p>
 
 </div>
 </div>
@@ -204,6 +211,17 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Sends a message to the remote scene. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">routeName</td><td><a class="el" href="class_stormancer_1_1_route.html" title="Represents a route on a scene. ">Route</a> name. </td></tr>
+    <tr><td class="paramname">writer</td><td>function where we write the message in the stream. </td></tr>
+    <tr><td class="paramname">priority</td><td>Priority of the message in the network. </td></tr>
+    <tr><td class="paramname">reliability</td><td>Reliability behavior of the message in the network. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p>Implemented in <a class="el" href="class_stormancer_1_1_scene_peer.html#a97171c346c1720c2d2e8f3195f72acbb">Stormancer::ScenePeer</a>.</p>
 
 </div>
@@ -214,7 +232,7 @@ Public Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jun 10 2015 18:07:28 for Stormancer-sdk-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jun 11 2015 14:26:52 for Stormancer-sdk-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.9.1
 </small></address>

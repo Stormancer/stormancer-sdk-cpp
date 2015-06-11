@@ -20,12 +20,6 @@ namespace Stormancer
 		return (serverEndpoint.length() ? serverEndpoint : apiEndpoint);
 	}
 
-	Configuration& Configuration::setMetadata(wstring key, wstring value)
-	{
-		metadata[key] = value;
-		return *this;
-	}
-
 	/*void Configuration::addPlugin(IClientPlugin* plugin)
 	{
 		plugins.push_back(plugin);
