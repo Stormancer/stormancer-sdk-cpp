@@ -1,7 +1,7 @@
 Stormancer SDK C++  
 
 Documentation  
-http://stormancer.github.io/stormancer-sdk-cpp/documentation/  
+http://stormancer.github.io/stormancer-sdk-cpp/documentation/html  
 
 
 Configuration help  
