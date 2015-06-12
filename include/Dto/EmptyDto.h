@@ -10,26 +10,23 @@ namespace Stormancer
 	public:
 	
 		/// Constructor.
-		EmptyDto();
+		STORMANCER_DLL_API EmptyDto();
 		
-		/*! Constructor.
-		\param stream The stream to deserialize.
-		*/
-		EmptyDto(bytestream* stream);
+		/// Constructor.
+		/// \param stream The stream to deserialize.
+		STORMANCER_DLL_API EmptyDto(bytestream* stream);
 		
 		/// Destructor.
-		virtual ~EmptyDto();
+		STORMANCER_DLL_API virtual ~EmptyDto();
 
 	public:
 	
-		/*! The method to serialize the object.
-		\param stream The stream where we serialize the object.
-		*/
+		/// The method to serialize the object.
+		/// \param stream The stream where we serialize the object.
 		void serialize(bytestream* stream);
 		
-		/*! The method to deserialize the object.
-		\param stream The stream to deserialize.
-		*/
+		/// The method to deserialize the object.
+		/// \param stream The stream to deserialize.
 		void deserialize(bytestream* stream);
 	};
 };

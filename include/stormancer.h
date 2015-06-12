@@ -16,7 +16,6 @@
 #include "Dto/SceneInfosDto.h"
 #include "Dto/SceneInfosRequestDto.h"
 
-#include "IMetadata.h"
 #include "ApiClient.h"
 #include "Client.h"
 #include "Configuration.h"

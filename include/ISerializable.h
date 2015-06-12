@@ -18,8 +18,8 @@ namespace Stormancer
 
 		// STATIC
 
-		static void serialize(ISerializable* data, bytestream* stream);
-		static void deserialize(bytestream* stream, ISerializable* data);
+		STORMANCER_DLL_API static void serialize(ISerializable* data, bytestream* stream);
+		STORMANCER_DLL_API static void deserialize(bytestream* stream, ISerializable* data);
 
 		// DATA (DE)SERIALIZATION
 		
@@ -34,10 +34,10 @@ namespace Stormancer
 		}
 
 		// Base template ref specializations
-		static void serialize(byte& data, bytestream* stream);
-		static void serialize(string& data, bytestream* stream);
-		static void serialize(wstring& data, bytestream* stream);
-		static void serialize(stringMap& data, bytestream* stream);
+		STORMANCER_DLL_API static void serialize(byte& data, bytestream* stream);
+		STORMANCER_DLL_API static void serialize(string& data, bytestream* stream);
+		STORMANCER_DLL_API static void serialize(wstring& data, bytestream* stream);
+		STORMANCER_DLL_API static void serialize(stringMap& data, bytestream* stream);
 
 		// Vector template
 		template<typename T>
@@ -51,7 +51,7 @@ namespace Stormancer
 			}
 		}
 
-		static void serializeVector(vector<RouteDto>& data, bytestream* stream);
+		STORMANCER_DLL_API static void serializeVector(vector<RouteDto>& data, bytestream* stream);
 
 		// Map template
 		template<typename MT1, typename MT2>
@@ -80,10 +80,10 @@ namespace Stormancer
 
 		// Base template specializations
 		// string
-		static void deserialize(bytestream* stream, string& str);
+		STORMANCER_DLL_API static void deserialize(bytestream* stream, string& str);
 
 		// wstring
-		static void deserialize(bytestream* stream, wstring& str);
+		STORMANCER_DLL_API static void deserialize(bytestream* stream, wstring& str);
 
 		// Vector template
 		template<typename VT>
@@ -99,8 +99,8 @@ namespace Stormancer
 			throw string("not implemented.");
 		}
 
-		static unique_ptr<MsgPack::Element>& valueFromMsgPackMapKey(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
-		static unique_ptr<MsgPack::Element>& valueFromMsgPackArrayKey(unique_ptr<MsgPack::Element>& msgPackArray, uint32 key);
+		STORMANCER_DLL_API static unique_ptr<MsgPack::Element>& valueFromMsgPackMapKey(unique_ptr<MsgPack::Element>& msgPackMap, wstring key);
+		STORMANCER_DLL_API static unique_ptr<MsgPack::Element>& valueFromMsgPackArrayKey(unique_ptr<MsgPack::Element>& msgPackArray, uint32 key);
 
 		template<typename T>
 		static T numberFromMsgPackMap(unique_ptr<MsgPack::Element>& msgPackMap, wstring key)

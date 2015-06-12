@@ -84,17 +84,12 @@ namespace Stormancer
 
 	public:
 		
-		/// Returns a copy of the metadatas.
-		stringMap getMetadata();
-		
-		/// Returns the value in the metadatas.
-		/// \param key The key associated to the wanted value.
-		wstring getMetadata(wstring key);
+		/// Metadata of the connection.
+		stringMap metadata;
 		
 		function<void(wstring)> connectionClosed;
 
 	protected:
-		stringMap _metadata;
 		ConnectionState _state;
 		wstring _account;
 		wstring _application;

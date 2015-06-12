@@ -297,9 +297,6 @@
     <ClCompile Include="src\StringFormat.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\IMetadatacpp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Configuration.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

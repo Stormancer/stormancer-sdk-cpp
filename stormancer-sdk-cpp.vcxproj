@@ -290,7 +290,6 @@
     <ClCompile Include="src\IConnection.cpp" />
     <ClCompile Include="src\IConnectionManager.cpp" />
     <ClCompile Include="src\ILogger.cpp" />
-    <ClCompile Include="src\IMetadatacpp.cpp" />
     <ClCompile Include="src\IPacketDispatcher.cpp" />
     <ClCompile Include="src\IPacketProcessor.cpp" />
     <ClCompile Include="src\IRequest.cpp" />

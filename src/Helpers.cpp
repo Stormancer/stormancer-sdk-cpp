@@ -17,7 +17,7 @@ namespace Stormancer
 		return am;
 	}
 
-	wstring Helpers::vectorJoin(vector<wstring> vector, wstring glue)
+	wstring Helpers::vectorJoin(vector<wstring>& vector, wstring glue)
 	{
 		wstringstream ss;
 		for (size_t i = 0; i < vector.size(); ++i)
