@@ -23,13 +23,13 @@ http://stormancer.github.io/stormancer-sdk-cpp/documentation/html/annotated.html
 ```
 PATH=$(SolutionDir)..\..\stormancer-sdk-cpp\RakNet\Lib\DLL\Lib;$(SolutionDir)..\..\stormancer-sdk-cpp\bin;%PATH%  
 ```
-- Change the **Additional include directories** *(Configuration Properties > C/C++ > General > Environment)* :  
+- Change the **Additional include directories** *(Configuration Properties > C/C++ > General > Additional include directories)* :  
 ```
 $(SolutionDir)..\..\stormancer-sdk-cpp\include  
 $(SolutionDir)..\..\stormancer-sdk-cpp\MsgPack  
 $(SolutionDir)..\..\stormancer-sdk-cpp\RakNet\Source  
 ```
-- Change the **Additional library directories** *(Configuration Properties > Linker > General > Environment)* :  
+- Change the **Additional library directories** *(Configuration Properties > Linker > General > Additional library directories)* :  
 ```
 $(SolutionDir)..\..\stormancer-sdk-cpp\RakNet\Lib\DLL\Lib  
 $(SolutionDir)..\..\stormancer-sdk-cpp\bin  
