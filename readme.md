@@ -19,22 +19,26 @@ http://stormancer.github.io/stormancer-sdk-cpp/documentation/html/annotated.html
 - Build the SDK.  
 - Open the **project properties**  
 - Select **All Configurations** and **All Platforms** *(or your target platform)* on top of the property window.  
-- Change the **Environment path** *(Configuration Properties > Debugging > Environment)* :  
+- Change the **Environment path**  
+*(Configuration Properties > Debugging > Environment)*  
 ```
 PATH=$(SolutionDir)..\..\stormancer-sdk-cpp\RakNet\Lib\DLL\Lib;$(SolutionDir)..\..\stormancer-sdk-cpp\bin;%PATH%  
 ```
-- Change the **Additional include directories** *(Configuration Properties > C/C++ > General > Additional include directories)* :  
+- Change the **Additional include directories**  
+*(Configuration Properties > C/C++ > General > Additional include directories)*  
 ```
 $(SolutionDir)..\..\stormancer-sdk-cpp\include  
 $(SolutionDir)..\..\stormancer-sdk-cpp\MsgPack  
 $(SolutionDir)..\..\stormancer-sdk-cpp\RakNet\Source  
 ```
-- Change the **Additional library directories** *(Configuration Properties > Linker > General > Additional library directories)* :  
+- Change the **Additional library directories**  
+(Configuration Properties > Linker > General > Additional library directories)*  
 ```
 $(SolutionDir)..\..\stormancer-sdk-cpp\RakNet\Lib\DLL\Lib  
 $(SolutionDir)..\..\stormancer-sdk-cpp\bin  
 ```
-- Change the **Additional dependencies** *(Configuration Properties > Linker > Input > Additional dependencies)* :  
+- Change the **Additional dependencies**  
+*(Configuration Properties > Linker > Input > Additional dependencies)*  
 ```
 DLL_vc9_DLL_$(Configuration)_$(Platform).lib  
 ws2_32.lib  
