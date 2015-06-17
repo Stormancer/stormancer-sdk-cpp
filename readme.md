@@ -32,7 +32,7 @@ $(SolutionDir)..\..\stormancer-sdk-cpp\MsgPack
 $(SolutionDir)..\..\stormancer-sdk-cpp\RakNet\Source  
 ```
 - Change the **Additional library directories**  
-(Configuration Properties > Linker > General > Additional library directories)*  
+*(Configuration Properties > Linker > General > Additional library directories)*  
 ```
 $(SolutionDir)..\..\stormancer-sdk-cpp\RakNet\Lib\DLL\Lib  
 $(SolutionDir)..\..\stormancer-sdk-cpp\bin  
