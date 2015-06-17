@@ -10,9 +10,16 @@ http://stormancer.github.io/stormancer-sdk-cpp/documentation/html/annotated.html
 - RakNet *(pre-built for windows 32/64 bits)*  
 - MsgPack  
 
-### NuGet packages to install  
+### NuGet packages to install
 - C++ REST SDK (or cpprestsdk) (by searching casablanca)  
 - Reactive Extensions for C++ (or rxcpp)  
+
+## Configure the samples
+- Change the **Environment path**  
+*(Configuration Properties > Debugging > Environment)*  
+```
+PATH=$(SolutionDir)RakNet\Lib\DLL\Lib;$(SolutionDir)bin;%PATH%  
+```
 
 ## Configure a project
 
