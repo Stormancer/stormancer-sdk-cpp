@@ -10,13 +10,19 @@ namespace Stormancer
 	{
 	}
 
-	SceneEndpoint TokenHandler::decodeToken(wstring& token)
+	SceneEndpoint TokenHandler::decodeToken(std::string& token)
 	{
-		token = Helpers::stringTrim(token, '"');
-		wstring data = Helpers::stringSplit(token, L"-")[0];
-		string buffer = Helpers::to_string(utility::conversions::from_base64(data));
-		bytestream bs(buffer);
+		std::wstring wtoken = Helpers::stringTrim(std::wstring(token.begin(), token.end()), L'"');
+		std::wstring data = Helpers::stringSplit(wtoken, L"-")[0];
+		auto vectorData = utility::conversions::from_base64(data);
+		std::string buffer(vectorData.begin(), vectorData.end());
 
-		return SceneEndpoint(token, ConnectionData(&bs));
+		msgpack::unpacked result;
+		msgpack::unpack(result, buffer.data(), buffer.size());
+		msgpack::object obj = result.get();
+
+		ConnectionData cData;
+		obj.convert(&cData);
+		return SceneEndpoint(std::string(wtoken.begin(), wtoken.end()), cData);
 	}
 };

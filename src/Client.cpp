@@ -24,10 +24,10 @@ namespace Stormancer
 
 	IConnection* Client::ConnectionHandler::getConnection(uint64 id)
 	{
-		throw exception("Client::ConnectionHandler::getConnection not implemented.");
+		throw std::exception("Client::ConnectionHandler::getConnection not implemented.");
 	}
 
-	void Client::ConnectionHandler::closeConnection(IConnection* connection, wstring reason)
+	void Client::ConnectionHandler::closeConnection(IConnection* connection, std::string reason)
 	{
 	}
 
@@ -43,7 +43,7 @@ namespace Stormancer
 		_apiClient(new ApiClient(config, _tokenHandler)),
 		_transport(config->transport),
 		_dispatcher(config->dispatcher),
-		_requestProcessor(new RequestProcessor(_logger, vector<IRequestModule*>())),
+		_requestProcessor(new RequestProcessor(_logger, std::vector<IRequestModule*>())),
 		_scenesDispatcher(new SceneDispatcher),
 		_metadata(config->metadata),
 		_maxPeers(config->maxPeers)
@@ -51,10 +51,10 @@ namespace Stormancer
 		_dispatcher->addProcessor(_requestProcessor);
 		_dispatcher->addProcessor(_scenesDispatcher);
 
-		_metadata[L"serializers"] = L"msgpack/map";
-		_metadata[L"transport"] = _transport->name();
-		_metadata[L"version"] = L"1.0.0";
-		_metadata[L"platform"] = L"cpp";
+		_metadata["serializers"] = "msgpack/array";
+		_metadata["transport"] = _transport->name();
+		_metadata["version"] = "1.0.0";
+		_metadata["platform"] = "cpp";
 
 		initialize();
 	}
@@ -90,13 +90,13 @@ namespace Stormancer
 		if (!_initialized)
 		{
 			_initialized = true;
-			_transport->packetReceived += new function<void(shared_ptr<Packet<>>)>(([this](shared_ptr<Packet<>> packet) {
+			_transport->packetReceived += new std::function<void(std::shared_ptr<Packet<>>)>(([this](std::shared_ptr<Packet<>> packet) {
 				this->transport_packetReceived(packet);
 			}));
 		}
 	}
 
-	wstring Client::applicationName()
+	std::string Client::applicationName()
 	{
 		return _applicationName;
 	}
@@ -118,25 +118,25 @@ namespace Stormancer
 		}
 	}
 
-	pplx::task<shared_ptr<Scene>> Client::getPublicScene(wstring sceneId, wstring userData)
+	pplx::task<std::shared_ptr<Scene>> Client::getPublicScene(std::string sceneId, std::string userData)
 	{
-		_logger->log(LogLevel::Trace, L"", L"Client::getPublicScene", sceneId);
+		_logger->log(LogLevel::Trace, "", "Client::getPublicScene", sceneId);
 
 		return _apiClient->getSceneEndpoint(_accountId, _applicationName, sceneId, userData).then([this, sceneId](SceneEndpoint& sep) {
 			return this->getScene(sceneId, sep);
 		});
 	}
 
-	pplx::task<shared_ptr<Scene>> Client::getScene(wstring sceneId, SceneEndpoint sep)
+	pplx::task<std::shared_ptr<Scene>> Client::getScene(std::string sceneId, SceneEndpoint sep)
 	{
-		_logger->log(LogLevel::Trace, L"", L"Client::getScene", sceneId);
+		_logger->log(LogLevel::Trace, "", "Client::getScene", sceneId);
 
 		return Helpers::taskIf(_serverConnection == nullptr, [this, sep]() {
 			return Helpers::taskIf(!_transport->isRunning(), [this]() {
 				_cts = pplx::cancellation_token_source();
-				return _transport->start(L"client", new ConnectionHandler(), _cts.get_token(), 11, (uint16)(_maxPeers + 1));
+				return _transport->start("client", new ConnectionHandler(), _cts.get_token(), 11, (uint16)(_maxPeers + 1));
 			}).then([this, sep]() {
-				wstring endpoint = sep.tokenData.Endpoints.at(_transport->name());
+				std::string endpoint = sep.tokenData.Endpoints.at(_transport->name());
 				return _transport->connect(endpoint).then([this](IConnection* connection) {
 					_serverConnection = connection;
 
@@ -153,12 +153,12 @@ namespace Stormancer
 
 			return sendSystemRequest<SceneInfosRequestDto, SceneInfosDto>((byte)MessageIDTypes::ID_GET_SCENE_INFOS, parameter);
 		}).then([this, sep, sceneId](SceneInfosDto result) {
-			this->_serverConnection->metadata[L"serializer"] = result.SelectedSerializer;
-			return shared_ptr<Scene>( new Scene(_serverConnection, this, sceneId, sep.token, result) );
+			this->_serverConnection->metadata["serializer"] = result.SelectedSerializer;
+			return std::shared_ptr<Scene>(new Scene(_serverConnection, this, sceneId, sep.token, result));
 		});
 	}
 
-	pplx::task<void> Client::connectToScene(Scene* scene, wstring& token, vector<Route*> localRoutes)
+	pplx::task<void> Client::connectToScene(Scene* scene, std::string& token, std::vector<Route*> localRoutes)
 	{
 		ConnectToSceneMsg parameter;
 		parameter.Token = token;
@@ -192,7 +192,7 @@ namespace Stormancer
 	pplx::task<void> Client::disconnect(Scene* scene, byte sceneHandle)
 	{
 		auto _scenesDispatcher = this->_scenesDispatcher;
-		return sendSystemRequest<byte, EmptyDto>((byte)MessageIDTypes::ID_DISCONNECT_FROM_SCENE, sceneHandle).then([this, _scenesDispatcher, sceneHandle, scene](pplx::task<EmptyDto> t) {
+		return sendSystemRequest<DisconnectFromSceneDto, EmptyDto>((byte)MessageIDTypes::ID_DISCONNECT_FROM_SCENE, DisconnectFromSceneDto(sceneHandle)).then([this, _scenesDispatcher, sceneHandle, scene](pplx::task<EmptyDto> t) {
 			_scenesDispatcher->removeScene(sceneHandle);
 		});
 	}
@@ -208,7 +208,7 @@ namespace Stormancer
 		}
 	}
 
-	void Client::transport_packetReceived(shared_ptr<Packet<>> packet)
+	void Client::transport_packetReceived(std::shared_ptr<Packet<>> packet)
 	{
 		// TODO plugins
 

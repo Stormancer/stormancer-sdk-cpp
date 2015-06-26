@@ -6,20 +6,12 @@ namespace Stormancer
 	{
 	}
 
-	EmptyDto::EmptyDto(bytestream* stream)
-	{
-		deserialize(stream);
-	}
-
 	EmptyDto::~EmptyDto()
 	{
 	}
 
-	void EmptyDto::serialize(bytestream* stream)
+	void EmptyDto::msgpack_unpack(msgpack::object const& o)
 	{
-	}
-
-	void EmptyDto::deserialize(bytestream* stream)
-	{
+		// do nothing
 	}
 }

@@ -2,7 +2,6 @@
 
 #include "headers.h"
 
-#include "StringFormat.h"
 #include "Action.h"
 
 #include "basic_bytebuf.h"
@@ -11,6 +10,7 @@
 #include "Dto/ConnectionData.h"
 #include "Dto/ConnectToSceneMsg.h"
 #include "Dto/ConnectionResult.h"
+#include "Dto/DisconnectFromSceneDto.h"
 #include "Dto/EmptyDto.h"
 #include "Dto/RouteDto.h"
 #include "Dto/SceneInfosDto.h"
@@ -30,7 +30,6 @@
 #include "IPacketProcessor.h"
 #include "IRequest.h"
 #include "IScenePeer.h"
-#include "ISerializable.h"
 #include "ITransport.h"
 #include "MessageIDTypes.h"
 #include "Packet.h"

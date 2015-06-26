@@ -17,9 +17,9 @@ namespace Stormancer
 		return am;
 	}
 
-	wstring Helpers::vectorJoin(vector<wstring>& vector, wstring glue)
+	std::string Helpers::vectorJoin(std::vector<std::string>& vector, std::string glue)
 	{
-		wstringstream ss;
+		std::stringstream ss;
 		for (size_t i = 0; i < vector.size(); ++i)
 		{
 			if (i != 0)
@@ -31,11 +31,11 @@ namespace Stormancer
 		return ss.str();
 	}
 
-	vector<wstring> Helpers::stringSplit(const wstring& str, const wstring separator)
+	std::vector<std::wstring> Helpers::stringSplit(const std::wstring& str, const std::wstring separator)
 	{
-		vector<wstring> splitted;
+		std::vector<std::wstring> splitted;
 		size_t cursor = 0, lastCursor = 0;
-		while ((cursor = str.find(separator, cursor)) != wstring::npos)
+		while ((cursor = str.find(separator, cursor)) != std::wstring::npos)
 		{
 			splitted << str.substr(lastCursor, cursor - lastCursor);
 			lastCursor = cursor;
@@ -45,9 +45,9 @@ namespace Stormancer
 		return splitted;
 	}
 
-	wstring Helpers::stringTrim(wstring& str, wchar_t ch)
+	std::wstring Helpers::stringTrim(std::wstring& str, wchar_t ch)
 	{
-		function<int(int)> ischar = [ch](int c) -> int {
+		std::function<int(int)> ischar = [ch](int c) -> int {
 			if (c == ch)
 			{
 				return 1;
@@ -66,7 +66,7 @@ namespace Stormancer
 		return create_task(tce);
 	}
 
-	pplx::task<void> Helpers::taskIf(bool condition, function<pplx::task<void>()> action)
+	pplx::task<void> Helpers::taskIf(bool condition, std::function<pplx::task<void>()> action)
 	{
 		if (condition)
 		{
@@ -80,15 +80,15 @@ namespace Stormancer
 
 	time_t Helpers::nowTime_t()
 	{
-		return chrono::system_clock::to_time_t(chrono::system_clock::now());
+		return std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 	}
 
-	wstring Helpers::time_tToStr(time_t& time, bool local)
+	std::string Helpers::time_tToStr(time_t& time, bool local)
 	{
 		return time_tToStr(time, (local ? "%x %X" : "%Y-%m-%dT%H:%M:%SZ"));
 	}
 
-	wstring Helpers::time_tToStr(time_t& time, const char* format)
+	std::string Helpers::time_tToStr(time_t& time, const char* format)
 	{
 		struct tm timeinfo;
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
@@ -96,30 +96,30 @@ namespace Stormancer
 #else
 		localtime_r(&time, &timeinfo); // POSIX
 #endif
-		stringstream ss;
-		ss << put_time((tm*)&timeinfo, format);
-		return Helpers::to_wstring(ss.str());
+		std::stringstream ss;
+		ss << std::put_time((tm*)&timeinfo, format);
+		return ss.str();
 	}
 
-	wstring Helpers::nowStr(bool local)
+	std::string Helpers::nowStr(bool local)
 	{
 		time_t now = nowTime_t();
 		return time_tToStr(now, local);
 	}
 
-	wstring Helpers::nowStr(const char* format)
+	std::string Helpers::nowStr(const char* format)
 	{
 		time_t now = nowTime_t();
 		return time_tToStr(now, format);
 	}
 
-	wstring Helpers::nowDateStr(bool local)
+	std::string Helpers::nowDateStr(bool local)
 	{
 		time_t now = nowTime_t();
 		return time_tToStr(now, "%Y-%m-%d");
 	}
 
-	wstring Helpers::nowTimeStr(bool local)
+	std::string Helpers::nowTimeStr(bool local)
 	{
 		time_t now = nowTime_t();
 		return time_tToStr(now, "%H:%M:%S");
@@ -131,12 +131,12 @@ namespace Stormancer
 		return bs;
 	}
 
-	bytestream& operator<<(bytestream& bs, const string& data)
+	bytestream& operator<<(bytestream& bs, const std::string& data)
 	{
 		return bs << data.c_str();
 	}
 
-	bytestream& operator<<(bytestream& bs, string& data)
+	bytestream& operator<<(bytestream& bs, std::string& data)
 	{
 		return bs << data.c_str();
 	}
@@ -147,17 +147,17 @@ namespace Stormancer
 		return bs;
 	}
 
-	bytestream& operator<<(bytestream& bs, const wstring& data)
+	bytestream& operator<<(bytestream& bs, const std::wstring& data)
 	{
 		return bs << data.c_str();
 	}
 
-	bytestream& operator<<(bytestream& bs, wstring& data)
+	bytestream& operator<<(bytestream& bs, std::wstring& data)
 	{
 		return bs << data.c_str();
 	}
 
-	bytestream& operator>>(bytestream& bs, string& str)
+	bytestream& operator>>(bytestream& bs, std::string& str)
 	{
 		uint32 len = (uint32)bs.rdbuf()->in_avail();
 		str.reserve(len);
@@ -168,7 +168,7 @@ namespace Stormancer
 		return bs;
 	}
 
-	bytestream& operator>>(bytestream& bs, wstring& str)
+	bytestream& operator>>(bytestream& bs, std::wstring& str)
 	{
 		uint32 len = (uint32)bs.rdbuf()->in_avail();
 		uint32 nbChars = len / 2;
@@ -178,43 +178,5 @@ namespace Stormancer
 		str.assign((wchar_t*)data, nbChars);
 		delete[] data;
 		return bs;
-	}
-
-	wstring Helpers::to_wstring(const char* str)
-	{
-		return to_wstring(string(str));
-	}
-
-	wstring Helpers::to_wstring(string str)
-	{
-		return wstring(str.begin(), str.end());
-	}
-
-	string Helpers::to_string(wstring& str)
-	{
-		return string(str.begin(), str.end());
-	}
-
-	string Helpers::to_string(vector<byte>& v)
-	{
-		string str;
-		str.resize(v.size());
-		for (size_t i = 0; i < v.size(); i++)
-		{
-			str[i] = v[i];
-		}
-		return str;
-	}
-
-	template<>
-	vector<byte> Helpers::convert<string, vector<byte>>(string& str)
-	{
-		vector<byte> v;
-		v.resize(str.size());
-		for (uint32 i = 0; v.size(); i++)
-		{
-			v[i] = str[i];
-		}
-		return v;
 	}
 };

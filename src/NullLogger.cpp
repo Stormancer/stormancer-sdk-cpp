@@ -10,11 +10,11 @@ namespace Stormancer
 	{
 	}
 
-	void NullLogger::log(wstring message)
+	void NullLogger::log(std::string message)
 	{
 	}
 
-	void NullLogger::log(LogLevel level, wstring category, wstring message, wstring data)
+	void NullLogger::log(LogLevel level, std::string category, std::string message, std::string data)
 	{
 	}
 

@@ -9,11 +9,11 @@ namespace Stormancer
 	{
 	public:
 		SceneEndpoint();
-		SceneEndpoint(wstring& token, ConnectionData& tokenData);
+		SceneEndpoint(std::string& token, ConnectionData& tokenData);
 		virtual ~SceneEndpoint();
 
 	public:
 		ConnectionData tokenData;
-		wstring token;
+		std::string token;
 	};
 };

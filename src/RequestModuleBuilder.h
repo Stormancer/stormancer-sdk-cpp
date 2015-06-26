@@ -9,12 +9,12 @@ namespace Stormancer
 	class RequestModuleBuilder
 	{
 	public:
-		RequestModuleBuilder(function<void(byte, function<pplx::task<void>(RequestContext*)>)> addHandler);
+		RequestModuleBuilder(std::function<void(byte, std::function<pplx::task<void>(RequestContext*)>)> addHandler);
 		virtual ~RequestModuleBuilder();
 
-		void service(byte msgId, function<pplx::task<void>(RequestContext*)> handler);
+		void service(byte msgId, std::function<pplx::task<void>(RequestContext*)> handler);
 
 	private:
-		function<void(byte, function<pplx::task<void>(RequestContext*)>)> _addHandler;
+		std::function<void(byte, std::function<pplx::task<void>(RequestContext*)>)> _addHandler;
 	};
 };

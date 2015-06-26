@@ -13,11 +13,10 @@ namespace Stormancer
 		ApiClient(Configuration* config, ITokenHandler* tokenHandler);
 		~ApiClient();
 
-		pplx::task<SceneEndpoint> getSceneEndpoint(wstring accountId, wstring applicationName, wstring sceneId, wstring userData = wstring());
+		pplx::task<SceneEndpoint> getSceneEndpoint(std::string accountId, std::string applicationName, std::string sceneId, std::string userData = std::string());
 
 	private:
 		Configuration* _config;
-		wstring _createTokenUri;
 		ITokenHandler* _tokenHandler;
 	};
 };

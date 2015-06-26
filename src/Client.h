@@ -28,7 +28,7 @@ namespace Stormancer
 			uint64 generateNewConnectionId();
 			void newConnection(IConnection* connection);
 			IConnection* getConnection(uint64 id);
-			void closeConnection(IConnection* connection, wstring reason);
+			void closeConnection(IConnection* connection, std::string reason);
 
 		private:
 			uint64 _current = 0;
@@ -45,7 +45,7 @@ namespace Stormancer
 
 		/// Copy constructor deleted.
 		Client(Client& other) = delete;
-		
+
 		/// Copy operator deleted.
 		Client& operator=(Client& other) = delete;
 
@@ -55,51 +55,51 @@ namespace Stormancer
 		/// \param sceneId The scene Id as a string.
 		/// \param userData Some custom user data as a string.
 		/// \return a task to the connection to the scene.
-		STORMANCER_DLL_API pplx::task<shared_ptr<Scene>> getPublicScene(wstring sceneId, wstring userData = L"");
+		STORMANCER_DLL_API pplx::task<std::shared_ptr<Scene>> getPublicScene(std::string sceneId, std::string userData = "");
 
 		/// Initialize packets reception from the right transport.
 		void initialize();
-		
+
 		/// Returns the name of the application.
-		wstring applicationName();
-		
+		std::string applicationName();
+
 		/// Returns the used logger.
 		ILogger* logger();
-		
+
 		/// Set the logger
 		void setLogger(ILogger* logger);
-		
+
 		/// Get scene informations for connection.
 		/// \param sceneId Scene id.
 		/// \param sep Scene Endpoint retrieved by ApiClient::getSceneEndpoint
 		/// \return A task which complete when the scene informations are retrieved.
-		pplx::task<shared_ptr<Scene>> getScene(wstring sceneId, SceneEndpoint sep);
-		
+		pplx::task<std::shared_ptr<Scene>> getScene(std::string sceneId, SceneEndpoint sep);
+
 		/// Disconnect and close all connections.
 		/// this method returns nothing. So it's useful for application close.
 		void disconnect();
 
 	private:
-	
+
 		/// Connect to a scene
 		/// \param scene The scene to connect to.
 		/// \param token Application token.
 		/// \param localRoutes Local routes declared.
 		/// \return A task which complete when the connection is done.
-		pplx::task<void> connectToScene(Scene* scene, wstring& token, vector<Route*> localRoutes);
-		
+		pplx::task<void> connectToScene(Scene* scene, std::string& token, std::vector<Route*> localRoutes);
+
 		/// Disconnect from a scene.
 		/// \param scene The scene.
 		/// \param sceneHandle Scene handle.
 		/// \return A task which complete when the disconnection is done.
 		pplx::task<void> disconnect(Scene* scene, byte sceneHandle);
-		
+
 		/// Disconnect from all scenes.
 		void disconnectAllScenes();
-		
+
 		/// Called by the transport when a packet has been received.
 		/// \param packet Received packet.
-		void transport_packetReceived(shared_ptr<Packet<>> packet);
+		void transport_packetReceived(std::shared_ptr<Packet<>> packet);
 
 		/// Send a system request to the server for important operations.
 		/// \param id Request id.
@@ -108,34 +108,26 @@ namespace Stormancer
 		template<typename T1, typename T2>
 		pplx::task<T2> sendSystemRequest(byte id, T1& parameter)
 		{
-			int a = 0;
 			return _requestProcessor->sendSystemRequest(_serverConnection, id, [this, &parameter](bytestream* stream) {
-				parameter.serialize(stream); // serialize request dto
-			}).then([this](shared_ptr<Packet<>> packet) {
-				auto r = T2(packet->stream); // deserialize result dto
-				return r;
-			});
-		}
-
-		/// Send a system request by providing one byte and receiving empty response.
-		/// \param id Request id.
-		/// \param parameter Byte parameter.
-		/// \return A task which complete when empty response is received.
-		template<>
-		pplx::task<EmptyDto> sendSystemRequest<byte, EmptyDto>(byte id, byte& parameter)
-		{
-			return _requestProcessor->sendSystemRequest(_serverConnection, id, [this, &parameter](bytestream* stream) {
-				ISerializable::serialize(byte(parameter), stream); // serialize byte
-			}).then([this](shared_ptr<Packet<>> packet) {
-				return EmptyDto(packet->stream); // empty dto
+				// serialize request dto
+				msgpack::pack(stream, parameter);
+			}).then([this](std::shared_ptr<Packet<>> packet) {
+				// deserialize result dto
+				std::string buffer;
+				*packet->stream >> buffer;
+				msgpack::unpacked result;
+				msgpack::unpack(&result, buffer.data(), buffer.size());
+				T2 t2;
+				result.get().convert(&t2);
+				return t2;
 			});
 		}
 
 	private:
 		bool _initialized = false;
 		ILogger* _logger = nullptr;
-		wstring _accountId;
-		wstring _applicationName;
+		std::string _accountId;
+		std::string _applicationName;
 		//const PluginBuildContext _pluginCtx;
 		IConnection* _serverConnection = nullptr;
 		ITransport* _transport = nullptr;

@@ -1,42 +1,27 @@
 #pragma once
 #include "headers.h"
-#include "ISerializable.h"
 
 namespace Stormancer
 {
 	/// Result of a connection attempt.
-	class ConnectionResult : public ISerializable
+	class ConnectionResult
 	{
 	public:
 	
 		/// Constructor.
 		ConnectionResult();
-		
-		/*! Constructor.
-		\param stream The stream to deserialize.
-		*/
-		ConnectionResult(bytestream* stream);
-		
+
 		/// Destructor.
 		virtual ~ConnectionResult();
 
-	public:
-	
-		/*! The method to serialize the object.
-		\param stream The stream where we serialize the object.
-		*/
-		void serialize(bytestream* stream);
-		
-		/*! The method to deserialize the object.
-		\param stream The stream to deserialize.
-		*/
-		void deserialize(bytestream* stream);
+		/// MessagePack deserialization.
+		void msgpack_unpack(msgpack::object const& o);
 
 	public:
 		/// Handle of the scene the client was connected to.
 		byte SceneHandle;
 		
 		/// Route mappings in the scene (ie : routeName => routeHandle)
-		map<wstring, uint16> RouteMappings;
+		std::map<std::string, uint16> RouteMappings;
 	};
 };

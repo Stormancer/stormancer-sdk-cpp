@@ -28,35 +28,35 @@ namespace Stormancer
 	{
 	}
 
-	wstring ILogger::format(LogLevel level, wstring& category, wstring& message, wstring& data)
+	std::string ILogger::format(LogLevel level, std::string& category, std::string& message, std::string& data)
 	{
-		wstringstream ss;
+		std::stringstream ss;
 
-		ss << L'[' << Helpers::nowStr() << L']';
-		ss << L" [" << static_cast<int>(level) << L']';
+		ss << '[' << Helpers::nowStr() << ']';
+		ss << " [" << static_cast<int>(level) << ']';
 		if (category.length())
 		{
-			ss << L" [" << category << L']';
+			ss << " [" << category << ']';
 		}
 		if (message.length())
 		{
-			ss << L' ' << message;
+			ss << ' ' << message;
 		}
 		if (data.length())
 		{
-			ss << L" [" << data << L']';
+			ss << " [" << data << ']';
 		}
 
 		return ss.str();
 	}
 
-	wstring ILogger::formatException(const std::exception& e)
+	std::string ILogger::formatException(const std::exception& e)
 	{
-		wstringstream ss;
+		std::stringstream ss;
 
-		ss << L'[' << Helpers::nowStr() << L']';
-		ss << L" [exception]";
-		ss << L' ' << e.what();
+		ss << '[' << Helpers::nowStr() << ']';
+		ss << " [exception]";
+		ss << ' ' << e.what();
 
 		return ss.str();
 	}

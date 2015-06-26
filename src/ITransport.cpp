@@ -17,7 +17,7 @@ namespace Stormancer
 		return _isRunning;
 	}
 
-	wstring ITransport::name()
+	std::string ITransport::name()
 	{
 		return _name;
 	}

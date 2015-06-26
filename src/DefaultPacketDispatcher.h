@@ -12,11 +12,11 @@ namespace Stormancer
 		DefaultPacketDispatcher();
 		virtual ~DefaultPacketDispatcher();
 
-		void dispatchPacket(shared_ptr<Packet<>> packet);
+		void dispatchPacket(std::shared_ptr<Packet<>> packet);
 		void addProcessor(IPacketProcessor* processor);
 
 	private:
-		map<byte, handlerFunction*> _handlers;
-		vector<processorFunction*> _defaultProcessors;
+		std::map<byte, handlerFunction*> _handlers;
+		std::vector<processorFunction*> _defaultProcessors;
 	};
 };

@@ -2,8 +2,6 @@
 
 namespace Stormancer
 {
-	using namespace std;
-
 	using int8 = int8_t;
 	using int16 = int16_t;
 	using int32 = int32_t;
@@ -16,6 +14,6 @@ namespace Stormancer
 
 	using byte = uint8;
 
-	using stringMap = map < wstring, wstring > ;
-	using anyMap = map < wstring, void* > ;
+	using stringMap = std::map < std::string, std::string >;
+	using anyMap = std::map < std::string, void* >;
 };

@@ -56,20 +56,20 @@ namespace Stormancer
 
 		/// Set a pointer to a data in the metadata.
 		template<typename TData>
-		void setMetadata(wstring key, TData* data)
+		void setMetadata(std::string key, TData* data)
 		{
 			_metadata[key] = static_cast<void*>(data);
 		}
 
 		/// Get a pointer to a data of the packet metadatas.
 		template<typename TData>
-		TData* getMetadata(wstring key)
+		TData* getMetadata(std::string key)
 		{
 			return (TData*)_metadata[key];
 		}
 
 		/// Remove a data from the metadatas.
-		void removeMetadata(wstring key)
+		void removeMetadata(std::string key)
 		{
 			auto it = _metadata.find(key);
 			_metadata.erase(it);
@@ -84,7 +84,7 @@ namespace Stormancer
 		bytestream* stream = nullptr;
 
 		/// Attached request.
-		shared_ptr<Request> request = nullptr;
+		std::shared_ptr<Request> request = nullptr;
 
 		/// Clean-up operations.
 		Action<> cleanup;

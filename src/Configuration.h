@@ -14,7 +14,7 @@ namespace Stormancer
 		/// Constructor.
 		/// \param account The account id.
 		/// \param application The application name.
-		STORMANCER_DLL_API Configuration(wstring account, wstring application);
+		STORMANCER_DLL_API Configuration(std::string account, std::string application);
 
 		/// Destructor.
 		STORMANCER_DLL_API ~Configuration();
@@ -26,20 +26,20 @@ namespace Stormancer
 		Configuration& operator=(Configuration& other) = delete;
 
 		/// Get the Api endpoint.
-		wstring getApiEndpoint();
+		std::string getApiEndpoint();
 
 		//void addPlugin(IClientPlugin* plugin);
 
 	public:
 
 		/// A string containing the account name of the application.
-		wstring account;
+		std::string account;
 
 		/// A string containing the name of the application.
-		wstring application;
+		std::string application;
 
 		/// A string containing the target server endpoint.
-		wstring serverEndpoint;
+		std::string serverEndpoint;
 
 		/// Gets or Sets the dispatcher to be used by the client.
 		IPacketDispatcher* dispatcher = nullptr;
@@ -56,7 +56,7 @@ namespace Stormancer
 	private:
 		
 		/// Api endpoint.
-		wstring apiEndpoint = L"https://api.stormancer.com/";
+		std::string apiEndpoint = "https://api.stormancer.com/";
 		
 		//vector<IClientPlugin*> plugins;
 	};

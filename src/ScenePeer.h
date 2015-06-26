@@ -10,18 +10,18 @@ namespace Stormancer
 	class ScenePeer : public IScenePeer
 	{
 	public:
-		ScenePeer(IConnection* connection, byte sceneHandle, map<wstring, Route>& routeMapping, Scene* scene);
+		ScenePeer(IConnection* connection, byte sceneHandle, std::map<std::string, Route>& routeMapping, Scene* scene);
 		virtual ~ScenePeer();
 
 	public:
-		void send(wstring& routeName, function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability);
+		void send(std::string& routeName, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability);
 		void disconnect();
 		uint64 id();
 
 	private:
 		IConnection* _connection;
 		byte _sceneHandle;
-		map<wstring, Route> _routeMapping;
+		std::map<std::string, Route> _routeMapping;
 		Scene* _scene;
 	};
 };

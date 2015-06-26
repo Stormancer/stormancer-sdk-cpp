@@ -7,7 +7,7 @@ namespace Stormancer
 	template<typename TParam = void>
 	class Action
 	{
-		using TFunction = function < void(TParam) > ;
+		using TFunction = std::function < void(TParam) >;
 
 	public:
 		Action()
@@ -65,14 +65,14 @@ namespace Stormancer
 		}
 
 	private:
-		vector<TFunction*> _functions;
+		std::vector<TFunction*> _functions;
 	};
 
 	/// Aggregates procedure pointers to be run simultaneously.
 	template<>
 	class Action < void >
 	{
-		using TFunction = function < void(void) > ;
+		using TFunction = std::function < void(void) >;
 
 	public:
 		Action()
@@ -130,6 +130,6 @@ namespace Stormancer
 		}
 
 	private:
-		vector<TFunction*> _functions;
+		std::vector<TFunction*> _functions;
 	};
 };

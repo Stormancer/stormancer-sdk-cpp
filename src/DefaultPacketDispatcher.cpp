@@ -21,7 +21,7 @@ namespace Stormancer
 		_defaultProcessors.clear();
 	}
 
-	void DefaultPacketDispatcher::dispatchPacket(shared_ptr<Packet<>> packet)
+	void DefaultPacketDispatcher::dispatchPacket(std::shared_ptr<Packet<>> packet)
 	{
 		pplx::create_task([this, packet]() {
 			bool processed = false;
@@ -41,6 +41,7 @@ namespace Stormancer
 					break;
 				}
 			}
+
 			for (auto processor : this->_defaultProcessors)
 			{
 				if ((*processor)(msgType, packet))
@@ -52,9 +53,8 @@ namespace Stormancer
 
 			if (!processed)
 			{
-				throw exception(string(StringFormat(L"Couldn't process message. msgId: ", msgType)).c_str());
+				throw std::exception(std::string(Helpers::stringFormat(L"Couldn't process message. msgId: ", msgType)).c_str());
 			}
-
 		});
 	}
 

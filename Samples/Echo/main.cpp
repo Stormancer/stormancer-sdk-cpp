@@ -2,49 +2,50 @@
 #include "ConsoleLogger.h"
 
 using namespace Stormancer;
+using namespace std;
 
 auto logger = (ConsoleLogger*)ILogger::instance(new ConsoleLogger(Stormancer::LogLevel::Trace));
 shared_ptr<Scene> scene = nullptr;
 
 pplx::task<void> test(Client& client)
 {
-	logger->logWhite(L"Get scene");
-	return client.getPublicScene(L"test-scene").then([](shared_ptr<Scene> sc) {
+	logger->logWhite("Get scene");
+	return client.getPublicScene("main").then([](shared_ptr<Scene> sc) {
 		scene = sc;
-		logger->logGreen(L"Done");
+		logger->logGreen("Done");
 		int nbMsgToSend = 10;
 		auto nbMsgReceived = new int(0);
 
-		logger->logWhite(L"Add route");
-		scene->addRoute(L"echo.out", [nbMsgToSend, nbMsgReceived](shared_ptr<Packet<IScenePeer>> p) {
+		logger->logWhite("Add route");
+		scene->addRoute("echo", [nbMsgToSend, nbMsgReceived](shared_ptr<Packet<IScenePeer>> p) {
 			int32 number1, number2, number3;
 			*p->stream >> number1 >> number2 >> number3;
-			logger->logGreen(L"Received message: [ " + to_wstring(number1) + L" ; " + to_wstring(number2) + L" ; " + to_wstring(number3) + L" ]");
+			logger->logGreen("Received message: [ " + to_string(number1) + " ; " + to_string(number2) + " ; " + to_string(number3) + " ]");
 
 			(*nbMsgReceived)++;
 			if (*nbMsgReceived == nbMsgToSend)
 			{
-				logger->logGreen(L"Done");
+				logger->logGreen("Done");
 
-				logger->logWhite(L"Disconnect");
+				logger->logWhite("Disconnect");
 				scene->disconnect().then([nbMsgReceived]() {
-					logger->logGreen(L"Done");
+					logger->logGreen("Done");
 					delete nbMsgReceived;
-					logger->logWhite(L"Type 'Enter' to finish the sample");
+					logger->logWhite("Type 'Enter' to finish the sample");
 				});
 			}
 		});
-		logger->logGreen(L"Done");
+		logger->logGreen("Done");
 
-		logger->logWhite(L"Connect to scene");
+		logger->logWhite("Connect to scene");
 		return scene->connect().then([nbMsgToSend]() {
-			logger->logGreen(L"Done");
+			logger->logGreen("Done");
 			for (int i = 0; i < nbMsgToSend; i++)
 			{
-				scene->sendPacket(L"echo.in", [](bytestream* stream) {
+				scene->sendPacket("echo", [](bytestream* stream) {
 					int32 number1(rand()), number2(rand()), number3(rand());
 					*stream << number1 << number2 << number3;
-					logger->logWhite(L"Sending message: [ " + to_wstring(number1) + L" ; " + to_wstring(number2) + L" ; " + to_wstring(number3) + L" ]");
+					logger->logWhite("Sending message: [ " + to_string(number1) + " ; " + to_string(number2) + " ; " + to_string(number3) + " ]");
 				});
 			}
 		});
@@ -55,13 +56,13 @@ int main(int argc, char* argv[])
 {
 	srand(time(NULL));
 
-	logger->logWhite(L"Type 'Enter' to start the sample");
+	logger->logWhite("Type 'Enter' to start the sample");
 	cin.ignore();
 
-	logger->logWhite(L"Create client");
-	Configuration config(L"997bc6ac-9021-2ad6-139b-da63edee8c58", L"echo");
+	logger->logWhite("Create client");
+	Configuration config("997bc6ac-9021-2ad6-139b-da63edee8c58", "base");
 	Client client(&config);
-	logger->logGreen(L"Done");
+	logger->logGreen("Done");
 
 	auto task = test(client);
 

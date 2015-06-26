@@ -35,8 +35,8 @@ namespace Stormancer
 
 	public:
 		// Logs a string message
-		virtual void log(wstring message) = 0;
-		virtual void log(LogLevel level, wstring category, wstring message, wstring data) = 0;
+		virtual void log(std::string message) = 0;
+		virtual void log(LogLevel level, std::string category, std::string message, std::string data) = 0;
 		virtual void log(const std::exception& e) = 0;
 
 		/// A basic format of the log message.
@@ -45,12 +45,12 @@ namespace Stormancer
 		/// \param message The message of the log.
 		/// \param data Some additional data.
 		/// \return The formatted message.
-		STORMANCER_DLL_API static wstring format(LogLevel level, wstring& category, wstring& message, wstring& data);
+		STORMANCER_DLL_API static std::string format(LogLevel level, std::string& category, std::string& message, std::string& data);
 
 		/// A basic format of an exception.
 		/// \param e The exception.
 		/// \return The formatted message.
-		STORMANCER_DLL_API static wstring formatException(const std::exception& e);
+		STORMANCER_DLL_API static std::string formatException(const std::exception& e);
 
 	protected:
 
@@ -63,7 +63,7 @@ namespace Stormancer
 	protected:
 
 		/// The mutex for using the logger.
-		mutex _mutex;
+		std::mutex _mutex;
 
 	private:
 		static ILogger* _logger;

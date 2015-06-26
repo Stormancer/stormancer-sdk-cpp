@@ -2,6 +2,7 @@
 #include "ConsoleLogger.h"
 
 using namespace Stormancer;
+using namespace std;
 
 auto logger = (ConsoleLogger*)ILogger::instance(new ConsoleLogger(Stormancer::LogLevel::Error));
 shared_ptr<Scene> scene = nullptr;
@@ -9,17 +10,17 @@ bool exitProgram = false;
 
 pplx::task<void> test(Client& client)
 {
-	return client.getPublicScene(L"test-scene").then([](shared_ptr<Scene> sc) {
+	return client.getPublicScene("test-scene").then([](shared_ptr<Scene> sc) {
 		scene = sc;
 
-		scene->addRoute(L"echo.out", [](shared_ptr<Packet<IScenePeer>> p) {
-			wstring message;
+		scene->addRoute("echo.out", [](shared_ptr<Packet<IScenePeer>> p) {
+			string message;
 			*p->stream >> message;
 			logger->logWhite(message);
 		});
 
 		return scene->connect().then([]() {
-			logger->logGrey(L"Connected");
+			logger->logGrey("Connected");
 		});
 	});
 }
@@ -28,10 +29,10 @@ int main(int argc, char* argv[])
 {
 	srand(time(NULL));
 
-	logger->logGrey(L"Connecting...");
-	logger->logGrey(L"You can exit the program by typing 'exit'");
+	logger->logGrey("Connecting...");
+	logger->logGrey("You can exit the program by typing 'exit'");
 
-	Configuration config(L"997bc6ac-9021-2ad6-139b-da63edee8c58", L"echo");
+	Configuration config("997bc6ac-9021-2ad6-139b-da63edee8c58", "echo");
 	Client client(&config);
 
 	auto task = test(client);
@@ -45,20 +46,20 @@ int main(int argc, char* argv[])
 		logger->log(e);
 	}
 
-	wstring message;
+	string message;
 	while (!exitProgram)
 	{
-		wcin.clear();
+		cin.clear();
 		message.clear();
-		getline(wcin, message);
+		getline(cin, message);
 
-		if (message == L"exit")
+		if (message == "exit")
 		{
 			exitProgram = true;
 		}
 		else if (scene && scene->connected())
 		{
-			scene->sendPacket(L"echo.in", [message](bytestream* stream) {
+			scene->sendPacket("echo.in", [message](bytestream* stream) {
 				*stream << message;
 			});
 		}

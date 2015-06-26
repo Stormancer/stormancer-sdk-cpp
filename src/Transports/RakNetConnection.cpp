@@ -2,7 +2,7 @@
 
 namespace Stormancer
 {
-	RakNetConnection::RakNetConnection(RakNet::RakNetGUID guid, int64 id, RakNet::RakPeerInterface* peer, function<void(RakNetConnection*)>* lambdaOnRequestClose)
+	RakNetConnection::RakNetConnection(RakNet::RakNetGUID guid, int64 id, RakNet::RakPeerInterface* peer, std::function<void(RakNetConnection*)>* lambdaOnRequestClose)
 		: _lastActivityDate(Helpers::nowTime_t()),
 		_guid(guid),
 		_rakPeer(peer)
@@ -25,10 +25,9 @@ namespace Stormancer
 		return _lastActivityDate;
 	}
 
-	wstring RakNetConnection::ipAddress()
+	std::string RakNetConnection::ipAddress()
 	{
-		string str = _rakPeer->GetSystemAddressFromGuid(_guid).ToString();
-		return Helpers::to_wstring(str);
+		return std::string(_rakPeer->GetSystemAddressFromGuid(_guid).ToString());
 	}
 
 	bool RakNetConnection::operator==(RakNetConnection& other)
@@ -56,7 +55,7 @@ namespace Stormancer
 		return _rakPeer->GetLastPing(_guid);
 	}
 
-	void RakNetConnection::sendSystem(byte msgId, function<void(bytestream*)> writer)
+	void RakNetConnection::sendSystem(byte msgId, std::function<void(bytestream*)> writer)
 	{
 		sendRaw([msgId, &writer](bytestream* stream) {
 			*stream << msgId;
@@ -66,7 +65,7 @@ namespace Stormancer
 		}, PacketPriority::HIGH_PRIORITY, PacketReliability::RELIABLE_ORDERED, (uint8)0);
 	}
 
-	void RakNetConnection::sendRaw(function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability, char channel)
+	void RakNetConnection::sendRaw(std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability, char channel)
 	{
 		bytestream stream;
 		writer(&stream);
@@ -76,11 +75,11 @@ namespace Stormancer
 		auto result = _rakPeer->Send(data.c_str(), data.length(), (PacketPriority)priority, (PacketReliability)reliability, channel, _guid, false);
 		if (result == 0)
 		{
-			throw exception("Failed to send message.");
+			throw std::exception("Failed to send message.");
 		}
 	}
 
-	void RakNetConnection::sendToScene(byte sceneIndex, uint16 route, function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability)
+	void RakNetConnection::sendToScene(byte sceneIndex, uint16 route, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability)
 	{
 		bytestream stream;
 		stream << sceneIndex;
@@ -91,11 +90,11 @@ namespace Stormancer
 
 		if (result == 0)
 		{
-			throw exception("Failed to send message.");
+			throw std::exception("Failed to send message.");
 		}
 	}
 
-	void RakNetConnection::setApplication(wstring account, wstring application)
+	void RakNetConnection::setApplication(std::string account, std::string application)
 	{
 		if (account.length() > 0)
 		{

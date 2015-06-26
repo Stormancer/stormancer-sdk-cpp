@@ -4,7 +4,7 @@
 
 namespace Stormancer
 {
-	using PacketObserver = rx::observer < shared_ptr<Packet<>> > ;
+	using PacketObserver = rx::observer < std::shared_ptr<Packet<>> >;
 
 	/// System request.
 	class Request

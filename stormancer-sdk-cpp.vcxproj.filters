@@ -37,9 +37,6 @@
     <ClInclude Include="src\DefaultPacketDispatcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Dto\EmptyDto.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\FileLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -71,9 +68,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\IScenePeer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ISerializable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\ITokenHandler.h">
@@ -139,13 +133,16 @@
     <ClInclude Include="src\stormancer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\StringFormat.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\TokenHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\typedef.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Dto\DisconnectFromSceneDto.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Dto\EmptyDto.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -195,9 +192,6 @@
     <ClCompile Include="src\ITransport.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MsgPack\MsgPack.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\PacketProcessorConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -234,9 +228,6 @@
     <ClCompile Include="src\TokenHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ISerializable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Dto\ConnectionResult.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -252,9 +243,6 @@
     <ClCompile Include="src\Dto\ConnectionData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Dto\EmptyDto.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Dto\RouteDto.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -264,13 +252,16 @@
     <ClCompile Include="src\FileLogger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\StringFormat.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Configuration.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\NullLogger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Dto\DisconnectFromSceneDto.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Dto\EmptyDto.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

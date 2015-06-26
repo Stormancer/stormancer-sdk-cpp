@@ -2,7 +2,7 @@
 
 namespace Stormancer
 {
-	PacketProcessorConfig::PacketProcessorConfig(map<byte, handlerFunction*>& handlers, vector<processorFunction*>& defaultProcessors)
+	PacketProcessorConfig::PacketProcessorConfig(std::map<byte, handlerFunction*>& handlers, std::vector<processorFunction*>& defaultProcessors)
 		: _handlers(handlers),
 		_defaultProcessors(defaultProcessors)
 	{
@@ -16,7 +16,7 @@ namespace Stormancer
 	{
 		if (Helpers::mapContains(_handlers, msgId))
 		{
-			throw exception(string(StringFormat(L"An handler is already registered for id {0}.", msgId)).c_str());
+			throw std::exception(std::string(Helpers::stringFormat(L"An handler is already registered for id {0}.", msgId)).c_str());
 		}
 		_handlers[msgId] = handler;
 	}

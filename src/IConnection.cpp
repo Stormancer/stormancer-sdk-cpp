@@ -22,12 +22,12 @@ namespace Stormancer
 		return _connectionDate;
 	}
 
-	wstring IConnection::account()
+	std::string IConnection::account()
 	{
 		return _account;
 	}
 
-	wstring IConnection::application()
+	std::string IConnection::application()
 	{
 		return _application;
 	}

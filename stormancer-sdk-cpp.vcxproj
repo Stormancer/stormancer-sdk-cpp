@@ -99,7 +99,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;STORMANCER_DLL_EXPORT;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)src;$(ProjectDir)MsgPack;$(SolutionDir)RakNet\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)src;$(SolutionDir)msgpack-c\include;$(SolutionDir)RakNet\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <StringPooling>false</StringPooling>
       <BufferSecurityCheck>true</BufferSecurityCheck>
@@ -125,7 +125,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;STORMANCER_DLL_EXPORT;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)MsgPack;$(SolutionDir)RakNet\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)src;$(SolutionDir)msgpack-c\include;$(SolutionDir)RakNet\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <StringPooling>false</StringPooling>
       <BufferSecurityCheck>true</BufferSecurityCheck>
@@ -155,7 +155,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;STORMANCER_DLL_EXPORT;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)MsgPack;$(SolutionDir)RakNet\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)src;$(SolutionDir)msgpack-c\include;$(SolutionDir)RakNet\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <StringPooling>false</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
@@ -185,7 +185,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;STORMANCER_DLL_EXPORT;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)MsgPack;$(SolutionDir)RakNet\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)src;$(SolutionDir)msgpack-c\include;$(SolutionDir)RakNet\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <StringPooling>false</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
@@ -223,6 +223,7 @@
     <ClInclude Include="src\Dto\ConnectionData.h" />
     <ClInclude Include="src\Dto\ConnectionResult.h" />
     <ClInclude Include="src\Dto\ConnectToSceneMsg.h" />
+    <ClInclude Include="src\Dto\DisconnectFromSceneDto.h" />
     <ClInclude Include="src\Dto\EmptyDto.h" />
     <ClInclude Include="src\Dto\RouteDto.h" />
     <ClInclude Include="src\Dto\SceneInfosDto.h" />
@@ -238,7 +239,6 @@
     <ClInclude Include="src\IRequest.h" />
     <ClInclude Include="src\IRequestModule.h" />
     <ClInclude Include="src\IScenePeer.h" />
-    <ClInclude Include="src\ISerializable.h" />
     <ClInclude Include="src\ITokenHandler.h" />
     <ClInclude Include="src\ITransport.h" />
     <ClInclude Include="src\MessageIDTypes.h" />
@@ -255,16 +255,16 @@
     <ClInclude Include="src\SceneEndpoint.h" />
     <ClInclude Include="src\ScenePeer.h" />
     <ClInclude Include="src\stormancer.h" />
-    <ClInclude Include="src\StringFormat.h" />
     <ClInclude Include="src\TokenHandler.h" />
     <ClInclude Include="src\Transports\RakNetConnection.h" />
     <ClInclude Include="src\Transports\RakNetTransport.h" />
     <ClInclude Include="src\typedef.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Dto\DisconnectFromSceneDto.cpp" />
+    <ClCompile Include="src\Dto\EmptyDto.cpp" />
     <ClCompile Include="src\FileLogger.cpp" />
     <ClCompile Include="src\Dto\ConnectionData.cpp" />
-    <ClCompile Include="MsgPack\MsgPack.cpp" />
     <ClCompile Include="src\ApiClient.cpp" />
     <ClCompile Include="src\Client.cpp" />
     <ClCompile Include="src\Configuration.cpp" />
@@ -272,7 +272,6 @@
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\Dto\ConnectionResult.cpp" />
     <ClCompile Include="src\Dto\ConnectToSceneMsg.cpp" />
-    <ClCompile Include="src\Dto\EmptyDto.cpp" />
     <ClCompile Include="src\Dto\RouteDto.cpp" />
     <ClCompile Include="src\Dto\SceneInfosDto.cpp" />
     <ClCompile Include="src\Dto\SceneInfosRequestDto.cpp" />
@@ -285,7 +284,6 @@
     <ClCompile Include="src\IRequest.cpp" />
     <ClCompile Include="src\IRequestModule.cpp" />
     <ClCompile Include="src\IScenePeer.cpp" />
-    <ClCompile Include="src\ISerializable.cpp" />
     <ClCompile Include="src\ITokenHandler.cpp" />
     <ClCompile Include="src\ITransport.cpp" />
     <ClCompile Include="src\NullLogger.cpp" />
@@ -299,7 +297,6 @@
     <ClCompile Include="src\SceneDispatcher.cpp" />
     <ClCompile Include="src\SceneEndpoint.cpp" />
     <ClCompile Include="src\ScenePeer.cpp" />
-    <ClCompile Include="src\StringFormat.cpp" />
     <ClCompile Include="src\TokenHandler.cpp" />
     <ClCompile Include="src\Transports\RakNetConnection.cpp" />
     <ClCompile Include="src\Transports\RakNetTransport.cpp" />

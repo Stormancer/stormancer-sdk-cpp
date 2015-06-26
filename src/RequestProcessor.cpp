@@ -2,14 +2,14 @@
 
 namespace Stormancer
 {
-	RequestProcessor::RequestProcessor(ILogger* logger, vector<IRequestModule*> modules)
+	RequestProcessor::RequestProcessor(ILogger* logger, std::vector<IRequestModule*> modules)
 		: _logger(logger)
 	{
-		addSystemRequestHandler = [this](byte msgId, function<pplx::task<void>(RequestContext*)> handler)
+		addSystemRequestHandler = [this](byte msgId, std::function<pplx::task<void>(RequestContext*)> handler)
 		{
 			if (_isRegistered)
 			{
-				throw exception("Can only add handler before 'RegisterProcessor' is called.");
+				throw std::exception("Can only add handler before 'RegisterProcessor' is called.");
 			}
 			_handlers[msgId] = handler;
 		};
@@ -32,7 +32,7 @@ namespace Stormancer
 
 		for (auto it : _handlers)
 		{
-			config.addProcessor(it.first, new handlerFunction([it](shared_ptr<Packet<>> p) {
+			config.addProcessor(it.first, new handlerFunction([it](std::shared_ptr<Packet<>> p) {
 				RequestContext context(p);
 				it.second(&context).then([&context, &p](pplx::task<void> task) {
 					if (!context.isComplete())
@@ -40,8 +40,8 @@ namespace Stormancer
 						if (false)
 						{
 							context.error([&p](bytestream* stream) {
-								string msg = "An error occured on the server.";
-								ISerializable::serialize(msg, stream);
+								msgpack::packer<bytestream> pk(stream);
+								pk.pack(std::string("An error occured on the server."));
 							});
 						}
 						else
@@ -54,7 +54,7 @@ namespace Stormancer
 			}));
 		}
 
-		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG, new handlerFunction([this](shared_ptr<Packet<>> p) {
+		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG, new handlerFunction([this](std::shared_ptr<Packet<>> p) {
 			uint16 id;
 			*(p->stream) >> id;
 
@@ -69,13 +69,13 @@ namespace Stormancer
 			}
 			else
 			{
-				_logger->log(LogLevel::Trace, L"", L"Unknow request id.", L"");
+				_logger->log(LogLevel::Trace, "", "Unknow request id.", "");
 			}
 
 			return true;
 		}));
 
-		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_COMPLETE, new handlerFunction([this](shared_ptr<Packet<>> p) {
+		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_COMPLETE, new handlerFunction([this](std::shared_ptr<Packet<>> p) {
 			uint16 id;
 			*(p->stream) >> id;
 
@@ -95,16 +95,14 @@ namespace Stormancer
 				}
 				else
 				{
-					_logger->log(LogLevel::Trace, L"", L"Unknow request id.", L"");
+					_logger->log(LogLevel::Trace, "", "Unknow request id.", "");
 				}
 			}
-
-
 
 			return true;
 		}));
 
-		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_ERROR, new handlerFunction([this](shared_ptr<Packet<>> p) {
+		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_ERROR, new handlerFunction([this](std::shared_ptr<Packet<>> p) {
 			uint16 id;
 			*(p->stream) >> id;
 
@@ -112,29 +110,34 @@ namespace Stormancer
 			{
 				p->request = _pendingRequests[id];
 
-				wstring msg;
-				ISerializable::deserialize(p->stream, msg);
+				std::string buf;
+				*p->stream >> buf;
+				msgpack::unpacked result;
+				msgpack::unpack(result, buf.data(), buf.size());
+				msgpack::object deserialized = result.get();
+				std::string msg;
+				deserialized.convert(&msg);
 
-				exception_ptr eptr = make_exception_ptr(new exception(Helpers::to_string(msg).c_str()));
+				auto eptr = std::make_exception_ptr(new std::exception(msg.c_str()));
 				p->request->observer.on_error(eptr);
 
 				freeRequestSlot(id);
 			}
 			else
 			{
-				_logger->log(LogLevel::Trace, L"", L"Unknow request id.", L"");
+				_logger->log(LogLevel::Trace, "", "Unknow request id.", "");
 			}
 
 			return true;
 		}));
 	}
 
-	pplx::task<shared_ptr<Packet<>>> RequestProcessor::sendSystemRequest(IConnection* peer, byte msgId, function<void(bytestream*)> writer)
+	pplx::task<std::shared_ptr<Packet<>>> RequestProcessor::sendSystemRequest(IConnection* peer, byte msgId, std::function<void(bytestream*)> writer)
 	{
-		auto tce = new pplx::task_completion_event<shared_ptr<Packet<>>>();
-		auto observer = rx::make_observer<shared_ptr<Packet<>>>([tce](shared_ptr<Packet<>> p) {
+		auto tce = new pplx::task_completion_event<std::shared_ptr<Packet<>>>();
+		auto observer = rx::make_observer<std::shared_ptr<Packet<>>>([tce](std::shared_ptr<Packet<>> p) {
 			tce->set(p);
-		}, [tce](exception_ptr ex) {
+		}, [tce](std::exception_ptr ex) {
 			tce->set_exception(ex);
 		});
 		auto request = reserveRequestSlot(observer.as_dynamic());
@@ -145,7 +148,7 @@ namespace Stormancer
 		});
 
 		auto task = pplx::create_task(*tce);
-		task.then([tce](pplx::task<shared_ptr<Packet<>>> t) {
+		task.then([tce](pplx::task<std::shared_ptr<Packet<>>> t) {
 			if (tce)
 			{
 				delete tce;
@@ -155,14 +158,14 @@ namespace Stormancer
 		return task;
 	}
 
-	shared_ptr<Request> RequestProcessor::reserveRequestSlot(PacketObserver&& observer)
+	std::shared_ptr<Request> RequestProcessor::reserveRequestSlot(PacketObserver&& observer)
 	{
 		static uint16 id = 0;
 		while (id < UINT16_MAX)
 		{
 			if (!Helpers::mapContains(_pendingRequests, id))
 			{
-				shared_ptr<Request> request(new Request(std::move(observer)));
+				std::shared_ptr<Request> request(new Request(std::move(observer)));
 				time(&request->lastRefresh);
 				request->id = id;
 				_pendingRequests[id] = request;
@@ -170,8 +173,8 @@ namespace Stormancer
 			}
 			id++;
 		}
-		_logger->log(LogLevel::Error, L"", L"Unable to create a new request: Too many pending requests.", L"");
-		throw exception("Unable to create a new request: Too many pending requests.");
+		_logger->log(LogLevel::Error, "", "Unable to create a new request: Too many pending requests.", "");
+		throw std::exception("Unable to create a new request: Too many pending requests.");
 	}
 
 	bool RequestProcessor::freeRequestSlot(uint16 requestId)

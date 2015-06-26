@@ -2,7 +2,7 @@
 
 namespace Stormancer
 {
-	RequestContext::RequestContext(shared_ptr<Packet<>> packet)
+	RequestContext::RequestContext(std::shared_ptr<Packet<>> packet)
 		: _packet(packet),
 		_stream(packet->stream)
 	{
@@ -16,7 +16,7 @@ namespace Stormancer
 	{
 	}
 
-	shared_ptr<Packet<>> RequestContext::packet()
+	std::shared_ptr<Packet<>> RequestContext::packet()
 	{
 		return _packet;
 	}
@@ -31,11 +31,11 @@ namespace Stormancer
 		return _isComplete;
 	}
 
-	void RequestContext::send(function<void(bytestream*)> writer)
+	void RequestContext::send(std::function<void(bytestream*)> writer)
 	{
 		if (_isComplete)
 		{
-			throw exception("The request is already completed.");
+			throw std::exception("The request is already completed.");
 		}
 		_didSendValues = true;
 		_packet->connection->sendSystem((byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG, [this, &writer](bytestream* stream) {
@@ -53,7 +53,7 @@ namespace Stormancer
 		});
 	}
 
-	void RequestContext::error(function<void(bytestream*)> writer)
+	void RequestContext::error(std::function<void(bytestream*)> writer)
 	{
 		_packet->connection->sendSystem((byte)MessageIDTypes::ID_REQUEST_RESPONSE_ERROR, [this, &writer](bytestream* stream) {
 			stream->write((char*)_requestId, 2);

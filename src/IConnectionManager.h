@@ -13,7 +13,7 @@ namespace Stormancer
 
 		virtual uint64 generateNewConnectionId() = 0;
 		virtual void newConnection(IConnection* connection) = 0;
-		virtual void closeConnection(IConnection* connection, wstring reason) = 0;
+		virtual void closeConnection(IConnection* connection, std::string reason) = 0;
 		virtual IConnection* getConnection(uint64 id) = 0;
 
 	public:

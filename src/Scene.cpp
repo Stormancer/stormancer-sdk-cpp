@@ -2,7 +2,7 @@
 
 namespace Stormancer
 {
-	Scene::Scene(IConnection* connection, Client* client, wstring id, wstring token, SceneInfosDto dto)
+	Scene::Scene(IConnection* connection, Client* client, std::string id, std::string token, SceneInfosDto dto)
 		: _id(id),
 		_peer(connection),
 		_token(token),
@@ -30,7 +30,7 @@ namespace Stormancer
 		}
 	}
 
-	wstring Scene::getHostMetadata(wstring key)
+	std::string Scene::getHostMetadata(std::string key)
 	{
 		return _metadata[key];
 	}
@@ -40,7 +40,7 @@ namespace Stormancer
 		return _handle;
 	}
 
-	wstring Scene::id()
+	std::string Scene::id()
 	{
 		return _id;
 	}
@@ -55,26 +55,26 @@ namespace Stormancer
 		return _peer;
 	}
 
-	vector<Route*> Scene::localRoutes()
+	std::vector<Route*> Scene::localRoutes()
 	{
 		return Helpers::mapValuesPtr(_localRoutesMap);
 	}
 
-	vector<Route*> Scene::remoteRoutes()
+	std::vector<Route*> Scene::remoteRoutes()
 	{
 		return Helpers::mapValuesPtr(_remoteRoutesMap);
 	}
 
-	void Scene::addRoute(wstring routeName, function<void(shared_ptr<Packet<IScenePeer>>)> handler, stringMap metadata)
+	void Scene::addRoute(std::string routeName, std::function<void(std::shared_ptr<Packet<IScenePeer>>)> handler, stringMap metadata)
 	{
 		if (routeName.length() == 0 || routeName[0] == '@')
 		{
-			throw exception("A route cannot be empty or start with the '@' character.");
+			throw std::exception("A route cannot be empty or start with the '@' character.");
 		}
 
 		if (_connected)
 		{
-			throw exception("You cannot register handles once the scene is connected.");
+			throw std::exception("You cannot register handles once the scene is connected.");
 		}
 
 		if (!Helpers::mapContains(_localRoutesMap, routeName))
@@ -85,17 +85,17 @@ namespace Stormancer
 		subscriptions.push_back(onMessage(routeName).subscribe(handler));
 	}
 
-	rx::observable<shared_ptr<Packet<IScenePeer>>> Scene::onMessage(Route* route)
+	rx::observable<std::shared_ptr<Packet<IScenePeer>>> Scene::onMessage(Route* route)
 	{
-		auto observable = rx::observable<>::create<shared_ptr<Packet<IScenePeer>>>([this, route](rx::subscriber<shared_ptr<Packet<IScenePeer>>> subscriber) {
-			auto handler = new function<void(shared_ptr<Packet<>>)>([this, subscriber](shared_ptr<Packet<>> p) {
-				shared_ptr<Packet<IScenePeer>> packet(new Packet<IScenePeer>(host(), p->stream, p->metadata()));
+		auto observable = rx::observable<>::create<std::shared_ptr<Packet<IScenePeer>>>([this, route](rx::subscriber<std::shared_ptr<Packet<IScenePeer>>> subscriber) {
+			auto handler = new std::function<void(std::shared_ptr<Packet<>>)>([this, subscriber](std::shared_ptr<Packet<>> p) {
+				std::shared_ptr<Packet<IScenePeer>> packet(new Packet<IScenePeer>(host(), p->stream, p->metadata()));
 				subscriber.on_next(packet);
 			});
 			route->handlers.push_back(handler);
 
 			subscriber.add([route, handler]() {
-				auto it = find(route->handlers.begin(), route->handlers.end(), handler);
+				auto it = std::find(route->handlers.begin(), route->handlers.end(), handler);
 				route->handlers.erase(it);
 				delete handler;
 			});
@@ -103,11 +103,11 @@ namespace Stormancer
 		return observable.as_dynamic();
 	}
 
-	rx::observable<shared_ptr<Packet<IScenePeer>>> Scene::onMessage(wstring routeName)
+	rx::observable<std::shared_ptr<Packet<IScenePeer>>> Scene::onMessage(std::string routeName)
 	{
 		if (_connected)
 		{
-			throw exception("You cannot register handles once the scene is connected.");
+			throw std::exception("You cannot register handles once the scene is connected.");
 		}
 
 		if (!Helpers::mapContains(_localRoutesMap, routeName))
@@ -119,20 +119,20 @@ namespace Stormancer
 		return onMessage(route);
 	}
 
-	void Scene::sendPacket(wstring routeName, function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability)
+	void Scene::sendPacket(std::string routeName, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability)
 	{
 		if (routeName.length() == 0)
 		{
-			throw exception("routeName is empty.");
+			throw std::exception("routeName is empty.");
 		}
 		if (!_connected)
 		{
-			throw exception("The scene must be connected to perform this operation.");
+			throw std::exception("The scene must be connected to perform this operation.");
 		}
 
 		if (!Helpers::mapContains(_remoteRoutesMap, routeName))
 		{
-			throw exception(string(StringFormat(L"The route '{0}' doesn't exist on the scene.", routeName)).c_str());
+			throw std::exception(std::string(Helpers::stringFormat(L"The route '{0}' doesn't exist on the scene.", routeName)).c_str());
 		}
 		Route& route = _remoteRoutesMap[routeName];
 
@@ -174,14 +174,14 @@ namespace Stormancer
 		}
 	}
 
-	void Scene::handleMessage(shared_ptr<Packet<>> packet)
+	void Scene::handleMessage(std::shared_ptr<Packet<>> packet)
 	{
 		packetReceived(packet);
 
 		uint16 routeId;
 		*packet->stream >> routeId;
 
-		packet->setMetadata(L"routeId", new uint16(routeId));
+		packet->setMetadata("routeId", new uint16(routeId));
 
 		if (Helpers::mapContains(_handlers, routeId))
 		{
@@ -192,12 +192,12 @@ namespace Stormancer
 			}
 		}
 
-		delete packet->getMetadata<uint16>(L"routeId");
+		delete packet->getMetadata<uint16>("routeId");
 	}
 
-	vector<IScenePeer*> Scene::remotePeers()
+	std::vector<IScenePeer*> Scene::remotePeers()
 	{
-		return vector < IScenePeer* > {host()};
+		return std::vector < IScenePeer* > {host()};
 	}
 
 	IScenePeer* Scene::host()

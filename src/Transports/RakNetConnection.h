@@ -12,7 +12,7 @@ namespace Stormancer
 	public:
 	
 		/// Constructor.
-		RakNetConnection(RakNet::RakNetGUID guid, int64 id, RakNet::RakPeerInterface* peer, function<void(RakNetConnection*)>* lambdaOnRequestClose);
+		RakNetConnection(RakNet::RakNetGUID guid, int64 id, RakNet::RakPeerInterface* peer, std::function<void(RakNetConnection*)>* lambdaOnRequestClose);
 		
 		/// Destructor.
 		virtual ~RakNetConnection();
@@ -26,7 +26,7 @@ namespace Stormancer
 		time_t lastActivityDate();
 		
 		/// Returns the ip address of the connection.
-		wstring ipAddress();
+		std::string ipAddress();
 		
 		/// Comparison operator
 		bool operator==(RakNetConnection& other);
@@ -39,11 +39,11 @@ namespace Stormancer
 		
 		
 		void close();
-		void sendSystem(byte msgId, function<void(bytestream*)> writer);
-		void sendRaw(function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability, char channel);
-		void sendToScene(byte sceneIndex, uint16 route, function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability);
+		void sendSystem(byte msgId, std::function<void(bytestream*)> writer);
+		void sendRaw(std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability, char channel);
+		void sendToScene(byte sceneIndex, uint16 route, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability);
 		int ping();
-		void setApplication(wstring account, wstring application);
+		void setApplication(std::string account, std::string application);
 
 		template<typename T>
 		void registerComponent(T* component)
@@ -76,6 +76,6 @@ namespace Stormancer
 		RakNet::RakNetGUID _guid;
 		stringMap _metadata;
 		time_t _lastActivityDate;
-		map<size_t, void*> _localData;
+		std::map<size_t, void*> _localData;
 	};
 };

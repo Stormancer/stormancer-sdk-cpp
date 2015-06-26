@@ -1,41 +1,36 @@
 #pragma once
 #include "headers.h"
-#include "ISerializable.h"
 
 namespace Stormancer
 {
 	/// Informations about the requested scene.
-	class SceneInfosRequestDto : public ISerializable
+	class SceneInfosRequestDto
 	{
 	public:
-	
+
 		/// Constructor.
 		SceneInfosRequestDto();
-		
-		/*! Constructor.
-		\param stream The stream to deserialize.
-		*/
-		SceneInfosRequestDto(bytestream* stream);
-		
+
 		/// Destructor.
 		virtual ~SceneInfosRequestDto();
 
-	public:
-	
-		/*! The method to serialize the object.
-		\param stream The stream where we serialize the object.
-		*/
-		void serialize(bytestream* stream);
-		
-		/*! The method to deserialize the object.
-		\param stream The stream to deserialize.
-		*/
-		void deserialize(bytestream* stream);
+		/// MessagePack serialization.
+		template<typename Packer>
+		void msgpack_pack(Packer& pk) const
+		{
+			pk.pack_map(2);
+
+			pk.pack("Token");
+			pk.pack(Token);
+
+			pk.pack("Metadata");
+			pk.pack(Metadata);
+		}
 
 	public:
 	
 		/// Authentication token containing informations about the target scene.
-		wstring Token;
+		std::string Token;
 		
 		/// Connexion metadatas.
 		stringMap Metadata;

@@ -6,26 +6,33 @@ namespace Stormancer
 	{
 	}
 
-	ConnectionResult::ConnectionResult(bytestream* stream)
-	{
-		deserialize(stream);
-	}
-
 	ConnectionResult::~ConnectionResult()
 	{
 	}
 
-	void ConnectionResult::serialize(bytestream* stream)
+	void ConnectionResult::msgpack_unpack(msgpack::object const& o)
 	{
-	}
+		if (o.type != msgpack::type::MAP)
+		{
+			throw std::exception("Bad msgpack format");
+		}
 
-	void ConnectionResult::deserialize(bytestream* stream)
-	{
-		MsgPack::Deserializer deserializer(stream->rdbuf());
-		unique_ptr<MsgPack::Element> element;
-		deserializer >> element;
+		auto mapptr = o.via.map.ptr;
+		uint32 mapsize = o.via.map.size;
 
-		SceneHandle = numberFromMsgPackMap<uint8>(element, L"SceneHandle");
-		RouteMappings = uint16MapFromMsgPackMap(element, L"RouteMappings");
+		for (uint32 i = 0; i < mapsize; i++)
+		{
+			std::string key;
+			mapptr[i].key.convert(&key);
+
+			if (key == "SceneHandle")
+			{
+				mapptr[i].val.convert(&SceneHandle);
+			}
+			else if (key == "RouteMappings")
+			{
+				mapptr[i].val.convert(&RouteMappings);
+			}
+		}
 	}
 }

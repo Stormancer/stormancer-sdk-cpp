@@ -2,7 +2,7 @@
 
 namespace Stormancer
 {
-	Configuration::Configuration(wstring account, wstring application)
+	Configuration::Configuration(std::string account, std::string application)
 		: account(account),
 		application(application),
 		dispatcher(new DefaultPacketDispatcher),
@@ -15,7 +15,7 @@ namespace Stormancer
 	{
 	}
 
-	wstring Configuration::getApiEndpoint()
+	std::string Configuration::getApiEndpoint()
 	{
 		return (serverEndpoint.length() ? serverEndpoint : apiEndpoint);
 	}

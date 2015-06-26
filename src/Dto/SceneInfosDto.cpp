@@ -6,28 +6,40 @@ namespace Stormancer
 	{
 	}
 
-	SceneInfosDto::SceneInfosDto(bytestream* stream)
-	{
-		deserialize(stream);
-	}
-
 	SceneInfosDto::~SceneInfosDto()
 	{
 	}
 
-	void SceneInfosDto::serialize(bytestream* stream)
+	void SceneInfosDto::msgpack_unpack(msgpack::object const& o)
 	{
-	}
+		if (o.type != msgpack::type::MAP)
+		{
+			throw std::exception("Bad msgpack format");
+		}
 
-	void SceneInfosDto::deserialize(bytestream* stream)
-	{
-		MsgPack::Deserializer deserializer(stream->rdbuf());
-		unique_ptr<MsgPack::Element> element;
-		deserializer >> element;
+		auto mapptr = o.via.map.ptr;
+		uint32 mapsize = o.via.map.size;
+		for (uint32 i = 0; i < mapsize; i++)
+		{
+			std::string key;
+			mapptr[i].key.convert(&key);
 
-		SceneId = stringFromMsgPackMap(element, L"SceneId");
-		Metadata = stringMapFromMsgPackMap(element, L"Metadata");
-		Routes = routeDtoVectorFromMsgPackMap(element, L"Routes");
-		SelectedSerializer = stringFromMsgPackMap(element, L"SelectedSerializer");
+			if (key == "SceneId")
+			{
+				mapptr[i].val.convert(&SceneId);
+			}
+			else if (key == "Metadata")
+			{
+				mapptr[i].val.convert(&Metadata);
+			}
+			else if (key == "Routes")
+			{
+				mapptr[i].val.convert(&Routes);
+			}
+			else if (key == "SelectedSerializer")
+			{
+				mapptr[i].val.convert(&SelectedSerializer);
+			}
+		}
 	}
 }

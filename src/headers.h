@@ -56,7 +56,7 @@ namespace rxsub = rxcpp::subjects;
 #include <RakNetTypes.h>
 
 // packed libs
-#include <MsgPack.h>
+#include <msgpack.hpp>
 
 // custom types
 #include "typedef.h"

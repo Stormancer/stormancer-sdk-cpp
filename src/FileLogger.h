@@ -19,14 +19,14 @@ namespace Stormancer
 	
 		/// A basic message log.
 		/// \message The message to log.
-		void log(wstring message);
+		void log(std::string message);
 		
 		/// A detailed message log.
 		/// \param level The level.
 		/// \param category The category (typically the source).
 		/// \param message The message.
 		/// \param data Some extra data.
-		void log(LogLevel level, wstring category, wstring message, wstring data);
+		void log(LogLevel level, std::string category, std::string message, std::string data);
 		
 		/// Log details about an exception.
 		/// \param e The exception.
@@ -40,9 +40,9 @@ namespace Stormancer
 	private:
 	
 		/// Name of the log file.
-		string _fileName;
+		std::string _fileName;
 		
 		/// Stream to the log file.
-		wofstream _myfile;
+		std::ofstream _myfile;
 	};
 };

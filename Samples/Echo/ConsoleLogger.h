@@ -8,17 +8,17 @@ public:
 	virtual ~ConsoleLogger();
 
 public:
-	void log(wstring message);
-	void log(Stormancer::LogLevel level, wstring category, wstring message, wstring data);
+	void log(std::string message);
+	void log(Stormancer::LogLevel level, std::string category, std::string message, std::string data);
 	void log(const std::exception& e);
 
-	void logWhite(wstring message);
-	void logGrey(wstring message);
-	void logGreen(wstring message);
-	void logRed(wstring message);
-	void logBlue(wstring message);
-	void logDarkRed(wstring message);
-	void logYellow(wstring message);
+	void logWhite(std::string message);
+	void logGrey(std::string message);
+	void logGreen(std::string message);
+	void logRed(std::string message);
+	void logBlue(std::string message);
+	void logDarkRed(std::string message);
+	void logYellow(std::string message);
 
 	static void ConsoleLogger::setConsoleColor(WORD color);
 	static void ConsoleLogger::setConsoleColorWhite();

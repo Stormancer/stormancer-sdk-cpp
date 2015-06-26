@@ -1,31 +1,32 @@
 #pragma once
 #include "headers.h"
-#include "ISerializable.h"
 
 namespace Stormancer
 {
 	/// Connection informations to send to the server.
-	class ConnectionData : public ISerializable
+	class ConnectionData
 	{
 	public:
+
+		/// Constructor.
 		ConnectionData();
-		ConnectionData(bytestream* stream);
+
+		/// Destructor.
 		virtual ~ConnectionData();
 
-	public:
-		void serialize(bytestream* stream);
-		void deserialize(bytestream* stream);
+		/// MessagePack deserialization.
+		void msgpack_unpack(msgpack::object const& o);
 
 	public:
-		wstring AccountId;
-		wstring Application;
-		wstring ContentType;
-		wstring DeploymentId;
+		std::string AccountId;
+		std::string Application;
+		std::string ContentType;
+		std::string DeploymentId;
 		stringMap Endpoints;
 		time_t Expiration;
 		time_t Issued;
-		wstring Routing;
-		wstring SceneId;
-		wstring UserData;
+		std::string Routing;
+		std::string SceneId;
+		std::string UserData;
 	};
 };
