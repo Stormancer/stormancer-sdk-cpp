@@ -9,7 +9,7 @@ namespace Stormancer
 		{
 			if (_isRegistered)
 			{
-				throw std::exception("Can only add handler before 'RegisterProcessor' is called.");
+				throw std::runtime_error("Can only add handler before 'RegisterProcessor' is called.");
 			}
 			_handlers[msgId] = handler;
 		};
@@ -118,7 +118,7 @@ namespace Stormancer
 				std::string msg;
 				deserialized.convert(&msg);
 
-				auto eptr = std::make_exception_ptr(new std::exception(msg.c_str()));
+				auto eptr = std::make_exception_ptr(new std::runtime_error(msg));
 				p->request->observer.on_error(eptr);
 
 				freeRequestSlot(id);
@@ -161,7 +161,7 @@ namespace Stormancer
 	std::shared_ptr<Request> RequestProcessor::reserveRequestSlot(PacketObserver&& observer)
 	{
 		static uint16 id = 0;
-		while (id < UINT16_MAX)
+		while (id < 0xffff)
 		{
 			if (!Helpers::mapContains(_pendingRequests, id))
 			{
@@ -174,7 +174,7 @@ namespace Stormancer
 			id++;
 		}
 		_logger->log(LogLevel::Error, "", "Unable to create a new request: Too many pending requests.", "");
-		throw std::exception("Unable to create a new request: Too many pending requests.");
+		throw std::overflow_error("Unable to create a new request: Too many pending requests.");
 	}
 
 	bool RequestProcessor::freeRequestSlot(uint16 requestId)

@@ -24,7 +24,7 @@ namespace Stormancer
 
 	IConnection* Client::ConnectionHandler::getConnection(uint64 id)
 	{
-		throw std::exception("Client::ConnectionHandler::getConnection not implemented.");
+		throw std::runtime_error("Client::ConnectionHandler::getConnection not implemented.");
 	}
 
 	void Client::ConnectionHandler::closeConnection(IConnection* connection, std::string reason)
@@ -122,7 +122,7 @@ namespace Stormancer
 	{
 		_logger->log(LogLevel::Trace, "", "Client::getPublicScene", sceneId);
 
-		return _apiClient->getSceneEndpoint(_accountId, _applicationName, sceneId, userData).then([this, sceneId](SceneEndpoint& sep) {
+		return _apiClient->getSceneEndpoint(_accountId, _applicationName, sceneId, userData).then([this, sceneId](SceneEndpoint sep) {
 			return this->getScene(sceneId, sep);
 		});
 	}
@@ -192,9 +192,11 @@ namespace Stormancer
 	pplx::task<void> Client::disconnect(Scene* scene, byte sceneHandle)
 	{
 		auto _scenesDispatcher = this->_scenesDispatcher;
-		return sendSystemRequest<DisconnectFromSceneDto, EmptyDto>((byte)MessageIDTypes::ID_DISCONNECT_FROM_SCENE, DisconnectFromSceneDto(sceneHandle)).then([this, _scenesDispatcher, sceneHandle, scene](pplx::task<EmptyDto> t) {
-			_scenesDispatcher->removeScene(sceneHandle);
-		});
+		DisconnectFromSceneDto dto(sceneHandle);
+		return sendSystemRequest<DisconnectFromSceneDto, EmptyDto>((byte)MessageIDTypes::ID_DISCONNECT_FROM_SCENE, dto)
+			.then([this, _scenesDispatcher, sceneHandle, scene](pplx::task<EmptyDto> t) {
+				_scenesDispatcher->removeScene(sceneHandle);
+			});
 	}
 
 	void Client::disconnectAllScenes()

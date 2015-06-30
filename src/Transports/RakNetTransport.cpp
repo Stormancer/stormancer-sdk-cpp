@@ -20,7 +20,7 @@ namespace Stormancer
 	{
 		if (handler == nullptr && serverPort > 0)
 		{
-			throw std::exception("Handler is null.");
+			throw std::invalid_argument("Handler is null.");
 		}
 		_type = type;
 
@@ -131,7 +131,7 @@ namespace Stormancer
 	{
 		if (_peer == nullptr || !_peer->IsActive())
 		{
-			throw std::exception("Transport not started. Call start before connect.");
+			throw std::runtime_error("Transport not started. Call start before connect.");
 		}
 		auto infos = Helpers::stringSplit(std::wstring(endpoint.begin(), endpoint.end()), L":");
 		std::string host(infos[0].begin(), infos[0].end());

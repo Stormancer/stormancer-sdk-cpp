@@ -9,29 +9,16 @@
 
 // standart libs
 #include <mutex>
-#include <atomic>
 #include <algorithm>
-#include <clocale>
-#include <ctime>
-#include <cctype>
-#include <cstdarg>
-#include <codecvt>
+#include <chrono>
 #include <functional>
-#include <future>
 #include <iostream>
-#include <iomanip>
-#include <iterator>
-#include <list>
-#include <locale>
 #include <map>
 #include <memory>
-#include <regex>
 #include <sstream>
-#include <stdint.h>
-#include <stdio.h>
-#include <streambuf>
+#include <cstdint>
+#include <cstdio>
 #include <string>
-#include <tchar.h>
 #include <typeinfo>
 #include <vector>
 
@@ -40,7 +27,6 @@
 #include <cpprest/http_client.h>
 #include <cpprest/filestream.h>
 
-#include <ppltasks.h>
 #include <pplx/pplxtasks.h>
 
 #include <rx.hpp>

@@ -12,9 +12,15 @@ namespace Stormancer
 
 	SceneEndpoint TokenHandler::decodeToken(std::string& token)
 	{
-		std::wstring wtoken = Helpers::stringTrim(std::wstring(token.begin(), token.end()), L'"');
+		std::wstring wtoken(token.begin(), token.end());
+		wtoken = Helpers::stringTrim(wtoken, L'"');
 		std::wstring data = Helpers::stringSplit(wtoken, L"-")[0];
+#if defined(_WIN32)
 		auto vectorData = utility::conversions::from_base64(data);
+#else
+		std::string data2(data.begin(), data.end());
+		auto vectorData = utility::conversions::from_base64(data2);
+#endif
 		std::string buffer(vectorData.begin(), vectorData.end());
 
 		msgpack::unpacked result;
@@ -23,6 +29,7 @@ namespace Stormancer
 
 		ConnectionData cData;
 		obj.convert(&cData);
-		return SceneEndpoint(std::string(wtoken.begin(), wtoken.end()), cData);
+		token = std::string(wtoken.begin(), wtoken.end());
+		return SceneEndpoint(token, cData);
 	}
 };

@@ -53,7 +53,7 @@ namespace Stormancer
 
 			if (!processed)
 			{
-				throw std::exception(std::string(Helpers::stringFormat(L"Couldn't process message. msgId: ", msgType)).c_str());
+				throw std::runtime_error(Helpers::stringFormat("Couldn't process message. msgId: ", msgType));
 			}
 		});
 	}

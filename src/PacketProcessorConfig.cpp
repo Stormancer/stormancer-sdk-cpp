@@ -16,7 +16,7 @@ namespace Stormancer
 	{
 		if (Helpers::mapContains(_handlers, msgId))
 		{
-			throw std::exception(std::string(Helpers::stringFormat(L"An handler is already registered for id {0}.", msgId)).c_str());
+			throw std::invalid_argument(Helpers::stringFormat("An handler is already registered for id ", msgId, ".").c_str());
 		}
 		_handlers[msgId] = handler;
 	}

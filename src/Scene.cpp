@@ -69,12 +69,12 @@ namespace Stormancer
 	{
 		if (routeName.length() == 0 || routeName[0] == '@')
 		{
-			throw std::exception("A route cannot be empty or start with the '@' character.");
+			throw std::invalid_argument("A route cannot be empty or start with the '@' character.");
 		}
 
 		if (_connected)
 		{
-			throw std::exception("You cannot register handles once the scene is connected.");
+			throw std::runtime_error("You cannot register handles once the scene is connected.");
 		}
 
 		if (!Helpers::mapContains(_localRoutesMap, routeName))
@@ -89,7 +89,8 @@ namespace Stormancer
 	{
 		auto observable = rx::observable<>::create<std::shared_ptr<Packet<IScenePeer>>>([this, route](rx::subscriber<std::shared_ptr<Packet<IScenePeer>>> subscriber) {
 			auto handler = new std::function<void(std::shared_ptr<Packet<>>)>([this, subscriber](std::shared_ptr<Packet<>> p) {
-				std::shared_ptr<Packet<IScenePeer>> packet(new Packet<IScenePeer>(host(), p->stream, p->metadata()));
+				auto metadata = p->metadata();
+				std::shared_ptr<Packet<IScenePeer>> packet(new Packet<IScenePeer>(host(), p->stream, metadata));
 				subscriber.on_next(packet);
 			});
 			route->handlers.push_back(handler);
@@ -107,7 +108,7 @@ namespace Stormancer
 	{
 		if (_connected)
 		{
-			throw std::exception("You cannot register handles once the scene is connected.");
+			throw std::runtime_error("You cannot register handles once the scene is connected.");
 		}
 
 		if (!Helpers::mapContains(_localRoutesMap, routeName))
@@ -123,16 +124,16 @@ namespace Stormancer
 	{
 		if (routeName.length() == 0)
 		{
-			throw std::exception("routeName is empty.");
+			throw std::invalid_argument("routeName is empty.");
 		}
 		if (!_connected)
 		{
-			throw std::exception("The scene must be connected to perform this operation.");
+			throw std::runtime_error("The scene must be connected to perform this operation.");
 		}
 
 		if (!Helpers::mapContains(_remoteRoutesMap, routeName))
 		{
-			throw std::exception(std::string(Helpers::stringFormat(L"The route '{0}' doesn't exist on the scene.", routeName)).c_str());
+			throw std::invalid_argument(Helpers::stringFormat("The route '", routeName, "' doesn't exist on the scene.").c_str());
 		}
 		Route& route = _remoteRoutesMap[routeName];
 

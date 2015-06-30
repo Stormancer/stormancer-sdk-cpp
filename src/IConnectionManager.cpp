@@ -1,5 +1,4 @@
-
-#include "IConnectionManager.h"
+#include "stormancer.h"
 
 namespace Stormancer
 {

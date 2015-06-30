@@ -35,7 +35,7 @@ namespace Stormancer
 	{
 		if (_isComplete)
 		{
-			throw std::exception("The request is already completed.");
+			throw std::runtime_error("The request is already completed.");
 		}
 		_didSendValues = true;
 		_packet->connection->sendSystem((byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG, [this, &writer](bytestream* stream) {

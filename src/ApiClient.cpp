@@ -25,6 +25,7 @@ namespace Stormancer
 		ILogger::instance()->log(LogLevel::Trace, "", "Client::getSceneEndpoint", Helpers::stringFormat(accountId, " ", applicationName, " ", sceneId, " ", userData));
 
 		std::string baseUri = _config->getApiEndpoint();
+#if defined(_WIN32)
 		http_client client(std::wstring(baseUri.begin(), baseUri.end()));
 		http_request request(methods::POST);
 		std::string relativeUri = Helpers::stringFormat("/", accountId, "/", applicationName, "/scenes/", sceneId, "/token");
@@ -33,6 +34,16 @@ namespace Stormancer
 		request.headers().add(L"Accept", L"application/json");
 		request.headers().add(L"x-version", L"1.0.0");
 		request.set_body(std::wstring(userData.begin(), userData.end()));
+#else
+		http_client client(baseUri);
+		http_request request(methods::POST);
+		std::string relativeUri = Helpers::stringFormat("/", accountId, "/", applicationName, "/scenes/", sceneId, "/token");
+		request.set_request_uri(relativeUri);
+		request.headers().add("Content-Type", "application/msgpack");
+		request.headers().add("Accept", "application/json");
+		request.headers().add("x-version", "1.0.0");
+		request.set_body(userData);
+#endif
 
 		return client.request(request).then([this, accountId, applicationName, sceneId](http_response response) {
 			uint16 statusCode = response.status_code();
@@ -46,10 +57,7 @@ namespace Stormancer
 				}
 				else
 				{
-					std::string errorMessage = Helpers::stringFormat("Unable to get scene ", accountId, "/", applicationName, "/", sceneId, ". Please check you used the correct account id, application name and scene id.\nResponse from server:\n", responseText);
-					std::stringstream ss;
-					ss << errorMessage << std::endl << "Response from server:" << std::endl << responseText;
-					throw std::exception(ss.str().c_str());
+					throw std::runtime_error(Helpers::stringFormat("Unable to get scene ", accountId, "/", applicationName, "/", sceneId, ". Please check you used the correct account id, application name and scene id.\nResponse from server:\n", responseText, "\nResponse from server:\n", responseText).c_str());
 				}
 			});
 

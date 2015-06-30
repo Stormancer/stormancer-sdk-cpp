@@ -3,7 +3,7 @@
 namespace Stormancer
 {
 	SceneDispatcher::SceneDispatcher()
-		: _scenes((uint32)MAXBYTE - (uint32)MessageIDTypes::ID_SCENES + 1, nullptr)
+		: _scenes((uint32)0xff - (uint32)MessageIDTypes::ID_SCENES + 1, nullptr)
 	{
 		handler = new processorFunction([this](uint8 sceneHandle, std::shared_ptr<Packet<>> packet) {
 			return this->handler_impl(sceneHandle, packet);

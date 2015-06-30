@@ -43,12 +43,6 @@ namespace Stormancer
 		return bs;
 	}
 
-	template<typename T>
-	bytestream& operator<<(bytestream& bs, T&& data)
-	{
-		return (bs << T(data));
-	}
-
 	/// Write a c-string in a byte stream.
 	/// \param bs The byte stream we want to write in.
 	/// \param data The c-string to write.
@@ -204,7 +198,7 @@ namespace Stormancer
 		template<typename T>
 		pplx::task<T> taskCompleted(T result)
 		{
-			task_completion_event<T> tce;
+			pplx::task_completion_event<T> tce;
 			tce.set(result);
 			return create_task(tce);
 		}
@@ -212,7 +206,7 @@ namespace Stormancer
 		template<typename T>
 		pplx::task<T> taskFromException(std::exception& ex)
 		{
-			task_completion_event<T> tce;
+			pplx::task_completion_event<T> tce;
 			tce.set_exception(ex);
 			return create_task(tce);
 		}

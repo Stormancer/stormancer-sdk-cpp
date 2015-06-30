@@ -2,13 +2,12 @@
 
 #define WIN32_LEAN_AND_MEAN	// Exclude rarely-used stuff from Windows headers
 // Windows Header Files:
+#if defined(_WIN32)
+
 #include <windows.h>
 
 
-BOOL APIENTRY DllMain( HMODULE hModule,
-                       DWORD  ul_reason_for_call,
-                       LPVOID lpReserved
-					 )
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
 {
 	switch (ul_reason_for_call)
 	{
@@ -21,3 +20,4 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 	return TRUE;
 }
 
+#endif // defined(_WIN32)

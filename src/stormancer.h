@@ -4,6 +4,18 @@
 
 #include "Action.h"
 
+#if defined(__cplusplus)
+#if !defined(_STD)
+#define _STD_BEGIN	namespace std {
+#define _STD_END		}
+#define _STD	::std::
+namespace std
+{
+	extern __declspec(dllimport) const streamoff _BADOFF;
+};
+#endif
+#endif
+
 #include "basic_bytebuf.h"
 #include "basic_bytestream.h"
 
@@ -16,6 +28,7 @@
 #include "Dto/SceneInfosDto.h"
 #include "Dto/SceneInfosRequestDto.h"
 
+#include "Helpers.h"
 #include "ApiClient.h"
 #include "Client.h"
 #include "Configuration.h"
@@ -24,7 +37,6 @@
 #include "NullLogger.h"
 #include "FileLogger.h"
 #include "DefaultPacketDispatcher.h"
-#include "Helpers.h"
 #include "IConnection.h"
 #include "IConnectionManager.h"
 #include "IPacketProcessor.h"
