@@ -85,9 +85,9 @@ namespace Stormancer
 		subscriptions.push_back(onMessage(routeName).subscribe(handler));
 	}
 
-	rx::observable<std::shared_ptr<Packet<IScenePeer>>> Scene::onMessage(Route* route)
+	rxcpp::observable<std::shared_ptr<Packet<IScenePeer>>> Scene::onMessage(Route* route)
 	{
-		auto observable = rx::observable<>::create<std::shared_ptr<Packet<IScenePeer>>>([this, route](rx::subscriber<std::shared_ptr<Packet<IScenePeer>>> subscriber) {
+		auto observable = rxcpp::observable<>::create<std::shared_ptr<Packet<IScenePeer>>>([this, route](rxcpp::subscriber<std::shared_ptr<Packet<IScenePeer>>> subscriber) {
 			auto handler = new std::function<void(std::shared_ptr<Packet<>>)>([this, subscriber](std::shared_ptr<Packet<>> p) {
 				auto metadata = p->metadata();
 				std::shared_ptr<Packet<IScenePeer>> packet(new Packet<IScenePeer>(host(), p->stream, metadata));
@@ -104,7 +104,7 @@ namespace Stormancer
 		return observable.as_dynamic();
 	}
 
-	rx::observable<std::shared_ptr<Packet<IScenePeer>>> Scene::onMessage(std::string routeName)
+	rxcpp::observable<std::shared_ptr<Packet<IScenePeer>>> Scene::onMessage(std::string routeName)
 	{
 		if (_connected)
 		{

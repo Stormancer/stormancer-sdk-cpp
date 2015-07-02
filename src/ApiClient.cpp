@@ -2,14 +2,6 @@
 
 namespace Stormancer
 {
-	//using namespace utility;                    // Common utilities like wstring conversions
-	using namespace web;                        // Common features like URIs.
-	using namespace web::http;                  // Common HTTP functionality
-	using namespace web::http::client;          // HTTP client features
-	//using namespace concurrency;
-	//using namespace concurrency::streams;       // Asynchronous streams
-	//using namespace pplx;
-
 	ApiClient::ApiClient(Configuration* config, ITokenHandler* tokenHandler)
 		: _config(config),
 		_tokenHandler(tokenHandler)
@@ -26,8 +18,8 @@ namespace Stormancer
 
 		std::string baseUri = _config->getApiEndpoint();
 #if defined(_WIN32)
-		http_client client(std::wstring(baseUri.begin(), baseUri.end()));
-		http_request request(methods::POST);
+		web::http::client::http_client client(std::wstring(baseUri.begin(), baseUri.end()));
+		web::http::http_request request(web::http::methods::POST);
 		std::string relativeUri = Helpers::stringFormat("/", accountId, "/", applicationName, "/scenes/", sceneId, "/token");
 		request.set_request_uri(std::wstring(relativeUri.begin(), relativeUri.end()));
 		request.headers().add(L"Content-Type", L"application/msgpack");
@@ -35,8 +27,8 @@ namespace Stormancer
 		request.headers().add(L"x-version", L"1.0.0");
 		request.set_body(std::wstring(userData.begin(), userData.end()));
 #else
-		http_client client(baseUri);
-		http_request request(methods::POST);
+		web::http::client::http_client client(baseUri);
+		web::http::http_request request(web::http::methods::POST);
 		std::string relativeUri = Helpers::stringFormat("/", accountId, "/", applicationName, "/scenes/", sceneId, "/token");
 		request.set_request_uri(relativeUri);
 		request.headers().add("Content-Type", "application/msgpack");
@@ -45,7 +37,7 @@ namespace Stormancer
 		request.set_body(userData);
 #endif
 
-		return client.request(request).then([this, accountId, applicationName, sceneId](http_response response) {
+		return client.request(request).then([this, accountId, applicationName, sceneId](web::http::http_response response) {
 			uint16 statusCode = response.status_code();
 			ILogger::instance()->log(LogLevel::Trace, "", "Client::getSceneEndpoint::client.request", "statusCode = " + std::to_string(statusCode));
 			auto ss = new concurrency::streams::stringstreambuf;

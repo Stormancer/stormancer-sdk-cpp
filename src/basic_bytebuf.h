@@ -1,5 +1,16 @@
 #pragma once
-#include <sstream>
+
+#if defined(__cplusplus)
+#if !defined(_STD)
+#define _STD_BEGIN	namespace std {
+#define _STD_END	}
+#define _STD		::std::
+namespace std
+{
+	extern __declspec(dllimport) const streamoff _BADOFF;
+};
+#endif
+#endif
 
 namespace Stormancer
 {
@@ -29,7 +40,7 @@ namespace Stormancer
 
 			explicit basic_bytebuf(const _Mystr& _Str,
 				ios_base::openmode _Mode = ios_base::in | ios_base::out)
-			{	// construct character buffer from string, mode
+			{	// construct character buffer from byte array, mode
 				_Init(_Str.c_str(), _Str.size(), _Getstate(_Mode));
 			}
 
@@ -87,27 +98,27 @@ namespace Stormancer
 			typedef typename _Traits::off_type off_type;
 
 			_Mystr str() const
-			{	// return string copy of character array
+			{	// return byte array copy of character array
 				if (!(_Mystate & _Constant) && _Mysb::pptr() != 0)
-				{	// writable, make string from write buffer
+				{	// writable, make byte array from write buffer
 					_Mystr _Str(_Mysb::pbase(), (_Seekhigh < _Mysb::pptr()
 						? _Mysb::pptr() : _Seekhigh) - _Mysb::pbase());
 					return (_Str);
 				}
 				else if (!(_Mystate & _Noread) && _Mysb::gptr() != 0)
-				{	// readable, make string from read buffer
+				{	// readable, make byte array from read buffer
 					_Mystr _Str(_Mysb::eback(), _Mysb::egptr() - _Mysb::eback());
 					return (_Str);
 				}
 				else
-				{	// inaccessible, return empty string
+				{	// inaccessible, return empty byte array
 					_Mystr _Nul;
 					return (_Nul);
 				}
 			}
 
 			void str(const _Mystr& _Newstr)
-			{	// replace character array from string
+			{	// replace character array from byte array
 				_Tidy();
 				_Init(_Newstr.c_str(), _Newstr.size(), _Mystate);
 			}
@@ -128,13 +139,15 @@ namespace Stormancer
 					return (_Traits::not_eof(_Meta));	// EOF, return success code
 
 				if (_Mystate & _Append
-					&& _Mysb::pptr() != 0 && _Mysb::pptr() < _Seekhigh)
-					_Mysb::setp(_Mysb::pbase(), _Seekhigh, _Mysb::epptr());
+					&& _Mysb::pptr() != 0)
+					_Mysb::setp(_Mysb::pbase(), _Mysb::epptr());
 
 				if (_Mysb::pptr() != 0
 					&& _Mysb::pptr() < _Mysb::epptr())
 				{	// room in buffer, store it
-					*_Mysb::_Pninc() = _Traits::to_char_type(_Meta);
+					//*_Mysb::_Pninc() = _Traits::to_char_type(_Meta);
+					*_Mysb::pptr() = _Traits::to_char_type(_Meta);
+					_Mysb::pbump(1);
 					return (_Meta);
 				}
 				else
@@ -171,7 +184,6 @@ namespace Stormancer
 					{	// not first growth, adjust pointers
 						_Seekhigh = _Newptr + (_Seekhigh - _Oldptr);
 						_Mysb::setp(_Newptr + (_Mysb::pbase() - _Oldptr),
-							_Newptr + (_Mysb::pptr() - _Oldptr),
 							_Newptr + _Newsize);
 						if (_Mystate & _Noread)
 							_Mysb::setg(_Newptr, 0, _Newptr);
@@ -185,7 +197,9 @@ namespace Stormancer
 						_Al.deallocate(_Oldptr, _Oldsize);
 					_Mystate |= _Allocated;
 
-					*_Mysb::_Pninc() = _Traits::to_char_type(_Meta);
+					//*_Mysb::_Pninc() = _Traits::to_char_type(_Meta);
+					*_Mysb::pptr() = _Traits::to_char_type(_Meta);
+					_Mysb::pbump(1);
 					return (_Meta);
 				}
 			}
@@ -246,7 +260,7 @@ namespace Stormancer
 					{	// change read position
 						_Mysb::gbump((int)(_Mysb::eback() - _Mysb::gptr() + _Off));
 						if (_Which & ios_base::out && _Mysb::pptr() != 0)
-							_Mysb::setp(_Mysb::pbase(), _Mysb::gptr(),
+							_Mysb::setp(_Mysb::pbase(), 
 							_Mysb::epptr());	// change write position to match
 					}
 					else
@@ -290,7 +304,7 @@ namespace Stormancer
 					{	// change read position
 						_Mysb::gbump((int)(_Mysb::eback() - _Mysb::gptr() + _Off));
 						if (_Mode & ios_base::out && _Mysb::pptr() != 0)
-							_Mysb::setp(_Mysb::pbase(), _Mysb::gptr(),
+							_Mysb::setp(_Mysb::pbase(),
 							_Mysb::epptr());	// change write position to match
 					}
 					else
@@ -325,8 +339,7 @@ namespace Stormancer
 						_Mysb::setg(_Pnew, _Pnew, _Pnew + _Count);	// setup read buffer
 					if (!(_Mystate & _Constant))
 					{	// setup write buffer, and maybe read buffer
-						_Mysb::setp(_Pnew,
-							(_Mystate & (_Atend | _Append)) ? _Pnew + _Count : _Pnew, _Pnew + _Count);
+						_Mysb::setp(_Pnew, _Pnew + _Count);
 						if (_Mysb::gptr() == 0)
 							_Mysb::setg(_Pnew, 0, _Pnew);
 					}

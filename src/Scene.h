@@ -8,7 +8,7 @@
 
 namespace Stormancer
 {
-	using PacketObservable = rx::observable < std::shared_ptr<Packet<>> >;
+	using PacketObservable = rxcpp::observable < std::shared_ptr<Packet<>> >;
 
 	class Client;
 	
@@ -87,12 +87,12 @@ namespace Stormancer
 		/// Creates an IObservable<Packet> instance that listen to events on the specified route.
 		/// \param route A pointer of the Route instance to listen to.
 		/// \return An IObservable<Packet> instance that fires each time a message is received on the route.
-		STORMANCER_DLL_API rx::observable<std::shared_ptr<Packet<IScenePeer>>> onMessage(Route* route);
+		STORMANCER_DLL_API rxcpp::observable<std::shared_ptr<Packet<IScenePeer>>> onMessage(Route* route);
 
 		/// Creates an IObservable<Packet> instance that listen to events on the specified route.
 		/// \param A string containing the name of the route to listen to.
 		/// \return An IObservable<Packet> instance that fires each time a message is received on the route.
-		STORMANCER_DLL_API rx::observable<std::shared_ptr<Packet<IScenePeer>>> onMessage(std::string routeName);
+		STORMANCER_DLL_API rxcpp::observable<std::shared_ptr<Packet<IScenePeer>>> onMessage(std::string routeName);
 
 		/// Get a vector containing the scene host connections.
 		/// \return A vector containing the scene host connections.

@@ -31,11 +31,6 @@
 
 #include <rx.hpp>
 
-namespace rx = rxcpp;
-namespace rxu = rxcpp::util;
-namespace rxsc = rxcpp::schedulers;
-namespace rxsub = rxcpp::subjects;
-
 #include <RakPeerInterface.h>
 #include <BitStream.h>
 #include <PacketPriority.h>

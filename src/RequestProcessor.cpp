@@ -135,7 +135,7 @@ namespace Stormancer
 	pplx::task<std::shared_ptr<Packet<>>> RequestProcessor::sendSystemRequest(IConnection* peer, byte msgId, std::function<void(bytestream*)> writer)
 	{
 		auto tce = new pplx::task_completion_event<std::shared_ptr<Packet<>>>();
-		auto observer = rx::make_observer<std::shared_ptr<Packet<>>>([tce](std::shared_ptr<Packet<>> p) {
+		auto observer = rxcpp::make_observer<std::shared_ptr<Packet<>>>([tce](std::shared_ptr<Packet<>> p) {
 			tce->set(p);
 		}, [tce](std::exception_ptr ex) {
 			tce->set_exception(ex);

@@ -1,5 +1,4 @@
 #pragma once
-#include <sstream>
 #include "basic_bytebuf.h"
 
 namespace Stormancer

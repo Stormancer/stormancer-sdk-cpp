@@ -1,4 +1,9 @@
 #include "stormancer.h"
+#if defined(_WIN32)
+
+#else
+#include <unistd.h>
+#endif
 
 namespace Stormancer
 {
@@ -42,7 +47,7 @@ namespace Stormancer
 		auto startupResult = server->Startup(maxConnections, socketDescriptor, 1);
 		if (startupResult != RakNet::StartupResult::RAKNET_STARTED)
 		{
-			throw std::exception(Helpers::stringFormat("Couldn't start raknet peer : ", startupResult).c_str());
+			throw std::runtime_error(Helpers::stringFormat("Couldn't start raknet peer : ", startupResult).c_str());
 		}
 		server->SetMaximumIncomingConnections(maxConnections);
 
@@ -114,7 +119,11 @@ namespace Stormancer
 				}
 				}
 			}
+#if defined(_WIN32)
 			Sleep(0);
+#else
+			sleep(0);
+#endif
 		}
 		server->Shutdown(0);
 		_isRunning = false;

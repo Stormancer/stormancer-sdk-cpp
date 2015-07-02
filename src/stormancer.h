@@ -4,18 +4,6 @@
 
 #include "Action.h"
 
-#if defined(__cplusplus)
-#if !defined(_STD)
-#define _STD_BEGIN	namespace std {
-#define _STD_END		}
-#define _STD	::std::
-namespace std
-{
-	extern __declspec(dllimport) const streamoff _BADOFF;
-};
-#endif
-#endif
-
 #include "basic_bytebuf.h"
 #include "basic_bytestream.h"
 
