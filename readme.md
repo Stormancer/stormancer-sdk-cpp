@@ -57,3 +57,14 @@ stormancer-sdk-cpp_Win32_Debug.lib
 - Build the project.  
 
 *Add the NuGet packages mentioned above if Visual Studio don't get it automatically when building the project*.  
+
+## Generate the docs
+
+- switch to master branch  
+- Get the last version of the stormancer sdk  
+- Get doxygen here : www.doxygen.org  
+- Install and open doxygen  
+- Open the configuration file in ./documentation/Doxyfile  
+- Generate the documentation  
+- Merge the master branch in the gh-pages branch  
+- Push the master and gh-pages branches in the github repositotry  
