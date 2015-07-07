@@ -31,6 +31,14 @@ namespace Stormancer
 	}
 
 	template<typename T>
+	std::string to_string(T& t)
+	{
+		std::stringstream ss;
+		ss << t;
+		return ss.str();
+	}
+
+	template<typename T>
 	bytestream& operator<<(bytestream& bs, T& data)
 	{
 #ifdef _IS_BIG_ENDIAN
@@ -113,8 +121,6 @@ namespace Stormancer
 
 #pragma endregion
 
-	namespace Helpers
-	{
 #pragma region map
 
 		anyMap stringMapToAnyMap(stringMap& sm);
@@ -242,6 +248,7 @@ namespace Stormancer
 		std::string STORMANCER_DLL_API nowStr(const char* format);
 		std::string STORMANCER_DLL_API nowDateStr(bool local = false);
 		std::string STORMANCER_DLL_API nowTimeStr(bool local = false);
+		void writetime(std::ostream &os, std::time_t tc, const char* format); // alternative to std::put_time (not in libstdc++4.9)
 
 #pragma endregion
 
@@ -264,5 +271,4 @@ namespace Stormancer
 		}
 
 #pragma endregion
-	};
 };

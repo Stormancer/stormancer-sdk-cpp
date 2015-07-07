@@ -30,7 +30,7 @@ namespace Stormancer
 			while (!processed && count < 40) // Max 40 layers
 			{
 				*(packet->stream) >> msgType;
-				if (Helpers::mapContains(this->_handlers, msgType))
+				if (mapContains(this->_handlers, msgType))
 				{
 					handlerFunction* handler = this->_handlers[msgType];
 					processed = (*handler)(packet);
@@ -53,7 +53,7 @@ namespace Stormancer
 
 			if (!processed)
 			{
-				throw std::runtime_error(Helpers::stringFormat("Couldn't process message. msgId: ", msgType));
+				throw std::runtime_error(stringFormat("Couldn't process message. msgId: ", msgType));
 			}
 		});
 	}

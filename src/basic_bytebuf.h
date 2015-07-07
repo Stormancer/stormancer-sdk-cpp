@@ -1,22 +1,18 @@
 #pragma once
-
-#if defined(__cplusplus)
-#if !defined(_STD)
-#define _STD_BEGIN	namespace std {
-#define _STD_END	}
-#define _STD		::std::
-namespace std
-{
-	extern __declspec(dllimport) const streamoff _BADOFF;
-};
-#endif
-#endif
+#include <sstream>
 
 namespace Stormancer
 {
 	namespace Streams
 	{
 		using namespace std;
+
+#if defined(__cplusplus)
+#if !defined(_STD)
+#define _STD ::std::
+		const streamoff _BADOFF = 0;
+#endif
+#endif
 
 		// TEMPLATE CLASS basic_bytebuf
 		/// Byte array buffer.
@@ -40,18 +36,18 @@ namespace Stormancer
 
 			explicit basic_bytebuf(const _Mystr& _Str,
 				ios_base::openmode _Mode = ios_base::in | ios_base::out)
-			{	// construct character buffer from byte array, mode
+			{	// construct character buffer from string, mode
 				_Init(_Str.c_str(), _Str.size(), _Getstate(_Mode));
 			}
 
 			basic_bytebuf(_Myt&& _Right)
 			{	// construct by moving _Right
-				_Assign_rv(_STD forward<_Myt>(_Right));
+				_Assign_rv(::std::forward<_Myt>(_Right));
 			}
 
 			_Myt& operator=(_Myt&& _Right)
 			{	// assign from _Right
-				_Assign_rv(_STD forward<_Myt>(_Right));
+				_Assign_rv(::std::forward<_Myt>(_Right));
 				return (*this);
 			}
 
@@ -69,8 +65,8 @@ namespace Stormancer
 				if (this != &_Right)
 				{	// different, worth swapping
 					_Mysb::swap(_Right);
-					_STD swap(_Seekhigh, _Right._Seekhigh);
-					_STD swap(_Mystate, _Right._Mystate);
+					::std::swap(_Seekhigh, _Right._Seekhigh);
+					::std::swap(_Mystate, _Right._Mystate);
 					_Swap_adl(_Al, _Right._Al);
 				}
 			}
@@ -78,7 +74,7 @@ namespace Stormancer
 			basic_bytebuf(const _Myt&) = delete;
 			_Myt& operator=(const _Myt&) = delete;
 
-			virtual ~basic_bytebuf() _NOEXCEPT
+			virtual ~basic_bytebuf() throw()
 			{	// destroy the object
 				_Tidy();
 			}
@@ -98,27 +94,27 @@ namespace Stormancer
 			typedef typename _Traits::off_type off_type;
 
 			_Mystr str() const
-			{	// return byte array copy of character array
+			{	// return string copy of character array
 				if (!(_Mystate & _Constant) && _Mysb::pptr() != 0)
-				{	// writable, make byte array from write buffer
+				{	// writable, make string from write buffer
 					_Mystr _Str(_Mysb::pbase(), (_Seekhigh < _Mysb::pptr()
 						? _Mysb::pptr() : _Seekhigh) - _Mysb::pbase());
 					return (_Str);
 				}
 				else if (!(_Mystate & _Noread) && _Mysb::gptr() != 0)
-				{	// readable, make byte array from read buffer
+				{	// readable, make string from read buffer
 					_Mystr _Str(_Mysb::eback(), _Mysb::egptr() - _Mysb::eback());
 					return (_Str);
 				}
 				else
-				{	// inaccessible, return empty byte array
+				{	// inaccessible, return empty string
 					_Mystr _Nul;
 					return (_Nul);
 				}
 			}
 
 			void str(const _Mystr& _Newstr)
-			{	// replace character array from byte array
+			{	// replace character array from string
 				_Tidy();
 				_Init(_Newstr.c_str(), _Newstr.size(), _Mystate);
 			}
@@ -139,15 +135,18 @@ namespace Stormancer
 					return (_Traits::not_eof(_Meta));	// EOF, return success code
 
 				if (_Mystate & _Append
-					&& _Mysb::pptr() != 0)
+					&& _Mysb::pptr() != 0 && _Mysb::pptr() < _Seekhigh)
+				{
 					_Mysb::setp(_Mysb::pbase(), _Mysb::epptr());
+					_Mysb::pbump((int)(_Seekhigh - _Mysb::pbase()));
+				}
 
 				if (_Mysb::pptr() != 0
 					&& _Mysb::pptr() < _Mysb::epptr())
 				{	// room in buffer, store it
-					//*_Mysb::_Pninc() = _Traits::to_char_type(_Meta);
-					*_Mysb::pptr() = _Traits::to_char_type(_Meta);
 					_Mysb::pbump(1);
+					auto pptr = _Mysb::pptr() - 1;
+					*pptr = _Traits::to_char_type(_Meta);
 					return (_Meta);
 				}
 				else
@@ -183,8 +182,11 @@ namespace Stormancer
 					else
 					{	// not first growth, adjust pointers
 						_Seekhigh = _Newptr + (_Seekhigh - _Oldptr);
-						_Mysb::setp(_Newptr + (_Mysb::pbase() - _Oldptr),
-							_Newptr + _Newsize);
+						auto tmpfirst = _Newptr + (_Mysb::pbase() - _Oldptr);
+						auto tmpnext = _Newptr + (_Mysb::pptr() - _Oldptr);
+						auto tmplast = _Newptr + _Newsize;
+						_Mysb::setp(tmpfirst, tmplast);
+						_Mysb::pbump((int)(tmpnext - tmpfirst));
 						if (_Mystate & _Noread)
 							_Mysb::setg(_Newptr, 0, _Newptr);
 						else
@@ -197,9 +199,9 @@ namespace Stormancer
 						_Al.deallocate(_Oldptr, _Oldsize);
 					_Mystate |= _Allocated;
 
-					//*_Mysb::_Pninc() = _Traits::to_char_type(_Meta);
-					*_Mysb::pptr() = _Traits::to_char_type(_Meta);
 					_Mysb::pbump(1);
+					auto pptr = _Mysb::pptr() - 1;
+					*pptr = _Traits::to_char_type(_Meta);
 					return (_Meta);
 				}
 			}
@@ -260,8 +262,10 @@ namespace Stormancer
 					{	// change read position
 						_Mysb::gbump((int)(_Mysb::eback() - _Mysb::gptr() + _Off));
 						if (_Which & ios_base::out && _Mysb::pptr() != 0)
-							_Mysb::setp(_Mysb::pbase(), 
-							_Mysb::epptr());	// change write position to match
+						{
+							_Mysb::setp(_Mysb::pbase(), _Mysb::epptr());	// change write position to match
+							_Mysb::pbump((int)(_Mysb::gptr() - _Mysb::pbase()));
+						}
 					}
 					else
 						_Off = _BADOFF;
@@ -304,8 +308,10 @@ namespace Stormancer
 					{	// change read position
 						_Mysb::gbump((int)(_Mysb::eback() - _Mysb::gptr() + _Off));
 						if (_Mode & ios_base::out && _Mysb::pptr() != 0)
-							_Mysb::setp(_Mysb::pbase(),
-							_Mysb::epptr());	// change write position to match
+						{
+							_Mysb::setp(_Mysb::pbase(), _Mysb::epptr());	// change write position to match
+							_Mysb::pbump((int)(_Mysb::gptr() - _Mysb::pbase()));
+						}
 					}
 					else
 						_Off = _BADOFF;
@@ -340,6 +346,8 @@ namespace Stormancer
 					if (!(_Mystate & _Constant))
 					{	// setup write buffer, and maybe read buffer
 						_Mysb::setp(_Pnew, _Pnew + _Count);
+						if (_Mystate & (_Atend | _Append))
+							_Mysb::pbump((int)_Count);
 						if (_Mysb::gptr() == 0)
 							_Mysb::setg(_Pnew, 0, _Pnew);
 					}

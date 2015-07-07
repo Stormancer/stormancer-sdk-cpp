@@ -2,12 +2,12 @@
 
 namespace Stormancer
 {
-	bool Helpers::ensureSuccessStatusCode(int statusCode)
+	bool ensureSuccessStatusCode(int statusCode)
 	{
 		return (statusCode >= 200 && statusCode < 300);
 	}
 
-	anyMap Helpers::stringMapToAnyMap(stringMap& sm)
+	anyMap stringMapToAnyMap(stringMap& sm)
 	{
 		anyMap am;
 		for (auto it = sm.begin(); it != sm.end(); ++it)
@@ -17,7 +17,7 @@ namespace Stormancer
 		return am;
 	}
 
-	std::string Helpers::vectorJoin(std::vector<std::string>& vector, std::string glue)
+	std::string vectorJoin(std::vector<std::string>& vector, std::string glue)
 	{
 		std::stringstream ss;
 		for (size_t i = 0; i < vector.size(); ++i)
@@ -31,7 +31,7 @@ namespace Stormancer
 		return ss.str();
 	}
 
-	std::vector<std::wstring> Helpers::stringSplit(const std::wstring& str, const std::wstring separator)
+	std::vector<std::wstring> stringSplit(const std::wstring& str, const std::wstring separator)
 	{
 		std::vector<std::wstring> splitted;
 		size_t cursor = 0, lastCursor = 0;
@@ -45,7 +45,7 @@ namespace Stormancer
 		return splitted;
 	}
 
-	std::wstring Helpers::stringTrim(std::wstring& str, wchar_t ch)
+	std::wstring stringTrim(std::wstring& str, wchar_t ch)
 	{
 		std::function<int(int)> ischar = [ch](int c) -> int {
 			if (c == ch)
@@ -59,14 +59,14 @@ namespace Stormancer
 		return str;
 	};
 
-	pplx::task<void> Helpers::taskCompleted()
+	pplx::task<void> taskCompleted()
 	{
 		pplx::task_completion_event<void> tce;
 		tce.set();
 		return create_task(tce);
 	}
 
-	pplx::task<void> Helpers::taskIf(bool condition, std::function<pplx::task<void>()> action)
+	pplx::task<void> taskIf(bool condition, std::function<pplx::task<void>()> action)
 	{
 		if (condition)
 		{
@@ -78,48 +78,65 @@ namespace Stormancer
 		}
 	}
 
-	time_t Helpers::nowTime_t()
+	time_t nowTime_t()
 	{
 		return std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 	}
 
-	std::string Helpers::time_tToStr(time_t& time, bool local)
+	std::string time_tToStr(time_t& time, bool local)
 	{
 		return time_tToStr(time, (local ? "%x %X" : "%Y-%m-%dT%H:%M:%SZ"));
 	}
 
-	std::string Helpers::time_tToStr(time_t& time, const char* format)
+	std::string time_tToStr(time_t& time, const char* format)
 	{
+		std::stringstream ss;
+#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
 		struct tm timeinfo;
+		localtime_s(&timeinfo, &time);
+		ss << std::put_time((tm*)&timeinfo, format);
+#else
+//		struct tm timeinfo;
+//		localtime_r(&time, &timeinfo); // POSIX
+//		ss << std::put_time((tm*)&timeinfo, format); // put_time not implemented in libstdc++4.9
+		writetime(ss, time, format);
+#endif
+		return ss.str();
+	}
+
+	void writetime(std::ostream &os, std::time_t time, const char* format)
+	{
+		std::locale loc;
+		struct tm timeinfo;
+		const std::time_put<char>& tmput = std::use_facet<std::time_put<char>>(loc);
+		//std::tm* now = std::localtime(&time);
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
 		localtime_s(&timeinfo, &time);
 #else
 		localtime_r(&time, &timeinfo); // POSIX
 #endif
-		std::stringstream ss;
-		ss << std::put_time((tm*)&timeinfo, format);
-		return ss.str();
+		tmput.put(os, os, ' ', &timeinfo, format, format + strlen(format));
 	}
 
-	std::string Helpers::nowStr(bool local)
+	std::string nowStr(bool local)
 	{
 		time_t now = nowTime_t();
 		return time_tToStr(now, local);
 	}
 
-	std::string Helpers::nowStr(const char* format)
+	std::string nowStr(const char* format)
 	{
 		time_t now = nowTime_t();
 		return time_tToStr(now, format);
 	}
 
-	std::string Helpers::nowDateStr(bool local)
+	std::string nowDateStr(bool local)
 	{
 		time_t now = nowTime_t();
 		return time_tToStr(now, "%Y-%m-%d");
 	}
 
-	std::string Helpers::nowTimeStr(bool local)
+	std::string nowTimeStr(bool local)
 	{
 		time_t now = nowTime_t();
 		return time_tToStr(now, "%H:%M:%S");

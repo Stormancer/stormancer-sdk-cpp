@@ -3,7 +3,7 @@
 namespace Stormancer
 {
 	FileLogger::FileLogger()
-		: _fileName(Helpers::nowDateStr() + ".log"),
+		: _fileName(nowDateStr() + ".log"),
 		_myfile(_fileName, std::ofstream::out | std::ofstream::app)
 	{
 		tryOpenFile();

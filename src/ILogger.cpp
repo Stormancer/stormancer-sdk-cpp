@@ -32,7 +32,7 @@ namespace Stormancer
 	{
 		std::stringstream ss;
 
-		ss << '[' << Helpers::nowStr() << ']';
+		ss << '[' << nowStr() << ']';
 		ss << " [" << static_cast<int>(level) << ']';
 		if (category.length())
 		{
@@ -54,7 +54,7 @@ namespace Stormancer
 	{
 		std::stringstream ss;
 
-		ss << '[' << Helpers::nowStr() << ']';
+		ss << '[' << nowStr() << ']';
 		ss << " [exception]";
 		ss << ' ' << e.what();
 

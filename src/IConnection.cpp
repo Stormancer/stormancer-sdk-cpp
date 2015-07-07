@@ -3,7 +3,7 @@
 namespace Stormancer
 {
 	IConnection::IConnection()
-		: _connectionDate(Helpers::nowTime_t()),
+		: _connectionDate(nowTime_t()),
 		_state(ConnectionState::connecting)
 	{
 	}

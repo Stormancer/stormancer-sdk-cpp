@@ -13,8 +13,8 @@ namespace Stormancer
 	SceneEndpoint TokenHandler::decodeToken(std::string& token)
 	{
 		std::wstring wtoken(token.begin(), token.end());
-		wtoken = Helpers::stringTrim(wtoken, L'"');
-		std::wstring data = Helpers::stringSplit(wtoken, L"-")[0];
+		wtoken = stringTrim(wtoken, L'"');
+		std::wstring data = stringSplit(wtoken, L"-")[0];
 #if defined(_WIN32)
 		auto vectorData = utility::conversions::from_base64(data);
 #else

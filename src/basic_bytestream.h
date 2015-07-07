@@ -42,12 +42,12 @@ namespace Stormancer
 			basic_bytestream(_Myt&& _Right)
 				: _Mybase(&_Stringbuffer)
 			{	// construct by moving _Right
-				_Assign_rv(_STD forward<_Myt>(_Right));
+				_Assign_rv(::std::forward<_Myt>(_Right));
 			}
 
 			_Myt& operator=(_Myt&& _Right)
 			{	// move from _Right
-				_Assign_rv(_STD forward<_Myt>(_Right));
+				_Assign_rv(::std::forward<_Myt>(_Right));
 				return (*this);
 			}
 
@@ -72,7 +72,7 @@ namespace Stormancer
 			basic_bytestream(const _Myt&) = delete;
 			_Myt& operator=(const _Myt&) = delete;
 
-			virtual ~basic_bytestream() _NOEXCEPT
+			virtual ~basic_bytestream() throw()
 			{	// destroy the object
 			}
 

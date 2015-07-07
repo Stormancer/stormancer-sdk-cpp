@@ -9,7 +9,7 @@ namespace Stormancer
 		(*packet->stream) >> _requestId[0];
 		(*packet->stream) >> _requestId[1];
 
-		Helpers::streamCopy(packet->stream, _stream);
+		streamCopy(packet->stream, _stream);
 	}
 
 	RequestContext::~RequestContext()

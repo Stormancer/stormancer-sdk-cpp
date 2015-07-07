@@ -16,9 +16,9 @@ namespace Stormancer
 
 	void ScenePeer::send(std::string& routeName, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability)
 	{
-		if (!Helpers::mapContains(_routeMapping, routeName))
+		if (!mapContains(_routeMapping, routeName))
 		{
-			throw std::invalid_argument(Helpers::stringFormat("The routeName '", routeName, "' is not declared on the server."));
+			throw std::invalid_argument(stringFormat("The routeName '", routeName, "' is not declared on the server."));
 		}
 		Route& r = _routeMapping[routeName];
 		_connection->sendToScene(_sceneHandle, r._handle, writer, priority, reliability);

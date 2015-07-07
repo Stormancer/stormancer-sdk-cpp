@@ -131,26 +131,21 @@ namespace Stormancer
 	{
 		_logger->log(LogLevel::Trace, "", "Client::getScene", sceneId);
 
-		return Helpers::taskIf(_serverConnection == nullptr, [this, sep]() {
-			return Helpers::taskIf(!_transport->isRunning(), [this]() {
+		return taskIf(_serverConnection == nullptr, [this, sep]() {
+			return taskIf(!_transport->isRunning(), [this]() {
 				_cts = pplx::cancellation_token_source();
 				return _transport->start("client", new ConnectionHandler(), _cts.get_token(), 11, (uint16)(_maxPeers + 1));
 			}).then([this, sep]() {
 				std::string endpoint = sep.tokenData.Endpoints.at(_transport->name());
 				return _transport->connect(endpoint).then([this](IConnection* connection) {
 					_serverConnection = connection;
-
-					for (auto& it : this->_metadata)
-					{
-						_serverConnection->metadata[it.first] = it.second;
-					}
+					_serverConnection->metadata = this->_metadata;
 				});
 			});
 		}).then([this, sep]() {
 			SceneInfosRequestDto parameter;
 			parameter.Metadata = _serverConnection->metadata;
 			parameter.Token = sep.token;
-
 			return sendSystemRequest<SceneInfosRequestDto, SceneInfosDto>((byte)MessageIDTypes::ID_GET_SCENE_INFOS, parameter);
 		}).then([this, sep, sceneId](SceneInfosDto result) {
 			this->_serverConnection->metadata["serializer"] = result.SelectedSerializer;

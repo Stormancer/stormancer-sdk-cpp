@@ -58,7 +58,7 @@ namespace Stormancer
 			uint16 id;
 			*(p->stream) >> id;
 
-			if (Helpers::mapContains(this->_pendingRequests, id))
+			if (mapContains(this->_pendingRequests, id))
 			{
 				auto request = this->_pendingRequests[id];
 				time(&request->lastRefresh);
@@ -85,7 +85,7 @@ namespace Stormancer
 
 			if (!hasValues)
 			{
-				if (Helpers::mapContains(this->_pendingRequests, id))
+				if (mapContains(this->_pendingRequests, id))
 				{
 					auto request = this->_pendingRequests[id];
 					p->request = request;
@@ -106,7 +106,7 @@ namespace Stormancer
 			uint16 id;
 			*(p->stream) >> id;
 
-			if (Helpers::mapContains(_pendingRequests, id))
+			if (mapContains(_pendingRequests, id))
 			{
 				p->request = _pendingRequests[id];
 
@@ -142,9 +142,9 @@ namespace Stormancer
 		});
 		auto request = reserveRequestSlot(observer.as_dynamic());
 
-		peer->sendSystem(msgId, [request, &writer](bytestream* bs) {
-			*bs << request->id;
-			writer(bs);
+		peer->sendSystem(msgId, [request, &writer](bytestream* stream) {
+			*stream << request->id;
+			writer(stream);
 		});
 
 		auto task = pplx::create_task(*tce);
@@ -163,7 +163,7 @@ namespace Stormancer
 		static uint16 id = 0;
 		while (id < 0xffff)
 		{
-			if (!Helpers::mapContains(_pendingRequests, id))
+			if (!mapContains(_pendingRequests, id))
 			{
 				std::shared_ptr<Request> request(new Request(std::move(observer)));
 				time(&request->lastRefresh);
@@ -179,7 +179,7 @@ namespace Stormancer
 
 	bool RequestProcessor::freeRequestSlot(uint16 requestId)
 	{
-		if (Helpers::mapContains(this->_pendingRequests, requestId))
+		if (mapContains(this->_pendingRequests, requestId))
 		{
 			this->_pendingRequests.erase(requestId);
 			return true;

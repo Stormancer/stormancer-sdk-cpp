@@ -57,12 +57,12 @@ namespace Stormancer
 
 	std::vector<Route*> Scene::localRoutes()
 	{
-		return Helpers::mapValuesPtr(_localRoutesMap);
+		return mapValuesPtr(_localRoutesMap);
 	}
 
 	std::vector<Route*> Scene::remoteRoutes()
 	{
-		return Helpers::mapValuesPtr(_remoteRoutesMap);
+		return mapValuesPtr(_remoteRoutesMap);
 	}
 
 	void Scene::addRoute(std::string routeName, std::function<void(std::shared_ptr<Packet<IScenePeer>>)> handler, stringMap metadata)
@@ -77,7 +77,7 @@ namespace Stormancer
 			throw std::runtime_error("You cannot register handles once the scene is connected.");
 		}
 
-		if (!Helpers::mapContains(_localRoutesMap, routeName))
+		if (!mapContains(_localRoutesMap, routeName))
 		{
 			_localRoutesMap[routeName] = Route(this, routeName, metadata);
 		}
@@ -111,7 +111,7 @@ namespace Stormancer
 			throw std::runtime_error("You cannot register handles once the scene is connected.");
 		}
 
-		if (!Helpers::mapContains(_localRoutesMap, routeName))
+		if (!mapContains(_localRoutesMap, routeName))
 		{
 			_localRoutesMap[routeName] = Route(this, routeName);
 		}
@@ -131,9 +131,9 @@ namespace Stormancer
 			throw std::runtime_error("The scene must be connected to perform this operation.");
 		}
 
-		if (!Helpers::mapContains(_remoteRoutesMap, routeName))
+		if (!mapContains(_remoteRoutesMap, routeName))
 		{
-			throw std::invalid_argument(Helpers::stringFormat("The route '", routeName, "' doesn't exist on the scene.").c_str());
+			throw std::invalid_argument(stringFormat("The route '", routeName, "' doesn't exist on the scene.").c_str());
 		}
 		Route& route = _remoteRoutesMap[routeName];
 
@@ -145,7 +145,7 @@ namespace Stormancer
 		if (!_connected && !connectCalled)
 		{
 			connectCalled = true;
-			connectTask = _client->connectToScene(this, _token, Helpers::mapValuesPtr(_localRoutesMap));
+			connectTask = _client->connectToScene(this, _token, mapValuesPtr(_localRoutesMap));
 			connectTask.then([this]() {
 				this->_connected = true;
 			});
@@ -184,7 +184,7 @@ namespace Stormancer
 
 		packet->setMetadata("routeId", new uint16(routeId));
 
-		if (Helpers::mapContains(_handlers, routeId))
+		if (mapContains(_handlers, routeId))
 		{
 			auto observers = _handlers[routeId];
 			for (size_t i = 0; i < observers.size(); i++)

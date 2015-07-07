@@ -3,7 +3,7 @@
 namespace Stormancer
 {
 	RakNetConnection::RakNetConnection(RakNet::RakNetGUID guid, int64 id, RakNet::RakPeerInterface* peer, std::function<void(RakNetConnection*)>* lambdaOnRequestClose)
-		: _lastActivityDate(Helpers::nowTime_t()),
+		: _lastActivityDate(nowTime_t()),
 		_guid(guid),
 		_rakPeer(peer)
 	{
@@ -59,9 +59,7 @@ namespace Stormancer
 	{
 		sendRaw([msgId, &writer](bytestream* stream) {
 			*stream << msgId;
-			auto str1 = stream->str();
 			writer(stream);
-			auto str2 = stream->str();
 		}, PacketPriority::HIGH_PRIORITY, PacketReliability::RELIABLE_ORDERED, (uint8)0);
 	}
 

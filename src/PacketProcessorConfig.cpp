@@ -14,9 +14,9 @@ namespace Stormancer
 
 	void PacketProcessorConfig::addProcessor(byte msgId, handlerFunction* handler)
 	{
-		if (Helpers::mapContains(_handlers, msgId))
+		if (mapContains(_handlers, msgId))
 		{
-			throw std::invalid_argument(Helpers::stringFormat("An handler is already registered for id ", msgId, ".").c_str());
+			throw std::invalid_argument(stringFormat("An handler is already registered for id ", msgId, ".").c_str());
 		}
 		_handlers[msgId] = handler;
 	}

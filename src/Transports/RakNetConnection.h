@@ -55,7 +55,7 @@ namespace Stormancer
 		bool getComponent(T* component = nullptr)
 		{
 			size_t hash_code = typeid(T).hash_code();
-			if (Helpers::mapContains(_localData, hash_code))
+			if (mapContains(_localData, hash_code))
 			{
 				if (component != nullptr)
 				{
