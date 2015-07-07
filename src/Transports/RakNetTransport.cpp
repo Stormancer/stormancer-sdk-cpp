@@ -145,7 +145,8 @@ namespace Stormancer
 		auto infos = stringSplit(std::wstring(endpoint.begin(), endpoint.end()), L":");
 		std::string host(infos[0].begin(), infos[0].end());
 		auto hostCStr = host.c_str();
-		uint16 port = static_cast<uint16>(stoi(infos[1]));
+		std::string portStr(infos[1].begin(), infos[1].end());
+		uint16 port = (uint16)std::atoi(portStr.c_str());
 		_peer->Connect(hostCStr, port, nullptr, 0);
 
 		std::string addressStr(RakNet::SystemAddress(hostCStr, port).ToString());
