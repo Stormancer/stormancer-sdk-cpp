@@ -1,11 +1,16 @@
-## How to build raknet for android
+#Raknet for android
+The compiled lib is available in the libs/armeabi-v7a subdirectory.
+
+## How to build
+If you  want to rebuild raknet.
 
 ### Links
-- https://github.com/OculusVR/RakNet
+- Source : https://github.com/OculusVR/RakNet
 
-If you really want to rebuild raknet. Read the **Preparation** part here before continuing:  
+Read the **Preparation** part here before continuing:  
 https://github.com/Stormancer/stormancer-sdk-cpp/blob/master/android_samples/stormancer/README.md
 
+###On Windows
 Run a windows cmd and type:  
 ```
 cd c:\cygwin64\home\username\android-ndk-r10\samples\raknet\
