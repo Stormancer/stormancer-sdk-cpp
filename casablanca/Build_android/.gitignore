@@ -17,10 +17,17 @@ build/build.armv7.release/*
 build/build.armv7.release/Binaries/*
 !build/build.armv7.release/Binaries/libcpprest.a
 
-#!build/Boost-for-Android
-#build/Boost-for-Android/*
-#!build/Boost-for-Android/build
-#build/Boost-for-Android/build/*
-#!build/Boost-for-Android/build/lib
-#build/Boost-for-Android/build/lib/*
-#!build/Boost-for-Android/build/lib/libboost_atomic-clang-mt-d-1_55.a
+!build/Boost-for-Android
+build/Boost-for-Android/*
+!build/Boost-for-Android/build
+build/Boost-for-Android/build/*
+!build/Boost-for-Android/build/lib
+
+!build/openssl
+build/openssl/*
+!build/openssl/armeabi-v7a
+build/openssl/armeabi-v7a/*
+!build/openssl/armeabi-v7a/lib
+build/openssl/armeabi-v7a/lib/*
+!build/openssl/armeabi-v7a/lib/libssl.a
+!build/openssl/armeabi-v7a/lib/libcrypto.a
