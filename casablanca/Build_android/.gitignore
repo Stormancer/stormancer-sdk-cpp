@@ -23,6 +23,10 @@ build/Boost-for-Android/*
 build/Boost-for-Android/build/*
 !build/Boost-for-Android/build/lib
 
+!build/Boost-for-Android/boost_1_55_0
+build/Boost-for-Android/boost_1_55_0/*
+!build/Boost-for-Android/boost_1_55_0/boost
+
 !build/openssl
 build/openssl/*
 !build/openssl/armeabi-v7a
@@ -31,3 +35,7 @@ build/openssl/armeabi-v7a/*
 build/openssl/armeabi-v7a/lib/*
 !build/openssl/armeabi-v7a/lib/libssl.a
 !build/openssl/armeabi-v7a/lib/libcrypto.a
+
+!build/openssl/armeabi-v7a/include
+
+build/openssl/$(TARGET_ARCH_ABI)/include/openssl
