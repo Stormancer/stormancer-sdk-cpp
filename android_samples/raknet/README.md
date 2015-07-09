@@ -13,8 +13,8 @@ https://github.com/Stormancer/stormancer-sdk-cpp/blob/master/android_samples/sto
 ###On Windows
 Run a windows cmd and type:  
 ```
-cd c:\cygwin64\home\username\android-ndk-r10\samples\raknet\
-mklink /D src C:\Users\username\stormancer-sdk-cpp\RakNet\Source
+cd c:\cygwin64\home\<username>\android-ndk-r10\samples\raknet\
+mklink /D src C:\Users\<username>\stormancer-sdk-cpp\RakNet\Source
 ```
 
 Run cygwin64 and type:  
