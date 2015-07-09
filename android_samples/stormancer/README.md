@@ -20,11 +20,11 @@ Download and install cygwin64 and check this packages:
 
 Run a windows cmd and type:
 ```
-cd c:\cygwin64\home\username\android-ndk-r10\samples\stormancer\
-mklink /D src C:\Users\username\DEV\stormancer-sdk-cpp\
-mklink /D rxcpp C:\Users\username\DEV\RxCpp
-mklink /D casablanca C:\Users\username\DEV\casablanca
-mklink /D raknet C:\cygwin64\home\username\android-ndk-r10\samples\raknet
+cd c:\cygwin64\home\<username>\android-ndk-r10\samples\stormancer\
+mklink /D src C:\Users\<username>\stormancer-sdk-cpp\
+mklink /D rxcpp C:\Users\<username>\RxCpp
+mklink /D casablanca C:\Users\<username>\casablanca
+mklink /D raknet C:\cygwin64\home\<username>\android-ndk-r10\samples\raknet
 ```
 
 ### Build
