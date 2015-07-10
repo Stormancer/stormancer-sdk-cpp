@@ -19,5 +19,5 @@ Unzip *libcpprest.zip* in the same directory. Location: *casablanca/Build_androi
 Run cygwin64 and type:
 ```
 cd /cygdrive/c/Users/<username>/stormancer-sdk-cpp/android_samples/stormancersdkcpp/
-/cygdrive/c/cygwin64/home/antla/android-ndk-r10e/ndk-build
+/cygdrive/c/cygwin64/home/<username>/android-ndk-r10e/ndk-build
 ```
