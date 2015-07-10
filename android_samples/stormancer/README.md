@@ -19,5 +19,5 @@ Unzip the file in the same directory: casablanca/Build_android/build/build.armv7
 Run cygwin64 and type:
 ```
 cd /cygdrive/c/Users/<username>/stormancer-sdk-cpp/android_samples/stormancer/
-/cygdrive/c/cygwin64/home/antla/android-ndk-r10e/ndk-build
+/cygdrive/c/cygwin64/home/<username>/android-ndk-r10e/ndk-build
 ```
