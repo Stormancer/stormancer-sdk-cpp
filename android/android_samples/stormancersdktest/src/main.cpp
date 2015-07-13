@@ -5,7 +5,7 @@
 #include <android/log.h>
 #include <stormancer.h>
 
-#define APPNAME "StormancerSdkTest"
+#define APPNAME "stormancersdktest"
 
 /* 
 * replace com_example_whatever with your package name
@@ -26,6 +26,8 @@ extern "C"
     JNIEXPORT void JNICALL Java_com_stormancer_stormancertestsample_MainActivity_stormancerConnect(JNIEnv* env, jobject obj)
     {
 		std::srand(time(NULL));
+
+		sleep(10000);
 
 		__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Create config");
 		auto config = new Stormancer::Configuration("997bc6ac-9021-2ad6-139b-da63edee8c58", "base");

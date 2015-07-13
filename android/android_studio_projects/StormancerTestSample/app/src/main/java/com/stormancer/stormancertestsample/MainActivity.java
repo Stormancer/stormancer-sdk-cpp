@@ -3,6 +3,7 @@ package com.stormancer.stormancertestsample;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,8 +20,12 @@ public class MainActivity extends Activity {
             {
                 Log.d("stormancersdktest", "Connection etablished !");
             }
+            else
+            {
+                Log.d("stormancersdktest", "Waiting for connection...");
+            }
             ////// set the interval time here
-            handler.postDelayed(updateData,1000);
+            handler.postDelayed(updateData, 2000);
         }
     };
 
@@ -30,7 +35,19 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         Log.d("stormancersdktest", "Starting connection...");
-        stormancerConnect();
+        //stormancerConnect();
+        //SystemClock.sleep(10000);
+        //long st = System.currentTimeMillis();
+        //while (System.currentTimeMillis() - st < 10000) {
+        // DO NOTHING
+        //}
+        new Thread(new Runnable() {
+            public void run() {
+                //stormancerConnect();
+                SystemClock.sleep(10000);
+            }
+        }).start();
+        updateData.run();
     }
 
     @Override
