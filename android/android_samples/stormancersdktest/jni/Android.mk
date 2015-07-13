@@ -29,8 +29,8 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := stormancersdktest
 LOCAL_SHARED_LIBRARIES := raknet
 LOCAL_SHARED_LIBRARIES += stormancersdkcpp
-#LOCAL_C_INCLUDES += ../src
-LOCAL_SRC_FILES := ../src/main.cpp
+LOCAL_C_INCLUDES += ../src
+LOCAL_SRC_FILES := ../src/main.cpp ../src/AndroidLogger.cpp
 LOCAL_LDLIBS += -lm -llog
 LOCAL_CPP_EXTENSION += .cpp .cxx .cc .c
 include $(BUILD_SHARED_LIBRARY)

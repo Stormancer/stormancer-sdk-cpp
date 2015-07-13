@@ -1,11 +1,11 @@
 /* C++ Version */
 
+#define APPNAME "stormancersdktest"
+
 #include <string.h>
 #include <jni.h>
-#include <android/log.h>
 #include <stormancer.h>
-
-#define APPNAME "stormancersdktest"
+#include "AndroidLogger.h"
 
 /* 
 * replace com_example_whatever with your package name
@@ -19,6 +19,8 @@
 *
 */
 
+auto logger = (AndroidLogger*)Stormancer::ILogger::instance(new AndroidLogger(Stormancer::LogLevel::Trace));
+
 std::shared_ptr<Stormancer::Scene> scene = nullptr;
 
 extern "C"
@@ -27,52 +29,53 @@ extern "C"
     {
 		std::srand(time(NULL));
 
-		sleep(10000);
-
-		__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Create config");
+		logger->log("Create config");
 		auto config = new Stormancer::Configuration("997bc6ac-9021-2ad6-139b-da63edee8c58", "base");
-		__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Done");
-		__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Create client");
+		logger->log("Done");
+		logger->log("Create client");
 		auto client = new Stormancer::Client(config);
-		__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Done");
+		logger->log("Done");
 		//std::shared_ptr<Scene> scene = nullptr;
 
-		__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Get scene");
+		logger->log("Get scene");
 		auto task = client->getPublicScene("main").then([/*&scene*/](std::shared_ptr<Stormancer::Scene> sc) {
 			scene = sc;
-			__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Done");
+			logger->log("Done");
 			int nbMsgToSend = 10;
 			auto nbMsgReceived = new int(0);
 
-			__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Add route");
+			logger->log("Add route");
 			scene->addRoute("echo", [nbMsgToSend, nbMsgReceived](std::shared_ptr<Stormancer::Packet<Stormancer::IScenePeer>> p) {
 				Stormancer::int32 number1, number2, number3;
 				*p->stream >> number1 >> number2 >> number3;
-				__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Received message: [ %d ; %d ; %d ]", number1, number2, number3);
-
+				std::stringstream ss;
+				ss << "Received message: [ " << number1  << " ; " << number2 << " ; " << number3 << " ]";
+				logger->log(ss.str());
 				(*nbMsgReceived)++;
 				if (*nbMsgReceived == nbMsgToSend)
 				{
-					__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Done");
+					logger->log("Done");
 
-					__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Disconnect");
+					logger->log("Disconnect");
 					scene->disconnect().then([nbMsgReceived]() {
-						__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Done");
+						logger->log("Done");
 						delete nbMsgReceived;
 					});
 				}
 			});
-			__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Done");
+			logger->log("Done");
 
-			__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Connect to scene");
+			logger->log("Connect to scene");
 			return scene->connect().then([nbMsgToSend]() {
-				__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Done");
+				logger->log("Done");
 				for (int i = 0; i < nbMsgToSend; i++)
 				{
 					scene->sendPacket("echo", [](Stormancer::bytestream* stream) {
 						Stormancer::int32 number1(rand()), number2(rand()), number3(rand());
 						*stream << number1 << number2 << number3;
-						__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Sending message: [ %d ; %d ; %d ]", number1, number2, number3);
+						std::stringstream ss;
+						ss << "Sending message: [ " << number1  << " ; " << number2 << " ; " << number3 << " ]";
+						logger->log(ss.str());
 					});
 				}
 			});

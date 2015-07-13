@@ -11,7 +11,6 @@ import android.view.MenuItem;
 public class MainActivity extends Activity {
 
     Handler handler = new Handler();
-
     private Runnable updateData = new Runnable(){
         public void run() {
             //call the service here
@@ -25,7 +24,7 @@ public class MainActivity extends Activity {
                 Log.d("stormancersdktest", "Waiting for connection...");
             }
             ////// set the interval time here
-            handler.postDelayed(updateData, 2000);
+            handler.postDelayed(updateData, 1000);
         }
     };
 
@@ -35,19 +34,20 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         Log.d("stormancersdktest", "Starting connection...");
+        updateData.run();
         //stormancerConnect();
         //SystemClock.sleep(10000);
         //long st = System.currentTimeMillis();
         //while (System.currentTimeMillis() - st < 10000) {
-        // DO NOTHING
+            // DO NOTHING
         //}
         new Thread(new Runnable() {
             public void run() {
-                //stormancerConnect();
-                SystemClock.sleep(10000);
+                stormancerConnect();
             }
         }).start();
-        updateData.run();
+
+        Log.d("stormancersdktest", "continue :)");
     }
 
     @Override
