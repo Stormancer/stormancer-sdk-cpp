@@ -8,11 +8,11 @@ If you  want to rebuild raknet.
 - Source : https://github.com/OculusVR/RakNet
 
 Read the **Prerequisites** part here before continuing:  
-https://github.com/Stormancer/stormancer-sdk-cpp/blob/master/android_samples/stormancer
+https://github.com/Stormancer/stormancer-sdk-cpp/blob/master/android/android_samples/stormancer
 
 ###On Windows
 Run cygwin64 and type:  
 ```
-cd /cygdrive/c/Users/<username>/stormancer-sdk-cpp/android_samples/raknet/
+cd /cygdrive/c/Users/<username>/stormancer-sdk-cpp/android/android_samples/raknet/
 /cygdrive/c/cygwin64/home/antla/android-ndk-r10e/ndk-build
 ```
