@@ -46,11 +46,15 @@ namespace Stormancer
 			}
 			else if (key == "Expiration")
 			{
-				mapptr[i].val.convert(&Expiration);
+				int64 ExpirationTmp;
+				mapptr[i].val.convert(&ExpirationTmp);
+				Expiration = ExpirationTmp;
 			}
 			else if (key == "Issued")
 			{
-				mapptr[i].val.convert(&Issued);
+				int64 IssuedTmp;
+				mapptr[i].val.convert(&IssuedTmp);
+				Issued = IssuedTmp;
 			}
 			else if (key == "Routing" && !mapptr[i].val.is_nil())
 			{

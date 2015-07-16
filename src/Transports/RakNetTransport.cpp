@@ -66,6 +66,8 @@ namespace Stormancer
 				}
 
 				packetSystemAddressStr = rakNetPacket->systemAddress.ToString();
+				_logger->log(LogLevel::Info, "", "Raknet packet received", stringFormat(packetSystemAddressStr, " ", (int)rakNetPacket->data[0]));
+
 				switch (rakNetPacket->data[0])
 				{
 				case (byte)DefaultMessageIDTypes::ID_CONNECTION_REQUEST_ACCEPTED:
@@ -99,7 +101,14 @@ namespace Stormancer
 				}
 				case (byte)MessageIDTypes::ID_CONNECTION_RESULT:
 				{
-					onConnectionIdReceived(*((int64*)(rakNetPacket->data + 1)));
+					int64 sid = 0;
+					for (int i = 0; i < 8; i++)
+					{
+						sid = sid << 8;
+						sid += rakNetPacket->data[8 - i];
+					}
+					_logger->log(LogLevel::Debug, "RakNetTransport::run", "Connection ID received", stringFormat(sid));
+					onConnectionIdReceived(sid);
 					break;
 				}
 				case (byte)DefaultMessageIDTypes::ID_CONNECTION_ATTEMPT_FAILED:
@@ -187,8 +196,6 @@ namespace Stormancer
 
 	void RakNetTransport::onMessageReceived(RakNet::Packet* rakNetPacket)
 	{
-		_logger->log(LogLevel::Trace, "", stringFormat("Message with id ", (byte)rakNetPacket->data[0], " arrived."), "");
-
 		auto connection = getConnection(rakNetPacket->guid);
 		auto stream = new bytestream;
 		stream->rdbuf()->pubsetbuf((char*)rakNetPacket->data, rakNetPacket->length);

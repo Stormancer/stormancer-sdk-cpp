@@ -103,25 +103,38 @@ namespace Stormancer
 		}));
 
 		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_ERROR, new handlerFunction([this](std::shared_ptr<Packet<>> p) {
+			_logger->log(LogLevel::Trace, "RequestProcessor::registerProcessor::lambda", "ID_REQUEST_RESPONSE_ERROR", "");
 			uint16 id;
 			*(p->stream) >> id;
+			_logger->log(LogLevel::Trace, "RequestProcessor::registerProcessor::lambda", "R1", "");
 
 			if (mapContains(_pendingRequests, id))
 			{
 				p->request = _pendingRequests[id];
+				_logger->log(LogLevel::Trace, "RequestProcessor::registerProcessor::lambda", "R2", "");
 
 				std::string buf;
 				*p->stream >> buf;
+				std::stringstream ss;
+				for (int i = 0; i < buf.size(); i++)
+				{
+					ss << (int)(buf[i]) << ",";
+				}
+				_logger->log(LogLevel::Trace, "RequestProcessor::registerProcessor::lambda", "R3", stringFormat(buf, " ", ss.str()));
 				msgpack::unpacked result;
 				msgpack::unpack(result, buf.data(), buf.size());
+				_logger->log(LogLevel::Trace, "RequestProcessor::registerProcessor::lambda", "R4", "");
 				msgpack::object deserialized = result.get();
+				_logger->log(LogLevel::Trace, "RequestProcessor::registerProcessor::lambda", "R5", "");
 				std::string msg;
 				deserialized.convert(&msg);
+				_logger->log(LogLevel::Trace, "RequestProcessor::registerProcessor::lambda", "R6", "");
 
 				auto eptr = std::make_exception_ptr(new std::runtime_error(msg));
 				p->request->observer.on_error(eptr);
 
 				freeRequestSlot(id);
+				_logger->log(LogLevel::Trace, "RequestProcessor::registerProcessor::lambda", "R7", "");
 			}
 			else
 			{

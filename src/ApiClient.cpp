@@ -14,8 +14,6 @@ namespace Stormancer
 
 	pplx::task<SceneEndpoint> ApiClient::getSceneEndpoint(std::string accountId, std::string applicationName, std::string sceneId, std::string userData)
 	{
-		ILogger::instance()->log(LogLevel::Trace, "", "Client::getSceneEndpoint", stringFormat(accountId, " ", applicationName, " ", sceneId, " ", userData));
-
 		std::string baseUri = _config->getApiEndpoint();
 #if defined(_WIN32)
 		web::http::client::http_client client(std::wstring(baseUri.begin(), baseUri.end()));
@@ -37,12 +35,30 @@ namespace Stormancer
 		request.set_body(userData);
 #endif
 
-		return client.request(request).then([this, accountId, applicationName, sceneId](web::http::http_response response) {
+		ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", baseUri, relativeUri);
+
+		return client.request(request)
+			.then([](pplx::task<web::http::http_response> t) {
+			try
+			{
+				return t.get();
+			}
+			catch (web::http::http_exception& e)
+			{
+				std::stringstream ss;
+				auto ec = e.error_code();
+				ss << "http_exception: " << ec << " | " << ec.value() << " | " << ec.message() << " | " << e.what();
+				ILogger::instance()->log(ss.str());
+				throw e;
+			}
+		})
+			.then([this, accountId, applicationName, sceneId](web::http::http_response response) {
 			uint16 statusCode = response.status_code();
-			ILogger::instance()->log(LogLevel::Trace, "", "Client::getSceneEndpoint::client.request", "statusCode = " + to_string(statusCode));
+			ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", "client.request statusCode", to_string(statusCode));
 			auto ss = new concurrency::streams::stringstreambuf;
 			auto result = response.body().read_to_end(*ss).then([this, ss, statusCode, accountId, applicationName, sceneId](size_t size) {
 				std::string responseText = ss->collection();
+				ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", "responseText", responseText);
 				if (ensureSuccessStatusCode(statusCode))
 				{
 					return _tokenHandler->decodeToken(responseText);

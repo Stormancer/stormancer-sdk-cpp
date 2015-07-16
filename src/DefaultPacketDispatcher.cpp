@@ -23,6 +23,7 @@ namespace Stormancer
 
 	void DefaultPacketDispatcher::dispatchPacket(std::shared_ptr<Packet<>> packet)
 	{
+
 		pplx::create_task([this, packet]() {
 			bool processed = false;
 			int count = 0;

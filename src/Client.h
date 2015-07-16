@@ -108,11 +108,14 @@ namespace Stormancer
 		template<typename T1, typename T2>
 		pplx::task<T2> sendSystemRequest(byte id, T1& parameter)
 		{
+			_logger->log(LogLevel::Trace, "Client::sendSystemRequest", "", stringFormat(id));
 			return _requestProcessor->sendSystemRequest(_serverConnection, id, [this, &parameter](bytestream* stream) {
+				_logger->log(LogLevel::Trace, "Client::sendSystemRequest", "lambda called by _requestProcessor::sendSystemRequest", "");
 				// serialize request dto
 				msgpack::pack(stream, parameter);
 				auto res = stream->str();
 			}).then([this](std::shared_ptr<Packet<>> packet) {
+				_logger->log(LogLevel::Trace, "Client::sendSystemRequest", "systemRequest response", "");
 				// deserialize result dto
 				std::string buffer;
 				*packet->stream >> buffer;

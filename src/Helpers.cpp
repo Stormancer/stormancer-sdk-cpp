@@ -141,59 +141,60 @@ namespace Stormancer
 		time_t now = nowTime_t();
 		return time_tToStr(now, "%H:%M:%S");
 	}
-
-	bytestream& operator<<(bytestream& bs, const char* data)
-	{
-		bs.write((char*)data, strlen(data));
-		return bs;
-	}
-
-	bytestream& operator<<(bytestream& bs, const std::string& data)
-	{
-		return bs << data.c_str();
-	}
-
-	bytestream& operator<<(bytestream& bs, std::string& data)
-	{
-		return bs << data.c_str();
-	}
-
-	bytestream& operator<<(bytestream& bs, const wchar_t* data)
-	{
-		bs.write((char*)data, 2 * wcslen(data));
-		return bs;
-	}
-
-	bytestream& operator<<(bytestream& bs, const std::wstring& data)
-	{
-		return bs << data.c_str();
-	}
-
-	bytestream& operator<<(bytestream& bs, std::wstring& data)
-	{
-		return bs << data.c_str();
-	}
-
-	bytestream& operator>>(bytestream& bs, std::string& str)
-	{
-		uint32 len = (uint32)bs.rdbuf()->in_avail();
-		str.reserve(len);
-		char* data = new char[len];
-		bs.read(data, len);
-		str.assign(data, len);
-		delete[] data;
-		return bs;
-	}
-
-	bytestream& operator>>(bytestream& bs, std::wstring& str)
-	{
-		uint32 len = (uint32)bs.rdbuf()->in_avail();
-		uint32 nbChars = len / 2;
-		str.reserve(nbChars);
-		char* data = new char[len];
-		bs.read(data, len);
-		str.assign((wchar_t*)data, nbChars);
-		delete[] data;
-		return bs;
-	}
 };
+
+Stormancer::bytestream& operator<<(Stormancer::bytestream& bs, const char* data)
+{
+	bs.write((char*)data, strlen(data));
+	return bs;
+}
+
+Stormancer::bytestream& operator<<(Stormancer::bytestream& bs, const std::string& data)
+{
+	return bs << data.c_str();
+}
+
+Stormancer::bytestream& operator<<(Stormancer::bytestream& bs, std::string& data)
+{
+	return bs << data.c_str();
+}
+
+Stormancer::bytestream& operator<<(Stormancer::bytestream& bs, const wchar_t* data)
+{
+	bs.write((char*)data, 2 * wcslen(data));
+	return bs;
+}
+
+Stormancer::bytestream& operator<<(Stormancer::bytestream& bs, const std::wstring& data)
+{
+	return bs << data.c_str();
+}
+
+Stormancer::bytestream& operator<<(Stormancer::bytestream& bs, std::wstring& data)
+{
+	return bs << data.c_str();
+}
+#include "ILogger.h"
+Stormancer::bytestream& operator>>(Stormancer::bytestream& bs, std::string& str)
+{
+	Stormancer::uint32 len = (Stormancer::uint32)bs.rdbuf()->in_avail();
+	str.reserve(len);
+	char* data = new char[len];
+	bs.read(data, len);
+	str.assign(data, len);
+	delete[] data;
+	Stormancer::ILogger::instance()->log(Stormancer::stringFormat(">>>>>>>>>>", len));
+	return bs;
+}
+
+Stormancer::bytestream& operator>>(Stormancer::bytestream& bs, std::wstring& str)
+{
+	Stormancer::uint32 len = (Stormancer::uint32)bs.rdbuf()->in_avail();
+	Stormancer::uint32 nbChars = len / 2;
+	str.reserve(nbChars);
+	char* data = new char[len];
+	bs.read(data, len);
+	str.assign((wchar_t*)data, nbChars);
+	delete[] data;
+	return bs;
+}

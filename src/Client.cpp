@@ -120,7 +120,7 @@ namespace Stormancer
 
 	pplx::task<std::shared_ptr<Scene>> Client::getPublicScene(std::string sceneId, std::string userData)
 	{
-		_logger->log(LogLevel::Trace, "", "Client::getPublicScene", sceneId);
+		_logger->log(LogLevel::Trace, "Client::getPublicScene", sceneId, userData);
 
 		return _apiClient->getSceneEndpoint(_accountId, _applicationName, sceneId, userData).then([this, sceneId](SceneEndpoint sep) {
 			return this->getScene(sceneId, sep);
@@ -129,7 +129,7 @@ namespace Stormancer
 
 	pplx::task<std::shared_ptr<Scene>> Client::getScene(std::string sceneId, SceneEndpoint sep)
 	{
-		_logger->log(LogLevel::Trace, "", "Client::getScene", sceneId);
+		_logger->log(LogLevel::Trace, "Client::getScene", sceneId, sep.token);
 
 		return taskIf(_serverConnection == nullptr, [this, sep]() {
 			return taskIf(!_transport->isRunning(), [this]() {
@@ -137,7 +137,9 @@ namespace Stormancer
 				return _transport->start("client", new ConnectionHandler(), _cts.get_token(), 11, (uint16)(_maxPeers + 1));
 			}).then([this, sep]() {
 				std::string endpoint = sep.tokenData.Endpoints.at(_transport->name());
+				_logger->log(LogLevel::Trace, "Client::getScene", "Connecting transport", "");
 				return _transport->connect(endpoint).then([this](IConnection* connection) {
+					_logger->log(LogLevel::Trace, "Client::getScene", "Client::transport connected", "");
 					_serverConnection = connection;
 					_serverConnection->metadata = this->_metadata;
 				});
@@ -146,8 +148,10 @@ namespace Stormancer
 			SceneInfosRequestDto parameter;
 			parameter.Metadata = _serverConnection->metadata;
 			parameter.Token = sep.token;
+			_logger->log(LogLevel::Trace, "Client::getScene", "send SceneInfosRequestDto", "");
 			return sendSystemRequest<SceneInfosRequestDto, SceneInfosDto>((byte)MessageIDTypes::ID_GET_SCENE_INFOS, parameter);
 		}).then([this, sep, sceneId](SceneInfosDto result) {
+			_logger->log(LogLevel::Trace, "Client::getScene", "SceneInfosDto received", "");
 			this->_serverConnection->metadata["serializer"] = result.SelectedSerializer;
 			return std::shared_ptr<Scene>(new Scene(_serverConnection, this, sceneId, sep.token, result));
 		});

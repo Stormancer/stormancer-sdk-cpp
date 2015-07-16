@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.22815.1
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cpprestsdk140", "Release\src\build\vs14\casablanca140.vcxproj", "{1014C621-BC2D-4813-B8C1-6D83AD6F9249}"
 EndProject
@@ -49,16 +49,16 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cpprestsdk140.uwp", "Releas
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		Release\src\build\common.vcxitems*{3a584d9c-1a98-4046-b7d3-b7171ef42d34}*SharedItemsImports = 4
 		Release\src\build\win32.vcxitems*{3a584d9c-1a98-4046-b7d3-b7171ef42d34}*SharedItemsImports = 4
+		Release\src\build\common.vcxitems*{3a584d9c-1a98-4046-b7d3-b7171ef42d34}*SharedItemsImports = 4
 		Release\src\build\winrt.vcxitems*{0a9ba181-7876-4b3d-a5e0-ee673fa51c05}*SharedItemsImports = 9
 		Release\src\build\android.vcxitems*{65951c40-a332-4b54-89c2-7cdaf30d5f66}*SharedItemsImports = 9
-		Release\src\build\common.vcxitems*{1014c621-bc2d-4813-b8c1-6d83ad6f9249}*SharedItemsImports = 4
 		Release\src\build\win32.vcxitems*{1014c621-bc2d-4813-b8c1-6d83ad6f9249}*SharedItemsImports = 4
-		Release\src\build\common.vcxitems*{36d79e79-7e9e-4b3a-88a3-9f9b295c80b9}*SharedItemsImports = 4
+		Release\src\build\common.vcxitems*{1014c621-bc2d-4813-b8c1-6d83ad6f9249}*SharedItemsImports = 4
 		Release\src\build\winrt.vcxitems*{36d79e79-7e9e-4b3a-88a3-9f9b295c80b9}*SharedItemsImports = 4
-		Release\src\build\common.vcxitems*{afb49019-965b-4c10-baff-c86c16d58010}*SharedItemsImports = 4
+		Release\src\build\common.vcxitems*{36d79e79-7e9e-4b3a-88a3-9f9b295c80b9}*SharedItemsImports = 4
 		Release\src\build\android.vcxitems*{afb49019-965b-4c10-baff-c86c16d58010}*SharedItemsImports = 4
+		Release\src\build\common.vcxitems*{afb49019-965b-4c10-baff-c86c16d58010}*SharedItemsImports = 4
 		Release\src\build\win32.vcxitems*{f40f4804-50f9-4257-8d74-b9cbb19ac4c3}*SharedItemsImports = 9
 		Release\src\build\other.vcxitems*{3d5908f7-7673-4229-bc46-2007a7af9cae}*SharedItemsImports = 9
 		Release\src\build\common.vcxitems*{594dcb5f-07e3-4084-a2ce-268611fa629f}*SharedItemsImports = 9
@@ -160,18 +160,14 @@ Global
 		{F03BEE03-BEFB-4B17-A774-D9C8246530D4}.Release|x86.Build.0 = Release|Win32
 		{AFB49019-965B-4C10-BAFF-C86C16D58010}.Debug|ARM.ActiveCfg = Debug|ARM
 		{AFB49019-965B-4C10-BAFF-C86C16D58010}.Debug|ARM.Build.0 = Debug|ARM
-		{AFB49019-965B-4C10-BAFF-C86C16D58010}.Debug|Win32.ActiveCfg = Debug|x86
-		{AFB49019-965B-4C10-BAFF-C86C16D58010}.Debug|Win32.Build.0 = Debug|x86
-		{AFB49019-965B-4C10-BAFF-C86C16D58010}.Debug|x64.ActiveCfg = Debug|x86
-		{AFB49019-965B-4C10-BAFF-C86C16D58010}.Debug|x86.ActiveCfg = Debug|x86
-		{AFB49019-965B-4C10-BAFF-C86C16D58010}.Debug|x86.Build.0 = Debug|x86
+		{AFB49019-965B-4C10-BAFF-C86C16D58010}.Debug|Win32.ActiveCfg = Debug|ARM
+		{AFB49019-965B-4C10-BAFF-C86C16D58010}.Debug|x64.ActiveCfg = Debug|ARM
+		{AFB49019-965B-4C10-BAFF-C86C16D58010}.Debug|x86.ActiveCfg = Debug|ARM
 		{AFB49019-965B-4C10-BAFF-C86C16D58010}.Release|ARM.ActiveCfg = Release|ARM
 		{AFB49019-965B-4C10-BAFF-C86C16D58010}.Release|ARM.Build.0 = Release|ARM
-		{AFB49019-965B-4C10-BAFF-C86C16D58010}.Release|Win32.ActiveCfg = Release|x86
-		{AFB49019-965B-4C10-BAFF-C86C16D58010}.Release|Win32.Build.0 = Release|x86
-		{AFB49019-965B-4C10-BAFF-C86C16D58010}.Release|x64.ActiveCfg = Release|x86
-		{AFB49019-965B-4C10-BAFF-C86C16D58010}.Release|x86.ActiveCfg = Release|x86
-		{AFB49019-965B-4C10-BAFF-C86C16D58010}.Release|x86.Build.0 = Release|x86
+		{AFB49019-965B-4C10-BAFF-C86C16D58010}.Release|Win32.ActiveCfg = Release|ARM
+		{AFB49019-965B-4C10-BAFF-C86C16D58010}.Release|x64.ActiveCfg = Release|ARM
+		{AFB49019-965B-4C10-BAFF-C86C16D58010}.Release|x86.ActiveCfg = Release|ARM
 		{3A584D9C-1A98-4046-B7D3-B7171EF42D34}.Debug|ARM.ActiveCfg = Debug|ARM
 		{3A584D9C-1A98-4046-B7D3-B7171EF42D34}.Debug|ARM.Build.0 = Debug|ARM
 		{3A584D9C-1A98-4046-B7D3-B7171EF42D34}.Debug|Win32.ActiveCfg = Debug|Win32

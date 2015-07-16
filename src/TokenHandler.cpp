@@ -30,6 +30,20 @@ namespace Stormancer
 		ConnectionData cData;
 		obj.convert(&cData);
 		token = std::string(wtoken.begin(), wtoken.end());
+
+		std::stringstream ss;
+		ss << cData.AccountId
+			<< " " << cData.Application
+			<< " " << cData.ContentType
+			<< " " << cData.DeploymentId
+			<< " " << cData.Endpoints.size()
+			<< " " << cData.Expiration
+			<< " " << cData.Issued
+			<< " " << cData.Routing
+			<< " " << cData.SceneId
+			<< " " << cData.UserData;
+		ILogger::instance()->log(LogLevel::Trace, "TokenHandler::decodeToken", "ConnectionData", ss.str());
+
 		return SceneEndpoint(token, cData);
 	}
 };

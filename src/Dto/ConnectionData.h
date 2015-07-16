@@ -23,8 +23,8 @@ namespace Stormancer
 		std::string ContentType;
 		std::string DeploymentId;
 		stringMap Endpoints;
-		time_t Expiration;
-		time_t Issued;
+		int64 Expiration;
+		int64 Issued;
 		std::string Routing;
 		std::string SceneId;
 		std::string UserData;

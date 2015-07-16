@@ -25,6 +25,18 @@ std::shared_ptr<Stormancer::Scene> scene = nullptr;
 
 extern "C"
 {
+	jint JNI_OnLoad(JavaVM* vm, void* reserved)
+	{
+		JNIEnv* env;
+		if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK)
+		{
+			return -1;
+		}
+
+		cpprest_init(vm);
+		return JNI_VERSION_1_6;
+	}
+
     JNIEXPORT void JNICALL Java_com_stormancer_stormancertestsample_MainActivity_stormancerConnect(JNIEnv* env, jobject obj)
     {
 		std::srand(time(NULL));
@@ -35,7 +47,6 @@ extern "C"
 		logger->log("Create client");
 		auto client = new Stormancer::Client(config);
 		logger->log("Done");
-		//std::shared_ptr<Scene> scene = nullptr;
 
 		logger->log("Get scene");
 		auto task = client->getPublicScene("main").then([/*&scene*/](std::shared_ptr<Stormancer::Scene> sc) {
@@ -46,11 +57,13 @@ extern "C"
 
 			logger->log("Add route");
 			scene->addRoute("echo", [nbMsgToSend, nbMsgReceived](std::shared_ptr<Stormancer::Packet<Stormancer::IScenePeer>> p) {
+				logger->log("Message received");
 				Stormancer::int32 number1, number2, number3;
-				*p->stream >> number1 >> number2 >> number3;
+				*p->stream >> number1 >> number2;// >> number3;
 				std::stringstream ss;
 				ss << "Received message: [ " << number1  << " ; " << number2 << " ; " << number3 << " ]";
 				logger->log(ss.str());
+
 				(*nbMsgReceived)++;
 				if (*nbMsgReceived == nbMsgToSend)
 				{
@@ -71,11 +84,19 @@ extern "C"
 				for (int i = 0; i < nbMsgToSend; i++)
 				{
 					scene->sendPacket("echo", [](Stormancer::bytestream* stream) {
+						logger->log("Send message");
 						Stormancer::int32 number1(rand()), number2(rand()), number3(rand());
-						*stream << number1 << number2 << number3;
+						*stream << number1 << number2;// << number3;
+
 						std::stringstream ss;
 						ss << "Sending message: [ " << number1  << " ; " << number2 << " ; " << number3 << " ]";
 						logger->log(ss.str());
+
+						Stormancer::bytestream bstest;
+						bstest << number1 << number2;// << number3;
+						bstest >> number1 >> number2;
+						logger->log(Stormancer::stringFormat("bstest ", number1, " ", number2, " ", number3));
+
 					});
 				}
 			});

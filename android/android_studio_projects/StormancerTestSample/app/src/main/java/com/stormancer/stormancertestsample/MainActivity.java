@@ -21,7 +21,7 @@ public class MainActivity extends Activity {
             }
             else
             {
-                Log.d("stormancersdktest", "Waiting for connection...");
+                //Log.d("stormancersdktest", "Waiting for connection...");
             }
             ////// set the interval time here
             handler.postDelayed(updateData, 1000);
@@ -35,17 +35,17 @@ public class MainActivity extends Activity {
 
         Log.d("stormancersdktest", "Starting connection...");
         updateData.run();
-        //stormancerConnect();
+        stormancerConnect();
         //SystemClock.sleep(10000);
         //long st = System.currentTimeMillis();
         //while (System.currentTimeMillis() - st < 10000) {
             // DO NOTHING
         //}
-        new Thread(new Runnable() {
-            public void run() {
-                stormancerConnect();
-            }
-        }).start();
+        //new Thread(new Runnable() {
+        //    public void run() {
+        //        stormancerConnect();
+        //    }
+        //}).start();
 
         Log.d("stormancersdktest", "continue :)");
     }
