@@ -104,7 +104,7 @@ namespace Stormancer
 					int64 sid = 0;
 					for (int i = 0; i < 8; i++)
 					{
-						sid = sid << 8;
+						sid <<= 8;
 						sid += rakNetPacket->data[8 - i];
 					}
 					_logger->log(LogLevel::Debug, "RakNetTransport::run", "Connection ID received", stringFormat(sid));
@@ -170,13 +170,14 @@ namespace Stormancer
 		std::string sysAddr(rakNetPacket->systemAddress.ToString());
 		_logger->log(LogLevel::Trace, "", stringFormat(sysAddr, " connected."), "");
 
-		auto c = createNewConnection(rakNetPacket->guid, server);
+		auto connection = createNewConnection(rakNetPacket->guid, server);
 		server->DeallocatePacket(rakNetPacket);
-		_handler->newConnection(c);
-		connectionOpened(dynamic_cast<IConnection*>(c));
+		_handler->newConnection(connection);
+		connectionOpened(dynamic_cast<IConnection*>(connection));
 
-		c->sendSystem((byte)MessageIDTypes::ID_CONNECTION_RESULT, [c](bytestream* stream) {
-			*stream << c->id();
+		connection->sendSystem((byte)MessageIDTypes::ID_CONNECTION_RESULT, [connection](bytestream* stream) {
+			int64 sid = connection->id();
+			*stream << sid;
 		});
 	}
 

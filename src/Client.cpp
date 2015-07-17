@@ -151,7 +151,13 @@ namespace Stormancer
 			_logger->log(LogLevel::Trace, "Client::getScene", "send SceneInfosRequestDto", "");
 			return sendSystemRequest<SceneInfosRequestDto, SceneInfosDto>((byte)MessageIDTypes::ID_GET_SCENE_INFOS, parameter);
 		}).then([this, sep, sceneId](SceneInfosDto result) {
-			_logger->log(LogLevel::Trace, "Client::getScene", "SceneInfosDto received", "");
+			std::stringstream ss;
+			ss << result.SceneId << " " << result.SelectedSerializer << " Routes:[";
+			for (int i = 0; i < result.Routes.size(); i++) ss << result.Routes.at(i).Handle << ":" << result.Routes.at(i).Name << ";";
+			ss << "] Metadata:[";
+			for (auto it : result.Metadata) ss << it.first << ":" << it.second << ";";
+			ss << "]";
+			_logger->log(LogLevel::Trace, "Client::getScene", "SceneInfosDto received", ss.str());
 			this->_serverConnection->metadata["serializer"] = result.SelectedSerializer;
 			return std::shared_ptr<Scene>(new Scene(_serverConnection, this, sceneId, sep.token, result));
 		});

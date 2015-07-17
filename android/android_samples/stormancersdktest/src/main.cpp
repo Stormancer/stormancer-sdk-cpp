@@ -57,9 +57,8 @@ extern "C"
 
 			logger->log("Add route");
 			scene->addRoute("echo", [nbMsgToSend, nbMsgReceived](std::shared_ptr<Stormancer::Packet<Stormancer::IScenePeer>> p) {
-				logger->log("Message received");
 				Stormancer::int32 number1, number2, number3;
-				*p->stream >> number1 >> number2;// >> number3;
+				*p->stream >> number1 >> number2 >> number3;
 				std::stringstream ss;
 				ss << "Received message: [ " << number1  << " ; " << number2 << " ; " << number3 << " ]";
 				logger->log(ss.str());
@@ -84,19 +83,12 @@ extern "C"
 				for (int i = 0; i < nbMsgToSend; i++)
 				{
 					scene->sendPacket("echo", [](Stormancer::bytestream* stream) {
-						logger->log("Send message");
 						Stormancer::int32 number1(rand()), number2(rand()), number3(rand());
-						*stream << number1 << number2;// << number3;
+						*stream << number1 << number2 << number3;
 
 						std::stringstream ss;
 						ss << "Sending message: [ " << number1  << " ; " << number2 << " ; " << number3 << " ]";
 						logger->log(ss.str());
-
-						Stormancer::bytestream bstest;
-						bstest << number1 << number2;// << number3;
-						bstest >> number1 >> number2;
-						logger->log(Stormancer::stringFormat("bstest ", number1, " ", number2, " ", number3));
-
 					});
 				}
 			});

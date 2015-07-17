@@ -42,7 +42,7 @@ namespace Stormancer
 	T* reverseByteOrder(T* data, size_t n = -1)
 	{
 		char* tmp = (char*)data;
-		std::reverse(tmp, tmp + (n >= 0 ? n : sizeof(T)));
+		std::reverse(tmp, tmp + (n < 0 ? sizeof(T) : n));
 		return data;
 	}
 
@@ -199,82 +199,3 @@ namespace Stormancer
 
 #pragma endregion
 };
-
-template<typename T>
-Stormancer::bytestream& operator<<(Stormancer::bytestream& bs, T& data)
-{
-#ifdef _IS_BIG_ENDIAN
-	T tmp(data);
-	reverseByteOrder(&tmp);
-	bs.write((char*)&tmp, sizeof(T));
-#else
-	bs.write((char*)&data, sizeof(T));
-#endif
-	return bs;
-}
-
-/// Write a c-string in a byte stream.
-/// \param bs The byte stream we want to write in.
-/// \param data The c-string to write.
-///	\return The byte stream.
-STORMANCER_DLL_API Stormancer::bytestream& operator<<(Stormancer::bytestream& bs, const char* data);
-
-/// Write a constant std::string in a byte stream.
-/// \param bs The byte stream we want to write in.
-/// \param data The std::string to write.
-/// \return The byte stream.
-STORMANCER_DLL_API Stormancer::bytestream& operator<<(Stormancer::bytestream& bs, const std::string& data);
-
-/// Write a c-string in a byte stream.
-/// \param bs The byte stream we want to write in.
-/// \param data The c-string to write.
-/// \return The byte stream.
-STORMANCER_DLL_API Stormancer::bytestream& operator<<(Stormancer::bytestream& bs, std::string& data);
-
-/// Write a wide c-string in a byte stream.
-/// \param bs The byte stream we want to write in.
-/// \param data The wide c-string to write.
-/// \return The byte stream.
-STORMANCER_DLL_API Stormancer::bytestream& operator<<(Stormancer::bytestream& bs, const wchar_t* data);
-
-/// Write a constant std::wstring in a byte stream.
-/// \param bs The byte stream we want to write in.
-/// \param data The std::wstring to write.
-/// \return The byte stream.
-STORMANCER_DLL_API Stormancer::bytestream& operator<<(Stormancer::bytestream& bs, const std::wstring& data);
-
-/// Write a std::wstring in a byte stream.
-/// \param bs The byte stream we want to write in.
-/// \param data The std::wstring to write.
-/// \return The byte stream.
-STORMANCER_DLL_API Stormancer::bytestream& operator<<(Stormancer::bytestream& bs, std::wstring& data);
-#include "ILogger.h"
-/// Template for reading any data type from the byte stream.
-/// \param bs The byte stream we want to read.
-/// \param data A ref to a variable for puting the read data.
-template<typename T>
-Stormancer::bytestream& operator>>(Stormancer::bytestream& bs, T& data)
-{
-	Stormancer::ILogger::instance()->log(Stormancer::stringFormat("#### Read ", sizeof(T)));
-	Stormancer::ILogger::instance()->log(Stormancer::stringFormat("#1"));
-	char* tmp = (char*)&data;
-	Stormancer::ILogger::instance()->log(Stormancer::stringFormat("#2"));
-	bs.read(tmp, sizeof(T));
-	Stormancer::ILogger::instance()->log(Stormancer::stringFormat("#3"));
-	//std::memcpy(tmp, data, sizeof(T)):
-#ifdef _IS_BIG_ENDIAN
-	reverseByteOrder(&data);
-#endif
-	Stormancer::ILogger::instance()->log(Stormancer::stringFormat("#4"));
-	return bs;
-}
-
-/// Read a std::string from a byte stream.
-/// \param bs The byte stream we want to read.
-/// \param data A ref to a std::string where we get the data.
-STORMANCER_DLL_API Stormancer::bytestream& operator>>(Stormancer::bytestream& bs, std::string& data);
-
-/// Read a std::wstring from a byte stream.
-/// \param bs The byte stream we want to read.
-/// \param data A ref to a std::wstring where we get the data.
-STORMANCER_DLL_API Stormancer::bytestream& operator>>(Stormancer::bytestream& bs, std::wstring& data);
