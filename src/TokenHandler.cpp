@@ -42,7 +42,7 @@ namespace Stormancer
 			<< " " << cData.Routing
 			<< " " << cData.SceneId
 			<< " " << cData.UserData;
-		ILogger::instance()->log(LogLevel::Trace, "TokenHandler::decodeToken", "ConnectionData", ss.str());
+		ILogger::instance()->log(LogLevel::Debug, "TokenHandler::decodeToken", "ConnectionData", ss.str());
 
 		return SceneEndpoint(token, cData);
 	}
