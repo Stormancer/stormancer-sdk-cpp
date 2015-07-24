@@ -10,20 +10,22 @@ http://stormancer.github.io/stormancer-sdk-cpp/documentation/html/annotated.html
 - RakNet *(pre-built for windows 32/64 bits)*  
 - MsgPack  
 
-### NuGet packages to install
-- C++ REST SDK (or cpprestsdk) (by searching casablanca)  
-- Reactive Extensions for C++ (or rxcpp)  
-
 ## Configure the samples
+For each sample, you have to do this:  
 - Change the **Environment path**  
-*(Configuration Properties > Debugging > Environment)*  
+*(Project properties > Configuration Properties > Debugging > Environment)*  
 ```
 PATH=$(SolutionDir)RakNet\Lib\DLL\Lib;$(SolutionDir)bin;%PATH%  
 ```
 
-## Configure a project
-
-- Build the SDK.  
+## Configure a project  
+*Don't forget to adapt the paths. We assume your project is in a project beside the stormancer-sdk-cpp.*  
+- Build the SDK and the samples before continuing.  
+You only need to restore the NuGet packages and set the envrionment path of the sdk and the sample projects to achieve this.  
+- Create / open your project.  
+- Install this NuGet packages:  
+    - C++ REST SDK (by searching casablanca or cpprestsdk)  
+    - Reactive Extensions for C++ (by searching rxcpp)  
 - Open the **project properties**  
 - Select **All Configurations** and **All Platforms** *(or your target platform)* on top of the property window.  
 - Change the **Environment path**  
@@ -34,8 +36,8 @@ PATH=$(SolutionDir)..\..\stormancer-sdk-cpp\RakNet\Lib\DLL\Lib;$(SolutionDir)..\
 - Change the **Additional include directories**  
 *(Configuration Properties > C/C++ > General > Additional include directories)*  
 ```
-$(SolutionDir)..\..\stormancer-sdk-cpp\include  
-$(SolutionDir)..\..\stormancer-sdk-cpp\MsgPack  
+$(SolutionDir)..\..\stormancer-sdk-cpp\src  
+$(SolutionDir)..\..\stormancer-sdk-cpp\msgpack-c\include  
 $(SolutionDir)..\..\stormancer-sdk-cpp\RakNet\Source  
 ```
 - Change the **Additional library directories**  
@@ -49,14 +51,11 @@ $(SolutionDir)..\..\stormancer-sdk-cpp\bin
 ```
 DLL_vc9_DLL_$(Configuration)_$(Platform).lib  
 ws2_32.lib  
-stormancer-sdk-cpp_Win32_Debug.lib  
+stormancer-sdk-cpp_$(Platform)_$(Configuration).lib  
 ```
-- If the project is in the Stormancer SDK solution. Add a reference.
-- If the project has its own solution. Reference manually the SDK to the project.
-- Add the *MsgPack/MsgPack.cpp* file of the SDK to the project.  
+- If the project is in the Stormancer SDK solution. You don't need to add `stormancer*.lib` in your *Additional dependendies*.  
+You only need to add a reference: *(Project properties > Common properties > References > Add New Reference... > stormancer-sdk-cpp)*  
 - Build the project.  
-
-*Add the NuGet packages mentioned above if Visual Studio don't get it automatically when building the project*.  
 
 ## Generate the docs
 
