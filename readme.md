@@ -53,8 +53,7 @@ DLL_vc9_DLL_$(Configuration)_$(Platform).lib
 ws2_32.lib  
 stormancer-sdk-cpp_$(Platform)_$(Configuration).lib  
 ```
-- If the project is in the Stormancer SDK solution. You don't need to add `stormancer*.lib` in your *Additional dependendies*.  
-You only need to add a reference: *(Project properties > Common properties > References > Add New Reference... > stormancer-sdk-cpp)*  
+- If you created your project directly in the Stormancer SDK solution. You don't need to add `stormancer*.lib` in your *Additional dependendies*. But you need to add a direct reference to the sdk: *(Project properties > Common properties > References > Add New Reference... > stormancer-sdk-cpp)*  
 - Build the project.  
 
 ## Generate the docs
