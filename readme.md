@@ -19,7 +19,7 @@ PATH=$(SolutionDir)RakNet\Lib\DLL\Lib;$(SolutionDir)bin;%PATH%
 ```
 
 ## Configure a project  
-*Don't forget to adapt the paths. We assume your project is in a project beside the stormancer-sdk-cpp.*  
+*Don't forget to adjust the paths. We assume your project is in a directory beside the stormancer-sdk-cpp.*  
 - Build the SDK and the samples before continuing.  
 You only need to restore the NuGet packages and set the envrionment path of the sdk and the sample projects to achieve this.  
 - Create / open your project.  
