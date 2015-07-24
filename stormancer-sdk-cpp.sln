@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "stormancer-sdk-cpp", "stormancer-sdk-cpp.vcxproj", "{597F12E7-04EF-4FCC-AC51-5EA9F3D542B4}"
 EndProject
@@ -13,8 +13,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Echo", "Samples\Echo\Echo.v
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Chat", "Samples\Chat\Chat.vcxproj", "{83ADE124-5C4E-473E-8691-B78899C89C80}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Msgpack-test", "..\Msgpack-test\Msgpack-test.vcxproj", "{AE824CFD-B4A6-4763-AF7B-8FBED48DC0E6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,12 +43,6 @@ Global
 		{83ADE124-5C4E-473E-8691-B78899C89C80}.Release|Win32.ActiveCfg = Release|Win32
 		{83ADE124-5C4E-473E-8691-B78899C89C80}.Release|Win32.Build.0 = Release|Win32
 		{83ADE124-5C4E-473E-8691-B78899C89C80}.Release|x64.ActiveCfg = Release|Win32
-		{AE824CFD-B4A6-4763-AF7B-8FBED48DC0E6}.Debug|Win32.ActiveCfg = Debug|Win32
-		{AE824CFD-B4A6-4763-AF7B-8FBED48DC0E6}.Debug|Win32.Build.0 = Debug|Win32
-		{AE824CFD-B4A6-4763-AF7B-8FBED48DC0E6}.Debug|x64.ActiveCfg = Debug|Win32
-		{AE824CFD-B4A6-4763-AF7B-8FBED48DC0E6}.Release|Win32.ActiveCfg = Release|Win32
-		{AE824CFD-B4A6-4763-AF7B-8FBED48DC0E6}.Release|Win32.Build.0 = Release|Win32
-		{AE824CFD-B4A6-4763-AF7B-8FBED48DC0E6}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -58,6 +50,5 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{72E8554F-47F1-4C29-AA8E-9D0C06873585} = {CAF00EAB-8E9D-442B-B086-7E59415F3AE7}
 		{83ADE124-5C4E-473E-8691-B78899C89C80} = {CAF00EAB-8E9D-442B-B086-7E59415F3AE7}
-		{AE824CFD-B4A6-4763-AF7B-8FBED48DC0E6} = {CAF00EAB-8E9D-442B-B086-7E59415F3AE7}
 	EndGlobalSection
 EndGlobal

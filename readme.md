@@ -31,20 +31,20 @@ You only need to restore the NuGet packages and set the envrionment path of the 
 - Change the **Environment path**  
 *(Configuration Properties > Debugging > Environment)*  
 ```
-PATH=$(SolutionDir)..\..\stormancer-sdk-cpp\RakNet\Lib\DLL\Lib;$(SolutionDir)..\..\stormancer-sdk-cpp\bin;%PATH%  
+PATH=$(SolutionDir)..\stormancer-sdk-cpp\RakNet\Lib\DLL\Lib;$(SolutionDir)..\stormancer-sdk-cpp\bin;%PATH%  
 ```
 - Change the **Additional include directories**  
 *(Configuration Properties > C/C++ > General > Additional include directories)*  
 ```
-$(SolutionDir)..\..\stormancer-sdk-cpp\src  
-$(SolutionDir)..\..\stormancer-sdk-cpp\msgpack-c\include  
-$(SolutionDir)..\..\stormancer-sdk-cpp\RakNet\Source  
+$(SolutionDir)..\stormancer-sdk-cpp\src  
+$(SolutionDir)..\stormancer-sdk-cpp\msgpack-c\include  
+$(SolutionDir)..\stormancer-sdk-cpp\RakNet\Source  
 ```
 - Change the **Additional library directories**  
 *(Configuration Properties > Linker > General > Additional library directories)*  
 ```
-$(SolutionDir)..\..\stormancer-sdk-cpp\RakNet\Lib\DLL\Lib  
-$(SolutionDir)..\..\stormancer-sdk-cpp\bin  
+$(SolutionDir)..\stormancer-sdk-cpp\RakNet\Lib\DLL\Lib  
+$(SolutionDir)..\stormancer-sdk-cpp\bin  
 ```
 - Change the **Additional dependencies**  
 *(Configuration Properties > Linker > Input > Additional dependencies)*  
