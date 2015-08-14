@@ -1,5 +1,4 @@
 #include "stormancer.h"
-#include "NullLogger.h"
 
 namespace Stormancer
 {

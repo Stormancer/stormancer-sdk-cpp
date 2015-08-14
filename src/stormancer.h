@@ -47,12 +47,11 @@
 #include "ITokenHandler.h"
 #include "TokenHandler.h"
 
-//#include "Plugins/IClientPlugin.h"
-//#include "Plugins/PluginBuildContext.h"
-//#include "Plugins/Request.h"
-//#include "Plugins/RpcClientPlugin.h"
-//#include "Plugins/RpcRequestContext.h"
-//#include "Plugins/RpcService.h"
+#include "Plugins/IClientPlugin.h"
+#include "Plugins/PluginBuildContext.h"
+#include "Plugins/RpcClientPlugin.h"
+#include "Plugins/RpcRequestContext.h"
+#include "Plugins/RpcService.h"
 
 #include "Transports/RakNetConnection.h"
 #include "Transports/RakNetTransport.h"

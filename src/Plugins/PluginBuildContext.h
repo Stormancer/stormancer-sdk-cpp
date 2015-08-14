@@ -11,14 +11,14 @@ namespace Stormancer
 		PluginBuildContext();
 		virtual ~PluginBuildContext();
 
-		vector<function<void(Scene&)>> sceneCreated;
+		Action<Scene*> sceneCreated;
 
-		vector<function<void(Client&)>> clientCreated;
+		Action<Client*> clientCreated;
 
-		vector<function<void(Scene&)>> sceneConnected;
+		Action<Scene*> sceneConnected;
 
-		vector<function<void(Scene&)>> sceneDisconnected;
+		Action<Scene*> sceneDisconnected;
 
-		vector<function<void(Packet2&)>> packetReceived;
+		Action<Packet<>*> packetReceived;
 	};
 };

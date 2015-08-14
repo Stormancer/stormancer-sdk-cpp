@@ -46,7 +46,8 @@ namespace Stormancer
 		_requestProcessor(new RequestProcessor(_logger, std::vector<IRequestModule*>())),
 		_scenesDispatcher(new SceneDispatcher),
 		_metadata(config->metadata),
-		_maxPeers(config->maxPeers)
+		_maxPeers(config->maxPeers),
+		_pluginCtx(new PluginBuildContext())
 	{
 		_dispatcher->addProcessor(_requestProcessor);
 		_dispatcher->addProcessor(_scenesDispatcher);
@@ -55,6 +56,13 @@ namespace Stormancer
 		_metadata["transport"] = _transport->name();
 		_metadata["version"] = "1.0.0";
 		_metadata["platform"] = "cpp";
+
+		for (auto plugin : config->plugins)
+		{
+			plugin->build(_pluginCtx);
+		}
+
+		_pluginCtx->clientCreated(this);
 
 		initialize();
 	}
@@ -159,7 +167,9 @@ namespace Stormancer
 			ss << "]";
 			_logger->log(LogLevel::Debug, "Client::getScene", "SceneInfosDto received", ss.str());
 			this->_serverConnection->metadata["serializer"] = result.SelectedSerializer;
-			return std::shared_ptr<Scene>(new Scene(_serverConnection, this, sceneId, sep.token, result));
+			auto scene = new scene(new Scene(_serverConnection, this, sceneId, sep.token, result));
+			this->_pluginCtx->sceneCreated(scene);
+			return std::make_shared(scene);
 		});
 	}
 
@@ -180,6 +190,7 @@ namespace Stormancer
 		return Client::sendSystemRequest<ConnectToSceneMsg, ConnectionResult>((byte)MessageIDTypes::ID_CONNECT_TO_SCENE, parameter).then([this, scene](ConnectionResult result) {
 			scene->completeConnectionInitialization(result);
 			this->_scenesDispatcher->addScene(scene);
+			this->_pluginCtx->sceneConnected(scene);
 		});
 	}
 
@@ -200,8 +211,9 @@ namespace Stormancer
 		DisconnectFromSceneDto dto(sceneHandle);
 		return sendSystemRequest<DisconnectFromSceneDto, EmptyDto>((byte)MessageIDTypes::ID_DISCONNECT_FROM_SCENE, dto)
 			.then([this, _scenesDispatcher, sceneHandle, scene](pplx::task<EmptyDto> t) {
-				_scenesDispatcher->removeScene(sceneHandle);
-			});
+			_scenesDispatcher->removeScene(sceneHandle);
+			this->_pluginCtx->SceneDisconnected(scene);
+		});
 	}
 
 	void Client::disconnectAllScenes()
@@ -217,8 +229,8 @@ namespace Stormancer
 
 	void Client::transport_packetReceived(std::shared_ptr<Packet<>> packet)
 	{
-		// TODO plugins
+		_pluginCtx->packetReceived(packet);
 
-		this->_dispatcher->dispatchPacket(packet);
+		this->_dispatcher->dispatchPacket(*packet);
 	}
 };

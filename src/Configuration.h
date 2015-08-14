@@ -2,6 +2,7 @@
 #include "headers.h"
 #include "ITransport.h"
 #include "IPacketDispatcher.h"
+#include "Plugins/IClientPlugin.h"
 
 namespace Stormancer
 {
@@ -28,7 +29,8 @@ namespace Stormancer
 		/// Get the Api endpoint.
 		std::string getApiEndpoint();
 
-		//void addPlugin(IClientPlugin* plugin);
+		/// Add a plugin in the configuration
+		void addPlugin(IClientPlugin* plugin);
 
 	public:
 
@@ -53,11 +55,12 @@ namespace Stormancer
 		/// Client metadatas.
 		stringMap metadata;
 
+		/// Plugins list
+		std::vector<IClientPlugin*> plugins;
+
 	private:
 		
 		/// Api endpoint.
 		std::string apiEndpoint = "https://api.stormancer.com/";
-		
-		//vector<IClientPlugin*> plugins;
 	};
 };

@@ -7,12 +7,23 @@ namespace Stormancer
 	class RpcService
 	{
 	public:
-		RpcService(Scene& scene);
+		struct PluginRequest
+		{
+			rxcpp::observer<Packet<IScenePeer>*> observer;
+			int receivedMsg;
+			pplx::task_completion_event<void> tce;
+		};
+
+	public:
+		RpcService(Scene* scene);
 		virtual ~RpcService();
 
 		// TODO
 
 	private:
-		const Scene& _scene;
+		uint16 _currentRequestId = 0;
+		std::mutex mutexForId;
+		std::map<uint16, Request*> _pendingRequests;
+		Scene* _scene;
 	};
 };

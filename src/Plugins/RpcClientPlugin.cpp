@@ -1,7 +1,4 @@
-
-#include "Plugins/RpcClientPlugin.h"
-#include "Helpers.h"
-#include "Plugins/RpcService.h"
+#include "stormancer.h"
 
 namespace Stormancer
 {
@@ -13,25 +10,27 @@ namespace Stormancer
 	{
 	}
 
-	void RpcClientPlugin::build(PluginBuildContext ctx)
+	void RpcClientPlugin::build(PluginBuildContext* ctx)
 	{
-		ctx.sceneCreated << [&](Scene& scene) {
-			auto rpcParams = scene.getHostMetadata(pluginName);
+		/*
+		ctx->sceneCreated += [&](Scene* scene) {
+			auto rpcParams = scene->getHostMetadata(pluginName);
 
 			if (rpcParams == version)
 			{
 				auto processor = RpcService(scene);
-				scene.registerComponent([]() { return processor; });
-				scene.addRoute(nextRouteName, [](Packet2 packet) {
+				scene->registerComponent([]() { return processor; });
+				scene->addRoute(nextRouteName, [](Packet<>* packet) {
 					processor.next(packet);
 				});
-				scene.addRoute(errorRouteName, [](Packet2 packet) {
+				scene->addRoute(errorRouteName, [](Packet<>* packet) {
 					processor.error(packet);
 				});
-				scene.addRoute(completedRouteName, [](Packet2 packet) {
+				scene->addRoute(completedRouteName, [](Packet<>* packet) {
 					processor.complete(packet);
 				});
 			}
 		};
+		*/
 	}
 };

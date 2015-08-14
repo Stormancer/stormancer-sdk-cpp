@@ -1,6 +1,7 @@
 #pragma once
 #include "headers.h"
 #include "Plugins/IClientPlugin.h"
+#include "Plugins/PluginBuildContext.h"
 
 namespace Stormancer
 {
@@ -10,14 +11,14 @@ namespace Stormancer
 		RpcClientPlugin();
 		virtual ~RpcClientPlugin();
 
-		void build(PluginBuildContext ctx);
+		void build(PluginBuildContext* ctx);
 
 	public:
-		const string nextRouteName = "stormancer.rpc.next";
-		const string errorRouteName = "stormancer.rpc.error";
-		const string completedRouteName = "stormancer.rpc.completed";
-		const string version = "1.0.0";
-		const string pluginName = "stormancer.plugins.rpc";
+		const std::string nextRouteName = "stormancer.rpc.next";
+		const std::string errorRouteName = "stormancer.rpc.error";
+		const std::string completedRouteName = "stormancer.rpc.completed";
+		const std::string version = "1.0.0";
+		const std::string pluginName = "stormancer.plugins.rpc";
 
 	private:
 

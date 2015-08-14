@@ -1,9 +1,8 @@
-
-#include "Plugins/RpcService.h"
+#include "stormancer.h"
 
 namespace Stormancer
 {
-	RpcService::RpcService(Scene& scene)
+	RpcService::RpcService(Scene* scene)
 		: _scene(scene)
 	{
 	}

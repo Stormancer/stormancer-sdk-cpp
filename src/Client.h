@@ -8,6 +8,7 @@
 #include "SceneDispatcher.h"
 #include "RequestProcessor.h"
 #include "IConnection.h"
+#include "Plugins/PluginBuildContext.h"
 
 namespace Stormancer
 {
@@ -129,7 +130,7 @@ namespace Stormancer
 		ILogger* _logger = nullptr;
 		std::string _accountId;
 		std::string _applicationName;
-		//const PluginBuildContext _pluginCtx;
+		PluginBuildContext* _pluginCtx = nullptr;
 		IConnection* _serverConnection = nullptr;
 		ITransport* _transport = nullptr;
 		ITokenHandler* _tokenHandler = nullptr;

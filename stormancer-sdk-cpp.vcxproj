@@ -245,6 +245,11 @@
     <ClInclude Include="src\NullLogger.h" />
     <ClInclude Include="src\Packet.h" />
     <ClInclude Include="src\PacketProcessorConfig.h" />
+    <ClInclude Include="src\Plugins\IClientPlugin.h" />
+    <ClInclude Include="src\Plugins\PluginBuildContext.h" />
+    <ClInclude Include="src\Plugins\RpcClientPlugin.h" />
+    <ClInclude Include="src\Plugins\RpcRequestContext.h" />
+    <ClInclude Include="src\Plugins\RpcService.h" />
     <ClInclude Include="src\Request.h" />
     <ClInclude Include="src\RequestContext.h" />
     <ClInclude Include="src\RequestModuleBuilder.h" />
@@ -288,6 +293,10 @@
     <ClCompile Include="src\ITransport.cpp" />
     <ClCompile Include="src\NullLogger.cpp" />
     <ClCompile Include="src\PacketProcessorConfig.cpp" />
+    <ClCompile Include="src\Plugins\IClientPlugin.cpp" />
+    <ClCompile Include="src\Plugins\PluginBuildContext.cpp" />
+    <ClCompile Include="src\Plugins\RpcClientPlugin.cpp" />
+    <ClCompile Include="src\Plugins\RpcService.cpp" />
     <ClCompile Include="src\Request.cpp" />
     <ClCompile Include="src\RequestContext.cpp" />
     <ClCompile Include="src\RequestModuleBuilder.cpp" />

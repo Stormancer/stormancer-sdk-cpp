@@ -1,5 +1,4 @@
-
-#include "Plugins/IClientPlugin.h"
+#include "stormancer.h"
 
 namespace Stormancer
 {

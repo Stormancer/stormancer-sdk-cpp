@@ -8,7 +8,7 @@ namespace Stormancer
 		dispatcher(new DefaultPacketDispatcher),
 		transport(new RakNetTransport(ILogger::instance()))
 	{
-		//plugins.push_back(new RpcClientPlugin());
+		plugins.push_back(new RpcClientPlugin());
 	}
 
 	Configuration::~Configuration()
@@ -20,8 +20,8 @@ namespace Stormancer
 		return (serverEndpoint.length() ? serverEndpoint : apiEndpoint);
 	}
 
-	/*void Configuration::addPlugin(IClientPlugin* plugin)
+	void Configuration::addPlugin(IClientPlugin* plugin)
 	{
 		plugins.push_back(plugin);
-	}*/
+	}
 };
