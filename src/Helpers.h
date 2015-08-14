@@ -150,9 +150,9 @@ namespace Stormancer
 
 #pragma region stream
 
-		bytestream* convertRakNetPacketToStream(RakNet::Packet* packet);
+		//bytestream* convertRakNetPacketToStream(RakNet::Packet* packet);
 
-		void deleteStringBuf(std::stringbuf* sb);
+		//void deleteStringBuf(std::stringbuf* sb);
 
 		template<typename T, typename U>
 		void streamCopy(T* fromStream, U* toStream)
@@ -163,6 +163,8 @@ namespace Stormancer
 			toStream->write(c, n);
 			delete[] c;
 		}
+
+		void readToEnd(bytestream* stream, char* data, std::streamsize* length);
 
 #pragma endregion
 

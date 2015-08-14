@@ -78,6 +78,13 @@ namespace Stormancer
 		}
 	}
 
+	void readToEnd(bytestream* stream, char* data, std::streamsize* length)
+	{
+		*length = stream->rdbuf()->in_avail();
+		data = new char[*length];
+		stream->read(data, *length);
+	}
+
 	time_t nowTime_t()
 	{
 		return std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
