@@ -164,19 +164,19 @@ namespace Stormancer
 			delete[] c;
 		}
 
-		void readToEnd(bytestream* stream, char* data, std::streamsize* length);
+		STORMANCER_DLL_API char* readToEnd(bytestream* stream, std::streamsize* length);
 
 #pragma endregion
 
 #pragma region time
 
-		time_t STORMANCER_DLL_API nowTime_t();
-		std::string STORMANCER_DLL_API time_tToStr(time_t& time, bool local = false);
-		std::string STORMANCER_DLL_API time_tToStr(time_t& time, const char* format);
-		std::string STORMANCER_DLL_API nowStr(bool local = false);
-		std::string STORMANCER_DLL_API nowStr(const char* format);
-		std::string STORMANCER_DLL_API nowDateStr(bool local = false);
-		std::string STORMANCER_DLL_API nowTimeStr(bool local = false);
+		STORMANCER_DLL_API time_t nowTime_t();
+		STORMANCER_DLL_API std::string time_tToStr(time_t& time, bool local = false);
+		STORMANCER_DLL_API std::string time_tToStr(time_t& time, const char* format);
+		STORMANCER_DLL_API std::string nowStr(bool local = false);
+		STORMANCER_DLL_API std::string nowStr(const char* format);
+		STORMANCER_DLL_API std::string nowDateStr(bool local = false);
+		STORMANCER_DLL_API std::string nowTimeStr(bool local = false);
 		void writetime(std::ostream &os, std::time_t tc, const char* format); // alternative to std::put_time (not in libstdc++4.9)
 
 #pragma endregion
