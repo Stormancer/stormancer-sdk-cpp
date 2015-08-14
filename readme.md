@@ -19,9 +19,9 @@ PATH=$(SolutionDir)RakNet\Lib\DLL\Lib;$(SolutionDir)bin;%PATH%
 ```
 
 ## Configure a project  
-*Don't forget to adapt the paths. We assume your project is in a project beside the stormancer-sdk-cpp.*  
+*Don't forget to adjust the paths. We assume your project is in a directory beside the stormancer-sdk-cpp.*  
 - Build the SDK and the samples before continuing.  
-You only need to restore the NuGet packages and set the envrionment path of the sdk and the sample projects to achieve this.  
+*You only need to restore the NuGet packages and set the envrionment path of the sdk and the sample projects to achieve this.*  
 - Create / open your project.  
 - Install this NuGet packages:  
     - C++ REST SDK (by searching casablanca or cpprestsdk)  
@@ -53,8 +53,7 @@ DLL_vc9_DLL_$(Configuration)_$(Platform).lib
 ws2_32.lib  
 stormancer-sdk-cpp_$(Platform)_$(Configuration).lib  
 ```
-- If the project is in the Stormancer SDK solution. You don't need to add `stormancer*.lib` in your *Additional dependendies*.  
-You only need to add a reference: *(Project properties > Common properties > References > Add New Reference... > stormancer-sdk-cpp)*  
+- If you created your project directly in the Stormancer SDK solution. You don't need to add `stormancer*.lib` in your *Additional dependendies*. But you need to add a direct reference to the sdk: *(Project properties > Common properties > References > Add New Reference... > stormancer-sdk-cpp)*  
 - Build the project.  
 
 ## Generate the docs
