@@ -1,7 +1,8 @@
 #pragma once
 #include "headers.h"
-#include "ITransport.h"
 #include "IPacketDispatcher.h"
+#include "DefaultScheduler.h"
+#include "Transports/RakNetTransport.h"
 
 namespace Stormancer
 {
@@ -44,19 +45,32 @@ namespace Stormancer
 		/// Gets or Sets the dispatcher to be used by the client.
 		IPacketDispatcher* dispatcher = nullptr;
 
-		/// Gets or sets the transport to be used by the client.
-		ITransport* transport = nullptr;
-
 		/// Maximum number of remote peers that can connect with this client.
 		uint16 maxPeers = 20;
 
 		/// Client metadatas.
 		stringMap metadata;
 
+		/// Enable or disable the asynchrounous dispatch of received messages. Enabled by default.
+		bool asynchronousDispatch = true;
+
+		/// The interval between successive ping requests, in milliseconds. Default is 5000 ms.
+		int32 pingInterval = 5000;
+
+		/// The scheduler used by the client to run the transport and other repeated tasks.
+		IScheduler* scheduler = new DefaultScheduler();
+
+		/// Gets or sets the transport to be used by the client.
+		std::function<ITransport*(std::map<std::string, void*>)> transportFactory;
+
 	private:
 		
-		/// Api endpoint.
 		std::string apiEndpoint = "https://api.stormancer.com/";
+
+		std::function<ITransport*(std::map<std::string, void*>)> defaultTransportFactory = [](std::map<std::string, void*> parameters)
+		{
+			return new RakNetTransport(static_cast<ILogger*>(parameters["ILogger"]), static_cast<IScheduler*>(parameters["IScheduler"]));
+		};
 		
 		//vector<IClientPlugin*> plugins;
 	};

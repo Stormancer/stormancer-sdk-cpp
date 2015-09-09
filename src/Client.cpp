@@ -37,16 +37,18 @@ namespace Stormancer
 	Client::Client(Configuration* config)
 		: _initialized(false),
 		_logger(ILogger::instance()),
+		_scheduler(config->scheduler),
 		_accountId(config->account),
 		_applicationName(config->application),
 		_tokenHandler(new TokenHandler()),
 		_apiClient(new ApiClient(config, _tokenHandler)),
-		_transport(config->transport),
+		_transport(config->transportFactory(std::map<std::string, void*>{ { "ILogger", (void*)_logger }, { "IScheduler", (void*)_scheduler } })),
 		_dispatcher(config->dispatcher),
 		_requestProcessor(new RequestProcessor(_logger, std::vector<IRequestModule*>())),
 		_scenesDispatcher(new SceneDispatcher),
 		_metadata(config->metadata),
-		_maxPeers(config->maxPeers)
+		_maxPeers(config->maxPeers),
+		_pingInterval(config->pingInterval)
 	{
 		_dispatcher->addProcessor(_requestProcessor);
 		_dispatcher->addProcessor(_scenesDispatcher);
@@ -90,9 +92,10 @@ namespace Stormancer
 		if (!_initialized)
 		{
 			_initialized = true;
-			_transport->packetReceived += new std::function<void(std::shared_ptr<Packet<>>)>(([this](std::shared_ptr<Packet<>> packet) {
+			_transport->packetReceived += std::function<void(std::shared_ptr<Packet<>>)>(([this](std::shared_ptr<Packet<>> packet) {
 				this->transport_packetReceived(packet);
 			}));
+			_watch.reset();
 		}
 	}
 
@@ -127,21 +130,33 @@ namespace Stormancer
 		});
 	}
 
+	pplx::task<std::shared_ptr<Scene>> Client::getScene(std::string token)
+	{
+		auto ci = _tokenHandler->decodeToken(token);
+		return getScene(ci.tokenData.SceneId, ci);
+	}
+
 	pplx::task<std::shared_ptr<Scene>> Client::getScene(std::string sceneId, SceneEndpoint sep)
 	{
 		_logger->log(LogLevel::Debug, "Client::getScene", sceneId, sep.token);
 
 		return taskIf(_serverConnection == nullptr, [this, sep]() {
-			return taskIf(!_transport->isRunning(), [this]() {
+			if (!_transport->isRunning()) {
 				_cts = pplx::cancellation_token_source();
-				return _transport->start("client", new ConnectionHandler(), _cts.get_token(), 11, (uint16)(_maxPeers + 1));
+				_transport->start("client", new ConnectionHandler(), _cts.get_token(), 10, (uint16)(_maxPeers + 1));
+			}
+			std::string endpoint = sep.tokenData.Endpoints.at(_transport->name());
+			_logger->log(LogLevel::Trace, "Client::getScene", "Connecting transport", "");
+			return _transport->connect(endpoint).then([this](IConnection* connection) {
+				_logger->log(LogLevel::Trace, "Client::getScene", "Client::transport connected", "");
+				_serverConnection = connection;
+				_serverConnection->metadata = _metadata;
 			}).then([this, sep]() {
-				std::string endpoint = sep.tokenData.Endpoints.at(_transport->name());
-				_logger->log(LogLevel::Trace, "Client::getScene", "Connecting transport", "");
-				return _transport->connect(endpoint).then([this](IConnection* connection) {
-					_logger->log(LogLevel::Trace, "Client::getScene", "Client::transport connected", "");
-					_serverConnection = connection;
-					_serverConnection->metadata = this->_metadata;
+				return updateServerMetadata().then([this, sep]() {
+					if (sep.tokenData.Version > 0)
+					{
+						startSyncClock();
+					}
 				});
 			});
 		}).then([this, sep]() {
@@ -149,7 +164,7 @@ namespace Stormancer
 			parameter.Metadata = _serverConnection->metadata;
 			parameter.Token = sep.token;
 			_logger->log(LogLevel::Debug, "Client::getScene", "send SceneInfosRequestDto", "");
-			return sendSystemRequest<SceneInfosRequestDto, SceneInfosDto>((byte)MessageIDTypes::ID_GET_SCENE_INFOS, parameter);
+			return sendSystemRequest<SceneInfosRequestDto, SceneInfosDto>((byte)SystemRequestIDTypes::ID_GET_SCENE_INFOS, parameter);
 		}).then([this, sep, sceneId](SceneInfosDto result) {
 			std::stringstream ss;
 			ss << result.SceneId << " " << result.SelectedSerializer << " Routes:[";
@@ -158,9 +173,16 @@ namespace Stormancer
 			for (auto it : result.Metadata) ss << it.first << ":" << it.second << ";";
 			ss << "]";
 			_logger->log(LogLevel::Debug, "Client::getScene", "SceneInfosDto received", ss.str());
-			this->_serverConnection->metadata["serializer"] = result.SelectedSerializer;
+			_serverConnection->metadata["serializer"] = result.SelectedSerializer;
 			return std::shared_ptr<Scene>(new Scene(_serverConnection, this, sceneId, sep.token, result));
 		});
+	}
+
+	pplx::task<void> Client::updateServerMetadata()
+	{
+		return _requestProcessor->sendSystemRequest(_serverConnection, (byte)SystemRequestIDTypes::ID_SET_METADATA, [this](bytestream* bs) {
+			msgpack::pack(bs, this->_serverConnection->metadata);
+		}).then([](std::shared_ptr<Packet<>> p) {});
 	}
 
 	pplx::task<void> Client::connectToScene(Scene* scene, std::string& token, std::vector<Route*> localRoutes)
@@ -177,7 +199,7 @@ namespace Stormancer
 		}
 		parameter.ConnectionMetadata = _serverConnection->metadata;
 
-		return Client::sendSystemRequest<ConnectToSceneMsg, ConnectionResult>((byte)MessageIDTypes::ID_CONNECT_TO_SCENE, parameter).then([this, scene](ConnectionResult result) {
+		return Client::sendSystemRequest<ConnectToSceneMsg, ConnectionResult>((byte)SystemRequestIDTypes::ID_CONNECT_TO_SCENE, parameter).then([this, scene](ConnectionResult result) {
 			scene->completeConnectionInitialization(result);
 			this->_scenesDispatcher->addScene(scene);
 		});
@@ -185,6 +207,8 @@ namespace Stormancer
 
 	void Client::disconnect()
 	{
+		stopSyncClock();
+
 		disconnectAllScenes();
 
 		if (_serverConnection != nullptr)
@@ -198,10 +222,10 @@ namespace Stormancer
 	{
 		auto _scenesDispatcher = this->_scenesDispatcher;
 		DisconnectFromSceneDto dto(sceneHandle);
-		return sendSystemRequest<DisconnectFromSceneDto, EmptyDto>((byte)MessageIDTypes::ID_DISCONNECT_FROM_SCENE, dto)
+		return sendSystemRequest<DisconnectFromSceneDto, EmptyDto>((byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, dto)
 			.then([this, _scenesDispatcher, sceneHandle, scene](pplx::task<EmptyDto> t) {
-				_scenesDispatcher->removeScene(sceneHandle);
-			});
+			_scenesDispatcher->removeScene(sceneHandle);
+		});
 	}
 
 	void Client::disconnectAllScenes()
@@ -220,5 +244,83 @@ namespace Stormancer
 		// TODO plugins
 
 		this->_dispatcher->dispatchPacket(packet);
+	}
+
+	int64 Client::clock()
+	{
+		return _watch.getElapsedTime() + _offset;
+	}
+
+	int64 Client::lastPing()
+	{
+		return _lastPing;
+	}
+
+	void Client::startSyncClock()
+	{
+		if (_scheduler)
+		{
+			Action<> action;
+			action += std::function<void()>([this]() {
+				this->syncClockImpl();
+			});
+			_syncClockSubscription = _scheduler->schedulePeriodic((int)_pingInterval, action);
+		}
+	}
+
+	void Client::stopSyncClock()
+	{
+		_syncClockSubscription.unsubscribe();
+	}
+
+	pplx::task<void> Client::syncClockImpl()
+	{
+		try
+		{
+			int64 tStart = _watch.getElapsedTime();
+			return _requestProcessor->sendSystemRequest(_serverConnection, (byte)SystemRequestIDTypes::ID_PING, [&tStart](bytestream* bs) {
+				*bs << tStart;
+			}, PacketPriority::IMMEDIATE_PRIORITY).then([this, tStart](std::shared_ptr<Packet<>> p) {
+				int64 tEnd = this->_watch.getElapsedTime();
+				uint64 tRef;
+				*p->stream >> tRef;
+				this->_lastPing = tEnd - tStart;
+				this->_offset = (int64)tRef - this->_lastPing / 2 - tStart;
+			});
+		}
+		catch (std::exception e)
+		{
+			_logger->log(LogLevel::Error, "Client::syncClockImpl", "Failed to ping server.", "");
+			throw std::runtime_error("Failed to ping server.");
+		}
+	}
+
+	// Class Client::Clock
+	Client::Watch::Watch()
+	{
+		reset();
+	}
+
+	Client::Watch::~Watch()
+	{
+	}
+
+	void Client::Watch::reset()
+	{
+		_startTime = std::chrono::high_resolution_clock::now();
+	}
+
+	int64 Client::Watch::getElapsedTime()
+	{
+		auto now = std::chrono::high_resolution_clock::now();
+		auto dif = now - _startTime;
+		auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(dif);
+		return ms.count() + _baseTime;
+	}
+
+	void Client::Watch::setBaseTime(int64 baseTime)
+	{
+		reset();
+		_baseTime = baseTime;
 	}
 };

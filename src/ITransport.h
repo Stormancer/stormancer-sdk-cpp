@@ -14,7 +14,7 @@ namespace Stormancer
 		ITransport();
 		virtual ~ITransport();
 
-		virtual pplx::task<void> start(std::string name, IConnectionManager* handler, pplx::cancellation_token token, uint16 port = 0, uint16 maxConnections = 0) = 0;
+		virtual void start(std::string name, IConnectionManager* handler, pplx::cancellation_token token, uint16 port = 0, uint16 maxConnections = 0) = 0;
 		virtual pplx::task<IConnection*> connect(std::string endpoint) = 0;
 		bool isRunning();
 		std::string name();

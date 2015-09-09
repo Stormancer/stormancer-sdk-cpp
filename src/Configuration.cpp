@@ -6,7 +6,7 @@ namespace Stormancer
 		: account(account),
 		application(application),
 		dispatcher(new DefaultPacketDispatcher),
-		transport(new RakNetTransport(ILogger::instance()))
+		transportFactory(defaultTransportFactory)
 	{
 		//plugins.push_back(new RpcClientPlugin());
 	}

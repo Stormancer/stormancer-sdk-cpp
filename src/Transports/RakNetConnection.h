@@ -12,7 +12,7 @@ namespace Stormancer
 	public:
 	
 		/// Constructor.
-		RakNetConnection(RakNet::RakNetGUID guid, int64 id, RakNet::RakPeerInterface* peer, std::function<void(RakNetConnection*)>* lambdaOnRequestClose);
+		RakNetConnection(RakNet::RakNetGUID guid, int64 id, RakNet::RakPeerInterface* peer, std::function<void(RakNetConnection*)> lambdaOnRequestClose);
 		
 		/// Destructor.
 		virtual ~RakNetConnection();
@@ -37,12 +37,16 @@ namespace Stormancer
 		/// Returns the metadatas
 		stringMap metadata();
 		
-		
 		void close();
-		void sendSystem(byte msgId, std::function<void(bytestream*)> writer);
+
+		void sendSystem(byte msgId, std::function<void(bytestream*)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY);
+
 		void sendRaw(std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability, char channel);
+
 		void sendToScene(byte sceneIndex, uint16 route, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability);
+
 		int ping();
+
 		void setApplication(std::string account, std::string application);
 
 		template<typename T>

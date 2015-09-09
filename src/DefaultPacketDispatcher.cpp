@@ -2,7 +2,8 @@
 
 namespace Stormancer
 {
-	DefaultPacketDispatcher::DefaultPacketDispatcher()
+	DefaultPacketDispatcher::DefaultPacketDispatcher(bool asyncDispatch)
+		: _asyncDispatch(asyncDispatch)
 	{
 	}
 
@@ -23,40 +24,51 @@ namespace Stormancer
 
 	void DefaultPacketDispatcher::dispatchPacket(std::shared_ptr<Packet<>> packet)
 	{
+		if (_asyncDispatch)
+		{
+			pplx::create_task([this, packet]() {
+				this->dispatchImpl(packet);
+			});
+		}
+		else
+		{
+			dispatchImpl(packet);
+		}
+	}
 
-		pplx::create_task([this, packet]() {
-			bool processed = false;
-			int count = 0;
-			byte msgType = 0;
-			while (!processed && count < 40) // Max 40 layers
+	void DefaultPacketDispatcher::dispatchImpl(std::shared_ptr<Packet<>> packet)
+	{
+		bool processed = false;
+		int count = 0;
+		byte msgType = 0;
+		while (!processed && count < 40) // Max 40 layers
+		{
+			*(packet->stream) >> msgType;
+			if (mapContains(this->_handlers, msgType))
 			{
-				*(packet->stream) >> msgType;
-				if (mapContains(this->_handlers, msgType))
-				{
-					handlerFunction* handler = this->_handlers[msgType];
-					processed = (*handler)(packet);
-					count++;
-				}
-				else
-				{
-					break;
-				}
+				handlerFunction* handler = this->_handlers[msgType];
+				processed = (*handler)(packet);
+				count++;
 			}
+			else
+			{
+				break;
+			}
+		}
 
-			for (auto processor : this->_defaultProcessors)
+		for (auto processor : this->_defaultProcessors)
+		{
+			if ((*processor)(msgType, packet))
 			{
-				if ((*processor)(msgType, packet))
-				{
-					processed = true;
-					break;
-				}
+				processed = true;
+				break;
 			}
+		}
 
-			if (!processed)
-			{
-				throw std::runtime_error(stringFormat("Couldn't process message. msgId: ", msgType));
-			}
-		});
+		if (!processed)
+		{
+			throw std::runtime_error(stringFormat("Couldn't process message. msgId: ", msgType));
+		}
 	}
 
 	void DefaultPacketDispatcher::addProcessor(IPacketProcessor* processor)

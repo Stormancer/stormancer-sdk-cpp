@@ -68,6 +68,10 @@ namespace Stormancer
 			{
 				mapptr[i].val.convert(&UserData);
 			}
+			else if (key == "Version")
+			{
+				mapptr[i].val.convert(&Version);
+			}
 		}
 	}
 }

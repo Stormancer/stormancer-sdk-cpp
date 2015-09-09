@@ -137,7 +137,7 @@ namespace Stormancer
 		}));
 	}
 
-	pplx::task<std::shared_ptr<Packet<>>> RequestProcessor::sendSystemRequest(IConnection* peer, byte msgId, std::function<void(bytestream*)> writer)
+	pplx::task<std::shared_ptr<Packet<>>> RequestProcessor::sendSystemRequest(IConnection* peer, byte msgId, std::function<void(bytestream*)> writer, PacketPriority priority)
 	{
 		auto tce = new pplx::task_completion_event<std::shared_ptr<Packet<>>>();
 		auto observer = rxcpp::make_observer<std::shared_ptr<Packet<>>>([tce](std::shared_ptr<Packet<>> p) {
@@ -150,7 +150,7 @@ namespace Stormancer
 		peer->sendSystem(msgId, [request, &writer](bytestream* stream) {
 			*stream << request->id;
 			writer(stream);
-		});
+		}, priority);
 
 		auto task = pplx::create_task(*tce);
 		task.then([tce](pplx::task<std::shared_ptr<Packet<>>> t) {
@@ -166,7 +166,8 @@ namespace Stormancer
 	std::shared_ptr<Request> RequestProcessor::reserveRequestSlot(PacketObserver&& observer)
 	{
 		static uint16 id = 0;
-		while (id < 0xffff)
+		int32 i = 0;
+		while (i <= 0xffff)
 		{
 			if (!mapContains(_pendingRequests, id))
 			{
@@ -177,6 +178,7 @@ namespace Stormancer
 				return request;
 			}
 			id++;
+			i++;
 		}
 		_logger->log(LogLevel::Error, "", "Unable to create a new request: Too many pending requests.", "");
 		throw std::overflow_error("Unable to create a new request: Too many pending requests.");

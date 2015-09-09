@@ -32,6 +32,7 @@
 #include "IScenePeer.h"
 #include "ITransport.h"
 #include "MessageIDTypes.h"
+#include "SystemRequestIDTypes.h"
 #include "Packet.h"
 #include "PacketProcessorConfig.h"
 #include "RequestContext.h"
@@ -46,6 +47,9 @@
 #include "IRequestModule.h"
 #include "ITokenHandler.h"
 #include "TokenHandler.h"
+#include "Subscription.h"
+#include "IScheduler.h"
+#include "DefaultScheduler.h"
 
 //#include "Plugins/IClientPlugin.h"
 //#include "Plugins/PluginBuildContext.h"

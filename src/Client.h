@@ -8,6 +8,7 @@
 #include "SceneDispatcher.h"
 #include "RequestProcessor.h"
 #include "IConnection.h"
+#include "IScheduler.h"
 
 namespace Stormancer
 {
@@ -16,6 +17,23 @@ namespace Stormancer
 	{
 		/// The scene need to access some private method of the client.
 		friend class Scene;
+
+	private:
+		class Watch
+		{
+		public:
+			Watch();
+			~Watch();
+
+		public:
+			void reset();
+			int64 getElapsedTime();
+			void setBaseTime(int64 baseTime);
+
+		private:
+			std::chrono::steady_clock::time_point _startTime;
+			int64 _baseTime = 0;
+		};
 
 	private:
 		class ConnectionHandler : public IConnectionManager
@@ -57,29 +75,28 @@ namespace Stormancer
 		/// \return a task to the connection to the scene.
 		STORMANCER_DLL_API pplx::task<std::shared_ptr<Scene>> getPublicScene(std::string sceneId, std::string userData = "");
 
-		/// Initialize packets reception from the right transport.
-		void initialize();
+		STORMANCER_DLL_API pplx::task<std::shared_ptr<Scene>> getScene(std::string token);
 
 		/// Returns the name of the application.
-		std::string applicationName();
+		STORMANCER_DLL_API std::string applicationName();
 
 		/// Returns the used logger.
-		ILogger* logger();
+		STORMANCER_DLL_API ILogger* logger();
 
 		/// Set the logger
-		void setLogger(ILogger* logger);
-
-		/// Get scene informations for connection.
-		/// \param sceneId Scene id.
-		/// \param sep Scene Endpoint retrieved by ApiClient::getSceneEndpoint
-		/// \return A task which complete when the scene informations are retrieved.
-		pplx::task<std::shared_ptr<Scene>> getScene(std::string sceneId, SceneEndpoint sep);
+		STORMANCER_DLL_API void setLogger(ILogger* logger);
 
 		/// Disconnect and close all connections.
 		/// this method returns nothing. So it's useful for application close.
-		void disconnect();
+		STORMANCER_DLL_API void disconnect();
+
+		STORMANCER_DLL_API int64 clock();
+
+		STORMANCER_DLL_API int64 lastPing();
 
 	private:
+
+		void initialize();
 
 		/// Connect to a scene
 		/// \param scene The scene to connect to.
@@ -93,6 +110,12 @@ namespace Stormancer
 		/// \param sceneHandle Scene handle.
 		/// \return A task which complete when the disconnection is done.
 		pplx::task<void> disconnect(Scene* scene, byte sceneHandle);
+
+		/// Get scene informations for connection.
+		/// \param sceneId Scene id.
+		/// \param sep Scene Endpoint retrieved by ApiClient::getSceneEndpoint
+		/// \return A task which complete when the scene informations are retrieved.
+		pplx::task<std::shared_ptr<Scene>> getScene(std::string sceneId, SceneEndpoint sep);
 
 		/// Disconnect from all scenes.
 		void disconnectAllScenes();
@@ -124,6 +147,14 @@ namespace Stormancer
 			});
 		}
 
+		pplx::task<void> updateServerMetadata();
+
+		void startSyncClock();
+
+		void stopSyncClock();
+
+		pplx::task<void> syncClockImpl();
+
 	private:
 		bool _initialized = false;
 		ILogger* _logger = nullptr;
@@ -140,5 +171,11 @@ namespace Stormancer
 		uint16 _maxPeers = 0;
 		stringMap _metadata;
 		IPacketDispatcher* _dispatcher = nullptr;
+		Watch _watch;
+		int64 _offset = 0;
+		int64 _lastPing = 0;
+		int64 _pingInterval = 5000;
+		IScheduler* _scheduler = nullptr;
+		Subscription _syncClockSubscription;
 	};
 };

@@ -44,7 +44,7 @@ namespace Stormancer
 		/// Sends a system request to the remote peer.
 		/// \param msgId The id of the system message.
 		/// \param writer The function to write in the stream.
-		virtual void sendSystem(byte msgId, std::function<void(bytestream*)> writer) = 0;
+		virtual void sendSystem(byte msgId, std::function<void(bytestream*)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY) = 0;
 		
 		/// Sends a scene request to the remote peer.
 		/// \param sceneIndex The scene index.

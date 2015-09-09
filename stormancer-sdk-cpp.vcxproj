@@ -25,6 +25,7 @@
     <ProjectName>stormancer-sdk-cpp</ProjectName>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">.\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <WindowsTargetPlatformVersion>10.0.10240.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -105,6 +106,8 @@
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <MinimalRebuild>true</MinimalRebuild>
+      <MultiProcessorCompilation>
+      </MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -131,6 +134,8 @@
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <MinimalRebuild>true</MinimalRebuild>
+      <MultiProcessorCompilation>
+      </MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -161,6 +166,8 @@
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <BufferSecurityCheck>true</BufferSecurityCheck>
+      <MultiProcessorCompilation>
+      </MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -191,6 +198,8 @@
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <BufferSecurityCheck>true</BufferSecurityCheck>
+      <MultiProcessorCompilation>
+      </MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -220,6 +229,7 @@
     <ClInclude Include="src\Configuration.h" />
     <ClInclude Include="src\ConnectionState.h" />
     <ClInclude Include="src\DefaultPacketDispatcher.h" />
+    <ClInclude Include="src\DefaultScheduler.h" />
     <ClInclude Include="src\Dto\ConnectionData.h" />
     <ClInclude Include="src\Dto\ConnectionResult.h" />
     <ClInclude Include="src\Dto\ConnectToSceneMsg.h" />
@@ -239,6 +249,7 @@
     <ClInclude Include="src\IRequest.h" />
     <ClInclude Include="src\IRequestModule.h" />
     <ClInclude Include="src\IScenePeer.h" />
+    <ClInclude Include="src\IScheduler.h" />
     <ClInclude Include="src\ITokenHandler.h" />
     <ClInclude Include="src\ITransport.h" />
     <ClInclude Include="src\MessageIDTypes.h" />
@@ -255,12 +266,15 @@
     <ClInclude Include="src\SceneEndpoint.h" />
     <ClInclude Include="src\ScenePeer.h" />
     <ClInclude Include="src\stormancer.h" />
+    <ClInclude Include="src\Subscription.h" />
+    <ClInclude Include="src\SystemRequestIDTypes.h" />
     <ClInclude Include="src\TokenHandler.h" />
     <ClInclude Include="src\Transports\RakNetConnection.h" />
     <ClInclude Include="src\Transports\RakNetTransport.h" />
     <ClInclude Include="src\typedef.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\DefaultScheduler.cpp" />
     <ClCompile Include="src\Dto\DisconnectFromSceneDto.cpp" />
     <ClCompile Include="src\Dto\EmptyDto.cpp" />
     <ClCompile Include="src\FileLogger.cpp" />
@@ -297,6 +311,7 @@
     <ClCompile Include="src\SceneDispatcher.cpp" />
     <ClCompile Include="src\SceneEndpoint.cpp" />
     <ClCompile Include="src\ScenePeer.cpp" />
+    <ClCompile Include="src\Subscription.cpp" />
     <ClCompile Include="src\TokenHandler.cpp" />
     <ClCompile Include="src\Transports\RakNetConnection.cpp" />
     <ClCompile Include="src\Transports\RakNetTransport.cpp" />

@@ -81,7 +81,7 @@ namespace Stormancer
 	char* readToEnd(bytestream* stream, std::streamsize* length)
 	{
 		*length = stream->rdbuf()->in_avail();
-		char* data = new char[*length];
+		char* data = new char[(uint32)*length];
 		stream->read(data, *length);
 		return data;
 	}

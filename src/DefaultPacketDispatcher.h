@@ -9,14 +9,18 @@ namespace Stormancer
 	class DefaultPacketDispatcher : public IPacketDispatcher
 	{
 	public:
-		DefaultPacketDispatcher();
+		DefaultPacketDispatcher(bool asyncDispatch = true);
 		virtual ~DefaultPacketDispatcher();
 
 		void dispatchPacket(std::shared_ptr<Packet<>> packet);
 		void addProcessor(IPacketProcessor* processor);
 
 	private:
+		void dispatchImpl(std::shared_ptr<Packet<>> packet);
+
+	private:
 		std::map<byte, handlerFunction*> _handlers;
 		std::vector<processorFunction*> _defaultProcessors;
+		bool _asyncDispatch = true;
 	};
 };

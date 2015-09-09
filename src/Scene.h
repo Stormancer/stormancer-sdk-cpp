@@ -11,19 +11,19 @@ namespace Stormancer
 	using PacketObservable = rxcpp::observable < std::shared_ptr<Packet<>> >;
 
 	class Client;
-	
+
 	/// Communicates with the server scene.
 	/// Get a scene by calling Client::getPublicScene or Client::getScene.
 	class Scene
 	{
 		/// The Client need to access some private members of the Scene.
-		friend class Client;	
-		
+		friend class Client;
+
 		/// The SceneDispatcher need to access some private members of the Scene.
 		friend class SceneDispatcher;
 
 	public:
-	
+
 		/// Constructor.
 		/// \param connection The connection to the scene.
 		/// \param client The client which manage the connection.
@@ -31,13 +31,13 @@ namespace Stormancer
 		/// \param token Application token.
 		/// \param dto Scene informations.
 		Scene(IConnection* connection, Client* client, std::string id, std::string token, SceneInfosDto dto);
-		
+
 		/// Destructor.
 		virtual ~Scene();
 
 		/// Copy constructor deleted.
 		Scene(Scene& other) = delete;
-		
+
 		/// Copy operator deleted.
 		Scene& operator=(Scene& other) = delete;
 
@@ -55,35 +55,35 @@ namespace Stormancer
 		/// \param metadata Metadatas about the Route.
 		/// Add a route for each different message type.
 		STORMANCER_DLL_API void addRoute(std::string routeName, std::function<void(std::shared_ptr<Packet<IScenePeer>>)> handler, stringMap metadata = stringMap());
-		
+
 		/// Send a packet to a route.
 		/// \param routeName Route name.
 		/// \param writer Function where we write the data in the byte stream.
 		/// \param priority Message priority on the network.
 		/// \param reliability Message reliability behavior.
 		STORMANCER_DLL_API void sendPacket(std::string routeName, std::function<void(bytestream*)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE);
-		
+
 		/// Returns the connected state to the the scene.
 		STORMANCER_DLL_API bool connected();
-		
+
 		/// Returns the scene id.
 		STORMANCER_DLL_API std::string id();
-		
+
 		/// Returns the scene handle.
 		STORMANCER_DLL_API byte handle();
-		
+
 		/// Returns a host metadata value.
 		STORMANCER_DLL_API std::string getHostMetadata(std::string key);
-		
+
 		/// Returns the host connection.
 		STORMANCER_DLL_API IConnection* hostConnection();
-		
+
 		/// Returns a copy of the local routes.
 		STORMANCER_DLL_API std::vector<Route*> localRoutes();
-		
+
 		/// Returns a copy of the remote routes.
 		STORMANCER_DLL_API std::vector<Route*> remoteRoutes();
-		
+
 		/// Creates an IObservable<Packet> instance that listen to events on the specified route.
 		/// \param route A pointer of the Route instance to listen to.
 		/// \return An IObservable<Packet> instance that fires each time a message is received on the route.
@@ -97,72 +97,72 @@ namespace Stormancer
 		/// Get a vector containing the scene host connections.
 		/// \return A vector containing the scene host connections.
 		STORMANCER_DLL_API std::vector<IScenePeer*> remotePeers();
-		
+
 		/// Returns the peer connection to the host.
 		STORMANCER_DLL_API IScenePeer* host();
-		
+
 		/// Finalize the connection to the scene.
 		/// \param cr Connection result message retrieved by a system request.
 		void completeConnectionInitialization(ConnectionResult& cr);
-		
+
 		/// Handle a message received on the scene and dispatch the packet to the right route handle.
 		/// \param packet Receivedpacket.
 		void handleMessage(std::shared_ptr<Packet<>> packet);
 
 	public:
-	
+
 		/// Fire when a packet is received in the scene. 
 		Action<std::shared_ptr<Packet<>>> packetReceived;
-		
+
 		const bool isHost = false;
 
 	private:
-	
+
 		/// Scene connected state.
 		bool _connected = false;
-		
+
 		/// Scene peer connection.
 		IConnection* _peer;
-		
+
 		/// Application token.
 		std::string _token;
-		
+
 		/// Scene handle.
 		byte _handle;
-		
+
 		/// Scene metadatas.
 		stringMap _metadata;
-		
+
 		/// Scene id.
 		std::string _id;
-		
+
 		/// The local routes.
 		std::map<std::string, Route> _localRoutesMap;
-		
+
 		/// The remote routes.
 		std::map<std::string, Route> _remoteRoutesMap;
-		
+
 		/// Route handlers.
-		std::map<uint16, std::vector<std::function<void(std::shared_ptr<Packet<>>)>*>> _handlers;
-		
+		std::map<uint16, std::vector<std::function<void(std::shared_ptr<Packet<>>)>>> _handlers;
+
 		/// Owner client.
 		Client* _client;
-		
+
 		/// RX subscriptions for disconnection.
 		std::vector<rxcpp::composite_subscription> subscriptions;
-		
+
 		/// Scene peer connection
 		IScenePeer* _host = nullptr;
-		
+
 		/// Connection requested state (when not completed).
 		bool connectCalled = false;
-		
+
 		/// Connection task.
 		pplx::task<void> connectTask;
-		
+
 		/// Disconnection request state (when not completed).
 		bool disconnectCalled = false;
-		
+
 		/// Disconnection task.
 		pplx::task<void> disconnectTask;
 	};

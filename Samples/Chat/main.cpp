@@ -10,10 +10,10 @@ bool exitProgram = false;
 
 pplx::task<void> test(Client& client)
 {
-	return client.getPublicScene("test-scene").then([](shared_ptr<Scene> sc) {
+	return client.getPublicScene("main").then([](shared_ptr<Scene> sc) {
 		scene = sc;
 
-		scene->addRoute("echo.out", [](shared_ptr<Packet<IScenePeer>> p) {
+		scene->addRoute("echo", [](shared_ptr<Packet<IScenePeer>> p) {
 			string message;
 			*p->stream >> message;
 			logger->logWhite(message);
@@ -27,12 +27,12 @@ pplx::task<void> test(Client& client)
 
 int main(int argc, char* argv[])
 {
-	srand(time(NULL));
+	srand((uint32)time(NULL));
 
 	logger->logGrey("Connecting...");
 	logger->logGrey("You can exit the program by typing 'exit'");
 
-	Configuration config("997bc6ac-9021-2ad6-139b-da63edee8c58", "echo");
+	Configuration config("997bc6ac-9021-2ad6-139b-da63edee8c58", "tester");
 	Client client(&config);
 
 	auto task = test(client);
@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
 		}
 		else if (scene && scene->connected())
 		{
-			scene->sendPacket("echo.in", [message](bytestream* stream) {
+			scene->sendPacket("echo", [message](bytestream* stream) {
 				*stream << message;
 			});
 		}

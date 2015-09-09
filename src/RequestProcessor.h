@@ -34,7 +34,7 @@ namespace Stormancer
 		\param writer A procedure writing the request parameters.
 		\return An observable returning the request responses.
 		*/
-		pplx::task<std::shared_ptr<Packet<>>> sendSystemRequest(IConnection* peer, byte msgId, std::function<void(bytestream*)> writer);
+		pplx::task<std::shared_ptr<Packet<>>> sendSystemRequest(IConnection* peer, byte msgId, std::function<void(bytestream*)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY);
 
 	private:
 	

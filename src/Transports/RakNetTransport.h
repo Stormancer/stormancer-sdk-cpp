@@ -11,15 +11,17 @@ namespace Stormancer
 	class RakNetTransport : public ITransport
 	{
 	public:
-		RakNetTransport(ILogger* logger);
+		RakNetTransport(ILogger* logger, IScheduler* scheduler);
 		virtual ~RakNetTransport();
 
 	public:
-		pplx::task<void> start(std::string type, IConnectionManager* handler, pplx::cancellation_token token, uint16 maxConnections = 11, uint16 serverPort = 0);
+		void start(std::string type, IConnectionManager* handler, pplx::cancellation_token token, uint16 maxConnections = 10, uint16 serverPort = 0);
 		pplx::task<IConnection*> connect(std::string endpoint);
+		void stop();
 
 	private:
-		void run(pplx::cancellation_token token, pplx::task_completion_event<void> startupTce, uint16 maxConnections = 11, uint16 serverPort = 0);
+		void initialize(uint16 maxConnections, uint16 serverPort = 0);
+		void run();
 		void onConnectionIdReceived(uint64 p);
 		void onConnection(RakNet::Packet* packet, RakNet::RakPeerInterface* server);
 		void onDisconnection(RakNet::Packet* packet, RakNet::RakPeerInterface* server, std::string reason);
@@ -37,5 +39,8 @@ namespace Stormancer
 		std::map<uint64, RakNetConnection*> _connections;
 		const int connectionTimeout = 5000;
 		std::map<std::string, pplx::task_completion_event<IConnection*>> _pendingConnections;
+		IScheduler* _scheduler = nullptr;
+		Subscription _scheduledTransportLoop;
+		RakNet::SocketDescriptor* _socketDescriptor = nullptr;
 	};
 };

@@ -28,5 +28,6 @@ namespace Stormancer
 		std::string Routing;
 		std::string SceneId;
 		std::string UserData;
+		int32 Version;
 	};
 };
