@@ -99,7 +99,7 @@ namespace Stormancer
 	std::string time_tToStr(time_t& time, const char* format)
 	{
 		std::stringstream ss;
-#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
+#if defined(_WIN32)
 		struct tm timeinfo;
 		localtime_s(&timeinfo, &time);
 		ss << std::put_time((tm*)&timeinfo, format);
@@ -118,7 +118,7 @@ namespace Stormancer
 		struct tm timeinfo;
 		const std::time_put<char>& tmput = std::use_facet<std::time_put<char>>(loc);
 		//std::tm* now = std::localtime(&time);
-#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
+#if defined(_WIN32)
 		localtime_s(&timeinfo, &time);
 #else
 		localtime_r(&time, &timeinfo); // POSIX

@@ -10,7 +10,7 @@ shared_ptr<Scene> scene = nullptr;
 pplx::task<void> test(Client& client)
 {
 	logger->logWhite("Get scene");
-	return client.getPublicScene("main").then([](shared_ptr<Scene> sc) {
+	return client.getPublicScene("main").then([&client](shared_ptr<Scene> sc) {
 		scene = sc;
 		logger->logGreen("Done");
 		int nbMsgToSend = 10;
@@ -18,9 +18,9 @@ pplx::task<void> test(Client& client)
 
 		logger->logWhite("Add route");
 		scene->addRoute("echo", [nbMsgToSend, nbMsgReceived](shared_ptr<Packet<IScenePeer>> p) {
-			int32 number1, number2, number3;
-			*p->stream >> number1 >> number2 >> number3;
-			logger->logGreen("Received message: [ " + to_string(number1) + " ; " + to_string(number2) + " ; " + to_string(number3) + " ]");
+			long clock;
+			*p->stream >> clock;
+			logger->logGreen("Received message: " + to_string(clock));
 
 			(*nbMsgReceived)++;
 			if (*nbMsgReceived == nbMsgToSend)
@@ -38,15 +38,22 @@ pplx::task<void> test(Client& client)
 		logger->logGreen("Done");
 
 		logger->logWhite("Connect to scene");
-		return scene->connect().then([nbMsgToSend]() {
+		return scene->connect().then([&client, nbMsgToSend]() {
 			logger->logGreen("Done");
-			for (int i = 0; i < nbMsgToSend; i++)
+
+			for (int i = 0; i < nbMsgToSend; )
 			{
-				scene->sendPacket("echo", [](bytestream* stream) {
-					int32 number1(rand()), number2(rand()), number3(rand());
-					*stream << number1 << number2 << number3;
-					logger->logWhite("Sending message: [ " + to_string(number1) + " ; " + to_string(number2) + " ; " + to_string(number3) + " ]");
-				});
+				int64 clock = client.clock();
+				if (clock)
+				{
+					scene->sendPacket("echo", [&client](bytestream* stream) {
+						auto clock = client.clock();
+						*stream << clock;
+						logger->logWhite("Sending message: " + to_string(clock));
+					});
+					i++;
+				}
+				Sleep(100);
 			}
 		});
 	});
@@ -54,8 +61,6 @@ pplx::task<void> test(Client& client)
 
 int main(int argc, char* argv[])
 {
-	srand(time(NULL));
-
 	logger->logWhite("Type 'Enter' to start the sample");
 	cin.ignore();
 

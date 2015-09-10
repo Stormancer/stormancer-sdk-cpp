@@ -54,15 +54,12 @@ namespace Stormancer
 
 	protected:
 
-		/// Constructor.
 		STORMANCER_DLL_API ILogger();
 
-		/// Destructor.
 		STORMANCER_DLL_API virtual ~ILogger();
 
 	protected:
 
-		/// The mutex for using the logger.
 		std::mutex _mutex;
 
 	private:
