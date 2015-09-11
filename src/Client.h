@@ -162,6 +162,7 @@ namespace Stormancer
 		std::string _applicationName;
 		//const PluginBuildContext _pluginCtx;
 		IConnection* _serverConnection = nullptr;
+		IScheduler* _scheduler = nullptr;
 		ITransport* _transport = nullptr;
 		ITokenHandler* _tokenHandler = nullptr;
 		ApiClient* _apiClient = nullptr;
@@ -175,7 +176,6 @@ namespace Stormancer
 		int64 _offset = 0;
 		int64 _lastPing = 0;
 		int64 _pingInterval = 5000;
-		IScheduler* _scheduler = nullptr;
 		Subscription _syncClockSubscription;
 	};
 };

@@ -67,10 +67,10 @@ namespace Stormancer
 		/// Gets or sets the transport to be used by the client.
 		std::function<ITransport*(std::map<std::string, void*>)> transportFactory;
 
-		const std::function<ITransport*(std::map<std::string, void*>)> defaultTransportFactory;/* = [](std::map<std::string, void*> parameters)
+		const std::function<ITransport*(std::map<std::string, void*>)> defaultTransportFactory = [](std::map<std::string, void*> parameters)
 		{
 			return new RakNetTransport(static_cast<ILogger*>(parameters["ILogger"]), static_cast<IScheduler*>(parameters["IScheduler"]));
-		};*/
+		};
 
 	private:
 
