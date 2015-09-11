@@ -2,7 +2,7 @@
 #include "headers.h"
 #include "ITransport.h"
 #include "ILogger.h"
-#include "Transports/RaknetConnection.h"
+#include "RaknetConnection.h"
 #include <RakPeerInterface.h>
 
 namespace Stormancer

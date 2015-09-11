@@ -1,7 +1,7 @@
 #pragma once
 #include "headers.h"
-#include "Dto/ConnectionResult.h"
-#include "Dto/SceneInfosDto.h"
+#include "ConnectionResult.h"
+#include "SceneInfosDto.h"
 #include "Route.h"
 #include "IScenePeer.h"
 #include "Packet.h"

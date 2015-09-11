@@ -1,174 +1,81 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Action.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ApiClient.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\basic_bytebuf.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\basic_bytestream.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Client.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Configuration.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Dto\ConnectionData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Dto\ConnectionResult.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ConnectionState.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Dto\ConnectToSceneMsg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DefaultPacketDispatcher.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\FileLogger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\headers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Helpers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\IConnection.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\IConnectionManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ILogger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\IPacketDispatcher.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\IPacketProcessor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\IRequest.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\IRequestModule.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\IScenePeer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ITokenHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ITransport.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\MessageIDTypes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\NullLogger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Packet.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\PacketProcessorConfig.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Transports\RakNetConnection.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Transports\RakNetTransport.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Request.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RequestContext.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RequestModuleBuilder.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RequestProcessor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Route.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Dto\RouteDto.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Scene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SceneDispatcher.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SceneEndpoint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Dto\SceneInfosDto.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Dto\SceneInfosRequestDto.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ScenePeer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\stormancer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\TokenHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\typedef.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Dto\DisconnectFromSceneDto.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Dto\EmptyDto.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SystemRequestIDTypes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\IScheduler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DefaultScheduler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Subscription.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
+    <ClCompile Include="src\Scene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneDispatcher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneEndpoint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneInfosDto.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneInfosRequestDto.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ScenePeer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Subscription.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TokenHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\ApiClient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Client.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Configuration.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ConnectionData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ConnectionResult.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ConnectToSceneMsg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\DefaultPacketDispatcher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\DefaultScheduler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DisconnectFromSceneDto.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EmptyDto.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FileLogger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Helpers.cpp">
@@ -204,13 +111,19 @@
     <ClCompile Include="src\ITransport.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\NullLogger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\PacketProcessorConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Transports\RakNetConnection.cpp">
+    <ClCompile Include="src\RakNetConnection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Transports\RakNetTransport.cpp">
+    <ClCompile Include="src\RakNetTransport.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Request.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\RequestContext.cpp">
@@ -225,70 +138,163 @@
     <ClCompile Include="src\Route.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SceneDispatcher.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SceneEndpoint.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ScenePeer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TokenHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Dto\ConnectionResult.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Dto\ConnectToSceneMsg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Dto\SceneInfosDto.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Dto\SceneInfosRequestDto.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Dto\ConnectionData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Dto\RouteDto.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Request.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\FileLogger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Configuration.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\NullLogger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Dto\DisconnectFromSceneDto.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Dto\EmptyDto.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DefaultScheduler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Subscription.cpp">
+    <ClCompile Include="src\RouteDto.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{b8a90d8f-6b74-430c-a7de-a29fa86bc848}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{9bbde854-a9d5-4a4b-8bfd-3c5fc6963aac}</UniqueIdentifier>
-    </Filter>
+    <ClInclude Include="src\Action.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ApiClient.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\basic_bytebuf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\basic_bytestream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Client.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Configuration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ConnectionData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ConnectionResult.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ConnectionState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ConnectToSceneMsg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DefaultPacketDispatcher.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DefaultScheduler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DisconnectFromSceneDto.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EmptyDto.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FileLogger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\headers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Helpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IConnection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IConnectionManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ILogger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IPacketDispatcher.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IPacketProcessor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IRequest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IRequestModule.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IScenePeer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IScheduler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ITokenHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ITransport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MessageIDTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\NullLogger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Packet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PacketProcessorConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RakNetConnection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RakNetTransport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Request.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RequestContext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RequestModuleBuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RequestProcessor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Route.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RouteDto.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SceneDispatcher.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SceneEndpoint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SceneInfosDto.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SceneInfosRequestDto.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ScenePeer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\stormancer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Subscription.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SystemRequestIDTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TokenHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\typedef.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

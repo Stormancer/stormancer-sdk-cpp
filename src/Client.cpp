@@ -46,7 +46,7 @@ namespace Stormancer
 		_dispatcher(config->dispatcher),
 		_requestProcessor(new RequestProcessor(_logger, std::vector<IRequestModule*>())),
 		_scenesDispatcher(new SceneDispatcher),
-		_metadata(config->metadata),
+		_metadata(config->_metadata),
 		_maxPeers(config->maxPeers),
 		_pingInterval(config->pingInterval)
 	{

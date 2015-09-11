@@ -54,13 +54,15 @@ pplx::task<void> test(Client& client)
 
 int main(int argc, char* argv[])
 {
-	srand(time(NULL));
-
+	srand((uint32)time(NULL));
+	/*
 	logger->logWhite("Type 'Enter' to start the sample");
 	cin.ignore();
-
+	*/
 	logger->logWhite("Create client");
-	Configuration config("997bc6ac-9021-2ad6-139b-da63edee8c58", "tester");
+	std::string accountId = "997bc6ac-9021-2ad6-139b-da63edee8c58";
+	std::string applicationName = "tester";
+	Configuration config(accountId, applicationName);
 	Client client(&config);
 	logger->logGreen("Done");
 

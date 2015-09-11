@@ -7,14 +7,14 @@
 
 #include "Action.h"
 
-#include "Dto/ConnectionData.h"
-#include "Dto/ConnectToSceneMsg.h"
-#include "Dto/ConnectionResult.h"
-#include "Dto/DisconnectFromSceneDto.h"
-#include "Dto/EmptyDto.h"
-#include "Dto/RouteDto.h"
-#include "Dto/SceneInfosDto.h"
-#include "Dto/SceneInfosRequestDto.h"
+#include "ConnectionData.h"
+#include "ConnectToSceneMsg.h"
+#include "ConnectionResult.h"
+#include "DisconnectFromSceneDto.h"
+#include "EmptyDto.h"
+#include "RouteDto.h"
+#include "SceneInfosDto.h"
+#include "SceneInfosRequestDto.h"
 
 #include "Helpers.h"
 #include "ApiClient.h"
@@ -51,12 +51,5 @@
 #include "IScheduler.h"
 #include "DefaultScheduler.h"
 
-//#include "Plugins/IClientPlugin.h"
-//#include "Plugins/PluginBuildContext.h"
-//#include "Plugins/Request.h"
-//#include "Plugins/RpcClientPlugin.h"
-//#include "Plugins/RpcRequestContext.h"
-//#include "Plugins/RpcService.h"
-
-#include "Transports/RakNetConnection.h"
-#include "Transports/RakNetTransport.h"
+#include "RakNetConnection.h"
+#include "RakNetTransport.h"

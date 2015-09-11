@@ -2,7 +2,8 @@
 #include "headers.h"
 #include "IPacketDispatcher.h"
 #include "DefaultScheduler.h"
-#include "Transports/RakNetTransport.h"
+#include "RakNetTransport.h"
+#include "DefaultPacketDispatcher.h"
 
 namespace Stormancer
 {
@@ -10,8 +11,9 @@ namespace Stormancer
     /// For instance to target a custom Stormancer cluster change the ServerEndoint property to the http API endpoint of your custom cluster.
 	class Configuration
 	{
-	public:
+		friend class Client;
 
+	public:
 		/// Constructor.
 		/// \param account The account id.
 		/// \param application The application name.
@@ -28,6 +30,11 @@ namespace Stormancer
 
 		/// Get the Api endpoint.
 		std::string getApiEndpoint();
+
+	private:
+
+		/// Set a metadata
+		Configuration& metadata(std::string key, std::string value);
 
 		//void addPlugin(IClientPlugin* plugin);
 
@@ -46,10 +53,7 @@ namespace Stormancer
 		IPacketDispatcher* dispatcher = nullptr;
 
 		/// Maximum number of remote peers that can connect with this client.
-		uint16 maxPeers = 20;
-
-		/// Client metadatas.
-		stringMap metadata;
+		uint16 maxPeers = 10;
 
 		/// Enable or disable the asynchrounous dispatch of received messages. Enabled by default.
 		bool asynchronousDispatch = true;
@@ -58,19 +62,21 @@ namespace Stormancer
 		int32 pingInterval = 5000;
 
 		/// The scheduler used by the client to run the transport and other repeated tasks.
-		IScheduler* scheduler = new DefaultScheduler();
+		IScheduler* scheduler = nullptr;
 
 		/// Gets or sets the transport to be used by the client.
 		std::function<ITransport*(std::map<std::string, void*>)> transportFactory;
 
-	private:
-		
-		std::string apiEndpoint = "https://api.stormancer.com/";
-
-		std::function<ITransport*(std::map<std::string, void*>)> defaultTransportFactory = [](std::map<std::string, void*> parameters)
+		const std::function<ITransport*(std::map<std::string, void*>)> defaultTransportFactory;/* = [](std::map<std::string, void*> parameters)
 		{
 			return new RakNetTransport(static_cast<ILogger*>(parameters["ILogger"]), static_cast<IScheduler*>(parameters["IScheduler"]));
-		};
+		};*/
+
+	private:
+
+		stringMap _metadata;
+
+		std::string apiEndpoint = "https://api.stormancer.com/";
 		
 		//vector<IClientPlugin*> plugins;
 	};
