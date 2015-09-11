@@ -15,7 +15,7 @@ For each sample, you have to do this:
 - Change the **Environment path**  
 *(Project properties > Configuration Properties > Debugging > Environment)*  
 ```
-PATH=$(SolutionDir)RakNet\Lib\DLL\Lib;$(SolutionDir)bin;%PATH%
+PATH=$(SolutionDir)..\stormancer-sdk-cpp\RakNet\Lib\DLL\Lib;$(SolutionDir)..\stormancer-sdk-cpp\bin;%PATH%
 ```
 
 ## Configure a project  
