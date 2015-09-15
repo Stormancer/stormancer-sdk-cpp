@@ -134,7 +134,7 @@ namespace Stormancer
 			return _requestProcessor->sendSystemRequest(_serverConnection, id, [this, &parameter](bytestream* stream) {
 				// serialize request dto
 				msgpack::pack(stream, parameter);
-				auto res = stream->str();
+				//auto res = stream->str();
 			}).then([this](std::shared_ptr<Packet<>> packet) {
 				// deserialize result dto
 				std::string buffer;
@@ -176,6 +176,6 @@ namespace Stormancer
 		int64 _offset = 0;
 		int64 _lastPing = 0;
 		int64 _pingInterval = 5000;
-		Subscription _syncClockSubscription;
+		std::shared_ptr<Subscription> _syncClockSubscription;
 	};
 };

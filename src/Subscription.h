@@ -7,16 +7,16 @@ namespace Stormancer
 	class Subscription
 	{
 	public:
-		Subscription();
-		Subscription(Action<> unsubscribe);
-		Subscription(Subscription& other);
-		Subscription(Subscription&& other);
-		Subscription& operator=(Subscription& other);
-		virtual ~Subscription();
+		STORMANCER_DLL_API Subscription();
+		STORMANCER_DLL_API Subscription(Action<> unsubscribe);
+		STORMANCER_DLL_API Subscription(Subscription& other);
+		STORMANCER_DLL_API Subscription(Subscription&& other);
+		STORMANCER_DLL_API Subscription& operator=(Subscription& other);
+		STORMANCER_DLL_API virtual ~Subscription();
 
 	public:
-		bool subscribed() const;
-		void unsubscribe();
+		STORMANCER_DLL_API bool subscribed() const;
+		STORMANCER_DLL_API void unsubscribe();
 
 	private:
 		Action<> _unsubscribe;

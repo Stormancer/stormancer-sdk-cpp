@@ -31,8 +31,9 @@ namespace Stormancer
 		_type = type;
 		_handler = handler;
 		initialize(serverPort, maxConnections);
-		_scheduledTransportLoop = _scheduler->schedulePeriodic(15, Action<>(std::function<void()>([this]() {
-			this->run();
+		_scheduledTransportLoop = _scheduler->schedulePeriodic(200, Action<>(std::function<void()>([this]() {
+			_logger->log(LogLevel::Trace, "", std::string("run"), "");
+			run();
 		})));
 	}
 
@@ -50,7 +51,7 @@ namespace Stormancer
 				throw std::runtime_error(std::string("Couldn't start raknet peer : ") + std::to_string(startupResult));
 			}
 			_peer->SetMaximumIncomingConnections(maxConnections);
-			_logger->log(LogLevel::Info, "", stringFormat("Raknet transport started ", _type), "");
+			_logger->log(LogLevel::Info, "", std::string("Raknet transport started ") + _type, "");
 		}
 		catch (std::exception e)
 		{
@@ -151,7 +152,7 @@ namespace Stormancer
 	{
 		if (_isRunning)
 		{
-			_scheduledTransportLoop.unsubscribe();
+			_scheduledTransportLoop->unsubscribe();
 			if (_peer)
 			{
 				if (_peer->IsActive())

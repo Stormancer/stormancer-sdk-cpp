@@ -10,20 +10,24 @@ namespace Stormancer
 	{
 	}
 
-	Subscription DefaultScheduler::schedulePeriodic(int delay, Action<> action)
+	std::shared_ptr<Subscription> DefaultScheduler::schedulePeriodic(int delay, Action<> action)
 	{
 		if (delay <= 0)
 		{
 			throw new std::out_of_range("Scheduler periodic delay must be positive.");
 		}
+		
+		auto scheduler = rxcpp::schedulers::make_same_worker(rxcpp::schedulers::make_event_loop().create_worker());
+		auto coordination = rxcpp::identity_one_worker(scheduler);
 
-		auto now = rxcpp::schedulers::make_event_loop().create_worker().now();
-		auto _syncClockSubscription = rxcpp::observable<>::interval(now, std::chrono::milliseconds(delay)).subscribe([this, action](int time) {
+		auto _syncClockSubscription = rxcpp::observable<>::interval(std::chrono::milliseconds(delay), coordination).subscribe([action](int time) {
 			action();
 		});
 
-		return Subscription(Action<>(std::function<void()>([_syncClockSubscription, action]() {
+		auto unsubscribeAction = Action<>(std::function<void()>([_syncClockSubscription]() {
 			_syncClockSubscription.unsubscribe();
-		})));
+		}));
+		
+		return std::shared_ptr<Subscription>(new Subscription(unsubscribeAction));
 	}
 };

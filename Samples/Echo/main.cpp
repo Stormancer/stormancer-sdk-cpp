@@ -55,14 +55,16 @@ pplx::task<void> test(Client& client)
 int main(int argc, char* argv[])
 {
 	srand((uint32)time(NULL));
-	/*
-	logger->logWhite("Type 'Enter' to start the sample");
-	cin.ignore();
-	*/
+
+	//logger->logWhite("Type 'Enter' to start the sample");
+	//cin.ignore();
+
 	logger->logWhite("Create client");
 	std::string accountId = "997bc6ac-9021-2ad6-139b-da63edee8c58";
 	std::string applicationName = "tester";
 	Configuration config(accountId, applicationName);
+	//config.serverEndpoint = "http://localhost:8081";
+	config.serverEndpoint = "http://localhost:8888";
 	Client client(&config);
 	logger->logGreen("Done");
 
@@ -76,6 +78,12 @@ int main(int argc, char* argv[])
 	{
 		logger->log(e);
 	}
+
+	//DefaultScheduler scheduler;
+	//int i = 0;
+	//auto truc = scheduler.schedulePeriodic(1000, Action<>(std::function<void()>([&i]() {
+	//	std::cout << i++ << std::endl;
+	//})));
 
 	cin.ignore();
 

@@ -9,11 +9,11 @@ namespace Stormancer
 	class DefaultScheduler : public IScheduler
 	{
 	public:
-		DefaultScheduler();
-		virtual ~DefaultScheduler();
+		STORMANCER_DLL_API DefaultScheduler();
+		STORMANCER_DLL_API virtual ~DefaultScheduler();
 		
 	public:
 		/// Schedule a periodic task on the scheculder
-		Subscription schedulePeriodic(int delay, Action<> action);
+		STORMANCER_DLL_API std::shared_ptr<Subscription> schedulePeriodic(int delay, Action<> action);
 	};
 };

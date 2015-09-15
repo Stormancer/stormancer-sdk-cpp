@@ -10,6 +10,6 @@ namespace Stormancer
 	{
 	public:
 		/// Schedule a periodic task on the scheculder
-		virtual Subscription schedulePeriodic(int delay, Action<> action) = 0;
+		virtual std::shared_ptr<Subscription> schedulePeriodic(int delay, Action<> action) = 0;
 	};
 };

@@ -182,7 +182,9 @@ namespace Stormancer
 	{
 		return _requestProcessor->sendSystemRequest(_serverConnection, (byte)SystemRequestIDTypes::ID_SET_METADATA, [this](bytestream* bs) {
 			msgpack::pack(bs, this->_serverConnection->metadata);
-		}).then([](std::shared_ptr<Packet<>> p) {});
+		}).then([](std::shared_ptr<Packet<>> p) {
+			int a = 748912791;
+		});
 	}
 
 	pplx::task<void> Client::connectToScene(Scene* scene, std::string& token, std::vector<Route*> localRoutes)
@@ -270,7 +272,7 @@ namespace Stormancer
 
 	void Client::stopSyncClock()
 	{
-		_syncClockSubscription.unsubscribe();
+		_syncClockSubscription->unsubscribe();
 	}
 
 	pplx::task<void> Client::syncClockImpl()
