@@ -23,6 +23,7 @@
 #include <vector>
 #include <iomanip>
 #include <thread>
+#include <regex>
 
 // custom libs
 

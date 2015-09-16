@@ -18,7 +18,7 @@ namespace Stormancer
 	{
 		if (!mapContains(_routeMapping, routeName))
 		{
-			throw std::invalid_argument(stringFormat("The routeName '", routeName, "' is not declared on the server."));
+			throw std::invalid_argument(std::string("The routeName '") + routeName + "' is not declared on the server.");
 		}
 		Route& r = _routeMapping[routeName];
 		_connection->sendToScene(_sceneHandle, r._handle, writer, priority, reliability);

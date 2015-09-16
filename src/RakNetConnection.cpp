@@ -58,6 +58,7 @@ namespace Stormancer
 	void RakNetConnection::sendSystem(byte msgId, std::function<void(bytestream*)> writer, PacketPriority priority)
 	{
 		sendRaw([msgId, &writer](bytestream* stream) {
+			*stream << (byte)MessageIDTypes::ID_SYSTEM_REQUEST;
 			*stream << msgId;
 			writer(stream);
 		}, priority, PacketReliability::RELIABLE_ORDERED, (uint8)0);

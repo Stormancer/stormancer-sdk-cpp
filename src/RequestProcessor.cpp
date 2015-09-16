@@ -123,7 +123,7 @@ namespace Stormancer
 				std::string msg;
 				deserialized.convert(&msg);
 
-				auto eptr = std::make_exception_ptr(new std::runtime_error(msg));
+				auto eptr = std::make_exception_ptr(new std::exception());//(msg));
 				p->request->observer.on_error(eptr);
 
 				freeRequestSlot(id);
@@ -143,7 +143,14 @@ namespace Stormancer
 		auto observer = rxcpp::make_observer<std::shared_ptr<Packet<>>>([tce](std::shared_ptr<Packet<>> p) {
 			tce->set(p);
 		}, [tce](std::exception_ptr ex) {
-			tce->set_exception(ex);
+			try
+			{
+				std::rethrow_exception(ex);
+			}
+			catch (const std::exception& e)
+			{
+				tce->set_exception<std::exception>(e);
+			}
 		});
 		auto request = reserveRequestSlot(observer.as_dynamic());
 
@@ -153,14 +160,20 @@ namespace Stormancer
 		}, priority);
 
 		auto task = pplx::create_task(*tce);
-		task.then([tce](pplx::task<std::shared_ptr<Packet<>>> t) {
+		return task.then([tce](pplx::task<std::shared_ptr<Packet<>>> t) {
 			if (tce)
 			{
 				delete tce;
 			}
+			try
+			{
+				return t.get();
+			}
+			catch (const std::exception& e)
+			{
+				throw std::runtime_error(std::string(e.what()) + "System request failed.");
+			}
 		});
-
-		return task;
 	}
 
 	std::shared_ptr<Request> RequestProcessor::reserveRequestSlot(PacketObserver&& observer)

@@ -53,11 +53,7 @@ namespace Stormancer
 	std::string ILogger::formatException(const std::exception& e)
 	{
 		std::stringstream ss;
-
-		ss << '[' << nowStr() << ']';
-		ss << " [exception]";
-		ss << ' ' << e.what();
-
+		ss << '[' << nowStr() << ']' << " [exception] " << e.what() << std::endl;
 		return ss.str();
 	}
 };

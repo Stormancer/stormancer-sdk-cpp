@@ -60,11 +60,8 @@ int main(int argc, char* argv[])
 	//cin.ignore();
 
 	logger->logWhite("Create client");
-	std::string accountId = "997bc6ac-9021-2ad6-139b-da63edee8c58";
-	std::string applicationName = "tester";
-	Configuration config(accountId, applicationName);
+	Configuration config("997bc6ac-9021-2ad6-139b-da63edee8c58", "tester");
 	//config.serverEndpoint = "http://localhost:8081";
-	config.serverEndpoint = "http://localhost:8888";
 	Client client(&config);
 	logger->logGreen("Done");
 

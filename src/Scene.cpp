@@ -121,10 +121,11 @@ namespace Stormancer
 
 	void Scene::sendPacket(std::string routeName, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability)
 	{
-		if (routeName.length() == 0)
+		if (!routeName.length())
 		{
 			throw std::invalid_argument("routeName is empty.");
 		}
+
 		if (!_connected)
 		{
 			throw std::runtime_error("The scene must be connected to perform this operation.");
@@ -132,7 +133,7 @@ namespace Stormancer
 
 		if (!mapContains(_remoteRoutesMap, routeName))
 		{
-			throw std::invalid_argument(stringFormat("The route '", routeName, "' doesn't exist on the scene.").c_str());
+			throw std::invalid_argument(std::string("The route '") + routeName + "' doesn't exist on the scene.");
 		}
 		Route& route = _remoteRoutesMap[routeName];
 

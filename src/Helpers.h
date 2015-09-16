@@ -137,10 +137,10 @@ namespace Stormancer
 		}
 
 		template<typename T>
-		pplx::task<T> taskFromException(std::exception& ex)
+		pplx::task<T> taskFromException(const std::exception& e)
 		{
 			pplx::task_completion_event<T> tce;
-			tce.set_exception(ex);
+			tce.set_exception<std::exception>(e);
 			return create_task(tce);
 		}
 
@@ -189,14 +189,6 @@ namespace Stormancer
 		uint64 ptrToUint64(T* ptr)
 		{
 			return *static_cast<uint64*>(static_cast<void*>(ptr));
-		}
-
-		template<typename P1 = const char*, typename P2 = const char*, typename P3 = const char*, typename P4 = const char*, typename P5 = const char*, typename P6 = const char*, typename P7 = const char*, typename P8 = const char*, typename P9 = const char*, typename P10 = const char*>
-		std::string stringFormat(P1 p1 = "", P2 p2 = "", P3 p3 = "", P4 p4 = "", P5 p5 = "", P6 p6 = "", P7 p7 = "", P8 p8 = "", P9 p9 = "", P10 p10 = "")
-		{
-			std::stringstream ss;
-			ss << p1 << p2 << p3 << p4 << p5 << p6 << p7 << p8 << p9 << p10;
-			return ss.str();
 		}
 
 #pragma endregion

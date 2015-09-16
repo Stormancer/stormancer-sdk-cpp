@@ -125,15 +125,23 @@ namespace Stormancer
 	{
 		_logger->log(LogLevel::Debug, "Client::getPublicScene", sceneId, userData);
 
-		return _apiClient->getSceneEndpoint(_accountId, _applicationName, sceneId, userData).then([this, sceneId](SceneEndpoint sep) {
-			return this->getScene(sceneId, sep);
+		return _apiClient->getSceneEndpoint(_accountId, _applicationName, sceneId, userData).then([this, sceneId](pplx::task<SceneEndpoint> t) {
+			try
+			{
+				SceneEndpoint sep = t.get();
+				return this->getScene(sceneId, sep);
+			}
+			catch (const std::exception& e)
+			{
+				throw std::runtime_error(std::string(e.what()) + "\nUnable to get the scene endpoint or connecting the scene.");
+			}
 		});
 	}
 
 	pplx::task<std::shared_ptr<Scene>> Client::getScene(std::string token)
 	{
-		auto ci = _tokenHandler->decodeToken(token);
-		return getScene(ci.tokenData.SceneId, ci);
+		auto sep = _tokenHandler->decodeToken(token);
+		return getScene(sep.tokenData.SceneId, sep);
 	}
 
 	pplx::task<std::shared_ptr<Scene>> Client::getScene(std::string sceneId, SceneEndpoint sep)
@@ -143,38 +151,98 @@ namespace Stormancer
 		return taskIf(_serverConnection == nullptr, [this, sep]() {
 			if (!_transport->isRunning()) {
 				_cts = pplx::cancellation_token_source();
-				_transport->start("client", new ConnectionHandler(), _cts.get_token(), 10, (uint16)(_maxPeers + 1));
+				try
+				{
+					_transport->start("client", new ConnectionHandler(), _cts.get_token(), 10, (uint16)(_maxPeers + 1));
+				}
+				catch (const std::exception& e)
+				{
+					throw std::runtime_error(std::string(e.what()) + "\nFailed to start the transport.");
+				}
 			}
 			std::string endpoint = sep.tokenData.Endpoints.at(_transport->name());
 			_logger->log(LogLevel::Trace, "Client::getScene", "Connecting transport", "");
-			return _transport->connect(endpoint).then([this](IConnection* connection) {
-				_logger->log(LogLevel::Trace, "Client::getScene", "Client::transport connected", "");
-				_serverConnection = connection;
-				_serverConnection->metadata = _metadata;
-			}).then([this, sep]() {
-				return updateServerMetadata().then([this, sep]() {
-					if (sep.tokenData.Version > 0)
+			try
+			{
+				return _transport->connect(endpoint).then([this](pplx::task<IConnection*> t) {
+					try
 					{
-						startSyncClock();
+						IConnection* connection = t.get();
+						_logger->log(LogLevel::Trace, "Client::getScene", "Client::transport connected", "");
+						_serverConnection = connection;
+						_serverConnection->metadata = _metadata;
 					}
-				});
-			});
-		}).then([this, sep]() {
-			SceneInfosRequestDto parameter;
-			parameter.Metadata = _serverConnection->metadata;
-			parameter.Token = sep.token;
-			_logger->log(LogLevel::Debug, "Client::getScene", "send SceneInfosRequestDto", "");
-			return sendSystemRequest<SceneInfosRequestDto, SceneInfosDto>((byte)SystemRequestIDTypes::ID_GET_SCENE_INFOS, parameter);
-		}).then([this, sep, sceneId](SceneInfosDto result) {
-			std::stringstream ss;
-			ss << result.SceneId << " " << result.SelectedSerializer << " Routes:[";
-			for (uint32 i = 0; i < result.Routes.size(); i++) ss << result.Routes.at(i).Handle << ":" << result.Routes.at(i).Name << ";";
-			ss << "] Metadata:[";
-			for (auto it : result.Metadata) ss << it.first << ":" << it.second << ";";
-			ss << "]";
-			_logger->log(LogLevel::Debug, "Client::getScene", "SceneInfosDto received", ss.str());
-			_serverConnection->metadata["serializer"] = result.SelectedSerializer;
-			return std::shared_ptr<Scene>(new Scene(_serverConnection, this, sceneId, sep.token, result));
+					catch (const std::exception& e)
+					{
+						throw std::runtime_error(std::string(e.what()) + "\nFailed to get the transport peer connection.");
+					}
+				}).then([this, sep](pplx::task<void> t) {
+					try
+					{
+						t.wait();
+						return updateServerMetadata();
+					}
+					catch (const std::exception& e)
+					{
+						throw std::runtime_error(std::string(e.what()) + "\nFailed to update server metadata.");
+					}
+				}).then([this, sep](pplx::task<void> t) {
+					try
+					{
+						t.wait();
+						if (sep.tokenData.Version > 0)
+						{
+							startSyncClock();
+						}
+					}
+					catch (const std::exception& e)
+					{
+						throw std::runtime_error(std::string(e.what()) + "\nFailed to start the sync clock.");
+					}
+				});;
+			}
+			catch (const std::exception& e)
+			{
+				throw std::runtime_error(std::string(e.what()) + "\nFailed to connect the transport.");
+			}
+		}).then([this, sep](pplx::task<void> t) {
+			try
+			{
+				t.wait();
+				SceneInfosRequestDto parameter;
+				parameter.Metadata = _serverConnection->metadata;
+				parameter.Token = sep.token;
+				_logger->log(LogLevel::Debug, "Client::getScene", "send SceneInfosRequestDto", "");
+				return sendSystemRequest<SceneInfosRequestDto, SceneInfosDto>((byte)SystemRequestIDTypes::ID_GET_SCENE_INFOS, parameter);
+			}
+			catch (const std::exception& e)
+			{
+				throw std::runtime_error(std::string(e.what()) + "\nFailed to get scene infos.");
+			}
+		}).then([this, sep, sceneId](pplx::task<SceneInfosDto> t) {
+			try
+			{
+				SceneInfosDto result = t.get();
+				std::stringstream ss;
+				ss << result.SceneId << " " << result.SelectedSerializer << " Routes:[";
+				for (uint32 i = 0; i < result.Routes.size(); i++)
+				{
+					ss << result.Routes.at(i).Handle << ":" << result.Routes.at(i).Name << ";";
+				}
+				ss << "] Metadata:[";
+				for (auto it : result.Metadata)
+				{
+					ss << it.first << ":" << it.second << ";";
+				}
+				ss << "]";
+				_logger->log(LogLevel::Debug, "Client::getScene", "SceneInfosDto received", ss.str());
+				_serverConnection->metadata["serializer"] = result.SelectedSerializer;
+				return std::shared_ptr<Scene>(new Scene(_serverConnection, this, sceneId, sep.token, result));
+			}
+			catch (const std::exception& e)
+			{
+				throw std::runtime_error(std::string(e.what()) + "\nFailed to create the scene.");
+			}
 		});
 	}
 
@@ -182,8 +250,14 @@ namespace Stormancer
 	{
 		return _requestProcessor->sendSystemRequest(_serverConnection, (byte)SystemRequestIDTypes::ID_SET_METADATA, [this](bytestream* bs) {
 			msgpack::pack(bs, this->_serverConnection->metadata);
-		}).then([](std::shared_ptr<Packet<>> p) {
-			int a = 748912791;
+		}).then([](pplx::task<std::shared_ptr<Packet<>>> t) {
+			try
+			{
+				t.wait();
+			}
+			catch (std::exception& e) {
+				throw std::logic_error(std::string(e.what()) + "\nFailed uo update the connection metadata.");
+			}
 		});
 	}
 

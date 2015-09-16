@@ -14,7 +14,7 @@ namespace Stormancer
 	{
 		if (delay <= 0)
 		{
-			throw new std::out_of_range("Scheduler periodic delay must be positive.");
+			throw std::out_of_range("Scheduler periodic delay must be positive.");
 		}
 		
 		auto scheduler = rxcpp::schedulers::make_same_worker(rxcpp::schedulers::make_event_loop().create_worker());
