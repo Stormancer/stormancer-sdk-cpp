@@ -5,7 +5,7 @@ namespace Stormancer
 	SceneDispatcher::SceneDispatcher()
 		: _scenes((uint32)0xff - (uint32)MessageIDTypes::ID_SCENES + 1, nullptr)
 	{
-		handler = new processorFunction([this](uint8 sceneHandle, std::shared_ptr<Packet<>> packet) {
+		handler = new processorFunction([this](uint8 sceneHandle, Packet_ptr packet) {
 			return this->handler_impl(sceneHandle, packet);
 		});
 	}
@@ -31,7 +31,7 @@ namespace Stormancer
 		_scenes[index] = nullptr;
 	}
 
-	bool SceneDispatcher::handler_impl(uint8 sceneHandle, std::shared_ptr<Packet<>> packet)
+	bool SceneDispatcher::handler_impl(uint8 sceneHandle, Packet_ptr packet)
 	{
 		if (sceneHandle < (uint8)MessageIDTypes::ID_SCENES)
 		{

@@ -73,9 +73,9 @@ namespace Stormancer
 		/// \param sceneId The scene Id as a string.
 		/// \param userData Some custom user data as a string.
 		/// \return a task to the connection to the scene.
-		STORMANCER_DLL_API pplx::task<std::shared_ptr<Scene>> getPublicScene(std::string sceneId, std::string userData = "");
+		STORMANCER_DLL_API pplx::task<Scene_ptr> getPublicScene(std::string sceneId, std::string userData = "");
 
-		STORMANCER_DLL_API pplx::task<std::shared_ptr<Scene>> getScene(std::string token);
+		STORMANCER_DLL_API pplx::task<Scene_ptr> getScene(std::string token);
 
 		/// Returns the name of the application.
 		STORMANCER_DLL_API std::string applicationName();
@@ -103,7 +103,7 @@ namespace Stormancer
 		/// \param token Application token.
 		/// \param localRoutes Local routes declared.
 		/// \return A task which complete when the connection is done.
-		pplx::task<void> connectToScene(Scene* scene, std::string& token, std::vector<Route*> localRoutes);
+		pplx::task<void> connectToScene(Scene* scene, std::string& token, std::vector<Route_ptr> localRoutes);
 
 		/// Disconnect from a scene.
 		/// \param scene The scene.
@@ -115,14 +115,14 @@ namespace Stormancer
 		/// \param sceneId Scene id.
 		/// \param sep Scene Endpoint retrieved by ApiClient::getSceneEndpoint
 		/// \return A task which complete when the scene informations are retrieved.
-		pplx::task<std::shared_ptr<Scene>> getScene(std::string sceneId, SceneEndpoint sep);
+		pplx::task<Scene_ptr> getScene(std::string sceneId, SceneEndpoint sep);
 
 		/// Disconnect from all scenes.
 		void disconnectAllScenes();
 
 		/// Called by the transport when a packet has been received.
 		/// \param packet Received packet.
-		void transport_packetReceived(std::shared_ptr<Packet<>> packet);
+		void transport_packetReceived(Packet_ptr packet);
 
 		/// Send a system request to the server for important operations.
 		/// \param id Request id.
@@ -135,7 +135,7 @@ namespace Stormancer
 				// serialize request dto
 				msgpack::pack(stream, parameter);
 				//auto res = stream->str();
-			}).then([this](std::shared_ptr<Packet<>> packet) {
+			}).then([this](Packet_ptr packet) {
 				// deserialize result dto
 				std::string buffer;
 				*packet->stream >> buffer;
@@ -176,6 +176,6 @@ namespace Stormancer
 		int64 _offset = 0;
 		int64 _lastPing = 0;
 		int64 _pingInterval = 5000;
-		std::shared_ptr<Subscription> _syncClockSubscription;
+		Subscription_ptr _syncClockSubscription;
 	};
 };

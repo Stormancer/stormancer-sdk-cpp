@@ -14,6 +14,6 @@ namespace Stormancer
 		
 	public:
 		/// Schedule a periodic task on the scheculder
-		STORMANCER_DLL_API std::shared_ptr<Subscription> schedulePeriodic(int delay, Action<> action);
+		STORMANCER_DLL_API Subscription_ptr schedulePeriodic(int delay, Action<> action);
 	};
 };

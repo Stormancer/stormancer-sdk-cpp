@@ -64,34 +64,12 @@ namespace Stormancer
 		}
 
 		template<typename TKey, typename TValue>
-		std::vector<TKey*> mapKeysPtr(std::map<TKey, TValue>& map)
-		{
-			std::vector<TKey*> vec;
-			for (auto it = map.begin(); it != map.end(); ++it)
-			{
-				vec.push_back(&it->first);
-			}
-			return vec;
-		}
-
-		template<typename TKey, typename TValue>
 		std::vector<TValue> mapValues(std::map<TKey, TValue>& map)
 		{
 			std::vector<TValue> vec;
 			for (auto it = map.begin(); it != map.end(); ++it)
 			{
 				vec.push_back(it->second);
-			}
-			return vec;
-		}
-
-		template<typename TKey, typename TValue>
-		std::vector<TValue*> mapValuesPtr(std::map<TKey, TValue>& map)
-		{
-			std::vector<TValue*> vec;
-			for (auto it = map.begin(); it != map.end(); ++it)
-			{
-				vec.push_back(&it->second);
 			}
 			return vec;
 		}

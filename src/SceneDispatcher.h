@@ -19,7 +19,7 @@ namespace Stormancer
 		void removeScene(uint8 sceneHandle);
 
 	private:
-		bool handler_impl(uint8 sceneHandle, std::shared_ptr<Packet<>> packet);
+		bool handler_impl(uint8 sceneHandle, Packet_ptr packet);
 
 	private:
 		processorFunction* handler = nullptr;

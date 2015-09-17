@@ -22,7 +22,7 @@ namespace Stormancer
 		_defaultProcessors.clear();
 	}
 
-	void DefaultPacketDispatcher::dispatchPacket(std::shared_ptr<Packet<>> packet)
+	void DefaultPacketDispatcher::dispatchPacket(Packet_ptr packet)
 	{
 		if (_asyncDispatch)
 		{
@@ -36,7 +36,7 @@ namespace Stormancer
 		}
 	}
 
-	void DefaultPacketDispatcher::dispatchImpl(std::shared_ptr<Packet<>> packet)
+	void DefaultPacketDispatcher::dispatchImpl(Packet_ptr packet)
 	{
 		bool processed = false;
 		int count = 0;

@@ -8,8 +8,6 @@
 
 namespace Stormancer
 {
-	using PacketObservable = rxcpp::observable < std::shared_ptr<Packet<>> >;
-
 	class Client;
 
 	/// Communicates with the server scene.
@@ -54,7 +52,7 @@ namespace Stormancer
 		/// \param handler Function which handle the receiving messages from the server on the route.
 		/// \param metadata Metadatas about the Route.
 		/// Add a route for each different message type.
-		STORMANCER_DLL_API void addRoute(std::string routeName, std::function<void(std::shared_ptr<Packet<IScenePeer>>)> handler, stringMap metadata = stringMap());
+		STORMANCER_DLL_API void addRoute(std::string routeName, std::function<void(Packetisp_ptr)> handler, stringMap metadata = stringMap());
 
 		/// Send a packet to a route.
 		/// \param routeName Route name.
@@ -79,20 +77,20 @@ namespace Stormancer
 		STORMANCER_DLL_API IConnection* hostConnection();
 
 		/// Returns a copy of the local routes.
-		STORMANCER_DLL_API std::vector<Route*> localRoutes();
+		STORMANCER_DLL_API std::vector<Route_ptr> localRoutes();
 
 		/// Returns a copy of the remote routes.
-		STORMANCER_DLL_API std::vector<Route*> remoteRoutes();
+		STORMANCER_DLL_API std::vector<Route_ptr> remoteRoutes();
 
 		/// Creates an IObservable<Packet> instance that listen to events on the specified route.
 		/// \param route A pointer of the Route instance to listen to.
 		/// \return An IObservable<Packet> instance that fires each time a message is received on the route.
-		STORMANCER_DLL_API rxcpp::observable<std::shared_ptr<Packet<IScenePeer>>> onMessage(Route* route);
+		STORMANCER_DLL_API rxcpp::observable<Packetisp_ptr> onMessage(Route_ptr);
 
 		/// Creates an IObservable<Packet> instance that listen to events on the specified route.
 		/// \param A string containing the name of the route to listen to.
 		/// \return An IObservable<Packet> instance that fires each time a message is received on the route.
-		STORMANCER_DLL_API rxcpp::observable<std::shared_ptr<Packet<IScenePeer>>> onMessage(std::string routeName);
+		STORMANCER_DLL_API rxcpp::observable<Packetisp_ptr> onMessage(std::string routeName);
 
 		/// Get a vector containing the scene host connections.
 		/// \return A vector containing the scene host connections.
@@ -107,12 +105,12 @@ namespace Stormancer
 
 		/// Handle a message received on the scene and dispatch the packet to the right route handle.
 		/// \param packet Receivedpacket.
-		void handleMessage(std::shared_ptr<Packet<>> packet);
+		void handleMessage(Packet_ptr packet);
 
 	public:
 
 		/// Fire when a packet is received in the scene. 
-		Action<std::shared_ptr<Packet<>>> packetReceived;
+		Action<Packet_ptr> packetReceived;
 
 		const bool isHost = false;
 
@@ -137,13 +135,13 @@ namespace Stormancer
 		std::string _id;
 
 		/// The local routes.
-		std::map<std::string, Route> _localRoutesMap;
+		std::map<std::string, Route_ptr> _localRoutesMap;
 
 		/// The remote routes.
-		std::map<std::string, Route> _remoteRoutesMap;
+		std::map<std::string, Route_ptr> _remoteRoutesMap;
 
 		/// Route handlers.
-		std::map<uint16, std::vector<std::function<void(std::shared_ptr<Packet<>>)>>> _handlers;
+		std::map<uint16, std::list<std::function<void(Packet_ptr)>>> _handlers;
 
 		/// Owner client.
 		Client* _client;

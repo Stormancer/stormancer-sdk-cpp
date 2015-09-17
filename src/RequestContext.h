@@ -12,13 +12,13 @@ namespace Stormancer
 		/*! Constructor
 		\param packet The packet.
 		*/
-		RequestContext(std::shared_ptr<Packet<>> packet);
+		RequestContext(Packet_ptr packet);
 		
 		/// Destructor.
 		virtual ~RequestContext();
 
 	public:
-		std::shared_ptr<Packet<>> packet();
+		Packet_ptr packet();
 		bytestream* inputStream();
 		
 		/// Returns the request completed state.
@@ -41,7 +41,7 @@ namespace Stormancer
 		byte _requestId[2];
 		
 		/// Packet that initiated the request
-		std::shared_ptr<Packet<>> _packet = nullptr;
+		Packet_ptr _packet = nullptr;
 		
 		/// Stream exposing the request parameters.
 		bytestream* _stream = nullptr;

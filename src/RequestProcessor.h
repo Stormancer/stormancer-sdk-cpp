@@ -34,11 +34,11 @@ namespace Stormancer
 		\param writer A procedure writing the request parameters.
 		\return An observable returning the request responses.
 		*/
-		pplx::task<std::shared_ptr<Packet<>>> sendSystemRequest(IConnection* peer, byte msgId, std::function<void(bytestream*)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY);
+		pplx::task<Packet_ptr> sendSystemRequest(IConnection* peer, byte msgId, std::function<void(bytestream*)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY);
 
 	private:
 	
-		std::shared_ptr<Request> reserveRequestSlot(PacketObserver&& observer);
+		Request_ptr reserveRequestSlot(PacketObserver&& observer);
 		
 		bool freeRequestSlot(uint16 requestId);
 
@@ -51,7 +51,7 @@ namespace Stormancer
 		std::function<void(byte, std::function<pplx::task<void>(RequestContext*)>)> addSystemRequestHandler;
 
 	protected:
-		std::map<uint16, std::shared_ptr<Request>> _pendingRequests;
+		std::map<uint16, Request_ptr> _pendingRequests;
 		ILogger* _logger;
 		bool _isRegistered = false;
 		std::map<byte, std::function<pplx::task<void>(RequestContext*)>> _handlers;

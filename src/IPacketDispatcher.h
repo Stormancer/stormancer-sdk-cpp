@@ -19,7 +19,7 @@ namespace Stormancer
 		/*! Dispatches a packet to the system.
 		\param packet The packet to dispatch.
 		*/
-		virtual void dispatchPacket(std::shared_ptr<Packet<>> packet) = 0;
+		virtual void dispatchPacket(Packet_ptr packet) = 0;
 
 		/*! Adds a packet processor to the dispatcher.
 		\param processor An 'IPacketProcessor' object.

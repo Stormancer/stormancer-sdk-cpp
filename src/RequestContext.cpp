@@ -2,7 +2,7 @@
 
 namespace Stormancer
 {
-	RequestContext::RequestContext(std::shared_ptr<Packet<>> packet)
+	RequestContext::RequestContext(Packet_ptr packet)
 		: _packet(packet),
 		_stream(packet->stream)
 	{
@@ -16,7 +16,7 @@ namespace Stormancer
 	{
 	}
 
-	std::shared_ptr<Packet<>> RequestContext::packet()
+	Packet_ptr RequestContext::packet()
 	{
 		return _packet;
 	}

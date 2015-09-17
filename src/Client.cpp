@@ -92,7 +92,7 @@ namespace Stormancer
 		if (!_initialized)
 		{
 			_initialized = true;
-			_transport->packetReceived += std::function<void(std::shared_ptr<Packet<>>)>(([this](std::shared_ptr<Packet<>> packet) {
+			_transport->packetReceived += std::function<void(Packet_ptr)>(([this](Packet_ptr packet) {
 				this->transport_packetReceived(packet);
 			}));
 			_watch.reset();
@@ -121,7 +121,7 @@ namespace Stormancer
 		}
 	}
 
-	pplx::task<std::shared_ptr<Scene>> Client::getPublicScene(std::string sceneId, std::string userData)
+	pplx::task<Scene_ptr> Client::getPublicScene(std::string sceneId, std::string userData)
 	{
 		_logger->log(LogLevel::Debug, "Client::getPublicScene", sceneId, userData);
 
@@ -138,13 +138,13 @@ namespace Stormancer
 		});
 	}
 
-	pplx::task<std::shared_ptr<Scene>> Client::getScene(std::string token)
+	pplx::task<Scene_ptr> Client::getScene(std::string token)
 	{
 		auto sep = _tokenHandler->decodeToken(token);
 		return getScene(sep.tokenData.SceneId, sep);
 	}
 
-	pplx::task<std::shared_ptr<Scene>> Client::getScene(std::string sceneId, SceneEndpoint sep)
+	pplx::task<Scene_ptr> Client::getScene(std::string sceneId, SceneEndpoint sep)
 	{
 		_logger->log(LogLevel::Debug, "Client::getScene", sceneId, sep.token);
 
@@ -237,7 +237,7 @@ namespace Stormancer
 				ss << "]";
 				_logger->log(LogLevel::Debug, "Client::getScene", "SceneInfosDto received", ss.str());
 				_serverConnection->metadata["serializer"] = result.SelectedSerializer;
-				return std::shared_ptr<Scene>(new Scene(_serverConnection, this, sceneId, sep.token, result));
+				return Scene_ptr(new Scene(_serverConnection, this, sceneId, sep.token, result));
 			}
 			catch (const std::exception& e)
 			{
@@ -250,7 +250,7 @@ namespace Stormancer
 	{
 		return _requestProcessor->sendSystemRequest(_serverConnection, (byte)SystemRequestIDTypes::ID_SET_METADATA, [this](bytestream* bs) {
 			msgpack::pack(bs, this->_serverConnection->metadata);
-		}).then([](pplx::task<std::shared_ptr<Packet<>>> t) {
+		}).then([](pplx::task<Packet_ptr> t) {
 			try
 			{
 				t.wait();
@@ -261,7 +261,7 @@ namespace Stormancer
 		});
 	}
 
-	pplx::task<void> Client::connectToScene(Scene* scene, std::string& token, std::vector<Route*> localRoutes)
+	pplx::task<void> Client::connectToScene(Scene* scene, std::string& token, std::vector<Route_ptr> localRoutes)
 	{
 		ConnectToSceneMsg parameter;
 		parameter.Token = token;
@@ -315,7 +315,7 @@ namespace Stormancer
 		}
 	}
 
-	void Client::transport_packetReceived(std::shared_ptr<Packet<>> packet)
+	void Client::transport_packetReceived(Packet_ptr packet)
 	{
 		// TODO plugins
 
@@ -356,7 +356,7 @@ namespace Stormancer
 			int64 tStart = _watch.getElapsedTime();
 			return _requestProcessor->sendSystemRequest(_serverConnection, (byte)SystemRequestIDTypes::ID_PING, [&tStart](bytestream* bs) {
 				*bs << tStart;
-			}, PacketPriority::IMMEDIATE_PRIORITY).then([this, tStart](std::shared_ptr<Packet<>> p) {
+			}, PacketPriority::IMMEDIATE_PRIORITY).then([this, tStart](Packet_ptr p) {
 				int64 tEnd = this->_watch.getElapsedTime();
 				uint64 tRef;
 				*p->stream >> tRef;

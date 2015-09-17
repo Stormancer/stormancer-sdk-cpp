@@ -3,6 +3,7 @@
 #include "IConnection.h"
 #include "Helpers.h"
 #include "Action.h"
+#include "IScenePeer.h"
 
 namespace Stormancer
 {
@@ -84,7 +85,7 @@ namespace Stormancer
 		bytestream* stream = nullptr;
 
 		/// Attached request.
-		std::shared_ptr<Request> request = nullptr;
+		Request_ptr request = nullptr;
 
 		/// Clean-up operations.
 		Action<> cleanup;

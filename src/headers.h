@@ -21,6 +21,7 @@
 #include <string>
 #include <typeinfo>
 #include <vector>
+#include <list>
 #include <iomanip>
 #include <thread>
 #include <regex>

@@ -11,7 +11,7 @@ namespace Stormancer
 	{
 		for (auto routeDto : dto.Routes)
 		{
-			_remoteRoutesMap[routeDto.Name] = Route(this, routeDto.Name, routeDto.Handle, routeDto.Metadata);
+			_remoteRoutesMap[routeDto.Name] = Route_ptr(new Route(this, routeDto.Name, routeDto.Handle, routeDto.Metadata));
 		}
 	}
 
@@ -55,17 +55,17 @@ namespace Stormancer
 		return _peer;
 	}
 
-	std::vector<Route*> Scene::localRoutes()
+	std::vector<Route_ptr> Scene::localRoutes()
 	{
-		return mapValuesPtr(_localRoutesMap);
+		return mapValues(_localRoutesMap);
 	}
 
-	std::vector<Route*> Scene::remoteRoutes()
+	std::vector<Route_ptr> Scene::remoteRoutes()
 	{
-		return mapValuesPtr(_remoteRoutesMap);
+		return mapValues(_remoteRoutesMap);
 	}
 
-	void Scene::addRoute(std::string routeName, std::function<void(std::shared_ptr<Packet<IScenePeer>>)> handler, stringMap metadata)
+	void Scene::addRoute(std::string routeName, std::function<void(Packetisp_ptr)> handler, stringMap metadata)
 	{
 		if (routeName.length() == 0 || routeName[0] == '@')
 		{
@@ -79,43 +79,44 @@ namespace Stormancer
 
 		if (!mapContains(_localRoutesMap, routeName))
 		{
-			_localRoutesMap[routeName] = Route(this, routeName, metadata);
+			_localRoutesMap[routeName] = Route_ptr(new Route(this, routeName, metadata));
 		}
 
 		subscriptions.push_back(onMessage(routeName).subscribe(handler));
 	}
 
-	rxcpp::observable<std::shared_ptr<Packet<IScenePeer>>> Scene::onMessage(Route* route)
+	rxcpp::observable<Packetisp_ptr> Scene::onMessage(Route_ptr route)
 	{
-		auto observable = rxcpp::observable<>::create<std::shared_ptr<Packet<IScenePeer>>>([this, route](rxcpp::subscriber<std::shared_ptr<Packet<IScenePeer>>> subscriber) {
-			auto handler = std::function<void(std::shared_ptr<Packet<>>)>([this, subscriber](std::shared_ptr<Packet<>> p) {
+		auto observable = rxcpp::observable<>::create<Packetisp_ptr>([this, route](rxcpp::subscriber<Packetisp_ptr> subscriber) {
+			auto handler = std::function<void(Packet_ptr)>([this, subscriber](Packet_ptr p) {
 				auto metadata = p->metadata();
-				std::shared_ptr<Packet<IScenePeer>> packet(new Packet<IScenePeer>(host(), p->stream, metadata));
+				Packetisp_ptr packet(new Packet<IScenePeer>(host(), p->stream, metadata));
 				subscriber.on_next(packet);
 			});
 			route->handlers.push_back(handler);
-
-			subscriber.add([route, handler]() {
-				//auto it = std::find(route->handlers.begin(), route->handlers.end(), handler);
-				//route->handlers.erase(it);
+			auto it = route->handlers.end();
+			it--;
+			subscriber.add([route, it]() {
+				route->handlers.erase(it);
 			});
 		});
 		return observable.as_dynamic();
 	}
 
-	rxcpp::observable<std::shared_ptr<Packet<IScenePeer>>> Scene::onMessage(std::string routeName)
+	rxcpp::observable<Packetisp_ptr> Scene::onMessage(std::string routeName)
 	{
 		if (_connected)
 		{
 			throw std::runtime_error("You cannot register handles once the scene is connected.");
 		}
 
+		Route_ptr route;
 		if (!mapContains(_localRoutesMap, routeName))
 		{
-			_localRoutesMap[routeName] = Route(this, routeName);
+			_localRoutesMap[routeName] = Route_ptr(new Route(this, routeName));
 		}
 
-		Route* route = &_localRoutesMap[routeName];
+		route = _localRoutesMap[routeName];
 		return onMessage(route);
 	}
 
@@ -135,9 +136,9 @@ namespace Stormancer
 		{
 			throw std::invalid_argument(std::string("The route '") + routeName + "' doesn't exist on the scene.");
 		}
-		Route& route = _remoteRoutesMap[routeName];
+		Route_ptr route = _remoteRoutesMap[routeName];
 
-		_peer->sendToScene(_handle, route._handle, writer, priority, reliability);
+		_peer->sendToScene(_handle, route->_handle, writer, priority, reliability);
 	}
 
 	pplx::task<void> Scene::connect()
@@ -145,7 +146,7 @@ namespace Stormancer
 		if (!_connected && !connectCalled)
 		{
 			connectCalled = true;
-			connectTask = _client->connectToScene(this, _token, mapValuesPtr(_localRoutesMap));
+			connectTask = _client->connectToScene(this, _token, mapValues(_localRoutesMap));
 			connectTask.then([this]() {
 				this->_connected = true;
 			});
@@ -170,12 +171,12 @@ namespace Stormancer
 
 		for (auto pair : _localRoutesMap)
 		{
-			pair.second._handle = cr.RouteMappings[pair.first];
-			_handlers[pair.second._handle] = pair.second.handlers;
+			pair.second->_handle = cr.RouteMappings[pair.first];
+			_handlers[pair.second->_handle] = pair.second->handlers;
 		}
 	}
 
-	void Scene::handleMessage(std::shared_ptr<Packet<>> packet)
+	void Scene::handleMessage(Packet_ptr packet)
 	{
 		packetReceived(packet);
 
@@ -187,9 +188,9 @@ namespace Stormancer
 		if (mapContains(_handlers, routeId))
 		{
 			auto observers = _handlers[routeId];
-			for (size_t i = 0; i < observers.size(); i++)
+			for (auto f : observers)
 			{
-				(observers[i])(packet);
+				f(packet);
 			}
 		}
 

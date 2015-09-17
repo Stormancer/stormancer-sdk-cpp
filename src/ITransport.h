@@ -21,7 +21,7 @@ namespace Stormancer
 		uint64 id();
 
 	public:
-		Action<std::shared_ptr<Packet<>>> packetReceived;
+		Action<Packet_ptr> packetReceived;
 		Action<IConnection*> connectionOpened;
 		Action<IConnection*> connectionClosed;
 

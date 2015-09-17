@@ -10,7 +10,7 @@ namespace Stormancer
 	{
 	}
 
-	std::shared_ptr<Subscription> DefaultScheduler::schedulePeriodic(int delay, Action<> action)
+	Subscription_ptr DefaultScheduler::schedulePeriodic(int delay, Action<> action)
 	{
 		if (delay <= 0)
 		{
@@ -28,6 +28,6 @@ namespace Stormancer
 			_syncClockSubscription.unsubscribe();
 		}));
 		
-		return std::shared_ptr<Subscription>(new Subscription(unsubscribeAction));
+		return Subscription_ptr(new Subscription(unsubscribeAction));
 	}
 };

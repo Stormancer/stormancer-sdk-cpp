@@ -2,7 +2,7 @@
 
 namespace Stormancer
 {
-	ScenePeer::ScenePeer(IConnection* connection, byte sceneHandle, std::map<std::string, Route>& routeMapping, Scene* scene)
+	ScenePeer::ScenePeer(IConnection* connection, byte sceneHandle, std::map<std::string, Route_ptr>& routeMapping, Scene* scene)
 		: _connection(connection),
 		_sceneHandle(sceneHandle),
 		_routeMapping(routeMapping),
@@ -20,8 +20,8 @@ namespace Stormancer
 		{
 			throw std::invalid_argument(std::string("The routeName '") + routeName + "' is not declared on the server.");
 		}
-		Route& r = _routeMapping[routeName];
-		_connection->sendToScene(_sceneHandle, r._handle, writer, priority, reliability);
+		Route_ptr r = _routeMapping[routeName];
+		_connection->sendToScene(_sceneHandle, r->_handle, writer, priority, reliability);
 	}
 
 	void ScenePeer::disconnect()
