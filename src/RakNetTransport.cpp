@@ -113,10 +113,6 @@ namespace Stormancer
 							auto tce = _pendingConnections[packetSystemAddressStr];
 							tce.set_exception<std::exception>(std::runtime_error("Connection attempt failed."));
 						}
-						else
-						{
-
-						}
 						break;
 					}
 					case (byte)MessageIDTypes::ID_CONNECTION_RESULT:
@@ -184,16 +180,19 @@ namespace Stormancer
 
 	pplx::task<IConnection*> RakNetTransport::connect(std::string endpoint)
 	{
+		//"^(([0-9A-F]{1,4}:){7}[0-9A-F]{1,4}|(\\d{1,3}\\.){3}\\d{1,3}):(\\d{1,5})$"
+
 		std::smatch m;
-		std::regex ipRegex("^(([0-9A-F]{1,4}:){7}[0-9A-F]{1,4}|(\\d{1,3}\\.){3}\\d{1,3}):(\\d{1,5})$", std::regex_constants::ECMAScript | std::regex_constants::icase);
+		std::regex ipRegex("^((\\d{1,3}\\.){3}\\d{1,3}):(\\d{1,5})$", std::regex_constants::ECMAScript | std::regex_constants::icase);
 		bool res = std::regex_search(endpoint, m, ipRegex);
 		if (!res || m.length() < 5)
 		{
 			throw std::invalid_argument("Bad scene endpoint (" + endpoint + ')');
 		}
 
-		auto host = std::string(m[1]).c_str();
-		uint16 port = (uint16)std::atoi(std::string(m[4]).c_str());
+		auto host = m.str(1);
+		auto hostCstr = host.c_str();
+		uint16 port = (uint16)std::atoi(m.str(3).c_str());
 		if (port == 0)
 		{
 			throw std::runtime_error("Scene endpoint port should not be 0 (" + endpoint + ')');
@@ -204,13 +203,13 @@ namespace Stormancer
 			throw std::runtime_error("Transport not started. Check you started it.");
 		}
 
-		auto result = _peer->Connect(host, port, nullptr, 0);
+		auto result = _peer->Connect(hostCstr, port, nullptr, 0);
 		if (result != RakNet::ConnectionAttemptResult::CONNECTION_ATTEMPT_STARTED)
 		{
 			throw std::runtime_error(std::string("Bad RakNet connection attempt result (") + std::to_string(result) + ')');
 		}
 
-		std::string addressStr = RakNet::SystemAddress(host, port).ToString();
+		std::string addressStr = RakNet::SystemAddress(hostCstr, port).ToString();
 		auto tce = pplx::task_completion_event<IConnection*>();
 		_pendingConnections[addressStr] = tce;
 		return pplx::task<IConnection*>(tce);

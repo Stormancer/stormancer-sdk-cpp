@@ -35,7 +35,7 @@ namespace Stormancer
 		return _name;
 	}
 
-	stringMap Route::metadata()
+	stringMap& Route::metadata()
 	{
 		return _metadata;
 	}

@@ -17,13 +17,15 @@ namespace Stormancer
 	public:
 		Scene* scene();
 		std::string name();
-		stringMap metadata();
+		stringMap& metadata();
 
 	public:
-		std::string _name;
 		uint16 _handle;
-		Scene* _scene;
-		stringMap _metadata;
 		std::list<std::function<void(Packet_ptr)>> handlers;
+
+	private:
+		Scene* _scene;
+		std::string _name;
+		stringMap _metadata;
 	};
 };
