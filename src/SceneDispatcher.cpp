@@ -38,7 +38,7 @@ namespace Stormancer
 			return false;
 		}
 
-		size_t sceneIndex = sceneHandle - (uint8)MessageIDTypes::ID_SCENES;
+		unsigned int sceneIndex = sceneHandle - (uint8)MessageIDTypes::ID_SCENES;
 		if (sceneIndex >= _scenes.size())
 		{
 			return false;

@@ -2,8 +2,8 @@
 
 namespace Stormancer
 {
-	Request::Request(PacketObserver&& observer)
-		: observer(observer)
+	Request::Request(pplx::task_completion_event<Packet_ptr> tce)
+		: tce(tce)
 	{
 	}
 

@@ -34,20 +34,25 @@ namespace Stormancer
 		{
 			config.addProcessor(it.first, new handlerFunction([it](Packet_ptr p) {
 				RequestContext context(p);
-				it.second(&context).then([&context, &p](pplx::task<void> task) {
+				it.second(&context).then([&context, p](pplx::task<void> t) {
 					if (!context.isComplete())
 					{
-						if (false)
+						// task faulted
+						try
 						{
-							context.error([&p](bytestream* stream) {
+							t.wait();
+						}
+						catch (const std::exception& e)
+						{
+							context.error([p, e](bytestream* stream) {
 								msgpack::packer<bytestream> pk(stream);
-								pk.pack(std::string("An error occured on the server."));
+								pk.pack(std::string("An error occured on the server. ") + e.what());
 							});
+							return;
 						}
-						else
-						{
-							context.complete();
-						}
+
+						// task completed
+						context.complete();
 					}
 				});
 				return true;
@@ -58,18 +63,17 @@ namespace Stormancer
 			uint16 id;
 			*(p->stream) >> id;
 
-			if (mapContains(this->_pendingRequests, id))
+			Request_ptr request = freeRequestSlot(id);
+
+			if (request)
 			{
-				auto request = this->_pendingRequests[id];
+				p->metadata()["request"] = (void*)request.get();
 				time(&request->lastRefresh);
-				request->observer.on_next(p);
-				request->observer.on_completed();
-				p->request = request;
-				freeRequestSlot(request->id);
+				request->tce.set(p);
 			}
 			else
 			{
-				_logger->log(LogLevel::Trace, "", "Unknow request id.", to_string(id));
+				_logger->log(LogLevel::Warn, "", "Unknow request id.", to_string(id));
 			}
 
 			return true;
@@ -79,24 +83,23 @@ namespace Stormancer
 			uint16 id;
 			*(p->stream) >> id;
 
-			char c;
-			*(p->stream) >> c;
-			bool hasValues = (c == 1);
+			char hasValues;
+			*(p->stream) >> hasValues;
 
-			if (!hasValues)
+			if (hasValues == 0)
 			{
-				if (mapContains(this->_pendingRequests, id))
-				{
-					auto request = this->_pendingRequests[id];
-					p->request = request;
+				Request_ptr request = freeRequestSlot(id);
 
-					request->observer.on_completed();
-					freeRequestSlot(request->id);
+				if (request)
+				{
+					p->metadata()["request"] = (void*)request.get();
+					request->tce.set(nullptr);
 				}
 				else
 				{
-					_logger->log(LogLevel::Trace, "", "Unknow request id.", to_string(id));
+					_logger->log(LogLevel::Warn, "", "Unknow request id.", to_string(id));
 				}
+
 			}
 
 			return true;
@@ -106,31 +109,24 @@ namespace Stormancer
 			uint16 id;
 			*(p->stream) >> id;
 
-			if (mapContains(_pendingRequests, id))
-			{
-				p->request = _pendingRequests[id];
+			Request_ptr request = freeRequestSlot(id);
 
+			if (request)
+			{
+				p->metadata()["request"] = (void*)request.get();
 				std::string buf;
 				*p->stream >> buf;
-				std::stringstream ss;
-				for (uint32 i = 0; i < buf.size(); i++)
-				{
-					ss << (int)(buf[i]) << ",";
-				}
 				msgpack::unpacked result;
 				msgpack::unpack(result, buf.data(), buf.size());
 				msgpack::object deserialized = result.get();
 				std::string msg;
 				deserialized.convert(&msg);
 
-				auto eptr = std::make_exception_ptr(new std::exception());//(msg));
-				p->request->observer.on_error(eptr);
-
-				freeRequestSlot(id);
+				request->tce.set_exception<std::exception>(std::runtime_error(msg));
 			}
 			else
 			{
-				_logger->log(LogLevel::Trace, "", "Unknow request id.", to_string(id));
+				_logger->log(LogLevel::Warn, "", "Unknow request id.", to_string(id));
 			}
 
 			return true;
@@ -139,71 +135,72 @@ namespace Stormancer
 
 	pplx::task<Packet_ptr> RequestProcessor::sendSystemRequest(IConnection* peer, byte msgId, std::function<void(bytestream*)> writer, PacketPriority priority)
 	{
-		auto tce = new pplx::task_completion_event<Packet_ptr>();
-		auto observer = rxcpp::make_observer<Packet_ptr>([tce](Packet_ptr p) {
-			tce->set(p);
-		}, [tce](std::exception_ptr ex) {
-			try
-			{
-				std::rethrow_exception(ex);
-			}
-			catch (const std::exception& e)
-			{
-				tce->set_exception<std::exception>(e);
-			}
-		});
-		auto request = reserveRequestSlot(observer.as_dynamic());
+		auto tce = pplx::task_completion_event<Packet_ptr>();
+		auto request = reserveRequestSlot(tce);
 
-		peer->sendSystem(msgId, [request, &writer](bytestream* stream) {
+		peer->sendSystem((byte)MessageIDTypes::ID_SYSTEM_REQUEST, [request, &writer, msgId](bytestream* stream) {
+			*stream << msgId;
 			*stream << request->id;
 			writer(stream);
 		}, priority);
 
-		auto task = pplx::create_task(*tce);
-		return task.then([tce](pplx::task<Packet_ptr> t) {
-			if (tce)
-			{
-				delete tce;
-			}
-			try
-			{
-				return t.get();
-			}
-			catch (const std::exception& e)
-			{
-				throw std::runtime_error(std::string(e.what()) + "System request failed.");
-			}
-		});
+		return pplx::create_task(tce);
 	}
 
-	Request_ptr RequestProcessor::reserveRequestSlot(PacketObserver&& observer)
+	Request_ptr RequestProcessor::reserveRequestSlot(pplx::task_completion_event<Packet_ptr> tce)
 	{
 		static uint16 id = 0;
+		// i is used to know if we tested all uint16 available values, whatever the current value of id.
 		int32 i = 0;
 		while (i <= 0xffff)
 		{
+			//std::stringstream ss;
+			//ss << std::this_thread::get_id();
+			//_logger->log(std::string("#4 lock ") + ss.str());
+			_mutexPendingRequests.lock();
+			//_logger->log("#4 exec");
+			Request_ptr request;
 			if (!mapContains(_pendingRequests, id))
 			{
-				Request_ptr request(new Request(std::move(observer)));
+				request = Request_ptr(new Request(tce));
 				time(&request->lastRefresh);
 				request->id = id;
 				_pendingRequests[id] = request;
+			}
+
+			//_logger->log("#4 unlock");
+			_mutexPendingRequests.unlock();
+			//_logger->log("#4 unlocked");
+
+			if (request)
+			{
 				return request;
 			}
+
 			id++;
 			i++;
 		}
-		_logger->log(LogLevel::Error, "", "Unable to create a new request: Too many pending requests.", "");
+		_logger->log(LogLevel::Error, "RequestProcessor::reserveRequestSlot", "Unable to create a new request: Too many pending requests.", "");
 		throw std::overflow_error("Unable to create a new request: Too many pending requests.");
 	}
 
-	bool RequestProcessor::freeRequestSlot(uint16 requestId)
+	Request_ptr RequestProcessor::freeRequestSlot(uint16 requestId)
 	{
-		if (mapContains(this->_pendingRequests, requestId))
+		//std::stringstream ss;
+		//ss << std::this_thread::get_id();
+		//_logger->log(std::string("#5 lock ") + ss.str());
+		_mutexPendingRequests.lock();
+		//_logger->log("#5 exec");
+		Request_ptr request;
+		if (mapContains(_pendingRequests, requestId))
 		{
-			this->_pendingRequests.erase(requestId);
-			return true;
+			request = _pendingRequests[requestId];
+			_pendingRequests.erase(requestId);
 		}
-		return false;
+		//_logger->log("#5 unlock");
+		_mutexPendingRequests.unlock();
+		//_logger->log("#5 unlocked");
+
+		return request;
 	}
 };

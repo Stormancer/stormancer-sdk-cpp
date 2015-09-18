@@ -66,15 +66,7 @@ int main(int argc, char* argv[])
 	logger->logGreen("Done");
 
 	auto task = test(client);
-
-	try
-	{
-		task.wait();
-	}
-	catch (const exception &e)
-	{
-		logger->log(e);
-	}
+	task.wait();
 
 	//DefaultScheduler scheduler;
 	//int i = 0;

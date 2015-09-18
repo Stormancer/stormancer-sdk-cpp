@@ -58,10 +58,9 @@ namespace Stormancer
 	void RakNetConnection::sendSystem(byte msgId, std::function<void(bytestream*)> writer, PacketPriority priority)
 	{
 		sendRaw([msgId, &writer](bytestream* stream) {
-			*stream << (byte)MessageIDTypes::ID_SYSTEM_REQUEST;
 			*stream << msgId;
 			writer(stream);
-		}, priority, PacketReliability::RELIABLE_ORDERED, (uint8)0);
+		}, priority, PacketReliability::RELIABLE_ORDERED, (byte)0);
 	}
 
 	void RakNetConnection::sendRaw(std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability, char channel)
@@ -69,12 +68,11 @@ namespace Stormancer
 		bytestream stream;
 		writer(&stream);
 		stream.flush();
-		auto data = stream.str();
-		auto length = data.length();
-		auto result = _rakPeer->Send(data.c_str(), (int)data.length(), (PacketPriority)priority, (PacketReliability)reliability, channel, _guid, false);
+		auto bytes = stream.str();
+		auto result = _rakPeer->Send(bytes.data(), (int)bytes.length(), (PacketPriority)priority, (PacketReliability)reliability, channel, _guid, false);
 		if (result == 0)
 		{
-			throw std::runtime_error("Failed to send message.");
+			throw std::runtime_error("Raknet failed to send the message.");
 		}
 	}
 
@@ -86,10 +84,9 @@ namespace Stormancer
 		writer(&stream);
 		auto data = stream.str();
 		auto result = _rakPeer->Send(data.c_str(), (int)data.length(), priority, reliability, 0, _guid, false);
-
 		if (result == 0)
 		{
-			throw std::runtime_error("Failed to send message.");
+			throw std::runtime_error("Raknet failed to send the message.");
 		}
 	}
 

@@ -133,7 +133,9 @@ namespace Stormancer
 			}
 			catch (const std::exception& e)
 			{
-				throw std::runtime_error(std::string(e.what()) + "\nUnable to get the scene endpoint or connecting the scene.");
+				std::runtime_error error(std::string(e.what()) + "\nUnable to get the scene endpoint / Failed to connect to the scene.");
+				_logger->log(error);
+				throw error;
 			}
 		});
 	}
@@ -248,6 +250,7 @@ namespace Stormancer
 
 	pplx::task<void> Client::updateServerMetadata()
 	{
+		_logger->log(LogLevel::Trace, "Client::updateServerMetadata", "sending system request.", "");
 		return _requestProcessor->sendSystemRequest(_serverConnection, (byte)SystemRequestIDTypes::ID_SET_METADATA, [this](bytestream* bs) {
 			msgpack::pack(bs, this->_serverConnection->metadata);
 		}).then([](pplx::task<Packet_ptr> t) {

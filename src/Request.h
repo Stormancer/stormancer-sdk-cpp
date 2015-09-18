@@ -8,12 +8,12 @@ namespace Stormancer
 	class Request
 	{
 	public:
-		Request(PacketObserver&& observer);
+		Request(pplx::task_completion_event<Packet_ptr> tce);
 		virtual ~Request();
 
 	public:
 		uint16 id = 0;
 		time_t lastRefresh = time(NULL);
-		PacketObserver observer;
+		pplx::task_completion_event<Packet_ptr> tce;
 	};
 };

@@ -7,8 +7,6 @@
 
 namespace Stormancer
 {
-	class Request;
-
 	/// Expose a stream for reading data received from the network.
 	template<typename T = IConnection>
 	class Packet
@@ -50,30 +48,9 @@ namespace Stormancer
 	public:
 	
 		/// Returns a copy of the packet metadatas.
-		anyMap metadata()
+		anyMap& metadata()
 		{
 			return _metadata;
-		}
-
-		/// Set a pointer to a data in the metadata.
-		template<typename TData>
-		void setMetadata(std::string key, TData* data)
-		{
-			_metadata[key] = static_cast<void*>(data);
-		}
-
-		/// Get a pointer to a data of the packet metadatas.
-		template<typename TData>
-		TData* getMetadata(std::string key)
-		{
-			return (TData*)_metadata[key];
-		}
-
-		/// Remove a data from the metadatas.
-		void removeMetadata(std::string key)
-		{
-			auto it = _metadata.find(key);
-			_metadata.erase(it);
 		}
 
 	public:
@@ -83,10 +60,7 @@ namespace Stormancer
 		
 		/// data stream.
 		bytestream* stream = nullptr;
-
-		/// Attached request.
-		Request_ptr request = nullptr;
-
+		
 		/// Clean-up operations.
 		Action<> cleanup;
 
