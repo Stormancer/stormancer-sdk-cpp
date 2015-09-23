@@ -15,7 +15,7 @@ For each sample, you have to do this:
 - Change the **Environment path**  
 *(Project properties > Configuration Properties > Debugging > Environment)*  
 ```
-PATH=$(SolutionDir)RakNet\Lib\DLL\Lib;$(SolutionDir)bin;%PATH%  
+PATH=$(SolutionDir)..\stormancer-sdk-cpp\RakNet\Lib\DLL\Lib;$(SolutionDir)..\stormancer-sdk-cpp\bin;%PATH%
 ```
 
 ## Configure a project  
@@ -31,29 +31,27 @@ PATH=$(SolutionDir)RakNet\Lib\DLL\Lib;$(SolutionDir)bin;%PATH%
 - Change the **Environment path**  
 *(Configuration Properties > Debugging > Environment)*  
 ```
-PATH=$(SolutionDir)..\stormancer-sdk-cpp\RakNet\Lib\DLL\Lib;$(SolutionDir)..\stormancer-sdk-cpp\bin;%PATH%  
+PATH=$(SolutionDir)..\stormancer-sdk-cpp\RakNet\Lib\DLL\Lib;$(SolutionDir)..\stormancer-sdk-cpp\bin;%PATH%
 ```
 - Change the **Additional include directories**  
 *(Configuration Properties > C/C++ > General > Additional include directories)*  
 ```
-$(SolutionDir)..\stormancer-sdk-cpp\src  
-$(SolutionDir)..\stormancer-sdk-cpp\msgpack-c\include  
-$(SolutionDir)..\stormancer-sdk-cpp\RakNet\Source  
+$(SolutionDir)..\stormancer-sdk-cpp\src
+$(SolutionDir)..\stormancer-sdk-cpp\msgpack-c\include
+$(SolutionDir)..\stormancer-sdk-cpp\RakNet\Source
 ```
 - Change the **Additional library directories**  
 *(Configuration Properties > Linker > General > Additional library directories)*  
 ```
-$(SolutionDir)..\stormancer-sdk-cpp\RakNet\Lib\DLL\Lib  
-$(SolutionDir)..\stormancer-sdk-cpp\bin  
+$(SolutionDir)..\stormancer-sdk-cpp\RakNet\Lib\DLL\Lib
+$(SolutionDir)..\stormancer-sdk-cpp\bin
 ```
 - Change the **Additional dependencies**  
 *(Configuration Properties > Linker > Input > Additional dependencies)*  
 ```
-DLL_vc9_DLL_$(Configuration)_$(Platform).lib  
-ws2_32.lib  
-stormancer-sdk-cpp_$(Platform)_$(Configuration).lib  
+DLL_vc9_DLL_$(Configuration)_$(Platform).lib
+stormancer-sdk-cpp_$(Platform)_$(Configuration).lib
 ```
-- If you created your project directly in the Stormancer SDK solution. You don't need to add `stormancer*.lib` in your *Additional dependendies*. But you need to add a direct reference to the sdk: *(Project properties > Common properties > References > Add New Reference... > stormancer-sdk-cpp)*  
 - Build the project.  
 
 ## Generate the docs
@@ -62,7 +60,7 @@ stormancer-sdk-cpp_$(Platform)_$(Configuration).lib
 - Get the last version of the stormancer sdk  
 - Get doxygen here : www.doxygen.org  
 - Install and open doxygen  
-- Open the configuration file in ./documentation/Doxyfile  
+- Open the configuration file *./documentation/Doxyfile* with doxygen  
 - Generate the documentation  
 - Merge the master branch in the gh-pages branch  
 - Push the master and gh-pages branches in the github repositotry  
