@@ -6,8 +6,7 @@ namespace Stormancer
 		: _packet(packet),
 		_stream(packet->stream)
 	{
-		(*packet->stream) >> _requestId[0];
-		(*packet->stream) >> _requestId[1];
+		(*packet->stream) >> _requestId;
 
 		streamCopy(packet->stream, _stream);
 	}
@@ -39,7 +38,7 @@ namespace Stormancer
 		}
 		_didSendValues = true;
 		_packet->connection->sendSystem((byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG, [this, &writer](bytestream* stream) {
-			stream->write((char*)this->_requestId, 2);
+			stream->write((char*)_requestId, 2);
 			writer(stream);
 		});
 	}
@@ -48,7 +47,7 @@ namespace Stormancer
 	{
 		_packet->connection->sendSystem((byte)MessageIDTypes::ID_REQUEST_RESPONSE_COMPLETE, [this](bytestream* stream) {
 			stream->write((char*)_requestId, 2);
-			char c = (this->_didSendValues ? 1 : 0);
+			char c = (_didSendValues ? 1 : 0);
 			stream->write(&c, 1);
 		});
 	}

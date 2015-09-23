@@ -5,7 +5,7 @@ using namespace Stormancer;
 using namespace std;
 
 auto logger = (ConsoleLogger*)ILogger::instance(new ConsoleLogger(Stormancer::LogLevel::Trace));
-shared_ptr<Scene> scene = nullptr;
+shared_ptr<Scene> scene;
 
 pplx::task<void> test(Client& client)
 {
@@ -38,15 +38,23 @@ pplx::task<void> test(Client& client)
 		logger->logGreen("Done");
 
 		logger->logWhite("Connect to scene");
-		return scene->connect().then([nbMsgToSend]() {
-			logger->logGreen("Done");
-			for (int i = 0; i < nbMsgToSend; i++)
+		return scene->connect().then([nbMsgToSend](pplx::task<void> t) {
+			try
 			{
-				scene->sendPacket("echo", [](bytestream* stream) {
-					int32 number1(rand()), number2(rand()), number3(rand());
-					*stream << number1 << number2 << number3;
-					logger->logWhite("Sending message: [ " + to_string(number1) + " ; " + to_string(number2) + " ; " + to_string(number3) + " ]");
-				});
+				logger->logGreen("Done");
+				for (int i = 0; i < nbMsgToSend; i++)
+				{
+					scene->sendPacket("echo", [](bytestream* stream) {
+						int32 number1(rand()), number2(rand()), number3(rand());
+						*stream << number1 << number2 << number3;
+						logger->logWhite("Sending message: [ " + to_string(number1) + " ; " + to_string(number2) + " ; " + to_string(number3) + " ]");
+					});
+				}
+			}
+			catch (const std::exception& e)
+			{
+				// connect failed
+				int test = 0;
 			}
 		});
 	});
@@ -66,13 +74,16 @@ int main(int argc, char* argv[])
 	logger->logGreen("Done");
 
 	auto task = test(client);
-	task.wait();
-
-	//DefaultScheduler scheduler;
-	//int i = 0;
-	//auto truc = scheduler.schedulePeriodic(1000, Action<>(std::function<void()>([&i]() {
-	//	std::cout << i++ << std::endl;
-	//})));
+	try
+	{
+		task.wait();
+	}
+	catch (const std::exception& e)
+	{
+		// create client failed
+		int test = 0;
+	}
+	logger->logYellow("CONNECTED");
 
 	cin.ignore();
 

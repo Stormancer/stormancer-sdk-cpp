@@ -55,8 +55,9 @@ namespace Stormancer
 
 		_metadata["serializers"] = "msgpack/array";
 		_metadata["transport"] = _transport->name();
-		_metadata["version"] = "1.0.0";
+		_metadata["version"] = "1.0.0a";
 		_metadata["platform"] = "cpp";
+		_metadata["protocol"] = "2";
 
 		initialize();
 	}
@@ -178,30 +179,7 @@ namespace Stormancer
 					{
 						throw std::runtime_error(std::string(e.what()) + "\nFailed to get the transport peer connection.");
 					}
-				}).then([this, sep](pplx::task<void> t) {
-					try
-					{
-						t.wait();
-						return updateServerMetadata();
-					}
-					catch (const std::exception& e)
-					{
-						throw std::runtime_error(std::string(e.what()) + "\nFailed to update server metadata.");
-					}
-				}).then([this, sep](pplx::task<void> t) {
-					try
-					{
-						t.wait();
-						if (sep.tokenData.Version > 0)
-						{
-							startSyncClock();
-						}
-					}
-					catch (const std::exception& e)
-					{
-						throw std::runtime_error(std::string(e.what()) + "\nFailed to start the sync clock.");
-					}
-				});;
+				});
 			}
 			catch (const std::exception& e)
 			{
@@ -211,40 +189,67 @@ namespace Stormancer
 			try
 			{
 				t.wait();
-				SceneInfosRequestDto parameter;
-				parameter.Metadata = _serverConnection->metadata;
-				parameter.Token = sep.token;
-				_logger->log(LogLevel::Debug, "Client::getScene", "send SceneInfosRequestDto", "");
-				return sendSystemRequest<SceneInfosRequestDto, SceneInfosDto>((byte)SystemRequestIDTypes::ID_GET_SCENE_INFOS, parameter);
+				return updateServerMetadata();
+			}
+			catch (const std::exception& e)
+			{
+				throw e;
+			}
+		}).then([this, sep](pplx::task<void> t) {
+			try
+			{
+				t.wait();
+			}
+			catch (const std::exception& e)
+			{
+				throw std::runtime_error(std::string(e.what()) + "\nFailed to start the sync clock.");
+			}
+
+			if (sep.tokenData.Version > 0)
+			{
+				startSyncClock();
+			}
+			SceneInfosRequestDto parameter;
+			parameter.Metadata = _serverConnection->metadata;
+			parameter.Token = sep.token;
+			_logger->log(LogLevel::Debug, "Client::getScene", "send SceneInfosRequestDto", "");
+			return sendSystemRequest<SceneInfosRequestDto, SceneInfosDto>((byte)SystemRequestIDTypes::ID_GET_SCENE_INFOS, parameter);
+		}).then([this, sep, sceneId](pplx::task<SceneInfosDto> t) {
+			SceneInfosDto result;
+			try
+			{
+				result = t.get();
 			}
 			catch (const std::exception& e)
 			{
 				throw std::runtime_error(std::string(e.what()) + "\nFailed to get scene infos.");
 			}
-		}).then([this, sep, sceneId](pplx::task<SceneInfosDto> t) {
-			try
+
+			std::stringstream ss;
+			ss << result.SceneId << " " << result.SelectedSerializer << " Routes:[";
+			for (uint32 i = 0; i < result.Routes.size(); i++)
 			{
-				SceneInfosDto result = t.get();
-				std::stringstream ss;
-				ss << result.SceneId << " " << result.SelectedSerializer << " Routes:[";
-				for (uint32 i = 0; i < result.Routes.size(); i++)
-				{
-					ss << result.Routes.at(i).Handle << ":" << result.Routes.at(i).Name << ";";
-				}
-				ss << "] Metadata:[";
-				for (auto it : result.Metadata)
-				{
-					ss << it.first << ":" << it.second << ";";
-				}
-				ss << "]";
-				_logger->log(LogLevel::Debug, "Client::getScene", "SceneInfosDto received", ss.str());
-				_serverConnection->metadata["serializer"] = result.SelectedSerializer;
-				return Scene_ptr(new Scene(_serverConnection, this, sceneId, sep.token, result));
+				ss << result.Routes.at(i).Handle << ":" << result.Routes.at(i).Name << ";";
 			}
-			catch (const std::exception& e)
+			ss << "] Metadata:[";
+			for (auto it : result.Metadata)
 			{
-				throw std::runtime_error(std::string(e.what()) + "\nFailed to create the scene.");
+				ss << it.first << ":" << it.second << ";";
 			}
+			ss << "]";
+			_logger->log(LogLevel::Debug, "Client::getScene", "SceneInfosDto received", ss.str());
+			_serverConnection->metadata["serializer"] = result.SelectedSerializer;
+			return updateServerMetadata().then([this, sep, sceneId, result](pplx::task<void> t) {
+				try
+				{
+					t.wait();
+					return Scene_ptr(new Scene(_serverConnection, this, sceneId, sep.token, result));
+				}
+				catch (const std::exception& e)
+				{
+					throw e;
+				}
+			});
 		});
 	}
 
@@ -252,14 +257,14 @@ namespace Stormancer
 	{
 		_logger->log(LogLevel::Trace, "Client::updateServerMetadata", "sending system request.", "");
 		return _requestProcessor->sendSystemRequest(_serverConnection, (byte)SystemRequestIDTypes::ID_SET_METADATA, [this](bytestream* bs) {
-			msgpack::pack(bs, this->_serverConnection->metadata);
+			msgpack::pack(bs, _serverConnection->metadata);
 		}).then([](pplx::task<Packet_ptr> t) {
 			try
 			{
 				t.wait();
 			}
 			catch (std::exception& e) {
-				throw std::logic_error(std::string(e.what()) + "\nFailed uo update the connection metadata.");
+				throw std::logic_error(std::string(e.what()) + "\nFailed to update the server metadata.");
 			}
 		});
 	}
@@ -278,9 +283,19 @@ namespace Stormancer
 		}
 		parameter.ConnectionMetadata = _serverConnection->metadata;
 
-		return Client::sendSystemRequest<ConnectToSceneMsg, ConnectionResult>((byte)SystemRequestIDTypes::ID_CONNECT_TO_SCENE, parameter).then([this, scene](ConnectionResult result) {
-			scene->completeConnectionInitialization(result);
-			this->_scenesDispatcher->addScene(scene);
+		return Client::sendSystemRequest<ConnectToSceneMsg, ConnectionResult>((byte)SystemRequestIDTypes::ID_CONNECT_TO_SCENE, parameter).then([this, scene](pplx::task<ConnectionResult> t) {
+			try
+			{
+				auto result = t.get();
+				scene->completeConnectionInitialization(result);
+				_scenesDispatcher->addScene(scene);
+			}
+			catch (const std::exception& e)
+			{
+				auto e2 = std::runtime_error(std::string(e.what()) + "\nFailed to connect to the scene.");
+				_logger->log(e2);
+				throw e2;
+			}
 		});
 	}
 
@@ -339,11 +354,9 @@ namespace Stormancer
 	{
 		if (_scheduler)
 		{
-			Action<> action;
-			action += std::function<void()>([this]() {
+			_syncClockSubscription = _scheduler->schedulePeriodic((int)_pingInterval, Action<>(std::function<void()>([this]() {
 				this->syncClockImpl();
-			});
-			_syncClockSubscription = _scheduler->schedulePeriodic((int)_pingInterval, action);
+			})));
 		}
 	}
 

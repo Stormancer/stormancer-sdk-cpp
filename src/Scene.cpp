@@ -183,7 +183,7 @@ namespace Stormancer
 		uint16 routeId;
 		*packet->stream >> routeId;
 
-		packet->setMetadata("routeId", new uint16(routeId));
+		packet->metadata()["routeId"] = new uint16(routeId);
 
 		if (mapContains(_handlers, routeId))
 		{
@@ -194,7 +194,7 @@ namespace Stormancer
 			}
 		}
 
-		delete packet->getMetadata<uint16>("routeId");
+		delete packet->metadata()["routeId"];
 	}
 
 	std::vector<IScenePeer*> Scene::remotePeers()

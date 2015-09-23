@@ -38,7 +38,7 @@ namespace Stormancer
 		void error(std::function<void(bytestream*)> writer);
 
 	private:
-		byte _requestId[2];
+		uint16 _requestId;
 		
 		/// Packet that initiated the request
 		Packet_ptr _packet = nullptr;

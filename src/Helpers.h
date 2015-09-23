@@ -39,10 +39,14 @@ namespace Stormancer
 	}
 
 	template<typename T>
-	T* reverseByteOrder(T* data, size_t n = -1)
+	T* reverseByteOrder(T* data, uint64 n = 0)
 	{
 		char* tmp = (char*)data;
-		std::reverse(tmp, tmp + (n < 0 ? sizeof(T) : n));
+		if (n == 0)
+		{
+			n = sizeof(T);
+		}
+		std::reverse(tmp, tmp + n);
 		return data;
 	}
 

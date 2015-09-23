@@ -73,7 +73,7 @@ namespace Stormancer
 			}
 			else
 			{
-				_logger->log(LogLevel::Warn, "", "Unknow request id.", to_string(id));
+				_logger->log(LogLevel::Warn, "RequestProcessor (message)", "Unknow request id.", to_string(id));
 			}
 
 			return true;
@@ -97,9 +97,8 @@ namespace Stormancer
 				}
 				else
 				{
-					_logger->log(LogLevel::Warn, "", "Unknow request id.", to_string(id));
+					_logger->log(LogLevel::Warn, "RequestProcessor (complete)", "Unknow request id.", to_string(id));
 				}
-
 			}
 
 			return true;
@@ -108,7 +107,7 @@ namespace Stormancer
 		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_ERROR, new handlerFunction([this](Packet_ptr p) {
 			uint16 id;
 			*(p->stream) >> id;
-
+			
 			Request_ptr request = freeRequestSlot(id);
 
 			if (request)
@@ -121,12 +120,11 @@ namespace Stormancer
 				msgpack::object deserialized = result.get();
 				std::string msg;
 				deserialized.convert(&msg);
-
 				request->tce.set_exception<std::exception>(std::runtime_error(msg));
 			}
 			else
 			{
-				_logger->log(LogLevel::Warn, "", "Unknow request id.", to_string(id));
+				_logger->log(LogLevel::Warn, "RequestProcessor (error)", "Unknow request id.", to_string(id));
 			}
 
 			return true;
@@ -151,7 +149,7 @@ namespace Stormancer
 	{
 		static uint16 id = 0;
 		// i is used to know if we tested all uint16 available values, whatever the current value of id.
-		int32 i = 0;
+		uint32 i = 0;
 		while (i <= 0xffff)
 		{
 			//std::stringstream ss;
@@ -180,7 +178,6 @@ namespace Stormancer
 			id++;
 			i++;
 		}
-		_logger->log(LogLevel::Error, "RequestProcessor::reserveRequestSlot", "Unable to create a new request: Too many pending requests.", "");
 		throw std::overflow_error("Unable to create a new request: Too many pending requests.");
 	}
 

@@ -46,7 +46,7 @@ namespace Stormancer
 		else
 		{
 			auto scene = _scenes[sceneIndex];
-			packet->setMetadata("scene", scene);
+			packet->metadata()["scene"] = scene;
 			scene->handleMessage(packet);
 			return true;
 		}

@@ -129,8 +129,7 @@ namespace Stormancer
 						break;
 					}
 					case (byte)DefaultMessageIDTypes::ID_ALREADY_CONNECTED:
-						_logger->log(LogLevel::Error, "RakNetTransport::run", "Peer already connected", packet->systemAddress.ToString());
-						throw std::logic_error("Peer already connected");
+						throw std::logic_error(std::string("Peer already connected (") + packet->systemAddress.ToString() + ")");
 						break;
 					case (byte)MessageIDTypes::ID_CONNECTION_RESULT:
 					{
@@ -141,7 +140,6 @@ namespace Stormancer
 					}
 					default:
 					{
-						_logger->log(LogLevel::Debug, "RakNetTransport::run", "Message", std::to_string(packet->data[0]));
 						onMessageReceived(packet);
 						break;
 					}
