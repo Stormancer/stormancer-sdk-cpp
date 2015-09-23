@@ -70,7 +70,7 @@ namespace Stormancer
 		writer(&stream);
 		stream.flush();
 		auto bytes = stream.str();
-
+		/*
 		std::stringstream ss;
 		ss << "SENT: ";
 		for (auto i = 0; i < bytes.length(); i++)
@@ -78,7 +78,7 @@ namespace Stormancer
 			ss << std::to_string((byte)bytes[i]) << " ";
 		}
 		ILogger::instance()->log(ss.str());
-
+		*/
 		auto result = _rakPeer->Send(bytes.data(), (int)bytes.length(), (PacketPriority)priority, (PacketReliability)reliability, channel, _guid, false);
 		if (result == 0)
 		{
