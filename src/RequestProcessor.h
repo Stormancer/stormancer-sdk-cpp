@@ -38,9 +38,9 @@ namespace Stormancer
 
 	private:
 	
-		Request_ptr reserveRequestSlot(pplx::task_completion_event<Packet_ptr> tce);
+		SystemRequest_ptr reserveRequestSlot(pplx::task_completion_event<Packet_ptr> tce);
 		
-		Request_ptr freeRequestSlot(uint16 requestId);
+		SystemRequest_ptr freeRequestSlot(uint16 requestId);
 
 	public:
 	
@@ -51,7 +51,7 @@ namespace Stormancer
 		std::function<void(byte, std::function<pplx::task<void>(RequestContext*)>)> addSystemRequestHandler;
 
 	protected:
-		std::map<uint16, Request_ptr> _pendingRequests;
+		std::map<uint16, SystemRequest_ptr> _pendingRequests;
 		std::mutex _mutexPendingRequests;
 		ILogger* _logger;
 		bool _isRegistered = false;

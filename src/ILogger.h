@@ -34,9 +34,14 @@ namespace Stormancer
 		STORMANCER_DLL_API static ILogger* instance(ILogger* logger);
 
 	public:
-		// Logs a string message
+
+		/// Logs a simple message
 		virtual void log(std::string message) = 0;
+
+		/// Logs a full message
 		virtual void log(LogLevel level, std::string category, std::string message, std::string data) = 0;
+
+		/// Logs an exception
 		virtual void log(const std::exception& e) = 0;
 
 		/// A basic format of the log message.

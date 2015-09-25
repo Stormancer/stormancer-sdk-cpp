@@ -8,9 +8,6 @@ namespace Stormancer
 	class ITokenHandler
 	{
 	public:
-		ITokenHandler();
-		virtual ~ITokenHandler();
-
 		virtual SceneEndpoint decodeToken(std::string& token) = 0;
 	};
 };

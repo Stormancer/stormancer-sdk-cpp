@@ -80,7 +80,7 @@ namespace Stormancer
 
 		/// Returns a boolean indicating if the map contains the key.
 		template<typename TKey, typename TValue>
-		bool mapContains(std::map<TKey, TValue>& map, TKey& key)
+		bool mapContains(const std::map<TKey, TValue>& map, const TKey& key) const
 		{
 			return (map.find(key) != map.end()) ? true : false;
 		}
@@ -172,6 +172,8 @@ namespace Stormancer
 		{
 			return *static_cast<uint64*>(static_cast<void*>(ptr));
 		}
+
+		std::string stringifyBytesArray(std::string bytes);
 
 #pragma endregion
 };

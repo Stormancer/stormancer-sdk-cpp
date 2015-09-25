@@ -160,7 +160,6 @@ namespace Stormancer
 		ILogger* _logger = nullptr;
 		std::string _accountId;
 		std::string _applicationName;
-		//const PluginBuildContext _pluginCtx;
 		IConnection* _serverConnection = nullptr;
 		IScheduler* _scheduler = nullptr;
 		ITransport* _transport = nullptr;
@@ -177,5 +176,6 @@ namespace Stormancer
 		int64 _lastPing = 0;
 		int64 _pingInterval = 5000;
 		Subscription_ptr _syncClockSubscription;
+		PluginBuildContext _pluginCtx;
 	};
 };

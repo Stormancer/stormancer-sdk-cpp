@@ -19,14 +19,16 @@ namespace Stormancer
 	{
 		disconnect();
 
-		if (_host)
-		{
-			delete _host;
-		}
+		_client->_pluginCtx.sceneDeleted(this);
 
 		for (auto sub : subscriptions)
 		{
 			sub.unsubscribe();
+		}
+
+		if (_host)
+		{
+			delete _host;
 		}
 	}
 
@@ -195,6 +197,20 @@ namespace Stormancer
 		}
 
 		delete packet->metadata()["routeId"];
+	}
+
+	void Scene::registerComponent(std::string componentName, std::function<void*()> factory)
+	{
+		_registeredComponents[componentName] = factory;
+	}
+
+	void* Scene::getComponent(std::string componentName)
+	{
+		if (!mapContains(_registeredComponents, componentName))
+		{
+			throw std::runtime_error(std::string(componentName) + " component not found.");
+		}
+		return _registeredComponents[componentName]();
 	}
 
 	std::vector<IScenePeer*> Scene::remotePeers()

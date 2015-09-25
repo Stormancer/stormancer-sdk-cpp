@@ -59,6 +59,13 @@ namespace Stormancer
 		_metadata["platform"] = "cpp";
 		_metadata["protocol"] = "2";
 
+		for (auto plugin : config->plugins())
+		{
+			plugin->build(_pluginCtx);
+		}
+
+		_pluginCtx.clientCreated(this);
+
 		initialize();
 	}
 
@@ -243,7 +250,9 @@ namespace Stormancer
 				try
 				{
 					t.wait();
-					return Scene_ptr(new Scene(_serverConnection, this, sceneId, sep.token, result));
+					auto scene = Scene_ptr(new Scene(_serverConnection, this, sceneId, sep.token, result));
+					_pluginCtx.sceneCreated(scene.get());
+					return scene;
 				}
 				catch (const std::exception& e)
 				{
@@ -289,6 +298,7 @@ namespace Stormancer
 				auto result = t.get();
 				scene->completeConnectionInitialization(result);
 				_scenesDispatcher->addScene(scene);
+				_pluginCtx.sceneConnected(scene);
 			}
 			catch (const std::exception& e)
 			{
@@ -314,11 +324,11 @@ namespace Stormancer
 
 	pplx::task<void> Client::disconnect(Scene* scene, byte sceneHandle)
 	{
-		auto _scenesDispatcher = this->_scenesDispatcher;
 		DisconnectFromSceneDto dto(sceneHandle);
 		return sendSystemRequest<DisconnectFromSceneDto, EmptyDto>((byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, dto)
-			.then([this, _scenesDispatcher, sceneHandle, scene](pplx::task<EmptyDto> t) {
+			.then([this, sceneHandle, scene](pplx::task<EmptyDto> t) {
 			_scenesDispatcher->removeScene(sceneHandle);
+			_pluginCtx.sceneDisconnected(scene);
 		});
 	}
 
@@ -335,7 +345,7 @@ namespace Stormancer
 
 	void Client::transport_packetReceived(Packet_ptr packet)
 	{
-		// TODO plugins
+		_pluginCtx.packetReceived(packet);
 
 		this->_dispatcher->dispatchPacket(packet);
 	}

@@ -8,9 +8,6 @@ namespace Stormancer
 	class IRequestModule
 	{
 	public:
-		IRequestModule();
-		virtual ~IRequestModule();
-
 		virtual void registerModule(RequestModuleBuilder* builder) = 0;
 	};
 };

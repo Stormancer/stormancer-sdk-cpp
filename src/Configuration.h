@@ -4,6 +4,7 @@
 #include "DefaultScheduler.h"
 #include "RakNetTransport.h"
 #include "DefaultPacketDispatcher.h"
+#include "IClientPlugin.h"
 
 namespace Stormancer
 {
@@ -31,12 +32,17 @@ namespace Stormancer
 		/// Get the Api endpoint.
 		std::string getApiEndpoint();
 
+		std::list<IClientPlugin*>& plugins();
+
+		/// Adds a plugin to the client.
+		/// Plugins enable developpers to plug custom code in the stormancer client's extensibility points. Possible uses include: custom high level protocols, logger or analyzers.
+		/// \param plugin The plugin instance to add.
+		void addPlugin(IClientPlugin* plugin);
+
 	private:
 
 		/// Set a metadata
 		Configuration& metadata(std::string key, std::string value);
-
-		//void addPlugin(IClientPlugin* plugin);
 
 	public:
 
@@ -77,7 +83,7 @@ namespace Stormancer
 		stringMap _metadata;
 
 		std::string apiEndpoint = "https://api.stormancer.com/";
-		
-		//vector<IClientPlugin*> plugins;
+
+		std::list<IClientPlugin*> _plugins;
 	};
 };

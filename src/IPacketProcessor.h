@@ -8,10 +8,6 @@ namespace Stormancer
 	class IPacketProcessor
 	{
 	public:
-		IPacketProcessor();
-		virtual ~IPacketProcessor();
-
-	public:
 		virtual void registerProcessor(PacketProcessorConfig& config) = 0;
 	};
 };

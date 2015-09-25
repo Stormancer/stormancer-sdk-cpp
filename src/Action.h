@@ -3,7 +3,7 @@
 
 namespace Stormancer
 {
-	/// Aggregates procedure pointers to be run simultaneously.
+	/// Aggregates procedures to be run simultaneously.
 	template<typename TParam = void>
 	class Action
 	{
@@ -73,6 +73,7 @@ namespace Stormancer
 			}
 		}
 		*/
+
 		const Action<TParam>& operator()(TParam data) const
 		{
 			for (auto f : _functions)
@@ -156,6 +157,7 @@ namespace Stormancer
 			}
 		}
 		*/
+
 		const Action<>& operator()() const
 		{
 			for (auto f : _functions)

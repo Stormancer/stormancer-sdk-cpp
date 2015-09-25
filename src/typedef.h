@@ -1,5 +1,17 @@
 #pragma once
 
+#define Packet_ptr std::shared_ptr<Packet<>>
+#define Packetisp_ptr std::shared_ptr<Packet<IScenePeer>>
+#define SystemRequest_ptr std::shared_ptr<SystemRequest>
+#define Route_ptr std::shared_ptr<Route>
+#define Scene_ptr std::shared_ptr<Scene>
+#define Subscription_ptr std::shared_ptr<Subscription>
+
+#define PacketObservable rxcpp::observable<Packet_ptr>
+
+#define handlerFunction std::function<bool(Packet_ptr)>
+#define processorFunction std::function<bool(byte, Packet_ptr)>
+
 namespace Stormancer
 {
 	using int8 = int8_t;

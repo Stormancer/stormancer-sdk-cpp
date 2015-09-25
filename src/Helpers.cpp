@@ -149,4 +149,18 @@ namespace Stormancer
 		time_t now = nowTime_t();
 		return time_tToStr(now, "%H:%M:%S");
 	}
+
+	std::string stringifyBytesArray(std::string bytes)
+	{
+		std::stringstream ss;
+		for (auto i = 0; i < bytes.length(); i++)
+		{
+			if (i)
+			{
+				ss << ' ';
+			}
+			ss << std::to_string((byte)bytes[i]);
+		}
+		return ss.str();
+	}
 };

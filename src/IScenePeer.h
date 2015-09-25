@@ -8,14 +8,6 @@ namespace Stormancer
 	{
 	public:
 	
-		/// Constructor.
-		IScenePeer();
-		
-		/// Destructor.
-		virtual ~IScenePeer();
-
-	public:
-	
 		/// Sends a message to the remote scene.
 		/// \param routeName Route name.
 		/// \param writer function where we write the message in the stream.

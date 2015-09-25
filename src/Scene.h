@@ -107,6 +107,10 @@ namespace Stormancer
 		/// \param packet Receivedpacket.
 		void handleMessage(Packet_ptr packet);
 
+		void registerComponent(std::string componentName, std::function<void*()> factory);
+
+		void* getComponent(std::string componentName);
+
 	public:
 
 		/// Fire when a packet is received in the scene. 
@@ -163,5 +167,8 @@ namespace Stormancer
 
 		/// Disconnection task.
 		pplx::task<void> disconnectTask;
+
+		/// Registered components
+		std::map<std::string, std::function<void*()>> _registeredComponents;
 	};
 };

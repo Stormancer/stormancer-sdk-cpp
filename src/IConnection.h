@@ -10,14 +10,6 @@ namespace Stormancer
 	class IConnection
 	{
 	public:
-	
-		/// Constructor.
-		IConnection();
-		
-		/// Destructor.
-		virtual ~IConnection();
-
-	public:
 		template<typename T>
 		void registerComponent(T* component)
 		{
@@ -90,11 +82,11 @@ namespace Stormancer
 		std::function<void(std::string)> connectionClosed;
 
 	protected:
-		ConnectionState _state;
 		std::string _account;
 		std::string _application;
 		int64 _id;
-		time_t _connectionDate;
+		ConnectionState _state = ConnectionState::connecting;
+		time_t _connectionDate = nowTime_t();
 		std::map<size_t, void*> _components;
 	};
 };

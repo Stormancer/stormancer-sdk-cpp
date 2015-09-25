@@ -1,18 +1,5 @@
 #pragma once
 
-#define Packet_ptr std::shared_ptr<Packet<>>
-#define Packetisp_ptr std::shared_ptr<Packet<IScenePeer>>
-#define Request_ptr std::shared_ptr<Request>
-#define Route_ptr std::shared_ptr<Route>
-#define Scene_ptr std::shared_ptr<Scene>
-#define Subscription_ptr std::shared_ptr<Subscription>
-
-#define PacketObservable rxcpp::observable<Packet_ptr>
-#define PacketObserver rxcpp::observer<Packet_ptr>
-
-#define handlerFunction std::function<bool(Packet_ptr)>
-#define processorFunction std::function<bool(byte, Packet_ptr)>
-
 #include "headers.h"
 
 #include "basic_bytebuf.h"
@@ -66,3 +53,9 @@
 
 #include "RakNetConnection.h"
 #include "RakNetTransport.h"
+
+#include "PluginBuildContext.h"
+#include "IClientPlugin.h"
+#include "RpcClientPlugin.h"
+#include "RpcService.h"
+#include "RpcRequest.h"

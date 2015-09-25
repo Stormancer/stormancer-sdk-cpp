@@ -5,11 +5,11 @@
 namespace Stormancer
 {
 	/// System request.
-	class Request
+	class SystemRequest
 	{
 	public:
-		Request(pplx::task_completion_event<Packet_ptr> tce);
-		virtual ~Request();
+		SystemRequest(pplx::task_completion_event<Packet_ptr> tce);
+		virtual ~SystemRequest();
 
 	public:
 		uint16 id = 0;

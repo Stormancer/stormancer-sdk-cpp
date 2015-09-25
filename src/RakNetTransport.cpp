@@ -70,6 +70,8 @@ namespace Stormancer
 					continue;
 				}
 
+				ILogger::instance()->log(std::string("RECEIVED: ") + stringifyBytesArray(std::string(packet->data, packet->data + packet->length)));
+
 				try
 				{
 					switch (packet->data[0])

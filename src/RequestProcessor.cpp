@@ -63,7 +63,7 @@ namespace Stormancer
 			uint16 id;
 			*(p->stream) >> id;
 
-			Request_ptr request = freeRequestSlot(id);
+			SystemRequest_ptr request = freeRequestSlot(id);
 
 			if (request)
 			{
@@ -88,7 +88,7 @@ namespace Stormancer
 
 			if (hasValues == 0)
 			{
-				Request_ptr request = freeRequestSlot(id);
+				SystemRequest_ptr request = freeRequestSlot(id);
 
 				if (request)
 				{
@@ -108,7 +108,7 @@ namespace Stormancer
 			uint16 id;
 			*(p->stream) >> id;
 			
-			Request_ptr request = freeRequestSlot(id);
+			SystemRequest_ptr request = freeRequestSlot(id);
 
 			if (request)
 			{
@@ -145,7 +145,7 @@ namespace Stormancer
 		return pplx::create_task(tce);
 	}
 
-	Request_ptr RequestProcessor::reserveRequestSlot(pplx::task_completion_event<Packet_ptr> tce)
+	SystemRequest_ptr RequestProcessor::reserveRequestSlot(pplx::task_completion_event<Packet_ptr> tce)
 	{
 		static uint16 id = 0;
 		// i is used to know if we tested all uint16 available values, whatever the current value of id.
@@ -157,10 +157,10 @@ namespace Stormancer
 			//_logger->log(std::string("#4 lock ") + ss.str());
 			_mutexPendingRequests.lock();
 			//_logger->log("#4 exec");
-			Request_ptr request;
+			SystemRequest_ptr request;
 			if (!mapContains(_pendingRequests, id))
 			{
-				request = Request_ptr(new Request(tce));
+				request = SystemRequest_ptr(new SystemRequest(tce));
 				time(&request->lastRefresh);
 				request->id = id;
 				_pendingRequests[id] = request;
@@ -181,14 +181,14 @@ namespace Stormancer
 		throw std::overflow_error("Unable to create a new request: Too many pending requests.");
 	}
 
-	Request_ptr RequestProcessor::freeRequestSlot(uint16 requestId)
+	SystemRequest_ptr RequestProcessor::freeRequestSlot(uint16 requestId)
 	{
 		//std::stringstream ss;
 		//ss << std::this_thread::get_id();
 		//_logger->log(std::string("#5 lock ") + ss.str());
 		_mutexPendingRequests.lock();
 		//_logger->log("#5 exec");
-		Request_ptr request;
+		SystemRequest_ptr request;
 		if (mapContains(_pendingRequests, requestId))
 		{
 			request = _pendingRequests[requestId];

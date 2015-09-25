@@ -2,16 +2,6 @@
 
 namespace Stormancer
 {
-	IConnection::IConnection()
-		: _connectionDate(nowTime_t()),
-		_state(ConnectionState::connecting)
-	{
-	}
-
-	IConnection::~IConnection()
-	{
-	}
-
 	int64 IConnection::id()
 	{
 		return _id;

@@ -10,20 +10,12 @@ namespace Stormancer
 	{
 	public:
 		
-		/// Constructor.
-		IPacketDispatcher();
-		
-		/// Destructor.
-		virtual ~IPacketDispatcher();
-
-		/*! Dispatches a packet to the system.
-		\param packet The packet to dispatch.
-		*/
+		/// Dispatches a packet to the system.
+		/// \param packet The packet to dispatch.
 		virtual void dispatchPacket(Packet_ptr packet) = 0;
 
-		/*! Adds a packet processor to the dispatcher.
-		\param processor An 'IPacketProcessor' object.
-		*/
+		/// Adds a packet processor to the dispatcher.
+		/// \param processor An 'IPacketProcessor' object.
 		virtual void addProcessor(IPacketProcessor* processor) = 0;
 	};
 };
