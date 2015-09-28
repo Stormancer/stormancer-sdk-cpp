@@ -10,12 +10,12 @@ namespace Stormancer
 		void build(PluginBuildContext ctx);
 
 	public:
-		static const std::string pluginName = "stormancer.plugins.rpc";
-		static const std::string serviceName = "rpcService";
-		static const std::string version = "1.1.0";
-		static const std::string nextRouteName = "stormancer.rpc.next";
-		static const std::string errorRouteName = "stormancer.rpc.error";
-		static const std::string completeRouteName = "stormancer.rpc.completed";
-		static const std::string cancellationRouteName = "stormancer.rpc.cancel";
+		static const std::string pluginName;
+		static const std::string serviceName;
+		static const std::string version;
+		static const std::string nextRouteName;
+		static const std::string errorRouteName;
+		static const std::string completeRouteName;
+		static const std::string cancellationRouteName;
 	};
 };

@@ -3,7 +3,7 @@
 #include "IPacketProcessor.h"
 #include "ILogger.h"
 #include "IRequestModule.h"
-#include "Request.h"
+#include "SystemRequest.h"
 
 namespace Stormancer
 {

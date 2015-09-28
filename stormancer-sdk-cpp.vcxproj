@@ -244,6 +244,7 @@
     <ClInclude Include="src\RakNetConnection.h" />
     <ClInclude Include="src\RakNetTransport.h" />
     <ClInclude Include="src\RpcRequest.h" />
+    <ClInclude Include="src\RpcRequestContext.h" />
     <ClInclude Include="src\SystemRequest.h" />
     <ClInclude Include="src\RequestContext.h" />
     <ClInclude Include="src\RequestModuleBuilder.h" />

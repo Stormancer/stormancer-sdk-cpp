@@ -12,6 +12,9 @@
 #define handlerFunction std::function<bool(Packet_ptr)>
 #define processorFunction std::function<bool(byte, Packet_ptr)>
 
+#define RpcRequest_ptr std::shared_ptr<RpcRequest>
+#define RpcRequestContex_ptr std::shared_ptr<RpcRequestContext<IScenePeer>>
+
 namespace Stormancer
 {
 	using int8 = int8_t;

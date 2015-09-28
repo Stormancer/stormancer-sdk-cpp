@@ -13,5 +13,6 @@ namespace Stormancer
 		rxcpp::subscriber<Packetisp_ptr> observer;
 		int receivedMsg;
 		pplx::task_completion_event<void> tce;
+		pplx::task<void> task;
 	};
 };

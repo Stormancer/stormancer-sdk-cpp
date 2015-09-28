@@ -28,7 +28,6 @@
 #include "IConnection.h"
 #include "IConnectionManager.h"
 #include "IPacketProcessor.h"
-#include "IRequest.h"
 #include "IScenePeer.h"
 #include "ITransport.h"
 #include "MessageIDTypes.h"
@@ -59,3 +58,4 @@
 #include "RpcClientPlugin.h"
 #include "RpcService.h"
 #include "RpcRequest.h"
+#include "RpcRequestContext.h"

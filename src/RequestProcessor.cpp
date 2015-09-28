@@ -147,16 +147,13 @@ namespace Stormancer
 
 	SystemRequest_ptr RequestProcessor::reserveRequestSlot(pplx::task_completion_event<Packet_ptr> tce)
 	{
+		_mutexPendingRequests.lock();
+
 		static uint16 id = 0;
 		// i is used to know if we tested all uint16 available values, whatever the current value of id.
 		uint32 i = 0;
 		while (i <= 0xffff)
 		{
-			//std::stringstream ss;
-			//ss << std::this_thread::get_id();
-			//_logger->log(std::string("#4 lock ") + ss.str());
-			_mutexPendingRequests.lock();
-			//_logger->log("#4 exec");
 			SystemRequest_ptr request;
 			if (!mapContains(_pendingRequests, id))
 			{
@@ -164,20 +161,15 @@ namespace Stormancer
 				time(&request->lastRefresh);
 				request->id = id;
 				_pendingRequests[id] = request;
-			}
-
-			//_logger->log("#4 unlock");
-			_mutexPendingRequests.unlock();
-			//_logger->log("#4 unlocked");
-
-			if (request)
-			{
 				return request;
 			}
 
 			id++;
 			i++;
 		}
+
+		_mutexPendingRequests.unlock();
+
 		throw std::overflow_error("Unable to create a new request: Too many pending requests.");
 	}
 
