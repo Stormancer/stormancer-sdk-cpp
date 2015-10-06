@@ -20,7 +20,7 @@ namespace Stormancer
 
 			for (auto r : rr)
 			{
-				if (r->name == route)
+				if (r->name() == route)
 				{
 					relevantRoute = r;
 					break;
@@ -64,7 +64,7 @@ namespace Stormancer
 
 	uint16 RpcService::pendingRequests()
 	{
-		return _pendingRequests.size();
+		return (uint16)_pendingRequests.size();
 	}
 
 	void RpcService::addProcedure(std::string route, std::function<pplx::task<void>(RpcRequestContex_ptr)> handler, bool ordered)

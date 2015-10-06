@@ -1,6 +1,7 @@
 #pragma once
 #include "headers.h"
 #include "RpcRequest.h"
+#include "RpcRequestContext.h"
 
 namespace Stormancer
 {

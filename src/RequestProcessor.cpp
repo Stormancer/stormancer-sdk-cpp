@@ -152,16 +152,13 @@ namespace Stormancer
 		static uint16 id = 0;
 		// i is used to know if we tested all uint16 available values, whatever the current value of id.
 		uint32 i = 0;
+		SystemRequest_ptr request;
 		while (i <= 0xffff)
 		{
-			SystemRequest_ptr request;
 			if (!mapContains(_pendingRequests, id))
 			{
 				request = SystemRequest_ptr(new SystemRequest(tce));
-				time(&request->lastRefresh);
-				request->id = id;
-				_pendingRequests[id] = request;
-				return request;
+				break;
 			}
 
 			id++;
@@ -170,25 +167,29 @@ namespace Stormancer
 
 		_mutexPendingRequests.unlock();
 
+		if (request)
+		{
+			time(&request->lastRefresh);
+			request->id = id;
+			_pendingRequests[id] = request;
+			return request;
+		}
+
 		throw std::overflow_error("Unable to create a new request: Too many pending requests.");
 	}
 
 	SystemRequest_ptr RequestProcessor::freeRequestSlot(uint16 requestId)
 	{
-		//std::stringstream ss;
-		//ss << std::this_thread::get_id();
-		//_logger->log(std::string("#5 lock ") + ss.str());
 		_mutexPendingRequests.lock();
-		//_logger->log("#5 exec");
+
 		SystemRequest_ptr request;
 		if (mapContains(_pendingRequests, requestId))
 		{
 			request = _pendingRequests[requestId];
 			_pendingRequests.erase(requestId);
 		}
-		//_logger->log("#5 unlock");
+
 		_mutexPendingRequests.unlock();
-		//_logger->log("#5 unlocked");
 
 		return request;
 	}

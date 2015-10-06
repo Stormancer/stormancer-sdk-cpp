@@ -28,6 +28,15 @@ namespace Stormancer
 		{
 			pplx::create_task([this, packet]() {
 				this->dispatchImpl(packet);
+			}).then([](pplx::task<void> t) {
+				try
+				{
+					t.wait();
+				}
+				catch (const std::exception& e)
+				{
+					int a = 1337;
+				}
 			});
 		}
 		else

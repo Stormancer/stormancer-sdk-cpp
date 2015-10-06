@@ -2,12 +2,13 @@
 
 namespace Stormancer
 {
-	Scene::Scene(IConnection* connection, Client* client, std::string id, std::string token, SceneInfosDto dto)
+	Scene::Scene(IConnection* connection, Client* client, std::string id, std::string token, SceneInfosDto dto, Action<void> onDelete)
 		: _id(id),
 		_peer(connection),
 		_token(token),
 		_client(client),
-		_metadata(dto.Metadata)
+		_metadata(dto.Metadata),
+		_onDelete(onDelete)
 	{
 		for (auto routeDto : dto.Routes)
 		{
@@ -17,6 +18,8 @@ namespace Stormancer
 
 	Scene::~Scene()
 	{
+		_onDelete();
+
 		disconnect();
 
 		_client->_pluginCtx.sceneDeleted(this);

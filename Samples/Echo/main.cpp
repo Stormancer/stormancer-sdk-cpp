@@ -6,11 +6,12 @@ using namespace std;
 
 auto logger = (ConsoleLogger*)ILogger::instance(new ConsoleLogger(Stormancer::LogLevel::Trace));
 shared_ptr<Scene> scene;
+bool displaySyncClock = true;
 
 pplx::task<void> test(Client& client)
 {
 	logger->logWhite("Get scene");
-	return client.getPublicScene("main").then([](shared_ptr<Scene> sc) {
+	return client.getPublicScene("main").then([&client](shared_ptr<Scene> sc) {
 		scene = sc;
 		logger->logGreen("Done");
 		int nbMsgToSend = 10;
@@ -38,7 +39,17 @@ pplx::task<void> test(Client& client)
 		logger->logGreen("Done");
 
 		logger->logWhite("Connect to scene");
-		return scene->connect().then([nbMsgToSend](pplx::task<void> t) {
+		return scene->connect().then([&client, nbMsgToSend](pplx::task<void> t) {
+
+			pplx::create_task([&client]() {
+				while (displaySyncClock)
+				{
+					int64 clock = client.clock();
+					logger->logYellow("clock: " + to_string(clock) + " ms (" + to_string(clock / 1000.0) + " s)");
+					Sleep(5000);
+				}
+			});
+
 			try
 			{
 				logger->logGreen("Done");
@@ -64,9 +75,6 @@ int main(int argc, char* argv[])
 {
 	srand((uint32)time(NULL));
 
-	//logger->logWhite("Type 'Enter' to start the sample");
-	//cin.ignore();
-
 	logger->logWhite("Create client");
 	Configuration config("997bc6ac-9021-2ad6-139b-da63edee8c58", "tester");
 	//config.serverEndpoint = "http://localhost:8081";
@@ -83,9 +91,10 @@ int main(int argc, char* argv[])
 		// create client failed
 		int test = 0;
 	}
-	logger->logYellow("CONNECTED");
+	logger->logGreen("CONNECTED");
 
 	cin.ignore();
+	displaySyncClock = false;
 
 	return 0;
 }

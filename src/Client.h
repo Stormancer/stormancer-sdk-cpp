@@ -177,5 +177,6 @@ namespace Stormancer
 		int64 _pingInterval = 5000;
 		Subscription_ptr _syncClockSubscription;
 		PluginBuildContext _pluginCtx;
+		std::map<std::string, std::weak_ptr<Scene>> _scenes;
 	};
 };

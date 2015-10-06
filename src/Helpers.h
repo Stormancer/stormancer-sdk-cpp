@@ -80,7 +80,7 @@ namespace Stormancer
 
 		/// Returns a boolean indicating if the map contains the key.
 		template<typename TKey, typename TValue>
-		bool mapContains(const std::map<TKey, TValue>& map, const TKey& key) const
+		bool mapContains(const std::map<TKey, TValue>& map, const TKey& key)
 		{
 			return (map.find(key) != map.end()) ? true : false;
 		}

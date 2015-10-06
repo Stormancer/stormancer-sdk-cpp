@@ -250,7 +250,22 @@ namespace Stormancer
 				try
 				{
 					t.wait();
-					auto scene = Scene_ptr(new Scene(_serverConnection, this, sceneId, sep.token, result));
+					
+					Scene_ptr scene;
+					if (mapContains(_scenes, sceneId))
+					{
+						scene = _scenes[sceneId].lock();
+					}
+					else
+					{
+						scene = Scene_ptr(new Scene(_serverConnection, this, sceneId, sep.token, result, Action<void>([this, sceneId]() {
+							if (mapContains(_scenes, sceneId))
+							{
+								_scenes.erase(sceneId);
+							}
+						})));
+						_scenes[sceneId] = scene;
+					}
 					_pluginCtx.sceneCreated(scene.get());
 					return scene;
 				}
@@ -334,8 +349,9 @@ namespace Stormancer
 
 	void Client::disconnectAllScenes()
 	{
-		for (auto scene : _scenesDispatcher->_scenes)
+		for (auto it : _scenes)
 		{
+			auto scene = it.second.lock();
 			if (scene)
 			{
 				scene->disconnect();

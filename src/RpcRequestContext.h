@@ -59,7 +59,7 @@ namespace Stormancer
 		}
 
 	private:
-		void writeRequestId(bytestream* stream)
+		void writeRequestId(bytestream* stream) const
 		{
 			*stream << _id;
 		}

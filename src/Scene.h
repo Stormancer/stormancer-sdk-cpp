@@ -28,7 +28,7 @@ namespace Stormancer
 		/// \param id Scene id.
 		/// \param token Application token.
 		/// \param dto Scene informations.
-		Scene(IConnection* connection, Client* client, std::string id, std::string token, SceneInfosDto dto);
+		Scene(IConnection* connection, Client* client, std::string id, std::string token, SceneInfosDto dto, Action<void> onDelete);
 
 		/// Destructor.
 		virtual ~Scene();
@@ -170,5 +170,8 @@ namespace Stormancer
 
 		/// Registered components
 		std::map<std::string, std::function<void*()>> _registeredComponents;
+
+		/// Event launched on instance deletion
+		Action<void> _onDelete;
 	};
 };

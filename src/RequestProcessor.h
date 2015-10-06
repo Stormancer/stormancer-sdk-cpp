@@ -12,10 +12,9 @@ namespace Stormancer
 	{
 	public:
 	
-		/*! Constructor.
-		\param logger The logger instance.
-		\param modules A vector of modules.
-		*/
+		/// Constructor.
+		/// \param logger The logger instance.
+		/// \param modules A vector of modules.
 		RequestProcessor(ILogger* logger, std::vector<IRequestModule*> modules);
 		
 		/// Destructor
@@ -23,17 +22,15 @@ namespace Stormancer
 
 	public:
 	
-		/*! Registers the processor into the dispatcher.
-		\param config The configuration of the processor.
-		*/
+		/// Registers the processor into the dispatcher.
+		/// \param config The configuration of the processor.
 		void registerProcessor(PacketProcessorConfig& config);
 		
-		/*! Sends a system request to the remote peer.
-		\param peer A target peer.
-		\param msgId The message id.
-		\param writer A procedure writing the request parameters.
-		\return An observable returning the request responses.
-		*/
+		/// Sends a system request to the remote peer.
+		/// \param peer A target peer.
+		/// \param msgId The message id.
+		/// \param writer A procedure writing the request parameters.
+		/// \return An observable returning the request responses.
 		pplx::task<Packet_ptr> sendSystemRequest(IConnection* peer, byte msgId, std::function<void(bytestream*)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY);
 
 	private:
@@ -44,10 +41,9 @@ namespace Stormancer
 
 	public:
 	
-		/*! Register a new system request handlers for the specified message Id.
-		\param msgId The system message id.
-		\param handler A function that handles message with the provided id.
-		*/
+		/// Register a new system request handlers for the specified message Id.
+		/// \param msgId The system message id.
+		/// \param handler A function that handles message with the provided id.
 		std::function<void(byte, std::function<pplx::task<void>(RequestContext*)>)> addSystemRequestHandler;
 
 	protected:
