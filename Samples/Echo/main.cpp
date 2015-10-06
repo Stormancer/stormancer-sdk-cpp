@@ -5,20 +5,20 @@ using namespace Stormancer;
 using namespace std;
 
 auto logger = (ConsoleLogger*)ILogger::instance(new ConsoleLogger(Stormancer::LogLevel::Trace));
-shared_ptr<Scene> scene;
-bool displaySyncClock = true;
+Scene_ptr scene;
+bool stop = false;
 
 pplx::task<void> test(Client& client)
 {
 	logger->logWhite("Get scene");
-	return client.getPublicScene("main").then([&client](shared_ptr<Scene> sc) {
+	return client.getPublicScene("main").then([&client](Scene_ptr sc) {
 		scene = sc;
 		logger->logGreen("Done");
 		int nbMsgToSend = 10;
 		auto nbMsgReceived = new int(0);
 
 		logger->logWhite("Add route");
-		scene->addRoute("echo", [nbMsgToSend, nbMsgReceived](shared_ptr<Packet<IScenePeer>> p) {
+		scene->addRoute("echo", [nbMsgToSend, nbMsgReceived](Packetisp_ptr p) {
 			int32 number1, number2, number3;
 			*p->stream >> number1 >> number2 >> number3;
 			logger->logGreen("Received message: [ " + to_string(number1) + " ; " + to_string(number2) + " ; " + to_string(number3) + " ]");
@@ -40,33 +40,32 @@ pplx::task<void> test(Client& client)
 
 		logger->logWhite("Connect to scene");
 		return scene->connect().then([&client, nbMsgToSend](pplx::task<void> t) {
+			logger->logGreen("Done");
 
 			pplx::create_task([&client]() {
-				while (displaySyncClock)
+				while (!stop)
 				{
 					int64 clock = client.clock();
 					logger->logYellow("clock: " + to_string(clock) + " ms (" + to_string(clock / 1000.0) + " s)");
+
+					try
+					{
+						scene->sendPacket("echo", [](bytestream* stream) {
+							int32 number1(rand()), number2(rand()), number3(rand());
+							*stream << number1 << number2 << number3;
+							logger->logWhite("Sending message: [ " + to_string(number1) + " ; " + to_string(number2) + " ; " + to_string(number3) + " ]");
+						});
+					}
+					catch (const std::exception& e)
+					{
+						// connect failed
+						int test = 0;
+					}
+
 					Sleep(5000);
 				}
 			});
 
-			try
-			{
-				logger->logGreen("Done");
-				for (int i = 0; i < nbMsgToSend; i++)
-				{
-					scene->sendPacket("echo", [](bytestream* stream) {
-						int32 number1(rand()), number2(rand()), number3(rand());
-						*stream << number1 << number2 << number3;
-						logger->logWhite("Sending message: [ " + to_string(number1) + " ; " + to_string(number2) + " ; " + to_string(number3) + " ]");
-					});
-				}
-			}
-			catch (const std::exception& e)
-			{
-				// connect failed
-				int test = 0;
-			}
 		});
 	});
 }
@@ -94,7 +93,7 @@ int main(int argc, char* argv[])
 	logger->logGreen("CONNECTED");
 
 	cin.ignore();
-	displaySyncClock = false;
+	stop = true;
 
 	return 0;
 }

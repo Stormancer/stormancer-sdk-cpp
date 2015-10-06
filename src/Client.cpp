@@ -73,7 +73,6 @@ namespace Stormancer
 	{
 		disconnect();
 
-		_cts.cancel();
 		delete _scenesDispatcher;
 		delete _requestProcessor;
 		delete _apiClient;
@@ -326,6 +325,8 @@ namespace Stormancer
 
 	void Client::disconnect()
 	{
+		_cts.cancel();
+
 		stopSyncClock();
 
 		disconnectAllScenes();
