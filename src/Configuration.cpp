@@ -10,7 +10,7 @@ namespace Stormancer
 	{
 		transportFactory = defaultTransportFactory;
 
-		//_plugins.push_back(new RpcClientPlugin());
+		_plugins.push_back(new RpcClientPlugin());
 	}
 
 	Configuration::~Configuration()
@@ -28,7 +28,7 @@ namespace Stormancer
 		return (serverEndpoint.length() ? serverEndpoint : apiEndpoint);
 	}
 
-	std::list<IClientPlugin*>& Configuration::plugins()
+	std::vector<IClientPlugin*>& Configuration::plugins()
 	{
 		return _plugins;
 	}

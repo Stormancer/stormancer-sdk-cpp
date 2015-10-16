@@ -28,9 +28,14 @@ namespace Stormancer
 			return _peer;
 		}
 
+		pplx::cancellation_token cancellationToken()
+		{
+			return _cancellationToken;
+		}
+
 		bytestream* inputStream()
 		{
-			return _stream;
+			return _inputStream;
 		}
 
 		void sendValue(Action<bytestream*> writer, PacketPriority priority)

@@ -7,15 +7,15 @@ namespace Stormancer
 	class RpcClientPlugin : public IClientPlugin
 	{
 	public:
-		void build(PluginBuildContext ctx);
+		void build(PluginBuildContext& ctx);
 
 	public:
 		static const std::string pluginName;
 		static const std::string serviceName;
 		static const std::string version;
-		static const std::string nextRouteName;
-		static const std::string errorRouteName;
-		static const std::string completeRouteName;
+		STORMANCER_DLL_API static const std::string nextRouteName;
+		STORMANCER_DLL_API static const std::string errorRouteName;
+		STORMANCER_DLL_API static const std::string completeRouteName;
 		static const std::string cancellationRouteName;
 	};
 };

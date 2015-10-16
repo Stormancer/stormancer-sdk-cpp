@@ -35,7 +35,7 @@ namespace Stormancer
 				}
 				catch (const std::exception& e)
 				{
-					int a = 1337;
+					throw e;
 				}
 			});
 		}

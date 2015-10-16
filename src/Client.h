@@ -52,6 +52,13 @@ namespace Stormancer
 			uint64 _current = 0;
 		};
 
+	private:
+		struct ClockValue
+		{
+			uint16 latency;
+			uint64 offset;
+		};
+
 	public:
 
 		/// Constructor.
@@ -175,6 +182,11 @@ namespace Stormancer
 		int64 _offset = 0;
 		int64 _lastPing = 0;
 		int64 _pingInterval = 5000;
+		int64 _pingIntervalAtStart = 100;
+		std::deque<ClockValue> _clockValues;
+		double _medianLatency = 0;
+		double _standardDeviationLatency = 0;
+		uint16 _maxClockValues = 24;
 		Subscription_ptr _syncClockSubscription;
 		PluginBuildContext _pluginCtx;
 		std::map<std::string, std::weak_ptr<Scene>> _scenes;

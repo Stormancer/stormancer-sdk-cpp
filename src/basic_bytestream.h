@@ -128,10 +128,21 @@ namespace Stormancer
 				return *this;
 			}
 
+			_Myt& operator<<(char* data)
+			{
+				this->write((char*)data, strlen(data));
+				return *this;
+			}
+
 			_Myt& operator<<(const char* data)
 			{
 				this->write((char*)data, strlen(data));
 				return *this;
+			}
+
+			_Myt& operator<<(std::string& data)
+			{
+				return ((*this) << data.c_str());
 			}
 
 			_Myt& operator<<(const std::string& data)
@@ -139,10 +150,21 @@ namespace Stormancer
 				return ((*this) << data.c_str());
 			}
 
+			_Myt& operator<<(wchar_t* data)
+			{
+				this->write((const char*)data, 2 * wcslen(data));
+				return *this;
+			}
+
 			_Myt& operator<<(const wchar_t* data)
 			{
 				this->write((const char*)data, 2 * wcslen(data));
 				return *this;
+			}
+
+			_Myt& operator<<(std::wstring& data)
+			{
+				return (*this) << data.c_str();
 			}
 
 			_Myt& operator<<(const std::wstring& data)

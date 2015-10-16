@@ -10,8 +10,9 @@ namespace Stormancer
 		~RpcRequest();
 
 	public:
+		uint16 id = 0;
+		int receivedMsg = 0;
 		rxcpp::subscriber<Packetisp_ptr> observer;
-		int receivedMsg;
 		pplx::task_completion_event<void> tce;
 		pplx::task<void> task;
 	};

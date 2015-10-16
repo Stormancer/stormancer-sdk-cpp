@@ -5,7 +5,10 @@
 #define SystemRequest_ptr std::shared_ptr<SystemRequest>
 #define Route_ptr std::shared_ptr<Route>
 #define Scene_ptr std::shared_ptr<Scene>
+#define Scene_wptr std::weak_ptr<Scene>
 #define Subscription_ptr std::shared_ptr<Subscription>
+#define Client_ptr std::shared_ptr<Client>
+#define Client_wptr std::weak_ptr<Client>
 
 #define PacketObservable rxcpp::observable<Packet_ptr>
 

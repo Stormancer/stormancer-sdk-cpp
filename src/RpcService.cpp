@@ -39,23 +39,34 @@ namespace Stormancer
 
 			RpcRequest_ptr request(new RpcRequest(subscriber));
 			auto id = reserveId();
+			request->id = id;
 
-			if (!(mapContains(_pendingRequests, id)))
-			{
-				_pendingRequests[id] = request;
-				_scene->sendPacket(route, [id, writer](bytestream* bs) {
-					*bs << id;
-					writer(bs);
-				}, priority, PacketReliability::RELIABLE_ORDERED);
-			}
+			_pendingRequestsMutex.lock();
+			_pendingRequests[id] = request;
+			_pendingRequestsMutex.unlock();
+
+			_scene->sendPacket(route, [id, writer](bytestream* bs) {
+				*bs << id;
+				writer(bs);
+			}, priority, PacketReliability::RELIABLE_ORDERED);
 
 			subscriber.add([this, id]() {
-				_scene->sendPacket(RpcClientPlugin::cancellationRouteName, [this, id](bytestream* bs) {
-					*bs << id;
-				});
+				RpcRequest_ptr request;
+
+				_pendingRequestsMutex.lock();
 				if (mapContains(_pendingRequests, id))
 				{
+					request = _pendingRequests[id];
 					_pendingRequests.erase(id);
+				}
+				_pendingRequestsMutex.unlock();
+
+				if (request)
+				{
+					_scene->sendPacket(RpcClientPlugin::cancellationRouteName, [this, id](bytestream* bs) {
+						*bs << id;
+					});
+					ILogger::instance()->log(LogLevel::Debug, "RpcService::rpc", std::string("Rpc request cancelled."), std::to_string(id));
 				}
 			});
 		});
@@ -64,55 +75,85 @@ namespace Stormancer
 
 	uint16 RpcService::pendingRequests()
 	{
-		return (uint16)_pendingRequests.size();
+		_pendingRequestsMutex.lock();
+		uint16 size = (uint16)_pendingRequests.size();
+		_pendingRequestsMutex.unlock();
+		return size;
 	}
 
 	void RpcService::addProcedure(std::string route, std::function<pplx::task<void>(RpcRequestContex_ptr)> handler, bool ordered)
 	{
-		_scene->addRoute(route, [this, handler, ordered](Packetisp_ptr p) {
-			uint16 id = 0;
-			*p->stream >> id;
-			pplx::cancellation_token_source cts;
-			RpcRequestContex_ptr ctx(new RpcRequestContext<IScenePeer>(p->connection, _scene, id, ordered, p->stream, cts.get_token()));
-			if (!mapContains(_runningRequests, id))
-			{
-				_runningRequests[id] = cts;
-				handler(ctx).then([this, id, ctx](pplx::task<void> t) {
-					try
-					{
-						t.wait();
-						_runningRequests.erase(id);
-						ctx->sendComplete();
-					}
-					catch (const std::exception& e)
-					{
-						ctx->sendError(e.what());
-					}
-				});
-			}
-		}, std::map<std::string, std::string> { { RpcClientPlugin::pluginName, RpcClientPlugin::version } });
+		try
+		{
+			_scene->addRoute(route, [this, handler, ordered](Packetisp_ptr p) {
+				uint16 id = 0;
+				*p->stream >> id;
+				pplx::cancellation_token_source cts;
+				RpcRequestContex_ptr ctx;
+				_runningRequestsMutex.lock();
+				if (!mapContains(_runningRequests, id))
+				{
+					_runningRequests[id] = cts;
+					ctx = RpcRequestContex_ptr(new RpcRequestContext<IScenePeer>(p->connection, _scene, id, ordered, p->stream, cts.get_token()));
+				}
+				_runningRequestsMutex.unlock();
+
+				if (ctx)
+				{
+					handler(ctx).then([this, id, ctx](pplx::task<void> t) {
+						try
+						{
+							t.wait();
+							_runningRequestsMutex.lock();
+							_runningRequests.erase(id);
+							_runningRequestsMutex.unlock();
+							ctx->sendComplete();
+						}
+						catch (const std::exception& e)
+						{
+							ctx->sendError(e.what());
+						}
+					});
+				}
+			}, std::map<std::string, std::string> { { RpcClientPlugin::pluginName, RpcClientPlugin::version } });
+		}
+		catch (const std::exception& e)
+		{
+			std::runtime_error e2(e.what() + std::string("\nFailed to add procedure on the scene."));
+			ILogger::instance()->log(e2);
+			throw e2;
+		}
 	}
 
 	uint16 RpcService::reserveId()
 	{
-		_mutex.lock();
+		uint32 i = 0;
+		uint16 idToReturn;
+		bool found = false;
+
+		_pendingRequestsMutex.lock();
 
 		static uint16 id = 0;
 
-		uint32 i = 0;
 		while (i <= 0xffff)
 		{
-			bool found = false;
-			if (!mapContains(_pendingRequests, id))
-			{
-				return id;
-			}
-
 			i++;
 			id++;
+
+			if (!mapContains(_pendingRequests, id))
+			{
+				idToReturn = id;
+				found = true;
+				break;
+			}
 		}
 
-		_mutex.unlock();
+		_pendingRequestsMutex.unlock();
+
+		if (found)
+		{
+			return idToReturn;
+		}
 
 		throw std::overflow_error("Unable to create a new RPC request: Too many pending requests.");
 	}
@@ -122,20 +163,22 @@ namespace Stormancer
 		uint16 id = 0;
 		*packet->stream >> id;
 
+		RpcRequest_ptr request;
+
+		_pendingRequestsMutex.lock();
 		if (mapContains(_pendingRequests, id))
 		{
-			return _pendingRequests[id];
+			request = _pendingRequests[id];
 		}
-		else
-		{
-			return nullptr;
-		}
+		_pendingRequestsMutex.unlock();
+
+		return request;
 	}
 
 	void RpcService::next(Packetisp_ptr packet)
 	{
 		auto rq = getPendingRequest(packet);
-
+		ILogger::instance()->log("next " + std::to_string(rq->id));
 		if (rq)
 		{
 			rq->receivedMsg++;
@@ -149,9 +192,14 @@ namespace Stormancer
 
 	void RpcService::error(Packetisp_ptr packet)
 	{
-		auto rq = getPendingRequest(packet);
-		if (rq)
+		auto request = getPendingRequest(packet);
+		ILogger::instance()->log("error " + std::to_string(request->id));
+		if (request)
 		{
+			_pendingRequestsMutex.lock();
+			_pendingRequests.erase(request->id);
+			_pendingRequestsMutex.unlock();
+
 			std::string buf;
 			*packet->stream >> buf;
 			msgpack::unpacked result;
@@ -159,7 +207,7 @@ namespace Stormancer
 			msgpack::object deserialized = result.get();
 			std::string msg;
 			deserialized.convert(&msg);
-			rq->observer.on_error(std::make_exception_ptr(std::runtime_error(msg)));
+			request->observer.on_error(std::make_exception_ptr(std::runtime_error(msg)));
 		}
 	}
 
@@ -169,18 +217,23 @@ namespace Stormancer
 		*packet->stream >> b;
 		bool messageSent = (b != 0);
 
-		auto rq = getPendingRequest(packet);
-		if (rq)
+		auto request = getPendingRequest(packet);
+		ILogger::instance()->log("complete " + std::to_string(request->id));
+		if (request)
 		{
+			_pendingRequestsMutex.lock();
+			_pendingRequests.erase(request->id);
+			_pendingRequestsMutex.unlock();
+
 			if (messageSent)
 			{
-				rq->task.then([rq](pplx::task<void> t) {
-					rq->observer.on_completed();
+				request->task.then([request](pplx::task<void> t) {
+					request->observer.on_completed();
 				});
 			}
 			else
 			{
-				rq->observer.on_completed();
+				request->observer.on_completed();
 			}
 		}
 	}
@@ -189,20 +242,26 @@ namespace Stormancer
 	{
 		uint16 id = 0;
 		*packet->stream >> id;
-		
+		ILogger::instance()->log("cancel " + std::to_string(id));
+
+		_runningRequestsMutex.lock();
 		if (mapContains(_runningRequests, id))
 		{
 			auto cts = _runningRequests[id];
 			_runningRequests.erase(id);
 			cts.cancel();
 		}
+		_runningRequestsMutex.unlock();
 	}
 
 	void RpcService::disconnected()
 	{
+		_runningRequestsMutex.lock();
 		for (auto pair : _runningRequests)
 		{
 			pair.second.cancel();
 		}
+		_runningRequests.clear();
+		_runningRequestsMutex.unlock();
 	}
 };

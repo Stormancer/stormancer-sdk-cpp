@@ -84,17 +84,8 @@ namespace Stormancer
 							auto tce = _pendingConnections[packetSystemAddressStr];
 
 							_logger->log(LogLevel::Debug, "RakNetTransport::run", "Connection request to accepted.", packetSystemAddressStr);
-							onConnection(packet, _peer);
-
-							if (mapContains(_connections, packet->guid.g))
-							{
-								auto c = _connections[packet->guid.g];
-								tce.set(c);
-							}
-							else
-							{
-								_logger->log(LogLevel::Error, "RakNetTransport::run", "Can't get the peer connection.", packetSystemAddressStr);
-							}
+							auto c = onConnection(packet, _peer);
+							tce.set(c);
 						}
 						else
 						{
@@ -223,7 +214,7 @@ namespace Stormancer
 		return pplx::task<IConnection*>(tce);
 	}
 
-	void RakNetTransport::onConnection(RakNet::Packet* packet, RakNet::RakPeerInterface* server)
+	RakNetConnection* RakNetTransport::onConnection(RakNet::Packet* packet, RakNet::RakPeerInterface* server)
 	{
 		_logger->log(LogLevel::Trace, "RakNetTransport::onConnection", std::string(packet->systemAddress.ToString()) + " connected.", "");
 
@@ -239,6 +230,8 @@ namespace Stormancer
 			int64 sid = c->id();
 			*stream << sid;
 		});
+
+		return c;
 	}
 
 	void RakNetTransport::onDisconnection(RakNet::Packet* packet, RakNet::RakPeerInterface* server, std::string reason)

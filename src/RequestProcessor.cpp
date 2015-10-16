@@ -155,14 +155,14 @@ namespace Stormancer
 		SystemRequest_ptr request;
 		while (i <= 0xffff)
 		{
+			id++;
+			i++;
+
 			if (!mapContains(_pendingRequests, id))
 			{
 				request = SystemRequest_ptr(new SystemRequest(tce));
 				break;
 			}
-
-			id++;
-			i++;
 		}
 
 		_mutexPendingRequests.unlock();

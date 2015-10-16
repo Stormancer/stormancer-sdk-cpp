@@ -25,6 +25,7 @@
 #include <iomanip>
 #include <thread>
 #include <regex>
+#include <numeric>
 
 // custom libs
 

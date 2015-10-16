@@ -7,6 +7,6 @@ namespace Stormancer
 	class IClientPlugin
 	{
 	public:
-		virtual void build(PluginBuildContext ctx) = 0;
+		virtual void build(PluginBuildContext& ctx) = 0;
 	};
 };

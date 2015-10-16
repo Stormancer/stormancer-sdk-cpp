@@ -10,7 +10,7 @@ namespace Stormancer
 	const std::string RpcClientPlugin::completeRouteName = "stormancer.rpc.completed";
 	const std::string RpcClientPlugin::cancellationRouteName = "stormancer.rpc.cancel";
 
-	void RpcClientPlugin::build(PluginBuildContext ctx)
+	void RpcClientPlugin::build(PluginBuildContext& ctx)
 	{
 		ctx.sceneCreated += [this](Scene* scene) {
 			auto rpcParams = scene->getHostMetadata(pluginName);

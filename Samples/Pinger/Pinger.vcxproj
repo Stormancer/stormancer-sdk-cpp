@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{85ABD094-17A7-441C-8CF4-5B579FAA954B}</ProjectGuid>
+    <ProjectGuid>{324B6DC8-1A5C-4E59-9687-31E742373D1C}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>Clock</RootNamespace>
+    <RootNamespace>Pinger</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.10240.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -96,8 +96,6 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>
-      </SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)..\stormancer-sdk-cpp\src;$(SolutionDir)..\stormancer-sdk-cpp\msgpack-c\include;$(SolutionDir)..\stormancer-sdk-cpp\RakNet\Source;$(SolutionDir)..\stormancer-sdk-cpp\Samples\Echo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -114,8 +112,6 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>
-      </SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)..\stormancer-sdk-cpp\src;$(SolutionDir)..\stormancer-sdk-cpp\msgpack-c\include;$(SolutionDir)..\stormancer-sdk-cpp\RakNet\Source;$(SolutionDir)..\stormancer-sdk-cpp\Samples\Echo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -134,8 +130,6 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>
-      </SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)..\stormancer-sdk-cpp\src;$(SolutionDir)..\stormancer-sdk-cpp\msgpack-c\include;$(SolutionDir)..\stormancer-sdk-cpp\RakNet\Source;$(SolutionDir)..\stormancer-sdk-cpp\Samples\Echo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -156,8 +150,6 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>
-      </SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)..\stormancer-sdk-cpp\src;$(SolutionDir)..\stormancer-sdk-cpp\msgpack-c\include;$(SolutionDir)..\stormancer-sdk-cpp\RakNet\Source;$(SolutionDir)..\stormancer-sdk-cpp\Samples\Echo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>

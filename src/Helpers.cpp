@@ -150,9 +150,13 @@ namespace Stormancer
 		return time_tToStr(now, "%H:%M:%S");
 	}
 
-	std::string stringifyBytesArray(std::string bytes)
+	std::string stringifyBytesArray(std::string bytes, bool hex)
 	{
 		std::stringstream ss;
+		if (hex)
+		{
+			ss << std::hex;
+		}
 		for (auto i = 0; i < bytes.length(); i++)
 		{
 			if (i)
@@ -161,6 +165,7 @@ namespace Stormancer
 			}
 			ss << std::to_string((byte)bytes[i]);
 		}
+		//ss << std::dec;
 		return ss.str();
 	}
 };

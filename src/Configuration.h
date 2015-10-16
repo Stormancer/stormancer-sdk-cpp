@@ -32,7 +32,7 @@ namespace Stormancer
 		/// Get the Api endpoint.
 		std::string getApiEndpoint();
 
-		std::list<IClientPlugin*>& plugins();
+		std::vector<IClientPlugin*>& plugins();
 
 		/// Adds a plugin to the client.
 		/// Plugins enable developpers to plug custom code in the stormancer client's extensibility points. Possible uses include: custom high level protocols, logger or analyzers.
@@ -84,6 +84,6 @@ namespace Stormancer
 
 		std::string apiEndpoint = "https://api.stormancer.com/";
 
-		std::list<IClientPlugin*> _plugins;
+		std::vector<IClientPlugin*> _plugins;
 	};
 };

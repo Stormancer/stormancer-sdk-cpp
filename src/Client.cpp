@@ -59,7 +59,8 @@ namespace Stormancer
 		_metadata["platform"] = "cpp";
 		_metadata["protocol"] = "2";
 
-		for (auto plugin : config->plugins())
+		auto plugins = config->plugins();
+		for (auto plugin : plugins)
 		{
 			plugin->build(_pluginCtx);
 		}
@@ -286,7 +287,8 @@ namespace Stormancer
 			{
 				t.wait();
 			}
-			catch (std::exception& e) {
+			catch (std::exception& e)
+			{
 				throw std::logic_error(std::string(e.what()) + "\nFailed to update the server metadata.");
 			}
 		});
@@ -381,10 +383,20 @@ namespace Stormancer
 	{
 		if (_scheduler)
 		{
-			_syncClockSubscription = _scheduler->schedulePeriodic((int)_pingInterval, Action<>(std::function<void()>([this]() {
-				this->syncClockImpl();
+			auto delay = (_clockValues.size() < _maxClockValues ? _pingIntervalAtStart : _pingInterval);
+			_syncClockSubscription = _scheduler->schedulePeriodic((int)delay, Action<>(std::function<void()>([this, delay]() {
+				if (delay == _pingIntervalAtStart && _clockValues.size() >= _maxClockValues)
+				{
+					stopSyncClock();
+					startSyncClock();
+				}
+				else
+				{
+					syncClockImpl();
+				}
 			})));
 		}
+		syncClockImpl();
 	}
 
 	void Client::stopSyncClock()
@@ -396,15 +408,54 @@ namespace Stormancer
 	{
 		try
 		{
-			int64 tStart = _watch.getElapsedTime();
-			return _requestProcessor->sendSystemRequest(_serverConnection, (byte)SystemRequestIDTypes::ID_PING, [&tStart](bytestream* bs) {
-				*bs << tStart;
-			}, PacketPriority::IMMEDIATE_PRIORITY).then([this, tStart](Packet_ptr p) {
-				int64 tEnd = this->_watch.getElapsedTime();
-				uint64 tRef;
-				*p->stream >> tRef;
-				this->_lastPing = tEnd - tStart;
-				this->_offset = (int64)tRef - this->_lastPing / 2 - tStart;
+			uint64 timeStart = _watch.getElapsedTime();
+			return _requestProcessor->sendSystemRequest(_serverConnection, (byte)SystemRequestIDTypes::ID_PING, [&timeStart](bytestream* bs) {
+				*bs << timeStart;
+			}, PacketPriority::IMMEDIATE_PRIORITY).then([this, timeStart](Packet_ptr p) {
+				uint64 timeEnd = (uint16)this->_watch.getElapsedTime();
+
+				uint64 timeServer;
+				*p->stream >> timeServer;
+
+				uint16 ping = timeEnd - timeStart;
+				_lastPing = ping;
+				uint16 latency = ping / 2;
+
+				uint64 offset = timeServer - timeEnd + latency;
+
+				_clockValues.push_back(ClockValue { ping, offset });
+				if (_clockValues.size() > _maxClockValues)
+				{
+					_clockValues.pop_front();
+				}
+
+				auto len = _clockValues.size();
+				std::vector<uint16> latencies(len);
+				for (auto i = 0; i < _clockValues.size(); i++)
+				{
+					latencies[i] = _clockValues[i].latency;
+				}
+				std::sort(latencies.begin(), latencies.end());
+				_medianLatency = latencies[std::floorl(len / 2)];
+				double average = std::accumulate(latencies.begin(), latencies.end(), 0.0) / len;
+				double varianceLatency = 0;
+				for (auto v : latencies)
+				{
+					auto tmp = v - average;
+					varianceLatency += (tmp * tmp);
+				}
+				varianceLatency /= len;
+				_standardDeviationLatency = std::sqrt(varianceLatency);
+
+				std::vector<uint64> offsets;
+				for (auto v : _clockValues)
+				{
+					if (v.latency < _medianLatency + _standardDeviationLatency)
+					{
+						offsets.push_back(v.offset);
+					}
+				}
+				_offset = std::accumulate(offsets.begin(), offsets.end(), 0.0) / offsets.size();
 			});
 		}
 		catch (std::exception e)

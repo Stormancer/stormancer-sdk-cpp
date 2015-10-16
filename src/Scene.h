@@ -99,6 +99,10 @@ namespace Stormancer
 		/// Returns the peer connection to the host.
 		STORMANCER_DLL_API IScenePeer* host();
 
+		STORMANCER_DLL_API void registerComponent(std::string componentName, std::function<void*()> factory);
+
+		STORMANCER_DLL_API void* getComponent(std::string componentName);
+
 		/// Finalize the connection to the scene.
 		/// \param cr Connection result message retrieved by a system request.
 		void completeConnectionInitialization(ConnectionResult& cr);
@@ -106,10 +110,6 @@ namespace Stormancer
 		/// Handle a message received on the scene and dispatch the packet to the right route handle.
 		/// \param packet Receivedpacket.
 		void handleMessage(Packet_ptr packet);
-
-		void registerComponent(std::string componentName, std::function<void*()> factory);
-
-		void* getComponent(std::string componentName);
 
 	public:
 
