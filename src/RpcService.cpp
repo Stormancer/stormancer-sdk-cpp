@@ -1,5 +1,4 @@
 #include "stormancer.h"
-#include "RpcRequestContext.h"
 
 namespace Stormancer
 {
@@ -100,7 +99,7 @@ namespace Stormancer
 
 				if (ctx)
 				{
-					handler(ctx).then([this, id, ctx](pplx::task<void> t) {
+					invokeWrapping(handler, ctx).then([this, id, ctx](pplx::task<void> t) {
 						try
 						{
 							t.wait();

@@ -111,11 +111,11 @@ namespace Stormancer
 		pplx::task<void> taskCompleted();
 
 		template<typename T>
-		pplx::task<T> taskCompleted(T result)
+		pplx::task<T> taskCompleted(T& result)
 		{
 			pplx::task_completion_event<T> tce;
 			tce.set(result);
-			return create_task(tce);
+			return pplx::create_task(tce);
 		}
 
 		template<typename T>
@@ -127,6 +127,32 @@ namespace Stormancer
 		}
 
 		pplx::task<void> taskIf(bool condition, std::function<pplx::task<void>()> action);
+
+		template<typename T>
+		pplx::task<T> invokeWrapping(std::function<pplx::task<T>()> func)
+		{
+			try
+			{
+				return func();
+			}
+			catch (const std::exception& e)
+			{
+				return taskFromException<T>(e);
+			}
+		}
+
+		template<typename T, typename U>
+		pplx::task<T> invokeWrapping(std::function<pplx::task<T>(U)> func, U& argument)
+		{
+			try
+			{
+				return func(argument);
+			}
+			catch (const std::exception& e)
+			{
+				return taskFromException<T>(e);
+			}
+		}
 
 #pragma endregion
 

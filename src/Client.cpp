@@ -371,7 +371,7 @@ namespace Stormancer
 
 	int64 Client::clock()
 	{
-		return _watch.getElapsedTime() + _offset;
+		return (int64)(_watch.getElapsedTime() + _offset);
 	}
 
 	int64 Client::lastPing()
@@ -381,6 +381,7 @@ namespace Stormancer
 
 	void Client::startSyncClock()
 	{
+		return;
 		if (_scheduler)
 		{
 			auto delay = (_clockValues.size() < _maxClockValues ? _pingIntervalAtStart : _pingInterval);
@@ -406,56 +407,89 @@ namespace Stormancer
 
 	pplx::task<void> Client::syncClockImpl()
 	{
+		bool skipPing;
+		_syncClockMutex.lock();
+		skipPing = !lastPingFinished;
+		_syncClockMutex.unlock();
+
+		if (skipPing)
+		{
+			std::runtime_error ex("SyncClock: last ping not yet finished");
+			return taskFromException<void>(ex);
+		}
+
 		try
 		{
+			_syncClockMutex.lock();
+			lastPingFinished = false;
+			_syncClockMutex.unlock();
+
 			uint64 timeStart = _watch.getElapsedTime();
 			return _requestProcessor->sendSystemRequest(_serverConnection, (byte)SystemRequestIDTypes::ID_PING, [&timeStart](bytestream* bs) {
 				*bs << timeStart;
-			}, PacketPriority::IMMEDIATE_PRIORITY).then([this, timeStart](Packet_ptr p) {
+			}, PacketPriority::IMMEDIATE_PRIORITY).then([this, timeStart](pplx::task<Packet_ptr> t) {
+				Packet_ptr packet;
+				try
+				{
+					packet = t.get();
+				}
+				catch (const std::exception& e) {
+					throw std::runtime_error(std::string(e.what()) + "\nFailed to ping the server");
+				}
+
 				uint64 timeEnd = (uint16)this->_watch.getElapsedTime();
 
+				_syncClockMutex.lock();
+
+				lastPingFinished = true;
+
 				uint64 timeServer;
-				*p->stream >> timeServer;
+				*packet->stream >> timeServer;
 
-				uint16 ping = timeEnd - timeStart;
+				uint16 ping = (uint16)(timeEnd - timeStart);
 				_lastPing = ping;
-				uint16 latency = ping / 2;
+				double latency = ping / 2.0;
 
-				uint64 offset = timeServer - timeEnd + latency;
+				double offset = timeServer - timeEnd + latency;
 
-				_clockValues.push_back(ClockValue { ping, offset });
+				_clockValues.push_back(ClockValue { latency, offset });
 				if (_clockValues.size() > _maxClockValues)
 				{
 					_clockValues.pop_front();
 				}
-
 				auto len = _clockValues.size();
-				std::vector<uint16> latencies(len);
-				for (auto i = 0; i < _clockValues.size(); i++)
+
+				std::vector<double> latencies(len);
+				for (auto i = 0; i < len; i++)
 				{
 					latencies[i] = _clockValues[i].latency;
 				}
 				std::sort(latencies.begin(), latencies.end());
-				_medianLatency = latencies[std::floorl(len / 2)];
-				double average = std::accumulate(latencies.begin(), latencies.end(), 0.0) / len;
+				_medianLatency = latencies[len / 2];
+				double pingAvg = std::accumulate(latencies.begin(), latencies.end(), 0.0) / len;
 				double varianceLatency = 0;
 				for (auto v : latencies)
 				{
-					auto tmp = v - average;
+					auto tmp = v - pingAvg;
 					varianceLatency += (tmp * tmp);
 				}
 				varianceLatency /= len;
 				_standardDeviationLatency = std::sqrt(varianceLatency);
 
-				std::vector<uint64> offsets;
+				double offsetsAvg = 0;
+				uint32 lenOffsets = 0;
+				double latencyMax = _medianLatency + _standardDeviationLatency;
 				for (auto v : _clockValues)
 				{
-					if (v.latency < _medianLatency + _standardDeviationLatency)
+					if (v.latency < latencyMax)
 					{
-						offsets.push_back(v.offset);
+						offsetsAvg += v.offset;
+						lenOffsets++;
 					}
 				}
-				_offset = std::accumulate(offsets.begin(), offsets.end(), 0.0) / offsets.size();
+				_offset = offsetsAvg / lenOffsets;
+
+				_syncClockMutex.unlock();
 			});
 		}
 		catch (std::exception e)

@@ -96,7 +96,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\stormancer-sdk-cpp\src;$(SolutionDir)..\stormancer-sdk-cpp\msgpack-c\include;$(SolutionDir)..\stormancer-sdk-cpp\RakNet\Source;$(SolutionDir)..\stormancer-sdk-cpp\Samples\Echo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\stormancer-sdk-cpp\src;$(SolutionDir)..\stormancer-sdk-cpp\msgpack-c\include;$(SolutionDir)..\stormancer-sdk-cpp\RakNet\Source;$(SolutionDir)..\stormancer-sdk-cpp\Samples\Tester;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -112,7 +112,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\stormancer-sdk-cpp\src;$(SolutionDir)..\stormancer-sdk-cpp\msgpack-c\include;$(SolutionDir)..\stormancer-sdk-cpp\RakNet\Source;$(SolutionDir)..\stormancer-sdk-cpp\Samples\Echo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\stormancer-sdk-cpp\src;$(SolutionDir)..\stormancer-sdk-cpp\msgpack-c\include;$(SolutionDir)..\stormancer-sdk-cpp\RakNet\Source;$(SolutionDir)..\stormancer-sdk-cpp\Samples\Tester;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -130,7 +130,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\stormancer-sdk-cpp\src;$(SolutionDir)..\stormancer-sdk-cpp\msgpack-c\include;$(SolutionDir)..\stormancer-sdk-cpp\RakNet\Source;$(SolutionDir)..\stormancer-sdk-cpp\Samples\Echo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\stormancer-sdk-cpp\src;$(SolutionDir)..\stormancer-sdk-cpp\msgpack-c\include;$(SolutionDir)..\stormancer-sdk-cpp\RakNet\Source;$(SolutionDir)..\stormancer-sdk-cpp\Samples\Tester;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -150,7 +150,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\stormancer-sdk-cpp\src;$(SolutionDir)..\stormancer-sdk-cpp\msgpack-c\include;$(SolutionDir)..\stormancer-sdk-cpp\RakNet\Source;$(SolutionDir)..\stormancer-sdk-cpp\Samples\Echo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\stormancer-sdk-cpp\src;$(SolutionDir)..\stormancer-sdk-cpp\msgpack-c\include;$(SolutionDir)..\stormancer-sdk-cpp\RakNet\Source;$(SolutionDir)..\stormancer-sdk-cpp\Samples\Tester;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -162,14 +162,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\Echo\ConsoleLogger.cpp" />
+    <ClCompile Include="..\Tester\ConsoleLogger.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Echo\ConsoleLogger.h" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ClInclude Include="..\Tester\ConsoleLogger.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

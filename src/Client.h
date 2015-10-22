@@ -55,8 +55,8 @@ namespace Stormancer
 	private:
 		struct ClockValue
 		{
-			uint16 latency;
-			uint64 offset;
+			double latency;
+			double offset;
 		};
 
 	public:
@@ -179,10 +179,12 @@ namespace Stormancer
 		stringMap _metadata;
 		IPacketDispatcher* _dispatcher = nullptr;
 		Watch _watch;
-		int64 _offset = 0;
+		double _offset = 0;
 		int64 _lastPing = 0;
 		int64 _pingInterval = 5000;
 		int64 _pingIntervalAtStart = 100;
+		bool lastPingFinished = true;
+		std::mutex _syncClockMutex;
 		std::deque<ClockValue> _clockValues;
 		double _medianLatency = 0;
 		double _standardDeviationLatency = 0;
