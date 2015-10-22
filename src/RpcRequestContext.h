@@ -40,6 +40,7 @@ namespace Stormancer
 
 		void sendValue(Action<bytestream*> writer, PacketPriority priority)
 		{
+			ILogger::instance()->log("send value" + std::to_string(_id));
 			_scene->sendPacket(RpcClientPlugin::nextRouteName, [this, writer](bytestream* bs) {
 				writeRequestId(bs);
 				writer(bs);
@@ -49,6 +50,7 @@ namespace Stormancer
 
 		void sendError(std::string errorMsg) const
 		{
+			ILogger::instance()->log("send error" + std::to_string(_id));
 			_scene->sendPacket(RpcClientPlugin::errorRouteName, [this, errorMsg](bytestream* bs) {
 				writeRequestId(bs);
 				msgpack::pack(bs, errorMsg);
@@ -57,6 +59,7 @@ namespace Stormancer
 
 		void sendComplete() const
 		{
+			ILogger::instance()->log("send complete" + std::to_string(_id));
 			_scene->sendPacket(RpcClientPlugin::completeRouteName, [this](bytestream* bs) {
 				*bs << _msgSent;
 				writeRequestId(bs);

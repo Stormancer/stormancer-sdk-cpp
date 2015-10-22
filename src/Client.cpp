@@ -381,7 +381,6 @@ namespace Stormancer
 
 	void Client::startSyncClock()
 	{
-		return;
 		if (_scheduler)
 		{
 			auto delay = (_clockValues.size() < _maxClockValues ? _pingIntervalAtStart : _pingInterval);
@@ -414,8 +413,7 @@ namespace Stormancer
 
 		if (skipPing)
 		{
-			std::runtime_error ex("SyncClock: last ping not yet finished");
-			return taskFromException<void>(ex);
+			return taskCompleted();
 		}
 
 		try

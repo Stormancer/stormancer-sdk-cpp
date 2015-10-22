@@ -28,12 +28,65 @@ void execNextTest()
 			{
 				t.wait();
 			}
-			catch (const std::exception& e)
+			catch (const std::exception& ex)
 			{
 				//
 			}
 		});
+		tests.pop_front();
 	}
+}
+
+void test_echo_received(Packetisp_ptr p)
+{
+	std::string message;
+	*p->stream >> message;
+	logger->logWhite("Message received (" + message + ")");
+	if (message == stormancer)
+	{
+		logger->logGreen("Echo OK");
+		execNextTest();
+	}
+}
+
+pplx::task<void> test_rpc_client(RpcRequestContex_ptr rc)
+{
+	std::string message;
+	*rc->inputStream() >> message;
+	logger->logWhite("rpc request received (" + message + ")");
+
+	rc->cancellationToken().register_callback([]() {
+		logger->logWhite("test_rpc_client: rpc request cancelled");
+		logger->logGreen("RPC on client cancel OK");
+		execNextTest();
+	});
+
+	return pplx::task<void>([message, rc]() {
+		Sleep(1000);
+		if (!rc->cancellationToken().is_canceled())
+		{
+			if (message == stormancer)
+			{
+				logger->logGreen("RPC on client OK");
+				logger->logWhite("sending rpc response");
+				rc->sendValue(Action<bytestream*>([message](bytestream* bs) {
+					*bs << message;
+				}), PacketPriority::MEDIUM_PRIORITY);
+				execNextTest();
+			}
+			else
+			{
+				logger->logRed("rpc server failed");
+				throw std::runtime_error("bad rpc server request (bad message)");
+			}
+		}
+	});
+}
+
+void test_rpc_server_cancelled(Packetisp_ptr p)
+{
+	logger->logWhite("RPC on server has been cancelled");
+	logger->logGreen("RPC on server cancel OK");
 }
 
 void test_connect()
@@ -51,6 +104,7 @@ void test_connect()
 
 		logger->logWhite("Add route");
 		scene->addRoute("echo", test_echo_received);
+		scene->addRoute("rpcservercancelled", test_rpc_server_cancelled);
 		logger->logGreen("Add route OK");
 
 		logger->logWhite("Add procedure");
@@ -59,24 +113,16 @@ void test_connect()
 
 		logger->logWhite("Connect to scene");
 		return scene->connect().then([](pplx::task<void> t) {
+			try
+			{
+				t.wait();
+			}
+			catch (const std::exception& ex)
+			{
+				//
+			}
 			logger->logGreen("Connect OK");
 			execNextTest();
-
-			syncclockTask = pplx::create_task([]() {
-				while (!client->lastPing() && !stop)
-				{
-					Sleep(100);
-				}
-				if (client->lastPing())
-				{
-					int64 clock = client->clock();
-					if (clock)
-					{
-						logger->logYellow("clock: " + to_string(clock / 1000.0));
-						logger->logGreen("SyncClock OK");
-					}
-				}
-			});
 		});
 	});
 }
@@ -96,18 +142,6 @@ void test_echo()
 	}
 }
 
-void test_echo_received(Packetisp_ptr p)
-{
-	std::string message;
-	*p->stream >> message;
-	logger->logWhite("Message received (" + message + ")");
-	if (message == stormancer)
-	{
-		logger->logGreen("Echo OK");
-		execNextTest();
-	}
-}
-
 void test_rpc_server()
 {
 	logger->logWhite("sending rpc request");
@@ -119,33 +153,59 @@ void test_rpc_server()
 		logger->logWhite("rpc response received (" + message + ")");
 		if (message == stormancer)
 		{
-			logger->logGreen("RPC client OK");
+			logger->logGreen("RPC on server OK");
 		}
 		// execNextTest(); // don't do that, the server send back a rpc for the next test!
 	});
 }
 
-pplx::task<void> test_rpc_client(RpcRequestContex_ptr rc)
+void test_rpc_server_cancel()
 {
-	pplx::task_completion_event<void> tce;
-	std::string message;
-	*rc->inputStream() >> message;
-	logger->logWhite("rpc request received (" + message + ")");
-	if (message == stormancer)
+	logger->logWhite("sending rpc request");
+	auto subscription = ((RpcService*)scene->getComponent("rpcService"))->rpc("rpc", Action<bytestream*>([](bytestream* stream) {
+		*stream << stormancer;
+	}), PacketPriority::MEDIUM_PRIORITY).subscribe([](Packetisp_ptr packet) {
+		logger->logRed("rpc response received, but this RPC should be cancelled.");
+	});
+	subscription.unsubscribe();
+}
+
+void test_syncclock()
+{
+	syncclockTask = pplx::create_task([]() {
+		while (!client->lastPing() && !stop)
+		{
+			Sleep(100);
+		}
+		if (client->lastPing())
+		{
+			int64 clock = client->clock();
+			if (clock)
+			{
+				logger->logYellow("clock: " + to_string(clock / 1000.0));
+				logger->logGreen("SyncClock OK");
+				execNextTest();
+			}
+		}
+	});
+}
+
+void test_disconnect()
+{
+	scene->disconnect().then([](pplx::task<void> t)
 	{
-		logger->logGreen("RPC server OK");
-		logger->logWhite("sending rpc response");
-		rc->sendValue(Action<bytestream*>([message](bytestream* bs) {
-			*bs << message;
-		}), PacketPriority::MEDIUM_PRIORITY);
-		tce.set();
-	}
-	else
-	{
-		logger->logRed("rpc server failed");
-		tce.set_exception<std::runtime_error>(std::runtime_error("bad rpc server request (bad message)"));
-	}
-	return pplx::create_task(tce);
+		try
+		{
+			t.wait();
+
+			logger->logGreen("Disconnect OK");
+			execNextTest();
+		}
+		catch (const std::exception& ex)
+		{
+			//
+		}
+	});
 }
 
 int main(int argc, char* argv[])
@@ -154,6 +214,10 @@ int main(int argc, char* argv[])
 
 	tests.push_back(test_connect);
 	tests.push_back(test_echo);
+	tests.push_back(test_rpc_server);
+	tests.push_back(test_rpc_server_cancel);
+	tests.push_back(test_syncclock);
+	tests.push_back(test_disconnect);
 
 	execNextTest();
 

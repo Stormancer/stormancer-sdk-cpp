@@ -88,6 +88,8 @@ namespace Stormancer
 		writer(&stream);
 		auto data = stream.str();
 
+		auto aa = data.c_str();
+
 		ILogger::instance()->log(std::string("SENT: ") + stringifyBytesArray(data, true));
 
 		auto result = _rakPeer->Send(data.c_str(), (int)data.length(), priority, reliability, 0, _guid, false);

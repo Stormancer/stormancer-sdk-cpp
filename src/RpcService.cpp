@@ -103,10 +103,18 @@ namespace Stormancer
 						try
 						{
 							t.wait();
+							bool requestFound = false;
 							_runningRequestsMutex.lock();
-							_runningRequests.erase(id);
+							if (requestFound = mapContains(_runningRequests, id))
+							{
+								_runningRequests.erase(id);
+							}
 							_runningRequestsMutex.unlock();
-							ctx->sendComplete();
+
+							if (requestFound)
+							{
+								ctx->sendComplete();
+							}
 						}
 						catch (const std::exception& e)
 						{

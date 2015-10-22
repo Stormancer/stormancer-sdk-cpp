@@ -127,7 +127,6 @@ int main(int argc, char* argv[])
 	catch (const std::exception& e)
 	{
 		// create client failed
-		int test = 0;
 	}
 
 	cin.ignore();
