@@ -85,7 +85,6 @@ pplx::task<void> test_rpc_client(RpcRequestContex_ptr rc)
 
 void test_rpc_server_cancelled(Packetisp_ptr p)
 {
-	logger->logWhite("RPC on server has been cancelled");
 	logger->logGreen("RPC on server cancel OK");
 }
 
@@ -129,6 +128,7 @@ void test_connect()
 
 void test_echo()
 {
+	logger->logWhite("test_echo");
 	try
 	{
 		scene->sendPacket("echo", [](bytestream* stream) {
@@ -144,7 +144,7 @@ void test_echo()
 
 void test_rpc_server()
 {
-	logger->logWhite("sending rpc request");
+	logger->logWhite("RPC on server");
 	((RpcService*)scene->getComponent("rpcService"))->rpc("rpc", Action<bytestream*>([](bytestream* stream) {
 		*stream << stormancer;
 	}), PacketPriority::MEDIUM_PRIORITY).subscribe([](Packetisp_ptr packet) {
@@ -161,7 +161,7 @@ void test_rpc_server()
 
 void test_rpc_server_cancel()
 {
-	logger->logWhite("sending rpc request");
+	logger->logWhite("Rpc on server cancel");
 	auto subscription = ((RpcService*)scene->getComponent("rpcService"))->rpc("rpc", Action<bytestream*>([](bytestream* stream) {
 		*stream << stormancer;
 	}), PacketPriority::MEDIUM_PRIORITY).subscribe([](Packetisp_ptr packet) {
@@ -172,6 +172,7 @@ void test_rpc_server_cancel()
 
 void test_syncclock()
 {
+	logger->logWhite("test sync clock");
 	syncclockTask = pplx::create_task([]() {
 		while (!client->lastPing() && !stop)
 		{
@@ -192,6 +193,7 @@ void test_syncclock()
 
 void test_disconnect()
 {
+	logger->logWhite("test disconnect");
 	scene->disconnect().then([](pplx::task<void> t)
 	{
 		try

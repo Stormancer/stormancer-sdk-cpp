@@ -65,7 +65,6 @@ namespace Stormancer
 					_scene->sendPacket(RpcClientPlugin::cancellationRouteName, [this, id](bytestream* bs) {
 						*bs << id;
 					});
-					ILogger::instance()->log(LogLevel::Debug, "RpcService::rpc", std::string("Rpc request cancelled."), std::to_string(id));
 				}
 			});
 		});
@@ -185,7 +184,6 @@ namespace Stormancer
 	void RpcService::next(Packetisp_ptr packet)
 	{
 		auto rq = getPendingRequest(packet);
-		ILogger::instance()->log("next " + std::to_string(rq->id));
 		if (rq)
 		{
 			rq->receivedMsg++;
@@ -200,7 +198,6 @@ namespace Stormancer
 	void RpcService::error(Packetisp_ptr packet)
 	{
 		auto request = getPendingRequest(packet);
-		ILogger::instance()->log("error " + std::to_string(request->id));
 		if (request)
 		{
 			_pendingRequestsMutex.lock();
@@ -225,7 +222,6 @@ namespace Stormancer
 		bool messageSent = (b != 0);
 
 		auto request = getPendingRequest(packet);
-		ILogger::instance()->log("complete " + std::to_string(request->id));
 		if (request)
 		{
 			_pendingRequestsMutex.lock();
@@ -249,7 +245,6 @@ namespace Stormancer
 	{
 		uint16 id = 0;
 		*packet->stream >> id;
-		ILogger::instance()->log("cancel " + std::to_string(id));
 
 		_runningRequestsMutex.lock();
 		if (mapContains(_runningRequests, id))

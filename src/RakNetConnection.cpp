@@ -71,8 +71,6 @@ namespace Stormancer
 		stream.flush();
 		auto bytes = stream.str();
 
-		ILogger::instance()->log(std::string("SENT: ") + stringifyBytesArray(bytes));
-
 		auto result = _rakPeer->Send(bytes.data(), (int)bytes.length(), (PacketPriority)priority, (PacketReliability)reliability, channel, _guid, false);
 		if (result == 0)
 		{
@@ -89,8 +87,6 @@ namespace Stormancer
 		auto data = stream.str();
 
 		auto aa = data.c_str();
-
-		ILogger::instance()->log(std::string("SENT: ") + stringifyBytesArray(data, true));
 
 		auto result = _rakPeer->Send(data.c_str(), (int)data.length(), priority, reliability, 0, _guid, false);
 		if (result == 0)
