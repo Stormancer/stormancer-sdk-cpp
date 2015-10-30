@@ -40,9 +40,9 @@ struct is_on_next_of
 {
     struct not_void {};
     template<class CT, class CF>
-    static auto check(int) -> decltype((*(CF*)nullptr)(*(CT*)nullptr));
+	static auto checkRX(int) -> decltype((*(CF*)nullptr)(*(CT*)nullptr));
     template<class CT, class CF>
-    static not_void check(...);
+	static not_void checkRX(...);
 
     typedef decltype(check<T, rxu::decay_t<F>>(0)) detail_result;
     static const bool value = std::is_same<detail_result, void>::value;
@@ -53,9 +53,9 @@ struct is_on_error
 {
     struct not_void {};
     template<class CF>
-    static auto check(int) -> decltype((*(CF*)nullptr)(*(std::exception_ptr*)nullptr));
+	static auto checkRX(int) -> decltype((*(CF*)nullptr)(*(std::exception_ptr*)nullptr));
     template<class CF>
-    static not_void check(...);
+	static not_void checkRX(...);
 
     static const bool value = std::is_same<decltype(check<rxu::decay_t<F>>(0)), void>::value;
 };
@@ -65,9 +65,9 @@ struct is_on_completed
 {
     struct not_void {};
     template<class CF>
-    static auto check(int) -> decltype((*(CF*)nullptr)());
+	static auto checkRX(int) -> decltype((*(CF*)nullptr)());
     template<class CF>
-    static not_void check(...);
+	static not_void checkRX(...);
 
     static const bool value = std::is_same<decltype(check<rxu::decay_t<F>>(0)), void>::value;
 };

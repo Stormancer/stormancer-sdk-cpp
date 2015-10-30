@@ -22,9 +22,9 @@ struct is_operator_factory_for
 {
     struct not_void {};
     template<class CS, class CF>
-    static auto check(int) -> decltype((*(CF*)nullptr)(*(CS*)nullptr));
+    static auto checkRX(int) -> decltype((*(CF*)nullptr)(*(CS*)nullptr));
     template<class CS, class CF>
-    static not_void check(...);
+	static not_void checkRX(...);
 
     typedef rxu::decay_t<Source> source_type;
     typedef rxu::decay_t<F> function_type;
@@ -38,9 +38,9 @@ struct has_on_subscribe_for
 {
     struct not_void {};
     template<class CS, class CT>
-    static auto check(int) -> decltype((*(CT*)nullptr).on_subscribe(*(CS*)nullptr));
+	static auto checkRX(int) -> decltype((*(CT*)nullptr).on_subscribe(*(CS*)nullptr));
     template<class CS, class CT>
-    static not_void check(...);
+	static not_void checkRX(...);
 
     typedef decltype(check<rxu::decay_t<Subscriber>, T>(0)) detail_result;
     static const bool value = std::is_same<detail_result, void>::value;

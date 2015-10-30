@@ -237,11 +237,11 @@ struct defer_trait
     struct tag_not_valid {static const bool valid = false; static const bool value = false;};
     typedef Deferred<typename resolve_type<AN>::type...> resolved_type;
     template<class... CN>
-    static auto check(int) -> tag_valid<resolved_type::value>;
+    static auto checkRX(int) -> tag_valid<resolved_type::value>;
     template<class... CN>
-    static tag_not_valid check(...);
+	static tag_not_valid checkRX(...);
 
-    typedef decltype(check<AN...>(0)) tag_type;
+	typedef decltype(checkRX<AN...>(0)) tag_type;
     static const bool valid = tag_type::valid;
     static const bool value = tag_type::value;
     static const bool not_value = valid && !value;
@@ -255,11 +255,11 @@ struct defer_type
     struct tag_not_valid {typedef void type; static const bool value = false;};
     typedef Deferred<typename resolve_type<AN>::type...> resolved_type;
     template<class... CN>
-    static auto check(int) -> tag_valid<resolved_type>;
+	static auto checkRX(int)->tag_valid<resolved_type>;
     template<class... CN>
-    static tag_not_valid check(...);
+	static tag_not_valid checkRX(...);
 
-    typedef decltype(check<AN...>(0)) tag_type;
+	typedef decltype(checkRX<AN...>(0)) tag_type;
     typedef typename tag_type::type type;
     static const bool value = tag_type::value;
 };
@@ -272,9 +272,9 @@ struct defer_value_type
     struct tag_not_valid {typedef void type; static const bool value = false;};
     typedef Deferred<typename resolve_type<AN>::type...> resolved_type;
     template<class... CN>
-    static auto check(int) -> tag_valid<value_type_t<resolved_type>>;
+	static auto checkRX(int)->tag_valid<value_type_t<resolved_type>>;
     template<class... CN>
-    static tag_not_valid check(...);
+	static tag_not_valid checkRX(...);
 
     typedef decltype(check<AN...>(0)) tag_type;
     typedef typename tag_type::type type;
@@ -289,11 +289,11 @@ struct defer_seed_type
     struct tag_not_valid {typedef void type; static const bool value = false;};
     typedef Deferred<typename resolve_type<AN>::type...> resolved_type;
     template<class... CN>
-    static auto check(int) -> tag_valid<typename resolved_type::seed_type>;
+	static auto checkRX(int)->tag_valid<typename resolved_type::seed_type>;
     template<class... CN>
-    static tag_not_valid check(...);
+	static tag_not_valid checkRX(...);
 
-    typedef decltype(check<AN...>(0)) tag_type;
+	typedef decltype(checkRX<AN...>(0)) tag_type;
     typedef typename tag_type::type type;
     static const bool value = tag_type::value;
 };

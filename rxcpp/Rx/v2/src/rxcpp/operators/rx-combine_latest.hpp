@@ -24,9 +24,9 @@ struct combine_latest_traits {
 
     struct tag_not_valid {};
     template<class CS, class... CVN>
-    static auto check(int) -> decltype((*(CS*)nullptr)((*(CVN*)nullptr)...));
+    static auto checkRX(int) -> decltype((*(CS*)nullptr)((*(CVN*)nullptr)...));
     template<class CS, class... CVN>
-    static tag_not_valid check(...);
+    static tag_not_valid checkRX(...);
 
     static_assert(!std::is_same<decltype(check<selector_type, typename ObservableN::value_type...>(0)), tag_not_valid>::value, "combine_latest Selector must be a function with the signature value_type(Observable::value_type...)");
 

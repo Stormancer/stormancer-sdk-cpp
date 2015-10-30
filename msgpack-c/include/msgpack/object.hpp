@@ -282,7 +282,7 @@ struct object_with_zone<msgpack::object> {
         case msgpack::type::BOOLEAN:
         case msgpack::type::POSITIVE_INTEGER:
         case msgpack::type::NEGATIVE_INTEGER:
-        case msgpack::type::FLOAT:
+		case msgpack::type::FLOATMSGPACK:
             std::memcpy(&o.via, &v.via, sizeof(v.via));
             return;
 
@@ -409,7 +409,7 @@ inline bool operator==(const msgpack::object& x, const msgpack::object& y)
     case msgpack::type::NEGATIVE_INTEGER:
         return x.via.i64 == y.via.i64;
 
-    case msgpack::type::FLOAT:
+	case msgpack::type::FLOATMSGPACK:
         return x.via.f64 == y.via.f64;
 
     case msgpack::type::STR:
@@ -691,7 +691,7 @@ inline std::ostream& operator<< (std::ostream& s, const msgpack::object& o)
         s << o.via.i64;
         break;
 
-    case msgpack::type::FLOAT:
+	case msgpack::type::FLOATMSGPACK:
         s << o.via.f64;
         break;
 

@@ -23,11 +23,11 @@ template<class T>
 class is_source
 {
     template<class C>
-    static typename C::source_tag* check(int);
+    static typename C::source_tag* checkRX(int);
     template<class C>
-    static void check(...);
+    static void checkRX(...);
 public:
-    static const bool value = std::is_convertible<decltype(check<rxu::decay_t<T>>(0)), tag_source*>::value;
+	static const bool value = std::is_convertible<decltype(checkRX<rxu::decay_t<T>>(0)), tag_source*>::value;
 };
 
 }

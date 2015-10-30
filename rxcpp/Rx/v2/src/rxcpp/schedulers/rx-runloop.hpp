@@ -135,7 +135,7 @@ public:
     {
         // take ownership so that the current_thread scheduler
         // uses the same queue on this thread
-        queue_type::ensure(sc->create_worker_interface());
+        queue_type::ensureRX(sc->create_worker_interface());
     }
     ~run_loop()
     {

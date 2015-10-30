@@ -69,4 +69,7 @@ namespace Stormancer
 		/// metadatas.
 		anyMap _metadata;
 	};
+
+	using Packet_ptr = std::shared_ptr<Packet<>>;
+	using Packetisp_ptr = std::shared_ptr<Packet<IScenePeer>>;
 };

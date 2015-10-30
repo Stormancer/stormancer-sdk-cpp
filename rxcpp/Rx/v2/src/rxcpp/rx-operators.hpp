@@ -22,11 +22,11 @@ template<class T>
 class is_operator
 {
     template<class C>
-    static typename C::operator_tag* check(int);
+    static typename C::operator_tag* checkRX(int);
     template<class C>
-    static void check(...);
+    static void checkRX(...);
 public:
-    static const bool value = std::is_convertible<decltype(check<rxu::decay_t<T>>(0)), tag_operator*>::value;
+	static const bool value = std::is_convertible<decltype(checkRX<rxu::decay_t<T>>(0)), tag_operator*>::value;
 };
 
 }

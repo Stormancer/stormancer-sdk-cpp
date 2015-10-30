@@ -89,7 +89,7 @@ public:
         // disallow recursion
         state->r.reset(false);
     }
-    static std::shared_ptr<worker_interface> ensure(std::shared_ptr<worker_interface> w) {
+    static std::shared_ptr<worker_interface> ensureRX(std::shared_ptr<worker_interface> w) {
         if (!!current_thread_queue()) {
             abort();
         }
@@ -197,7 +197,7 @@ private:
                 }
 
                 // take ownership
-                queue_type::ensure(std::make_shared<derecurser>());
+                queue_type::ensureRX(std::make_shared<derecurser>());
             }
             // release ownership
             RXCPP_UNWIND_AUTO([]{

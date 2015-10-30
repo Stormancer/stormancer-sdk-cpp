@@ -174,4 +174,7 @@ namespace Stormancer
 		/// Event launched on instance deletion
 		Action<void> _onDelete;
 	};
+
+	using Scene_ptr = std::shared_ptr<Scene>;
+	using Scene_wptr = std::weak_ptr<Scene>;
 };

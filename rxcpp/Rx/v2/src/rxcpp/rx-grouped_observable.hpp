@@ -16,9 +16,9 @@ struct has_on_get_key_for
 {
     struct not_void {};
     template<class CS>
-    static auto check(int) -> decltype((*(CS*)nullptr).on_get_key());
+    static auto checkRX(int) -> decltype((*(CS*)nullptr).on_get_key());
     template<class CS>
-    static not_void check(...);
+    static not_void checkRX(...);
 
     typedef decltype(check<Source>(0)) detail_result;
     static const bool value = std::is_same<detail_result, rxu::decay_t<K>>::value;

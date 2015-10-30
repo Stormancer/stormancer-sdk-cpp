@@ -30,11 +30,11 @@ struct is_accumulate_function_for {
 
     struct tag_not_valid {};
     template<class CS, class CV, class CRS>
-    static auto check(int) -> decltype((*(CRS*)nullptr)(*(CS*)nullptr, *(CV*)nullptr));
+    static auto checkRX(int) -> decltype((*(CRS*)nullptr)(*(CS*)nullptr, *(CV*)nullptr));
     template<class CS, class CV, class CRS>
-    static tag_not_valid check(...);
+    static tag_not_valid checkRX(...);
 
-    typedef decltype(check<seed_type, source_value_type, accumulator_type>(0)) type;
+    typedef decltype(checkRX<seed_type, source_value_type, accumulator_type>(0)) type;
     static const bool value = std::is_same<type, seed_type>::value;
 };
 
@@ -47,11 +47,11 @@ struct is_result_function_for {
     struct tag_not_valid {};
 
     template<class CS, class CRS>
-    static auto check(int) -> decltype((*(CRS*)nullptr)(*(CS*)nullptr));
+    static auto checkRX(int) -> decltype((*(CRS*)nullptr)(*(CS*)nullptr));
     template<class CS, class CRS>
-    static tag_not_valid check(...);
+    static tag_not_valid checkRX(...);
 
-    typedef decltype(check<seed_type, result_selector_type>(0)) type;
+	typedef decltype(checkRX<seed_type, result_selector_type>(0)) type;
     static const bool value = !std::is_same<type, tag_not_valid>::value;
 };
 

@@ -33,9 +33,9 @@ class is_worker
 {
     struct not_void {};
     template<class C>
-    static typename C::worker_tag* check(int);
+	static typename C::worker_tag* checkRX(int);
     template<class C>
-    static not_void check(...);
+	static not_void checkRX(...);
 public:
     static const bool value = std::is_convertible<decltype(check<rxu::decay_t<T>>(0)), tag_worker*>::value;
 };
@@ -46,9 +46,9 @@ class is_scheduler
 {
     struct not_void {};
     template<class C>
-    static typename C::scheduler_tag* check(int);
+	static typename C::scheduler_tag* checkRX(int);
     template<class C>
-    static not_void check(...);
+	static not_void checkRX(...);
 public:
     static const bool value = std::is_convertible<decltype(check<rxu::decay_t<T>>(0)), tag_scheduler*>::value;
 };
@@ -59,11 +59,11 @@ class is_schedulable
 {
     struct not_void {};
     template<class C>
-    static typename C::schedulable_tag* check(int);
+	static typename C::schedulable_tag* checkRX(int);
     template<class C>
-    static not_void check(...);
+	static not_void checkRX(...);
 public:
-    static const bool value = std::is_convertible<decltype(check<rxu::decay_t<T>>(0)), tag_schedulable*>::value;
+	static const bool value = std::is_convertible<decltype(checkRX<rxu::decay_t<T>>(0)), tag_schedulable*>::value;
 };
 
 
@@ -78,11 +78,11 @@ template<class T>
 class is_observer
 {
     template<class C>
-    static typename C::observer_tag* check(int);
+	static typename C::observer_tag* checkRX(int);
     template<class C>
-    static void check(...);
+	static void checkRX(...);
 public:
-    static const bool value = std::is_convertible<decltype(check<rxu::decay_t<T>>(0)), tag_observer*>::value;
+	static const bool value = std::is_convertible<decltype(checkRX<rxu::decay_t<T>>(0)), tag_observer*>::value;
 };
 
 struct tag_dynamic_observer {};
@@ -91,9 +91,9 @@ class is_dynamic_observer
 {
     struct not_void {};
     template<class C>
-    static typename C::dynamic_observer_tag* check(int);
+	static typename C::dynamic_observer_tag* checkRX(int);
     template<class C>
-    static not_void check(...);
+	static not_void checkRX(...);
 public:
     static const bool value = std::is_convertible<decltype(check<rxu::decay_t<T>>(0)), tag_dynamic_observer*>::value;
 };
@@ -104,11 +104,11 @@ class is_subscriber
 {
     struct not_void {};
     template<class C>
-    static typename C::subscriber_tag* check(int);
+	static typename C::subscriber_tag* checkRX(int);
     template<class C>
-    static not_void check(...);
+	static not_void checkRX(...);
 public:
-    static const bool value = std::is_convertible<decltype(check<rxu::decay_t<T>>(0)), tag_subscriber*>::value;
+	static const bool value = std::is_convertible<decltype(checkRX<rxu::decay_t<T>>(0)), tag_subscriber*>::value;
 };
 
 struct tag_dynamic_observable {};
@@ -117,9 +117,9 @@ class is_dynamic_observable
 {
     struct not_void {};
     template<class C>
-    static typename C::dynamic_observable_tag* check(int);
+	static typename C::dynamic_observable_tag* checkRX(int);
     template<class C>
-    static not_void check(...);
+	static not_void checkRX(...);
 public:
     static const bool value = std::is_convertible<decltype(check<rxu::decay_t<T>>(0)), tag_dynamic_observable*>::value;
 };
@@ -149,11 +149,11 @@ template<class T>
 class is_observable
 {
     template<class C>
-    static typename C::observable_tag check(int);
+	static typename C::observable_tag checkRX(int);
     template<class C>
-    static void check(...);
+	static void checkRX(...);
 public:
-    static const bool value = std::is_convertible<decltype(check<rxu::decay_t<T>>(0)), tag_observable>::value;
+	static const bool value = std::is_convertible<decltype(checkRX<rxu::decay_t<T>>(0)), tag_observable>::value;
 };
 
 struct tag_dynamic_connectable_observable : public tag_dynamic_observable {};
@@ -163,9 +163,9 @@ class is_dynamic_connectable_observable
 {
     struct not_void {};
     template<class C>
-    static typename C::dynamic_observable_tag* check(int);
+	static typename C::dynamic_observable_tag* checkRX(int);
     template<class C>
-    static not_void check(...);
+	static not_void checkRX(...);
 public:
     static const bool value = std::is_convertible<decltype(check<rxu::decay_t<T>>(0)), tag_dynamic_connectable_observable*>::value;
 };
@@ -183,9 +183,9 @@ template<class T>
 class is_connectable_observable
 {
     template<class C>
-    static typename C::observable_tag check(int);
+	static typename C::observable_tag checkRX(int);
     template<class C>
-    static void check(...);
+	static void checkRX(...);
 public:
     static const bool value = std::is_convertible<decltype(check<rxu::decay_t<T>>(0)), tag_connectable_observable>::value;
 };
@@ -197,9 +197,9 @@ class is_dynamic_grouped_observable
 {
     struct not_void {};
     template<class C>
-    static typename C::dynamic_observable_tag* check(int);
+	static typename C::dynamic_observable_tag* checkRX(int);
     template<class C>
-    static not_void check(...);
+	static not_void checkRX(...);
 public:
     static const bool value = std::is_convertible<decltype(check<rxu::decay_t<T>>(0)), tag_dynamic_grouped_observable*>::value;
 };
@@ -220,9 +220,9 @@ template<class T>
 class is_grouped_observable
 {
     template<class C>
-    static typename C::observable_tag check(int);
+	static typename C::observable_tag checkRX(int);
     template<class C>
-    static void check(...);
+	static void checkRX(...);
 public:
     static const bool value = std::is_convertible<decltype(check<rxu::decay_t<T>>(0)), tag_grouped_observable>::value;
 };

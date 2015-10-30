@@ -183,11 +183,11 @@ struct is_action_function
 {
     struct not_void {};
     template<class CF>
-    static auto check(int) -> decltype((*(CF*)nullptr)(*(schedulable*)nullptr));
+	static auto checkRX(int) -> decltype((*(CF*)nullptr)(*(schedulable*)nullptr));
     template<class CF>
-    static not_void check(...);
+	static not_void checkRX(...);
 
-    static const bool value = std::is_same<decltype(check<rxu::decay_t<F>>(0)), void>::value;
+	static const bool value = std::is_same<decltype(checkRX<rxu::decay_t<F>>(0)), void>::value;
 };
 
 }

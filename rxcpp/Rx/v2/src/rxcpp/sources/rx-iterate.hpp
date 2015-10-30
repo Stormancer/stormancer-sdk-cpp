@@ -20,9 +20,9 @@ struct is_iterable
 
     struct not_void {};
     template<class CC>
-    static auto check(int) -> decltype(std::begin(*(CC*)nullptr));
+    static auto checkRX(int) -> decltype(std::begin(*(CC*)nullptr));
     template<class CC>
-    static not_void check(...);
+    static not_void checkRX(...);
 
     static const bool value = !std::is_same<decltype(check<collection_type>(0)), not_void>::value;
 };

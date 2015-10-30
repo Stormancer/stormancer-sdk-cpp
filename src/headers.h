@@ -7,6 +7,10 @@
 #define STORMANCER_DLL_API __declspec(dllimport) 
 #endif
 
+#if defined(UE_EDITOR) || defined(UE_GAME)
+#include "AllowWindowsPlatformTypes.h"
+#endif
+
 // standart libs
 #include <mutex>
 #include <algorithm>
@@ -46,3 +50,7 @@
 
 // custom types
 #include "typedef.h"
+
+#if defined(UE_EDITOR) || defined(UE_GAME)
+#include "HideWindowsPlatformTypes.h"
+#endif

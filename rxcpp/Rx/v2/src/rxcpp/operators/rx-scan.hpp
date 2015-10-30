@@ -35,9 +35,9 @@ struct scan : public operator_base<rxu::decay_t<Seed>>
     scan_initial_type initial;
 
     template<class CT, class CS, class CP>
-    static auto check(int) -> decltype((*(CP*)nullptr)(*(CS*)nullptr, *(CT*)nullptr));
+    static auto checkRX(int) -> decltype((*(CP*)nullptr)(*(CS*)nullptr, *(CT*)nullptr));
     template<class CT, class CS, class CP>
-    static void check(...);
+    static void checkRX(...);
 
     scan(source_type o, accumulator_type a, seed_type s)
         : initial(std::move(o), a, s)

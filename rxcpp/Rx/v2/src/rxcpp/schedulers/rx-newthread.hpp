@@ -89,7 +89,7 @@ private:
             state->worker = tf([keepAlive](){
 
                 // take ownership
-                queue_type::ensure(std::make_shared<new_worker>(keepAlive));
+                queue_type::ensureRX(std::make_shared<new_worker>(keepAlive));
                 // release ownership
                 RXCPP_UNWIND_AUTO([]{
                     queue_type::destroy();
