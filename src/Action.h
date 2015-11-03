@@ -15,8 +15,8 @@ namespace Stormancer
 		}
 
 		Action(TFunction function)
-			: _functions{ function }
 		{
+			_functions.push_back(function);
 		}
 
 		virtual ~Action()
