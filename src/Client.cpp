@@ -65,7 +65,7 @@ namespace Stormancer
 			plugin->build(_pluginCtx);
 		}
 
-		_pluginCtx.clientCreated(this);
+		_pluginCtx.clientCreated(myWPtr);
 
 		initialize();
 	}
@@ -93,6 +93,13 @@ namespace Stormancer
 		{
 			delete _transport;
 		}
+	}
+
+	Client_ptr Client::createClient(Configuration* config)
+	{
+		auto client = Client_ptr(new Client(config));
+		client->myWPtr = client;
+		return client;
 	}
 
 	void Client::initialize()
@@ -129,7 +136,7 @@ namespace Stormancer
 		}
 	}
 
-	pplx::task<Scene_ptr> Client::getPublicScene(std::string sceneId, std::string userData)
+	pplx::task<Scene_ptr> Client::getPublicScene(const char* sceneId, const char* userData)
 	{
 		_logger->log(LogLevel::Debug, "Client::getPublicScene", sceneId, userData);
 
@@ -156,7 +163,7 @@ namespace Stormancer
 
 	pplx::task<Scene_ptr> Client::getScene(std::string sceneId, SceneEndpoint sep)
 	{
-		_logger->log(LogLevel::Debug, "Client::getScene", sceneId, sep.token);
+		_logger->log(LogLevel::Debug, "Client::getScene", sceneId.c_str(), sep.token.c_str());
 
 		return taskIf(_serverConnection == nullptr, [this, sep]() {
 			if (!_transport->isRunning()) {
@@ -244,7 +251,7 @@ namespace Stormancer
 				ss << it.first << ":" << it.second << ";";
 			}
 			ss << "]";
-			_logger->log(LogLevel::Debug, "Client::getScene", "SceneInfosDto received", ss.str());
+			_logger->log(LogLevel::Debug, "Client::getScene", "SceneInfosDto received", ss.str().c_str());
 			_serverConnection->metadata["serializer"] = result.SelectedSerializer;
 			return updateServerMetadata().then([this, sep, sceneId, result](pplx::task<void> t) {
 				try
@@ -258,15 +265,16 @@ namespace Stormancer
 					}
 					else
 					{
-						scene = Scene_ptr(new Scene(_serverConnection, this, sceneId, sep.token, result, Action<void>([this, sceneId]() {
+						scene = Scene_ptr(new Scene(_serverConnection, myWPtr, sceneId, sep.token, result, Action<void>([this, sceneId]() {
 							if (mapContains(_scenes, sceneId))
 							{
 								_scenes.erase(sceneId);
 							}
 						})));
+						scene->myWPtr = scene;
 						_scenes[sceneId] = scene;
 					}
-					_pluginCtx.sceneCreated(scene.get());
+					_pluginCtx.sceneCreated(scene);
 					return scene;
 				}
 				catch (const std::exception& e)
@@ -294,8 +302,14 @@ namespace Stormancer
 		});
 	}
 
-	pplx::task<void> Client::connectToScene(Scene* scene, std::string& token, std::vector<Route_ptr> localRoutes)
+	pplx::task<void> Client::connectToScene(Scene_wptr scene_wptr, std::string& token, std::vector<Route_ptr> localRoutes)
 	{
+		auto scene = scene_wptr.lock();
+		if (!scene)
+		{
+			throw std::runtime_error("The scene ptr is invalid");
+		}
+
 		ConnectToSceneMsg parameter;
 		parameter.Token = token;
 		for (auto r : localRoutes)
@@ -340,14 +354,18 @@ namespace Stormancer
 		}
 	}
 
-	pplx::task<void> Client::disconnect(Scene* scene, byte sceneHandle)
+	pplx::task<void> Client::disconnect(Scene_wptr scene_wptr, byte sceneHandle)
 	{
+		auto scene = scene_wptr.lock();
+		if (!scene)
+		{
+			throw std::runtime_error("The scene ptr is invalid");
+		}
+
 		DisconnectFromSceneDto dto(sceneHandle);
-		return sendSystemRequest<DisconnectFromSceneDto, EmptyDto>((byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, dto)
-			.then([this, sceneHandle, scene](pplx::task<EmptyDto> t) {
-			_scenesDispatcher->removeScene(sceneHandle);
-			_pluginCtx.sceneDisconnected(scene);
-		});
+		_pluginCtx.sceneDisconnected(scene);
+		_scenesDispatcher->removeScene(sceneHandle);
+		return sendSystemRequest<DisconnectFromSceneDto, EmptyDto>((byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, dto).then([](EmptyDto&){});
 	}
 
 	void Client::disconnectAllScenes()
@@ -495,34 +513,5 @@ namespace Stormancer
 			_logger->log(LogLevel::Error, "Client::syncClockImpl", "Failed to ping server.", "");
 			throw std::runtime_error("Failed to ping server.");
 		}
-	}
-
-	// Class Client::Clock
-	Client::Watch::Watch()
-	{
-		reset();
-	}
-
-	Client::Watch::~Watch()
-	{
-	}
-
-	void Client::Watch::reset()
-	{
-		_startTime = std::chrono::high_resolution_clock::now();
-	}
-
-	int64 Client::Watch::getElapsedTime()
-	{
-		auto now = std::chrono::high_resolution_clock::now();
-		auto dif = now - _startTime;
-		auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(dif);
-		return ms.count() + _baseTime;
-	}
-
-	void Client::Watch::setBaseTime(int64 baseTime)
-	{
-		reset();
-		_baseTime = baseTime;
 	}
 };

@@ -2,7 +2,7 @@
 
 namespace Stormancer
 {
-	Scene::Scene(IConnection* connection, Client* client, std::string id, std::string token, SceneInfosDto dto, Action<void> onDelete)
+	Scene::Scene(IConnection* connection, Client_wptr client, std::string id, std::string token, SceneInfosDto dto, Action<void> onDelete)
 		: _id(id),
 		_peer(connection),
 		_token(token),
@@ -12,7 +12,7 @@ namespace Stormancer
 	{
 		for (auto routeDto : dto.Routes)
 		{
-			_remoteRoutesMap[routeDto.Name] = Route_ptr(new Route(this, routeDto.Name, routeDto.Handle, routeDto.Metadata));
+			_remoteRoutesMap[routeDto.Name] = Route_ptr(new Route(myWPtr, routeDto.Name, routeDto.Handle, routeDto.Metadata));
 		}
 	}
 
@@ -22,7 +22,11 @@ namespace Stormancer
 
 		disconnect();
 
-		_client->_pluginCtx.sceneDeleted(this);
+		auto client = _client.lock();
+		if (client)
+		{
+			client->_pluginCtx.sceneDeleted(myWPtr);
+		}
 
 		for (auto sub : subscriptions)
 		{
@@ -69,10 +73,13 @@ namespace Stormancer
 	{
 		return mapValues(_remoteRoutesMap);
 	}
-
-	void Scene::addRoute(std::string routeName, std::function<void(Packetisp_ptr)> handler, stringMap metadata)
+	
+	void Scene::addRoute(const char* routeName2, std::function<void(Packetisp_ptr)> handler, rakStringMap metadata2)
 	{
-		if (routeName.length() == 0 || routeName[0] == '@')
+		std::string routeName = routeName2;
+		stringMap metadata = toStringMap(metadata2);
+
+		if (routeName.size() == 0 || routeName[0] == '@')
 		{
 			throw std::invalid_argument("A route cannot be empty or start with the '@' character.");
 		}
@@ -84,7 +91,7 @@ namespace Stormancer
 
 		if (!mapContains(_localRoutesMap, routeName))
 		{
-			_localRoutesMap[routeName] = Route_ptr(new Route(this, routeName, metadata));
+			_localRoutesMap[routeName] = Route_ptr(new Route(myWPtr, routeName, metadata));
 		}
 
 		subscriptions.push_back(onMessage(routeName).subscribe(handler));
@@ -118,16 +125,16 @@ namespace Stormancer
 		Route_ptr route;
 		if (!mapContains(_localRoutesMap, routeName))
 		{
-			_localRoutesMap[routeName] = Route_ptr(new Route(this, routeName));
+			_localRoutesMap[routeName] = Route_ptr(new Route(myWPtr, routeName));
 		}
 
 		route = _localRoutesMap[routeName];
 		return onMessage(route);
 	}
 
-	void Scene::sendPacket(std::string routeName, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability)
+	void Scene::sendPacket(const char* routeName2, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability)
 	{
-		if (!routeName.length())
+		if (!std::strlen(routeName2))
 		{
 			throw std::invalid_argument("routeName is empty.");
 		}
@@ -137,6 +144,7 @@ namespace Stormancer
 			throw std::runtime_error("The scene must be connected to perform this operation.");
 		}
 
+		std::string routeName = routeName2;
 		if (!mapContains(_remoteRoutesMap, routeName))
 		{
 			throw std::invalid_argument(std::string("The route '") + routeName + "' doesn't exist on the scene.");
@@ -148,26 +156,27 @@ namespace Stormancer
 
 	pplx::task<void> Scene::connect()
 	{
-		if (!_connected && !connectCalled)
+		auto client = _client.lock();
+		if (!_connected && !_connecting && client)
 		{
-			connectCalled = true;
-			connectTask = _client->connectToScene(this, _token, mapValues(_localRoutesMap));
-			connectTask.then([this]() {
-				this->_connected = true;
+			_connecting = true;
+			_connectTask = client->connectToScene(myWPtr, _token, mapValues(_localRoutesMap));
+			_connectTask.then([this]() {
+				_connected = true;
 			});
 		}
-		return connectTask;
+		return _connectTask;
 	}
 
 	pplx::task<void> Scene::disconnect()
 	{
-		if (_connected && !disconnectCalled)
+		auto client = _client.lock();
+		if (_connected && client)
 		{
-			disconnectCalled = true;
-			disconnectTask = _client->disconnect(this, _handle);
-			this->_connected = false;
+			_connected = false;
+			_disconnectTask = client->disconnect(myWPtr, _handle);
 		}
-		return disconnectTask;
+		return _disconnectTask;
 	}
 
 	void Scene::completeConnectionInitialization(ConnectionResult& cr)
@@ -211,7 +220,7 @@ namespace Stormancer
 	{
 		if (!mapContains(_registeredComponents, componentName))
 		{
-			throw std::runtime_error(std::string(componentName) + " component not found.");
+			throw std::runtime_error("Component not found (" + std::string(componentName) + ")");
 		}
 		return _registeredComponents[componentName]();
 	}
@@ -225,7 +234,7 @@ namespace Stormancer
 	{
 		if (!_host)
 		{
-			_host = new ScenePeer(_peer, _handle, _remoteRoutesMap, this);
+			_host = new ScenePeer(_peer, _handle, _remoteRoutesMap, myWPtr);
 		}
 		return _host;
 	}

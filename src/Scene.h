@@ -28,7 +28,7 @@ namespace Stormancer
 		/// \param id Scene id.
 		/// \param token Application token.
 		/// \param dto Scene informations.
-		Scene(IConnection* connection, Client* client, std::string id, std::string token, SceneInfosDto dto, Action<void> onDelete);
+		Scene(IConnection* connection, Client_wptr client, std::string id, std::string token, SceneInfosDto dto, Action<void> onDelete);
 
 		/// Destructor.
 		virtual ~Scene();
@@ -52,14 +52,14 @@ namespace Stormancer
 		/// \param handler Function which handle the receiving messages from the server on the route.
 		/// \param metadata Metadatas about the Route.
 		/// Add a route for each different message type.
-		STORMANCER_DLL_API void addRoute(std::string routeName, std::function<void(Packetisp_ptr)> handler, stringMap metadata = stringMap());
+		STORMANCER_DLL_API void addRoute(const char* routeName, std::function<void(Packetisp_ptr)> handler, rakStringMap metadata = rakStringMap());
 
 		/// Send a packet to a route.
 		/// \param routeName Route name.
 		/// \param writer Function where we write the data in the byte stream.
 		/// \param priority Message priority on the network.
 		/// \param reliability Message reliability behavior.
-		STORMANCER_DLL_API void sendPacket(std::string routeName, std::function<void(bytestream*)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE);
+		STORMANCER_DLL_API void sendPacket(const char* routeName, std::function<void(bytestream*)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE);
 
 		/// Returns the connected state to the the scene.
 		STORMANCER_DLL_API bool connected();
@@ -118,6 +118,8 @@ namespace Stormancer
 
 		const bool isHost = false;
 
+		Scene_wptr myWPtr;
+
 	private:
 
 		/// Scene connected state.
@@ -148,7 +150,7 @@ namespace Stormancer
 		std::map<uint16, std::list<std::function<void(Packet_ptr)>>> _handlers;
 
 		/// Owner client.
-		Client* _client;
+		Client_wptr _client;
 
 		/// RX subscriptions for disconnection.
 		std::vector<rxcpp::composite_subscription> subscriptions;
@@ -157,16 +159,13 @@ namespace Stormancer
 		IScenePeer* _host = nullptr;
 
 		/// Connection requested state (when not completed).
-		bool connectCalled = false;
-
-		/// Connection task.
-		pplx::task<void> connectTask;
-
-		/// Disconnection request state (when not completed).
-		bool disconnectCalled = false;
+		bool _connecting = false;
 
 		/// Disconnection task.
-		pplx::task<void> disconnectTask;
+		pplx::task<void> _connectTask;
+
+		/// Disconnection task.
+		pplx::task<void> _disconnectTask;
 
 		/// Registered components
 		std::map<std::string, std::function<void*()>> _registeredComponents;

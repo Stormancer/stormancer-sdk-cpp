@@ -49,6 +49,7 @@
 #include "Subscription.h"
 #include "IScheduler.h"
 #include "DefaultScheduler.h"
+#include "Watch.h"
 
 #include "RakNetConnection.h"
 #include "RakNetTransport.h"

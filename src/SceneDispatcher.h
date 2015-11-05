@@ -15,7 +15,7 @@ namespace Stormancer
 
 	public:
 		void registerProcessor(PacketProcessorConfig& config);
-		void addScene(Scene* scene);
+		void addScene(Scene_wptr scene);
 		void removeScene(uint8 sceneHandle);
 
 	private:
@@ -23,6 +23,6 @@ namespace Stormancer
 
 	private:
 		processorFunction* handler = nullptr;
-		std::vector<Scene*> _scenes;
+		std::vector<Scene_wptr> _scenes;
 	};
 };

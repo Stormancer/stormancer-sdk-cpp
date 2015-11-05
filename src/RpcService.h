@@ -8,13 +8,13 @@ namespace Stormancer
 	class RpcService
 	{
 	public:
-		RpcService(Scene* scene);
+		RpcService(Scene_wptr scene_wptr);
 		~RpcService();
 
 	public:
-		STORMANCER_DLL_API rxcpp::observable<Packetisp_ptr> RpcService::rpc(std::string route, Action<bytestream*> writer, PacketPriority priority);
+		STORMANCER_DLL_API rxcpp::observable<Packetisp_ptr> RpcService::rpc(const char* route, Action<bytestream*> writer, PacketPriority priority);
 		STORMANCER_DLL_API uint16 pendingRequests();
-		STORMANCER_DLL_API void addProcedure(std::string route, std::function<pplx::task<void>(RpcRequestContex_ptr)> handler, bool ordered);
+		STORMANCER_DLL_API void addProcedure(const char* route, std::function<pplx::task<void>(RpcRequestContex_ptr)> handler, bool ordered);
 		void next(Packetisp_ptr packet);
 		void error(Packetisp_ptr packet);
 		void complete(Packetisp_ptr packet);
@@ -30,6 +30,6 @@ namespace Stormancer
 		std::mutex _pendingRequestsMutex;
 		std::map<uint16, pplx::cancellation_token_source> _runningRequests;
 		std::mutex _runningRequestsMutex;
-		Scene* _scene;
+		Scene_wptr _scene;
 	};
 };

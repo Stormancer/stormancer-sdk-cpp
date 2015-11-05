@@ -41,7 +41,7 @@ namespace Stormancer
 		try
 		{
 			_isRunning = true;
-			_logger->log(LogLevel::Info, "RakNetTransport::initialize", std::string("Starting raknet transport ") + _type, "");
+			_logger->log(LogLevel::Info, "RakNetTransport::initialize", ("Starting raknet transport " + _type).c_str(), "");
 			_peer = RakNet::RakPeerInterface::GetInstance();
 			_socketDescriptor = (serverPort != 0 ? new RakNet::SocketDescriptor(serverPort, nullptr) : new RakNet::SocketDescriptor());
 			auto startupResult = _peer->Startup(maxConnections, _socketDescriptor, 1);
@@ -50,7 +50,7 @@ namespace Stormancer
 				throw std::runtime_error(std::string("RakNet peer startup failed (RakNet::StartupResult == ") + std::to_string(startupResult) + ')');
 			}
 			_peer->SetMaximumIncomingConnections(maxConnections);
-			_logger->log(LogLevel::Info, "RakNetTransport::initialize", std::string("Raknet transport started ") + _type, "");
+			_logger->log(LogLevel::Info, "RakNetTransport::initialize", ("Raknet transport started " + _type).c_str(), "");
 		}
 		catch (const std::exception& e)
 		{
@@ -76,42 +76,42 @@ namespace Stormancer
 					{
 					case (byte)DefaultMessageIDTypes::ID_CONNECTION_REQUEST_ACCEPTED:
 					{
-						std::string packetSystemAddressStr = packet->systemAddress.ToString();
+						std::string packetSystemAddressStr = packet->systemAddress.ToString(true, ':');
 						if (mapContains(_pendingConnections, packetSystemAddressStr))
 						{
 							auto tce = _pendingConnections[packetSystemAddressStr];
 
-							_logger->log(LogLevel::Debug, "RakNetTransport::run", "Connection request to accepted.", packetSystemAddressStr);
+							_logger->log(LogLevel::Debug, "RakNetTransport::run", "Connection request to accepted.", packetSystemAddressStr.c_str());
 							auto c = onConnection(packet, _peer);
 							tce.set(c);
 						}
 						else
 						{
-							_logger->log(LogLevel::Error, "RakNetTransport::run", "Can't get the pending connection TCE.", packetSystemAddressStr);
+							_logger->log(LogLevel::Error, "RakNetTransport::run", "Can't get the pending connection TCE.", packetSystemAddressStr.c_str());
 						}
 						break;
 					}
 					case (byte)DefaultMessageIDTypes::ID_NEW_INCOMING_CONNECTION:
 					{
-						_logger->log(LogLevel::Trace, "RakNetTransport::run", "Incoming connection.", packet->systemAddress.ToString());
+						_logger->log(LogLevel::Trace, "RakNetTransport::run", "Incoming connection.", packet->systemAddress.ToString(true, ':'));
 						onConnection(packet, _peer);
 						break;
 					}
 					case (byte)DefaultMessageIDTypes::ID_DISCONNECTION_NOTIFICATION:
 					{
-						_logger->log(LogLevel::Trace, "RakNetTransport::run", "Peer disconnected.", packet->systemAddress.ToString());
+						_logger->log(LogLevel::Trace, "RakNetTransport::run", "Peer disconnected.", packet->systemAddress.ToString(true, ':'));
 						onDisconnection(packet, _peer, "CLIENT_DISCONNECTED");
 						break;
 					}
 					case (byte)DefaultMessageIDTypes::ID_CONNECTION_LOST:
 					{
-						_logger->log(LogLevel::Trace, "RakNetTransport::run", "Peer lost the connection.", packet->systemAddress.ToString());
+						_logger->log(LogLevel::Trace, "RakNetTransport::run", "Peer lost the connection.", packet->systemAddress.ToString(true, ':'));
 						onDisconnection(packet, _peer, "CONNECTION_LOST");
 						break;
 					}
 					case (byte)DefaultMessageIDTypes::ID_CONNECTION_ATTEMPT_FAILED:
 					{
-						std::string packetSystemAddressStr = packet->systemAddress.ToString();
+						std::string packetSystemAddressStr = packet->systemAddress.ToString(true, ':');
 						if (mapContains(_pendingConnections, packetSystemAddressStr))
 						{
 							auto tce = _pendingConnections[packetSystemAddressStr];
@@ -120,12 +120,12 @@ namespace Stormancer
 						break;
 					}
 					case (byte)DefaultMessageIDTypes::ID_ALREADY_CONNECTED:
-						throw std::logic_error(std::string("Peer already connected (") + packet->systemAddress.ToString() + ")");
+						throw std::logic_error(std::string("Peer already connected (") + packet->systemAddress.ToString(true, ':') + ")");
 						break;
 					case (byte)MessageIDTypes::ID_CONNECTION_RESULT:
 					{
 						int64 sid = *(int64*)(packet->data + 1);
-						_logger->log(LogLevel::Debug, "RakNetTransport::run", "Connection ID received.", std::to_string(sid));
+						_logger->log(LogLevel::Debug, "RakNetTransport::run", "Connection ID received.", std::to_string(sid).c_str());
 						onConnectionIdReceived(sid);
 						break;
 					}
@@ -206,7 +206,7 @@ namespace Stormancer
 			throw std::runtime_error(std::string("Bad RakNet connection attempt result (") + std::to_string(result) + ')');
 		}
 
-		std::string addressStr = RakNet::SystemAddress(hostCstr, port).ToString();
+		std::string addressStr = RakNet::SystemAddress(hostCstr, port).ToString(true, ':');
 		auto tce = pplx::task_completion_event<IConnection*>();
 		_pendingConnections[addressStr] = tce;
 		return pplx::task<IConnection*>(tce);
@@ -214,7 +214,7 @@ namespace Stormancer
 
 	RakNetConnection* RakNetTransport::onConnection(RakNet::Packet* packet, RakNet::RakPeerInterface* server)
 	{
-		_logger->log(LogLevel::Trace, "RakNetTransport::onConnection", std::string(packet->systemAddress.ToString()) + " connected.", "");
+		_logger->log(LogLevel::Trace, "RakNetTransport::onConnection", (std::string(packet->systemAddress.ToString(true, ':')) + " connected.").c_str(), "");
 
 		auto c = createNewConnection(packet->guid, _peer);
 
@@ -234,7 +234,7 @@ namespace Stormancer
 
 	void RakNetTransport::onDisconnection(RakNet::Packet* packet, RakNet::RakPeerInterface* server, std::string reason)
 	{
-		_logger->log(LogLevel::Trace, "RakNetTransport::onDisconnection", std::string(packet->systemAddress.ToString()) + " disconnected.", "");
+		_logger->log(LogLevel::Trace, "RakNetTransport::onDisconnection", (std::string(packet->systemAddress.ToString(true, ':')) + " disconnected.").c_str(), "");
 
 		auto c = removeConnection(packet->guid);
 

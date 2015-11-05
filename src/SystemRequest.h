@@ -16,4 +16,6 @@ namespace Stormancer
 		time_t lastRefresh = time(NULL);
 		pplx::task_completion_event<Packet_ptr> tce;
 	};
+
+	using SystemRequest_ptr = std::shared_ptr<SystemRequest>;
 };

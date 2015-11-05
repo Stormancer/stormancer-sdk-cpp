@@ -14,7 +14,7 @@ namespace Stormancer
 		_myfile.close();
 	}
 
-	void FileLogger::log(std::string message)
+	void FileLogger::log(const char* message)
 	{
 		_mutex.lock();
 		if (tryOpenFile())
@@ -26,12 +26,12 @@ namespace Stormancer
 		_mutex.unlock();
 	}
 
-	void FileLogger::log(LogLevel level, std::string category, std::string message, std::string data)
+	void FileLogger::log(LogLevel level, const char* category, const char* message, const char* data)
 	{
 		_mutex.lock();
 		if (tryOpenFile())
 		{
-			_myfile << format(level, category, message, data) << std::endl;
+			_myfile << format(level, category, message, data).C_String() << std::endl;
 			_myfile.flush();
 			_myfile.close();
 		}

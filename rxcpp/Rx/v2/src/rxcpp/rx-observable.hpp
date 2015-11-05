@@ -29,7 +29,7 @@ struct is_operator_factory_for
     typedef rxu::decay_t<Source> source_type;
     typedef rxu::decay_t<F> function_type;
 
-    typedef decltype(check<source_type, function_type>(0)) detail_result;
+    typedef decltype(checkRX<source_type, function_type>(0)) detail_result;
     static const bool value = !std::is_same<detail_result, not_void>::value && is_observable<source_type>::value;
 };
 
@@ -42,7 +42,7 @@ struct has_on_subscribe_for
     template<class CS, class CT>
 	static not_void checkRX(...);
 
-    typedef decltype(check<rxu::decay_t<Subscriber>, T>(0)) detail_result;
+    typedef decltype(checkRX<rxu::decay_t<Subscriber>, T>(0)) detail_result;
     static const bool value = std::is_same<detail_result, void>::value;
 };
 

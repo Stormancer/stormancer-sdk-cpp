@@ -10,12 +10,12 @@ namespace Stormancer
 		void build(PluginBuildContext& ctx);
 
 	public:
-		static const std::string pluginName;
-		static const std::string serviceName;
-		static const std::string version;
-		STORMANCER_DLL_API static const std::string nextRouteName;
-		STORMANCER_DLL_API static const std::string errorRouteName;
-		STORMANCER_DLL_API static const std::string completeRouteName;
-		static const std::string cancellationRouteName;
+		static const char* pluginName;
+		static const char* serviceName;
+		static const char* version;
+		STORMANCER_DLL_API static const char* nextRouteName;
+		STORMANCER_DLL_API static const char* errorRouteName;
+		STORMANCER_DLL_API static const char* completeRouteName;
+		static const char* cancellationRouteName;
 	};
 };

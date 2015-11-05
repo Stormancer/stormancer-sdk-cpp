@@ -19,14 +19,14 @@ namespace Stormancer
 	
 		/// A basic message log.
 		/// \message The message to log.
-		void log(std::string message);
+		void log(const char* message);
 		
 		/// A detailed message log.
 		/// \param level The level.
 		/// \param category The category (typically the source).
 		/// \param message The message.
 		/// \param data Some extra data.
-		void log(LogLevel level, std::string category, std::string message, std::string data);
+		void log(LogLevel level, const char* category, const char* message, const char* data);
 		
 		/// Log details about an exception.
 		/// \param e The exception.

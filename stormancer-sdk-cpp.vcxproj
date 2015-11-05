@@ -208,6 +208,7 @@
     <ClCompile Include="src\ScenePeer.cpp" />
     <ClCompile Include="src\Subscription.cpp" />
     <ClCompile Include="src\TokenHandler.cpp" />
+    <ClCompile Include="src\Watch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Action.h" />
@@ -266,6 +267,7 @@
     <ClInclude Include="src\SystemRequestIDTypes.h" />
     <ClInclude Include="src\TokenHandler.h" />
     <ClInclude Include="src\typedef.h" />
+    <ClInclude Include="src\Watch.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

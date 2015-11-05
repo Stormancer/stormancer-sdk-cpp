@@ -35,7 +35,7 @@ namespace Stormancer
 		request.set_body(userData);
 #endif
 
-		ILogger::instance()->log(LogLevel::Debug, "Client::getSceneEndpoint", baseUri, relativeUri);
+		ILogger::instance()->log(LogLevel::Debug, "Client::getSceneEndpoint", baseUri.c_str(), relativeUri.c_str());
 
 		return client.request(request)
 			.then([](pplx::task<web::http::http_response> t) {
@@ -53,11 +53,11 @@ namespace Stormancer
 			{
 				web::http::http_response response = t.get();
 				uint16 statusCode = response.status_code();
-				ILogger::instance()->log(LogLevel::Debug, "Client::getSceneEndpoint", "client.request statusCode", to_string(statusCode));
+				ILogger::instance()->log(LogLevel::Debug, "Client::getSceneEndpoint", "client.request statusCode", to_string(statusCode).c_str());
 				auto ss = new concurrency::streams::stringstreambuf;
 				auto result = response.body().read_to_end(*ss).then([this, ss, statusCode, accountId, applicationName, sceneId](size_t size) {
 					std::string responseText = ss->collection();
-					ILogger::instance()->log(LogLevel::Debug, "Client::getSceneEndpoint", "responseText", responseText);
+					ILogger::instance()->log(LogLevel::Debug, "Client::getSceneEndpoint", "responseText", responseText.c_str());
 					if (ensureSuccessStatusCode(statusCode))
 					{
 						return _tokenHandler->decodeToken(responseText);

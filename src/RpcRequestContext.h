@@ -7,8 +7,8 @@ namespace Stormancer
 	class RpcRequestContext
 	{
 	public:
-		RpcRequestContext(T* peer, Scene* scene, uint16 id, bool ordered, bytestream* inputStream, pplx::cancellation_token token)
-			: _scene(scene),
+		RpcRequestContext(T* peer, Scene_wptr scene_wptr, uint16 id, bool ordered, bytestream* inputStream, pplx::cancellation_token token)
+			: _scene(scene_wptr),
 			_id(id),
 			_ordered(ordered),
 			_peer(peer),
@@ -40,7 +40,13 @@ namespace Stormancer
 
 		void sendValue(Action<bytestream*> writer, PacketPriority priority)
 		{
-			_scene->sendPacket(RpcClientPlugin::nextRouteName, [this, writer](bytestream* bs) {
+			auto scene = _scene.lock();
+			if (!scene)
+			{
+				throw std::runtime_error("The scene ptr is invalid");
+			}
+
+			scene->sendPacket(RpcClientPlugin::nextRouteName, [this, writer](bytestream* bs) {
 				writeRequestId(bs);
 				writer(bs);
 			}, priority, (_ordered ? PacketReliability::RELIABLE_ORDERED : PacketReliability::RELIABLE));
@@ -49,7 +55,13 @@ namespace Stormancer
 
 		void sendError(std::string errorMsg) const
 		{
-			_scene->sendPacket(RpcClientPlugin::errorRouteName, [this, errorMsg](bytestream* bs) {
+			auto scene = _scene.lock();
+			if (!scene)
+			{
+				throw std::runtime_error("The scene ptr is invalid");
+			}
+
+			scene->sendPacket(RpcClientPlugin::errorRouteName, [this, errorMsg](bytestream* bs) {
 				writeRequestId(bs);
 				msgpack::pack(bs, errorMsg);
 			}, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE_ORDERED);
@@ -57,7 +69,13 @@ namespace Stormancer
 
 		void sendComplete() const
 		{
-			_scene->sendPacket(RpcClientPlugin::completeRouteName, [this](bytestream* bs) {
+			auto scene = _scene.lock();
+			if (!scene)
+			{
+				throw std::runtime_error("The scene ptr is invalid");
+			}
+
+			scene->sendPacket(RpcClientPlugin::completeRouteName, [this](bytestream* bs) {
 				*bs << _msgSent;
 				writeRequestId(bs);
 			}, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE_ORDERED);
@@ -70,7 +88,7 @@ namespace Stormancer
 		}
 
 	private:
-		Scene* _scene;
+		Scene_wptr _scene;
 		uint16 _id;
 		bool _ordered;
 		T* _peer;
@@ -78,4 +96,6 @@ namespace Stormancer
 		bytestream* _inputStream = nullptr;
 		pplx::cancellation_token _cancellationToken;
 	};
+
+	using RpcRequestContex_ptr = std::shared_ptr<RpcRequestContext<IScenePeer>>;
 };

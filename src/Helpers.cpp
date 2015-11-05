@@ -17,6 +17,17 @@ namespace Stormancer
 		return am;
 	}
 
+	stringMap toStringMap(rakStringMap map1)
+	{
+		stringMap map2;
+		for (uint32 i = 0; i < map1.Size(); ++i)
+		{
+			auto key = map1.GetKeyAtIndex(i);
+			map2[std::string(key)] = map1.Get(key);
+		}
+		return map2;
+	}
+
 	std::string vectorJoin(std::vector<std::string>& vector, std::string glue)
 	{
 		std::stringstream ss;

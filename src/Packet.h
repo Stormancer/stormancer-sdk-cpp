@@ -72,4 +72,7 @@ namespace Stormancer
 
 	using Packet_ptr = std::shared_ptr<Packet<>>;
 	using Packetisp_ptr = std::shared_ptr<Packet<IScenePeer>>;
+	using PacketObservable = rxcpp::observable<Packet_ptr>;
+	using handlerFunction = std::function<bool(Packet_ptr)>;
+	using processorFunction = std::function<bool(byte, Packet_ptr)>;
 };

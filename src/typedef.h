@@ -1,19 +1,5 @@
 #pragma once
 
-#define SystemRequest_ptr std::shared_ptr<SystemRequest>
-#define Route_ptr std::shared_ptr<Route>
-#define Subscription_ptr std::shared_ptr<Subscription>
-#define Client_ptr std::shared_ptr<Client>
-#define Client_wptr std::weak_ptr<Client>
-
-#define PacketObservable rxcpp::observable<Packet_ptr>
-
-#define handlerFunction std::function<bool(Packet_ptr)>
-#define processorFunction std::function<bool(byte, Packet_ptr)>
-
-#define RpcRequest_ptr std::shared_ptr<RpcRequest>
-#define RpcRequestContex_ptr std::shared_ptr<RpcRequestContext<IScenePeer>>
-
 namespace Stormancer
 {
 	using int8 = int8_t;
@@ -28,6 +14,8 @@ namespace Stormancer
 
 	using byte = uint8;
 
-	using stringMap = std::map < std::string, std::string >;
-	using anyMap = std::map < std::string, void* >;
+	using stringMap = std::map<std::string, std::string>;
+	using rakStringMap = DataStructures::Map<RakNet::RakString, RakNet::RakString>;
+	using anyMap = std::map<std::string, void*>;
+	using rakAnyMap = DataStructures::Map<RakNet::RakString, void*>;
 };

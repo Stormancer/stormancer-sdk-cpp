@@ -22,4 +22,6 @@ namespace Stormancer
 		Action<> _unsubscribe;
 		bool _subscribed = true;
 	};
+
+	using Subscription_ptr = std::shared_ptr<Subscription>;
 };

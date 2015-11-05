@@ -9,31 +9,20 @@
 #include "RequestProcessor.h"
 #include "IConnection.h"
 #include "IScheduler.h"
+#include "Watch.h"
 
 namespace Stormancer
 {
+	class Client;
+
+	using Client_ptr = std::shared_ptr<Client>;
+	using Client_wptr = std::weak_ptr<Client>;
+
 	/// Manage the connection to the scenes of an application.
 	class Client
 	{
 		/// The scene need to access some private method of the client.
 		friend class Scene;
-
-	private:
-		class Watch
-		{
-		public:
-			Watch();
-			~Watch();
-
-		public:
-			void reset();
-			int64 getElapsedTime();
-			void setBaseTime(int64 baseTime);
-
-		private:
-			std::chrono::steady_clock::time_point _startTime;
-			int64 _baseTime = 0;
-		};
 
 	private:
 		class ConnectionHandler : public IConnectionManager
@@ -60,13 +49,15 @@ namespace Stormancer
 		};
 
 	public:
-
-		/// Constructor.
+		/// Factory.
 		/// \param config A pointer to a Configuration.
-		STORMANCER_DLL_API Client(Configuration* config);
+		STORMANCER_DLL_API static Client_ptr createClient(Configuration* config);
 
 		/// Destructor.
 		STORMANCER_DLL_API ~Client();
+
+	private:
+		Client(Configuration* config);
 
 		/// Copy constructor deleted.
 		Client(Client& other) = delete;
@@ -80,7 +71,7 @@ namespace Stormancer
 		/// \param sceneId The scene Id as a string.
 		/// \param userData Some custom user data as a string.
 		/// \return a task to the connection to the scene.
-		STORMANCER_DLL_API pplx::task<Scene_ptr> getPublicScene(std::string sceneId, std::string userData = "");
+		STORMANCER_DLL_API pplx::task<Scene_ptr> getPublicScene(const char* sceneId, const char* userData = "");
 
 		STORMANCER_DLL_API pplx::task<Scene_ptr> getScene(std::string token);
 
@@ -110,13 +101,13 @@ namespace Stormancer
 		/// \param token Application token.
 		/// \param localRoutes Local routes declared.
 		/// \return A task which complete when the connection is done.
-		pplx::task<void> connectToScene(Scene* scene, std::string& token, std::vector<Route_ptr> localRoutes);
+		pplx::task<void> connectToScene(Scene_wptr scene, std::string& token, std::vector<Route_ptr> localRoutes);
 
 		/// Disconnect from a scene.
 		/// \param scene The scene.
 		/// \param sceneHandle Scene handle.
 		/// \return A task which complete when the disconnection is done.
-		pplx::task<void> disconnect(Scene* scene, byte sceneHandle);
+		pplx::task<void> disconnect(Scene_wptr scene, byte sceneHandle);
 
 		/// Get scene informations for connection.
 		/// \param sceneId Scene id.
@@ -161,6 +152,9 @@ namespace Stormancer
 		void stopSyncClock();
 
 		pplx::task<void> syncClockImpl();
+
+	public:
+		Client_wptr myWPtr;
 
 	private:
 		bool _initialized = false;

@@ -9,43 +9,51 @@ ConsoleLogger::~ConsoleLogger()
 {
 }
 
-void ConsoleLogger::log(std::string message)
+void ConsoleLogger::log(const char* message)
 {
-	logWhite(message);
+	log(Stormancer::LogLevel::Info, "None", message, "");
 }
 
-void ConsoleLogger::log(Stormancer::LogLevel level, std::string category, std::string message, std::string data)
+void ConsoleLogger::log(Stormancer::LogLevel level, const char* category, const char* message, const char* data)
 {
 	if (level > _maximalLogLevel)
 	{
 		return;
 	}
+	RakNet::RakString message2 = format(level, category, message, data);
 
-	std::string message2 = format(level, category, message, data);
+	_mutex.lock();
+
 	switch (level)
 	{
 	case Stormancer::LogLevel::Trace:
-		logGrey(message2);
+		setConsoleColorGrey();
 		break;
 	case Stormancer::LogLevel::Debug:
-		logWhite(message2);
+		setConsoleColorWhite();
 		break;
 	case Stormancer::LogLevel::Info:
-		logBlue(message2);
+		setConsoleColorBlue();
 		break;
 	case Stormancer::LogLevel::Warn:
-		logYellow(message2);
+		setConsoleColorYellow();
 		break;
 	case Stormancer::LogLevel::Error:
-		logDarkRed(message2);
+		setConsoleColorRed();
 		break;
 	case Stormancer::LogLevel::Fatal:
-		logRed(message2);
+		setConsoleColorDarkRed();
 		break;
 	default:
-		logWhite(message2);
+		setConsoleColorWhite();
 		break;
 	}
+
+	std::clog << message2.C_String() << std::endl;
+
+	setConsoleColorWhite();
+
+	_mutex.unlock();
 }
 
 void ConsoleLogger::log(const std::exception& e)
@@ -53,68 +61,6 @@ void ConsoleLogger::log(const std::exception& e)
 	_mutex.lock();
 	setConsoleColorRed();
 	std::clog << formatException(e);
-	setConsoleColorWhite();
-	_mutex.unlock();
-}
-
-void ConsoleLogger::logWhite(std::string message)
-{
-	_mutex.lock();
-	setConsoleColorWhite();
-	std::clog << message << std::endl;
-	_mutex.unlock();
-}
-
-void ConsoleLogger::logGrey(std::string message)
-{
-	_mutex.lock();
-	setConsoleColorGrey();
-	std::clog << message << std::endl;
-	setConsoleColorWhite();
-	_mutex.unlock();
-}
-
-void ConsoleLogger::logGreen(std::string message)
-{
-	_mutex.lock();
-	setConsoleColorGreen();
-	std::clog << message << std::endl;
-	setConsoleColorWhite();
-	_mutex.unlock();
-}
-
-void ConsoleLogger::logRed(std::string message)
-{
-	_mutex.lock();
-	setConsoleColorRed();
-	std::clog << message << std::endl;
-	setConsoleColorWhite();
-	_mutex.unlock();
-}
-
-void ConsoleLogger::logBlue(std::string message)
-{
-	_mutex.lock();
-	setConsoleColorBlue();
-	std::clog << message << std::endl;
-	setConsoleColorWhite();
-	_mutex.unlock();
-}
-
-void ConsoleLogger::logDarkRed(std::string message)
-{
-	_mutex.lock();
-	setConsoleColorDarkRed();
-	std::clog << message << std::endl;
-	setConsoleColorWhite();
-	_mutex.unlock();
-}
-
-void ConsoleLogger::logYellow(std::string message)
-{
-	_mutex.lock();
-	setConsoleColorYellow();
-	std::clog << message << std::endl;
 	setConsoleColorWhite();
 	_mutex.unlock();
 }

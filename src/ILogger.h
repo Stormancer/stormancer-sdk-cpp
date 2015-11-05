@@ -36,10 +36,10 @@ namespace Stormancer
 	public:
 
 		/// Logs a simple message
-		virtual void log(std::string message) = 0;
+		virtual void log(const char* message) = 0;
 
 		/// Logs a full message
-		virtual void log(LogLevel level, std::string category, std::string message, std::string data) = 0;
+		virtual void log(LogLevel level, const char* category, const char* message, const char* data) = 0;
 
 		/// Logs an exception
 		virtual void log(const std::exception& e) = 0;
@@ -50,12 +50,12 @@ namespace Stormancer
 		/// \param message The message of the log.
 		/// \param data Some additional data.
 		/// \return The formatted message.
-		STORMANCER_DLL_API static std::string format(LogLevel level, std::string& category, std::string& message, std::string& data);
+		STORMANCER_DLL_API static RakNet::RakString format(LogLevel level, const char* category, const char* message, const char* data);
 
 		/// A basic format of an exception.
 		/// \param e The exception.
 		/// \return The formatted message.
-		STORMANCER_DLL_API static std::string formatException(const std::exception& e);
+		STORMANCER_DLL_API static RakNet::RakString formatException(const std::exception& e);
 
 	protected:
 

@@ -2,7 +2,7 @@
 
 namespace Stormancer
 {
-	Configuration::Configuration(std::string account, std::string application)
+	Configuration::Configuration(const char* account, const char* application)
 		: account(account),
 		application(application),
 		dispatcher(new DefaultPacketDispatcher()),

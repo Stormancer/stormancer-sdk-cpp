@@ -10,12 +10,12 @@ namespace Stormancer
 	{
 	public:
 		Route();
-		Route(Scene* scene, std::string& routeName, uint16 handle, stringMap metadata = stringMap());
-		Route(Scene* scene, std::string& routeName, stringMap metadata = stringMap());
+		Route(Scene_wptr scene, std::string& routeName, uint16 handle, stringMap metadata = stringMap());
+		Route(Scene_wptr scene, std::string& routeName, stringMap metadata = stringMap());
 		virtual ~Route();
 
 	public:
-		Scene* scene();
+		Scene_wptr scene();
 		std::string name();
 		stringMap& metadata();
 
@@ -24,8 +24,10 @@ namespace Stormancer
 		std::list<std::function<void(Packet_ptr)>> handlers;
 
 	private:
-		Scene* _scene;
+		Scene_wptr _scene;
 		std::string _name;
 		stringMap _metadata;
 	};
+
+	using Route_ptr = std::shared_ptr<Route>;
 };

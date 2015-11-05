@@ -33,17 +33,20 @@
 
 // custom libs
 
+// restsdk
 #include <cpprest/http_client.h>
 #include <cpprest/filestream.h>
-
 #include <pplx/pplxtasks.h>
 
+// rx
 #include <rx.hpp>
 
+// raknet
 #include <RakPeerInterface.h>
 #include <BitStream.h>
 #include <PacketPriority.h>
 #include <RakNetTypes.h>
+#include <DS_Map.h>
 
 // packed libs
 #include <msgpack.hpp>

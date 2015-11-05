@@ -28,32 +28,32 @@ namespace Stormancer
 	{
 	}
 
-	std::string ILogger::format(LogLevel level, std::string& category, std::string& message, std::string& data)
+	RakNet::RakString ILogger::format(LogLevel level, const char* category, const char* message, const char* data)
 	{
 		std::stringstream ss;
 
 		ss << '[' << nowStr() << ']';
 		ss << " [" << static_cast<int>(level) << ']';
-		if (category.length())
+		if (std::strlen(category))
 		{
 			ss << " [" << category << ']';
 		}
-		if (message.length())
+		if (std::strlen(message))
 		{
 			ss << ' ' << message;
 		}
-		if (data.length())
+		if (std::strlen(data))
 		{
 			ss << " [" << data << ']';
 		}
 
-		return ss.str();
+		return RakNet::RakString(ss.str().c_str());
 	}
 
-	std::string ILogger::formatException(const std::exception& e)
+	RakNet::RakString ILogger::formatException(const std::exception& e)
 	{
 		std::stringstream ss;
 		ss << '[' << nowStr() << ']' << " [exception] " << e.what() << std::endl;
-		return ss.str();
+		return RakNet::RakString(ss.str().c_str());
 	}
 };

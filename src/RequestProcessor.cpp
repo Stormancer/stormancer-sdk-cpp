@@ -73,7 +73,7 @@ namespace Stormancer
 			}
 			else
 			{
-				_logger->log(LogLevel::Warn, "RequestProcessor (message)", "Unknow request id.", to_string(id));
+				_logger->log(LogLevel::Warn, "RequestProcessor (message)", "Unknow request id.", to_string(id).c_str());
 			}
 
 			return true;
@@ -97,7 +97,7 @@ namespace Stormancer
 				}
 				else
 				{
-					_logger->log(LogLevel::Warn, "RequestProcessor (complete)", "Unknow request id.", to_string(id));
+					_logger->log(LogLevel::Warn, "RequestProcessor (complete)", "Unknow request id.", to_string(id).c_str());
 				}
 			}
 
@@ -124,7 +124,7 @@ namespace Stormancer
 			}
 			else
 			{
-				_logger->log(LogLevel::Warn, "RequestProcessor (error)", "Unknow request id.", to_string(id));
+				_logger->log(LogLevel::Warn, "RequestProcessor (error)", "Unknow request id.", to_string(id).c_str());
 			}
 
 			return true;

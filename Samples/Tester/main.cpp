@@ -5,15 +5,13 @@ using namespace Stormancer;
 using namespace std;
 
 auto logger = (ConsoleLogger*)ILogger::instance(new ConsoleLogger(Stormancer::LogLevel::Trace));
-Configuration* config = nullptr;
-Client* client = nullptr;
-Scene_ptr scene;
 bool stop = false;
-const std::string stormancer = "stormancer";
-const std::string accountId = "997bc6ac-9021-2ad6-139b-da63edee8c58";
-//const std::string accountId = "test";
-const std::string applicationName = "tester";
-const std::string sceneName = "main";
+const char* accountId = "997bc6ac-9021-2ad6-139b-da63edee8c58";
+const char* applicationName = "tester";
+const char* sceneName = "main";
+Configuration config(accountId, applicationName);
+Client_ptr client;
+Scene_ptr scene;
 pplx::task<void> syncclockTask;
 
 std::deque<std::function<void()>> tests;
@@ -30,7 +28,7 @@ void execNextTest()
 			}
 			catch (const std::exception& ex)
 			{
-				//
+				throw ex;
 			}
 		});
 		tests.pop_front();
@@ -41,10 +39,10 @@ void test_echo_received(Packetisp_ptr p)
 {
 	std::string message;
 	*p->stream >> message;
-	logger->logWhite("Message received (" + message + ")");
-	if (message == stormancer)
+	logger->log(LogLevel::Debug, "test_echo_received", ("Message received (" + message + ")").c_str(), "");
+	if (message == "stormancer")
 	{
-		logger->logGreen("Echo OK");
+		logger->log(LogLevel::Info, "test_echo_received", "Echo OK", "");
 		execNextTest();
 	}
 }
@@ -53,11 +51,11 @@ pplx::task<void> test_rpc_client(RpcRequestContex_ptr rc)
 {
 	std::string message;
 	*rc->inputStream() >> message;
-	logger->logWhite("rpc request received (" + message + ")");
+	logger->log(LogLevel::Debug, "test_rpc_client", ("rpc request received (" + message + ")").c_str(), "");
 
 	rc->cancellationToken().register_callback([]() {
-		logger->logWhite("test_rpc_client: rpc request cancelled");
-		logger->logGreen("RPC on client cancel OK");
+		logger->log(LogLevel::Debug, "test_rpc_client", "test_rpc_client: rpc request cancelled", "");
+		logger->log(LogLevel::Info, "test_rpc_client", "RPC on client cancel OK", "");
 		execNextTest();
 	});
 
@@ -65,10 +63,10 @@ pplx::task<void> test_rpc_client(RpcRequestContex_ptr rc)
 		Sleep(1000);
 		if (!rc->cancellationToken().is_canceled())
 		{
-			if (message == stormancer)
+			if (message == "stormancer")
 			{
-				logger->logGreen("RPC on client OK");
-				logger->logWhite("sending rpc response");
+				logger->log(LogLevel::Info, "test_rpc_client", "RPC on client OK", "");
+				logger->log(LogLevel::Debug, "test_rpc_client", "sending rpc response", "");
 				rc->sendValue(Action<bytestream*>([message](bytestream* bs) {
 					*bs << message;
 				}), PacketPriority::MEDIUM_PRIORITY);
@@ -76,7 +74,7 @@ pplx::task<void> test_rpc_client(RpcRequestContex_ptr rc)
 			}
 			else
 			{
-				logger->logRed("rpc server failed");
+				logger->log(LogLevel::Error, "test_rpc_client", "rpc server failed", "");
 				throw std::runtime_error("bad rpc server request (bad message)");
 			}
 		}
@@ -85,32 +83,30 @@ pplx::task<void> test_rpc_client(RpcRequestContex_ptr rc)
 
 void test_rpc_server_cancelled(Packetisp_ptr p)
 {
-	logger->logGreen("RPC on server cancel OK");
+	logger->log(LogLevel::Info, "test_rpc_server_cancelled", "RPC on server cancel OK", "");
 }
 
 void test_connect()
 {
-	logger->logWhite("Create client");
-	config = new Configuration(accountId, applicationName);
-	//config.serverEndpoint = "http://localhost:8081";
-	client = new Client(config);
-	logger->logGreen("Create client OK");
+	logger->log(LogLevel::Debug, "test_connect", "Create client", "");
+	client = Client::createClient(&config);
+	logger->log(LogLevel::Info, "test_connect", "Create client OK", "");
 
-	logger->logWhite("Get scene");
+	logger->log(LogLevel::Debug, "test_connect", "Get scene", "");
 	client->getPublicScene(sceneName).then([](Scene_ptr sc) {
 		scene = sc;
-		logger->logGreen("Get scene OK");
+		logger->log(LogLevel::Info, "test_connect", "Get scene OK", "");
 
-		logger->logWhite("Add route");
+		logger->log(LogLevel::Debug, "test_connect", "Add route", "");
 		scene->addRoute("echo", test_echo_received);
 		scene->addRoute("rpcservercancelled", test_rpc_server_cancelled);
-		logger->logGreen("Add route OK");
+		logger->log(LogLevel::Info, "test_connect", "Add route OK", "");
 
-		logger->logWhite("Add procedure");
+		logger->log(LogLevel::Debug, "test_connect", "Add procedure", "");
 		((RpcService*)scene->getComponent("rpcService"))->addProcedure("rpc", test_rpc_client, true);
-		logger->logGreen("Add procedure OK");
+		logger->log(LogLevel::Info, "test_connect", "Add procedure OK", "");
 
-		logger->logWhite("Connect to scene");
+		logger->log(LogLevel::Debug, "test_connect", "Connect to scene", "");
 		return scene->connect().then([](pplx::task<void> t) {
 			try
 			{
@@ -118,9 +114,10 @@ void test_connect()
 			}
 			catch (const std::exception& ex)
 			{
-				//
+				logger->log(LogLevel::Error, "test_connect", "Failed to connect to the scene", "");
+				throw ex;
 			}
-			logger->logGreen("Connect OK");
+			logger->log(LogLevel::Info, "test_connect", "Connect OK", "");
 			execNextTest();
 		});
 	});
@@ -128,51 +125,52 @@ void test_connect()
 
 void test_echo()
 {
-	logger->logWhite("test_echo");
+	logger->log(LogLevel::Debug, "test_echo", "test_echo", "");
 	try
 	{
 		scene->sendPacket("echo", [](bytestream* stream) {
-			*stream << stormancer;
-			logger->logWhite("Sending message...");
+			*stream << "stormancer";
+			logger->log(LogLevel::Debug, "test_echo", "Sending message...", "");
 		});
 	}
-	catch (const std::exception& e)
+	catch (const std::exception& ex)
 	{
-		logger->logRed(std::string("Can't send data to the scene through the 'echo' route.\n") + e.what());
+		logger->log(LogLevel::Error, "test_echo", (std::string("Can't send data to the scene through the 'echo' route.\n") + ex.what()).c_str(), "");
+		throw ex;
 	}
 }
 
 void test_rpc_server()
 {
-	logger->logWhite("RPC on server");
+	logger->log(LogLevel::Debug, "test_rpc_server", "RPC on server", "");
 	((RpcService*)scene->getComponent("rpcService"))->rpc("rpc", Action<bytestream*>([](bytestream* stream) {
-		*stream << stormancer;
+		*stream << "stormancer";
 	}), PacketPriority::MEDIUM_PRIORITY).subscribe([](Packetisp_ptr packet) {
 		std::string message;
 		*packet->stream >> message;
-		logger->logWhite("rpc response received (" + message + ")");
-		if (message == stormancer)
+		logger->log(LogLevel::Debug, "test_rpc_server", ("rpc response received (" + message + ")").c_str(), "");
+		if (message == "stormancer")
 		{
-			logger->logGreen("RPC on server OK");
+			logger->log(LogLevel::Info, "test_rpc_server", "RPC on server OK", "");
 		}
-		// execNextTest(); // don't do that, the server send back a rpc for the next test!
+		//execNextTest(); // don't do that, the server send back a rpc for the next test!
 	});
 }
 
 void test_rpc_server_cancel()
 {
-	logger->logWhite("Rpc on server cancel");
+	logger->log(LogLevel::Debug, "test_rpc_server_cancel", "Rpc on server cancel", "");
 	auto subscription = ((RpcService*)scene->getComponent("rpcService"))->rpc("rpc", Action<bytestream*>([](bytestream* stream) {
-		*stream << stormancer;
+		*stream << "stormancer";
 	}), PacketPriority::MEDIUM_PRIORITY).subscribe([](Packetisp_ptr packet) {
-		logger->logRed("rpc response received, but this RPC should be cancelled.");
+		logger->log(LogLevel::Debug, "test_rpc_server_cancel", "rpc response received, but this RPC should be cancelled.", "");
 	});
 	subscription.unsubscribe();
 }
 
 void test_syncclock()
 {
-	logger->logWhite("test sync clock");
+	logger->log(LogLevel::Debug, "test_syncclock", "test sync clock", "");
 	syncclockTask = pplx::create_task([]() {
 		while (!client->lastPing() && !stop)
 		{
@@ -183,8 +181,8 @@ void test_syncclock()
 			int64 clock = client->clock();
 			if (clock)
 			{
-				logger->logYellow("clock: " + to_string(clock / 1000.0));
-				logger->logGreen("SyncClock OK");
+				logger->log(LogLevel::Debug, "test_syncclock", ("clock: " + to_string(clock / 1000.0)).c_str(), "");
+				logger->log(LogLevel::Info, "test_syncclock", "SyncClock OK", "");
 				execNextTest();
 			}
 		}
@@ -193,20 +191,20 @@ void test_syncclock()
 
 void test_disconnect()
 {
-	logger->logWhite("test disconnect");
+	logger->log(LogLevel::Debug, "test_disconnect", "test disconnect", "");
 	scene->disconnect().then([](pplx::task<void> t)
 	{
 		try
 		{
 			t.wait();
-
-			logger->logGreen("Disconnect OK");
-			execNextTest();
 		}
 		catch (const std::exception& ex)
 		{
-			//
+			logger->log(LogLevel::Error, "test_disconnect", "Failed to connect to the scene", "");
+			throw ex;
 		}
+		logger->log(LogLevel::Info, "test_disconnect", "Disconnect OK", "");
+		execNextTest();
 	});
 }
 

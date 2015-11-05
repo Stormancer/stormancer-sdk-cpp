@@ -85,6 +85,8 @@ namespace Stormancer
 			return (map.find(key) != map.end()) ? true : false;
 		}
 
+		stringMap toStringMap(rakStringMap map);
+
 #pragma endregion
 
 #pragma region string

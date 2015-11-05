@@ -2,41 +2,49 @@
 
 namespace Stormancer
 {
-	const std::string RpcClientPlugin::pluginName = "stormancer.plugins.rpc";
-	const std::string RpcClientPlugin::serviceName = "rpcService";
-	const std::string RpcClientPlugin::version = "1.1.0";
-	const std::string RpcClientPlugin::nextRouteName = "stormancer.rpc.next";
-	const std::string RpcClientPlugin::errorRouteName = "stormancer.rpc.error";
-	const std::string RpcClientPlugin::completeRouteName = "stormancer.rpc.completed";
-	const std::string RpcClientPlugin::cancellationRouteName = "stormancer.rpc.cancel";
+	const char* RpcClientPlugin::pluginName = "stormancer.plugins.rpc";
+	const char* RpcClientPlugin::serviceName = "rpcService";
+	const char* RpcClientPlugin::version = "1.1.0";
+	const char* RpcClientPlugin::nextRouteName = "stormancer.rpc.next";
+	const char* RpcClientPlugin::errorRouteName = "stormancer.rpc.error";
+	const char* RpcClientPlugin::completeRouteName = "stormancer.rpc.completed";
+	const char* RpcClientPlugin::cancellationRouteName = "stormancer.rpc.cancel";
 
 	void RpcClientPlugin::build(PluginBuildContext& ctx)
 	{
-		ctx.sceneCreated += [this](Scene* scene) {
-			auto rpcParams = scene->getHostMetadata(pluginName);
-
-			if (rpcParams == version)
+		ctx.sceneCreated += [this](Scene_wptr scene_wptr) {
+			auto scene = scene_wptr.lock();
+			if (scene)
 			{
-				auto processor = new RpcService(scene);
-				scene->registerComponent(RpcClientPlugin::serviceName, [processor]() { return (void*)processor; });
-				scene->addRoute(RpcClientPlugin::nextRouteName, [processor](Packetisp_ptr p) {
-					processor->next(p);
-				});
-				scene->addRoute(RpcClientPlugin::cancellationRouteName, [processor](Packetisp_ptr p) {
-					processor->cancel(p);
-				});
-				scene->addRoute(RpcClientPlugin::errorRouteName, [processor](Packetisp_ptr p) {
-					processor->error(p);
-				});
-				scene->addRoute(RpcClientPlugin::completeRouteName, [processor](Packetisp_ptr p) {
-					processor->complete(p);
-				});
+				auto rpcParams = scene->getHostMetadata(pluginName);
+
+				if (rpcParams == version)
+				{
+					auto processor = new RpcService(scene_wptr);
+					scene->registerComponent(RpcClientPlugin::serviceName, [processor]() { return (void*)processor; });
+					scene->addRoute(RpcClientPlugin::nextRouteName, [processor](Packetisp_ptr p) {
+						processor->next(p);
+					});
+					scene->addRoute(RpcClientPlugin::cancellationRouteName, [processor](Packetisp_ptr p) {
+						processor->cancel(p);
+					});
+					scene->addRoute(RpcClientPlugin::errorRouteName, [processor](Packetisp_ptr p) {
+						processor->error(p);
+					});
+					scene->addRoute(RpcClientPlugin::completeRouteName, [processor](Packetisp_ptr p) {
+						processor->complete(p);
+					});
+				}
 			}
 		};
 
-		ctx.sceneDisconnected += [this](Scene* scene) {
-			auto processor = (RpcService*)scene->getComponent(RpcClientPlugin::serviceName);
-			processor->disconnected();
+		ctx.sceneDisconnected += [this](Scene_wptr scene_wptr) {
+			auto scene = scene_wptr.lock();
+			if (scene)
+			{
+				auto processor = (RpcService*)scene->getComponent(RpcClientPlugin::serviceName);
+				processor->disconnected();
+			}
 		};
 	}
 };

@@ -18,7 +18,7 @@ namespace Stormancer
 		/// Constructor.
 		/// \param account The account id.
 		/// \param application The application name.
-		STORMANCER_DLL_API Configuration(std::string account, std::string application);
+		STORMANCER_DLL_API Configuration(const char* account, const char* application);
 
 		/// Destructor.
 		STORMANCER_DLL_API ~Configuration();

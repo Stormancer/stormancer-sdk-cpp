@@ -16,4 +16,6 @@ namespace Stormancer
 		pplx::task_completion_event<void> tce;
 		pplx::task<void> task;
 	};
+
+	using RpcRequest_ptr = std::shared_ptr<RpcRequest>;
 };
