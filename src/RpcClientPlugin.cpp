@@ -38,8 +38,7 @@ namespace Stormancer
 			}
 		};
 
-		ctx.sceneDisconnected += [this](Scene_wptr scene_wptr) {
-			auto scene = scene_wptr.lock();
+		ctx.sceneDisconnected += [this](Scene* scene) {
 			if (scene)
 			{
 				auto processor = (RpcService*)scene->getComponent(RpcClientPlugin::serviceName);

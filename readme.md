@@ -18,7 +18,8 @@ For each sample, you have to do this:
 PATH=$(SolutionDir)..\stormancer-sdk-cpp\RakNet\Lib\DLL\Lib;$(SolutionDir)..\stormancer-sdk-cpp\bin;%PATH%
 ```
 
-## Configure a project  
+## Configure a project
+
 *Don't forget to adjust the paths. We assume your project is in a directory beside the stormancer-sdk-cpp.*  
 - Build the SDK and the samples before continuing.  
 *You only need to restore the NuGet packages and set the envrionment path of the sdk and the sample projects to achieve this.*  
@@ -55,31 +56,40 @@ stormancer-sdk-cpp_$(Configuration)_$(Platform).lib
 - Build the project.  
 
 
-## configure your **Unreal Engine** Visual Studio game project
+## Configure an **Unreal Engine 4** Visual Studio project
 
-- Move the **Stormancer-sdk-cpp** inside your *Documents/Unreal Projects* directory  
+- Clone the **Stormancer-sdk-cpp** inside your *Documents/Unreal Projects* directory  
 - Add the **cpprestsdk** NuGet package (casablanca)  
 - Go to the Project Properties and set *All configurations* and *All platforms* on top  
-- Set to *Debugging* > *Environment* :  
+- Set to *Configuration Properties* > *Debugging* > **Environment** :  
 ```
 PATH=$(SolutionDir)..\stormancer-sdk-cpp\RakNet\Lib\DLL\Lib;$(SolutionDir)..\stormancer-sdk-cpp\bin;%PATH%
 ```
-- Set to **VC++ Directories** > **Include Directories**  
+- Set to *Configuration Properties* > *VC++ Directories* > **Include Directories**  
 ```
-$(SolutionDir)packages\cpprestsdk.v120.windesktop.msvcstl.dyn.rt-dyn.2.6.0\build\native\include;$(SolutionDir)..\stormancer-sdk-cpp\rxcpp\Rx\v2\src\rxcpp;$(SolutionDir)..\stormancer-sdk-cpp\src;$(SolutionDir)..\stormancer-sdk-cpp\msgpack-c\include;$(SolutionDir)..\stormancer-sdk-cpp\RakNet\Source;<different options>
+$(SolutionDir)packages\cpprestsdk.v120.windesktop.msvcstl.dyn.rt-dyn.2.6.0\build\native\include;
+$(SolutionDir)..\stormancer-sdk-cpp\rxcpp\Rx\v2\src\rxcpp;
+$(SolutionDir)..\stormancer-sdk-cpp\src;
+$(SolutionDir)..\stormancer-sdk-cpp\msgpack-c\include;
+$(SolutionDir)..\stormancer-sdk-cpp\RakNet\Source;
+<different options>
+
 ```
-- Set to **VC++ Directories** > **Library Directories**  
+- Set to *Configuration Properties* > *VC++ Directories* > **Library Directories**  
 ```
-$(SolutionDir)packages\cpprestsdk.v120.windesktop.msvcstl.dyn.rt-dyn.2.6.0\lib\native\v120\windesktop\msvcstl\dyn\rt-dyn\x64\Release;$(SolutionDir)..\stormancer-sdk-cpp\RakNet\Lib\DLL\Lib;$(SolutionDir)..\stormancer-sdk-cpp\bin;<different options>
+$(SolutionDir)packages\cpprestsdk.v120.windesktop.msvcstl.dyn.rt-dyn.2.6.0\lib\native\v120\windesktop\msvcstl\dyn\rt-dyn\x64\Release;
+$(SolutionDir)..\stormancer-sdk-cpp\RakNet\Lib\DLL\Lib;
+$(SolutionDir)..\stormancer-sdk-cpp\bin;
+<different options>
 ```
 - Click OK  
 - Open the file '<YourProject>.Build.cs' and add this lines at the end of <YourProject> function  
 ```
-PublicAdditionalLibraries.Add("DLL_vc9_DLL_Release_x64.lib");
-PublicAdditionalLibraries.Add("stormancer-sdk-cpp_Release_x64.lib");
-PublicAdditionalLibraries.Add("cpprest120_2_6.lib");
+PublicAdditionalLibraries.Add("RakNet120_Release_x64.lib");
+PublicAdditionalLibraries.Add("Stormancer120_Release_x64.lib");
 ```
 - Build your project in **Development Editor** and **Win64** modes
+
 
 ## Generate the docs
 

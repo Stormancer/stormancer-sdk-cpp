@@ -17,7 +17,17 @@ namespace Stormancer
 	{
 	}
 
-	Configuration& Configuration::metadata(std::string key, std::string value)
+	Configuration_ptr Configuration::forAccount(const char* account, const char* application)
+	{
+		if (!account || !application)
+		{
+			throw std::invalid_argument("Check your account and application parameters");
+		}
+
+		return Configuration_ptr(new Configuration(account, application));
+	}
+
+	Configuration& Configuration::metadata(const char* key, const char* value)
 	{
 		_metadata[key] = value;
 		return *this;
@@ -25,7 +35,7 @@ namespace Stormancer
 
 	std::string Configuration::getApiEndpoint()
 	{
-		return (serverEndpoint.length() ? serverEndpoint : apiEndpoint);
+		return (strlen(serverEndpoint) ? serverEndpoint : apiEndpoint);
 	}
 
 	std::vector<IClientPlugin*>& Configuration::plugins()

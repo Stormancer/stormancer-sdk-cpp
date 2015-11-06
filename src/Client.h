@@ -48,17 +48,14 @@ namespace Stormancer
 			double offset;
 		};
 
-	public:
-		/// Factory.
-		/// \param config A pointer to a Configuration.
-		STORMANCER_DLL_API static Client_ptr createClient(Configuration* config);
+	private:
+		Client(Configuration_ptr config);
 
+	public:
 		/// Destructor.
 		STORMANCER_DLL_API ~Client();
 
 	private:
-		Client(Configuration* config);
-
 		/// Copy constructor deleted.
 		Client(Client& other) = delete;
 
@@ -66,6 +63,9 @@ namespace Stormancer
 		Client& operator=(Client& other) = delete;
 
 	public:
+		/// Factory.
+		/// \param config A pointer to a Configuration.
+		STORMANCER_DLL_API static Client_ptr createClient(Configuration_ptr config);
 
 		/// Get a public scene.
 		/// \param sceneId The scene Id as a string.
@@ -107,7 +107,7 @@ namespace Stormancer
 		/// \param scene The scene.
 		/// \param sceneHandle Scene handle.
 		/// \return A task which complete when the disconnection is done.
-		pplx::task<void> disconnect(Scene_wptr scene, byte sceneHandle);
+		pplx::task<void> disconnect(Scene* scene, byte sceneHandle);
 
 		/// Get scene informations for connection.
 		/// \param sceneId Scene id.

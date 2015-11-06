@@ -16,24 +16,33 @@ namespace Stormancer
 
 	RakNetTransport::~RakNetTransport()
 	{
-		if (_handler)
-		{
-			delete _handler;
-		}
+		stop();
 	}
 
 	void RakNetTransport::start(std::string type, IConnectionManager* handler, pplx::cancellation_token token, uint16 maxConnections, uint16 serverPort)
 	{
+		_mutex.lock();
+		bool isRunning = _isRunning;
+		_mutex.unlock();
+
+		if (isRunning)
+		{
+			throw std::runtime_error("RakNet transport is already started.");
+		}
+
 		if (handler == nullptr && serverPort > 0)
 		{
-			throw std::invalid_argument("Handler is null.");
+			throw std::invalid_argument("Handler is null for server.");
 		}
+
+		_mutex.lock();
 		_type = type;
 		_handler = handler;
 		initialize(serverPort, maxConnections);
 		_scheduledTransportLoop = _scheduler->schedulePeriodic(15, Action<>(std::function<void()>([this]() {
 			run();
 		})));
+		_mutex.unlock();
 	}
 
 	void RakNetTransport::initialize(uint16 maxConnections, uint16 serverPort)
@@ -60,10 +69,11 @@ namespace Stormancer
 
 	void RakNetTransport::run()
 	{
+		_mutex.lock();
 		try
 		{
 			RakNet::Packet* packet;
-			while ((packet = _peer->Receive()) != nullptr)
+			while (packet = _peer->Receive())
 			{
 				if (packet->length == 0)
 				{
@@ -120,7 +130,7 @@ namespace Stormancer
 						break;
 					}
 					case (byte)DefaultMessageIDTypes::ID_ALREADY_CONNECTED:
-						throw std::logic_error(std::string("Peer already connected (") + packet->systemAddress.ToString(true, ':') + ")");
+						_logger->log(LogLevel::Error, "RakNetTransport::run", "Peer already connected", packet->systemAddress.ToString(true, ':'));
 						break;
 					case (byte)MessageIDTypes::ID_CONNECTION_RESULT:
 					{
@@ -146,10 +156,12 @@ namespace Stormancer
 		{
 			_logger->log(LogLevel::Error, "RakNetTransport::run", "An error occured while running the transport.", e.what());
 		}
+		_mutex.unlock();
 	}
 
 	void RakNetTransport::stop()
 	{
+		_mutex.lock();
 		if (_isRunning)
 		{
 			_scheduledTransportLoop->unsubscribe();
@@ -167,9 +179,15 @@ namespace Stormancer
 				delete _socketDescriptor;
 				_socketDescriptor = nullptr;
 			}
-			_isRunning = false;
 			ILogger::instance()->log(LogLevel::Info, "RakNetTransport::run", "Stopped raknet server.", "");
 		}
+
+		if (_handler)
+		{
+			delete _handler;
+			_handler = nullptr;
+		}
+		_mutex.unlock();
 	}
 
 	void RakNetTransport::onConnectionIdReceived(uint64 p)
@@ -195,12 +213,17 @@ namespace Stormancer
 			throw std::runtime_error("Scene endpoint port should not be 0 (" + endpoint + ')');
 		}
 
-		if (_peer == nullptr || !_peer->IsActive())
+		_mutex.lock();
+		bool transportNotStarted = (_peer == nullptr || !_peer->IsActive());
+		_mutex.unlock();
+		if (transportNotStarted)
 		{
 			throw std::runtime_error("Transport not started. Check you started it.");
 		}
 
+		_mutex.lock();
 		auto result = _peer->Connect(hostCstr, port, nullptr, 0);
+		_mutex.unlock();
 		if (result != RakNet::ConnectionAttemptResult::CONNECTION_ATTEMPT_STARTED)
 		{
 			throw std::runtime_error(std::string("Bad RakNet connection attempt result (") + std::to_string(result) + ')');

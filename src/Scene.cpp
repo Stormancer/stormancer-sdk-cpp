@@ -22,12 +22,6 @@ namespace Stormancer
 
 		disconnect();
 
-		auto client = _client.lock();
-		if (client)
-		{
-			client->_pluginCtx.sceneDeleted(myWPtr);
-		}
-
 		for (auto sub : subscriptions)
 		{
 			sub.unsubscribe();
@@ -174,7 +168,7 @@ namespace Stormancer
 		if (_connected && client)
 		{
 			_connected = false;
-			_disconnectTask = client->disconnect(myWPtr, _handle);
+			_disconnectTask = client->disconnect(this, _handle);
 		}
 		return _disconnectTask;
 	}

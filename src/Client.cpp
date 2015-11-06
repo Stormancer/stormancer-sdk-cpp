@@ -34,7 +34,7 @@ namespace Stormancer
 
 	// Client
 
-	Client::Client(Configuration* config)
+	Client::Client(Configuration_ptr config)
 		: _initialized(false),
 		_logger(ILogger::instance()),
 		_scheduler(config->scheduler),
@@ -42,7 +42,6 @@ namespace Stormancer
 		_applicationName(config->application),
 		_tokenHandler(new TokenHandler()),
 		_apiClient(new ApiClient(config, _tokenHandler)),
-		_transport(config->transportFactory(std::map<std::string, void*>{ { "ILogger", (void*)_logger }, { "IScheduler", (void*)_scheduler } })),
 		_dispatcher(config->dispatcher),
 		_requestProcessor(new RequestProcessor(_logger, std::vector<IRequestModule*>())),
 		_scenesDispatcher(new SceneDispatcher),
@@ -50,6 +49,11 @@ namespace Stormancer
 		_maxPeers(config->maxPeers),
 		_pingInterval(config->pingInterval)
 	{
+		DataStructures::Map<RakNet::RakString, void*> params;
+		params.Set("ILogger", (void*)_logger);
+		params.Set("IScheduler", (void*)_scheduler);
+		_transport = config->transportFactory(params);
+
 		_dispatcher->addProcessor(_requestProcessor);
 		_dispatcher->addProcessor(_scenesDispatcher);
 
@@ -75,28 +79,43 @@ namespace Stormancer
 		disconnect();
 
 		delete _scenesDispatcher;
+		_scenesDispatcher = nullptr;
+
 		delete _requestProcessor;
+		_requestProcessor = nullptr;
+
 		delete _apiClient;
+		_apiClient = nullptr;
+
 		delete _tokenHandler;
+		_tokenHandler = nullptr;
 
 		if (_serverConnection)
 		{
 			delete _serverConnection;
+			_serverConnection = nullptr;
 		}
 
 		if (_dispatcher)
 		{
 			delete _dispatcher;
+			_dispatcher = nullptr;
 		}
 
 		if (_transport)
 		{
 			delete _transport;
+			_transport = nullptr;
 		}
 	}
 
-	Client_ptr Client::createClient(Configuration* config)
+	Client_ptr Client::createClient(Configuration_ptr config)
 	{
+		if (!config)
+		{
+			throw std::invalid_argument("Check the configuration");
+		}
+
 		auto client = Client_ptr(new Client(config));
 		client->myWPtr = client;
 		return client;
@@ -347,19 +366,17 @@ namespace Stormancer
 
 		disconnectAllScenes();
 
-		if (_serverConnection != nullptr)
+		if (_serverConnection)
 		{
 			_serverConnection->close();
-			_serverConnection = nullptr;
 		}
 	}
 
-	pplx::task<void> Client::disconnect(Scene_wptr scene_wptr, byte sceneHandle)
+	pplx::task<void> Client::disconnect(Scene* scene, byte sceneHandle)
 	{
-		auto scene = scene_wptr.lock();
 		if (!scene)
 		{
-			throw std::runtime_error("The scene ptr is invalid");
+			throw std::runtime_error("The scene ptr is null");
 		}
 
 		DisconnectFromSceneDto dto(sceneHandle);
@@ -449,8 +466,10 @@ namespace Stormancer
 				{
 					packet = t.get();
 				}
-				catch (const std::exception& e) {
-					throw std::runtime_error(std::string(e.what()) + "\nFailed to ping the server");
+				catch (const std::exception& e)
+				{
+					ILogger::instance()->log(LogLevel::Warn, "syncClock", "Failed to ping the server", e.what());
+					return;
 				}
 
 				uint64 timeEnd = (uint16)this->_watch.getElapsedTime();

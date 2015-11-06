@@ -9,7 +9,6 @@ bool stop = false;
 const char* accountId = "997bc6ac-9021-2ad6-139b-da63edee8c58";
 const char* applicationName = "tester";
 const char* sceneName = "main";
-Configuration config(accountId, applicationName);
 Client_ptr client;
 Scene_ptr scene;
 pplx::task<void> syncclockTask;
@@ -89,7 +88,8 @@ void test_rpc_server_cancelled(Packetisp_ptr p)
 void test_connect()
 {
 	logger->log(LogLevel::Debug, "test_connect", "Create client", "");
-	client = Client::createClient(&config);
+	auto config = Configuration::forAccount(accountId, applicationName);
+	client = Client::createClient(config);
 	logger->log(LogLevel::Info, "test_connect", "Create client OK", "");
 
 	logger->log(LogLevel::Debug, "test_connect", "Get scene", "");
@@ -171,6 +171,7 @@ void test_rpc_server_cancel()
 void test_syncclock()
 {
 	logger->log(LogLevel::Debug, "test_syncclock", "test sync clock", "");
+	stop = false;
 	syncclockTask = pplx::create_task([]() {
 		while (!client->lastPing() && !stop)
 		{
@@ -208,22 +209,35 @@ void test_disconnect()
 	});
 }
 
+void clean()
+{
+	logger->log(LogLevel::Debug, "clean", "deleting scene and client", "");
+	stop = true;
+	scene.reset();
+	client.reset();
+	logger->log(LogLevel::Debug, "clean", "scene and client deleted", "");
+
+	execNextTest();
+}
+
 int main(int argc, char* argv[])
 {
 	srand((uint32)time(NULL));
 
 	tests.push_back(test_connect);
-	tests.push_back(test_echo);
-	tests.push_back(test_rpc_server);
-	tests.push_back(test_rpc_server_cancel);
-	tests.push_back(test_syncclock);
-	tests.push_back(test_disconnect);
+	//tests.push_back(test_echo);
+	//tests.push_back(test_rpc_server);
+	//tests.push_back(test_rpc_server_cancel);
+	//tests.push_back(test_syncclock);
+	//tests.push_back(test_disconnect);
+	tests.push_back(clean);
+	//tests.push_back(test_connect);
+	//tests.push_back(clean);
 
 	execNextTest();
 
 	cin.ignore();
 	stop = true;
-	syncclockTask.wait();
 
 	return 0;
 }

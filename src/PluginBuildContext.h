@@ -28,10 +28,7 @@ namespace Stormancer
 		Action<Scene_wptr> sceneConnected;
 
 		/// Event fired when a scene is disconnected.
-		Action<Scene_wptr> sceneDisconnected;
-
-		/// Event fired when a scene is deleted.
-		Action<Scene_wptr> sceneDeleted;
+		Action<Scene*> sceneDisconnected;
 
 		/// Event fired when a packet is received from a remote peer.
 		Action<Packet_ptr> packetReceived;

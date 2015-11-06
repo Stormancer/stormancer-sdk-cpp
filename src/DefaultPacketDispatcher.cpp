@@ -53,9 +53,9 @@ namespace Stormancer
 		while (!processed && count < 40) // Max 40 layers
 		{
 			*(packet->stream) >> msgType;
-			if (mapContains(this->_handlers, msgType))
+			if (mapContains(_handlers, msgType))
 			{
-				handlerFunction* handler = this->_handlers[msgType];
+				handlerFunction* handler = _handlers[msgType];
 				processed = (*handler)(packet);
 				count++;
 			}

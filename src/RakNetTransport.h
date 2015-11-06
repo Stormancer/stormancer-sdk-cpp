@@ -42,5 +42,6 @@ namespace Stormancer
 		IScheduler* _scheduler = nullptr;
 		Subscription_ptr _scheduledTransportLoop;
 		RakNet::SocketDescriptor* _socketDescriptor = nullptr;
+		std::mutex _mutex;
 	};
 };

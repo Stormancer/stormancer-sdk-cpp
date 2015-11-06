@@ -8,52 +8,59 @@
 
 namespace Stormancer
 {
+	class Configuration;
+	using Configuration_ptr = std::shared_ptr<Configuration>;
+	using Configuration_wptr = std::weak_ptr<Configuration>;
+
 	/// Used by a Client for initialization.
     /// For instance to target a custom Stormancer cluster change the ServerEndoint property to the http API endpoint of your custom cluster.
 	class Configuration
 	{
 		friend class Client;
 
+	private:
+		// Constructor.
+		Configuration(const char*, const char* application);
+
 	public:
-		/// Constructor.
-		/// \param account The account id.
-		/// \param application The application name.
-		STORMANCER_DLL_API Configuration(const char* account, const char* application);
-
-		/// Destructor.
-		STORMANCER_DLL_API ~Configuration();
-
-		/// Copy constructor deleted.
+		// Copy constructor deleted.
 		Configuration(Configuration& other) = delete;
 
-		/// Copy deleted.
+		// Copy deleted.
 		Configuration& operator=(Configuration& other) = delete;
 
-		/// Get the Api endpoint.
+		// Destructor.
+		~Configuration();
+
+	public:
+		/// Create an account with an account and an application name and returns a Configuration smart ptr.
+		STORMANCER_DLL_API static Configuration_ptr forAccount(const char* account, const char* application);
+
+		// Get the Api endpoint.
 		std::string getApiEndpoint();
 
-		std::vector<IClientPlugin*>& plugins();
+		/// Get a reference to the plugins list
+		STORMANCER_DLL_API std::vector<IClientPlugin*>& plugins();
 
 		/// Adds a plugin to the client.
 		/// Plugins enable developpers to plug custom code in the stormancer client's extensibility points. Possible uses include: custom high level protocols, logger or analyzers.
 		/// \param plugin The plugin instance to add.
-		void addPlugin(IClientPlugin* plugin);
+		STORMANCER_DLL_API void addPlugin(IClientPlugin* plugin);
 
 	private:
-
-		/// Set a metadata
-		Configuration& metadata(std::string key, std::string value);
+		// Set a metadata
+		Configuration& metadata(const char*, const char*);
 
 	public:
 
 		/// A string containing the account name of the application.
-		std::string account;
+		const char* account = "";
 
 		/// A string containing the name of the application.
-		std::string application;
+		const char* application = "";
 
 		/// A string containing the target server endpoint.
-		std::string serverEndpoint;
+		const char* serverEndpoint = "";
 
 		/// Gets or Sets the dispatcher to be used by the client.
 		IPacketDispatcher* dispatcher = nullptr;
@@ -71,14 +78,13 @@ namespace Stormancer
 		IScheduler* scheduler = nullptr;
 
 		/// Gets or sets the transport to be used by the client.
-		std::function<ITransport*(std::map<std::string, void*>)> transportFactory;
-
-		const std::function<ITransport*(std::map<std::string, void*>)> defaultTransportFactory = [](std::map<std::string, void*> parameters)
-		{
-			return new RakNetTransport(static_cast<ILogger*>(parameters["ILogger"]), static_cast<IScheduler*>(parameters["IScheduler"]));
-		};
+		std::function<ITransport*(DataStructures::Map<RakNet::RakString, void*>)> transportFactory;
 
 	private:
+		const std::function<ITransport*(DataStructures::Map<RakNet::RakString, void*>)> defaultTransportFactory = [](DataStructures::Map<RakNet::RakString, void*> parameters)
+		{
+			return new RakNetTransport(static_cast<ILogger*>(parameters.Get("ILogger")), static_cast<IScheduler*>(parameters.Get("IScheduler")));
+		};
 
 		stringMap _metadata;
 
