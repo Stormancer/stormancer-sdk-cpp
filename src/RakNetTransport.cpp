@@ -169,7 +169,7 @@ namespace Stormancer
 			{
 				if (_peer->IsActive())
 				{
-					_peer->Shutdown(0);
+					_peer->Shutdown(1000);
 				}
 				RakNet::RakPeerInterface::DestroyInstance(_peer);
 				_peer = nullptr;
