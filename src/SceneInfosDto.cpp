@@ -10,7 +10,7 @@ namespace Stormancer
 	{
 	}
 
-	void SceneInfosDto::msgpack_unpack(msgpack::object const& o)
+	void SceneInfosDto::msgpack_unpack(const msgpack::object& o)
 	{
 		if (o.type != msgpack::type::MAP)
 		{

@@ -16,7 +16,7 @@ namespace Stormancer
 		virtual ~SceneInfosDto();
 
 		/// deserialize by using MessagePack.
-		void msgpack_unpack(msgpack::object const& o);
+		void msgpack_unpack(const msgpack::object& o);
 
 	public:
 		
