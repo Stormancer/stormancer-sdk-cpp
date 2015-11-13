@@ -42,9 +42,9 @@
 #include <rx.hpp>
 
 // raknet
+#include <PacketPriority.h>
 #include <RakPeerInterface.h>
 #include <BitStream.h>
-#include <PacketPriority.h>
 #include <RakNetTypes.h>
 #include <DS_Map.h>
 

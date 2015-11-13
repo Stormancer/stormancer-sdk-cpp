@@ -117,16 +117,7 @@
     <ClCompile Include="src\RouteDto.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RpcClientPlugin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RpcService.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\SystemRequest.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RpcRequest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Watch.cpp">
@@ -287,19 +278,7 @@
     <ClInclude Include="src\PluginBuildContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RpcClientPlugin.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RpcService.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\SystemRequest.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RpcRequest.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RpcRequestContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Watch.h">

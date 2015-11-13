@@ -49,7 +49,7 @@ namespace Stormancer
 		_maxPeers(config->maxPeers),
 		_pingInterval(config->pingInterval)
 	{
-		DataStructures::Map<RakNet::RakString, void*> params;
+		DataStructures::Map<const char*, void*> params;
 		params.Set("ILogger", (void*)_logger);
 		params.Set("IScheduler", (void*)_scheduler);
 		_transport = config->transportFactory(params);
@@ -116,7 +116,7 @@ namespace Stormancer
 			throw std::invalid_argument("Check the configuration");
 		}
 
-		auto client = Client_ptr(new Client(config));
+		auto client = Client_ptr(new Client(config), deleter<Client>());
 		client->myWPtr = client;
 		return client;
 	}
@@ -289,7 +289,7 @@ namespace Stormancer
 							{
 								_scenes.erase(sceneId);
 							}
-						})));
+						})), deleter<Scene>());
 						scene->myWPtr = scene;
 						_scenes[sceneId] = scene;
 					}
@@ -334,7 +334,7 @@ namespace Stormancer
 		for (auto r : localRoutes)
 		{
 			RouteDto routeDto;
-			routeDto.Handle = r->_handle;
+			routeDto.Handle = r->handle();
 			routeDto.Metadata = r->metadata();
 			routeDto.Name = r->name();
 			parameter.Routes << routeDto;

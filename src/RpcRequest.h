@@ -6,8 +6,8 @@ namespace Stormancer
 	class RpcRequest
 	{
 	public:
-		RpcRequest(rxcpp::subscriber<Packetisp_ptr>& observer);
-		~RpcRequest();
+		STORMANCER_DLL_API RpcRequest(rxcpp::subscriber<Packetisp_ptr>& observer);
+		STORMANCER_DLL_API ~RpcRequest();
 
 	public:
 		uint16 id = 0;

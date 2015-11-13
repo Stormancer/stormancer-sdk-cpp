@@ -1,3 +1,4 @@
+#include "BoidsViewer.h"
 #include "stormancer.h"
 
 namespace Stormancer

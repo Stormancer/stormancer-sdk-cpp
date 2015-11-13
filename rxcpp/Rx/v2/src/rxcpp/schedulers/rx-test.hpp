@@ -345,9 +345,9 @@ struct is_create_source_function
 {
     struct not_void {};
     template<class CF>
-    static auto check(int) -> decltype((*(CF*)nullptr)());
+    static auto checkRX(int) -> decltype((*(CF*)nullptr)());
     template<class CF>
-    static not_void check(...);
+    static not_void checkRX(...);
 
     static const bool value = is_observable<decltype(check<rxu::decay_t<F>>(0))>::value;
 };

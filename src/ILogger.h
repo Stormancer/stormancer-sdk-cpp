@@ -50,12 +50,12 @@ namespace Stormancer
 		/// \param message The message of the log.
 		/// \param data Some additional data.
 		/// \return The formatted message.
-		STORMANCER_DLL_API static RakNet::RakString format(LogLevel level, const char* category, const char* message, const char* data);
+		STORMANCER_DLL_API static std::shared_ptr<const char> format(LogLevel level, const char* category, const char* message, const char* data);
 
 		/// A basic format of an exception.
 		/// \param e The exception.
 		/// \return The formatted message.
-		STORMANCER_DLL_API static RakNet::RakString formatException(const std::exception& e);
+		STORMANCER_DLL_API static std::shared_ptr<const char> formatException(const std::exception& e);
 
 	protected:
 

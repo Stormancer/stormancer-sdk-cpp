@@ -40,7 +40,7 @@ namespace Stormancer
 		std::string getApiEndpoint();
 
 		/// Get a reference to the plugins list
-		STORMANCER_DLL_API std::vector<IClientPlugin*>& plugins();
+		STORMANCER_DLL_API const std::vector<IClientPlugin*>& plugins();
 
 		/// Adds a plugin to the client.
 		/// Plugins enable developpers to plug custom code in the stormancer client's extensibility points. Possible uses include: custom high level protocols, logger or analyzers.
@@ -78,10 +78,10 @@ namespace Stormancer
 		IScheduler* scheduler = nullptr;
 
 		/// Gets or sets the transport to be used by the client.
-		std::function<ITransport*(DataStructures::Map<RakNet::RakString, void*>)> transportFactory;
+		std::function<ITransport*(DataStructures::Map<const char*, void*>)> transportFactory;
 
 	private:
-		const std::function<ITransport*(DataStructures::Map<RakNet::RakString, void*>)> defaultTransportFactory = [](DataStructures::Map<RakNet::RakString, void*> parameters)
+		const std::function<ITransport*(DataStructures::Map<const char*, void*>)> defaultTransportFactory = [](DataStructures::Map<const char*, void*> parameters)
 		{
 			return new RakNetTransport(static_cast<ILogger*>(parameters.Get("ILogger")), static_cast<IScheduler*>(parameters.Get("IScheduler")));
 		};

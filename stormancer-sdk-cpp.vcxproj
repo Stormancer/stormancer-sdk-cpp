@@ -103,6 +103,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>STORMANCER_DLL_EXPORT;WIN32;_DEBUG;_WINDOWS;_USRDLL;STORMANCERSDKCPP_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)src;$(SolutionDir)msgpack-c\include;$(SolutionDir)RakNet\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -119,6 +120,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>STORMANCER_DLL_EXPORT;_DEBUG;_WINDOWS;_USRDLL;STORMANCERSDKCPP_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)src;$(SolutionDir)msgpack-c\include;$(SolutionDir)RakNet\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -191,15 +193,12 @@
     <ClCompile Include="src\PacketProcessorConfig.cpp" />
     <ClCompile Include="src\RakNetConnection.cpp" />
     <ClCompile Include="src\RakNetTransport.cpp" />
-    <ClCompile Include="src\RpcRequest.cpp" />
     <ClCompile Include="src\SystemRequest.cpp" />
     <ClCompile Include="src\RequestContext.cpp" />
     <ClCompile Include="src\RequestModuleBuilder.cpp" />
     <ClCompile Include="src\RequestProcessor.cpp" />
     <ClCompile Include="src\Route.cpp" />
     <ClCompile Include="src\RouteDto.cpp" />
-    <ClCompile Include="src\RpcClientPlugin.cpp" />
-    <ClCompile Include="src\RpcService.cpp" />
     <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\SceneDispatcher.cpp" />
     <ClCompile Include="src\SceneEndpoint.cpp" />
@@ -246,16 +245,12 @@
     <ClInclude Include="src\PluginBuildContext.h" />
     <ClInclude Include="src\RakNetConnection.h" />
     <ClInclude Include="src\RakNetTransport.h" />
-    <ClInclude Include="src\RpcRequest.h" />
-    <ClInclude Include="src\RpcRequestContext.h" />
     <ClInclude Include="src\SystemRequest.h" />
     <ClInclude Include="src\RequestContext.h" />
     <ClInclude Include="src\RequestModuleBuilder.h" />
     <ClInclude Include="src\RequestProcessor.h" />
     <ClInclude Include="src\Route.h" />
     <ClInclude Include="src\RouteDto.h" />
-    <ClInclude Include="src\RpcClientPlugin.h" />
-    <ClInclude Include="src\RpcService.h" />
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\SceneDispatcher.h" />
     <ClInclude Include="src\SceneEndpoint.h" />

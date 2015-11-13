@@ -29,13 +29,23 @@ namespace Stormancer
 		return _scene;
 	}
 
-	std::string Route::name()
+	const char* Route::name()
 	{
-		return _name;
+		return _name.c_str();
+	}
+
+	uint16 Route::handle()
+	{
+		return _handle;
 	}
 
 	stringMap& Route::metadata()
 	{
 		return _metadata;
+	}
+
+	void Route::setHandle(uint16 newHandle)
+	{
+		_handle = newHandle;
 	}
 };

@@ -1,3 +1,4 @@
+#include "BoidsViewer.h"
 #include "stormancer.h"
 
 namespace Stormancer
@@ -10,7 +11,7 @@ namespace Stormancer
 	RpcService::~RpcService()
 	{
 	}
-
+	/*
 	rxcpp::observable<Packetisp_ptr> RpcService::rpc(const char* route2, Action<bytestream*> writer, PacketPriority priority)
 	{
 		auto scene = _scene.lock();
@@ -23,9 +24,11 @@ namespace Stormancer
 		auto observable = rxcpp::observable<>::create<Packetisp_ptr>([this, scene, writer, route, priority](rxcpp::subscriber<Packetisp_ptr> subscriber) {
 			auto rr = scene->remoteRoutes();
 			Route_ptr relevantRoute;
-
-			for (auto r : rr)
+			
+			auto sz = rr.Size();
+			for (uint32 i = 0; i < sz; ++i)
 			{
+				auto r = rr[i];
 				if (r->name() == route)
 				{
 					relevantRoute = r;
@@ -77,7 +80,7 @@ namespace Stormancer
 		});
 		return observable.as_dynamic();
 	}
-
+	*/
 	uint16 RpcService::pendingRequests()
 	{
 		_pendingRequestsMutex.lock();
@@ -241,8 +244,10 @@ namespace Stormancer
 		if (request)
 		{
 			_pendingRequestsMutex.lock();
+			ILogger::instance()->log(Stormancer::LogLevel::Debug, "", "COMPLETE LOCKED", "");
 			_pendingRequests.erase(request->id);
 			_pendingRequestsMutex.unlock();
+			ILogger::instance()->log(Stormancer::LogLevel::Debug, "", "COMPLETE UNLOCKED", "");
 
 			if (messageSent)
 			{

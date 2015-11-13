@@ -14,8 +14,7 @@ namespace Stormancer
 
 	using byte = uint8;
 
+	using cstringMap = std::map<const char*, const char*>;
 	using stringMap = std::map<std::string, std::string>;
-	using rakStringMap = DataStructures::Map<RakNet::RakString, RakNet::RakString>;
 	using anyMap = std::map<std::string, void*>;
-	using rakAnyMap = DataStructures::Map<RakNet::RakString, void*>;
 };

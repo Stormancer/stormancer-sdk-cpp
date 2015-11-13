@@ -220,19 +220,34 @@ void clean()
 	execNextTest();
 }
 
+void theEnd()
+{
+	logger->log(LogLevel::Info, "clean", "TESTS SUCCESSFUL !", "");
+
+	execNextTest();
+}
+
 int main(int argc, char* argv[])
 {
 	srand((uint32)time(NULL));
 
 	tests.push_back(test_connect);
-	//tests.push_back(test_echo);
-	//tests.push_back(test_rpc_server);
-	//tests.push_back(test_rpc_server_cancel);
-	//tests.push_back(test_syncclock);
-	//tests.push_back(test_disconnect);
+	tests.push_back(test_echo);
+	tests.push_back(test_rpc_server);
+	tests.push_back(test_rpc_server_cancel);
+	tests.push_back(test_syncclock);
+	tests.push_back(test_disconnect);
 	tests.push_back(clean);
-	//tests.push_back(test_connect);
-	//tests.push_back(clean);
+
+	tests.push_back(test_connect);
+	tests.push_back(test_echo);
+	tests.push_back(test_rpc_server);
+	tests.push_back(test_rpc_server_cancel);
+	tests.push_back(test_syncclock);
+	tests.push_back(test_disconnect);
+	tests.push_back(clean);
+
+	tests.push_back(theEnd);
 
 	execNextTest();
 

@@ -4,6 +4,8 @@
 namespace Stormancer
 {
 	class Scene;
+	using Scene_ptr = std::shared_ptr<Scene>;
+	using Scene_wptr = std::weak_ptr<Scene>;
 
 	/// Represents a route on a scene.
 	class Route
@@ -16,14 +18,16 @@ namespace Stormancer
 
 	public:
 		Scene_wptr scene();
-		std::string name();
-		stringMap& metadata();
+		STORMANCER_DLL_API const char* name();
+		STORMANCER_DLL_API uint16 handle();
+		STORMANCER_DLL_API stringMap& metadata();
+		void setHandle(uint16 newHandle);
 
 	public:
-		uint16 _handle;
 		std::list<std::function<void(Packet_ptr)>> handlers;
 
 	private:
+		uint16 _handle;
 		Scene_wptr _scene;
 		std::string _name;
 		stringMap _metadata;

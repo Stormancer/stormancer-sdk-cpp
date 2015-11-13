@@ -9,8 +9,6 @@ namespace Stormancer
 		scheduler(new DefaultScheduler())
 	{
 		transportFactory = defaultTransportFactory;
-
-		_plugins.push_back(new RpcClientPlugin());
 	}
 
 	Configuration::~Configuration()
@@ -38,7 +36,7 @@ namespace Stormancer
 		return (strlen(serverEndpoint) ? serverEndpoint : apiEndpoint);
 	}
 
-	std::vector<IClientPlugin*>& Configuration::plugins()
+	const std::vector<IClientPlugin*>& Configuration::plugins()
 	{
 		return _plugins;
 	}

@@ -8,7 +8,7 @@ namespace Stormancer
 	class Action
 	{
 		using TFunction = std::function<void(TParam)>;
-		using TVector = std::vector<TFunction>;
+		using TContainer = DataStructures::List<TFunction>;
 		using TAction = Action<TParam>;
 
 	public:
@@ -18,7 +18,7 @@ namespace Stormancer
 
 		Action(TFunction function)
 		{
-			_functions.push_back(function);
+			_functions.Insert(function, __FILE__, __LINE__);
 		}
 
 		virtual ~Action()
@@ -45,28 +45,30 @@ namespace Stormancer
 	public:
 		TAction& operator=(TFunction function)
 		{
-			_functions.clear();
-			_functions.push_back(function);
+			_functions.Clear(false, __FILE__, __LINE__);
+			_functions.Insert(function, __FILE__, __LINE__);
 			return *this;
 		}
 
 		TAction& operator+=(TFunction function)
 		{
-			_functions.push_back(function);
+			_functions.Insert(function, __FILE__, __LINE__);
 			return *this;
 		}
 
 		const TAction& operator()(TParam data) const
 		{
-			for (auto f : _functions)
+			uint32 sz = _functions.Size();
+			for (uint32 i = 0; i < sz; i++)
 			{
+				auto f = _functions.Get(i);
 				f(data);
 			}
 			return *this;
 		}
 
 	private:
-		TVector _functions;
+		TContainer _functions;
 	};
 
 	/// Aggregates procedure pointers to be run simultaneously.
@@ -74,7 +76,7 @@ namespace Stormancer
 	class Action<void>
 	{
 		using TFunction = std::function<void(void)>;
-		using TVector = std::vector<TFunction>;
+		using TContainer = DataStructures::List<TFunction>;
 		using TAction = Action<>;
 
 	public:
@@ -84,7 +86,7 @@ namespace Stormancer
 
 		Action(TFunction function)
 		{
-			_functions.push_back(function);
+			_functions.Insert(function, __FILE__, __LINE__);
 		}
 
 		virtual ~Action()
@@ -111,27 +113,29 @@ namespace Stormancer
 	public:
 		TAction& operator=(TFunction function)
 		{
-			_functions.clear();
-			_functions.push_back(function);
+			_functions.Clear(false, __FILE__, __LINE__);
+			_functions.Insert(function, __FILE__, __LINE__);
 			return *this;
 		}
 
 		TAction& operator+=(TFunction function)
 		{
-			_functions.push_back(function);
+			_functions.Insert(function, __FILE__, __LINE__);
 			return *this;
 		}
 
 		const TAction& operator()() const
 		{
-			for (auto f : _functions)
+			uint32 sz = _functions.Size();
+			for (uint32 i = 0; i < sz; i++)
 			{
+				auto f = _functions.Get(i);
 				f();
 			}
 			return *this;
 		}
 
 	private:
-		TVector _functions;
+		TContainer _functions;
 	};
 };

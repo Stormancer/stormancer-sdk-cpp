@@ -31,7 +31,8 @@ namespace Stormancer
 		_mutex.lock();
 		if (tryOpenFile())
 		{
-			_myfile << format(level, category, message, data).C_String() << std::endl;
+			auto ptr = format(level, category, message, data);
+			_myfile << ptr.get() << std::endl;
 			_myfile.flush();
 			_myfile.close();
 		}

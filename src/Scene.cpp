@@ -33,9 +33,9 @@ namespace Stormancer
 		}
 	}
 
-	std::string Scene::getHostMetadata(std::string key)
+	const char* Scene::getHostMetadata(const char* key)
 	{
-		return _metadata[key];
+		return _metadata[key].c_str();
 	}
 
 	byte Scene::handle()
@@ -43,9 +43,9 @@ namespace Stormancer
 		return _handle;
 	}
 
-	std::string Scene::id()
+	const char* Scene::id()
 	{
-		return _id;
+		return _id.c_str();
 	}
 
 	bool Scene::connected()
@@ -58,20 +58,28 @@ namespace Stormancer
 		return _peer;
 	}
 
-	std::vector<Route_ptr> Scene::localRoutes()
+	DataStructures::List<Route_ptr> Scene::localRoutes()
 	{
-		return mapValues(_localRoutesMap);
+		return mapToRakListValues(_localRoutesMap);
 	}
 
-	std::vector<Route_ptr> Scene::remoteRoutes()
+	DataStructures::List<Route_ptr> Scene::remoteRoutes()
 	{
-		return mapValues(_remoteRoutesMap);
+		return mapToRakListValues(_remoteRoutesMap);
 	}
-	
-	void Scene::addRoute(const char* routeName2, std::function<void(Packetisp_ptr)> handler, rakStringMap metadata2)
+
+	void Scene::addRoute(const char* routeName2, std::function<void(Packetisp_ptr)> handler, std::map<const char*, const char*>* metadata2)
 	{
 		std::string routeName = routeName2;
-		stringMap metadata = toStringMap(metadata2);
+
+		stringMap metadata;
+		if (metadata2)
+		{
+			for (auto it : *metadata2)
+			{
+				metadata[std::string(it.first)] = std::string(it.second);
+			}
+		}
 
 		if (routeName.size() == 0 || routeName[0] == '@')
 		{
@@ -88,7 +96,7 @@ namespace Stormancer
 			_localRoutesMap[routeName] = Route_ptr(new Route(myWPtr, routeName, metadata));
 		}
 
-		subscriptions.push_back(onMessage(routeName).subscribe(handler));
+		subscriptions.push_back(onMessage(routeName2).subscribe(handler));
 	}
 
 	rxcpp::observable<Packetisp_ptr> Scene::onMessage(Route_ptr route)
@@ -109,8 +117,9 @@ namespace Stormancer
 		return observable.as_dynamic();
 	}
 
-	rxcpp::observable<Packetisp_ptr> Scene::onMessage(std::string routeName)
+	rxcpp::observable<Packetisp_ptr> Scene::onMessage(const char* routeName2)
 	{
+		std::string routeName = routeName2;
 		if (_connected)
 		{
 			throw std::runtime_error("You cannot register handles once the scene is connected.");
@@ -145,7 +154,7 @@ namespace Stormancer
 		}
 		Route_ptr route = _remoteRoutesMap[routeName];
 
-		_peer->sendToScene(_handle, route->_handle, writer, priority, reliability);
+		_peer->sendToScene(_handle, route->handle(), writer, priority, reliability);
 	}
 
 	pplx::task<void> Scene::connect()
@@ -179,8 +188,8 @@ namespace Stormancer
 
 		for (auto pair : _localRoutesMap)
 		{
-			pair.second->_handle = cr.RouteMappings[pair.first];
-			_handlers[pair.second->_handle] = pair.second->handlers;
+			pair.second->setHandle(cr.RouteMappings[pair.first]);
+			_handlers[pair.second->handle()] = pair.second->handlers;
 		}
 	}
 
@@ -205,13 +214,14 @@ namespace Stormancer
 		delete packet->metadata()["routeId"];
 	}
 
-	void Scene::registerComponent(std::string componentName, std::function<void*()> factory)
+	void Scene::registerComponent(const char* componentName, std::function<void*()> factory)
 	{
 		_registeredComponents[componentName] = factory;
 	}
 
-	void* Scene::getComponent(std::string componentName)
+	void* Scene::getComponent(const char* componentName2)
 	{
+		std::string componentName = componentName2;
 		if (!mapContains(_registeredComponents, componentName))
 		{
 			throw std::runtime_error("Component not found (" + std::string(componentName) + ")");
@@ -219,9 +229,11 @@ namespace Stormancer
 		return _registeredComponents[componentName]();
 	}
 
-	std::vector<IScenePeer*> Scene::remotePeers()
+	DataStructures::List<IScenePeer*> Scene::remotePeers()
 	{
-		return std::vector < IScenePeer* > {host()};
+		DataStructures::List<IScenePeer*> container;
+		container.Insert(host(), __FILE__, __LINE__);
+		return container;
 	}
 
 	IScenePeer* Scene::host()

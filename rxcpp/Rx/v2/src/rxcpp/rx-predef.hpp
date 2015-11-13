@@ -121,7 +121,7 @@ class is_dynamic_observable
     template<class C>
 	static not_void checkRX(...);
 public:
-    static const bool value = std::is_convertible<decltype(check<rxu::decay_t<T>>(0)), tag_dynamic_observable*>::value;
+    static const bool value = std::is_convertible<decltype(checkRX<rxu::decay_t<T>>(0)), tag_dynamic_observable*>::value;
 };
 
 template<class T>
