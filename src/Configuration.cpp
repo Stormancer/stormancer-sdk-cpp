@@ -15,14 +15,19 @@ namespace Stormancer
 	{
 	}
 
-	Configuration_ptr Configuration::forAccount(const char* account, const char* application)
+	Configuration* Configuration::forAccount(const char* account, const char* application)
 	{
 		if (!account || !application)
 		{
 			throw std::invalid_argument("Check your account and application parameters");
 		}
 
-		return Configuration_ptr(new Configuration(account, application));
+		return new Configuration(account, application);
+	}
+
+	void Configuration::destroy()
+	{
+		delete this;
 	}
 
 	Configuration& Configuration::metadata(const char* key, const char* value)

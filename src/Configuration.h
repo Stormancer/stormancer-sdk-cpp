@@ -8,10 +8,6 @@
 
 namespace Stormancer
 {
-	class Configuration;
-	using Configuration_ptr = std::shared_ptr<Configuration>;
-	using Configuration_wptr = std::weak_ptr<Configuration>;
-
 	/// Used by a Client for initialization.
     /// For instance to target a custom Stormancer cluster change the ServerEndoint property to the http API endpoint of your custom cluster.
 	class Configuration
@@ -20,7 +16,7 @@ namespace Stormancer
 
 	private:
 		// Constructor.
-		Configuration(const char*, const char* application);
+		Configuration(const char* account, const char* application);
 
 	public:
 		// Copy constructor deleted.
@@ -34,7 +30,9 @@ namespace Stormancer
 
 	public:
 		/// Create an account with an account and an application name and returns a Configuration smart ptr.
-		STORMANCER_DLL_API static Configuration_ptr forAccount(const char* account, const char* application);
+		STORMANCER_DLL_API static Configuration* forAccount(const char* account, const char* application);
+
+		STORMANCER_DLL_API void destroy();
 
 		// Get the Api endpoint.
 		std::string getApiEndpoint();

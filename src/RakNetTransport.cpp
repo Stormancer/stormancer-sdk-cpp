@@ -91,7 +91,7 @@ namespace Stormancer
 						{
 							auto tce = _pendingConnections[packetSystemAddressStr];
 
-							_logger->log(LogLevel::Debug, "RakNetTransport::run", "Connection request to accepted.", packetSystemAddressStr.c_str());
+							_logger->log(LogLevel::Debug, "RakNetTransport::run", "Connection request accepted.", packetSystemAddressStr.c_str());
 							auto c = onConnection(packet, _peer);
 							tce.set(c);
 						}

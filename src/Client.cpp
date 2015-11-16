@@ -34,7 +34,7 @@ namespace Stormancer
 
 	// Client
 
-	Client::Client(Configuration_ptr config)
+	Client::Client(Configuration* config)
 		: _initialized(false),
 		_logger(ILogger::instance()),
 		_scheduler(config->scheduler),
@@ -69,7 +69,7 @@ namespace Stormancer
 			plugin->build(_pluginCtx);
 		}
 
-		_pluginCtx.clientCreated(myWPtr);
+		_pluginCtx.clientCreated(this);
 
 		initialize();
 	}
@@ -109,16 +109,19 @@ namespace Stormancer
 		}
 	}
 
-	Client_ptr Client::createClient(Configuration_ptr config)
+	Client* Client::createClient(Configuration* config)
 	{
 		if (!config)
 		{
 			throw std::invalid_argument("Check the configuration");
 		}
 
-		auto client = Client_ptr(new Client(config), deleter<Client>());
-		client->myWPtr = client;
-		return client;
+		return new Client(config);
+	}
+
+	void Client::destroy()
+	{
+		delete this;
 	}
 
 	void Client::initialize()
@@ -174,8 +177,9 @@ namespace Stormancer
 		});
 	}
 
-	pplx::task<Scene_ptr> Client::getScene(std::string token)
+	pplx::task<Scene_ptr> Client::getScene(const char* token2)
 	{
+		std::string token = token2;
 		auto sep = _tokenHandler->decodeToken(token);
 		return getScene(sep.tokenData.SceneId, sep);
 	}
@@ -284,7 +288,7 @@ namespace Stormancer
 					}
 					else
 					{
-						scene = Scene_ptr(new Scene(_serverConnection, myWPtr, sceneId, sep.token, result, Action<void>([this, sceneId]() {
+						scene = Scene_ptr(new Scene(_serverConnection, this, sceneId, sep.token, result, Action<void>([this, sceneId]() {
 							if (mapContains(_scenes, sceneId))
 							{
 								_scenes.erase(sceneId);

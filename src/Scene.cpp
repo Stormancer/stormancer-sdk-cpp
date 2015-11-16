@@ -2,7 +2,7 @@
 
 namespace Stormancer
 {
-	Scene::Scene(IConnection* connection, Client_wptr client, std::string id, std::string token, SceneInfosDto dto, Action<void> onDelete)
+	Scene::Scene(IConnection* connection, Client* client, std::string id, std::string token, SceneInfosDto dto, Action<void> onDelete)
 		: _id(id),
 		_peer(connection),
 		_token(token),
@@ -31,6 +31,11 @@ namespace Stormancer
 		{
 			delete _host;
 		}
+	}
+	
+	void Scene::destroy()
+	{
+		delete this;
 	}
 
 	const char* Scene::getHostMetadata(const char* key)
@@ -159,11 +164,10 @@ namespace Stormancer
 
 	pplx::task<void> Scene::connect()
 	{
-		auto client = _client.lock();
-		if (!_connected && !_connecting && client)
+		if (!_connected && !_connecting && _client)
 		{
 			_connecting = true;
-			_connectTask = client->connectToScene(myWPtr, _token, mapValues(_localRoutesMap));
+			_connectTask = _client->connectToScene(myWPtr, _token, mapValues(_localRoutesMap));
 			_connectTask.then([this]() {
 				_connected = true;
 			});
@@ -173,11 +177,10 @@ namespace Stormancer
 
 	pplx::task<void> Scene::disconnect()
 	{
-		auto client = _client.lock();
-		if (_connected && client)
+		if (_connected && _client)
 		{
 			_connected = false;
-			_disconnectTask = client->disconnect(this, _handle);
+			_disconnectTask = _client->disconnect(this, _handle);
 		}
 		return _disconnectTask;
 	}

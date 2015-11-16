@@ -5,7 +5,6 @@
 namespace Stormancer
 {
 	class Client;
-	using Client_wptr = std::weak_ptr<Client>;
 
 	class Scene;
 	using Scene_wptr = std::weak_ptr<Scene>;
@@ -19,7 +18,7 @@ namespace Stormancer
 	{
 	public:
 		/// Event fired when a client object is created.
-		Action<Client_wptr> clientCreated;
+		Action<Client*> clientCreated;
 
 		/// Event fired when a scene object is created.
 		Action<Scene_wptr> sceneCreated;

@@ -15,9 +15,6 @@ namespace Stormancer
 {
 	class Client;
 
-	using Client_ptr = std::shared_ptr<Client>;
-	using Client_wptr = std::weak_ptr<Client>;
-
 	/// Manage the connection to the scenes of an application.
 	class Client
 	{
@@ -49,11 +46,11 @@ namespace Stormancer
 		};
 
 	private:
-		Client(Configuration_ptr config);
+		Client(Configuration* config);
 
 	public:
 		/// Destructor.
-		STORMANCER_DLL_API ~Client();
+		~Client();
 
 	private:
 		/// Copy constructor deleted.
@@ -65,7 +62,9 @@ namespace Stormancer
 	public:
 		/// Factory.
 		/// \param config A pointer to a Configuration.
-		STORMANCER_DLL_API static Client_ptr createClient(Configuration_ptr config);
+		STORMANCER_DLL_API static Client* createClient(Configuration* config);
+
+		STORMANCER_DLL_API void destroy();
 
 		/// Get a public scene.
 		/// \param sceneId The scene Id as a string.
@@ -73,7 +72,7 @@ namespace Stormancer
 		/// \return a task to the connection to the scene.
 		STORMANCER_DLL_API pplx::task<Scene_ptr> getPublicScene(const char* sceneId, const char* userData = "");
 
-		STORMANCER_DLL_API pplx::task<Scene_ptr> getScene(std::string token);
+		STORMANCER_DLL_API pplx::task<Scene_ptr> getScene(const char* token);
 
 		/// Returns the name of the application.
 		STORMANCER_DLL_API std::string applicationName();
@@ -152,9 +151,6 @@ namespace Stormancer
 		void stopSyncClock();
 
 		pplx::task<void> syncClockImpl();
-
-	public:
-		Client_wptr myWPtr;
 
 	private:
 		bool _initialized = false;

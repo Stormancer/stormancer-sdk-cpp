@@ -28,7 +28,7 @@ namespace Stormancer
 		/// \param id Scene id.
 		/// \param token Application token.
 		/// \param dto Scene informations.
-		Scene(IConnection* connection, Client_wptr client, std::string id, std::string token, SceneInfosDto dto, Action<void> onDelete);
+		Scene(IConnection* connection, Client* client, std::string id, std::string token, SceneInfosDto dto, Action<void> onDelete);
 
 		/// Destructor.
 		virtual ~Scene();
@@ -46,6 +46,8 @@ namespace Stormancer
 
 		/// Disconnect from the scene.
 		STORMANCER_DLL_API pplx::task<void> disconnect();
+
+		STORMANCER_DLL_API void destroy();
 
 		/// Add a route to the scene.
 		/// \param routeName Route name.
@@ -118,8 +120,6 @@ namespace Stormancer
 
 		const bool isHost = false;
 
-		Scene_wptr myWPtr;
-
 	private:
 
 		/// Scene connected state.
@@ -150,7 +150,7 @@ namespace Stormancer
 		std::map<uint16, std::list<std::function<void(Packet_ptr)>>> _handlers;
 
 		/// Owner client.
-		Client_wptr _client;
+		Client* _client;
 
 		/// RX subscriptions for disconnection.
 		std::vector<rxcpp::composite_subscription> subscriptions;
