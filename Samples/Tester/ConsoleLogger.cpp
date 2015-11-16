@@ -20,7 +20,7 @@ void ConsoleLogger::log(Stormancer::LogLevel level, const char* category, const 
 	{
 		return;
 	}
-	RakNet::RakString message2 = format(level, category, message, data);
+	std::string message2 = format(level, category, message, data).get();
 
 	_mutex.lock();
 
@@ -49,7 +49,7 @@ void ConsoleLogger::log(Stormancer::LogLevel level, const char* category, const 
 		break;
 	}
 
-	std::clog << message2.C_String() << std::endl;
+	std::clog << message2 << std::endl;
 
 	setConsoleColorWhite();
 

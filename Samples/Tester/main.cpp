@@ -9,7 +9,8 @@ bool stop = false;
 const char* accountId = "997bc6ac-9021-2ad6-139b-da63edee8c58";
 const char* applicationName = "tester";
 const char* sceneName = "main";
-Client_ptr client;
+Configuration* config = nullptr;
+Client* client = nullptr;
 Scene_ptr scene;
 pplx::task<void> syncclockTask;
 
@@ -45,7 +46,7 @@ void test_echo_received(Packetisp_ptr p)
 		execNextTest();
 	}
 }
-
+/*
 pplx::task<void> test_rpc_client(RpcRequestContex_ptr rc)
 {
 	std::string message;
@@ -84,11 +85,11 @@ void test_rpc_server_cancelled(Packetisp_ptr p)
 {
 	logger->log(LogLevel::Info, "test_rpc_server_cancelled", "RPC on server cancel OK", "");
 }
-
+*/
 void test_connect()
 {
 	logger->log(LogLevel::Debug, "test_connect", "Create client", "");
-	auto config = Configuration::forAccount(accountId, applicationName);
+	config = Configuration::forAccount(accountId, applicationName);
 	client = Client::createClient(config);
 	logger->log(LogLevel::Info, "test_connect", "Create client OK", "");
 
@@ -99,13 +100,13 @@ void test_connect()
 
 		logger->log(LogLevel::Debug, "test_connect", "Add route", "");
 		scene->addRoute("echo", test_echo_received);
-		scene->addRoute("rpcservercancelled", test_rpc_server_cancelled);
+		//scene->addRoute("rpcservercancelled", test_rpc_server_cancelled);
 		logger->log(LogLevel::Info, "test_connect", "Add route OK", "");
-
+		/*
 		logger->log(LogLevel::Debug, "test_connect", "Add procedure", "");
 		((RpcService*)scene->getComponent("rpcService"))->addProcedure("rpc", test_rpc_client, true);
 		logger->log(LogLevel::Info, "test_connect", "Add procedure OK", "");
-
+		*/
 		logger->log(LogLevel::Debug, "test_connect", "Connect to scene", "");
 		return scene->connect().then([](pplx::task<void> t) {
 			try
@@ -139,7 +140,7 @@ void test_echo()
 		throw ex;
 	}
 }
-
+/*
 void test_rpc_server()
 {
 	logger->log(LogLevel::Debug, "test_rpc_server", "RPC on server", "");
@@ -167,7 +168,7 @@ void test_rpc_server_cancel()
 	});
 	subscription.unsubscribe();
 }
-
+*/
 void test_syncclock()
 {
 	logger->log(LogLevel::Debug, "test_syncclock", "test sync clock", "");
@@ -214,7 +215,8 @@ void clean()
 	logger->log(LogLevel::Debug, "clean", "deleting scene and client", "");
 	stop = true;
 	scene.reset();
-	client.reset();
+	client->destroy();
+	config->destroy();
 	logger->log(LogLevel::Debug, "clean", "scene and client deleted", "");
 
 	execNextTest();
@@ -233,16 +235,16 @@ int main(int argc, char* argv[])
 
 	tests.push_back(test_connect);
 	tests.push_back(test_echo);
-	tests.push_back(test_rpc_server);
-	tests.push_back(test_rpc_server_cancel);
+	//tests.push_back(test_rpc_server);
+	//tests.push_back(test_rpc_server_cancel);
 	tests.push_back(test_syncclock);
 	tests.push_back(test_disconnect);
 	tests.push_back(clean);
 
 	tests.push_back(test_connect);
 	tests.push_back(test_echo);
-	tests.push_back(test_rpc_server);
-	tests.push_back(test_rpc_server_cancel);
+	//tests.push_back(test_rpc_server);
+	//tests.push_back(test_rpc_server_cancel);
 	tests.push_back(test_syncclock);
 	tests.push_back(test_disconnect);
 	tests.push_back(clean);
