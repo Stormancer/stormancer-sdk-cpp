@@ -58,7 +58,7 @@ stormancer-sdk-cpp_$(Configuration)_$(Platform).lib
 
 ## Configure an **Unreal Engine 4** Visual Studio project
 
-- Clone the **Stormancer-sdk-cpp** inside your *Documents/Unreal Projects* directory  
+- Clone the **Stormancer-sdk-cpp** inside your *Documents/Unreal Projects* directory (or get the release on github)  
 - Add the **cpprestsdk** NuGet package (casablanca)  
 - Go to the Project Properties and set *All configurations* and *All platforms* on top  
 - Set to *Configuration Properties* > *Debugging* > **Environment** :  
@@ -83,7 +83,7 @@ $(SolutionDir)..\stormancer-sdk-cpp\bin;
 <different options>
 ```
 - Click OK  
-- Open the file '<YourProject>.Build.cs' and add this lines at the end of <YourProject> function  
+- Open the file '<YourProject>.Build.cs' and add this lines at the end of <YourProject> constructor  
 ```
 PublicAdditionalLibraries.Add("RakNet120_Release_x64.lib");
 PublicAdditionalLibraries.Add("Stormancer120_Release_x64.lib");
