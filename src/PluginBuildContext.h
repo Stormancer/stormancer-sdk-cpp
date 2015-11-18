@@ -7,7 +7,6 @@ namespace Stormancer
 	class Client;
 
 	class Scene;
-	using Scene_wptr = std::weak_ptr<Scene>;
 
 	template<typename T>
 	class Packet;
@@ -21,10 +20,10 @@ namespace Stormancer
 		Action<Client*> clientCreated;
 
 		/// Event fired when a scene object is created.
-		Action<Scene_wptr> sceneCreated;
+		Action<Scene*> sceneCreated;
 
 		/// Event fired when a a scene is connected to the server.
-		Action<Scene_wptr> sceneConnected;
+		Action<Scene*> sceneConnected;
 
 		/// Event fired when a scene is disconnected.
 		Action<Scene*> sceneDisconnected;

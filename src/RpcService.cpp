@@ -153,7 +153,7 @@ namespace Stormancer
 	uint16 RpcService::reserveId()
 	{
 		uint32 i = 0;
-		uint16 idToReturn;
+		uint16 idToReturn = 0;
 		bool found = false;
 
 		_pendingRequestsMutex.lock();

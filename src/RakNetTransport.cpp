@@ -146,15 +146,15 @@ namespace Stormancer
 					}
 					}
 				}
-				catch (std::exception e)
+				catch (const std::exception& ex)
 				{
-					_logger->log(LogLevel::Error, "RakNetTransport::run", "An error occured while handling a message.", e.what());
+					_logger->log(LogLevel::Error, "RakNetTransport::run", "An error occured while handling a message.", ex.what());
 				}
 			}
 		}
-		catch (std::exception e)
+		catch (const std::exception& ex)
 		{
-			_logger->log(LogLevel::Error, "RakNetTransport::run", "An error occured while running the transport.", e.what());
+			_logger->log(LogLevel::Error, "RakNetTransport::run", "An error occured while running the transport.", ex.what());
 		}
 		_mutex.unlock();
 	}

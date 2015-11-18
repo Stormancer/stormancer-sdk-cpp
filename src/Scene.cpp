@@ -12,7 +12,7 @@ namespace Stormancer
 	{
 		for (auto routeDto : dto.Routes)
 		{
-			_remoteRoutesMap[routeDto.Name] = Route_ptr(new Route(myWPtr, routeDto.Name, routeDto.Handle, routeDto.Metadata));
+			_remoteRoutesMap[routeDto.Name] = Route_ptr(new Route(this, routeDto.Name, routeDto.Handle, routeDto.Metadata));
 		}
 	}
 
@@ -98,7 +98,7 @@ namespace Stormancer
 
 		if (!mapContains(_localRoutesMap, routeName))
 		{
-			_localRoutesMap[routeName] = Route_ptr(new Route(myWPtr, routeName, metadata));
+			_localRoutesMap[routeName] = Route_ptr(new Route(this, routeName, metadata));
 		}
 
 		subscriptions.push_back(onMessage(routeName2).subscribe(handler));
@@ -133,7 +133,7 @@ namespace Stormancer
 		Route_ptr route;
 		if (!mapContains(_localRoutesMap, routeName))
 		{
-			_localRoutesMap[routeName] = Route_ptr(new Route(myWPtr, routeName));
+			_localRoutesMap[routeName] = Route_ptr(new Route(this, routeName));
 		}
 
 		route = _localRoutesMap[routeName];
@@ -167,7 +167,7 @@ namespace Stormancer
 		if (!_connected && !_connecting && _client)
 		{
 			_connecting = true;
-			_connectTask = _client->connectToScene(myWPtr, _token, mapValues(_localRoutesMap));
+			_connectTask = _client->connectToScene(this, _token, mapValues(_localRoutesMap));
 			_connectTask.then([this]() {
 				_connected = true;
 			});
@@ -243,7 +243,7 @@ namespace Stormancer
 	{
 		if (!_host)
 		{
-			_host = new ScenePeer(_peer, _handle, _remoteRoutesMap, myWPtr);
+			_host = new ScenePeer(_peer, _handle, _remoteRoutesMap, this);
 		}
 		return _host;
 	}

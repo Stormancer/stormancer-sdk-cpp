@@ -11,7 +11,7 @@ const char* applicationName = "tester";
 const char* sceneName = "main";
 Configuration* config = nullptr;
 Client* client = nullptr;
-Scene_ptr scene;
+Scene* sceneMain;
 pplx::task<void> syncclockTask;
 
 std::deque<std::function<void()>> tests;
@@ -94,8 +94,8 @@ void test_connect()
 	logger->log(LogLevel::Info, "test_connect", "Create client OK", "");
 
 	logger->log(LogLevel::Debug, "test_connect", "Get scene", "");
-	client->getPublicScene(sceneName).then([](Scene_ptr sc) {
-		scene = sc;
+	client->getPublicScene(sceneName).then([](Scene* scene) {
+		sceneMain = scene;
 		logger->log(LogLevel::Info, "test_connect", "Get scene OK", "");
 
 		logger->log(LogLevel::Debug, "test_connect", "Add route", "");
@@ -129,7 +129,7 @@ void test_echo()
 	logger->log(LogLevel::Debug, "test_echo", "test_echo", "");
 	try
 	{
-		scene->sendPacket("echo", [](bytestream* stream) {
+		sceneMain->sendPacket("echo", [](bytestream* stream) {
 			*stream << "stormancer";
 			logger->log(LogLevel::Debug, "test_echo", "Sending message...", "");
 		});
@@ -194,7 +194,7 @@ void test_syncclock()
 void test_disconnect()
 {
 	logger->log(LogLevel::Debug, "test_disconnect", "test disconnect", "");
-	scene->disconnect().then([](pplx::task<void> t)
+	sceneMain->disconnect().then([](pplx::task<void> t)
 	{
 		try
 		{
@@ -214,15 +214,18 @@ void clean()
 {
 	logger->log(LogLevel::Debug, "clean", "deleting scene and client", "");
 	stop = true;
-	scene.reset();
+	sceneMain->destroy();
+	sceneMain = nullptr;
 	client->destroy();
+	client = nullptr;
 	config->destroy();
+	config = nullptr;
 	logger->log(LogLevel::Debug, "clean", "scene and client deleted", "");
 
 	execNextTest();
 }
 
-void theEnd()
+void the_end()
 {
 	logger->log(LogLevel::Info, "clean", "TESTS SUCCESSFUL !", "");
 
@@ -249,7 +252,7 @@ int main(int argc, char* argv[])
 	tests.push_back(test_disconnect);
 	tests.push_back(clean);
 
-	tests.push_back(theEnd);
+	tests.push_back(the_end);
 
 	execNextTest();
 

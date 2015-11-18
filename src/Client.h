@@ -70,9 +70,9 @@ namespace Stormancer
 		/// \param sceneId The scene Id as a string.
 		/// \param userData Some custom user data as a string.
 		/// \return a task to the connection to the scene.
-		STORMANCER_DLL_API pplx::task<Scene_ptr> getPublicScene(const char* sceneId, const char* userData = "");
+		STORMANCER_DLL_API pplx::task<Scene*> getPublicScene(const char* sceneId, const char* userData = "");
 
-		STORMANCER_DLL_API pplx::task<Scene_ptr> getScene(const char* token);
+		STORMANCER_DLL_API pplx::task<Scene*> getScene(const char* token);
 
 		/// Returns the name of the application.
 		STORMANCER_DLL_API std::string applicationName();
@@ -100,7 +100,7 @@ namespace Stormancer
 		/// \param token Application token.
 		/// \param localRoutes Local routes declared.
 		/// \return A task which complete when the connection is done.
-		pplx::task<void> connectToScene(Scene_wptr scene, std::string& token, std::vector<Route_ptr> localRoutes);
+		pplx::task<void> connectToScene(Scene* scene, std::string& token, std::vector<Route_ptr> localRoutes);
 
 		/// Disconnect from a scene.
 		/// \param scene The scene.
@@ -112,7 +112,7 @@ namespace Stormancer
 		/// \param sceneId Scene id.
 		/// \param sep Scene Endpoint retrieved by ApiClient::getSceneEndpoint
 		/// \return A task which complete when the scene informations are retrieved.
-		pplx::task<Scene_ptr> getScene(std::string sceneId, SceneEndpoint sep);
+		pplx::task<Scene*> getScene(std::string sceneId, SceneEndpoint sep);
 
 		/// Disconnect from all scenes.
 		void disconnectAllScenes();
@@ -181,6 +181,6 @@ namespace Stormancer
 		uint16 _maxClockValues = 24;
 		Subscription_ptr _syncClockSubscription;
 		PluginBuildContext _pluginCtx;
-		std::map<std::string, std::weak_ptr<Scene>> _scenes;
+		std::map<std::string, Scene*> _scenes;
 	};
 };

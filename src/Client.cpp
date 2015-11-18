@@ -158,7 +158,7 @@ namespace Stormancer
 		}
 	}
 
-	pplx::task<Scene_ptr> Client::getPublicScene(const char* sceneId, const char* userData)
+	pplx::task<Scene*> Client::getPublicScene(const char* sceneId, const char* userData)
 	{
 		_logger->log(LogLevel::Debug, "Client::getPublicScene", sceneId, userData);
 
@@ -177,14 +177,14 @@ namespace Stormancer
 		});
 	}
 
-	pplx::task<Scene_ptr> Client::getScene(const char* token2)
+	pplx::task<Scene*> Client::getScene(const char* token2)
 	{
 		std::string token = token2;
 		auto sep = _tokenHandler->decodeToken(token);
 		return getScene(sep.tokenData.SceneId, sep);
 	}
 
-	pplx::task<Scene_ptr> Client::getScene(std::string sceneId, SceneEndpoint sep)
+	pplx::task<Scene*> Client::getScene(std::string sceneId, SceneEndpoint sep)
 	{
 		_logger->log(LogLevel::Debug, "Client::getScene", sceneId.c_str(), sep.token.c_str());
 
@@ -281,20 +281,19 @@ namespace Stormancer
 				{
 					t.wait();
 					
-					Scene_ptr scene;
+					Scene* scene;
 					if (mapContains(_scenes, sceneId))
 					{
-						scene = _scenes[sceneId].lock();
+						scene = _scenes[sceneId];
 					}
 					else
 					{
-						scene = Scene_ptr(new Scene(_serverConnection, this, sceneId, sep.token, result, Action<void>([this, sceneId]() {
+						scene = new Scene(_serverConnection, this, sceneId, sep.token, result, Action<void>([this, sceneId]() {
 							if (mapContains(_scenes, sceneId))
 							{
 								_scenes.erase(sceneId);
 							}
-						})), deleter<Scene>());
-						scene->myWPtr = scene;
+						}));
 						_scenes[sceneId] = scene;
 					}
 					_pluginCtx.sceneCreated(scene);
@@ -325,9 +324,8 @@ namespace Stormancer
 		});
 	}
 
-	pplx::task<void> Client::connectToScene(Scene_wptr scene_wptr, std::string& token, std::vector<Route_ptr> localRoutes)
+	pplx::task<void> Client::connectToScene(Scene* scene, std::string& token, std::vector<Route_ptr> localRoutes)
 	{
-		auto scene = scene_wptr.lock();
 		if (!scene)
 		{
 			throw std::runtime_error("The scene ptr is invalid");
@@ -393,7 +391,7 @@ namespace Stormancer
 	{
 		for (auto it : _scenes)
 		{
-			auto scene = it.second.lock();
+			auto scene = it.second;
 			if (scene)
 			{
 				scene->disconnect();

@@ -10,10 +10,6 @@ namespace Stormancer
 {
 	class Client;
 
-	class Scene;
-	using Scene_ptr = std::shared_ptr<Scene>;
-	using Scene_wptr = std::weak_ptr<Scene>;
-
 	/// Communicates with the server scene.
 	/// Get a scene by calling Client::getPublicScene or Client::getScene.
 	class Scene
@@ -38,10 +34,10 @@ namespace Stormancer
 		virtual ~Scene();
 
 		/// Copy constructor deleted.
-		Scene(Scene& other) = delete;
+		Scene(const Scene& other) = delete;
 
 		/// Copy operator deleted.
-		Scene& operator=(Scene& other) = delete;
+		Scene& operator=(const Scene& other) = delete;
 
 	public:
 
@@ -125,8 +121,6 @@ namespace Stormancer
 		const bool isHost = false;
 
 	private:
-
-		Scene_wptr myWPtr;
 
 		/// Scene connected state.
 		bool _connected = false;

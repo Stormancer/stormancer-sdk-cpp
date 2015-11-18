@@ -2,7 +2,7 @@
 
 namespace Stormancer
 {
-	ScenePeer::ScenePeer(IConnection* connection, byte sceneHandle, std::map<std::string, Route_ptr>& routeMapping, Scene_wptr scene)
+	ScenePeer::ScenePeer(IConnection* connection, byte sceneHandle, std::map<std::string, Route_ptr>& routeMapping, Scene* scene)
 		: _connection(connection),
 		_sceneHandle(sceneHandle),
 		_routeMapping(routeMapping),
@@ -26,10 +26,9 @@ namespace Stormancer
 
 	void ScenePeer::disconnect()
 	{
-		auto scene = _scene.lock();
-		if (scene)
+		if (_scene)
 		{
-			scene->disconnect();
+			_scene->disconnect();
 		}
 	}
 

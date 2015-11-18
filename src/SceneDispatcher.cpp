@@ -3,7 +3,7 @@
 namespace Stormancer
 {
 	SceneDispatcher::SceneDispatcher()
-		: _scenes((uint32)0xff - (uint32)MessageIDTypes::ID_SCENES + 1, Scene_wptr())
+		: _scenes((uint32)0xff - (uint32)MessageIDTypes::ID_SCENES + 1, nullptr)
 	{
 		handler = new processorFunction([this](uint8 sceneHandle, Packet_ptr packet) {
 			return this->handler_impl(sceneHandle, packet);
@@ -19,9 +19,8 @@ namespace Stormancer
 		config.addCatchAllProcessor(handler);
 	}
 
-	void SceneDispatcher::addScene(Scene_wptr scene_wptr)
+	void SceneDispatcher::addScene(Scene* scene)
 	{
-		auto scene = scene_wptr.lock();
 		if (scene)
 		{
 			uint8 index = scene->handle() - (uint8)MessageIDTypes::ID_SCENES;
@@ -32,7 +31,7 @@ namespace Stormancer
 	void SceneDispatcher::removeScene(uint8 sceneHandle)
 	{
 		size_t index = sceneHandle - (uint8)MessageIDTypes::ID_SCENES;
-		_scenes[index].reset();
+		_scenes[index] = nullptr;
 	}
 
 	bool SceneDispatcher::handler_impl(uint8 sceneHandle, Packet_ptr packet)
@@ -43,10 +42,10 @@ namespace Stormancer
 		}
 
 		unsigned int sceneIndex = sceneHandle - (uint8)MessageIDTypes::ID_SCENES;
-		auto scene = _scenes[sceneIndex].lock();
+		auto scene = _scenes[sceneIndex];
 		if (scene)
 		{
-			packet->metadata()["scene"] = scene.get();
+			packet->metadata()["scene"] = scene;
 			scene->handleMessage(packet);
 			return true;
 		}
