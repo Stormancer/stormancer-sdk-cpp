@@ -2,13 +2,14 @@
 
 namespace Stormancer
 {
-	Scene::Scene(IConnection* connection, Client* client, std::string id, std::string token, SceneInfosDto dto, Action<void> onDelete)
+	Scene::Scene(IConnection* connection, Client* client, std::string id, std::string token, SceneInfosDto dto, DependencyResolver* parentDependencyResolver, Action<void> onDelete)
 		: _id(id),
 		_peer(connection),
 		_token(token),
 		_client(client),
 		_metadata(dto.Metadata),
-		_onDelete(onDelete)
+		_onDelete(onDelete),
+		_dependencyResolver(new DependencyResolver(parentDependencyResolver))
 	{
 		for (auto routeDto : dto.Routes)
 		{
@@ -215,6 +216,11 @@ namespace Stormancer
 		}
 
 		delete packet->metadata()["routeId"];
+	}
+
+	DependencyResolver* Scene::dependencyResolver() const
+	{
+		return _dependencyResolver;
 	}
 
 	void Scene::registerComponent(const char* componentName, std::function<void*()> factory)

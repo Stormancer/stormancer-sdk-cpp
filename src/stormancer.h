@@ -16,6 +16,7 @@
 #include "SceneInfosDto.h"
 #include "SceneInfosRequestDto.h"
 
+#include "DependencyResolver.h"
 #include "Helpers.h"
 #include "ApiClient.h"
 #include "Client.h"

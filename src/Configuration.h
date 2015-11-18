@@ -76,12 +76,12 @@ namespace Stormancer
 		IScheduler* scheduler = nullptr;
 
 		/// Gets or sets the transport to be used by the client.
-		std::function<ITransport*(DataStructures::Map<const char*, void*>)> transportFactory;
+		std::function<ITransport*(DependencyResolver*)> transportFactory;
 
 	private:
-		const std::function<ITransport*(DataStructures::Map<const char*, void*>)> defaultTransportFactory = [](DataStructures::Map<const char*, void*> parameters)
+		const std::function<ITransport*(DependencyResolver*)> defaultTransportFactory = [](DependencyResolver* resolver)
 		{
-			return new RakNetTransport(static_cast<ILogger*>(parameters.Get("ILogger")), static_cast<IScheduler*>(parameters.Get("IScheduler")));
+			return new RakNetTransport(resolver->resolve<ILogger>(), resolver->resolve<IScheduler>());
 		};
 
 		stringMap _metadata;

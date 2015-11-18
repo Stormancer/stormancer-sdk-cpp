@@ -28,7 +28,7 @@ namespace Stormancer
 		/// \param id Scene id.
 		/// \param token Application token.
 		/// \param dto Scene informations.
-		Scene(IConnection* connection, Client* client, std::string id, std::string token, SceneInfosDto dto, Action<void> onDelete);
+		Scene(IConnection* connection, Client* client, std::string id, std::string token, SceneInfosDto dto, DependencyResolver* parentDependencyResolver, Action<void> onDelete);
 
 		/// Destructor.
 		virtual ~Scene();
@@ -112,6 +112,8 @@ namespace Stormancer
 		/// Handle a message received on the scene and dispatch the packet to the right route handle.
 		/// \param packet Receivedpacket.
 		void handleMessage(Packet_ptr packet);
+
+		DependencyResolver* dependencyResolver() const;
 		
 	public:
 
@@ -172,5 +174,7 @@ namespace Stormancer
 
 		/// Event launched on instance deletion
 		Action<void> _onDelete;
+
+		DependencyResolver* _dependencyResolver = nullptr;
 	};
 };

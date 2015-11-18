@@ -36,8 +36,6 @@ namespace Stormancer
 
 	Client::Client(Configuration* config)
 		: _initialized(false),
-		_logger(ILogger::instance()),
-		_scheduler(config->scheduler),
 		_accountId(config->account),
 		_applicationName(config->application),
 		_tokenHandler(new TokenHandler()),
@@ -47,12 +45,20 @@ namespace Stormancer
 		_scenesDispatcher(new SceneDispatcher),
 		_metadata(config->_metadata),
 		_maxPeers(config->maxPeers),
-		_pingInterval(config->pingInterval)
+		_pingInterval(config->pingInterval),
+		_dependencyResolver(new DependencyResolver())
 	{
-		DataStructures::Map<const char*, void*> params;
-		params.Set("ILogger", (void*)_logger);
-		params.Set("IScheduler", (void*)_scheduler);
-		_transport = config->transportFactory(params);
+		_dependencyResolver->registerDependency<ILogger>([](DependencyResolver* resolver) {
+			return ILogger::instance();
+		});
+		_dependencyResolver->registerDependency<IScheduler>([config](DependencyResolver* resolver){
+			return config->scheduler;
+		});
+		_dependencyResolver->registerDependency(config->transportFactory);
+
+		_logger = _dependencyResolver->resolve<ILogger>();
+		_scheduler = _dependencyResolver->resolve<IScheduler>();
+		_transport = _dependencyResolver->resolve<ITransport>();
 
 		_dispatcher->addProcessor(_requestProcessor);
 		_dispatcher->addProcessor(_scenesDispatcher);
@@ -280,7 +286,7 @@ namespace Stormancer
 				try
 				{
 					t.wait();
-					
+
 					Scene* scene;
 					if (mapContains(_scenes, sceneId))
 					{
@@ -288,7 +294,7 @@ namespace Stormancer
 					}
 					else
 					{
-						scene = new Scene(_serverConnection, this, sceneId, sep.token, result, Action<void>([this, sceneId]() {
+						scene = new Scene(_serverConnection, this, sceneId, sep.token, result, _dependencyResolver, Action<void>([this, sceneId]() {
 							if (mapContains(_scenes, sceneId))
 							{
 								_scenes.erase(sceneId);
@@ -489,7 +495,7 @@ namespace Stormancer
 
 				double offset = timeServer - timeEnd + latency;
 
-				_clockValues.push_back(ClockValue { latency, offset });
+				_clockValues.push_back(ClockValue{ latency, offset });
 				if (_clockValues.size() > _maxClockValues)
 				{
 					_clockValues.pop_front();
@@ -534,5 +540,10 @@ namespace Stormancer
 			_logger->log(LogLevel::Error, "Client::syncClockImpl", "Failed to ping server.", "");
 			throw std::runtime_error("Failed to ping server.");
 		}
+	}
+
+	DependencyResolver* Client::dependencyResolver() const
+	{
+		return _dependencyResolver;
 	}
 };

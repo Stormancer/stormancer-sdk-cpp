@@ -181,6 +181,7 @@
     <ClCompile Include="src\ConnectToSceneMsg.cpp" />
     <ClCompile Include="src\DefaultPacketDispatcher.cpp" />
     <ClCompile Include="src\DefaultScheduler.cpp" />
+    <ClCompile Include="src\DependencyResolver.cpp" />
     <ClCompile Include="src\DisconnectFromSceneDto.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\EmptyDto.cpp" />
@@ -222,6 +223,7 @@
     <ClInclude Include="src\ConnectToSceneMsg.h" />
     <ClInclude Include="src\DefaultPacketDispatcher.h" />
     <ClInclude Include="src\DefaultScheduler.h" />
+    <ClInclude Include="src\DependencyResolver.h" />
     <ClInclude Include="src\DisconnectFromSceneDto.h" />
     <ClInclude Include="src\EmptyDto.h" />
     <ClInclude Include="src\FileLogger.h" />
