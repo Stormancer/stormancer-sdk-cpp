@@ -192,6 +192,25 @@ void test_syncclock()
 	});
 }
 
+void test_steam()
+{
+	logger->log(LogLevel::Debug, "test_steam", "Steam authentication", "");
+
+	auto config = Configuration::forAccount("ee59dae9-332d-519d-070e-f9353ae7bbce", "battlefeet-gothic");
+	auto client = Client::createClient(config);
+
+	auto authService = client->dependencyResolver()->resolve<IAuthenticationService>();
+	authService->steamLogin("TEST").then([client, authService](Scene* scene) {
+		logger->log(LogLevel::Info, "test_steam", "Steam authentication OK", "");
+
+		authService->logout().then([client]() {
+			client->disconnect();
+		});
+
+		execNextTest();
+	});
+}
+
 void test_disconnect()
 {
 	logger->log(LogLevel::Debug, "test_disconnect", "test disconnect", "");
@@ -207,17 +226,6 @@ void test_disconnect()
 			throw ex;
 		}
 		logger->log(LogLevel::Info, "test_disconnect", "Disconnect OK", "");
-		execNextTest();
-	});
-}
-
-void test_steam()
-{
-	logger->log(LogLevel::Debug, "test_steam", "Authentication", "");
-
-	auto authService = sceneMain->dependencyResolver()->resolve<IAuthenticationService>();
-	authService->steamLogin("TEST").then([](Scene* scene) {
-		logger->log(LogLevel::Debug, "test_steam", "Authentication OK", "");
 		execNextTest();
 	});
 }
@@ -254,13 +262,15 @@ int main(int argc, char* argv[])
 	tests.push_back(test_disconnect);
 	tests.push_back(clean);
 
-	//tests.push_back(test_connect);
-	//tests.push_back(test_echo);
-	//tests.push_back(test_rpc_server);
-	//tests.push_back(test_rpc_server_cancel);
-	//tests.push_back(test_syncclock);
-	//tests.push_back(test_disconnect);
-	//tests.push_back(clean);
+	tests.push_back(test_connect);
+	tests.push_back(test_echo);
+	tests.push_back(test_rpc_server);
+	tests.push_back(test_rpc_server_cancel);
+	tests.push_back(test_syncclock);
+	tests.push_back(test_disconnect);
+	tests.push_back(clean);
+
+	tests.push_back(test_steam);
 
 	tests.push_back(the_end);
 
