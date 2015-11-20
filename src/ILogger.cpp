@@ -34,15 +34,15 @@ namespace Stormancer
 
 		ss << '[' << nowStr() << ']';
 		ss << " [" << static_cast<int>(level) << ']';
-		if (std::strlen(category))
+		if (category && std::strlen(category))
 		{
 			ss << " [" << category << ']';
 		}
-		if (std::strlen(message))
+		if (message && std::strlen(message))
 		{
 			ss << ' ' << message;
 		}
-		if (std::strlen(data))
+		if (data && std::strlen(data))
 		{
 			ss << " [" << data << ']';
 		}

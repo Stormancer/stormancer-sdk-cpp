@@ -6,28 +6,14 @@ namespace Stormancer
 	{
 	}
 
+	Subscription::Subscription(std::function<void()> unsubscribe)
+	{
+		_unsubscribe += unsubscribe;
+	}
+
 	Subscription::Subscription(Action<> unsubscribe)
 		: _unsubscribe(unsubscribe)
 	{
-	}
-
-	Subscription::Subscription(Subscription& other)
-		: _unsubscribe(other._unsubscribe),
-		_subscribed(other._subscribed)
-	{
-	}
-
-	Subscription::Subscription(Subscription&& other)
-		: _unsubscribe(other._unsubscribe),
-		_subscribed(other._subscribed)
-	{
-	}
-
-	Subscription& Subscription::operator=(Subscription& other)
-	{
-		_unsubscribe = std::move(other._unsubscribe);
-		_subscribed = other._subscribed;
-		return *this;
 	}
 
 	Subscription::~Subscription()
@@ -42,7 +28,15 @@ namespace Stormancer
 
 	void Subscription::unsubscribe()
 	{
-		_unsubscribe();
-		_subscribed = false;
+		if (_subscribed)
+		{
+			_unsubscribe();
+			_subscribed = false;
+		}
+	}
+
+	void Subscription::destroy()
+	{
+		delete this;
 	}
 };

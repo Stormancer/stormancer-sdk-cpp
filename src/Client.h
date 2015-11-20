@@ -91,7 +91,7 @@ namespace Stormancer
 
 		STORMANCER_DLL_API int64 lastPing();
 
-		DependencyResolver* dependencyResolver() const;
+		STORMANCER_DLL_API DependencyResolver* dependencyResolver() const;
 
 	private:
 
@@ -181,7 +181,7 @@ namespace Stormancer
 		double _medianLatency = 0;
 		double _standardDeviationLatency = 0;
 		uint16 _maxClockValues = 24;
-		Subscription_ptr _syncClockSubscription;
+		ISubscription* _syncClockSubscription;
 		PluginBuildContext _pluginCtx;
 		std::map<std::string, Scene*> _scenes;
 		DependencyResolver* _dependencyResolver;

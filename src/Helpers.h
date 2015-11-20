@@ -5,58 +5,37 @@
 
 namespace Stormancer
 {
-	//template<typename T>
-	//class SWrapper
-	//{
-	//public:
-	//	T* data;
+	template<typename T>
+	class SWrapper
+	{
+	public:
+		T* data;
 
-	//private:
-	//	uint64* refsCount;
-	//	std::mutex* _mutex;
+	public:
+		SWrapper(T* data = nullptr)
+			: data(data)
+		{
+		}
 
-	//public:
-	//	SWrapper(T* data = nullptr)
-	//		: data(data),
-	//		refsCount(new uint64(1)),
-	//		_mutex(new std::mutex())
-	//	{
-	//	}
+		SWrapper(const SWrapper& other) = delete;
 
-	//	SWrapper(const SWrapper& other)
-	//		_mutex(other._mutex)
-	//	{
-	//		_mutex->lock();
-	//		data = other.data;
-	//		refsCount = other.refsCount;
-	//		++(*refsCount);
-	//		_mutex->unlock();
-	//	}
+		SWrapper& operator=(const SWrapper& other) = delete;
 
-	//	SWrapper& operator=(const SWrapper& other)
-	//	{
-	//		_mutex = other._mutex;
-	//		_mutex->lock();
-	//		data = other.data;
-	//		refsCount = other.refsCount;
-	//		_mutex->unlock();
-	//	}
+	private:
+		~SWrapper()
+		{
+			if (data)
+			{
+				delete data;
+			}
+		}
 
-	//private:
-	//	~SWrapper()
-	//	{
-	//		if (*refsCount == 0 && data)
-	//		{
-	//			delete data;
-	//		}
-	//	}
-
-	//public:
-	//	void destroy()
-	//	{
-	//		delete this;
-	//	}
-	//};
+	public:
+		void destroy()
+		{
+			delete this;
+		}
+	};
 
 	template<typename T>
 	struct deleter

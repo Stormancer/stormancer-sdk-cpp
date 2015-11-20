@@ -1,27 +1,25 @@
 #pragma once
 #include "headers.h"
 #include "Action.h"
+#include "ISubscription.h"
 
 namespace Stormancer
 {
-	class Subscription
+	class Subscription : public ISubscription
 	{
 	public:
-		STORMANCER_DLL_API Subscription();
-		STORMANCER_DLL_API Subscription(Action<> unsubscribe);
-		STORMANCER_DLL_API Subscription(Subscription& other);
-		STORMANCER_DLL_API Subscription(Subscription&& other);
-		STORMANCER_DLL_API Subscription& operator=(Subscription& other);
-		STORMANCER_DLL_API virtual ~Subscription();
+		Subscription();
+		Subscription(std::function<void()> unsubscribe);
+		Subscription(Action<> unsubscribe);
+		virtual ~Subscription();
 
 	public:
 		STORMANCER_DLL_API bool subscribed() const;
 		STORMANCER_DLL_API void unsubscribe();
+		STORMANCER_DLL_API void destroy();
 
 	private:
 		Action<> _unsubscribe;
 		bool _subscribed = true;
 	};
-
-	using Subscription_ptr = std::shared_ptr<Subscription>;
 };

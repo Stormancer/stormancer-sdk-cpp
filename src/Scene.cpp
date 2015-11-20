@@ -74,17 +74,14 @@ namespace Stormancer
 		return mapToRakListValues(_remoteRoutesMap);
 	}
 
-	void Scene::addRoute(const char* routeName2, std::function<void(Packetisp_ptr)> handler, std::map<const char*, const char*>* metadata2)
+	void Scene::addRoute(const char* routeName2, std::function<void(Packetisp_ptr)> handler, const stringMap* metadata2)
 	{
 		std::string routeName = routeName2;
 
 		stringMap metadata;
 		if (metadata2)
 		{
-			for (auto it : *metadata2)
-			{
-				metadata[std::string(it.first)] = std::string(it.second);
-			}
+			 metadata = *metadata2;
 		}
 
 		if (routeName.size() == 0 || routeName[0] == '@')
@@ -186,6 +183,11 @@ namespace Stormancer
 		return _disconnectTask;
 	}
 
+	DependencyResolver* Scene::dependencyResolver() const
+	{
+		return _dependencyResolver;
+	}
+
 	void Scene::completeConnectionInitialization(ConnectionResult& cr)
 	{
 		_handle = cr.SceneHandle;
@@ -216,26 +218,6 @@ namespace Stormancer
 		}
 
 		delete packet->metadata()["routeId"];
-	}
-
-	DependencyResolver* Scene::dependencyResolver() const
-	{
-		return _dependencyResolver;
-	}
-
-	void Scene::registerComponent(const char* componentName, std::function<void*()> factory)
-	{
-		_registeredComponents[componentName] = factory;
-	}
-
-	void* Scene::getComponent(const char* componentName2)
-	{
-		std::string componentName = componentName2;
-		if (!mapContains(_registeredComponents, componentName))
-		{
-			throw std::runtime_error("Component not found (" + std::string(componentName) + ")");
-		}
-		return _registeredComponents[componentName]();
 	}
 
 	DataStructures::List<IScenePeer*> Scene::remotePeers()

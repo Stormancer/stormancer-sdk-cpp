@@ -46,8 +46,8 @@ void test_echo_received(Packetisp_ptr p)
 		execNextTest();
 	}
 }
-/*
-pplx::task<void> test_rpc_client(RpcRequestContex_ptr rc)
+
+pplx::task<void> test_rpc_client(RpcRequestContext_ptr rc)
 {
 	std::string message;
 	*rc->inputStream() >> message;
@@ -85,7 +85,7 @@ void test_rpc_server_cancelled(Packetisp_ptr p)
 {
 	logger->log(LogLevel::Info, "test_rpc_server_cancelled", "RPC on server cancel OK", "");
 }
-*/
+
 void test_connect()
 {
 	logger->log(LogLevel::Debug, "test_connect", "Create client", "");
@@ -100,13 +100,13 @@ void test_connect()
 
 		logger->log(LogLevel::Debug, "test_connect", "Add route", "");
 		scene->addRoute("echo", test_echo_received);
-		//scene->addRoute("rpcservercancelled", test_rpc_server_cancelled);
+		scene->addRoute("rpcservercancelled", test_rpc_server_cancelled);
 		logger->log(LogLevel::Info, "test_connect", "Add route OK", "");
-		/*
+
 		logger->log(LogLevel::Debug, "test_connect", "Add procedure", "");
-		((RpcService*)scene->getComponent("rpcService"))->addProcedure("rpc", test_rpc_client, true);
+		scene->dependencyResolver()->resolve<IRpcService>()->addProcedure("rpc", test_rpc_client, true);
 		logger->log(LogLevel::Info, "test_connect", "Add procedure OK", "");
-		*/
+
 		logger->log(LogLevel::Debug, "test_connect", "Connect to scene", "");
 		return scene->connect().then([](pplx::task<void> t) {
 			try
@@ -140,13 +140,13 @@ void test_echo()
 		throw ex;
 	}
 }
-/*
+
 void test_rpc_server()
 {
 	logger->log(LogLevel::Debug, "test_rpc_server", "RPC on server", "");
-	((RpcService*)scene->getComponent("rpcService"))->rpc("rpc", Action<bytestream*>([](bytestream* stream) {
+	sceneMain->dependencyResolver()->resolve<IRpcService>()->rpc("rpc", Action<bytestream*>([](bytestream* stream) {
 		*stream << "stormancer";
-	}), PacketPriority::MEDIUM_PRIORITY).subscribe([](Packetisp_ptr packet) {
+	}), PacketPriority::MEDIUM_PRIORITY)->subscribe([](Packetisp_ptr packet) {
 		std::string message;
 		*packet->stream >> message;
 		logger->log(LogLevel::Debug, "test_rpc_server", ("rpc response received (" + message + ")").c_str(), "");
@@ -154,6 +154,7 @@ void test_rpc_server()
 		{
 			logger->log(LogLevel::Info, "test_rpc_server", "RPC on server OK", "");
 		}
+
 		//execNextTest(); // don't do that, the server send back a rpc for the next test!
 	});
 }
@@ -161,14 +162,14 @@ void test_rpc_server()
 void test_rpc_server_cancel()
 {
 	logger->log(LogLevel::Debug, "test_rpc_server_cancel", "Rpc on server cancel", "");
-	auto subscription = ((RpcService*)scene->getComponent("rpcService"))->rpc("rpc", Action<bytestream*>([](bytestream* stream) {
+	auto subscription = sceneMain->dependencyResolver()->resolve<IRpcService>()->rpc("rpc", Action<bytestream*>([](bytestream* stream) {
 		*stream << "stormancer";
-	}), PacketPriority::MEDIUM_PRIORITY).subscribe([](Packetisp_ptr packet) {
+	}), PacketPriority::MEDIUM_PRIORITY)->subscribe([](Packetisp_ptr packet) {
 		logger->log(LogLevel::Debug, "test_rpc_server_cancel", "rpc response received, but this RPC should be cancelled.", "");
 	});
-	subscription.unsubscribe();
+	subscription->unsubscribe();
 }
-*/
+
 void test_syncclock()
 {
 	logger->log(LogLevel::Debug, "test_syncclock", "test sync clock", "");
@@ -210,6 +211,17 @@ void test_disconnect()
 	});
 }
 
+void test_steam()
+{
+	logger->log(LogLevel::Debug, "test_steam", "Authentication", "");
+
+	auto authService = sceneMain->dependencyResolver()->resolve<IAuthenticationService>();
+	authService->steamLogin("TEST").then([](Scene* scene) {
+		logger->log(LogLevel::Debug, "test_steam", "Authentication OK", "");
+		execNextTest();
+	});
+}
+
 void clean()
 {
 	logger->log(LogLevel::Debug, "clean", "deleting scene and client", "");
@@ -234,23 +246,21 @@ void the_end()
 
 int main(int argc, char* argv[])
 {
-	srand((uint32)time(NULL));
-
 	tests.push_back(test_connect);
 	tests.push_back(test_echo);
-	//tests.push_back(test_rpc_server);
-	//tests.push_back(test_rpc_server_cancel);
+	tests.push_back(test_rpc_server);
+	tests.push_back(test_rpc_server_cancel);
 	tests.push_back(test_syncclock);
 	tests.push_back(test_disconnect);
 	tests.push_back(clean);
 
-	tests.push_back(test_connect);
-	tests.push_back(test_echo);
+	//tests.push_back(test_connect);
+	//tests.push_back(test_echo);
 	//tests.push_back(test_rpc_server);
 	//tests.push_back(test_rpc_server_cancel);
-	tests.push_back(test_syncclock);
-	tests.push_back(test_disconnect);
-	tests.push_back(clean);
+	//tests.push_back(test_syncclock);
+	//tests.push_back(test_disconnect);
+	//tests.push_back(clean);
 
 	tests.push_back(the_end);
 

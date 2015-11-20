@@ -277,7 +277,7 @@ namespace Stormancer
 		auto connection = getConnection(rakNetPacket->guid);
 		auto stream = new bytestream;
 		stream->rdbuf()->pubsetbuf((char*)rakNetPacket->data, rakNetPacket->length);
-		Packet_ptr packet(new Packet<>(connection, stream));
+		Packet_ptr packet(new Packet<>(connection, stream), deleter<Packet<>>());
 		auto peer = this->_peer;
 		packet->cleanup += std::function<void(void)>([stream, peer, rakNetPacket]() {
 			if (stream)

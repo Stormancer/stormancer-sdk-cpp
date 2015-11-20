@@ -48,12 +48,8 @@ namespace Stormancer
 		_pingInterval(config->pingInterval),
 		_dependencyResolver(new DependencyResolver())
 	{
-		_dependencyResolver->registerDependency<ILogger>([](DependencyResolver* resolver) {
-			return ILogger::instance();
-		});
-		_dependencyResolver->registerDependency<IScheduler>([config](DependencyResolver* resolver){
-			return config->scheduler;
-		});
+		_dependencyResolver->registerDependency<ILogger>(ILogger::instance());
+		_dependencyResolver->registerDependency<IScheduler>(config->scheduler);
 		_dependencyResolver->registerDependency(config->transportFactory);
 
 		_logger = _dependencyResolver->resolve<ILogger>();
@@ -72,7 +68,7 @@ namespace Stormancer
 		auto plugins = config->plugins();
 		for (auto plugin : plugins)
 		{
-			plugin->build(_pluginCtx);
+			plugin->build(&_pluginCtx);
 		}
 
 		_pluginCtx.clientCreated(this);
@@ -166,6 +162,16 @@ namespace Stormancer
 
 	pplx::task<Scene*> Client::getPublicScene(const char* sceneId, const char* userData)
 	{
+		if (!sceneId)
+		{
+			throw std::invalid_argument("Bad scene id");
+		}
+
+		if (!userData)
+		{
+			userData = "";
+		}
+
 		_logger->log(LogLevel::Debug, "Client::getPublicScene", sceneId, userData);
 
 		return _apiClient->getSceneEndpoint(_accountId, _applicationName, sceneId, userData).then([this, sceneId](pplx::task<SceneEndpoint> t) {

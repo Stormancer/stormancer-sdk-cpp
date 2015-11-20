@@ -9,6 +9,8 @@ namespace Stormancer
 		scheduler(new DefaultScheduler())
 	{
 		transportFactory = defaultTransportFactory;
+		_plugins.push_back(new RpcPlugin());
+		_plugins.push_back(new AuthenticationPlugin());
 	}
 
 	Configuration::~Configuration()

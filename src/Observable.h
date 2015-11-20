@@ -14,13 +14,36 @@ namespace Stormancer
 		{
 		}
 
-		virtual ~Observable()
+		~Observable()
 		{
 		}
 
-		void subscribe(std::function<void(T)> f)
+		ISubscription* subscribe(std::function<void(T)> f)
 		{
-			_observable.subscribe(f);
+			auto onerror = [](std::exception_ptr ep){
+				try
+				{
+					std::rethrow_exception(ep);
+				}
+				catch (const std::exception& ex)
+				{
+					ILogger::instance()->log(LogLevel::Error, "Observable::subscribe", "Observable error", ex.what());
+				}
+			};
+
+			auto subscription = _observable.subscribe(f, onerror);
+
+			return new Subscription([subscription]() {
+				subscription.unsubscribe();
+			});
 		}
+
+		void destroy()
+		{
+			delete this;
+		}
+
+	private:
+		rxcpp::observable<T> _observable;
 	};
 };

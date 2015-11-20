@@ -54,7 +54,7 @@ namespace Stormancer
 		/// \param handler Function which handle the receiving messages from the server on the route.
 		/// \param metadata Metadatas about the Route.
 		/// Add a route for each different message type.
-		STORMANCER_DLL_API void addRoute(const char* routeName, std::function<void(Packetisp_ptr)> handler, std::map<const char*, const char*>* metadata = nullptr);
+		STORMANCER_DLL_API void addRoute(const char* routeName, std::function<void(Packetisp_ptr)> handler, const stringMap* metadata = nullptr);
 
 		/// Send a packet to a route.
 		/// \param routeName Route name.
@@ -101,9 +101,7 @@ namespace Stormancer
 		/// Returns the peer connection to the host.
 		STORMANCER_DLL_API IScenePeer* host();
 
-		STORMANCER_DLL_API void registerComponent(const char* componentName, std::function<void*()> factory);
-
-		STORMANCER_DLL_API void* getComponent(const char* componentName);
+		STORMANCER_DLL_API DependencyResolver* dependencyResolver() const;
 
 		/// Finalize the connection to the scene.
 		/// \param cr Connection result message retrieved by a system request.
@@ -112,8 +110,6 @@ namespace Stormancer
 		/// Handle a message received on the scene and dispatch the packet to the right route handle.
 		/// \param packet Receivedpacket.
 		void handleMessage(Packet_ptr packet);
-
-		DependencyResolver* dependencyResolver() const;
 		
 	public:
 

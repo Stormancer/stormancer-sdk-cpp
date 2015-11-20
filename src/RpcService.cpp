@@ -1,9 +1,8 @@
-#include "BoidsViewer.h"
 #include "stormancer.h"
 
 namespace Stormancer
 {
-	RpcService::RpcService(Scene_wptr scene)
+	RpcService::RpcService(Scene* scene)
 		: _scene(scene)
 	{
 	}
@@ -11,25 +10,23 @@ namespace Stormancer
 	RpcService::~RpcService()
 	{
 	}
-	/*
-	rxcpp::observable<Packetisp_ptr> RpcService::rpc(const char* route2, Action<bytestream*> writer, PacketPriority priority)
+
+	IObservable<Packetisp_ptr>* RpcService::rpc(const char* route, Action<bytestream*> writer, PacketPriority priority)
 	{
-		auto scene = _scene.lock();
-		if (!scene)
+		if (!_scene)
 		{
 			throw std::runtime_error("The scene ptr is invalid");
 		}
 
-		std::string route = route2;
-		auto observable = rxcpp::observable<>::create<Packetisp_ptr>([this, scene, writer, route, priority](rxcpp::subscriber<Packetisp_ptr> subscriber) {
-			auto rr = scene->remoteRoutes();
+		auto observable = rxcpp::observable<>::create<Packetisp_ptr>([this, writer, route, priority](rxcpp::subscriber<Packetisp_ptr> subscriber) {
+			auto rr = _scene->remoteRoutes();
 			Route_ptr relevantRoute;
-			
+
 			auto sz = rr.Size();
 			for (uint32 i = 0; i < sz; ++i)
 			{
 				auto r = rr[i];
-				if (r->name() == route)
+				if (strcmp(r->name(), route) == 0)
 				{
 					relevantRoute = r;
 					break;
@@ -41,9 +38,9 @@ namespace Stormancer
 				throw std::runtime_error("The target route does not exist on the remote host.");
 			}
 
-			if (relevantRoute->metadata()[RpcClientPlugin::pluginName] != RpcClientPlugin::version)
+			if (relevantRoute->metadata()[RpcPlugin::pluginName] != RpcPlugin::version)
 			{
-				throw std::runtime_error(std::string("The target remote route does not support the plugin RPC version ") + RpcClientPlugin::version);
+				throw std::runtime_error(std::string("The target remote route does not support the plugin RPC version ") + RpcPlugin::version);
 			}
 
 			RpcRequest_ptr request(new RpcRequest(subscriber));
@@ -54,12 +51,12 @@ namespace Stormancer
 			_pendingRequests[id] = request;
 			_pendingRequestsMutex.unlock();
 
-			scene->sendPacket(route.c_str(), [id, writer](bytestream* bs) {
+			_scene->sendPacket(route, [id, writer](bytestream* bs) {
 				*bs << id;
 				writer(bs);
 			}, priority, PacketReliability::RELIABLE_ORDERED);
 
-			subscriber.add([this, scene, id]() {
+			subscriber.add([this, id]() {
 				RpcRequest_ptr request;
 
 				_pendingRequestsMutex.lock();
@@ -72,15 +69,15 @@ namespace Stormancer
 
 				if (request)
 				{
-					scene->sendPacket(RpcClientPlugin::cancellationRouteName, [this, id](bytestream* bs) {
+					_scene->sendPacket(RpcPlugin::cancellationRouteName, [this, id](bytestream* bs) {
 						*bs << id;
 					});
 				}
 			});
 		});
-		return observable.as_dynamic();
+		return new Observable<Packetisp_ptr>(observable.as_dynamic());
 	}
-	*/
+
 	uint16 RpcService::pendingRequests()
 	{
 		_pendingRequestsMutex.lock();
@@ -89,29 +86,27 @@ namespace Stormancer
 		return size;
 	}
 
-	void RpcService::addProcedure(const char* route, std::function<pplx::task<void>(RpcRequestContex_ptr)> handler, bool ordered)
+	void RpcService::addProcedure(const char* route, std::function<pplx::task<void>(RpcRequestContext_ptr)> handler, bool ordered)
 	{
-		auto scene = _scene.lock();
-		if (!scene)
+		if (!_scene)
 		{
 			throw std::runtime_error("The scene ptr is invalid");
 		}
 
 		try
 		{
-			rakStringMap rpcMetadatas;
-			rpcMetadatas.Set(RakNet::RakString(RpcClientPlugin::pluginName), RakNet::RakString(RpcClientPlugin::version));
+			stringMap rpcMetadatas{ { RpcPlugin::pluginName, RpcPlugin::version } };
 
-			scene->addRoute(route, [this, scene, handler, ordered](Packetisp_ptr p) {
+			_scene->addRoute(route, [this, handler, ordered](Packetisp_ptr p) {
 				uint16 id = 0;
 				*p->stream >> id;
 				pplx::cancellation_token_source cts;
-				RpcRequestContex_ptr ctx;
+				RpcRequestContext_ptr ctx;
 				_runningRequestsMutex.lock();
 				if (!mapContains(_runningRequests, id))
 				{
 					_runningRequests[id] = cts;
-					ctx = RpcRequestContex_ptr(new RpcRequestContext<IScenePeer>(p->connection, scene, id, ordered, p->stream, cts.get_token()));
+					ctx = RpcRequestContext_ptr(new RpcRequestContext<IScenePeer>(p->connection, _scene, id, ordered, p->stream, cts.get_token()));
 				}
 				_runningRequestsMutex.unlock();
 
@@ -140,7 +135,7 @@ namespace Stormancer
 						}
 					});
 				}
-			}, rpcMetadatas);
+			}, &rpcMetadatas);
 		}
 		catch (const std::exception& e)
 		{
@@ -244,10 +239,8 @@ namespace Stormancer
 		if (request)
 		{
 			_pendingRequestsMutex.lock();
-			ILogger::instance()->log(Stormancer::LogLevel::Debug, "", "COMPLETE LOCKED", "");
 			_pendingRequests.erase(request->id);
 			_pendingRequestsMutex.unlock();
-			ILogger::instance()->log(Stormancer::LogLevel::Debug, "", "COMPLETE UNLOCKED", "");
 
 			if (messageSent)
 			{

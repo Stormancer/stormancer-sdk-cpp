@@ -18,7 +18,7 @@ namespace Stormancer
 
 		Action(TFunction function)
 		{
-			_functions.Insert(function);
+			_functions.push_back(function);
 		}
 
 		virtual ~Action()
@@ -32,13 +32,21 @@ namespace Stormancer
 		}
 
 		Action(TAction&& other)
-			: _functions(std::move(other._functions))
 		{
+			_functions.reserve(other._functions.size());
+			for (uint32 i = 0; i < other._functions.size(); i++)
+			{
+				_functions.push_back(other._functions[i]);
+			}
 		}
 
 		TAction& operator=(const TAction& other)
 		{
-			_functions = other._functions;
+			_functions.reserve(other._functions.size());
+			for (uint32 i = 0; i < other._functions.size(); i++)
+			{
+				_functions.push_back(other._functions[i]);
+			}
 			return *this;
 		}
 
@@ -58,7 +66,7 @@ namespace Stormancer
 
 		const TAction& operator()(TParam data) const
 		{
-			uint32 sz = _functions.size();
+			size_t sz = _functions.size();
 			for (uint32 i = 0; i < sz; i++)
 			{
 				auto f = _functions.at(i);
@@ -95,8 +103,8 @@ namespace Stormancer
 
 	public:
 		Action(const TAction& other)
-			: _functions(other._functions)
 		{
+			_functions.reserve(other._functions.size());
 			for (uint32 i = 0; i < other._functions.size(); i++)
 			{
 				_functions.push_back(other._functions[i]);
@@ -110,7 +118,11 @@ namespace Stormancer
 
 		TAction& operator=(const TAction& other)
 		{
-			_functions = other._functions;
+			_functions.reserve(other._functions.size());
+			for (uint32 i = 0; i < other._functions.size(); i++)
+			{
+				_functions.push_back(other._functions[i]);
+			}
 			return *this;
 		}
 
@@ -130,7 +142,7 @@ namespace Stormancer
 
 		const TAction& operator()() const
 		{
-			uint32 sz = _functions.size();
+			size_t sz = _functions.size();
 			for (uint32 i = 0; i < sz; i++)
 			{
 				auto f = _functions.at(i);

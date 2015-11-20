@@ -11,14 +11,8 @@ namespace Stormancer
 		{
 		}
 
-		virtual void subscribe(std::function<void(T)>) = 0;
+		virtual ISubscription* subscribe(std::function<void(T)>) = 0;
 
-		virtual void destroy()
-		{
-			delete this;
-		}
-
-	private:
-		rxcpp::observable<T> _observable;
+		virtual void destroy() = 0;
 	};
 }
