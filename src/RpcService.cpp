@@ -11,7 +11,7 @@ namespace Stormancer
 	{
 	}
 
-	IObservable<Packetisp_ptr>* RpcService::rpc(const char* route, Action<bytestream*> writer, PacketPriority priority)
+	IObservable<Packetisp_ptr>* RpcService::rpc(const char* route, std::function<void(bytestream*)> writer, PacketPriority priority)
 	{
 		if (!_scene)
 		{

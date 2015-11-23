@@ -9,7 +9,7 @@ namespace Stormancer
 	class IRpcService
 	{
 	public:
-		virtual IObservable<Packetisp_ptr>* rpc(const char* route, Action<bytestream*> writer, PacketPriority priority) = 0;
+		virtual IObservable<Packetisp_ptr>* rpc(const char* route, std::function<void(bytestream*)> writer_ptr, PacketPriority priority) = 0;
 		virtual void addProcedure(const char* route, std::function<pplx::task<void>(RpcRequestContext_ptr)> handler, bool ordered) = 0;
 		virtual uint16 pendingRequests() = 0;
 		virtual void disconnected() = 0;

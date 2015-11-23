@@ -205,7 +205,7 @@ namespace Stormancer
 				_cts = pplx::cancellation_token_source();
 				try
 				{
-					_transport->start("client", new ConnectionHandler(), _cts.get_token(), 10, (uint16)(_maxPeers + 1));
+					_transport->start("client", new ConnectionHandler(), _cts.get_token(), 0, (uint16)(_maxPeers + 1));
 				}
 				catch (const std::exception& e)
 				{

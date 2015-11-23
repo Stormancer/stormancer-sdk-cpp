@@ -67,9 +67,9 @@ pplx::task<void> test_rpc_client(RpcRequestContext_ptr rc)
 			{
 				logger->log(LogLevel::Info, "test_rpc_client", "RPC on client OK", "");
 				logger->log(LogLevel::Debug, "test_rpc_client", "sending rpc response", "");
-				rc->sendValue(Action<bytestream*>([message](bytestream* bs) {
+				rc->sendValue([message](bytestream* bs) {
 					*bs << message;
-				}), PacketPriority::MEDIUM_PRIORITY);
+				}, PacketPriority::MEDIUM_PRIORITY);
 				execNextTest();
 			}
 			else
@@ -144,7 +144,7 @@ void test_echo()
 void test_rpc_server()
 {
 	logger->log(LogLevel::Debug, "test_rpc_server", "RPC on server", "");
-	sceneMain->dependencyResolver()->resolve<IRpcService>()->rpc("rpc", Action<bytestream*>([](bytestream* stream) {
+	sceneMain->dependencyResolver()->resolve<IRpcService>()->rpc("rpc", std::function<void(bytestream*)>([](bytestream* stream) {
 		*stream << "stormancer";
 	}), PacketPriority::MEDIUM_PRIORITY)->subscribe([](Packetisp_ptr packet) {
 		std::string message;
@@ -162,7 +162,7 @@ void test_rpc_server()
 void test_rpc_server_cancel()
 {
 	logger->log(LogLevel::Debug, "test_rpc_server_cancel", "Rpc on server cancel", "");
-	auto subscription = sceneMain->dependencyResolver()->resolve<IRpcService>()->rpc("rpc", Action<bytestream*>([](bytestream* stream) {
+	auto subscription = sceneMain->dependencyResolver()->resolve<IRpcService>()->rpc("rpc", std::function<void(bytestream*)>([](bytestream* stream) {
 		*stream << "stormancer";
 	}), PacketPriority::MEDIUM_PRIORITY)->subscribe([](Packetisp_ptr packet) {
 		logger->log(LogLevel::Debug, "test_rpc_server_cancel", "rpc response received, but this RPC should be cancelled.", "");
@@ -196,7 +196,8 @@ void test_steam()
 {
 	logger->log(LogLevel::Debug, "test_steam", "Steam authentication", "");
 
-	auto config = Configuration::forAccount("ee59dae9-332d-519d-070e-f9353ae7bbce", "battlefeet-gothic");
+	//auto config = Configuration::forAccount("ee59dae9-332d-519d-070e-f9353ae7bbce", "battlefeet-gothic");
+	auto config = Configuration::forAccount("d9590543-56c3-c94a-f7bf-c394b26deb15", "authentication-test");
 	auto client = Client::createClient(config);
 
 	auto authService = client->dependencyResolver()->resolve<IAuthenticationService>();
@@ -226,7 +227,11 @@ void test_disconnect()
 			throw ex;
 		}
 		logger->log(LogLevel::Info, "test_disconnect", "Disconnect OK", "");
-		execNextTest();
+		pplx::create_task([]() {
+			client->disconnect();
+			Sleep(1000);
+			execNextTest();
+		});
 	});
 }
 

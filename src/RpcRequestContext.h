@@ -38,7 +38,7 @@ namespace Stormancer
 			return _inputStream;
 		}
 
-		void sendValue(Action<bytestream*> writer, PacketPriority priority)
+		void sendValue(std::function<void(bytestream*)> writer, PacketPriority priority)
 		{
 			if (!_scene)
 			{

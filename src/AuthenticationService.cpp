@@ -86,9 +86,9 @@ namespace Stormancer
 		pplx::task_completion_event<Scene*> tce;
 		getAuthenticationScene().then([this, authContext, tce](Scene* scene) {
 			auto rpcService = scene->dependencyResolver()->resolve<IRpcService>();
-			auto observable = rpcService->rpc(_loginRoute.c_str(), Action<bytestream*>([authContext](bytestream* stream) {
+			auto observable = rpcService->rpc(_loginRoute.c_str(), [authContext](bytestream* stream) {
 				msgpack::pack(stream, authContext);
-			}), PacketPriority::MEDIUM_PRIORITY);
+			}, PacketPriority::MEDIUM_PRIORITY);
 			auto subscription = observable->subscribe([this, tce](Stormancer::Packetisp_ptr packet) {
 				LoginResult loginResult(packet->stream);
 				_client->getScene(loginResult.Token.c_str()).then([tce](Scene* scene) {
