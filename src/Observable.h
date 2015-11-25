@@ -18,9 +18,9 @@ namespace Stormancer
 		{
 		}
 
-		ISubscription* subscribe(std::function<void(T)> f)
+		ISubscription* subscribe(std::function<void(T)> onNext)
 		{
-			auto onerror = [](std::exception_ptr ep){
+			auto onError = [](std::exception_ptr ep){
 				try
 				{
 					std::rethrow_exception(ep);
@@ -31,7 +31,45 @@ namespace Stormancer
 				}
 			};
 
-			auto subscription = _observable.subscribe(f, onerror);
+			auto subscription = _observable.subscribe(onNext, onError);
+
+			return new Subscription([subscription]() {
+				subscription.unsubscribe();
+			});
+		}
+
+		ISubscription* subscribe(std::function<void(T)> onNext, std::function<void(std::exception_ptr)> onError)
+		{
+			auto subscription = _observable.subscribe(onNext, onError);
+
+			return new Subscription([subscription]() {
+				subscription.unsubscribe();
+			});
+		}
+
+		ISubscription* subscribe(std::function<void(T)> onNext, std::function<void(std::exception_ptr)> onError, std::function<void()> onComplete)
+		{
+			auto subscription = _observable.subscribe(onNext, onError, onComplete);
+
+			return new Subscription([subscription]() {
+				subscription.unsubscribe();
+			});
+		}
+
+		ISubscription* subscribe(std::function<void(T)> onNext, std::function<void()> onComplete)
+		{
+			auto onError = [](std::exception_ptr ep){
+				try
+				{
+					std::rethrow_exception(ep);
+				}
+				catch (const std::exception& ex)
+				{
+					ILogger::instance()->log(LogLevel::Error, "Observable::subscribe", "Observable error", ex.what());
+				}
+			};
+
+			auto subscription = _observable.subscribe(onNext, onError, onComplete);
 
 			return new Subscription([subscription]() {
 				subscription.unsubscribe();

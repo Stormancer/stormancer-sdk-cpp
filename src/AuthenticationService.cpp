@@ -9,6 +9,9 @@ namespace Stormancer
 		msgpack::unpacked result;
 		msgpack::unpack(&result, buffer.data(), buffer.size());
 		result.get().convert(this);
+
+		pplx::task_completion_event<void> tce;
+		auto a = pplx::create_task(tce);
 	}
 
 
