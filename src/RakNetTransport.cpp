@@ -39,9 +39,9 @@ namespace Stormancer
 		_type = type;
 		_handler = handler;
 		initialize(serverPort, maxConnections);
-		_scheduledTransportLoop = _scheduler->schedulePeriodic(15, Action<>(std::function<void()>([this]() {
+		_scheduledTransportLoop = _scheduler->schedulePeriodic(15, [this]() {
 			run();
-		})));
+		});
 		_mutex.unlock();
 	}
 

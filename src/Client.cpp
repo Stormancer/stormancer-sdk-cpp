@@ -160,7 +160,7 @@ namespace Stormancer
 		}
 	}
 
-	pplx::task<Scene*> Client::getPublicScene(const char* sceneId, const char* userData)
+	pplx::task<Result<Scene*>*> Client::getPublicScene(const char* sceneId, const char* userData)
 	{
 		if (!sceneId)
 		{
@@ -172,33 +172,57 @@ namespace Stormancer
 			userData = "";
 		}
 
-		_logger->log(LogLevel::Debug, "Client::getPublicScene", sceneId, userData);
+		_logger->log(LogLevel::Trace, "Client::getPublicScene", sceneId, userData);
 
 		return _apiClient->getSceneEndpoint(_accountId, _applicationName, sceneId, userData).then([this, sceneId](pplx::task<SceneEndpoint> t) {
 			try
 			{
 				SceneEndpoint sep = t.get();
-				return this->getScene(sceneId, sep);
+				return this->getScene(sceneId, sep).then([](pplx::task<Scene*> t) {
+					auto result = new Result<Scene*>();
+					try
+					{
+						auto scene = t.get();
+						result->set(scene);
+					}
+					catch (const std::exception& ex)
+					{
+						result->setError(ex.what());
+					}
+					return result;
+				});
 			}
 			catch (const std::exception& e)
 			{
-				std::runtime_error error(std::string(e.what()) + "\nUnable to get the scene endpoint / Failed to connect to the scene.");
+				std::runtime_error error(std::string(e.what()) + "\nUnable to get the scene endpoint.");
 				_logger->log(error);
 				throw error;
 			}
 		});
 	}
 
-	pplx::task<Scene*> Client::getScene(const char* token2)
+	pplx::task<Result<Scene*>*> Client::getScene(const char* token2)
 	{
 		std::string token = token2;
 		auto sep = _tokenHandler->decodeToken(token);
-		return getScene(sep.tokenData.SceneId, sep);
+		return getScene(sep.tokenData.SceneId, sep).then([](pplx::task<Scene*> t) {
+			auto result = new Result<Scene*>();
+			try
+			{
+				auto scene = t.get();
+				result->set(scene);
+			}
+			catch (const std::exception& ex)
+			{
+				result->setError(ex.what());
+			}
+			return result;
+		});
 	}
 
 	pplx::task<Scene*> Client::getScene(std::string sceneId, SceneEndpoint sep)
 	{
-		_logger->log(LogLevel::Debug, "Client::getScene", sceneId.c_str(), sep.token.c_str());
+		_logger->log(LogLevel::Trace, "Client::getScene", sceneId.c_str(), sep.token.c_str());
 
 		return taskIf(_serverConnection == nullptr, [this, sep]() {
 			if (!_transport->isRunning()) {
@@ -261,7 +285,7 @@ namespace Stormancer
 			SceneInfosRequestDto parameter;
 			parameter.Metadata = _serverConnection->metadata;
 			parameter.Token = sep.token;
-			_logger->log(LogLevel::Debug, "Client::getScene", "send SceneInfosRequestDto", "");
+			_logger->log(LogLevel::Trace, "Client::getScene", "send SceneInfosRequestDto", "");
 			return sendSystemRequest<SceneInfosRequestDto, SceneInfosDto>((byte)SystemRequestIDTypes::ID_GET_SCENE_INFOS, parameter);
 		}).then([this, sep, sceneId](pplx::task<SceneInfosDto> t) {
 			SceneInfosDto result;
@@ -286,13 +310,14 @@ namespace Stormancer
 				ss << it.first << ":" << it.second << ";";
 			}
 			ss << "]";
-			_logger->log(LogLevel::Debug, "Client::getScene", "SceneInfosDto received", ss.str().c_str());
+			_logger->log(LogLevel::Trace, "Client::getScene", "SceneInfosDto received", ss.str().c_str());
 			_serverConnection->metadata["serializer"] = result.SelectedSerializer;
 			return updateServerMetadata().then([this, sep, sceneId, result](pplx::task<void> t) {
 				try
 				{
 					t.wait();
 
+					_logger->log(LogLevel::Trace, "Client::getScene", "Returning the scene ", sceneId.c_str());
 					Scene* scene;
 					if (mapContains(_scenes, sceneId))
 					{
@@ -433,7 +458,7 @@ namespace Stormancer
 		if (_scheduler)
 		{
 			auto delay = (_clockValues.size() < _maxClockValues ? _pingIntervalAtStart : _pingInterval);
-			_syncClockSubscription = _scheduler->schedulePeriodic((int)delay, Action<>(std::function<void()>([this, delay]() {
+			_syncClockSubscription = _scheduler->schedulePeriodic((int)delay, [this, delay]() {
 				if (delay == _pingIntervalAtStart && _clockValues.size() >= _maxClockValues)
 				{
 					stopSyncClock();
@@ -443,7 +468,7 @@ namespace Stormancer
 				{
 					syncClockImpl();
 				}
-			})));
+			});
 		}
 		syncClockImpl();
 	}

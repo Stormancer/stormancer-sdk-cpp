@@ -12,8 +12,8 @@ namespace Stormancer
 		}
 
 		virtual ISubscription* subscribe(std::function<void(T)> onNext) = 0;
-		virtual ISubscription* subscribe(std::function<void(T)> onNext, std::function<void(std::exception_ptr)> onError) = 0;
-		virtual ISubscription* subscribe(std::function<void(T)> onNext, std::function<void(std::exception_ptr)> onError, std::function<void()> onComplete) = 0;
+		virtual ISubscription* subscribe(std::function<void(T)> onNext, std::function<void(const char* errorMessage)> onError) = 0;
+		virtual ISubscription* subscribe(std::function<void(T)> onNext, std::function<void(const char* errorMessage)> onError, std::function<void()> onComplete) = 0;
 		virtual ISubscription* subscribe(std::function<void(T)> onNext, std::function<void()> onComplete) = 0;
 
 		virtual void destroy() = 0;

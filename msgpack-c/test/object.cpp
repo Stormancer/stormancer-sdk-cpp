@@ -278,7 +278,7 @@ TEST(object, construct_primitive)
     EXPECT_EQ(-1, obj_int.via.i64);
 
     msgpack::object obj_float(1.2);
-    EXPECT_EQ(msgpack::type::FLOAT, obj_float.type);
+    EXPECT_EQ(msgpack::type::FLOATMSGPACK, obj_float.type);
     EXPECT_EQ(1.2, obj_float.via.f64);
 #if defined(MSGPACK_USE_LEGACY_NAME_AS_FLOAT)
     EXPECT_EQ(msgpack::type::DOUBLE, obj_float.type);

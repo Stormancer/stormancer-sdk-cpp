@@ -5,6 +5,176 @@
 
 namespace Stormancer
 {
+	template<typename T = void>
+	class Result
+	{
+	private:
+		bool _isSuccess = false;
+		T _data;
+		std::string _errorMessage;
+
+	public:
+		Result()
+		{
+		}
+
+		Result(T data)
+			: _data(data),
+			_isSuccess(true)
+		{
+		}
+
+		bool isSuccess()
+		{
+			return _isSuccess;
+		}
+
+		void set(T data)
+		{
+			_data = data;
+			_isSuccess = true;
+		}
+
+		void setError(const char* errorMessage)
+		{
+			_errorMessage = errorMessage;
+			_isSuccess = false;
+		}
+
+		const char* error()
+		{
+			return _errorMessage.c_str();
+		}
+
+		T get()
+		{
+			return _data;
+		}
+
+		void destroy()
+		{
+			delete this;
+		}
+	};
+
+	template<>
+	class Result<void>
+	{
+	private:
+		bool _isSuccess = false;
+		std::string _errorMessage;
+
+	public:
+		Result()
+		{
+		}
+
+		bool isSuccess()
+		{
+			return _isSuccess;
+		}
+
+		void set()
+		{
+			_isSuccess = true;
+		}
+
+		void setError(const char* errorMessage)
+		{
+			_errorMessage = errorMessage;
+			_isSuccess = false;
+		}
+
+		const char* error()
+		{
+			return _errorMessage.c_str();
+		}
+
+		void destroy()
+		{
+			delete this;
+		}
+	};
+
+	template<typename T>
+	class MsgPackMaybe
+	{
+	private:
+		T* _t;
+
+	public:
+		MsgPackMaybe(T* t = nullptr)
+			: _t(t)
+		{
+		}
+
+		MsgPackMaybe(const MsgPackMaybe& mb)
+			: _t(mb._t)
+		{
+		}
+
+		MsgPackMaybe& operator=(const MsgPackMaybe& mb)
+		{
+			_t = mb._t;
+			return *this;
+		}
+
+		virtual ~MsgPackMaybe()
+		{
+		}
+
+		MsgPackMaybe& operator=(T* t)
+		{
+			_t = t;
+			return *this;
+		}
+
+		bool hasValue()
+		{
+			return (_t ? true : false);
+		}
+
+		T* get()
+		{
+			return _t;
+		}
+
+		template<typename Packer>
+		void msgpack_pack(Packer& pk) const
+		{
+			if (_t)
+			{
+				pk.pack(*_t);
+			}
+			else
+			{
+				pk.pack_nil();
+			}
+		}
+
+		void msgpack_unpack(msgpack::object const& o)
+		{
+			if (o.is_nil())
+			{
+				_t = nullptr;
+			}
+			else
+			{
+				_t = new T();
+				msgpack::adaptor::convert<T>()(o, *_t);
+			}
+		}
+
+		void destroy()
+		{
+			if (_t)
+			{
+				delete _t;
+				_t = nullptr;
+			}
+		}
+	};
+
 	template<typename T>
 	class SWrapper
 	{

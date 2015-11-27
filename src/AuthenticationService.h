@@ -33,13 +33,13 @@ namespace Stormancer
 		const char* loginRoute();
 		void setLoginRoute(const char* name);
 
-		pplx::task<Scene*> login(const char* pseudo, const char* password);
-		pplx::task<Scene*> login(const stringMap* authenticationContext);
-		pplx::task<Scene*> steamLogin(const char* steamTicket);
+		pplx::task<Result<Scene*>*> login(const char* pseudo, const char* password);
+		pplx::task<Result<Scene*>*> login(const stringMap* authenticationContext);
+		pplx::task<Result<Scene*>*> steamLogin(const char* steamTicket);
 
 		pplx::task<Scene*> getAuthenticationScene();
 
-		pplx::task<void> logout();
+		pplx::task<Result<>*> logout();
 
 	private:
 		std::string _authenticationSceneName = "authenticator";

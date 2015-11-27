@@ -15,12 +15,12 @@ namespace Stormancer
 		virtual const char* loginRoute() = 0;
 		virtual void setLoginRoute(const char* name) = 0;
 
-		virtual pplx::task<Scene*> login(const char* pseudo, const char* password) = 0;
-		virtual pplx::task<Scene*> login(const stringMap* authenticationContext) = 0;
-		virtual pplx::task<Scene*> steamLogin(const char* steamTicket) = 0;
+		virtual pplx::task<Result<Scene*>*> login(const char* pseudo, const char* password) = 0;
+		virtual pplx::task<Result<Scene*>*> login(const stringMap* authenticationContext) = 0;
+		virtual pplx::task<Result<Scene*>*> steamLogin(const char* steamTicket) = 0;
 
 		virtual pplx::task<Scene*> getAuthenticationScene() = 0;
 
-		virtual pplx::task<void> logout() = 0;
+		virtual pplx::task<Result<>*> logout() = 0;
 	};
 };

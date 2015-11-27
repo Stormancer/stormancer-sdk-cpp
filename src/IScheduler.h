@@ -10,6 +10,6 @@ namespace Stormancer
 	{
 	public:
 		/// Schedule a periodic task on the scheculder
-		virtual ISubscription* schedulePeriodic(int delay, Action<> action) = 0;
+		virtual ISubscription* schedulePeriodic(int delay, std::function<void()> funct) = 0;
 	};
 };

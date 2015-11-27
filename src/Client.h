@@ -70,9 +70,9 @@ namespace Stormancer
 		/// \param sceneId The scene Id as a string.
 		/// \param userData Some custom user data as a string.
 		/// \return a task to the connection to the scene.
-		STORMANCER_DLL_API pplx::task<Scene*> getPublicScene(const char* sceneId, const char* userData = "");
+		STORMANCER_DLL_API pplx::task<Result<Scene*>*> getPublicScene(const char* sceneId, const char* userData = "");
 
-		STORMANCER_DLL_API pplx::task<Scene*> getScene(const char* token);
+		STORMANCER_DLL_API pplx::task<Result<Scene*>*> getScene(const char* token);
 
 		/// Returns the name of the application.
 		STORMANCER_DLL_API std::string applicationName();

@@ -38,18 +38,36 @@ namespace Stormancer
 			});
 		}
 
-		ISubscription* subscribe(std::function<void(T)> onNext, std::function<void(std::exception_ptr)> onError)
+		ISubscription* subscribe(std::function<void(T)> onNext, std::function<void(const char* errorMessage)> onError)
 		{
-			auto subscription = _observable.subscribe(onNext, onError);
+			auto subscription = _observable.subscribe(onNext, [onError](std::exception_ptr ep) {
+				try
+				{
+					std::rethrow_exception(ep);
+				}
+				catch (const std::exception& ex)
+				{
+					onError(ex.what());
+				}
+			});
 
 			return new Subscription([subscription]() {
 				subscription.unsubscribe();
 			});
 		}
 
-		ISubscription* subscribe(std::function<void(T)> onNext, std::function<void(std::exception_ptr)> onError, std::function<void()> onComplete)
+		ISubscription* subscribe(std::function<void(T)> onNext, std::function<void(const char* errorMessage)> onError, std::function<void()> onComplete)
 		{
-			auto subscription = _observable.subscribe(onNext, onError, onComplete);
+			auto subscription = _observable.subscribe(onNext, [onError](std::exception_ptr ep){
+				try
+				{
+					std::rethrow_exception(ep);
+				}
+				catch (const std::exception& ex)
+				{
+					onError(ex.what());
+				}
+			}, onComplete);
 
 			return new Subscription([subscription]() {
 				subscription.unsubscribe();

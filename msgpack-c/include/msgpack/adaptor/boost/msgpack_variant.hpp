@@ -47,7 +47,7 @@ struct basic_variant :
         bool,              // BOOL
         int64_t,           // NEGATIVE_INTEGER
         uint64_t,          // POSITIVE_INTEGER
-        double,            // FLOAT
+        double,            // FLOATMSGPACK
         std::string,       // STR
 #if (BOOST_VERSION / 100000) >= 1 && ((BOOST_VERSION / 100) % 1000) >= 53
         boost::string_ref, // STR
@@ -66,7 +66,7 @@ struct basic_variant :
         bool,              // BOOL
         int64_t,           // NEGATIVE_INTEGER
         uint64_t,          // POSITIVE_INTEGER
-        double,            // FLOAT
+        double,            // FLOATMSGPACK
         std::string,       // STR
 #if (BOOST_VERSION / 100000) >= 1 && ((BOOST_VERSION / 100) % 1000) >= 53
         boost::string_ref, // STR
@@ -275,7 +275,7 @@ struct as<msgpack::type::basic_variant<STR, BIN, EXT> > {
             return o.as<uint64_t>();
         case type::NEGATIVE_INTEGER:
             return o.as<int64_t>();
-        case type::FLOAT:
+        case type::FLOATMSGPACK:
             return o.as<double>();
         case type::STR:
             return o.as<STR>();
@@ -315,7 +315,7 @@ struct convert<msgpack::type::basic_variant<STR, BIN, EXT> > {
         case type::NEGATIVE_INTEGER:
             v = o.as<int64_t>();
             break;
-        case type::FLOAT:
+        case type::FLOATMSGPACK:
             v = o.as<double>();
             break;
         case type::STR:

@@ -25,8 +25,10 @@ namespace Stormancer
 
 		for (auto sub : subscriptions)
 		{
-			sub.unsubscribe();
+			sub->unsubscribe();
+			sub->destroy();
 		}
+		subscriptions.clear();
 
 		if (_host)
 		{
@@ -74,35 +76,46 @@ namespace Stormancer
 		return mapToRakListValues(_remoteRoutesMap);
 	}
 
-	void Scene::addRoute(const char* routeName2, std::function<void(Packetisp_ptr)> handler, const stringMap* metadata2)
+	Result<>* Scene::addRoute(const char* routeName2, std::function<void(Packetisp_ptr)> handler, const stringMap* metadata2)
 	{
-		std::string routeName = routeName2;
-
-		stringMap metadata;
-		if (metadata2)
+		auto result = new Result<>();
+		try
 		{
-			 metadata = *metadata2;
-		}
+			std::string routeName = routeName2;
 
-		if (routeName.size() == 0 || routeName[0] == '@')
+			stringMap metadata;
+			if (metadata2)
+			{
+				metadata = *metadata2;
+			}
+
+			if (routeName.size() == 0 || routeName[0] == '@')
+			{
+				throw std::invalid_argument("A route cannot be empty or start with the '@' character.");
+			}
+
+			if (_connected)
+			{
+				throw std::runtime_error("You cannot register handles once the scene is connected.");
+			}
+
+			if (!mapContains(_localRoutesMap, routeName))
+			{
+				_localRoutesMap[routeName] = Route_ptr(new Route(this, routeName, metadata));
+			}
+
+			auto subscription = onMessage(routeName2)->subscribe(handler);
+			subscriptions.push_back(subscription);
+			result->set();
+		}
+		catch (const std::exception& ex)
 		{
-			throw std::invalid_argument("A route cannot be empty or start with the '@' character.");
+			result->setError(ex.what());
 		}
-
-		if (_connected)
-		{
-			throw std::runtime_error("You cannot register handles once the scene is connected.");
-		}
-
-		if (!mapContains(_localRoutesMap, routeName))
-		{
-			_localRoutesMap[routeName] = Route_ptr(new Route(this, routeName, metadata));
-		}
-
-		subscriptions.push_back(onMessage(routeName2).subscribe(handler));
+		return result;
 	}
 
-	rxcpp::observable<Packetisp_ptr> Scene::onMessage(Route_ptr route)
+	IObservable<Packetisp_ptr>* Scene::onMessage(Route_ptr route)
 	{
 		auto observable = rxcpp::observable<>::create<Packetisp_ptr>([this, route](rxcpp::subscriber<Packetisp_ptr> subscriber) {
 			auto handler = std::function<void(Packet_ptr)>([this, subscriber](Packet_ptr p) {
@@ -117,10 +130,11 @@ namespace Stormancer
 				route->handlers.erase(it);
 			});
 		});
-		return observable.as_dynamic();
+		IObservable<Packetisp_ptr>* res = new Observable<Packetisp_ptr>(observable.as_dynamic());
+		return res;
 	}
 
-	rxcpp::observable<Packetisp_ptr> Scene::onMessage(const char* routeName2)
+	IObservable<Packetisp_ptr>* Scene::onMessage(const char* routeName2)
 	{
 		std::string routeName = routeName2;
 		if (_connected)
@@ -138,29 +152,39 @@ namespace Stormancer
 		return onMessage(route);
 	}
 
-	void Scene::sendPacket(const char* routeName2, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability)
+	Result<>* Scene::sendPacket(const char* routeName2, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability)
 	{
-		if (!std::strlen(routeName2))
+		auto result = new Result<>();
+		try
 		{
-			throw std::invalid_argument("routeName is empty.");
-		}
+			if (!std::strlen(routeName2))
+			{
+				throw std::invalid_argument("routeName is empty.");
+			}
 
-		if (!_connected)
+			if (!_connected)
+			{
+				throw std::runtime_error("The scene must be connected to perform this operation.");
+			}
+
+			std::string routeName = routeName2;
+			if (!mapContains(_remoteRoutesMap, routeName))
+			{
+				throw std::invalid_argument(std::string("The route '") + routeName + "' doesn't exist on the scene.");
+			}
+			Route_ptr route = _remoteRoutesMap[routeName];
+
+			_peer->sendToScene(_handle, route->handle(), writer, priority, reliability);
+			result->set();
+		}
+		catch (const std::exception& ex)
 		{
-			throw std::runtime_error("The scene must be connected to perform this operation.");
+			result->setError(ex.what());
 		}
-
-		std::string routeName = routeName2;
-		if (!mapContains(_remoteRoutesMap, routeName))
-		{
-			throw std::invalid_argument(std::string("The route '") + routeName + "' doesn't exist on the scene.");
-		}
-		Route_ptr route = _remoteRoutesMap[routeName];
-
-		_peer->sendToScene(_handle, route->handle(), writer, priority, reliability);
+		return result;
 	}
 
-	pplx::task<void> Scene::connect()
+	pplx::task<Result<>*> Scene::connect()
 	{
 		if (!_connected && !_connecting && _client)
 		{
@@ -170,17 +194,45 @@ namespace Stormancer
 				_connected = true;
 			});
 		}
-		return _connectTask;
+		return _connectTask.then([](pplx::task<void> t) {
+			auto result = new Result<>();
+			try
+			{
+				t.wait();
+				result->set();
+			}
+			catch (const std::exception& ex)
+			{
+				result->setError(ex.what());
+			}
+			return result;
+		});
 	}
 
-	pplx::task<void> Scene::disconnect()
+	pplx::task<Result<>*> Scene::disconnect()
 	{
 		if (_connected && _client)
 		{
 			_connected = false;
 			_disconnectTask = _client->disconnect(this, _handle);
 		}
-		return _disconnectTask;
+		else
+		{
+			_disconnectTask = taskCompleted();
+		}
+		return _disconnectTask.then([](pplx::task<void> t) {
+			auto result = new Result<>();
+			try
+			{
+				t.wait();
+				result->set();
+			}
+			catch (const std::exception& ex)
+			{
+				result->setError(ex.what());
+			}
+			return result;
+		});
 	}
 
 	DependencyResolver* Scene::dependencyResolver() const

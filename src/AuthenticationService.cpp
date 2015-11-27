@@ -14,6 +14,16 @@ namespace Stormancer
 		auto a = pplx::create_task(tce);
 	}
 
+	stringMap processToDll(const stringMap* map)
+	{
+		stringMap map2;
+		for (auto it : *map)
+		{
+			map2[it.first.c_str()] = it.second.c_str();
+		}
+		return map2;
+	}
+
 
 
 	AuthenticationService::AuthenticationService(Client* client)
@@ -55,50 +65,62 @@ namespace Stormancer
 		_loginRoute = name;
 	}
 
-	pplx::task<Scene*> AuthenticationService::login(const char* pseudo, const char* password)
+	pplx::task<Result<Scene*>*> AuthenticationService::login(const char* pseudo, const char* password)
 	{
 		stringMap authContext{ { "provider", "loginpassword" }, { pseudo, password } };
 		return login(&authContext);
 	}
 
-	pplx::task<Scene*> AuthenticationService::steamLogin(const char* steamTicket)
+	pplx::task<Result<Scene*>*> AuthenticationService::steamLogin(const char* steamTicket)
 	{
 		stringMap authContext{ { "provider", "steam" }, { "ticket", steamTicket } };
 		return login(&authContext);
 	}
 
-	stringMap processToDll(const stringMap* map)
+	pplx::task<Result<Scene*>*> AuthenticationService::login(const stringMap* authenticationContext)
 	{
-		stringMap map2;
-		for (auto it : *map)
+		pplx::task_completion_event<Result<Scene*>*> tce;
+		auto result = new Result<Scene*>();
+		try
 		{
-			map2[it.first.c_str()] = it.second.c_str();
-		}
-		return map2;
-	}
+			auto authContext = processToDll(authenticationContext);
 
-	pplx::task<Scene*> AuthenticationService::login(const stringMap* authenticationContext)
-	{
-		auto authContext = processToDll(authenticationContext);
+			if (_authenticated)
+			{
+				throw std::runtime_error("Authentication service already authenticated.");
+			}
 
-		if (_authenticated)
-		{
-			throw std::runtime_error("Authentication service already authenticated.");
-		}
-
-		pplx::task_completion_event<Scene*> tce;
-		getAuthenticationScene().then([this, authContext, tce](Scene* scene) {
-			auto rpcService = scene->dependencyResolver()->resolve<IRpcService>();
-			auto observable = rpcService->rpc(_loginRoute.c_str(), [authContext](bytestream* stream) {
-				msgpack::pack(stream, authContext);
-			}, PacketPriority::MEDIUM_PRIORITY);
-			auto subscription = observable->subscribe([this, tce](Stormancer::Packetisp_ptr packet) {
-				LoginResult loginResult(packet->stream);
-				_client->getScene(loginResult.Token.c_str()).then([tce](Scene* scene) {
-					tce.set(scene);
-				});
+			getAuthenticationScene().then([this, authContext, tce, result](pplx::task<Scene*> t) {
+				try
+				{
+					auto scene = t.get();
+					auto rpcService = scene->dependencyResolver()->resolve<IRpcService>();
+					auto observable = rpcService->rpc(_loginRoute.c_str(), [authContext](bytestream* stream) {
+						msgpack::pack(stream, authContext);
+					}, PacketPriority::MEDIUM_PRIORITY);
+					auto subscription = observable->subscribe([this, tce, result](Stormancer::Packetisp_ptr packet) {
+						LoginResult loginResult(packet->stream);
+						_client->getScene(loginResult.Token.c_str()).then([tce, result](Result<Scene*>* result2) {
+							*result = *result2;
+							tce.set(result);
+						});
+					}, std::function<void(const char*)>([tce, result](const char* error) {
+						result->setError(error);
+						tce.set(result);
+					}));
+				}
+				catch (const std::exception& ex)
+				{
+					result->setError(ex.what());
+					tce.set(result);
+				}
 			});
-		});
+		}
+		catch (const std::exception& ex)
+		{
+			result->setError(ex.what());
+			tce.set(result);
+		}
 		return pplx::create_task(tce);
 	}
 
@@ -108,32 +130,77 @@ namespace Stormancer
 		{
 			_authenticationSceneRetrieving = true;
 			pplx::task_completion_event<Scene*> tce;
-			_client->getPublicScene(_authenticationSceneName.c_str(), nullptr).then([tce](Scene* scene) {
-				scene->connect().then([tce, scene]() {
-					tce.set(scene);
-				});
+			_client->getPublicScene(_authenticationSceneName.c_str(), nullptr).then([tce](Result<Scene*>* result2) {
+				if (result2->isSuccess())
+				{
+					auto scene = result2->get();
+					scene->connect().then([tce, scene](Result<>* result) {
+						if (result->isSuccess())
+						{
+							tce.set(scene);
+						}
+						else
+						{
+							tce.set_exception(std::runtime_error(result->error()));
+						}
+						result->destroy();
+					});
+				}
+				else
+				{
+					tce.set_exception(std::runtime_error(result2->error()));
+				}
+				result2->destroy();
 			});
 			_authenticationScene = pplx::create_task(tce);
 		}
 		return _authenticationScene;
 	}
 
-	pplx::task<void> AuthenticationService::logout()
+	pplx::task<Result<>*> AuthenticationService::logout()
 	{
-		pplx::task_completion_event<void> tce;
-		if (_authenticated)
+		auto result = new Result<>();
+		pplx::task_completion_event<Result<>*> tce;
+		try
 		{
-			_authenticated = false;
-			getAuthenticationScene().then([tce](Scene* scene) {
-				scene->disconnect().then([scene, tce]() {
-					scene->destroy();
-					tce.set();
+			if (_authenticated)
+			{
+				_authenticated = false;
+				getAuthenticationScene().then([tce, result](pplx::task<Scene*> t) {
+					try
+					{
+						auto scene = t.get();
+						scene->disconnect().then([scene, tce, result](Result<>* result2) {
+							if (result2->isSuccess())
+							{
+								scene->destroy();
+								result->set();
+							}
+							else
+							{
+								result->setError(result2->error());
+							}
+							tce.set(result);
+							result2->destroy();
+						});
+					}
+					catch (const std::exception& ex)
+					{
+						result->setError(ex.what());
+						tce.set(result);
+					}
 				});
-			});
+			}
+			else
+			{
+				result->set();
+				tce.set(result);
+			}
 		}
-		else
+		catch (const std::exception& ex)
 		{
-			tce.set();
+			result->setError(ex.what());
+			tce.set(result);
 		}
 		return pplx::create_task(tce);
 	}

@@ -73,7 +73,8 @@ namespace Stormancer
 			}
 			else
 			{
-				_logger->log(LogLevel::Warn, "RequestProcessor (message)", "Unknow request id.", to_string(id).c_str());
+				std::string idstr = std::to_string(id);
+				_logger->log(LogLevel::Warn, "RequestProcessor (message)", "Unknow request id.", idstr.c_str());
 			}
 
 			return true;
