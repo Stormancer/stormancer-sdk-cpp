@@ -61,8 +61,7 @@
 #include "RakNetConnection.h"
 #include "RakNetTransport.h"
 
-#include "PluginBuildContext.h"
-#include "IClientPlugin.h"
+#include "IPlugin.h"
 
 #include "RpcPlugin.h"
 #include "RpcService.h"

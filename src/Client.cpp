@@ -46,7 +46,8 @@ namespace Stormancer
 		_metadata(config->_metadata),
 		_maxPeers(config->maxPeers),
 		_pingInterval(config->pingInterval),
-		_dependencyResolver(new DependencyResolver())
+		_dependencyResolver(new DependencyResolver()),
+		_plugins(config->plugins())
 	{
 		_dependencyResolver->registerDependency<ILogger>(ILogger::instance());
 		_dependencyResolver->registerDependency<IScheduler>(config->scheduler);
@@ -65,13 +66,10 @@ namespace Stormancer
 		_metadata["platform"] = "cpp";
 		_metadata["protocol"] = "2";
 
-		auto plugins = config->plugins();
-		for (auto plugin : plugins)
+		for (auto plugin : _plugins)
 		{
-			plugin->build(&_pluginCtx);
+			plugin->clientCreated(this);
 		}
-
-		_pluginCtx.clientCreated(this);
 
 		initialize();
 	}
@@ -79,6 +77,12 @@ namespace Stormancer
 	Client::~Client()
 	{
 		disconnect();
+
+		for (auto plugin : _plugins)
+		{
+			plugin->destroy();
+		}
+		_plugins.clear();
 
 		delete _scenesDispatcher;
 		_scenesDispatcher = nullptr;
@@ -131,9 +135,9 @@ namespace Stormancer
 		if (!_initialized)
 		{
 			_initialized = true;
-			_transport->packetReceived += std::function<void(Packet_ptr)>(([this](Packet_ptr packet) {
+			_transport->packetReceived += [this](Packet_ptr packet) {
 				this->transport_packetReceived(packet);
-			}));
+			};
 			_watch.reset();
 		}
 	}
@@ -325,15 +329,18 @@ namespace Stormancer
 					}
 					else
 					{
-						scene = new Scene(_serverConnection, this, sceneId, sep.token, result, _dependencyResolver, Action<void>([this, sceneId]() {
+						scene = new Scene(_serverConnection, this, sceneId, sep.token, result, _dependencyResolver, [this, sceneId]() {
 							if (mapContains(_scenes, sceneId))
 							{
 								_scenes.erase(sceneId);
 							}
-						}));
+						});
 						_scenes[sceneId] = scene;
 					}
-					_pluginCtx.sceneCreated(scene);
+					for (auto plugin : _plugins)
+					{
+						plugin->sceneCreated(scene);
+					}
 					return scene;
 				}
 				catch (const std::exception& e)
@@ -368,6 +375,11 @@ namespace Stormancer
 			throw std::runtime_error("The scene ptr is invalid");
 		}
 
+		for (auto plugin : _plugins)
+		{
+			plugin->sceneConnecting(scene);
+		}
+
 		ConnectToSceneMsg parameter;
 		parameter.Token = token;
 		for (auto r : localRoutes)
@@ -386,7 +398,10 @@ namespace Stormancer
 				auto result = t.get();
 				scene->completeConnectionInitialization(result);
 				_scenesDispatcher->addScene(scene);
-				_pluginCtx.sceneConnected(scene);
+				for (auto plugin : _plugins)
+				{
+					plugin->sceneConnected(scene);
+				}
 			}
 			catch (const std::exception& e)
 			{
@@ -419,7 +434,10 @@ namespace Stormancer
 		}
 
 		DisconnectFromSceneDto dto(sceneHandle);
-		_pluginCtx.sceneDisconnected(scene);
+		for (auto plugin : _plugins)
+		{
+			plugin->sceneDisconnected(scene);
+		}
 		_scenesDispatcher->removeScene(sceneHandle);
 		return sendSystemRequest<DisconnectFromSceneDto, EmptyDto>((byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, dto).then([](EmptyDto&){});
 	}
@@ -438,7 +456,10 @@ namespace Stormancer
 
 	void Client::transport_packetReceived(Packet_ptr packet)
 	{
-		_pluginCtx.packetReceived(packet);
+		for (auto plugin : _plugins)
+		{
+			plugin->packetReceived(packet);
+		}
 
 		this->_dispatcher->dispatchPacket(packet);
 	}

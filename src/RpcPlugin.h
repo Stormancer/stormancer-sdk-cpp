@@ -1,13 +1,17 @@
 #pragma once
 #include "headers.h"
-#include "IClientPlugin.h"
+#include "IPlugin.h"
 
 namespace Stormancer
 {
-	class RpcPlugin : public IClientPlugin
+	class RpcPlugin : public IPlugin
 	{
 	public:
-		void build(PluginBuildContext* ctx);
+		void sceneCreated(Scene* scene);
+		
+		void sceneDisconnected(Scene* scene);
+
+		void destroy();
 
 	public:
 		STORMANCER_DLL_API static const char* pluginName;

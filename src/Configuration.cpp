@@ -43,12 +43,12 @@ namespace Stormancer
 		return (strlen(serverEndpoint) ? serverEndpoint : apiEndpoint);
 	}
 
-	const std::vector<IClientPlugin*>& Configuration::plugins()
+	const std::vector<IPlugin*>& Configuration::plugins()
 	{
 		return _plugins;
 	}
 
-	void Configuration::addPlugin(IClientPlugin* plugin)
+	void Configuration::addPlugin(IPlugin* plugin)
 	{
 		_plugins.push_back(plugin);
 	}

@@ -25,7 +25,7 @@ namespace Stormancer
 			}
 			else
 			{
-				throw std::runtime_error(std::string("The dependency resolver can't build the object (") + t.name() + ")");
+				return nullptr;
 			}
 		}
 
@@ -40,15 +40,13 @@ namespace Stormancer
 		template<typename T>
 		void registerDependency(T* instance)
 		{
-			auto& t = typeid(T);
-			auto h = t.hash_code();
-			_factories[h] = [instance](DependencyResolver* resolver) {
+			registerDependency<T>([instance](DependencyResolver* resolver) {
 				return instance;
-			};
+			});
 		}
 
 	private:
 		std::map<std::size_t, std::function<void*(DependencyResolver* resolver)>> _factories;
-		DependencyResolver* _parent;
+		DependencyResolver* _parent = nullptr;
 	};
 };

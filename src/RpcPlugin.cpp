@@ -10,39 +10,43 @@ namespace Stormancer
 	const char* RpcPlugin::completeRouteName = "stormancer.rpc.completed";
 	const char* RpcPlugin::cancellationRouteName = "stormancer.rpc.cancel";
 
-	void RpcPlugin::build(PluginBuildContext* ctx)
+	void RpcPlugin::sceneCreated(Scene* scene)
 	{
-		ctx->sceneCreated += [this](Scene* scene) {
-			if (scene)
-			{
-				auto rpcParams = scene->getHostMetadata(pluginName);
+		if (scene)
+		{
+			auto rpcParams = scene->getHostMetadata(pluginName);
 
-				if (strcmp(rpcParams, version) == 0)
-				{
-					auto processor = new RpcService(scene);
-					scene->dependencyResolver()->registerDependency<IRpcService>(processor);
-					scene->addRoute(nextRouteName, [processor](Packetisp_ptr p) {
-						processor->next(p);
-					});
-					scene->addRoute(cancellationRouteName, [processor](Packetisp_ptr p) {
-						processor->cancel(p);
-					});
-					scene->addRoute(errorRouteName, [processor](Packetisp_ptr p) {
-						processor->error(p);
-					});
-					scene->addRoute(completeRouteName, [processor](Packetisp_ptr p) {
-						processor->complete(p);
-					});
-				}
-			}
-		};
-
-		ctx->sceneDisconnected += [this](Scene* scene) {
-			if (scene)
+			if (strcmp(rpcParams, version) == 0)
 			{
-				auto processor = scene->dependencyResolver()->resolve<IRpcService>();
-				processor->disconnected();
+				auto processor = new RpcService(scene);
+				scene->dependencyResolver()->registerDependency<IRpcService>(processor);
+				scene->addRoute(nextRouteName, [processor](Packetisp_ptr p) {
+					processor->next(p);
+				});
+				scene->addRoute(cancellationRouteName, [processor](Packetisp_ptr p) {
+					processor->cancel(p);
+				});
+				scene->addRoute(errorRouteName, [processor](Packetisp_ptr p) {
+					processor->error(p);
+				});
+				scene->addRoute(completeRouteName, [processor](Packetisp_ptr p) {
+					processor->complete(p);
+				});
 			}
-		};
+		}
+	}
+
+	void RpcPlugin::sceneDisconnected(Scene* scene)
+	{
+		if (scene)
+		{
+			auto processor = scene->dependencyResolver()->resolve<IRpcService>();
+			processor->disconnected();
+		}
+	}
+
+	void RpcPlugin::destroy()
+	{
+		delete this;
 	}
 };

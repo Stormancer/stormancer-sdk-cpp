@@ -191,6 +191,7 @@
     <ClCompile Include="src\Helpers.cpp" />
     <ClCompile Include="src\IConnection.cpp" />
     <ClCompile Include="src\ILogger.cpp" />
+    <ClCompile Include="src\IPlugin.cpp" />
     <ClCompile Include="src\ITransport.cpp" />
     <ClCompile Include="src\NullLogger.cpp" />
     <ClCompile Include="src\PacketProcessorConfig.cpp" />
@@ -237,7 +238,7 @@
     <ClInclude Include="src\headers.h" />
     <ClInclude Include="src\Helpers.h" />
     <ClInclude Include="src\IAuthenticationService.h" />
-    <ClInclude Include="src\IClientPlugin.h" />
+    <ClInclude Include="src\IPlugin.h" />
     <ClInclude Include="src\IConnection.h" />
     <ClInclude Include="src\IConnectionManager.h" />
     <ClInclude Include="src\ILogger.h" />
@@ -256,7 +257,6 @@
     <ClInclude Include="src\Observable.h" />
     <ClInclude Include="src\Packet.h" />
     <ClInclude Include="src\PacketProcessorConfig.h" />
-    <ClInclude Include="src\PluginBuildContext.h" />
     <ClInclude Include="src\RakNetConnection.h" />
     <ClInclude Include="src\RakNetTransport.h" />
     <ClInclude Include="src\RpcPlugin.h" />

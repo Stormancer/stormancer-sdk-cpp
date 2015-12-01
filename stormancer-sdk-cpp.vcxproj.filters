@@ -141,6 +141,9 @@
     <ClCompile Include="src\RpcPlugin.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\IPlugin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Action.h">
@@ -290,12 +293,6 @@
     <ClInclude Include="src\typedef.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\IClientPlugin.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\PluginBuildContext.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\SystemRequest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -336,6 +333,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RpcPlugin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IPlugin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -10,6 +10,7 @@
 #include "IConnection.h"
 #include "IScheduler.h"
 #include "Watch.h"
+#include "ITokenHandler.h"
 
 namespace Stormancer
 {
@@ -182,8 +183,8 @@ namespace Stormancer
 		double _standardDeviationLatency = 0;
 		uint16 _maxClockValues = 24;
 		ISubscription* _syncClockSubscription;
-		PluginBuildContext _pluginCtx;
 		std::map<std::string, Scene*> _scenes;
 		DependencyResolver* _dependencyResolver;
+		std::vector<IPlugin*> _plugins;
 	};
 };

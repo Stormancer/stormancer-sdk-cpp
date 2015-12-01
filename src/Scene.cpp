@@ -2,7 +2,7 @@
 
 namespace Stormancer
 {
-	Scene::Scene(IConnection* connection, Client* client, std::string id, std::string token, SceneInfosDto dto, DependencyResolver* parentDependencyResolver, Action<void> onDelete)
+	Scene::Scene(IConnection* connection, Client* client, std::string id, std::string token, SceneInfosDto dto, DependencyResolver* parentDependencyResolver, std::function<void()> onDelete)
 		: _id(id),
 		_peer(connection),
 		_token(token),

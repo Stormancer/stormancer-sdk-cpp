@@ -1,17 +1,17 @@
 #pragma once
 #include "headers.h"
+#include "IPlugin.h"
 
 namespace Stormancer
 {
-	class AuthenticationPlugin : public IClientPlugin
+	class AuthenticationPlugin : public IPlugin
 	{
 	public:
 		AuthenticationPlugin();
 		virtual ~AuthenticationPlugin();
 
-		void build(PluginBuildContext* ctx);
-		
-	private:
-		void registerAuthenticationService(Client* client);
+		void clientCreated(Client* client);
+
+		void destroy();
 	};
 };
