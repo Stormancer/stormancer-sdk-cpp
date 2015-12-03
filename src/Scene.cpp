@@ -110,7 +110,7 @@ namespace Stormancer
 		}
 		catch (const std::exception& ex)
 		{
-			result->setError(ex.what());
+			result->setError(1, ex.what());
 		}
 		return result;
 	}
@@ -179,7 +179,7 @@ namespace Stormancer
 		}
 		catch (const std::exception& ex)
 		{
-			result->setError(ex.what());
+			result->setError(1, ex.what());
 		}
 		return result;
 	}
@@ -203,7 +203,7 @@ namespace Stormancer
 			}
 			catch (const std::exception& ex)
 			{
-				result->setError(ex.what());
+				result->setError(1, ex.what());
 			}
 			return result;
 		});
@@ -229,7 +229,7 @@ namespace Stormancer
 			}
 			catch (const std::exception& ex)
 			{
-				result->setError(ex.what());
+				result->setError(1, ex.what());
 			}
 			return result;
 		});

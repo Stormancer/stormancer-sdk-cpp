@@ -86,7 +86,7 @@ void test_connect()
 
 	logger->log(LogLevel::Debug, "test_connect", "Get scene", "");
 	client->getPublicScene(sceneName).then([](Result<Scene*>* result) {
-		if (result->isSuccess())
+		if (result->success())
 		{
 			sceneMain = result->get();
 			logger->log(LogLevel::Info, "test_connect", "Get scene OK", "");
@@ -102,23 +102,21 @@ void test_connect()
 
 			logger->log(LogLevel::Debug, "test_connect", "Connect to scene", "");
 			sceneMain->connect().then([](Result<>* result) {
-				if (result->isSuccess())
+				if (result->success())
 				{
 					logger->log(LogLevel::Info, "test_connect", "Connect OK", "");
 					execNextTest();
 				}
 				else
 				{
-					std::string error = result->error();
-					logger->log(LogLevel::Error, "test_connect", "Failed to connect to the scene", error.c_str());
+					logger->log(LogLevel::Error, "test_connect", "Failed to connect to the scene", result->reason());
 				}
 				result->destroy();
 			});
 		}
 		else
 		{
-			std::string error = result->error();
-			logger->log(LogLevel::Error, "test_connect", "Failed to get the scene", error.c_str());
+			logger->log(LogLevel::Error, "test_connect", "Failed to get the scene", result->reason());
 		}
 		result->destroy();
 	});
@@ -131,9 +129,9 @@ void test_echo()
 			*stream << "stormancer";
 			logger->log(LogLevel::Debug, "test_echo", "Sending message...", "");
 		});
-		if (!result->isSuccess())
+		if (!result->success())
 		{
-		logger->log(LogLevel::Error, "test_echo", "Can't send data to the scene through the 'echo' route.", result->error());
+		logger->log(LogLevel::Error, "test_echo", "Can't send data to the scene through the 'echo' route.", result->reason());
 	}
 }
 
@@ -192,23 +190,22 @@ void test_steam()
 {
 	logger->log(LogLevel::Debug, "test_steam", "Steam authentication", "");
 
-	auto config = Configuration::forAccount("d9590543-56c3-c94a-f7bf-c394b26deb15", "authentication-test");
+	auto config = Configuration::forAccount("ee59dae9-332d-519d-070e-f9353ae7bbce", "battlefeet-gothic");
 	auto client = Client::createClient(config);
 
 	auto authService = client->dependencyResolver()->resolve<IAuthenticationService>();
-	authService->steamLogin("TEST").then([client, authService](Result<Scene*>* result) {
+	authService->steamLogin("SteamTicket").then([client, authService](Result<Scene*>* result) {
 		logger->log(LogLevel::Info, "test_steam", "Steam authentication OK", "");
 
 		authService->logout().then([client](Result<>* result) {
-			if (result->isSuccess())
+			if (result->success())
 			{
 				client->disconnect();
 				execNextTest();
 			}
 			else
 			{
-				std::string error = result->error();
-				logger->log(LogLevel::Error, "test_steam", "Failed to logout", error.c_str());
+				logger->log(LogLevel::Error, "test_steam", "Failed to logout", result->reason());
 			}
 			result->destroy();
 		});
@@ -222,7 +219,7 @@ void test_disconnect()
 	logger->log(LogLevel::Debug, "test_disconnect", "test disconnect", "");
 	sceneMain->disconnect().then([](Result<>* result)
 	{
-		if (result->isSuccess())
+		if (result->success())
 		{
 			logger->log(LogLevel::Info, "test_disconnect", "Disconnect OK", "");
 			pplx::create_task([]() {
@@ -233,8 +230,7 @@ void test_disconnect()
 		}
 		else
 		{
-			auto error = result->error();
-			logger->log(LogLevel::Error, "test_disconnect", "Failed to disconnect", error);
+			logger->log(LogLevel::Error, "test_disconnect", "Failed to disconnect", result->reason());
 		}
 		result->destroy();
 	});
@@ -264,14 +260,6 @@ void the_end()
 
 int main(int argc, char* argv[])
 {
-	tests.push_back(test_connect);
-	tests.push_back(test_echo);
-	tests.push_back(test_rpc_server);
-	tests.push_back(test_rpc_server_cancel);
-	tests.push_back(test_syncclock);
-	tests.push_back(test_disconnect);
-	tests.push_back(clean);
-
 	tests.push_back(test_connect);
 	tests.push_back(test_echo);
 	tests.push_back(test_rpc_server);

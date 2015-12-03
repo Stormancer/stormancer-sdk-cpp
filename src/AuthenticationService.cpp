@@ -105,20 +105,20 @@ namespace Stormancer
 							tce.set(result);
 						});
 					}, std::function<void(const char*)>([tce, result](const char* error) {
-						result->setError(error);
+						result->setError(1, error);
 						tce.set(result);
 					}));
 				}
 				catch (const std::exception& ex)
 				{
-					result->setError(ex.what());
+					result->setError(1, ex.what());
 					tce.set(result);
 				}
 			});
 		}
 		catch (const std::exception& ex)
 		{
-			result->setError(ex.what());
+			result->setError(1, ex.what());
 			tce.set(result);
 		}
 		return pplx::create_task(tce);
@@ -131,24 +131,24 @@ namespace Stormancer
 			_authenticationSceneRetrieving = true;
 			pplx::task_completion_event<Scene*> tce;
 			_client->getPublicScene(_authenticationSceneName.c_str(), nullptr).then([tce](Result<Scene*>* result2) {
-				if (result2->isSuccess())
+				if (result2->success())
 				{
 					auto scene = result2->get();
 					scene->connect().then([tce, scene](Result<>* result) {
-						if (result->isSuccess())
+						if (result->success())
 						{
 							tce.set(scene);
 						}
 						else
 						{
-							tce.set_exception(std::runtime_error(result->error()));
+							tce.set_exception(std::runtime_error(result->reason()));
 						}
 						result->destroy();
 					});
 				}
 				else
 				{
-					tce.set_exception(std::runtime_error(result2->error()));
+					tce.set_exception(std::runtime_error(result2->reason()));
 				}
 				result2->destroy();
 			});
@@ -171,14 +171,14 @@ namespace Stormancer
 					{
 						auto scene = t.get();
 						scene->disconnect().then([scene, tce, result](Result<>* result2) {
-							if (result2->isSuccess())
+							if (result2->success())
 							{
 								scene->destroy();
 								result->set();
 							}
 							else
 							{
-								result->setError(result2->error());
+								result->setError(1, result2->reason());
 							}
 							tce.set(result);
 							result2->destroy();
@@ -186,7 +186,7 @@ namespace Stormancer
 					}
 					catch (const std::exception& ex)
 					{
-						result->setError(ex.what());
+						result->setError(1, ex.what());
 						tce.set(result);
 					}
 				});
@@ -199,7 +199,7 @@ namespace Stormancer
 		}
 		catch (const std::exception& ex)
 		{
-			result->setError(ex.what());
+			result->setError(1, ex.what());
 			tce.set(result);
 		}
 		return pplx::create_task(tce);

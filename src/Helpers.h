@@ -9,9 +9,10 @@ namespace Stormancer
 	class Result
 	{
 	private:
-		bool _isSuccess = false;
 		T _data;
-		std::string _errorMessage;
+		int _error = -1;
+		char* _reason = nullptr;
+
 
 	public:
 		Result()
@@ -20,30 +21,58 @@ namespace Stormancer
 
 		Result(T data)
 			: _data(data),
-			_isSuccess(true)
+			_error(0)
 		{
 		}
 
-		bool isSuccess()
+		~Result()
 		{
-			return _isSuccess;
+			if (_reason)
+			{
+				delete[] _reason;
+				_reason = nullptr;
+			}
+		}
+
+		bool finished()
+		{
+			return (_error != -1);
+		}
+
+		bool success()
+		{
+			return (_error == 0);
 		}
 
 		void set(T data)
 		{
 			_data = data;
-			_isSuccess = true;
+			_error = 0;
 		}
 
-		void setError(const char* errorMessage)
+		void setError(int error, const char* reason)
 		{
-			_errorMessage = errorMessage;
-			_isSuccess = false;
+			_error = error;
+
+			if (_reason)
+			{
+				delete[] _reason;
+				_reason = nullptr;
+			}
+
+			auto sz = std::strlen(reason) + 1;
+			_reason = new char[sz];
+			std::memcpy(_reason, reason, sz);
 		}
 
-		const char* error()
+		int error()
 		{
-			return _errorMessage.c_str();
+			return _error;
+		}
+
+		const char* reason()
+		{
+			return _reason;
 		}
 
 		T get()
@@ -61,33 +90,61 @@ namespace Stormancer
 	class Result<void>
 	{
 	private:
-		bool _isSuccess = false;
-		std::string _errorMessage;
+		int _error = -1;
+		char* _reason = nullptr;
 
 	public:
 		Result()
 		{
 		}
 
-		bool isSuccess()
+		~Result()
 		{
-			return _isSuccess;
+			if (_reason)
+			{
+				delete[] _reason;
+				_reason = nullptr;
+			}
+		}
+
+		bool finished()
+		{
+			return (_error != -1);
+		}
+
+		bool success()
+		{
+			return (_error == 0);
 		}
 
 		void set()
 		{
-			_isSuccess = true;
+			_error = 0;
 		}
 
-		void setError(const char* errorMessage)
+		void setError(int error, const char* reason)
 		{
-			_errorMessage = errorMessage;
-			_isSuccess = false;
+			_error = error;
+
+			if (_reason)
+			{
+				delete[] _reason;
+				_reason = nullptr;
+			}
+
+			auto sz = std::strlen(reason) + 1;
+			_reason = new char[sz];
+			std::memcpy(_reason, reason, sz);
 		}
 
-		const char* error()
+		int error()
 		{
-			return _errorMessage.c_str();
+			return _error;
+		}
+
+		const char* reason()
+		{
+			return _reason;
 		}
 
 		void destroy()
