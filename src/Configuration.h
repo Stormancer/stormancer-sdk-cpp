@@ -69,14 +69,18 @@ namespace Stormancer
 		/// Enable or disable the asynchrounous dispatch of received messages. Enabled by default.
 		bool asynchronousDispatch = true;
 
-		/// The interval between successive ping requests, in milliseconds. Default is 5000 ms.
-		int32 pingInterval = 5000;
 
 		/// The scheduler used by the client to run the transport and other repeated tasks.
 		IScheduler* scheduler = nullptr;
 
 		/// Gets or sets the transport to be used by the client.
 		std::function<ITransport*(DependencyResolver*)> transportFactory;
+
+		/// use the syncClock
+		bool synchronisedClock = true;
+
+		/// The interval between successive ping requests, in milliseconds. Default is 5000 ms.
+		int32 synchronisedClockInterval = 5000;
 
 	private:
 		const std::function<ITransport*(DependencyResolver*)> defaultTransportFactory = [](DependencyResolver* resolver)

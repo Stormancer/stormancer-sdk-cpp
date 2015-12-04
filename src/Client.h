@@ -174,7 +174,8 @@ namespace Stormancer
 		Watch _watch;
 		double _offset = 0;
 		int64 _lastPing = 0;
-		int64 _pingInterval = 5000;
+		bool _synchronisedClock = true;
+		int64 _synchronisedClockInterval = 5000;
 		int64 _pingIntervalAtStart = 100;
 		bool lastPingFinished = true;
 		std::mutex _syncClockMutex;

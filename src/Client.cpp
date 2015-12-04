@@ -45,9 +45,10 @@ namespace Stormancer
 		_scenesDispatcher(new SceneDispatcher),
 		_metadata(config->_metadata),
 		_maxPeers(config->maxPeers),
-		_pingInterval(config->pingInterval),
 		_dependencyResolver(new DependencyResolver()),
-		_plugins(config->plugins())
+		_plugins(config->plugins()),
+		_synchronisedClock(config->synchronisedClock),
+		_synchronisedClockInterval(config->synchronisedClockInterval)
 	{
 		_dependencyResolver->registerDependency<ILogger>(ILogger::instance());
 		_dependencyResolver->registerDependency<IScheduler>(config->scheduler);
@@ -76,6 +77,7 @@ namespace Stormancer
 
 	Client::~Client()
 	{
+		ILogger::instance()->log(LogLevel::Warn, "Client destructor", "deleting the client...", "");
 		disconnect();
 
 		for (auto plugin : _plugins)
@@ -282,7 +284,7 @@ namespace Stormancer
 				throw std::runtime_error(std::string(e.what()) + "\nFailed to start the sync clock.");
 			}
 
-			if (sep.tokenData.Version > 0)
+			if (_synchronisedClock && sep.tokenData.Version > 0)
 			{
 				startSyncClock();
 			}
@@ -416,7 +418,10 @@ namespace Stormancer
 	{
 		_cts.cancel();
 
-		stopSyncClock();
+		if (_synchronisedClock)
+		{
+			stopSyncClock();
+		}
 
 		disconnectAllScenes();
 
@@ -478,7 +483,7 @@ namespace Stormancer
 	{
 		if (_scheduler)
 		{
-			auto delay = (_clockValues.size() < _maxClockValues ? _pingIntervalAtStart : _pingInterval);
+			auto delay = (_clockValues.size() < _maxClockValues ? _pingIntervalAtStart : _synchronisedClockInterval);
 			_syncClockSubscription = _scheduler->schedulePeriodic((int)delay, [this, delay]() {
 				if (delay == _pingIntervalAtStart && _clockValues.size() >= _maxClockValues)
 				{
