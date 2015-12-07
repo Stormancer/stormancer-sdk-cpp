@@ -43,7 +43,7 @@ namespace Stormancer
 
 	const char* Scene::getHostMetadata(const char* key)
 	{
-		return _metadata[key].c_str();
+		return (mapContains(_metadata, std::string(key)) ? _metadata[key].c_str() : nullptr);
 	}
 
 	byte Scene::handle()

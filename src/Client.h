@@ -183,9 +183,9 @@ namespace Stormancer
 		double _medianLatency = 0;
 		double _standardDeviationLatency = 0;
 		uint16 _maxClockValues = 24;
-		ISubscription* _syncClockSubscription;
+		ISubscription* _syncClockSubscription = nullptr;
 		std::map<std::string, Scene*> _scenes;
-		DependencyResolver* _dependencyResolver;
+		DependencyResolver* _dependencyResolver = nullptr;
 		std::vector<IPlugin*> _plugins;
 	};
 };
