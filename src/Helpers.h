@@ -233,38 +233,6 @@ namespace Stormancer
 	};
 
 	template<typename T>
-	class SWrapper
-	{
-	public:
-		T* data;
-
-	public:
-		SWrapper(T* data = nullptr)
-			: data(data)
-		{
-		}
-
-		SWrapper(const SWrapper& other) = delete;
-
-		SWrapper& operator=(const SWrapper& other) = delete;
-
-	private:
-		~SWrapper()
-		{
-			if (data)
-			{
-				delete data;
-			}
-		}
-
-	public:
-		void destroy()
-		{
-			delete this;
-		}
-	};
-
-	template<typename T>
 	struct deleter
 	{
 		void operator()(const T* p)

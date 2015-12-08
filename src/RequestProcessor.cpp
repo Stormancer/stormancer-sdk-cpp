@@ -24,7 +24,7 @@ namespace Stormancer
 
 	RequestProcessor::~RequestProcessor()
 	{
-		ILogger::instance()->log(LogLevel::Warn, "RequestProcessor destructor", "deleting the RequestProcessor...", "");
+		ILogger::instance()->log(LogLevel::Trace, "RequestProcessor destructor", "deleting the RequestProcessor...", "");
 	}
 
 	void RequestProcessor::registerProcessor(PacketProcessorConfig& config)
@@ -76,16 +76,6 @@ namespace Stormancer
 			}
 			else
 			{
-				const void * address = static_cast<const void*>(this);
-				if (address != saddress)
-				{
-					std::stringstream ss;
-					ss << address << " != " << saddress;
-					std::string name = ss.str();
-					const char* cstr = name.c_str();
-					ILogger::instance()->log(LogLevel::Warn, "RequestProcessor", "this changed!", cstr);
-				}
-
 				std::string idstr = std::to_string(id);
 				ILogger::instance()->log(LogLevel::Warn, "RequestProcessor/next", "Unknow request id.", idstr.c_str());
 			}
@@ -111,7 +101,7 @@ namespace Stormancer
 				}
 				else
 				{
-					_logger->log(LogLevel::Warn, "RequestProcessor/complete", "Unknow request id.", to_string(id).c_str());
+					ILogger::instance()->log(LogLevel::Warn, "RequestProcessor/complete", "Unknow request id.", to_string(id).c_str());
 				}
 			}
 
@@ -138,7 +128,7 @@ namespace Stormancer
 			}
 			else
 			{
-				_logger->log(LogLevel::Warn, "RequestProcessor/error", "Unknow request id.", to_string(id).c_str());
+				ILogger::instance()->log(LogLevel::Warn, "RequestProcessor/error", "Unknow request id.", to_string(id).c_str());
 			}
 
 			return true;
@@ -161,8 +151,6 @@ namespace Stormancer
 
 	SystemRequest_ptr RequestProcessor::reserveRequestSlot(pplx::task_completion_event<Packet_ptr> tce)
 	{
-		ILogger::instance()->log(LogLevel::Warn, "RequestProcessor::reserveRequestSlot", "reserve request slot", "");
-
 		_mutexPendingRequests.lock();
 
 		static uint16 id = 0;

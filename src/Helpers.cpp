@@ -157,7 +157,7 @@ namespace Stormancer
 		{
 			ss << std::hex;
 		}
-		for (auto i = 0; i < bytes.length(); i++)
+		for (auto i = 0; i < bytes.length(); ++i)
 		{
 			if (i)
 			{

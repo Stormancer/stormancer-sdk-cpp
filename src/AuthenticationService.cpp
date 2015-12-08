@@ -98,16 +98,23 @@ namespace Stormancer
 					auto observable = rpcService->rpc(_loginRoute.c_str(), [authContext](bytestream* stream) {
 						msgpack::pack(stream, authContext);
 					}, PacketPriority::MEDIUM_PRIORITY);
-					auto subscription = observable->subscribe([this, tce, result](Stormancer::Packetisp_ptr packet) {
+					auto onNext = [this, tce, result](Stormancer::Packetisp_ptr packet) {
 						LoginResult loginResult(packet->stream);
 						_client->getScene(loginResult.Token.c_str()).then([tce, result](Result<Scene*>* result2) {
 							*result = *result2;
 							tce.set(result);
 						});
-					}, std::function<void(const char*)>([tce, result](const char* error) {
+						ILogger::instance()->log(LogLevel::Trace, "AuthenticationService", "onNext", "");
+					};
+					auto onError = std::function<void(const char*)>([tce, result](const char* error) {
 						result->setError(1, error);
 						tce.set(result);
-					}));
+						ILogger::instance()->log(LogLevel::Warn, "AuthenticationService", "onError", error);
+					});
+					auto onComplete = []() {
+						ILogger::instance()->log(LogLevel::Trace, "AuthenticationService", "onComplete", "");
+					};
+					auto subscription = observable->subscribe(onNext, onError, onComplete);
 				}
 				catch (const std::exception& ex)
 				{
