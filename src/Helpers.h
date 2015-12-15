@@ -5,14 +5,31 @@
 
 namespace Stormancer
 {
+	class ResultBase
+	{
+	public:
+		STORMANCER_DLL_API ~ResultBase();
+
+		STORMANCER_DLL_API bool finished();
+
+		STORMANCER_DLL_API bool success();
+
+		STORMANCER_DLL_API void setError(int error, const char* reason);
+
+		STORMANCER_DLL_API int error();
+
+		STORMANCER_DLL_API const char* reason();
+
+	protected:
+		int _error = -1;
+		std::string _reason;
+	};
+
 	template<typename T = void>
-	class Result
+	class Result : public ResultBase
 	{
 	private:
 		T _data;
-		int _error = -1;
-		char* _reason = nullptr;
-
 
 	public:
 		Result()
@@ -27,52 +44,12 @@ namespace Stormancer
 
 		~Result()
 		{
-			if (_reason)
-			{
-				delete[] _reason;
-				_reason = nullptr;
-			}
-		}
-
-		bool finished()
-		{
-			return (_error != -1);
-		}
-
-		bool success()
-		{
-			return (_error == 0);
 		}
 
 		void set(T data)
 		{
 			_data = data;
 			_error = 0;
-		}
-
-		void setError(int error, const char* reason)
-		{
-			_error = error;
-
-			if (_reason)
-			{
-				delete[] _reason;
-				_reason = nullptr;
-			}
-
-			auto sz = std::strlen(reason) + 1;
-			_reason = new char[sz];
-			std::memcpy(_reason, reason, sz);
-		}
-
-		int error()
-		{
-			return _error;
-		}
-
-		const char* reason()
-		{
-			return _reason;
 		}
 
 		T get()
@@ -84,15 +61,16 @@ namespace Stormancer
 		{
 			delete this;
 		}
+
+		static void destroyInstance(Result<T>* instance)
+		{
+			delete instance;
+		}
 	};
 
 	template<>
-	class Result<void>
+	class Result<void> : public ResultBase
 	{
-	private:
-		int _error = -1;
-		char* _reason = nullptr;
-
 	public:
 		Result()
 		{
@@ -100,11 +78,6 @@ namespace Stormancer
 
 		~Result()
 		{
-			if (_reason)
-			{
-				delete[] _reason;
-				_reason = nullptr;
-			}
 		}
 
 		bool finished()
@@ -122,34 +95,14 @@ namespace Stormancer
 			_error = 0;
 		}
 
-		void setError(int error, const char* reason)
-		{
-			_error = error;
-
-			if (_reason)
-			{
-				delete[] _reason;
-				_reason = nullptr;
-			}
-
-			auto sz = std::strlen(reason) + 1;
-			_reason = new char[sz];
-			std::memcpy(_reason, reason, sz);
-		}
-
-		int error()
-		{
-			return _error;
-		}
-
-		const char* reason()
-		{
-			return _reason;
-		}
-
 		void destroy()
 		{
 			delete this;
+		}
+
+		static void destroyInstance(Result<void>* instance)
+		{
+			delete instance;
 		}
 	};
 

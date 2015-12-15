@@ -12,10 +12,10 @@ namespace Stormancer
 
 	public:
 		uint16 id = 0;
-		int receivedMsg = 0;
 		rxcpp::subscriber<Packetisp_ptr> observer;
 		pplx::task_completion_event<void> tce;
 		pplx::task<void> task;
+		bool hasCompleted = false;
 	};
 
 	using RpcRequest_ptr = std::shared_ptr<RpcRequest>;

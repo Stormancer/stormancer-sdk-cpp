@@ -50,7 +50,7 @@ namespace Stormancer
 		try
 		{
 			_isRunning = true;
-			_logger->log(LogLevel::Debug, "RakNetTransport::initialize", ("Starting raknet transport " + _type).c_str(), "");
+			_logger->log(LogLevel::Trace, "RakNetTransport::initialize", ("Starting raknet transport " + _type).c_str(), "");
 			_peer = RakNet::RakPeerInterface::GetInstance();
 			_socketDescriptor = (serverPort != 0 ? new RakNet::SocketDescriptor(serverPort, nullptr) : new RakNet::SocketDescriptor());
 			auto startupResult = _peer->Startup(maxConnections, _socketDescriptor, 1);
@@ -59,7 +59,7 @@ namespace Stormancer
 				throw std::runtime_error(std::string("RakNet peer startup failed (RakNet::StartupResult == ") + std::to_string(startupResult) + ')');
 			}
 			_peer->SetMaximumIncomingConnections(maxConnections);
-			_logger->log(LogLevel::Debug, "RakNetTransport::initialize", ("Raknet transport started " + _type).c_str(), "");
+			_logger->log(LogLevel::Trace, "RakNetTransport::initialize", ("Raknet transport started " + _type).c_str(), "");
 		}
 		catch (const std::exception& e)
 		{
@@ -91,7 +91,7 @@ namespace Stormancer
 						{
 							auto tce = _pendingConnections[packetSystemAddressStr];
 
-							_logger->log(LogLevel::Debug, "RakNetTransport::run", "Connection request accepted.", packetSystemAddressStr.c_str());
+							_logger->log(LogLevel::Trace, "RakNetTransport::run", "Connection request accepted.", packetSystemAddressStr.c_str());
 							auto c = onConnection(packet, _peer);
 							tce.set(c);
 						}
@@ -135,7 +135,7 @@ namespace Stormancer
 					case (byte)MessageIDTypes::ID_CONNECTION_RESULT:
 					{
 						int64 sid = *(int64*)(packet->data + 1);
-						_logger->log(LogLevel::Debug, "RakNetTransport::run", "Connection ID received.", std::to_string(sid).c_str());
+						_logger->log(LogLevel::Trace, "RakNetTransport::run", "Connection ID received.", std::to_string(sid).c_str());
 						onConnectionIdReceived(sid);
 						break;
 					}
@@ -179,7 +179,7 @@ namespace Stormancer
 				delete _socketDescriptor;
 				_socketDescriptor = nullptr;
 			}
-			ILogger::instance()->log(LogLevel::Debug, "RakNetTransport::run", "Stopped raknet server.", "");
+			ILogger::instance()->log(LogLevel::Trace, "RakNetTransport::run", "Stopped raknet server.", "");
 		}
 
 		if (_handler)
@@ -274,6 +274,10 @@ namespace Stormancer
 
 	void RakNetTransport::onMessageReceived(RakNet::Packet* rakNetPacket)
 	{
+		//std::string receivedData((char*)rakNetPacket->data, rakNetPacket->length);
+		//auto bytes = stringifyBytesArray(receivedData, true);
+		//ILogger::instance()->log(LogLevel::Trace, "onMessageReceived", "data", bytes.c_str());
+
 		auto connection = getConnection(rakNetPacket->guid);
 		auto stream = new bytestream;
 		stream->rdbuf()->pubsetbuf((char*)rakNetPacket->data, rakNetPacket->length);

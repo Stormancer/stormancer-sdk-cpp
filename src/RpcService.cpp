@@ -48,6 +48,7 @@ namespace Stormancer
 			request->id = id;
 
 			_pendingRequestsMutex.lock();
+			auto idstr = std::to_string(id);
 			_pendingRequests[id] = request;
 			_pendingRequestsMutex.unlock();
 
@@ -56,22 +57,19 @@ namespace Stormancer
 				writer(bs);
 			}, priority, PacketReliability::RELIABLE_ORDERED);
 
-			subscriber.add([this, id]() {
-				RpcRequest_ptr request;
-
-				_pendingRequestsMutex.lock();
-				if (mapContains(_pendingRequests, id))
+			subscriber.add([this, id, request]() {
+				if (!request->hasCompleted)
 				{
-					request = _pendingRequests[id];
-					_pendingRequests.erase(id);
-				}
-				_pendingRequestsMutex.unlock();
-
-				if (request)
-				{
-					_scene->sendPacket(RpcPlugin::cancellationRouteName, [this, id](bytestream* bs) {
-						*bs << id;
-					});
+					_pendingRequestsMutex.lock();
+					if (mapContains(_pendingRequests, id))
+					{
+						auto idstr = std::to_string(id);
+						_pendingRequests.erase(id);
+						_scene->sendPacket(RpcPlugin::cancellationRouteName, [this, id](bytestream* bs) {
+							*bs << id;
+						});
+					}
+					_pendingRequestsMutex.unlock();
 				}
 			});
 		});
@@ -148,7 +146,7 @@ namespace Stormancer
 	uint16 RpcService::reserveId()
 	{
 		uint32 i = 0;
-		uint16 idToReturn = 0;
+		uint16 result = 0;
 		bool found = false;
 
 		_pendingRequestsMutex.lock();
@@ -162,7 +160,7 @@ namespace Stormancer
 
 			if (!mapContains(_pendingRequests, id))
 			{
-				idToReturn = id;
+				result = id;
 				found = true;
 				break;
 			}
@@ -172,7 +170,7 @@ namespace Stormancer
 
 		if (found)
 		{
-			return idToReturn;
+			return result;
 		}
 
 		throw std::overflow_error("Unable to create a new RPC request: Too many pending requests.");
@@ -195,17 +193,28 @@ namespace Stormancer
 		return request;
 	}
 
+	void RpcService::eraseRequest(uint16 requestId)
+	{
+		_pendingRequestsMutex.lock();
+		auto idstr = std::to_string(requestId);
+		_pendingRequests.erase(requestId);
+		_pendingRequestsMutex.unlock();
+	}
+
 	void RpcService::next(Packetisp_ptr packet)
 	{
 		auto rq = getPendingRequest(packet);
 		if (rq)
 		{
-			rq->receivedMsg++;
 			rq->observer.on_next(packet);
 			if (!rq->task.is_done())
 			{
 				rq->tce.set();
 			}
+		}
+		else
+		{
+			ILogger::instance()->log(LogLevel::Warn, "RpcService", "Pending RPC request not found", "");
 		}
 	}
 
@@ -214,7 +223,10 @@ namespace Stormancer
 		auto request = getPendingRequest(packet);
 		if (request)
 		{
+			request->hasCompleted = true;
+
 			_pendingRequestsMutex.lock();
+			auto idstr = std::to_string(request->id);
 			_pendingRequests.erase(request->id);
 			_pendingRequestsMutex.unlock();
 
@@ -238,18 +250,18 @@ namespace Stormancer
 		auto request = getPendingRequest(packet);
 		if (request)
 		{
-			_pendingRequestsMutex.lock();
-			_pendingRequests.erase(request->id);
-			_pendingRequestsMutex.unlock();
+			request->hasCompleted = true;
 
 			if (messageSent)
 			{
-				request->task.then([request](pplx::task<void> t) {
+				request->task.then([this, request](pplx::task<void> t) {
+					eraseRequest(request->id);
 					request->observer.on_completed();
 				});
 			}
 			else
 			{
+				eraseRequest(request->id);
 				request->observer.on_completed();
 			}
 		}

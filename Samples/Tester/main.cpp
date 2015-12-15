@@ -11,7 +11,7 @@ const char* applicationName = "tester";
 const char* sceneName = "main";
 Configuration* config = nullptr;
 Client* client = nullptr;
-Scene* sceneMain;
+Scene* sceneMain = nullptr;
 pplx::task<void> syncclockTask;
 
 std::deque<std::function<void()>> tests;
@@ -118,7 +118,8 @@ void test_connect()
 		{
 			logger->log(LogLevel::Error, "test_connect", "Failed to get the scene", result->reason());
 		}
-		result->destroy();
+		//result->destroy();
+		result->destroyInstance(result);
 	});
 }
 

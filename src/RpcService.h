@@ -26,6 +26,7 @@ namespace Stormancer
 	private:
 		uint16 reserveId();
 		RpcRequest_ptr getPendingRequest(Packetisp_ptr packet);
+		void eraseRequest(uint16 requestId);
 
 	private:
 		std::map<uint16, RpcRequest_ptr> _pendingRequests;

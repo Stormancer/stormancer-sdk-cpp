@@ -77,7 +77,7 @@ namespace Stormancer
 
 	Client::~Client()
 	{
-		ILogger::instance()->log(LogLevel::Warn, "Client destructor", "deleting the client...", "");
+		ILogger::instance()->log(LogLevel::Trace, "Client destructor", "deleting the client...", "");
 		disconnect();
 
 		for (auto plugin : _plugins)

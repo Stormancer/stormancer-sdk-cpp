@@ -2,6 +2,39 @@
 
 namespace Stormancer
 {
+	ResultBase::~ResultBase()
+	{
+	}
+
+	bool ResultBase::finished()
+	{
+		return (_error != -1);
+	}
+
+	bool ResultBase::success()
+	{
+		return (_error == 0);
+	}
+
+	void ResultBase::setError(int error, const char* reason)
+	{
+		_error = error;
+		_reason = reason;
+	}
+
+	int ResultBase::error()
+	{
+		return _error;
+	}
+
+	const char* ResultBase::reason()
+	{
+		return "";
+		//return _reason.c_str();
+	}
+
+
+
 	bool ensureSuccessStatusCode(int statusCode)
 	{
 		return (statusCode >= 200 && statusCode < 300);

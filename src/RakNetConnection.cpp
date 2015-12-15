@@ -88,6 +88,9 @@ namespace Stormancer
 
 		auto aa = data.c_str();
 
+		//auto bytes = stringifyBytesArray(data, true);
+		//ILogger::instance()->log(LogLevel::Trace, "RakNetConnection::sendToScene", "send bytes", bytes.c_str());
+
 		auto result = _rakPeer->Send(data.c_str(), (int)data.length(), priority, reliability, 0, _guid, false);
 		if (result == 0)
 		{
