@@ -50,7 +50,7 @@ namespace Stormancer
 		try
 		{
 			_isRunning = true;
-			_logger->log(LogLevel::Trace, "RakNetTransport::initialize", ("Starting raknet transport " + _type).c_str(), "");
+			_logger->log(LogLevel::Trace, "RakNetTransport::initialize", "Starting raknet transport", _type.c_str());
 			_peer = RakNet::RakPeerInterface::GetInstance();
 			_socketDescriptor = (serverPort != 0 ? new RakNet::SocketDescriptor(serverPort, nullptr) : new RakNet::SocketDescriptor());
 			auto startupResult = _peer->Startup(maxConnections, _socketDescriptor, 1);
@@ -59,7 +59,7 @@ namespace Stormancer
 				throw std::runtime_error(std::string("RakNet peer startup failed (RakNet::StartupResult == ") + std::to_string(startupResult) + ')');
 			}
 			_peer->SetMaximumIncomingConnections(maxConnections);
-			_logger->log(LogLevel::Trace, "RakNetTransport::initialize", ("Raknet transport started " + _type).c_str(), "");
+			_logger->log(LogLevel::Trace, "RakNetTransport::initialize", "Raknet transport started", _type.c_str());
 		}
 		catch (const std::exception& e)
 		{

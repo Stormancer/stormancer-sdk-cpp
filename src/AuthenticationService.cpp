@@ -104,16 +104,13 @@ namespace Stormancer
 							*result = *result2;
 							tce.set(result);
 						});
-						ILogger::instance()->log(LogLevel::Trace, "AuthenticationService", "onNext", "");
 					};
 					auto onError = std::function<void(const char*)>([tce, result](const char* error) {
 						result->setError(1, error);
 						tce.set(result);
-						ILogger::instance()->log(LogLevel::Warn, "AuthenticationService", "onError", error);
+						ILogger::instance()->log(LogLevel::Error, "AuthenticationService", "onError", error);
 					});
-					auto onComplete = []() {
-						ILogger::instance()->log(LogLevel::Trace, "AuthenticationService", "onComplete", "");
-					};
+					auto onComplete = []() {};
 					auto subscription = observable->subscribe(onNext, onError, onComplete);
 				}
 				catch (const std::exception& ex)
