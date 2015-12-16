@@ -29,8 +29,7 @@ namespace Stormancer
 
 	const char* ResultBase::reason()
 	{
-		return "";
-		//return _reason.c_str();
+		return _reason.c_str();
 	}
 
 

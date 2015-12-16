@@ -15,10 +15,17 @@ namespace Stormancer
 	{
 		if (!_scene)
 		{
+			ILogger::instance()->log(LogLevel::Error, "rpc.rpc", "Invalid scene", "");
 			throw std::runtime_error("The scene ptr is invalid");
 		}
 
+#ifdef LOG_RPC
+		ILogger::instance()->log(LogLevel::Trace, "rpc.rpc", "pre observable", "");
+#endif
 		auto observable = rxcpp::observable<>::create<Packetisp_ptr>([this, writer, route, priority](rxcpp::subscriber<Packetisp_ptr> subscriber) {
+#ifdef LOG_RPC
+			ILogger::instance()->log(LogLevel::Trace, "rpc.rpc", "subscription begin", "");
+#endif
 			auto rr = _scene->remoteRoutes();
 			Route_ptr relevantRoute;
 
@@ -35,12 +42,15 @@ namespace Stormancer
 
 			if (!relevantRoute)
 			{
+				ILogger::instance()->log(LogLevel::Error, "rpc.rpc", "The target route does not exist on the remote host.", "");
 				throw std::runtime_error("The target route does not exist on the remote host.");
 			}
 
 			if (relevantRoute->metadata()[RpcPlugin::pluginName] != RpcPlugin::version)
 			{
-				throw std::runtime_error(std::string("The target remote route does not support the plugin RPC version ") + RpcPlugin::version);
+				auto errorMsg = std::string("The target remote route does not support the plugin RPC version ") + RpcPlugin::version;
+				ILogger::instance()->log(LogLevel::Error, "rpc.rpc", errorMsg.c_str(), "");
+				throw std::runtime_error(errorMsg);
 			}
 
 			RpcRequest_ptr request(new RpcRequest(subscriber));
@@ -51,12 +61,25 @@ namespace Stormancer
 			_pendingRequests[id] = request;
 			_pendingRequestsMutex.unlock();
 
-			_scene->sendPacket(route, [id, writer](bytestream* bs) {
+#ifdef LOG_RPC
+			ILogger::instance()->log(LogLevel::Trace, "rpc.rpc", "pre send packet", "");
+#endif
+			auto result = _scene->sendPacket(route, [id, writer](bytestream* bs) {
 				*bs << id;
 				writer(bs);
 			}, priority, PacketReliability::RELIABLE_ORDERED);
+			if (!result->success())
+			{
+				ILogger::instance()->log(LogLevel::Error, "rpc.rpc", "sendPacket failed", result->reason());
+			}
 
+#ifdef LOG_RPC
+			ILogger::instance()->log(LogLevel::Trace, "rpc.rpc", "post send packet", "");
+#endif
 			subscriber.add([this, id, request]() {
+#ifdef LOG_RPC
+				ILogger::instance()->log(LogLevel::Trace, "rpc.rpc", "cancel", "");
+#endif
 				if (!request->hasCompleted)
 				{
 					_pendingRequestsMutex.lock();
@@ -70,7 +93,14 @@ namespace Stormancer
 					_pendingRequestsMutex.unlock();
 				}
 			});
+#ifdef LOG_RPC
+			ILogger::instance()->log(LogLevel::Trace, "rpc.rpc", "subscription end", "");
+#endif
 		});
+
+#ifdef LOG_RPC
+		ILogger::instance()->log(LogLevel::Trace, "rpc.rpc", "post observable", "");
+#endif
 		return new Observable<Packetisp_ptr>(observable.as_dynamic());
 	}
 

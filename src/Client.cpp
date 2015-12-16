@@ -404,6 +404,7 @@ namespace Stormancer
 				{
 					plugin->sceneConnected(scene);
 				}
+				ILogger::instance()->log(LogLevel::Info, "client", "Scene connected", scene->id());
 			}
 			catch (const std::exception& e)
 			{
@@ -444,7 +445,9 @@ namespace Stormancer
 			plugin->sceneDisconnected(scene);
 		}
 		_scenesDispatcher->removeScene(sceneHandle);
-		return sendSystemRequest<DisconnectFromSceneDto, EmptyDto>((byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, dto).then([](EmptyDto&){});
+		return sendSystemRequest<DisconnectFromSceneDto, EmptyDto>((byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, dto).then([scene](EmptyDto&){
+			ILogger::instance()->log(LogLevel::Info, "client", "Scene disconnected", scene->id());
+		});
 	}
 
 	void Client::disconnectAllScenes()

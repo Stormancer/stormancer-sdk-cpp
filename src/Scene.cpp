@@ -189,11 +189,20 @@ namespace Stormancer
 		if (!_connected && !_connecting && _client)
 		{
 			_connecting = true;
-			_connectTask = _client->connectToScene(this, _token, mapValues(_localRoutesMap));
-			_connectTask.then([this]() {
-				_connected = true;
+			_connectTask = _client->connectToScene(this, _token, mapValues(_localRoutesMap)).then([this](pplx::task<void> t) {
+				_connecting = false;
+				try
+				{
+					t.wait();
+					_connected = true;
+				}
+				catch (const std::exception& ex)
+				{
+					throw ex;
+				}
 			});
 		}
+
 		return _connectTask.then([](pplx::task<void> t) {
 			auto result = new Result<>();
 			try
@@ -203,6 +212,8 @@ namespace Stormancer
 			}
 			catch (const std::exception& ex)
 			{
+
+				ILogger::instance()->log(LogLevel::Error, "scene.connect", "Failed to connect the scene", ex.what());
 				result->setError(1, ex.what());
 			}
 			return result;
