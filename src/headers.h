@@ -8,9 +8,10 @@
 #endif
 
 // DEFINES
-//#define LOG_RAKNET_PACKETS
-#define LOG_STORMANCER_PACKETS
-#define LOG_RPC
+#define STORMANCER_LOG_CLIENT
+//#define STORMANCER_LOG_PACKETS
+//#define STORMANCER_LOG_RAKNET_PACKETS
+//#define STORMANCER_LOG_RPC
 
 #if defined(UE_EDITOR) || defined(UE_GAME)
 #include "AllowWindowsPlatformTypes.h"

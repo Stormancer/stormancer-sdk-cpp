@@ -212,7 +212,6 @@ namespace Stormancer
 			}
 			catch (const std::exception& ex)
 			{
-
 				ILogger::instance()->log(LogLevel::Error, "scene.connect", "Failed to connect the scene", ex.what());
 				result->setError(1, ex.what());
 			}

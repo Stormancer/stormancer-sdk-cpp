@@ -19,13 +19,7 @@ namespace Stormancer
 			throw std::runtime_error("The scene ptr is invalid");
 		}
 
-#ifdef LOG_RPC
-		ILogger::instance()->log(LogLevel::Trace, "rpc.rpc", "pre observable", "");
-#endif
 		auto observable = rxcpp::observable<>::create<Packetisp_ptr>([this, writer, route, priority](rxcpp::subscriber<Packetisp_ptr> subscriber) {
-#ifdef LOG_RPC
-			ILogger::instance()->log(LogLevel::Trace, "rpc.rpc", "subscription begin", "");
-#endif
 			auto rr = _scene->remoteRoutes();
 			Route_ptr relevantRoute;
 
@@ -61,9 +55,6 @@ namespace Stormancer
 			_pendingRequests[id] = request;
 			_pendingRequestsMutex.unlock();
 
-#ifdef LOG_RPC
-			ILogger::instance()->log(LogLevel::Trace, "rpc.rpc", "pre send packet", "");
-#endif
 			auto result = _scene->sendPacket(route, [id, writer](bytestream* bs) {
 				*bs << id;
 				writer(bs);
@@ -73,13 +64,7 @@ namespace Stormancer
 				ILogger::instance()->log(LogLevel::Error, "rpc.rpc", "sendPacket failed", result->reason());
 			}
 
-#ifdef LOG_RPC
-			ILogger::instance()->log(LogLevel::Trace, "rpc.rpc", "post send packet", "");
-#endif
 			subscriber.add([this, id, request]() {
-#ifdef LOG_RPC
-				ILogger::instance()->log(LogLevel::Trace, "rpc.rpc", "cancel", "");
-#endif
 				if (!request->hasCompleted)
 				{
 					_pendingRequestsMutex.lock();
@@ -93,14 +78,8 @@ namespace Stormancer
 					_pendingRequestsMutex.unlock();
 				}
 			});
-#ifdef LOG_RPC
-			ILogger::instance()->log(LogLevel::Trace, "rpc.rpc", "subscription end", "");
-#endif
 		});
 
-#ifdef LOG_RPC
-		ILogger::instance()->log(LogLevel::Trace, "rpc.rpc", "post observable", "");
-#endif
 		return new Observable<Packetisp_ptr>(observable.as_dynamic());
 	}
 
@@ -238,7 +217,7 @@ namespace Stormancer
 		auto request = getPendingRequest(packet);
 		if (request)
 		{
-#ifdef LOG_RPC
+#ifdef STORMANCER_LOG_RPC
 			auto idstr = std::to_string(request->id);
 			ILogger::instance()->log(LogLevel::Trace, "RpcService::next", "rpc next", idstr.c_str());
 #endif
@@ -256,7 +235,7 @@ namespace Stormancer
 		auto request = getPendingRequest(packet);
 		if (request)
 		{
-#ifdef LOG_RPC
+#ifdef STORMANCER_LOG_RPC
 			auto idstr = std::to_string(request->id);
 			ILogger::instance()->log(LogLevel::Trace, "RpcService::error", "rpc error", idstr.c_str());
 #endif
@@ -287,7 +266,7 @@ namespace Stormancer
 		auto request = getPendingRequest(packet);
 		if (request)
 		{
-#ifdef LOG_RPC
+#ifdef STORMANCER_LOG_RPC
 			auto idstr = std::to_string(request->id);
 			ILogger::instance()->log(LogLevel::Trace, "RpcService::complete", "rpc complete", idstr.c_str());
 #endif
@@ -314,7 +293,7 @@ namespace Stormancer
 		uint16 id = 0;
 		*packet->stream >> id;
 
-#ifdef LOG_RPC
+#ifdef STORMANCER_LOG_RPC
 		auto idstr = std::to_string(id);
 		ILogger::instance()->log(LogLevel::Trace, "RpcService::cancel", "rpc cancel", idstr.c_str());
 #endif

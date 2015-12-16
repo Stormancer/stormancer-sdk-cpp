@@ -77,7 +77,9 @@ namespace Stormancer
 
 	Client::~Client()
 	{
+#ifdef STORMANCER_LOG_CLIENT
 		ILogger::instance()->log(LogLevel::Trace, "Client destructor", "deleting the client...", "");
+#endif
 		disconnect();
 
 		for (auto plugin : _plugins)
@@ -121,7 +123,9 @@ namespace Stormancer
 	{
 		if (!config)
 		{
-			throw std::invalid_argument("Check the configuration");
+#ifdef STORMANCER_LOG_CLIENT
+			ILogger::instance()->log(LogLevel::Error, "client", "Check the configuration", "");
+#endif
 		}
 
 		return new Client(config);
@@ -170,7 +174,9 @@ namespace Stormancer
 	{
 		if (!sceneId)
 		{
-			throw std::invalid_argument("Bad scene id");
+#ifdef STORMANCER_LOG_CLIENT
+			ILogger::instance()->log(LogLevel::Error, "client", "Bad scene id", "");
+#endif
 		}
 
 		if (!userData)
@@ -178,14 +184,16 @@ namespace Stormancer
 			userData = "";
 		}
 
-		_logger->log(LogLevel::Trace, "Client::getPublicScene", sceneId, userData);
+#ifdef STORMANCER_LOG_CLIENT
+		ILogger::instance()->log(LogLevel::Trace, "Client::getPublicScene", sceneId, userData);
+#endif
 
 		return _apiClient->getSceneEndpoint(_accountId, _applicationName, sceneId, userData).then([this, sceneId](pplx::task<SceneEndpoint> t) {
+			auto result = new Result<Scene*>();
 			try
 			{
 				SceneEndpoint sep = t.get();
-				return this->getScene(sceneId, sep).then([](pplx::task<Scene*> t) {
-					auto result = new Result<Scene*>();
+				return this->getScene(sceneId, sep).then([result](pplx::task<Scene*> t) {
 					try
 					{
 						auto scene = t.get();
@@ -198,11 +206,14 @@ namespace Stormancer
 					return result;
 				});
 			}
-			catch (const std::exception& e)
+			catch (const std::exception& ex)
 			{
-				std::runtime_error error(std::string(e.what()) + "\nUnable to get the scene endpoint.");
-				_logger->log(error);
-				throw error;
+				std::runtime_error error(std::string(ex.what()) + "\nUnable to get the scene endpoint.");
+				ILogger::instance()->log(error);
+				result->setError(1, ex.what());
+				return pplx::task<Result<Scene*>*>([result]() {
+					return result;
+				});
 			}
 		});
 	}
@@ -228,7 +239,9 @@ namespace Stormancer
 
 	pplx::task<Scene*> Client::getScene(std::string sceneId, SceneEndpoint sep)
 	{
+#ifdef STORMANCER_LOG_CLIENT
 		_logger->log(LogLevel::Trace, "Client::getScene", sceneId.c_str(), sep.token.c_str());
+#endif
 
 		return taskIf(_serverConnection == nullptr, [this, sep]() {
 			if (!_transport->isRunning()) {
@@ -243,14 +256,18 @@ namespace Stormancer
 				}
 			}
 			std::string endpoint = sep.tokenData.Endpoints.at(_transport->name());
+#ifdef STORMANCER_LOG_CLIENT
 			_logger->log(LogLevel::Trace, "Client::getScene", "Connecting transport", "");
+#endif
 			try
 			{
 				return _transport->connect(endpoint).then([this](pplx::task<IConnection*> t) {
 					try
 					{
 						IConnection* connection = t.get();
+#ifdef STORMANCER_LOG_CLIENT
 						_logger->log(LogLevel::Trace, "Client::getScene", "Client::transport connected", "");
+#endif
 						_serverConnection = connection;
 						_serverConnection->metadata = _metadata;
 					}
@@ -291,7 +308,9 @@ namespace Stormancer
 			SceneInfosRequestDto parameter;
 			parameter.Metadata = _serverConnection->metadata;
 			parameter.Token = sep.token;
+#ifdef STORMANCER_LOG_CLIENT
 			_logger->log(LogLevel::Trace, "Client::getScene", "send SceneInfosRequestDto", "");
+#endif
 			return sendSystemRequest<SceneInfosRequestDto, SceneInfosDto>((byte)SystemRequestIDTypes::ID_GET_SCENE_INFOS, parameter);
 		}).then([this, sep, sceneId](pplx::task<SceneInfosDto> t) {
 			SceneInfosDto result;
@@ -316,14 +335,18 @@ namespace Stormancer
 				ss << it.first << ":" << it.second << ";";
 			}
 			ss << "]";
+#ifdef STORMANCER_LOG_CLIENT
 			_logger->log(LogLevel::Trace, "Client::getScene", "SceneInfosDto received", ss.str().c_str());
+#endif
 			_serverConnection->metadata["serializer"] = result.SelectedSerializer;
 			return updateServerMetadata().then([this, sep, sceneId, result](pplx::task<void> t) {
 				try
 				{
 					t.wait();
 
+#ifdef STORMANCER_LOG_CLIENT
 					_logger->log(LogLevel::Trace, "Client::getScene", "Returning the scene ", sceneId.c_str());
+#endif
 					Scene* scene;
 					if (mapContains(_scenes, sceneId))
 					{
@@ -355,7 +378,9 @@ namespace Stormancer
 
 	pplx::task<void> Client::updateServerMetadata()
 	{
+#ifdef STORMANCER_LOG_CLIENT
 		_logger->log(LogLevel::Trace, "Client::updateServerMetadata", "sending system request.", "");
+#endif
 		return _requestProcessor->sendSystemRequest(_serverConnection, (byte)SystemRequestIDTypes::ID_SET_METADATA, [this](bytestream* bs) {
 			msgpack::pack(bs, _serverConnection->metadata);
 		}).then([](pplx::task<Packet_ptr> t) {
@@ -404,12 +429,16 @@ namespace Stormancer
 				{
 					plugin->sceneConnected(scene);
 				}
+#ifdef STORMANCER_LOG_CLIENT
 				ILogger::instance()->log(LogLevel::Info, "client", "Scene connected", scene->id());
+#endif
 			}
 			catch (const std::exception& e)
 			{
 				auto e2 = std::runtime_error(std::string(e.what()) + "\nFailed to connect to the scene.");
+#ifdef STORMANCER_LOG_CLIENT
 				_logger->log(e2);
+#endif
 				throw e2;
 			}
 		});
@@ -445,8 +474,10 @@ namespace Stormancer
 			plugin->sceneDisconnected(scene);
 		}
 		_scenesDispatcher->removeScene(sceneHandle);
-		return sendSystemRequest<DisconnectFromSceneDto, EmptyDto>((byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, dto).then([scene](EmptyDto&){
+		return sendSystemRequest<DisconnectFromSceneDto, EmptyDto>((byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, dto).then([scene](EmptyDto&) {
+#ifdef STORMANCER_LOG_CLIENT
 			ILogger::instance()->log(LogLevel::Info, "client", "Scene disconnected", scene->id());
+#endif
 		});
 	}
 
@@ -536,7 +567,9 @@ namespace Stormancer
 				}
 				catch (const std::exception& e)
 				{
+#ifdef STORMANCER_LOG_CLIENT
 					ILogger::instance()->log(LogLevel::Warn, "syncClock", "Failed to ping the server", e.what());
+#endif
 					return;
 				}
 
@@ -597,7 +630,9 @@ namespace Stormancer
 		}
 		catch (std::exception e)
 		{
+#ifdef STORMANCER_LOG_CLIENT
 			_logger->log(LogLevel::Error, "Client::syncClockImpl", "Failed to ping server.", "");
+#endif
 			throw std::runtime_error("Failed to ping server.");
 		}
 	}

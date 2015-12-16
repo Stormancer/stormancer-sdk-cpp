@@ -81,7 +81,7 @@ namespace Stormancer
 					continue;
 				}
 
-#ifdef LOG_RAKNET_PACKETS
+#ifdef STORMANCER_LOG_RAKNET_PACKETS
 				std::string receivedData((char*)rakNetPacket->data, rakNetPacket->length);
 				auto bytes = stringifyBytesArray(receivedData, true);
 				ILogger::instance()->log(LogLevel::Trace, "onMessageReceived", "data", bytes.c_str());
@@ -281,7 +281,7 @@ namespace Stormancer
 
 	void RakNetTransport::onMessageReceived(RakNet::Packet* rakNetPacket)
 	{
-#ifdef LOG_STORMANCER_PACKETS
+#if defined(STORMANCER_LOG_PACKETS) && !defined(STORMANCER_LOG_RAKNET_PACKETS)
 		std::string receivedData((char*)rakNetPacket->data, rakNetPacket->length);
 		auto bytes = stringifyBytesArray(receivedData, true);
 		ILogger::instance()->log(LogLevel::Trace, "RakNetTransport::onMessageReceived", "data", bytes.c_str());
