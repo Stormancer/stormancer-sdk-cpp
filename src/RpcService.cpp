@@ -48,7 +48,6 @@ namespace Stormancer
 			request->id = id;
 
 			_pendingRequestsMutex.lock();
-			auto idstr = std::to_string(id);
 			_pendingRequests[id] = request;
 			_pendingRequestsMutex.unlock();
 
@@ -63,7 +62,6 @@ namespace Stormancer
 					_pendingRequestsMutex.lock();
 					if (mapContains(_pendingRequests, id))
 					{
-						auto idstr = std::to_string(id);
 						_pendingRequests.erase(id);
 						_scene->sendPacket(RpcPlugin::cancellationRouteName, [this, id](bytestream* bs) {
 							*bs << id;
@@ -190,31 +188,36 @@ namespace Stormancer
 		}
 		_pendingRequestsMutex.unlock();
 
+		if (!request)
+		{
+			ILogger::instance()->log(LogLevel::Warn, "RpcService", "Pending RPC request not found", "");
+		}
+
 		return request;
 	}
 
 	void RpcService::eraseRequest(uint16 requestId)
 	{
 		_pendingRequestsMutex.lock();
-		auto idstr = std::to_string(requestId);
 		_pendingRequests.erase(requestId);
 		_pendingRequestsMutex.unlock();
 	}
 
 	void RpcService::next(Packetisp_ptr packet)
 	{
-		auto rq = getPendingRequest(packet);
-		if (rq)
+		auto request = getPendingRequest(packet);
+		if (request)
 		{
-			rq->observer.on_next(packet);
-			if (!rq->task.is_done())
+#ifdef LOG_RPC
+			auto idstr = std::to_string(request->id);
+			ILogger::instance()->log(LogLevel::Trace, "RpcService::next", "rpc next", idstr.c_str());
+#endif
+
+			request->observer.on_next(packet);
+			if (!request->task.is_done())
 			{
-				rq->tce.set();
+				request->tce.set();
 			}
-		}
-		else
-		{
-			ILogger::instance()->log(LogLevel::Warn, "RpcService", "Pending RPC request not found", "");
 		}
 	}
 
@@ -223,10 +226,14 @@ namespace Stormancer
 		auto request = getPendingRequest(packet);
 		if (request)
 		{
+#ifdef LOG_RPC
+			auto idstr = std::to_string(request->id);
+			ILogger::instance()->log(LogLevel::Trace, "RpcService::error", "rpc error", idstr.c_str());
+#endif
+
 			request->hasCompleted = true;
 
 			_pendingRequestsMutex.lock();
-			auto idstr = std::to_string(request->id);
 			_pendingRequests.erase(request->id);
 			_pendingRequestsMutex.unlock();
 
@@ -250,6 +257,11 @@ namespace Stormancer
 		auto request = getPendingRequest(packet);
 		if (request)
 		{
+#ifdef LOG_RPC
+			auto idstr = std::to_string(request->id);
+			ILogger::instance()->log(LogLevel::Trace, "RpcService::complete", "rpc complete", idstr.c_str());
+#endif
+
 			request->hasCompleted = true;
 
 			if (messageSent)
@@ -271,6 +283,11 @@ namespace Stormancer
 	{
 		uint16 id = 0;
 		*packet->stream >> id;
+
+#ifdef LOG_RPC
+		auto idstr = std::to_string(id);
+		ILogger::instance()->log(LogLevel::Trace, "RpcService::cancel", "rpc cancel", idstr.c_str());
+#endif
 
 		_runningRequestsMutex.lock();
 		if (mapContains(_runningRequests, id))

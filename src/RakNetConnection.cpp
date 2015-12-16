@@ -66,12 +66,16 @@ namespace Stormancer
 	void RakNetConnection::sendRaw(std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability, char channel)
 	{
 		bytestream stream;
-
 		writer(&stream);
 		stream.flush();
 		auto bytes = stream.str();
 
-		auto result = _rakPeer->Send(bytes.data(), (int)bytes.length(), (PacketPriority)priority, (PacketReliability)reliability, channel, _guid, false);
+#ifdef LOG_STORMANCER_PACKETS
+		auto bytes2 = stringifyBytesArray(bytes, true);
+		ILogger::instance()->log(LogLevel::Trace, "RakNetConnection::sendToScene", "send bytes", bytes2.c_str());
+#endif
+
+		auto result = _rakPeer->Send(bytes.data(), (int)bytes.length(), priority, reliability, channel, _guid, false);
 		if (result == 0)
 		{
 			throw std::runtime_error("Raknet failed to send the message.");
@@ -84,14 +88,14 @@ namespace Stormancer
 		stream << sceneIndex;
 		stream << route;
 		writer(&stream);
-		auto data = stream.str();
+		auto bytes = stream.str();
 
-		auto aa = data.c_str();
+#ifdef LOG_STORMANCER_PACKETS
+		auto bytes2 = stringifyBytesArray(bytes, true);
+		ILogger::instance()->log(LogLevel::Trace, "RakNetConnection::sendToScene", "send bytes", bytes2.c_str());
+#endif
 
-		//auto bytes = stringifyBytesArray(data, true);
-		//ILogger::instance()->log(LogLevel::Trace, "RakNetConnection::sendToScene", "send bytes", bytes.c_str());
-
-		auto result = _rakPeer->Send(data.c_str(), (int)data.length(), priority, reliability, 0, _guid, false);
+		auto result = _rakPeer->Send(bytes.data(), (int)bytes.length(), priority, reliability, 0, _guid, false);
 		if (result == 0)
 		{
 			throw std::runtime_error("Raknet failed to send the message.");
