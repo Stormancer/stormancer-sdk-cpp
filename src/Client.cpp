@@ -131,11 +131,6 @@ namespace Stormancer
 		return new Client(config);
 	}
 
-	void Client::destroy()
-	{
-		delete this;
-	}
-
 	void Client::initialize()
 	{
 		if (!_initialized)

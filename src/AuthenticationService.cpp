@@ -103,6 +103,7 @@ namespace Stormancer
 						_client->getScene(loginResult.Token.c_str()).then([tce, result](Result<Scene*>* result2) {
 							*result = *result2;
 							tce.set(result);
+							destroy(result2);
 						});
 					};
 					auto onError = std::function<void(const char*)>([tce, result](const char* error) {
@@ -147,14 +148,14 @@ namespace Stormancer
 						{
 							tce.set_exception(std::runtime_error(result->reason()));
 						}
-						result->destroy();
+						destroy(result);
 					});
 				}
 				else
 				{
 					tce.set_exception(std::runtime_error(result2->reason()));
 				}
-				result2->destroy();
+				destroy(result2);
 			});
 			_authenticationScene = pplx::create_task(tce);
 		}
@@ -177,7 +178,7 @@ namespace Stormancer
 						scene->disconnect().then([scene, tce, result](Result<>* result2) {
 							if (result2->success())
 							{
-								scene->destroy();
+								destroy(scene);
 								result->set();
 							}
 							else
@@ -185,7 +186,7 @@ namespace Stormancer
 								result->setError(1, result2->reason());
 							}
 							tce.set(result);
-							result2->destroy();
+							destroy(result2);
 						});
 					}
 					catch (const std::exception& ex)

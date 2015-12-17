@@ -101,25 +101,24 @@ void test_connect()
 			logger->log(LogLevel::Info, "test_connect", "Add procedure OK", "");
 
 			logger->log(LogLevel::Debug, "test_connect", "Connect to scene", "");
-			sceneMain->connect().then([](Result<>* result) {
-				if (result->success())
+			sceneMain->connect().then([](Result<>* result2) {
+				if (result2->success())
 				{
 					logger->log(LogLevel::Info, "test_connect", "Connect OK", "");
 					execNextTest();
 				}
 				else
 				{
-					logger->log(LogLevel::Error, "test_connect", "Failed to connect to the scene", result->reason());
+					logger->log(LogLevel::Error, "test_connect", "Failed to connect to the scene", result2->reason());
 				}
-				result->destroy();
+				destroy(result2);
 			});
 		}
 		else
 		{
 			logger->log(LogLevel::Error, "test_connect", "Failed to get the scene", result->reason());
 		}
-		//result->destroy();
-		result->destroyInstance(result);
+		destroy(result);
 	});
 }
 
@@ -198,20 +197,20 @@ void test_steam()
 	authService->steamLogin("SteamTicket").then([client, authService](Result<Scene*>* result) {
 		logger->log(LogLevel::Info, "test_steam", "Steam authentication OK", "");
 
-		authService->logout().then([client](Result<>* result) {
-			if (result->success())
+		authService->logout().then([client](Result<>* result2) {
+			if (result2->success())
 			{
 				client->disconnect();
 				execNextTest();
 			}
 			else
 			{
-				logger->log(LogLevel::Error, "test_steam", "Failed to logout", result->reason());
+				logger->log(LogLevel::Error, "test_steam", "Failed to logout", result2->reason());
 			}
-			result->destroy();
+			destroy(result2);
 		});
 
-		result->destroy();
+		destroy(result);
 	});
 }
 
@@ -233,7 +232,7 @@ void test_disconnect()
 		{
 			logger->log(LogLevel::Error, "test_disconnect", "Failed to disconnect", result->reason());
 		}
-		result->destroy();
+		destroy(result);
 	});
 }
 
@@ -241,9 +240,9 @@ void clean()
 {
 	logger->log(LogLevel::Debug, "clean", "deleting scene and client", "");
 	stop = true;
-	sceneMain->destroy();
+	destroy(sceneMain);
 	sceneMain = nullptr;
-	client->destroy();
+	destroy(client);
 	client = nullptr;
 	config->destroy();
 	config = nullptr;

@@ -48,8 +48,6 @@ namespace Stormancer
 		/// Disconnect from the scene.
 		STORMANCER_DLL_API pplx::task<Result<void>*> disconnect();
 
-		STORMANCER_DLL_API void destroy();
-
 		/// Add a route to the scene.
 		/// \param routeName Route name.
 		/// \param handler Function which handle the receiving messages from the server on the route.
@@ -111,7 +109,7 @@ namespace Stormancer
 		/// Handle a message received on the scene and dispatch the packet to the right route handle.
 		/// \param packet Receivedpacket.
 		void handleMessage(Packet_ptr packet);
-		
+
 	public:
 
 		/// Fire when a packet is received in the scene. 

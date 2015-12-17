@@ -36,11 +36,6 @@ namespace Stormancer
 		}
 	}
 	
-	void Scene::destroy()
-	{
-		delete this;
-	}
-
 	const char* Scene::getHostMetadata(const char* key)
 	{
 		return (mapContains(_metadata, std::string(key)) ? _metadata[key].c_str() : nullptr);

@@ -69,8 +69,8 @@ int main()
 			if (result->success())
 			{
 				sceneMain = result->get();
-				sceneMain->connect().then([](Result<>* result) {
-					if (result->success())
+				sceneMain->connect().then([](Result<>* result2) {
+					if (result2->success())
 					{
 						logger->log(LogLevel::Info, "test_connect", "Connect OK", "");
 
@@ -79,16 +79,16 @@ int main()
 					}
 					else
 					{
-						logger->log(LogLevel::Error, "test_connect", "Failed to connect to the scene", result->reason());
+						logger->log(LogLevel::Error, "test_connect", "Failed to connect to the scene", result2->reason());
 					}
-					result->destroy();
+					destroy(result2);
 				});
 			}
 			else
 			{
 				logger->log(LogLevel::Error, "test_steam", "Failed to logout", result->reason());
 			}
-			result->destroy();
+			destroy(result);
 		});
 	}
 

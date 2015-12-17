@@ -65,8 +65,6 @@ namespace Stormancer
 		/// \param config A pointer to a Configuration.
 		STORMANCER_DLL_API static Client* createClient(Configuration* config);
 
-		STORMANCER_DLL_API void destroy();
-
 		/// Get a public scene.
 		/// \param sceneId The scene Id as a string.
 		/// \param userData Some custom user data as a string.

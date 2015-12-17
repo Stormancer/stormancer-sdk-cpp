@@ -28,9 +28,6 @@ namespace Stormancer
 	template<typename T = void>
 	class Result : public ResultBase
 	{
-	private:
-		T _data;
-
 	public:
 		Result()
 		{
@@ -39,10 +36,6 @@ namespace Stormancer
 		Result(T data)
 			: _data(data),
 			_error(0)
-		{
-		}
-
-		~Result()
 		{
 		}
 
@@ -57,54 +50,31 @@ namespace Stormancer
 			return _data;
 		}
 
-		void destroy()
-		{
-			delete this;
-		}
-
-		static void destroyInstance(Result<T>* instance)
-		{
-			delete instance;
-		}
+	private:
+		T _data;
 	};
 
 	template<>
 	class Result<void> : public ResultBase
 	{
 	public:
-		Result()
-		{
-		}
-
-		~Result()
-		{
-		}
-
-		bool finished()
-		{
-			return (_error != -1);
-		}
-
-		bool success()
-		{
-			return (_error == 0);
-		}
-
 		void set()
 		{
 			_error = 0;
 		}
-
-		void destroy()
-		{
-			delete this;
-		}
-
-		static void destroyInstance(Result<void>* instance)
-		{
-			delete instance;
-		}
 	};
+
+	class Client;
+
+	STORMANCER_DLL_API void destroy(Client* client);
+
+	class Scene;
+
+	STORMANCER_DLL_API void destroy(Scene* scene);
+
+	STORMANCER_DLL_API void destroy(Result<Scene*>* instance);
+
+	STORMANCER_DLL_API void destroy(Result<>* instance);
 
 	template<typename T>
 	class MsgPackMaybe

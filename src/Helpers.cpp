@@ -32,6 +32,26 @@ namespace Stormancer
 		return _reason.c_str();
 	}
 
+	void destroy(Client* client)
+	{
+		delete client;
+	}
+
+	void destroy(Scene* scene)
+	{
+		delete scene;
+	}
+
+	void destroy(Result<Scene*>* instance)
+	{
+		delete instance;
+	}
+
+	void destroy(Result<>* instance)
+	{
+		delete instance;
+	}
+
 
 
 	bool ensureSuccessStatusCode(int statusCode)
