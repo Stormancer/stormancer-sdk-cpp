@@ -185,5 +185,8 @@ namespace Stormancer
 		std::map<std::string, Scene*> _scenes;
 		DependencyResolver* _dependencyResolver = nullptr;
 		std::vector<IPlugin*> _plugins;
+		std::mutex _connectionMutex;
+		pplx::task<void> _connectionTask;
+		bool _connectionTaskSet = false;
 	};
 };

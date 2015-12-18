@@ -27,11 +27,6 @@ namespace Stormancer
 		return new Configuration(account, application);
 	}
 
-	void Configuration::destroy()
-	{
-		delete this;
-	}
-
 	Configuration& Configuration::metadata(const char* key, const char* value)
 	{
 		_metadata[key] = value;

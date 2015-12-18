@@ -32,8 +32,6 @@ namespace Stormancer
 		/// Create an account with an account and an application name and returns a Configuration smart ptr.
 		STORMANCER_DLL_API static Configuration* forAccount(const char* account, const char* application);
 
-		STORMANCER_DLL_API void destroy();
-
 		// Get the Api endpoint.
 		std::string getApiEndpoint();
 

@@ -96,7 +96,7 @@ namespace Stormancer
 
 		void destroy()
 		{
-			delete this;
+			Stormancer::destroy(this);
 		}
 
 	private:

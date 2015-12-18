@@ -36,6 +36,8 @@ namespace Stormancer
 		
 		/// Returns the metadatas
 		stringMap metadata();
+
+		DependencyResolver* dependencyResolver();
 		
 		void close();
 
@@ -81,5 +83,6 @@ namespace Stormancer
 		stringMap _metadata;
 		time_t _lastActivityDate;
 		std::map<size_t, void*> _localData;
+		DependencyResolver* _dependencyResolver = nullptr;
 	};
 };

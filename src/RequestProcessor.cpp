@@ -153,20 +153,25 @@ namespace Stormancer
 	{
 		_mutexPendingRequests.lock();
 
-		static uint16 id = 0;
-		// i is used to know if we tested all uint16 available values, whatever the current value of id.
-		uint32 i = 0;
+		uint16 selectedId;
 		SystemRequest_ptr request;
-		while (i <= 0xffff)
-		{
-			id++;
-			i++;
-
-			if (!mapContains(_pendingRequests, id))
+		
+		{ // this unamed scope ensures the id is not used outside the locked mutex.
+			static uint16 id = 0;
+			// i is used to know if we tested all uint16 available values, whatever the current value of id.
+			uint32 i = 0;
+			while (i <= 0xffff)
 			{
-				request = SystemRequest_ptr(new SystemRequest(tce));
-				break;
+				id++;
+				i++;
+
+				if (!mapContains(_pendingRequests, id))
+				{
+					request = SystemRequest_ptr(new SystemRequest(tce));
+					break;
+				}
 			}
+			selectedId = id;
 		}
 
 		_mutexPendingRequests.unlock();
@@ -174,8 +179,8 @@ namespace Stormancer
 		if (request)
 		{
 			time(&request->lastRefresh);
-			request->id = id;
-			_pendingRequests[id] = request;
+			request->id = selectedId;
+			_pendingRequests[selectedId] = request;
 			return request;
 		}
 

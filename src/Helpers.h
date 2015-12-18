@@ -64,17 +64,31 @@ namespace Stormancer
 		}
 	};
 
-	class Client;
+	class Configuration;
+	STORMANCER_DLL_API void destroy(Configuration* ptr);
 
-	STORMANCER_DLL_API void destroy(Client* client);
+	class Client;
+	STORMANCER_DLL_API void destroy(Client* ptr);
 
 	class Scene;
+	STORMANCER_DLL_API void destroy(Scene* ptr);
+	STORMANCER_DLL_API void destroy(Result<Scene*>* ptr);
 
-	STORMANCER_DLL_API void destroy(Scene* scene);
+	class AuthenticationPlugin;
+	STORMANCER_DLL_API void destroy(AuthenticationPlugin* ptr);
 
-	STORMANCER_DLL_API void destroy(Result<Scene*>* instance);
+	class RpcPlugin;
+	STORMANCER_DLL_API void destroy(RpcPlugin* ptr);
 
-	STORMANCER_DLL_API void destroy(Result<>* instance);
+	template<typename T>
+	class Packet;
+	class IScenePeer;
+	template<typename T>
+	class Observable;
+	using Packetisp_ptr = std::shared_ptr<Packet<IScenePeer>>;
+	STORMANCER_DLL_API void destroy(Observable<Packetisp_ptr>* ptr);
+
+	STORMANCER_DLL_API void destroy(Result<>* ptr);
 
 	template<typename T>
 	class MsgPackMaybe

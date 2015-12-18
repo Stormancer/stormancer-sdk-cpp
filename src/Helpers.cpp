@@ -32,24 +32,46 @@ namespace Stormancer
 		return _reason.c_str();
 	}
 
-	void destroy(Client* client)
+
+
+	void destroy(Configuration* ptr)
 	{
-		delete client;
+		delete ptr;
 	}
 
-	void destroy(Scene* scene)
+	void destroy(Client* ptr)
 	{
-		delete scene;
+		delete ptr;
 	}
 
-	void destroy(Result<Scene*>* instance)
+	void destroy(Scene* ptr)
 	{
-		delete instance;
+		delete ptr;
 	}
 
-	void destroy(Result<>* instance)
+	void destroy(Result<Scene*>* ptr)
 	{
-		delete instance;
+		delete ptr;
+	}
+
+	void destroy(Result<>* ptr)
+	{
+		delete ptr;
+	}
+
+	void destroy(AuthenticationPlugin* ptr)
+	{
+		delete ptr;
+	}
+
+	void destroy(RpcPlugin* ptr)
+	{
+		delete ptr;
+	}
+
+	void destroy(Observable<Packetisp_ptr>* ptr)
+	{
+		delete ptr;
 	}
 
 
@@ -217,7 +239,7 @@ namespace Stormancer
 			}
 			ss << std::to_string((byte)bytes[i]);
 		}
-		//ss << std::dec;
+		ss << std::dec;
 		return ss.str();
 	}
 };

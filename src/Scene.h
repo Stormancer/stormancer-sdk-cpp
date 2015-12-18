@@ -43,10 +43,10 @@ namespace Stormancer
 	public:
 
 		/// Connect to the scene.
-		STORMANCER_DLL_API pplx::task<Result<void>*> connect();
+		STORMANCER_DLL_API pplx::task<Result<>*> connect();
 
 		/// Disconnect from the scene.
-		STORMANCER_DLL_API pplx::task<Result<void>*> disconnect();
+		STORMANCER_DLL_API pplx::task<Result<>*> disconnect();
 
 		/// Add a route to the scene.
 		/// \param routeName Route name.

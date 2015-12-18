@@ -45,6 +45,11 @@ namespace Stormancer
 		return _metadata;
 	}
 
+	DependencyResolver* RakNetConnection::dependencyResolver()
+	{
+		return _dependencyResolver;
+	}
+
 	void RakNetConnection::close()
 	{
 		_closeAction(this);

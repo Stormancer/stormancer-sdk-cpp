@@ -18,6 +18,6 @@ namespace Stormancer
 
 	void AuthenticationPlugin::destroy()
 	{
-		delete this;
+		Stormancer::destroy(this);
 	}
 };

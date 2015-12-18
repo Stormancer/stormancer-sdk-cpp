@@ -59,7 +59,8 @@ namespace Stormancer
 	{
 		std::stringstream ss;
 		ss << '[' << nowStr() << ']' << " [exception] " << e.what() << std::endl;
-		auto dataToCopy = ss.str().c_str();
+		auto str = ss.str();
+		auto dataToCopy = str.c_str();
 		auto len = strlen(dataToCopy) + 1;
 		auto data = new char[len];
 		memcpy(data, dataToCopy, len);

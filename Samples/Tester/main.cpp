@@ -120,6 +120,42 @@ void test_connect()
 		}
 		destroy(result);
 	});
+
+	client->getPublicScene(sceneName).then([](Result<Scene*>* result) {
+		if (result->success())
+		{
+			sceneMain = result->get();
+			logger->log(LogLevel::Info, "test_connect", "Get scene OK", "");
+
+			logger->log(LogLevel::Debug, "test_connect", "Add route", "");
+			sceneMain->addRoute("echo", test_echo_received);
+			sceneMain->addRoute("rpcservercancelled", test_rpc_server_cancelled);
+			logger->log(LogLevel::Info, "test_connect", "Add route OK", "");
+
+			logger->log(LogLevel::Debug, "test_connect", "Add procedure", "");
+			sceneMain->dependencyResolver()->resolve<IRpcService>()->addProcedure("rpc", test_rpc_client, true);
+			logger->log(LogLevel::Info, "test_connect", "Add procedure OK", "");
+
+			logger->log(LogLevel::Debug, "test_connect", "Connect to scene", "");
+			sceneMain->connect().then([](Result<>* result2) {
+				if (result2->success())
+				{
+					logger->log(LogLevel::Info, "test_connect", "Connect OK", "");
+					execNextTest();
+				}
+				else
+				{
+					logger->log(LogLevel::Error, "test_connect", "Failed to connect to the scene", result2->reason());
+				}
+				destroy(result2);
+			});
+		}
+		else
+		{
+			logger->log(LogLevel::Error, "test_connect", "Failed to get the scene", result->reason());
+		}
+		destroy(result);
+	});
 }
 
 void test_echo()
@@ -244,7 +280,7 @@ void clean()
 	sceneMain = nullptr;
 	destroy(client);
 	client = nullptr;
-	config->destroy();
+	destroy(config);
 	config = nullptr;
 	logger->log(LogLevel::Debug, "clean", "scene and client deleted", "");
 

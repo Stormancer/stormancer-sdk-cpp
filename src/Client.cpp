@@ -234,72 +234,88 @@ namespace Stormancer
 
 	pplx::task<Scene*> Client::getScene(std::string sceneId, SceneEndpoint sep)
 	{
+		if (_cts.get_token().is_canceled()){
+			throw std::runtime_error("Client has been disconnected. A client can only connect once.");
+		}
+
 #ifdef STORMANCER_LOG_CLIENT
 		_logger->log(LogLevel::Trace, "Client::getScene", sceneId.c_str(), sep.token.c_str());
 #endif
-
-		return taskIf(_serverConnection == nullptr, [this, sep]() {
-			if (!_transport->isRunning()) {
-				_cts = pplx::cancellation_token_source();
-				try
-				{
-					_transport->start("client", new ConnectionHandler(), _cts.get_token(), 0, (uint16)(_maxPeers + 1));
-				}
-				catch (const std::exception& e)
-				{
-					throw std::runtime_error(std::string(e.what()) + "\nFailed to start the transport.");
-				}
-			}
-			std::string endpoint = sep.tokenData.Endpoints.at(_transport->name());
-#ifdef STORMANCER_LOG_CLIENT
-			_logger->log(LogLevel::Trace, "Client::getScene", "Connecting transport", "");
-#endif
-			try
+		if (!_connectionTaskSet)
+		{
+			_connectionMutex.lock();
+			if (!_connectionTaskSet)
 			{
-				return _transport->connect(endpoint).then([this](pplx::task<IConnection*> t) {
+				_connectionTask = taskIf(_serverConnection == nullptr, [this, sep]() {
+
+					if (!_transport->isRunning()) {
+						try
+						{
+							_transport->start("client", new ConnectionHandler(), _cts.get_token(), 0, (uint16)(_maxPeers + 1));
+						}
+						catch (const std::exception& e)
+						{
+							throw std::runtime_error(std::string(e.what()) + "\nFailed to start the transport.");
+						}
+					}
+					std::string endpoint = sep.tokenData.Endpoints.at(_transport->name());
+#ifdef STORMANCER_LOG_CLIENT
+					_logger->log(LogLevel::Trace, "Client::getScene", "Connecting transport", "");
+#endif
 					try
 					{
-						IConnection* connection = t.get();
+						return _transport->connect(endpoint).then([this](pplx::task<IConnection*> t) {
+							try
+							{
+								IConnection* connection = t.get();
 #ifdef STORMANCER_LOG_CLIENT
-						_logger->log(LogLevel::Trace, "Client::getScene", "Client::transport connected", "");
+								_logger->log(LogLevel::Trace, "Client::getScene", "Client::transport connected", "");
 #endif
-						_serverConnection = connection;
-						_serverConnection->metadata = _metadata;
+								_serverConnection = connection;
+								_serverConnection->metadata = _metadata;
+							}
+							catch (const std::exception& e)
+							{
+								throw std::runtime_error(std::string(e.what()) + "\nFailed to get the transport peer connection.");
+							}
+						});
 					}
 					catch (const std::exception& e)
 					{
-						throw std::runtime_error(std::string(e.what()) + "\nFailed to get the transport peer connection.");
+						throw std::runtime_error(std::string(e.what()) + "\nFailed to connect the transport.");
+					}
+				}).then([this, sep](pplx::task<void> t) {
+					try
+					{
+						t.wait();
+						return updateServerMetadata();
+					}
+					catch (const std::exception& e)
+					{
+						throw e;
+					}
+				}).then([this, sep](pplx::task<void> t) {
+					try
+					{
+						t.wait();
+					}
+					catch (const std::exception& e)
+					{
+						throw std::runtime_error(std::string(e.what()) + "\nFailed to start the sync clock.");
+					}
+
+					if (_synchronisedClock && sep.tokenData.Version > 0)
+					{
+						startSyncClock();
 					}
 				});
 			}
-			catch (const std::exception& e)
-			{
-				throw std::runtime_error(std::string(e.what()) + "\nFailed to connect the transport.");
-			}
-		}).then([this, sep](pplx::task<void> t) {
-			try
-			{
-				t.wait();
-				return updateServerMetadata();
-			}
-			catch (const std::exception& e)
-			{
-				throw e;
-			}
-		}).then([this, sep](pplx::task<void> t) {
-			try
-			{
-				t.wait();
-			}
-			catch (const std::exception& e)
-			{
-				throw std::runtime_error(std::string(e.what()) + "\nFailed to start the sync clock.");
-			}
 
-			if (_synchronisedClock && sep.tokenData.Version > 0)
-			{
-				startSyncClock();
-			}
+			_connectionTaskSet = true;
+			_connectionMutex.unlock();
+		}
+
+		return _connectionTask.then([this, sep](){
 			SceneInfosRequestDto parameter;
 			parameter.Metadata = _serverConnection->metadata;
 			parameter.Token = sep.token;

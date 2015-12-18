@@ -30,7 +30,7 @@ namespace Stormancer
 		/// Event fired when a packet is received from a remote peer.
 		STORMANCER_DLL_API virtual void packetReceived(Packet_ptr packet);
 
-		/// Called to destroy the plugin.
-		virtual void destroy() = 0;
+		/// Event fired when a packet is received from a remote peer.
+		STORMANCER_DLL_API virtual void destroy() = 0;
 	};
 };

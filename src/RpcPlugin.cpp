@@ -47,6 +47,6 @@ namespace Stormancer
 
 	void RpcPlugin::destroy()
 	{
-		delete this;
+		Stormancer::destroy(this);
 	}
 };

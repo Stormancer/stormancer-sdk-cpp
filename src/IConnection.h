@@ -3,6 +3,7 @@
 #include "ConnectionState.h"
 #include <PacketPriority.h>
 #include "basic_bytestream.h"
+#include "DependencyResolver.h"
 
 namespace Stormancer
 {
@@ -10,29 +11,6 @@ namespace Stormancer
 	class IConnection
 	{
 	public:
-		template<typename T>
-		void registerComponent(T* component)
-		{
-			_components[typeid(T).hash_code()] = static_cast<void*>(component);
-		}
-
-		template<typename T>
-		bool getComponent(T* component = nullptr)
-		{
-			size_t hash_code = typeid(T).hash_code();
-			if (mapContains(_components, hash_code))
-			{
-				if (component != nullptr)
-				{
-					component = static_cast<T*>(_components[hash_code]);
-				}
-				return true;
-			}
-
-			component = nullptr;
-			return false;
-		}
-
 		/// Sends a system request to the remote peer.
 		/// \param msgId The id of the system message.
 		/// \param writer The function to write in the stream.
@@ -74,6 +52,8 @@ namespace Stormancer
 		/// Returns the connection state.
 		virtual ConnectionState state();
 
+		virtual DependencyResolver* dependencyResolver() = 0;
+
 	public:
 		
 		/// Metadata of the connection.
@@ -87,6 +67,5 @@ namespace Stormancer
 		int64 _id;
 		ConnectionState _state = ConnectionState::connecting;
 		time_t _connectionDate = nowTime_t();
-		std::map<size_t, void*> _components;
 	};
 };
