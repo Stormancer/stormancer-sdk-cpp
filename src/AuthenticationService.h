@@ -10,12 +10,13 @@ namespace Stormancer
 		LoginResult(Stormancer::bytestream* stream);
 
 	public:
-		std::string ErrorMsg;
-		bool Success = false;
-		std::string Token;
+		std::string errorMsg;
+		bool success;
+		std::string token;
+		std::string userId;
 
 	public:
-		MSGPACK_DEFINE(ErrorMsg, Success, Token);
+		MSGPACK_DEFINE(errorMsg, success, token, userId);
 	};
 
 	class AuthenticationService : public IAuthenticationService
@@ -35,11 +36,14 @@ namespace Stormancer
 
 		pplx::task<Result<Scene*>*> login(const char* pseudo, const char* password);
 		pplx::task<Result<Scene*>*> login(const stringMap* authenticationContext);
+
 		pplx::task<Result<Scene*>*> steamLogin(const char* steamTicket);
 
 		pplx::task<Scene*> getAuthenticationScene();
 
 		pplx::task<Result<>*> logout();
+
+		const char* userId();
 
 	private:
 		std::string _authenticationSceneName = "authenticator";
@@ -48,6 +52,7 @@ namespace Stormancer
 		bool _authenticated = false;
 		bool _authenticationInProgress = false;
 		bool _authenticationSceneRetrieving = false;
+		std::string _userId;
 
 		Client* _client = nullptr;
 		pplx::task<Scene*> _authenticationScene;

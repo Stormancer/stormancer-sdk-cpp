@@ -14,16 +14,6 @@ namespace Stormancer
 		auto a = pplx::create_task(tce);
 	}
 
-	stringMap processToDll(const stringMap* map)
-	{
-		stringMap map2;
-		for (auto it : *map)
-		{
-			map2[it.first.c_str()] = it.second.c_str();
-		}
-		return map2;
-	}
-
 
 
 	AuthenticationService::AuthenticationService(Client* client)
@@ -83,7 +73,7 @@ namespace Stormancer
 		auto result = new Result<Scene*>();
 		try
 		{
-			auto authContext = processToDll(authenticationContext);
+			auto authContext = copyHeapSafe(authenticationContext);
 
 			if (_authenticated)
 			{
@@ -100,7 +90,8 @@ namespace Stormancer
 					}, PacketPriority::MEDIUM_PRIORITY);
 					auto onNext = [this, tce, result](Stormancer::Packetisp_ptr packet) {
 						LoginResult loginResult(packet->stream);
-						_client->getScene(loginResult.Token.c_str()).then([tce, result](Result<Scene*>* result2) {
+						_userId = loginResult.userId;
+						_client->getScene(loginResult.token.c_str()).then([tce, result](Result<Scene*>* result2) {
 							*result = *result2;
 							tce.set(result);
 							destroy(result2);
@@ -208,5 +199,10 @@ namespace Stormancer
 			tce.set(result);
 		}
 		return pplx::create_task(tce);
+	}
+
+	const char* AuthenticationService::userId()
+	{
+		return _userId.c_str();
 	}
 };

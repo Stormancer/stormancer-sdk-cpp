@@ -5,6 +5,8 @@
 
 namespace Stormancer
 {
+	STORMANCER_DLL_API stringMap copyHeapSafe(const stringMap* map);
+
 	class ResultBase
 	{
 	public:

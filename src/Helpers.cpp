@@ -2,6 +2,16 @@
 
 namespace Stormancer
 {
+	stringMap copyHeapSafe(const stringMap* map)
+	{
+		stringMap map2;
+		for (auto it : *map)
+		{
+			map2[it.first.c_str()] = it.second.c_str();
+		}
+		return map2;
+	}
+
 	ResultBase::~ResultBase()
 	{
 	}

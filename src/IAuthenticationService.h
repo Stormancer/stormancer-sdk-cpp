@@ -17,10 +17,13 @@ namespace Stormancer
 
 		virtual pplx::task<Result<Scene*>*> login(const char* pseudo, const char* password) = 0;
 		virtual pplx::task<Result<Scene*>*> login(const stringMap* authenticationContext) = 0;
+
 		virtual pplx::task<Result<Scene*>*> steamLogin(const char* steamTicket) = 0;
 
 		virtual pplx::task<Scene*> getAuthenticationScene() = 0;
 
 		virtual pplx::task<Result<>*> logout() = 0;
+
+		virtual const char* userId() = 0;
 	};
 };
