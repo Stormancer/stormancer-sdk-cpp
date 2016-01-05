@@ -5,8 +5,8 @@ using namespace Stormancer;
 using namespace std;
 
 auto logger = (ConsoleLogger*)ILogger::instance(new ConsoleLogger(Stormancer::LogLevel::Trace));
-const char* accountId = "ee59dae9-332d-519d-070e-f9353ae7bbce";
-const char* applicationName = "battlefeet-gothic";
+const char* accountId = "...";
+const char* applicationName = "tester";
 Configuration* config = nullptr;
 Client* client = nullptr;
 Scene* sceneMain = nullptr;
@@ -34,6 +34,24 @@ void rpc()
 
 int main()
 {
+	{
+		int mb1 = 127;
+		int mb3 = 127 * 127;
+		std::stringstream ss;
+		msgpack::pack(ss, mb1);
+		msgpack::pack(ss, mb3);
+		std::string str = ss.str();
+		msgpack::unpacked ret;
+		std::size_t off = msgpack::unpack(ret, str.data(), str.size());
+		int mb2;
+		ret.get().convert(&mb2);
+		std::cout << mb2 << endl;
+		std::size_t off2 = msgpack::unpack(ret, str.data() + off, str.size() - off);
+		int mb4;
+		ret.get().convert(&mb4);
+		std::cout << mb4 << endl;
+	}
+
 	//{
 	//	Stormancer::MsgPackMaybe<int> mb1;
 	//	mb1 = new int(127);
@@ -56,41 +74,41 @@ int main()
 	//	}
 	//}
 
-	{
-		logger->log(LogLevel::Debug, "test_connect", "Create client", "");
-		config = Configuration::forAccount(accountId, applicationName);
-		config->synchronisedClock = false;
-		client = Client::createClient(config);
-		logger->log(LogLevel::Info, "test_connect", "Create client OK", "");
+	//{
+	//	logger->log(LogLevel::Debug, "test_connect", "Create client", "");
+	//	config = Configuration::forAccount(accountId, applicationName);
+	//	config->synchronisedClock = false;
+	//	client = Client::createClient(config);
+	//	logger->log(LogLevel::Info, "test_connect", "Create client OK", "");
 
-		auto authService = client->dependencyResolver()->resolve<IAuthenticationService>();
-		authService->steamLogin("SteamTicket").then([authService](Result<Scene*>* result) {
-			logger->log(LogLevel::Info, "test_steam", "Steam authentication OK", "");
-			if (result->success())
-			{
-				sceneMain = result->get();
-				sceneMain->connect().then([](Result<>* result2) {
-					if (result2->success())
-					{
-						logger->log(LogLevel::Info, "test_connect", "Connect OK", "");
+	//	auto authService = client->dependencyResolver()->resolve<IAuthenticationService>();
+	//	authService->steamLogin("SteamTicket").then([authService](Result<Scene*>* result) {
+	//		logger->log(LogLevel::Info, "test_steam", "Steam authentication OK", "");
+	//		if (result->success())
+	//		{
+	//			sceneMain = result->get();
+	//			sceneMain->connect().then([](Result<>* result2) {
+	//				if (result2->success())
+	//				{
+	//					logger->log(LogLevel::Info, "test_connect", "Connect OK", "");
 
-						rpcService = sceneMain->dependencyResolver()->resolve<IRpcService>();
-						rpc();
-					}
-					else
-					{
-						logger->log(LogLevel::Error, "test_connect", "Failed to connect to the scene", result2->reason());
-					}
-					destroy(result2);
-				});
-			}
-			else
-			{
-				logger->log(LogLevel::Error, "test_steam", "Failed to logout", result->reason());
-			}
-			destroy(result);
-		});
-	}
+	//					rpcService = sceneMain->dependencyResolver()->resolve<IRpcService>();
+	//					rpc();
+	//				}
+	//				else
+	//				{
+	//					logger->log(LogLevel::Error, "test_connect", "Failed to connect to the scene", result2->reason());
+	//				}
+	//				destroy(result2);
+	//			});
+	//		}
+	//		else
+	//		{
+	//			logger->log(LogLevel::Error, "test_steam", "Failed to logout", result->reason());
+	//		}
+	//		destroy(result);
+	//	});
+	//}
 
 	std::cin.ignore();
 

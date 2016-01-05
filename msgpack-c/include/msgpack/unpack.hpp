@@ -1130,20 +1130,20 @@ unpacked unpack(
     unpack_limit const& limit = unpack_limit());
 
 
-void unpack(unpacked& result,
+std::size_t unpack(unpacked& result,
             const char* data, std::size_t len, std::size_t& off, bool& referenced,
             unpack_reference_func f = nullptr, void* user_data = nullptr,
             unpack_limit const& limit = unpack_limit());
-void unpack(unpacked& result,
+std::size_t unpack(unpacked& result,
             const char* data, std::size_t len, std::size_t& off,
             unpack_reference_func f = nullptr, void* user_data = nullptr,
             unpack_limit const& limit = unpack_limit());
-void unpack(unpacked& result,
+std::size_t unpack(unpacked& result,
             const char* data, std::size_t len, bool& referenced,
             unpack_reference_func f = nullptr, void* user_data = nullptr,
             unpack_limit const& limit = unpack_limit());
 
-void unpack(unpacked& result,
+std::size_t unpack(unpacked& result,
             const char* data, std::size_t len,
             unpack_reference_func f = nullptr, void* user_data = nullptr,
             unpack_limit const& limit = unpack_limit());
@@ -1571,7 +1571,7 @@ inline unpacked unpack(
     return unpack(data, len, off, referenced, f, user_data, limit);
 }
 
-inline void unpack(unpacked& result,
+inline std::size_t unpack(unpacked& result,
                    const char* data, std::size_t len, std::size_t& off, bool& referenced,
                    unpack_reference_func f, void* user_data, unpack_limit const& limit)
 {
@@ -1587,12 +1587,12 @@ inline void unpack(unpacked& result,
         off = noff;
         result.set(obj);
         result.zone() = msgpack::move(z);
-        return;
+        return off;
     case UNPACK_EXTRA_BYTES:
         off = noff;
         result.set(obj);
         result.zone() = msgpack::move(z);
-        return;
+        return off;
     case UNPACK_CONTINUE:
         throw msgpack::insufficient_bytes("insufficient bytes");
     case UNPACK_PARSE_ERROR:
@@ -1601,29 +1601,32 @@ inline void unpack(unpacked& result,
     }
 }
 
-inline void unpack(unpacked& result,
+inline std::size_t unpack(unpacked& result,
                    const char* data, std::size_t len, std::size_t& off,
                    unpack_reference_func f, void* user_data, unpack_limit const& limit)
 {
     bool referenced;
     unpack(result, data, len, off, referenced, f, user_data, limit);
+	return off;
 }
 
-inline void unpack(unpacked& result,
+inline std::size_t unpack(unpacked& result,
                    const char* data, std::size_t len, bool& referenced,
                    unpack_reference_func f, void* user_data, unpack_limit const& limit)
 {
     std::size_t off = 0;
     unpack(result, data, len, off, referenced, f, user_data, limit);
+	return off;
 }
 
-inline void unpack(unpacked& result,
+inline std::size_t unpack(unpacked& result,
                    const char* data, std::size_t len,
                    unpack_reference_func f, void* user_data, unpack_limit const& limit)
 {
     bool referenced;
     std::size_t off = 0;
     unpack(result, data, len, off, referenced, f, user_data, limit);
+	return off;
 }
 
 
