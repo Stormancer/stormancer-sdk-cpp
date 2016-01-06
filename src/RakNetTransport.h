@@ -4,6 +4,7 @@
 #include "ILogger.h"
 #include "RaknetConnection.h"
 #include <RakPeerInterface.h>
+#include "DependencyResolver.h"
 
 namespace Stormancer
 {
@@ -11,7 +12,7 @@ namespace Stormancer
 	class RakNetTransport : public ITransport
 	{
 	public:
-		RakNetTransport(ILogger* logger, IScheduler* scheduler);
+		RakNetTransport(DependencyResolver* resolver);
 		virtual ~RakNetTransport();
 
 	public:
@@ -30,8 +31,16 @@ namespace Stormancer
 		RakNetConnection* createNewConnection(RakNet::RakNetGUID raknetGuid, RakNet::RakPeerInterface* peer);
 		RakNetConnection* removeConnection(RakNet::RakNetGUID guid);
 		void onRequestClose(RakNetConnection* c);
+		bool isRunning() const;
+		std::string name() const;
+		uint64 id() const;
+		DependencyResolver* dependencyResolver() const;
+		void onPacketReceived(std::function<void(Packet_ptr)> callback);
+		const char* host() const;
+		uint16 port() const;
 
 	private:
+		DependencyResolver* _dependencyResolver = nullptr;
 		IConnectionManager* _handler = nullptr;
 		RakNet::RakPeerInterface* _peer = nullptr;
 		ILogger* _logger = nullptr;
@@ -43,5 +52,13 @@ namespace Stormancer
 		ISubscription* _scheduledTransportLoop;
 		RakNet::SocketDescriptor* _socketDescriptor = nullptr;
 		std::mutex _mutex;
+		bool _isRunning = false;
+		std::string _name;
+		uint64 _id = 0;
+		Action<Packet_ptr> _onPacketReceived;
+		Action<IConnection*> _connectionOpened;
+		Action<IConnection*> _connectionClosed;
+		std::string _host;
+		uint16 _port = 0;
 	};
 };

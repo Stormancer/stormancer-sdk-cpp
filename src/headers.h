@@ -53,6 +53,7 @@
 #include <BitStream.h>
 #include <RakNetTypes.h>
 #include <DS_Map.h>
+#include <NatPunchthroughClient.h>
 
 // packed libs
 #include <msgpack.hpp>

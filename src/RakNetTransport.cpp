@@ -8,11 +8,13 @@
 
 namespace Stormancer
 {
-	RakNetTransport::RakNetTransport(ILogger* logger, IScheduler* scheduler)
-		: _logger(logger),
-		_scheduler(scheduler)
+	RakNetTransport::RakNetTransport(DependencyResolver* resolver)
+		: _isRunning(false),
+		_dependencyResolver(resolver),
+		_logger(resolver->resolve<ILogger>()),
+		_scheduler(resolver->resolve<IScheduler>()),
+		_name("raknet")
 	{
-		ITransport::_name = "raknet";
 	}
 
 	RakNetTransport::~RakNetTransport()
@@ -53,6 +55,7 @@ namespace Stormancer
 			_isRunning = true;
 			_logger->log(LogLevel::Trace, "RakNetTransport::initialize", "Starting raknet transport", _type.c_str());
 			_peer = RakNet::RakPeerInterface::GetInstance();
+			_dependencyResolver->registerDependency(_peer);
 			_socketDescriptor = (serverPort != 0 ? new RakNet::SocketDescriptor(serverPort, nullptr) : new RakNet::SocketDescriptor());
 			auto startupResult = _peer->Startup(maxConnections, _socketDescriptor, 1);
 			if (startupResult != RakNet::StartupResult::RAKNET_STARTED)
@@ -212,10 +215,10 @@ namespace Stormancer
 			throw std::invalid_argument("Bad scene endpoint (" + endpoint + ')');
 		}
 
-		auto host = m.str(1);
-		auto hostCstr = host.c_str();
-		uint16 port = (uint16)std::atoi(m.str(4).c_str());
-		if (port == 0)
+		_host = m.str(1);
+		auto hostCstr = _host.c_str();
+		_port = (uint16)std::atoi(m.str(4).c_str());
+		if (_port == 0)
 		{
 			throw std::runtime_error("Scene endpoint port should not be 0 (" + endpoint + ')');
 		}
@@ -229,14 +232,14 @@ namespace Stormancer
 		}
 
 		_mutex.lock();
-		auto result = _peer->Connect(hostCstr, port, nullptr, 0);
+		auto result = _peer->Connect(hostCstr, _port, nullptr, 0);
 		_mutex.unlock();
 		if (result != RakNet::ConnectionAttemptResult::CONNECTION_ATTEMPT_STARTED)
 		{
 			throw std::runtime_error(std::string("Bad RakNet connection attempt result (") + std::to_string(result) + ')');
 		}
 
-		std::string addressStr = RakNet::SystemAddress(hostCstr, port).ToString(true, ':');
+		std::string addressStr = RakNet::SystemAddress(hostCstr, _port).ToString(true, ':');
 		auto tce = pplx::task_completion_event<IConnection*>();
 		_pendingConnections[addressStr] = tce;
 		return pplx::task<IConnection*>(tce);
@@ -252,7 +255,7 @@ namespace Stormancer
 
 		_handler->newConnection(c);
 
-		connectionOpened(dynamic_cast<IConnection*>(c));
+		_connectionOpened(dynamic_cast<IConnection*>(c));
 
 		c->sendSystem((byte)MessageIDTypes::ID_CONNECTION_RESULT, [c](bytestream* stream) {
 			int64 sid = c->id();
@@ -272,7 +275,7 @@ namespace Stormancer
 
 		_handler->closeConnection(c, reason);
 
-		connectionClosed(dynamic_cast<IConnection*>(c));
+		_connectionClosed(dynamic_cast<IConnection*>(c));
 
 		c->connectionClosed(reason);
 
@@ -304,7 +307,7 @@ namespace Stormancer
 			}
 		});
 
-		packetReceived(packet);
+		_onPacketReceived(packet);
 	}
 
 	RakNetConnection* RakNetTransport::getConnection(RakNet::RakNetGUID guid)
@@ -333,5 +336,40 @@ namespace Stormancer
 	void RakNetTransport::onRequestClose(RakNetConnection* c)
 	{
 		_peer->CloseConnection(c->guid(), true);
+	}
+
+	bool RakNetTransport::isRunning() const
+	{
+		return _isRunning;
+	}
+
+	std::string RakNetTransport::name() const
+	{
+		return _name;
+	}
+
+	uint64 RakNetTransport::id() const
+	{
+		return _id;
+	}
+
+	DependencyResolver* RakNetTransport::dependencyResolver() const
+	{
+		return _dependencyResolver;
+	}
+
+	void RakNetTransport::onPacketReceived(std::function<void(Packet_ptr)> callback)
+	{
+		_onPacketReceived += callback;
+	}
+
+	const char* RakNetTransport::host() const
+	{
+		return _host.c_str();
+	}
+
+	uint16 RakNetTransport::port() const
+	{
+		return _port;
 	}
 };

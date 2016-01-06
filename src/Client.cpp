@@ -136,9 +136,7 @@ namespace Stormancer
 		if (!_initialized)
 		{
 			_initialized = true;
-			_transport->packetReceived += [this](Packet_ptr packet) {
-				this->transport_packetReceived(packet);
-			};
+			_transport->onPacketReceived([this](Packet_ptr packet) { transport_packetReceived(packet); });
 			_watch.reset();
 		}
 	}
@@ -252,6 +250,10 @@ namespace Stormancer
 						try
 						{
 							_transport->start("client", new ConnectionHandler(), _cts.get_token(), 0, (uint16)(_maxPeers + 1));
+							for (auto plugin : _plugins)
+							{
+								plugin->transportStarted(_transport);
+							}
 						}
 						catch (const std::exception& e)
 						{

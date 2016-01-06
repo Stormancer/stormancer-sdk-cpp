@@ -15,6 +15,9 @@ namespace Stormancer
 		/// Event fired when a client object is created.
 		STORMANCER_DLL_API virtual void clientCreated(Client* client);
 
+		/// Event fired when a the transport is started
+		STORMANCER_DLL_API virtual void transportStarted(ITransport* transport);
+
 		/// Event fired when a scene object is created.
 		STORMANCER_DLL_API virtual void sceneCreated(Scene* scene);
 
@@ -30,7 +33,7 @@ namespace Stormancer
 		/// Event fired when a packet is received from a remote peer.
 		STORMANCER_DLL_API virtual void packetReceived(Packet_ptr packet);
 
-		/// Event fired when a packet is received from a remote peer.
+		/// Destroy the plugin.
 		STORMANCER_DLL_API virtual void destroy() = 0;
 	};
 };

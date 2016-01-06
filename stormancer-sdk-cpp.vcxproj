@@ -192,7 +192,6 @@
     <ClCompile Include="src\IConnection.cpp" />
     <ClCompile Include="src\ILogger.cpp" />
     <ClCompile Include="src\IPlugin.cpp" />
-    <ClCompile Include="src\ITransport.cpp" />
     <ClCompile Include="src\NullLogger.cpp" />
     <ClCompile Include="src\PacketProcessorConfig.cpp" />
     <ClCompile Include="src\RakNetConnection.cpp" />

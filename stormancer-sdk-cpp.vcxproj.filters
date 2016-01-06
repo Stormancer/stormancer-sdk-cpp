@@ -87,9 +87,6 @@
     <ClCompile Include="src\ILogger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ITransport.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\NullLogger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

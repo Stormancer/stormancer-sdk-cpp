@@ -10,6 +10,10 @@ namespace Stormancer
 	{
 	}
 
+	void IPlugin::transportStarted(ITransport* transport)
+	{
+	}
+
 	void IPlugin::sceneCreated(Scene* scene)
 	{
 	}

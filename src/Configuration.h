@@ -83,7 +83,7 @@ namespace Stormancer
 	private:
 		const std::function<ITransport*(DependencyResolver*)> defaultTransportFactory = [](DependencyResolver* resolver)
 		{
-			return new RakNetTransport(resolver->resolve<ILogger>(), resolver->resolve<IScheduler>());
+			return new RakNetTransport(resolver);
 		};
 
 		stringMap _metadata;
