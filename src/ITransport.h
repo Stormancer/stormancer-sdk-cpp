@@ -20,5 +20,6 @@ namespace Stormancer
 		virtual void onPacketReceived(std::function<void(Packet_ptr)> callback) = 0;
 		virtual const char* host() const = 0;
 		virtual uint16 port() const = 0;
+		virtual void onTransportEvent(std::function<void(void*, void*, void*)> callback) = 0;
 	};
 };

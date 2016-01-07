@@ -5,8 +5,9 @@ using namespace Stormancer;
 using namespace std;
 
 auto logger = (ConsoleLogger*)ILogger::instance(new ConsoleLogger(Stormancer::LogLevel::Trace));
-const char* accountId = "...";
+const char* accountId = "997bc6ac-9021-2ad6-139b-da63edee8c58";
 const char* applicationName = "tester";
+const char* sceneName = "main";
 Configuration* config = nullptr;
 Client* client = nullptr;
 Scene* sceneMain = nullptr;
@@ -14,101 +15,69 @@ IRpcService* rpcService = nullptr;
 
 void rpc()
 {
-	static unsigned int i = 1;
-	auto istr = std::to_string(++i);
+	ISubscription* sub = nullptr;
 
-	logger->log(Stormancer::LogLevel::Info, "rpc", "start rpc...", istr.c_str());
-	auto obs = rpcService->rpc("profiles.getall", [](bytestream* stream) {}, PacketPriority::MEDIUM_PRIORITY);
-	auto onNext = [istr](Packetisp_ptr packet) {
-		logger->log(Stormancer::LogLevel::Info, "rpc", "observable next", istr.c_str());
+	logger->log(Stormancer::LogLevel::Info, "rpc", "start rpc...", "");
+	auto obs = rpcService->rpc("rpc", [](bytestream* stream) {}, PacketPriority::MEDIUM_PRIORITY);
+
+	auto onNext = [&sub](Packetisp_ptr packet) {
+		logger->log(Stormancer::LogLevel::Info, "rpc", "observable next", "");
 		rpc();
+		sub->destroy();
 	};
-	auto onComplete = [istr]() {
-		logger->log(Stormancer::LogLevel::Trace, "rpc", "observable complete", istr.c_str());
+
+	auto onComplete = []() {
+		logger->log(Stormancer::LogLevel::Trace, "rpc", "observable complete", "");
 	};
-	auto onError = [istr](const char* error) {
+
+	auto onError = [](const char* error) {
 		logger->log(Stormancer::LogLevel::Error, "rpc", "observable error", error);
 	};
-	auto sub = obs->subscribe(onNext, onError, onComplete);
+
+	sub = obs->subscribe(onNext, onError, onComplete);
 }
 
 int main()
 {
 	{
-		int mb1 = 127;
-		int mb3 = 127 * 127;
-		std::stringstream ss;
-		msgpack::pack(ss, mb1);
-		msgpack::pack(ss, mb3);
-		std::string str = ss.str();
-		msgpack::unpacked ret;
-		std::size_t off = msgpack::unpack(ret, str.data(), str.size());
-		int mb2;
-		ret.get().convert(&mb2);
-		std::cout << mb2 << endl;
-		std::size_t off2 = msgpack::unpack(ret, str.data() + off, str.size() - off);
-		int mb4;
-		ret.get().convert(&mb4);
-		std::cout << mb4 << endl;
+		logger->log(LogLevel::Debug, "main", "Create client", "");
+		config = Configuration::forAccount(accountId, applicationName);
+		config->synchronisedClock = false;
+		client = Client::createClient(config);
+		logger->log(LogLevel::Info, "main", "Create client OK", "");
+
+		client->getPublicScene(sceneName).then([](Result<Scene*>* result) {
+			if (result->success())
+			{
+				sceneMain = result->get();
+
+				sceneMain->onConnectionStateChanged([](ConnectionState connectionState) {
+					auto stateStr = std::to_string((int)connectionState);
+					logger->log(LogLevel::Info, "main", "SCENE MAIN CONNECTION STATE CHANGED", stateStr.c_str());
+				});
+
+				sceneMain->connect().then([](Result<>* result2) {
+					if (result2->success())
+					{
+						logger->log(LogLevel::Info, "main", "Connect OK", "");
+
+						rpcService = sceneMain->dependencyResolver()->resolve<IRpcService>();
+						rpc();
+					}
+					else
+					{
+						logger->log(LogLevel::Error, "main", "Failed to connect to the scene", result2->reason());
+					}
+					destroy(result2);
+				});
+			}
+			else
+			{
+				logger->log(LogLevel::Error, "main", "Failed to get the scene", result->reason());
+			}
+			destroy(result);
+		});
 	}
-
-	//{
-	//	Stormancer::MsgPackMaybe<int> mb1;
-	//	mb1 = new int(127);
-	//	std::stringstream ss;
-	//	msgpack::pack(ss, mb1);
-	//	std::string str = ss.str();
-	//	msgpack::unpacked ret;
-	//	msgpack::unpack(ret, str.data(), str.size());
-	//	Stormancer::MsgPackMaybe<int> mb2;
-	//	ret.get().convert(&mb2);
-	//	auto b1 = mb2.hasValue();
-	//	if (b1)
-	//	{
-	//		auto i1 = mb2.get();
-	//		std::cout << *i1;
-	//	}
-	//	else
-	//	{
-	//		std::cout << "nil";
-	//	}
-	//}
-
-	//{
-	//	logger->log(LogLevel::Debug, "test_connect", "Create client", "");
-	//	config = Configuration::forAccount(accountId, applicationName);
-	//	config->synchronisedClock = false;
-	//	client = Client::createClient(config);
-	//	logger->log(LogLevel::Info, "test_connect", "Create client OK", "");
-
-	//	auto authService = client->dependencyResolver()->resolve<IAuthenticationService>();
-	//	authService->steamLogin("SteamTicket").then([authService](Result<Scene*>* result) {
-	//		logger->log(LogLevel::Info, "test_steam", "Steam authentication OK", "");
-	//		if (result->success())
-	//		{
-	//			sceneMain = result->get();
-	//			sceneMain->connect().then([](Result<>* result2) {
-	//				if (result2->success())
-	//				{
-	//					logger->log(LogLevel::Info, "test_connect", "Connect OK", "");
-
-	//					rpcService = sceneMain->dependencyResolver()->resolve<IRpcService>();
-	//					rpc();
-	//				}
-	//				else
-	//				{
-	//					logger->log(LogLevel::Error, "test_connect", "Failed to connect to the scene", result2->reason());
-	//				}
-	//				destroy(result2);
-	//			});
-	//		}
-	//		else
-	//		{
-	//			logger->log(LogLevel::Error, "test_steam", "Failed to logout", result->reason());
-	//		}
-	//		destroy(result);
-	//	});
-	//}
 
 	std::cin.ignore();
 

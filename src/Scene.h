@@ -62,8 +62,10 @@ namespace Stormancer
 		/// \param reliability Message reliability behavior.
 		STORMANCER_DLL_API Result<>* sendPacket(const char* routeName, std::function<void(bytestream*)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE);
 
-		/// Returns the connected state to the the scene.
-		STORMANCER_DLL_API bool connected();
+		/// Returns the connection state to the the scene.
+		STORMANCER_DLL_API ConnectionState connectionState();
+
+		STORMANCER_DLL_API void onConnectionStateChanged(std::function<void(ConnectionState)> callback);
 
 		/// Returns the scene id.
 		STORMANCER_DLL_API const char* id();
@@ -120,7 +122,7 @@ namespace Stormancer
 	private:
 
 		/// Scene connected state.
-		bool _connected = false;
+		ConnectionState _connectionState = ConnectionState::Disconnected;
 
 		/// Scene peer connection.
 		IConnection* _peer;
@@ -150,7 +152,7 @@ namespace Stormancer
 		Client* _client;
 
 		/// RX subscriptions for disconnection.
-		std::vector<ISubscription*> subscriptions;
+		std::vector<ISubscription*> _subscriptions;
 
 		/// Scene peer connection
 		IScenePeer* _host = nullptr;
@@ -171,5 +173,7 @@ namespace Stormancer
 		std::function<void()> _onDelete;
 
 		DependencyResolver* _dependencyResolver = nullptr;
+
+		std::function<void(ConnectionState)> _onConnectionStateChanged;
 	};
 };

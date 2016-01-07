@@ -189,7 +189,6 @@
     <ClCompile Include="src\EmptyDto.cpp" />
     <ClCompile Include="src\FileLogger.cpp" />
     <ClCompile Include="src\Helpers.cpp" />
-    <ClCompile Include="src\IConnection.cpp" />
     <ClCompile Include="src\ILogger.cpp" />
     <ClCompile Include="src\IPlugin.cpp" />
     <ClCompile Include="src\NullLogger.cpp" />

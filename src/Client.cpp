@@ -137,6 +137,12 @@ namespace Stormancer
 		{
 			_initialized = true;
 			_transport->onPacketReceived([this](Packet_ptr packet) { transport_packetReceived(packet); });
+			_transport->onTransportEvent([this](void* data, void* data2, void* data3) {
+				for (auto plugin : _plugins)
+				{
+					plugin->transportEvent(data, data2, data3);
+				}
+			});
 			_watch.reset();
 		}
 	}
@@ -274,7 +280,7 @@ namespace Stormancer
 								_logger->log(LogLevel::Trace, "Client::getScene", "Client::transport connected", "");
 #endif
 								_serverConnection = connection;
-								_serverConnection->metadata = _metadata;
+								_serverConnection->setMetadata(_metadata);
 							}
 							catch (const std::exception& e)
 							{
@@ -319,7 +325,7 @@ namespace Stormancer
 
 		return _connectionTask.then([this, sep](){
 			SceneInfosRequestDto parameter;
-			parameter.Metadata = _serverConnection->metadata;
+			parameter.Metadata = _serverConnection->metadata();
 			parameter.Token = sep.token;
 #ifdef STORMANCER_LOG_CLIENT
 			_logger->log(LogLevel::Trace, "Client::getScene", "send SceneInfosRequestDto", "");
@@ -351,7 +357,7 @@ namespace Stormancer
 #ifdef STORMANCER_LOG_CLIENT
 			_logger->log(LogLevel::Trace, "Client::getScene", "SceneInfosDto received", ss.str().c_str());
 #endif
-			_serverConnection->metadata["serializer"] = result.SelectedSerializer;
+			_serverConnection->metadata()["serializer"] = result.SelectedSerializer;
 			return updateServerMetadata().then([this, sep, sceneId, result](pplx::task<void> t) {
 				try
 				{
@@ -395,7 +401,7 @@ namespace Stormancer
 		_logger->log(LogLevel::Trace, "Client::updateServerMetadata", "sending system request.", "");
 #endif
 		return _requestProcessor->sendSystemRequest(_serverConnection, (byte)SystemRequestIDTypes::ID_SET_METADATA, [this](bytestream* bs) {
-			msgpack::pack(bs, _serverConnection->metadata);
+			msgpack::pack(bs, _serverConnection->metadata());
 		}).then([](pplx::task<Packet_ptr> t) {
 			try
 			{
@@ -430,7 +436,7 @@ namespace Stormancer
 			routeDto.Name = r->name();
 			parameter.Routes << routeDto;
 		}
-		parameter.ConnectionMetadata = _serverConnection->metadata;
+		parameter.ConnectionMetadata = _serverConnection->metadata();
 
 		return Client::sendSystemRequest<ConnectToSceneMsg, ConnectionResult>((byte)SystemRequestIDTypes::ID_CONNECT_TO_SCENE, parameter).then([this, scene](pplx::task<ConnectionResult> t) {
 			try

@@ -38,6 +38,7 @@ namespace Stormancer
 		void onPacketReceived(std::function<void(Packet_ptr)> callback);
 		const char* host() const;
 		uint16 port() const;
+		void onTransportEvent(std::function<void(void*, void*, void*)> callback);
 
 	private:
 		DependencyResolver* _dependencyResolver = nullptr;
@@ -60,5 +61,6 @@ namespace Stormancer
 		Action<IConnection*> _connectionClosed;
 		std::string _host;
 		uint16 _port = 0;
+		std::function<void(void*, void*, void*)> _onTransportEvent;
 	};
 };

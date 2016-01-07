@@ -14,6 +14,10 @@ namespace Stormancer
 	{
 	}
 
+	void IPlugin::transportEvent(void* data, void* data2, void* data3)
+	{
+	}
+
 	void IPlugin::sceneCreated(Scene* scene)
 	{
 	}

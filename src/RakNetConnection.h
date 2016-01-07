@@ -10,45 +10,30 @@ namespace Stormancer
 	class RakNetConnection : public IConnection
 	{
 	public:
-	
-		/// Constructor.
 		RakNetConnection(RakNet::RakNetGUID guid, int64 id, RakNet::RakPeerInterface* peer, std::function<void(RakNetConnection*)> lambdaOnRequestClose);
-		
-		/// Destructor.
 		virtual ~RakNetConnection();
 
 	public:
-	
-		/// Returns the id of the connection.
+		int64 id();
+		time_t connectionDate();
+		std::string account();
+		std::string application();
+		ConnectionState state();
+		void setConnectionState(ConnectionState connectionState);
+		void onConnectionStateChanged(std::function<void(ConnectionState)> callback);
 		RakNet::RakNetGUID guid();
-		
-		/// Returns the last activity date.
 		time_t lastActivityDate();
-		
-		/// Returns the ip address of the connection.
 		std::string ipAddress();
-		
-		/// Comparison operator
 		bool operator==(RakNetConnection& other);
-		
-		/// Comparison operator (non)
 		bool operator!=(RakNetConnection& other);
-		
-		/// Returns the metadatas
-		stringMap metadata();
-
+		stringMap& metadata();
+		void setMetadata(stringMap& metadata);
 		DependencyResolver* dependencyResolver();
-		
 		void close();
-
 		void sendSystem(byte msgId, std::function<void(bytestream*)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY);
-
 		void sendRaw(std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability, char channel);
-
 		void sendToScene(byte sceneIndex, uint16 route, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability);
-
 		int ping();
-
 		void setApplication(std::string account, std::string application);
 
 		template<typename T>
@@ -75,14 +60,21 @@ namespace Stormancer
 		}
 
 	public:
+		std::function<void(std::string)> connectionClosed;
 		Action<RakNetConnection*> _closeAction;
 
 	private:
-		RakNet::RakPeerInterface* _rakPeer;
-		RakNet::RakNetGUID _guid;
 		stringMap _metadata;
-		time_t _lastActivityDate;
+		std::string _account;
+		std::string _application;
+		int64 _id = 0;
+		ConnectionState _state = ConnectionState::Disconnected;
+		time_t _connectionDate = nowTime_t();
+		RakNet::RakPeerInterface* _rakPeer = nullptr;
+		RakNet::RakNetGUID _guid;
+		time_t _lastActivityDate = nowTime_t();
 		std::map<size_t, void*> _localData;
 		DependencyResolver* _dependencyResolver = nullptr;
+		Action<ConnectionState> _onConnectionStateChanged;
 	};
 };

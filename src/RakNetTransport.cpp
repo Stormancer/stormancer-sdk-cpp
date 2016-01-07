@@ -92,7 +92,17 @@ namespace Stormancer
 
 				try
 				{
-					switch (rakNetPacket->data[0])
+					byte ID = rakNetPacket->data[0];
+
+					if (ID < (byte)DefaultMessageIDTypes::ID_USER_PACKET_ENUM)
+					{
+						if (_onTransportEvent)
+						{
+							_onTransportEvent((void*)&ID, (void*)rakNetPacket, (void*)_peer);
+						}
+					}
+
+					switch (ID)
 					{
 					case (byte)DefaultMessageIDTypes::ID_CONNECTION_REQUEST_ACCEPTED:
 					{
@@ -137,16 +147,21 @@ namespace Stormancer
 							auto tce = _pendingConnections[packetSystemAddressStr];
 							tce.set_exception<std::exception>(std::runtime_error("Connection attempt failed."));
 						}
+						_peer->DeallocatePacket(rakNetPacket);
 						break;
 					}
 					case (byte)DefaultMessageIDTypes::ID_ALREADY_CONNECTED:
+					{
 						_logger->log(LogLevel::Error, "RakNetTransport::run", "Peer already connected", rakNetPacket->systemAddress.ToString(true, ':'));
+						_peer->DeallocatePacket(rakNetPacket);
 						break;
+					}
 					case (byte)MessageIDTypes::ID_CONNECTION_RESULT:
 					{
 						int64 sid = *(int64*)(rakNetPacket->data + 1);
 						_logger->log(LogLevel::Trace, "RakNetTransport::run", "Connection ID received.", std::to_string(sid).c_str());
 						onConnectionIdReceived(sid);
+						_peer->DeallocatePacket(rakNetPacket);
 						break;
 					}
 					default:
@@ -232,7 +247,7 @@ namespace Stormancer
 		}
 
 		_mutex.lock();
-		auto result = _peer->Connect(hostCstr, _port, nullptr, 0);
+		auto result = _peer->Connect(hostCstr, _port, "", 0);
 		_mutex.unlock();
 		if (result != RakNet::ConnectionAttemptResult::CONNECTION_ATTEMPT_STARTED)
 		{
@@ -250,6 +265,8 @@ namespace Stormancer
 		_logger->log(LogLevel::Trace, "RakNetTransport::onConnection", (std::string(packet->systemAddress.ToString(true, ':')) + " connected.").c_str(), "");
 
 		auto c = createNewConnection(packet->guid, _peer);
+
+		c->setConnectionState(ConnectionState::Connected);
 
 		server->DeallocatePacket(packet);
 
@@ -371,5 +388,10 @@ namespace Stormancer
 	uint16 RakNetTransport::port() const
 	{
 		return _port;
+	}
+
+	void RakNetTransport::onTransportEvent(std::function<void(void*, void*, void*)> callback)
+	{
+		_onTransportEvent = callback;
 	}
 };

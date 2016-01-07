@@ -81,9 +81,6 @@
     <ClCompile Include="src\Helpers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\IConnection.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\ILogger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

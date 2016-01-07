@@ -5,9 +5,9 @@ namespace Stormancer
 	RakNetConnection::RakNetConnection(RakNet::RakNetGUID guid, int64 id, RakNet::RakPeerInterface* peer, std::function<void(RakNetConnection*)> lambdaOnRequestClose)
 		: _lastActivityDate(nowTime_t()),
 		_guid(guid),
-		_rakPeer(peer)
+		_rakPeer(peer),
+		_id(id)
 	{
-		IConnection::_id = id;
 		_closeAction += lambdaOnRequestClose;
 	}
 
@@ -32,17 +32,22 @@ namespace Stormancer
 
 	bool RakNetConnection::operator==(RakNetConnection& other)
 	{
-		return (this->_id == other._id);
+		return (_id == other._id);
 	}
 
 	bool RakNetConnection::operator!=(RakNetConnection& other)
 	{
-		return (this->_id != other._id);
+		return (_id != other._id);
 	}
 
-	stringMap RakNetConnection::metadata()
+	stringMap& RakNetConnection::metadata()
 	{
 		return _metadata;
+	}
+
+	void RakNetConnection::setMetadata(stringMap& metadata)
+	{
+		_metadata = metadata;
 	}
 
 	DependencyResolver* RakNetConnection::dependencyResolver()
@@ -114,5 +119,41 @@ namespace Stormancer
 			this->_account = account;
 			this->_application = application;
 		}
+	}
+
+	int64 RakNetConnection::id()
+	{
+		return _id;
+	}
+
+	time_t RakNetConnection::connectionDate()
+	{
+		return _connectionDate;
+	}
+
+	std::string RakNetConnection::account()
+	{
+		return _account;
+	}
+
+	std::string RakNetConnection::application()
+	{
+		return _application;
+	}
+
+	ConnectionState RakNetConnection::state()
+	{
+		return _state;
+	}
+
+	void RakNetConnection::setConnectionState(ConnectionState connectionState)
+	{
+		_state = connectionState;
+		_onConnectionStateChanged(_state);
+	}
+
+	void RakNetConnection::onConnectionStateChanged(std::function<void(ConnectionState)> callback)
+	{
+		_onConnectionStateChanged += callback;
 	}
 };

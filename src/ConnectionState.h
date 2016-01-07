@@ -7,12 +7,14 @@ namespace Stormancer
 	enum class ConnectionState
 	{
 		/// disconnected.
-		disconnected,
+		Disconnected,
 		
 		/// Connecting.
-		connecting,
+		Connecting,
 		
 		/// Connected.
-		connected
+		Connected,
+
+		Disconnecting
 	};
 };
