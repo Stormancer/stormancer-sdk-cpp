@@ -48,18 +48,16 @@ namespace Stormancer
 		
 		/// Returns the id of the application to which this connection is connected.
 		virtual std::string application() = 0;
-		
-		/// Returns the connection state.
-		virtual ConnectionState state() = 0;
-
-		virtual DependencyResolver* dependencyResolver() = 0;
-
-		virtual void setConnectionState(ConnectionState connectionState) = 0;
-
-		virtual void onConnectionStateChanged(std::function<void(ConnectionState)> callback) = 0;
 
 		virtual stringMap& metadata() = 0;
-
 		virtual void setMetadata(stringMap& metadata) = 0;
+		
+		virtual DependencyResolver* dependencyResolver() = 0;
+
+		/// Returns the connection state.
+		virtual ConnectionState connectionState() = 0;
+		virtual void setConnectionState(ConnectionState connectionState) = 0;
+		virtual Action<ConnectionState>& connectionStateChangedAction() = 0;
+		virtual Action<ConnectionState>::TIterator onConnectionStateChanged(std::function<void(ConnectionState)> callback) = 0;
 	};
 };

@@ -16,10 +16,10 @@ namespace Stormancer
 			_remoteRoutesMap[routeDto.Name] = Route_ptr(new Route(this, routeDto.Name, routeDto.Handle, routeDto.Metadata));
 		}
 
-		_peer->onConnectionStateChanged([this](ConnectionState connectionState) {
-			_connectionState = connectionState;
-			if (_onConnectionStateChanged)
+		_peerConnectionStateEraseIterator = _peer->onConnectionStateChanged([this](ConnectionState connectionState) {
+			if (connectionState == ConnectionState::Disconnected)
 			{
+				_connectionState = connectionState;
 				_onConnectionStateChanged(connectionState);
 			}
 		});
@@ -27,6 +27,8 @@ namespace Stormancer
 
 	Scene::~Scene()
 	{
+		_peer->connectionStateChangedAction().erase(_peerConnectionStateEraseIterator);
+
 		_onDelete();
 
 		disconnect();
@@ -64,9 +66,14 @@ namespace Stormancer
 		return _connectionState;
 	}
 
-	void Scene::onConnectionStateChanged(std::function<void(ConnectionState)> callback)
+	Action<ConnectionState>& Scene::connectionStateChangedAction()
 	{
-		_onConnectionStateChanged = callback;
+		return _onConnectionStateChanged;
+	}
+
+	Action<ConnectionState>::TIterator Scene::onConnectionStateChanged(std::function<void(ConnectionState)> callback)
+	{
+		return _onConnectionStateChanged.push_back(callback);
 	}
 
 	IConnection* Scene::hostConnection()
@@ -196,9 +203,8 @@ namespace Stormancer
 	{
 		if (_connectionState == ConnectionState::Disconnected && _client)
 		{
-			_connecting = true;
+			setConnectionState(ConnectionState::Connecting);
 			_connectTask = _client->connectToScene(this, _token, mapValues(_localRoutesMap)).then([this](pplx::task<void> t) {
-				_connecting = false;
 				try
 				{
 					t.wait();
@@ -273,7 +279,7 @@ namespace Stormancer
 
 	void Scene::handleMessage(Packet_ptr packet)
 	{
-		packetReceived(packet);
+		_onPacketReceived(packet);
 
 		uint16 routeId;
 		*packet->stream >> routeId;
@@ -306,5 +312,30 @@ namespace Stormancer
 			_host = new ScenePeer(_peer, _handle, _remoteRoutesMap, this);
 		}
 		return _host;
+	}
+
+	bool Scene::isHost() const
+	{
+		return _isHost;
+	}
+
+	Action<Packet_ptr>::TIterator Scene::onPacketReceived(std::function<void(Packet_ptr)> callback)
+	{
+		return _onPacketReceived.push_back(callback);
+	}
+
+	Action<Packet_ptr>& Scene::packetReceivedAction()
+	{
+		return _onPacketReceived;
+	}
+
+	void Scene::setConnectionState(ConnectionState connectionState)
+	{
+		bool changed = (_connectionState != connectionState);
+		_connectionState = connectionState;
+		if (changed)
+		{
+			_onConnectionStateChanged(connectionState);
+		}
 	}
 };

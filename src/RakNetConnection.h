@@ -18,9 +18,10 @@ namespace Stormancer
 		time_t connectionDate();
 		std::string account();
 		std::string application();
-		ConnectionState state();
+		ConnectionState connectionState();
 		void setConnectionState(ConnectionState connectionState);
-		void onConnectionStateChanged(std::function<void(ConnectionState)> callback);
+		Action<ConnectionState>& connectionStateChangedAction();
+		Action<ConnectionState>::TIterator onConnectionStateChanged(std::function<void(ConnectionState)> callback);
 		RakNet::RakNetGUID guid();
 		time_t lastActivityDate();
 		std::string ipAddress();
@@ -68,13 +69,13 @@ namespace Stormancer
 		std::string _account;
 		std::string _application;
 		int64 _id = 0;
-		ConnectionState _state = ConnectionState::Disconnected;
 		time_t _connectionDate = nowTime_t();
 		RakNet::RakPeerInterface* _rakPeer = nullptr;
 		RakNet::RakNetGUID _guid;
 		time_t _lastActivityDate = nowTime_t();
 		std::map<size_t, void*> _localData;
 		DependencyResolver* _dependencyResolver = nullptr;
+		ConnectionState _connectionState = ConnectionState::Disconnected;
 		Action<ConnectionState> _onConnectionStateChanged;
 	};
 };

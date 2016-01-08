@@ -92,6 +92,12 @@ namespace Stormancer
 
 		STORMANCER_DLL_API DependencyResolver* dependencyResolver() const;
 
+		STORMANCER_DLL_API Action<ConnectionState>& connectionStateChangedAction();
+
+		STORMANCER_DLL_API Action<ConnectionState>::TIterator onConnectionStateChanged(std::function<void(ConnectionState)> callback);
+
+		STORMANCER_DLL_API ConnectionState connectionState() const;
+
 	private:
 
 		void initialize();
@@ -188,5 +194,6 @@ namespace Stormancer
 		std::mutex _connectionMutex;
 		pplx::task<void> _connectionTask;
 		bool _connectionTaskSet = false;
+		Action<ConnectionState> _onConnectionStateChanged;
 	};
 };

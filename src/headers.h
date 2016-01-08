@@ -36,6 +36,8 @@
 #include <thread>
 #include <regex>
 #include <numeric>
+#include <list>
+#include <forward_list>
 
 // custom libs
 

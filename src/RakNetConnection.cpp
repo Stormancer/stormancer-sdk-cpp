@@ -141,19 +141,28 @@ namespace Stormancer
 		return _application;
 	}
 
-	ConnectionState RakNetConnection::state()
+	ConnectionState RakNetConnection::connectionState()
 	{
-		return _state;
+		return _connectionState;
 	}
 
 	void RakNetConnection::setConnectionState(ConnectionState connectionState)
 	{
-		_state = connectionState;
-		_onConnectionStateChanged(_state);
+		bool changed = (_connectionState != connectionState);
+		_connectionState = connectionState;
+		if (changed)
+		{
+			_onConnectionStateChanged(_connectionState);
+		}
 	}
 
-	void RakNetConnection::onConnectionStateChanged(std::function<void(ConnectionState)> callback)
+	Action<ConnectionState>& RakNetConnection::connectionStateChangedAction()
 	{
-		_onConnectionStateChanged += callback;
+		return _onConnectionStateChanged;
+	}
+
+	Action<ConnectionState>::TIterator RakNetConnection::onConnectionStateChanged(std::function<void(ConnectionState)> callback)
+	{
+		return _onConnectionStateChanged.push_back(callback);
 	}
 };

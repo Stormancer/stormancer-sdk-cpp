@@ -281,6 +281,9 @@ namespace Stormancer
 #endif
 								_serverConnection = connection;
 								_serverConnection->setMetadata(_metadata);
+								_serverConnection->onConnectionStateChanged([this](ConnectionState connectionState) {
+									_onConnectionStateChanged(connectionState);
+								});
 							}
 							catch (const std::exception& e)
 							{
@@ -659,5 +662,20 @@ namespace Stormancer
 	DependencyResolver* Client::dependencyResolver() const
 	{
 		return _dependencyResolver;
+	}
+
+	Action<ConnectionState>& Client::connectionStateChangedAction()
+	{
+		return _onConnectionStateChanged;
+	}
+
+	Action<ConnectionState>::TIterator Client::onConnectionStateChanged(std::function<void(ConnectionState)> callback)
+	{
+		return _onConnectionStateChanged.push_back(callback);
+	}
+
+	ConnectionState Client::connectionState() const
+	{
+		return _serverConnection->connectionState();
 	}
 };

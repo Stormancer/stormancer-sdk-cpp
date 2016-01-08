@@ -65,7 +65,9 @@ namespace Stormancer
 		/// Returns the connection state to the the scene.
 		STORMANCER_DLL_API ConnectionState connectionState();
 
-		STORMANCER_DLL_API void onConnectionStateChanged(std::function<void(ConnectionState)> callback);
+		STORMANCER_DLL_API Action<ConnectionState>& connectionStateChangedAction();
+
+		STORMANCER_DLL_API Action<ConnectionState>::TIterator onConnectionStateChanged(std::function<void(ConnectionState)> callback);
 
 		/// Returns the scene id.
 		STORMANCER_DLL_API const char* id();
@@ -104,6 +106,11 @@ namespace Stormancer
 
 		STORMANCER_DLL_API DependencyResolver* dependencyResolver() const;
 
+		/// Fire when a packet is received in the scene. 
+		STORMANCER_DLL_API Action<Packet_ptr>::TIterator onPacketReceived(std::function<void(Packet_ptr)> callback);
+
+		STORMANCER_DLL_API Action<Packet_ptr>& packetReceivedAction();
+
 		/// Finalize the connection to the scene.
 		/// \param cr Connection result message retrieved by a system request.
 		void completeConnectionInitialization(ConnectionResult& cr);
@@ -112,17 +119,14 @@ namespace Stormancer
 		/// \param packet Receivedpacket.
 		void handleMessage(Packet_ptr packet);
 
-	public:
+		bool isHost() const;
 
-		/// Fire when a packet is received in the scene. 
-		Action<Packet_ptr> packetReceived;
-
-		const bool isHost = false;
+	private:
+		void setConnectionState(ConnectionState connectionState);
 
 	private:
 
-		/// Scene connected state.
-		ConnectionState _connectionState = ConnectionState::Disconnected;
+		const bool _isHost = false;
 
 		/// Scene peer connection.
 		IConnection* _peer;
@@ -174,6 +178,11 @@ namespace Stormancer
 
 		DependencyResolver* _dependencyResolver = nullptr;
 
-		std::function<void(ConnectionState)> _onConnectionStateChanged;
+		Action<Packet_ptr> _onPacketReceived;
+
+		/// Scene connected state.
+		ConnectionState _connectionState = ConnectionState::Disconnected;
+		Action<ConnectionState> _onConnectionStateChanged;
+		Action<ConnectionState>::TIterator _peerConnectionStateEraseIterator;
 	};
 };

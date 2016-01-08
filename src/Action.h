@@ -7,8 +7,10 @@ namespace Stormancer
 	template<typename TParam = void>
 	class Action
 	{
+	public:
 		using TFunction = std::function<void(TParam)>;
-		using TContainer = std::vector<TFunction>;
+		using TContainer = std::list<TFunction>;
+		using TIterator = typename TContainer::iterator;
 		using TAction = Action<TParam>;
 
 	public:
@@ -16,9 +18,9 @@ namespace Stormancer
 		{
 		}
 
-		Action(TFunction function)
+		Action(TFunction f)
 		{
-			_functions.push_back(function);
+			_functions.push_back(f);
 		}
 
 		virtual ~Action()
@@ -32,47 +34,58 @@ namespace Stormancer
 		}
 
 		Action(TAction&& other)
+			: _functions(std::move(other._functions))
 		{
-			_functions.reserve(other._functions.size());
-			for (uint32 i = 0; i < other._functions.size(); i++)
-			{
-				_functions.push_back(other._functions[i]);
-			}
-		}
-
-		TAction& operator=(const TAction& other)
-		{
-			_functions.reserve(other._functions.size());
-			for (uint32 i = 0; i < other._functions.size(); i++)
-			{
-				_functions.push_back(other._functions[i]);
-			}
-			return *this;
 		}
 
 	public:
-		TAction& operator=(TFunction function)
+		TAction& operator=(const TAction& other)
 		{
-			_functions.clear();
-			_functions.push_back(function);
+			_functions = other._functions;
 			return *this;
 		}
 
-		TAction& operator+=(TFunction function)
+		TAction& operator=(TFunction f)
 		{
-			_functions.push_back(function);
+			_functions.clear();
+			_functions.push_back(f);
+			return *this;
+		}
+
+		TAction& operator+=(TFunction f)
+		{
+			_functions.push_back(f);
 			return *this;
 		}
 
 		const TAction& operator()(TParam data) const
 		{
-			size_t sz = _functions.size();
-			for (uint32 i = 0; i < sz; i++)
+			for (auto f : _functions)
 			{
-				auto f = _functions.at(i);
 				f(data);
 			}
 			return *this;
+		}
+
+	public:
+		TIterator push_front(TFunction f)
+		{
+			return _functions.insert(_functions.begin(), f);
+		}
+
+		TIterator push_back(TFunction f)
+		{
+			return _functions.insert(_functions.end(), f);
+		}
+
+		void erase(TIterator it)
+		{
+			_functions.erase(it);
+		}
+
+		void clear()
+		{
+			_functions.clear();
 		}
 
 	private:
@@ -83,8 +96,10 @@ namespace Stormancer
 	template<>
 	class Action<void>
 	{
+	public:
 		using TFunction = std::function<void(void)>;
-		using TContainer = std::vector<TFunction>;
+		using TContainer = std::list<TFunction>;
+		using TIterator = TContainer::iterator;
 		using TAction = Action<>;
 
 	public:
@@ -92,9 +107,9 @@ namespace Stormancer
 		{
 		}
 
-		Action(TFunction function)
+		Action(TFunction f)
 		{
-			_functions.push_back(function);
+			_functions.push_back(f);
 		}
 
 		virtual ~Action()
@@ -103,52 +118,63 @@ namespace Stormancer
 
 	public:
 		Action(const TAction& other)
-		{
-			_functions.reserve(other._functions.size());
-			for (uint32 i = 0; i < other._functions.size(); i++)
-			{
-				_functions.push_back(other._functions[i]);
-			}
-		}
-
-		Action(TAction&& right)
-			: _functions(std::move(right._functions))
+			: _functions(other._functions)
 		{
 		}
 
-		TAction& operator=(const TAction& other)
+		Action(TAction&& other)
+			: _functions(std::move(other._functions))
 		{
-			_functions.reserve(other._functions.size());
-			for (uint32 i = 0; i < other._functions.size(); i++)
-			{
-				_functions.push_back(other._functions[i]);
-			}
-			return *this;
 		}
 
 	public:
-		TAction& operator=(TFunction function)
+		TAction& operator=(const TAction& other)
 		{
-			_functions.clear();
-			_functions.push_back(function);
+			_functions = other._functions;
 			return *this;
 		}
 
-		TAction& operator+=(TFunction function)
+		TAction& operator=(TFunction f)
 		{
-			_functions.push_back(function);
+			_functions.clear();
+			_functions.push_back(f);
+			return *this;
+		}
+
+		TAction& operator+=(TFunction f)
+		{
+			_functions.push_back(f);
 			return *this;
 		}
 
 		const TAction& operator()() const
 		{
-			size_t sz = _functions.size();
-			for (uint32 i = 0; i < sz; i++)
+			for (auto f : _functions)
 			{
-				auto f = _functions.at(i);
 				f();
 			}
 			return *this;
+		}
+
+	public:
+		TIterator push_front(TFunction f)
+		{
+			return _functions.insert(_functions.begin(), f);
+		}
+
+		TIterator push_back(TFunction f)
+		{
+			return _functions.insert(_functions.end(), f);
+		}
+
+		void erase(TIterator it)
+		{
+			_functions.erase(it);
+		}
+
+		void clear()
+		{
+			_functions.clear();
 		}
 
 	private:
