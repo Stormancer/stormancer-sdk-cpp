@@ -19,8 +19,7 @@ namespace Stormancer
 		_peerConnectionStateEraseIterator = _peer->onConnectionStateChanged([this](ConnectionState connectionState) {
 			if (connectionState == ConnectionState::Disconnected)
 			{
-				_connectionState = connectionState;
-				_onConnectionStateChanged(connectionState);
+				setConnectionState(ConnectionState::Disconnected);
 			}
 		});
 	}
@@ -201,25 +200,22 @@ namespace Stormancer
 
 	pplx::task<Result<>*> Scene::connect()
 	{
-		if (_connectionState == ConnectionState::Disconnected && _client)
+		auto result = new Result<>();
+		
+		try
 		{
-			setConnectionState(ConnectionState::Connecting);
-			_connectTask = _client->connectToScene(this, _token, mapValues(_localRoutesMap)).then([this](pplx::task<void> t) {
-				try
-				{
-					t.wait();
-					_connectionState = ConnectionState::Connected;
-					_onConnectionStateChanged(_connectionState);
-				}
-				catch (const std::exception& ex)
-				{
-					throw ex;
-				}
-			});
+			if (_connectionState == ConnectionState::Disconnected && _client)
+			{
+				_connectTask = _client->connectToScene(this, _token, mapValues(_localRoutesMap));
+			}
+		}
+		catch (const std::exception& ex)
+		{
+			result->setError(1, ex.what());
+			return taskCompleted(result);
 		}
 
-		return _connectTask.then([](pplx::task<void> t) {
-			auto result = new Result<>();
+		return _connectTask.then([result](pplx::task<void> t) {
 			try
 			{
 				t.wait();
@@ -238,14 +234,13 @@ namespace Stormancer
 	{
 		if (_connectionState == ConnectionState::Connected && _client)
 		{
-			_connectionState = ConnectionState::Disconnected;
-			_onConnectionStateChanged(_connectionState);
 			_disconnectTask = _client->disconnect(this, _handle);
 		}
 		else
 		{
 			_disconnectTask = taskCompleted();
 		}
+
 		return _disconnectTask.then([](pplx::task<void> t) {
 			auto result = new Result<>();
 			try

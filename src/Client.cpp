@@ -272,59 +272,34 @@ namespace Stormancer
 #endif
 					try
 					{
-						return _transport->connect(endpoint).then([this](pplx::task<IConnection*> t) {
-							try
-							{
-								IConnection* connection = t.get();
+						return _transport->connect(endpoint).then([this](IConnection* connection) {
 #ifdef STORMANCER_LOG_CLIENT
-								_logger->log(LogLevel::Trace, "Client::getScene", "Client::transport connected", "");
+							_logger->log(LogLevel::Trace, "Client::getScene", "Client::transport connected", "");
 #endif
-								_serverConnection = connection;
+							_serverConnection = connection;
 
-								_onConnectionStateChanged(_serverConnection->connectionState());
+							_onConnectionStateChanged(_serverConnection->connectionState());
 
-								auto peerConnectionStateEraseIterator = new Action<ConnectionState>::TIterator();
-								*peerConnectionStateEraseIterator = _serverConnection->onConnectionStateChanged([this, peerConnectionStateEraseIterator](ConnectionState connectionState) {
-									if (connectionState == ConnectionState::Disconnected)
-									{
-										_serverConnection->connectionStateChangedAction().erase(*peerConnectionStateEraseIterator);
-										delete peerConnectionStateEraseIterator;
-									}
-									_onConnectionStateChanged(connectionState);
-								});
+							auto peerConnectionStateEraseIterator = new Action<ConnectionState>::TIterator();
+							*peerConnectionStateEraseIterator = _serverConnection->onConnectionStateChanged([this, peerConnectionStateEraseIterator](ConnectionState connectionState) {
+								if (connectionState == ConnectionState::Disconnected)
+								{
+									_serverConnection->connectionStateChangedAction().erase(*peerConnectionStateEraseIterator);
+									delete peerConnectionStateEraseIterator;
+								}
+								_onConnectionStateChanged(connectionState);
+							});
 
-								_serverConnection->setMetadata(_metadata);
-							}
-							catch (const std::exception& e)
-							{
-								throw std::runtime_error(std::string(e.what()) + "\nFailed to get the transport peer connection.");
-							}
+							_serverConnection->setMetadata(_metadata);
 						});
 					}
-					catch (const std::exception& e)
+					catch (const std::exception& ex)
 					{
-						throw std::runtime_error(std::string(e.what()) + "\nFailed to connect the transport.");
+						throw std::runtime_error(std::string(ex.what()) + "\nFailed to connect the transport.");
 					}
-				}).then([this, sep](pplx::task<void> t) {
-					try
-					{
-						t.wait();
-						return updateServerMetadata();
-					}
-					catch (const std::exception& e)
-					{
-						throw e;
-					}
-				}).then([this, sep](pplx::task<void> t) {
-					try
-					{
-						t.wait();
-					}
-					catch (const std::exception& e)
-					{
-						throw std::runtime_error(std::string(e.what()) + "\nFailed to start the sync clock.");
-					}
-
+				}).then([this, sep]() {
+					return updateServerMetadata();
+				}).then([this, sep]() {
 					if (_synchronisedClock && sep.tokenData.Version > 0)
 					{
 						startSyncClock();
@@ -434,6 +409,13 @@ namespace Stormancer
 			throw std::runtime_error("The scene ptr is invalid");
 		}
 
+		if (scene->connectionState() != ConnectionState::Disconnected)
+		{
+			throw std::runtime_error("The scene is not in disconnected state");
+		}
+
+		scene->setConnectionState(ConnectionState::Connecting);
+
 		for (auto plugin : _plugins)
 		{
 			plugin->sceneConnecting(scene);
@@ -451,28 +433,17 @@ namespace Stormancer
 		}
 		parameter.ConnectionMetadata = _serverConnection->metadata();
 
-		return Client::sendSystemRequest<ConnectToSceneMsg, ConnectionResult>((byte)SystemRequestIDTypes::ID_CONNECT_TO_SCENE, parameter).then([this, scene](pplx::task<ConnectionResult> t) {
-			try
+		return Client::sendSystemRequest<ConnectToSceneMsg, ConnectionResult>((byte)SystemRequestIDTypes::ID_CONNECT_TO_SCENE, parameter).then([this, scene](ConnectionResult result) {
+			scene->completeConnectionInitialization(result);
+			_scenesDispatcher->addScene(scene);
+			scene->setConnectionState(ConnectionState::Connected);
+			for (auto plugin : _plugins)
 			{
-				auto result = t.get();
-				scene->completeConnectionInitialization(result);
-				_scenesDispatcher->addScene(scene);
-				for (auto plugin : _plugins)
-				{
-					plugin->sceneConnected(scene);
-				}
-#ifdef STORMANCER_LOG_CLIENT
-				ILogger::instance()->log(LogLevel::Info, "client", "Scene connected", scene->id());
-#endif
+				plugin->sceneConnected(scene);
 			}
-			catch (const std::exception& e)
-			{
-				auto e2 = std::runtime_error(std::string(e.what()) + "\nFailed to connect to the scene.");
 #ifdef STORMANCER_LOG_CLIENT
-				_logger->log(e2);
+			ILogger::instance()->log(LogLevel::Info, "client", "Scene connected", scene->id());
 #endif
-				throw e2;
-			}
 		});
 	}
 
@@ -500,15 +471,31 @@ namespace Stormancer
 			throw std::runtime_error("The scene ptr is null");
 		}
 
-		DisconnectFromSceneDto dto(sceneHandle);
+		if (scene->connectionState() != ConnectionState::Connected)
+		{
+			throw std::runtime_error("The scene is not in connected state");
+		}
+
+		scene->setConnectionState(ConnectionState::Disconnecting);
+
+		//for (auto plugin : _plugins)
+		//{
+		//	plugin->sceneDisconnecting(scene);
+		//}
+
+		scene->setConnectionState(ConnectionState::Disconnected);
+
 		for (auto plugin : _plugins)
 		{
 			plugin->sceneDisconnected(scene);
 		}
+
+		DisconnectFromSceneDto dto(sceneHandle);
 		_scenesDispatcher->removeScene(sceneHandle);
-		return sendSystemRequest<DisconnectFromSceneDto, EmptyDto>((byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, dto).then([scene](EmptyDto&) {
+		std::string sceneId = scene->id();
+		return sendSystemRequest<DisconnectFromSceneDto, EmptyDto>((byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, dto).then([sceneId](EmptyDto&) {
 #ifdef STORMANCER_LOG_CLIENT
-			ILogger::instance()->log(LogLevel::Info, "client", "Scene disconnected", scene->id());
+			ILogger::instance()->log(LogLevel::Info, "client", "Scene disconnected", sceneId.c_str());
 #endif
 		});
 	}
