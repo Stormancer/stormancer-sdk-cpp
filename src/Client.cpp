@@ -280,10 +280,20 @@ namespace Stormancer
 								_logger->log(LogLevel::Trace, "Client::getScene", "Client::transport connected", "");
 #endif
 								_serverConnection = connection;
-								_serverConnection->setMetadata(_metadata);
-								_serverConnection->onConnectionStateChanged([this](ConnectionState connectionState) {
+
+								_onConnectionStateChanged(_serverConnection->connectionState());
+
+								auto peerConnectionStateEraseIterator = new Action<ConnectionState>::TIterator();
+								*peerConnectionStateEraseIterator = _serverConnection->onConnectionStateChanged([this, peerConnectionStateEraseIterator](ConnectionState connectionState) {
+									if (connectionState == ConnectionState::Disconnected)
+									{
+										_serverConnection->connectionStateChangedAction().erase(*peerConnectionStateEraseIterator);
+										delete peerConnectionStateEraseIterator;
+									}
 									_onConnectionStateChanged(connectionState);
 								});
+
+								_serverConnection->setMetadata(_metadata);
 							}
 							catch (const std::exception& e)
 							{

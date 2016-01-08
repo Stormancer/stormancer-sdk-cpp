@@ -27,7 +27,7 @@ namespace Stormancer
 		if (_asyncDispatch)
 		{
 			pplx::create_task([this, packet]() {
-				this->dispatchImpl(packet);
+				dispatchImpl(packet);
 			}).then([](pplx::task<void> t) {
 				try
 				{
@@ -35,6 +35,7 @@ namespace Stormancer
 				}
 				catch (const std::exception& e)
 				{
+					ILogger::instance()->log(LogLevel::Error, "client.dispatchPacket", "Exception unhandled in dispatchPacketImpl", e.what());
 					throw e;
 				}
 			});

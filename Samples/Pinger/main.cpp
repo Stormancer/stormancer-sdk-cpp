@@ -11,19 +11,20 @@ const char* sceneName = "main";
 Configuration* config = nullptr;
 Client* client = nullptr;
 Scene* sceneMain = nullptr;
-IRpcService* rpcService = nullptr;
 
-void rpc()
+void rpc(Scene* scene)
 {
+	auto rpcService = scene->dependencyResolver()->resolve<IRpcService>();
+
 	ISubscription* sub = nullptr;
 
 	logger->log(Stormancer::LogLevel::Info, "rpc", "start rpc...", "");
-	auto obs = rpcService->rpc("rpc", [](bytestream* stream) {}, PacketPriority::MEDIUM_PRIORITY);
+	auto observable = rpcService->rpc("rpc", [](bytestream* stream) {}, PacketPriority::MEDIUM_PRIORITY);
 
-	auto onNext = [&sub](Packetisp_ptr packet) {
+	auto onNext = [&sub, scene](Packetisp_ptr packet) {
 		logger->log(Stormancer::LogLevel::Info, "rpc", "observable next", "");
-		rpc();
-		sub->destroy();
+		//sub->destroy();
+		//rpc(scene);
 	};
 
 	auto onComplete = []() {
@@ -34,7 +35,28 @@ void rpc()
 		logger->log(Stormancer::LogLevel::Error, "rpc", "observable error", error);
 	};
 
-	sub = obs->subscribe(onNext, onError, onComplete);
+	sub = observable->subscribe(onNext, onError, onComplete);
+}
+
+std::string connectionStateToString(ConnectionState connectionState)
+{
+	std::string stateStr = std::to_string((int)connectionState) + " ";
+	switch (connectionState)
+	{
+	case ConnectionState::Disconnected:
+		stateStr += "Disconnected";
+		break;
+	case ConnectionState::Connecting:
+		stateStr += "Connecting";
+		break;
+	case ConnectionState::Connected:
+		stateStr += "Connected";
+		break;
+	case ConnectionState::Disconnecting:
+		stateStr += "Disconnecting";
+		break;
+	}
+	return stateStr;
 }
 
 int main()
@@ -46,14 +68,19 @@ int main()
 		client = Client::createClient(config);
 		logger->log(LogLevel::Info, "main", "Create client OK", "");
 
+		client->onConnectionStateChanged([](ConnectionState connectionState) {
+			auto stateStr = connectionStateToString(connectionState);
+			logger->log(LogLevel::Info, "main", "CLIENT ", stateStr.c_str());
+		});
+
 		client->getPublicScene(sceneName).then([](Result<Scene*>* result) {
 			if (result->success())
 			{
 				sceneMain = result->get();
 
 				sceneMain->onConnectionStateChanged([](ConnectionState connectionState) {
-					auto stateStr = std::to_string((int)connectionState);
-					logger->log(LogLevel::Info, "main", "SCENE MAIN CONNECTION STATE CHANGED", stateStr.c_str());
+					auto stateStr = connectionStateToString(connectionState);
+					logger->log(LogLevel::Info, "main", "SCENE MAIN ", stateStr.c_str());
 				});
 
 				sceneMain->connect().then([](Result<>* result2) {
@@ -61,8 +88,8 @@ int main()
 					{
 						logger->log(LogLevel::Info, "main", "Connect OK", "");
 
-						rpcService = sceneMain->dependencyResolver()->resolve<IRpcService>();
-						rpc();
+						//rpc(sceneMain);
+						sceneMain->disconnect();
 					}
 					else
 					{

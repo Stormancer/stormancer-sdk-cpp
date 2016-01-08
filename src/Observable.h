@@ -20,14 +20,14 @@ namespace Stormancer
 
 		ISubscription* subscribe(std::function<void(T)> onNext)
 		{
-			auto onError = [](std::exception_ptr ep){
+			auto onError = [](std::exception_ptr ep) {
 				try
 				{
 					std::rethrow_exception(ep);
 				}
 				catch (const std::exception& ex)
 				{
-					ILogger::instance()->log(LogLevel::Error, "Observable::subscribe", "Observable error", ex.what());
+					ILogger::instance()->log(LogLevel::Error, "Observable::subscribe(onNext)", "Observable error", ex.what());
 				}
 			};
 
@@ -83,7 +83,7 @@ namespace Stormancer
 				}
 				catch (const std::exception& ex)
 				{
-					ILogger::instance()->log(LogLevel::Error, "Observable::subscribe", "Observable error", ex.what());
+					ILogger::instance()->log(LogLevel::Error, "Observable::subscribe(onNext, onComplete)", "Observable error", ex.what());
 				}
 			};
 
