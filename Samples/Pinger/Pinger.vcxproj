@@ -166,12 +166,20 @@
   <ItemGroup>
     <ClCompile Include="..\Tester\ConsoleLogger.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="main2.cpp" />
+    <ClCompile Include="NatPlugin.cpp" />
+    <ClCompile Include="NatService.cpp" />
+    <ClCompile Include="RakNetPeer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Tester\ConsoleLogger.h" />
+    <ClInclude Include="IPeer.h" />
+    <ClInclude Include="NatPlugin.h" />
+    <ClInclude Include="NatService.h" />
+    <ClInclude Include="RakNetPeer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

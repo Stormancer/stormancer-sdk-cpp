@@ -18,19 +18,19 @@ namespace Stormancer
 
 			if (strcmp(rpcParams, version) == 0)
 			{
-				auto processor = new RpcService(scene);
-				scene->dependencyResolver()->registerDependency<IRpcService>(processor);
-				scene->addRoute(nextRouteName, [processor](Packetisp_ptr p) {
-					processor->next(p);
+				auto rpcService = new RpcService(scene);
+				scene->dependencyResolver()->registerDependency<IRpcService>(rpcService);
+				scene->addRoute(nextRouteName, [rpcService](Packetisp_ptr p) {
+					rpcService->next(p);
 				});
-				scene->addRoute(cancellationRouteName, [processor](Packetisp_ptr p) {
-					processor->cancel(p);
+				scene->addRoute(cancellationRouteName, [rpcService](Packetisp_ptr p) {
+					rpcService->cancel(p);
 				});
-				scene->addRoute(errorRouteName, [processor](Packetisp_ptr p) {
-					processor->error(p);
+				scene->addRoute(errorRouteName, [rpcService](Packetisp_ptr p) {
+					rpcService->error(p);
 				});
-				scene->addRoute(completeRouteName, [processor](Packetisp_ptr p) {
-					processor->complete(p);
+				scene->addRoute(completeRouteName, [rpcService](Packetisp_ptr p) {
+					rpcService->complete(p);
 				});
 			}
 		}
@@ -40,8 +40,8 @@ namespace Stormancer
 	{
 		if (scene)
 		{
-			auto processor = scene->dependencyResolver()->resolve<IRpcService>();
-			processor->disconnected();
+			auto rpcService = scene->dependencyResolver()->resolve<IRpcService>();
+			rpcService->cancelAll("Scene disconnected");
 		}
 	}
 

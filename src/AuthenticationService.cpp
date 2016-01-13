@@ -90,19 +90,29 @@ namespace Stormancer
 					}, PacketPriority::MEDIUM_PRIORITY);
 					auto onNext = [this, tce, result](Stormancer::Packetisp_ptr packet) {
 						LoginResult loginResult(packet->stream);
-						_userId = loginResult.userId;
-						_client->getScene(loginResult.token.c_str()).then([tce, result](Result<Scene*>* result2) {
-							*result = *result2;
+						if (loginResult.success)
+						{
+							_userId = loginResult.userId;
+							_client->getScene(loginResult.token.c_str()).then([tce, result](Result<Scene*>* result2) {
+								*result = *result2;
+								tce.set(result);
+								destroy(result2);
+							});
+						}
+						else
+						{
+							result->setError(1, loginResult.errorMsg.c_str());
 							tce.set(result);
-							destroy(result2);
-						});
+							ILogger::instance()->log(LogLevel::Error, "AuthenticationService", "onError", loginResult.errorMsg.c_str());
+						}
 					};
 					auto onError = std::function<void(const char*)>([tce, result](const char* error) {
 						result->setError(1, error);
 						tce.set(result);
 						ILogger::instance()->log(LogLevel::Error, "AuthenticationService", "onError", error);
 					});
-					auto onComplete = []() {};
+					auto onComplete = []() {
+					};
 					auto subscription = observable->subscribe(onNext, onError, onComplete);
 				}
 				catch (const std::exception& ex)

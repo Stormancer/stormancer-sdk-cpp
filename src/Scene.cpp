@@ -30,12 +30,15 @@ namespace Stormancer
 
 		_onDelete();
 
-		disconnect();
+		disconnect(true);
 
-		for (auto sub : _subscriptions)
+		for (auto weakSub : _subscriptions)
 		{
-			sub->unsubscribe();
-			sub->destroy();
+			auto sub = weakSub.lock();
+			if (sub)
+			{
+				sub->unsubscribe();
+			}
 		}
 		_subscriptions.clear();
 
@@ -65,7 +68,7 @@ namespace Stormancer
 		return _connectionState;
 	}
 
-	Action<ConnectionState>& Scene::connectionStateChangedAction()
+	Action<ConnectionState>& Scene::onConnectionStateChangedAction()
 	{
 		return _onConnectionStateChanged;
 	}
@@ -230,11 +233,11 @@ namespace Stormancer
 		});
 	}
 
-	pplx::task<Result<>*> Scene::disconnect()
+	pplx::task<Result<>*> Scene::disconnect(bool immediate)
 	{
 		if (_connectionState == ConnectionState::Connected && _client)
 		{
-			_disconnectTask = _client->disconnect(this, _handle);
+			_disconnectTask = _client->disconnect(this, _handle, immediate);
 		}
 		else
 		{
@@ -324,13 +327,12 @@ namespace Stormancer
 		return _onPacketReceived;
 	}
 
-	void Scene::setConnectionState(ConnectionState connectionState)
+	void Scene::setConnectionState(ConnectionState state)
 	{
-		bool changed = (_connectionState != connectionState);
-		_connectionState = connectionState;
-		if (changed)
+		if (_connectionState != state)
 		{
-			_onConnectionStateChanged(connectionState);
+			_connectionState = state;
+			_onConnectionStateChanged(state);
 		}
 	}
 };

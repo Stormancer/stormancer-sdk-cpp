@@ -29,6 +29,9 @@ namespace Stormancer
 		/// Event fired when a scene is connected to the server.
 		STORMANCER_DLL_API virtual void sceneConnected(Scene* scene);
 
+		/// Event fired when a scene is disconnecting.
+		STORMANCER_DLL_API virtual void sceneDisconnecting(Scene* scene);
+
 		/// Event fired when a scene is disconnected.
 		STORMANCER_DLL_API virtual void sceneDisconnected(Scene* scene);
 

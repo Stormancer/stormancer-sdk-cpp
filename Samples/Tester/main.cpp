@@ -26,6 +26,27 @@ void execNextTest()
 	}
 }
 
+std::string connectionStateToString(ConnectionState connectionState)
+{
+	std::string stateStr = std::to_string((int)connectionState) + " ";
+	switch (connectionState)
+	{
+	case ConnectionState::Disconnected:
+		stateStr += "Disconnected";
+		break;
+	case ConnectionState::Connecting:
+		stateStr += "Connecting";
+		break;
+	case ConnectionState::Connected:
+		stateStr += "Connected";
+		break;
+	case ConnectionState::Disconnecting:
+		stateStr += "Disconnecting";
+		break;
+	}
+	return stateStr;
+}
+
 void test_echo_received(Packetisp_ptr p)
 {
 	std::string message;
@@ -79,94 +100,97 @@ void test_rpc_server_cancelled(Packetisp_ptr p)
 
 void test_connect()
 {
-	logger->log(LogLevel::Debug, "test_connect", "Create client", "");
-	config = Configuration::forAccount(accountId, applicationName);
-	client = Client::createClient(config);
-	logger->log(LogLevel::Info, "test_connect", "Create client OK", "");
+	try
+	{
+		logger->log(LogLevel::Debug, "test_connect", "Create client", "");
+		config = Configuration::forAccount(accountId, applicationName);
+		client = Client::createClient(config);
+		logger->log(LogLevel::Info, "test_connect", "Create client OK", "");
 
-	logger->log(LogLevel::Debug, "test_connect", "Get scene", "");
-	client->getPublicScene(sceneName).then([](Result<Scene*>* result) {
-		if (result->success())
-		{
-			sceneMain = result->get();
-			logger->log(LogLevel::Info, "test_connect", "Get scene OK", "");
+		client->onConnectionStateChanged([](ConnectionState state) {
+			try
+			{
+				auto stateStr = connectionStateToString(state);
+				logger->log(LogLevel::Info, "Client", "Client connection state changed", stateStr.c_str());
+			}
+			catch (const std::exception& ex)
+			{
+				logger->log(ex);
+			}
+		});
 
-			logger->log(LogLevel::Debug, "test_connect", "Add route", "");
-			sceneMain->addRoute("echo", test_echo_received);
-			sceneMain->addRoute("rpcservercancelled", test_rpc_server_cancelled);
-			logger->log(LogLevel::Info, "test_connect", "Add route OK", "");
-
-			logger->log(LogLevel::Debug, "test_connect", "Add procedure", "");
-			sceneMain->dependencyResolver()->resolve<IRpcService>()->addProcedure("rpc", test_rpc_client, true);
-			logger->log(LogLevel::Info, "test_connect", "Add procedure OK", "");
-
-			logger->log(LogLevel::Debug, "test_connect", "Connect to scene", "");
-			sceneMain->connect().then([](Result<>* result2) {
-				if (result2->success())
+		logger->log(LogLevel::Debug, "test_connect", "Get scene", "");
+		client->getPublicScene(sceneName).then([](Result<Scene*>* result) {
+			try
+			{
+				if (result->success())
 				{
-					logger->log(LogLevel::Info, "test_connect", "Connect OK", "");
-					execNextTest();
+					sceneMain = result->get();
+
+					sceneMain->onConnectionStateChanged([](ConnectionState state) {
+						auto stateStr = connectionStateToString(state);
+						logger->log(LogLevel::Info, "Scene", "Scene connection state changed", stateStr.c_str());
+					});
+
+					logger->log(LogLevel::Info, "test_connect", "Get scene OK", "");
+
+					logger->log(LogLevel::Debug, "test_connect", "Add route", "");
+					sceneMain->addRoute("echo", test_echo_received);
+					sceneMain->addRoute("rpcservercancelled", test_rpc_server_cancelled);
+					logger->log(LogLevel::Info, "test_connect", "Add route OK", "");
+
+					logger->log(LogLevel::Debug, "test_connect", "Add procedure", "");
+					sceneMain->dependencyResolver()->resolve<IRpcService>()->addProcedure("rpc", test_rpc_client, true);
+					logger->log(LogLevel::Info, "test_connect", "Add procedure OK", "");
+
+					logger->log(LogLevel::Debug, "test_connect", "Connect to scene", "");
+					sceneMain->connect().then([](Result<>* result2) {
+						if (result2->success())
+						{
+							logger->log(LogLevel::Info, "test_connect", "Connect OK", "");
+							execNextTest();
+						}
+						else
+						{
+							logger->log(LogLevel::Error, "test_connect", "Failed to connect to the scene", result2->reason());
+						}
+						destroy(result2);
+					});
 				}
 				else
 				{
-					logger->log(LogLevel::Error, "test_connect", "Failed to connect to the scene", result2->reason());
+					logger->log(LogLevel::Error, "test_connect", "Failed to get the scene", result->reason());
 				}
-				destroy(result2);
-			});
-		}
-		else
-		{
-			logger->log(LogLevel::Error, "test_connect", "Failed to get the scene", result->reason());
-		}
-		destroy(result);
-	});
+				destroy(result);
+			}
+			catch (const std::exception& ex)
+			{
+				logger->log(ex);
+			}
+		});
 
-	client->getPublicScene(sceneName).then([](Result<Scene*>* result) {
-		if (result->success())
-		{
-			sceneMain = result->get();
-			logger->log(LogLevel::Info, "test_connect", "Get scene OK", "");
-
-			logger->log(LogLevel::Debug, "test_connect", "Add route", "");
-			sceneMain->addRoute("echo", test_echo_received);
-			sceneMain->addRoute("rpcservercancelled", test_rpc_server_cancelled);
-			logger->log(LogLevel::Info, "test_connect", "Add route OK", "");
-
-			logger->log(LogLevel::Debug, "test_connect", "Add procedure", "");
-			sceneMain->dependencyResolver()->resolve<IRpcService>()->addProcedure("rpc", test_rpc_client, true);
-			logger->log(LogLevel::Info, "test_connect", "Add procedure OK", "");
-
-			logger->log(LogLevel::Debug, "test_connect", "Connect to scene", "");
-			sceneMain->connect().then([](Result<>* result2) {
-				if (result2->success())
-				{
-					logger->log(LogLevel::Info, "test_connect", "Connect OK", "");
-					execNextTest();
-				}
-				else
-				{
-					logger->log(LogLevel::Error, "test_connect", "Failed to connect to the scene", result2->reason());
-				}
-				destroy(result2);
-			});
-		}
-		else
-		{
-			logger->log(LogLevel::Error, "test_connect", "Failed to get the scene", result->reason());
-		}
-		destroy(result);
-	});
+		//client->getPublicScene(sceneName).then([](Result<Scene*>* result) {
+		//	sceneMain = result->get();
+		//	sceneMain->connect().then([](Result<>* result2) {
+		//		destroy(result2);
+		//	});
+		//});
+	}
+	catch (const std::exception& ex)
+	{
+		logger->log(ex);
+	}
 }
 
 void test_echo()
 {
 	logger->log(LogLevel::Debug, "test_echo", "test_echo", "");
-		auto result = sceneMain->sendPacket("echo", [](bytestream* stream) {
-			*stream << "stormancer";
-			logger->log(LogLevel::Debug, "test_echo", "Sending message...", "");
-		});
-		if (!result->success())
-		{
+	auto result = sceneMain->sendPacket("echo", [](bytestream* stream) {
+		*stream << "stormancer";
+		logger->log(LogLevel::Debug, "test_echo", "Sending message...", "");
+	});
+	if (!result->success())
+	{
 		logger->log(LogLevel::Error, "test_echo", "Can't send data to the scene through the 'echo' route.", result->reason());
 	}
 }
@@ -197,7 +221,15 @@ void test_rpc_server_cancel()
 	}), PacketPriority::MEDIUM_PRIORITY)->subscribe([](Packetisp_ptr packet) {
 		logger->log(LogLevel::Debug, "test_rpc_server_cancel", "rpc response received, but this RPC should be cancelled.", "");
 	});
-	subscription->unsubscribe();
+	auto sub = subscription.lock();
+	if (sub)
+	{
+		sub->unsubscribe();
+	}
+	else
+	{
+		logger->log(LogLevel::Error, "test_rpc_server_cancel", "subscription is empty", "");
+	}
 }
 
 void test_syncclock()
@@ -222,53 +254,20 @@ void test_syncclock()
 	});
 }
 
-void test_steam()
-{
-	logger->log(LogLevel::Debug, "test_steam", "Steam authentication", "");
-
-	auto config = Configuration::forAccount("ee59dae9-332d-519d-070e-f9353ae7bbce", "battlefeet-gothic");
-	auto client = Client::createClient(config);
-
-	auto authService = client->dependencyResolver()->resolve<IAuthenticationService>();
-	authService->steamLogin("SteamTicket").then([client, authService](Result<Scene*>* result) {
-		logger->log(LogLevel::Info, "test_steam", "Steam authentication OK", "");
-
-		authService->logout().then([client](Result<>* result2) {
-			if (result2->success())
-			{
-				client->disconnect();
-				execNextTest();
-			}
-			else
-			{
-				logger->log(LogLevel::Error, "test_steam", "Failed to logout", result2->reason());
-			}
-			destroy(result2);
-		});
-
-		destroy(result);
-	});
-}
-
 void test_disconnect()
 {
 	logger->log(LogLevel::Debug, "test_disconnect", "test disconnect", "");
-	sceneMain->disconnect().then([](Result<>* result)
-	{
-		if (result->success())
+	client->disconnect().then([](Result<>* result2) {
+		if (result2->success())
 		{
-			logger->log(LogLevel::Info, "test_disconnect", "Disconnect OK", "");
-			pplx::create_task([]() {
-				client->disconnect();
-				Sleep(1000);
-				execNextTest();
-			});
+			logger->log(LogLevel::Info, "test_disconnect", "Disconnect client OK", "");
+			execNextTest();
 		}
 		else
 		{
-			logger->log(LogLevel::Error, "test_disconnect", "Failed to disconnect", result->reason());
+			logger->log(LogLevel::Error, "test_disconnect", "Failed to disconnect client", result2->reason());
 		}
-		destroy(result);
+		destroy(result2);
 	});
 }
 
@@ -303,8 +302,6 @@ int main(int argc, char* argv[])
 	tests.push_back(test_syncclock);
 	tests.push_back(test_disconnect);
 	tests.push_back(clean);
-
-	tests.push_back(test_steam);
 
 	tests.push_back(the_end);
 

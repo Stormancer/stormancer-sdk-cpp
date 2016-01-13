@@ -308,7 +308,7 @@ namespace Stormancer
 		_runningRequestsMutex.unlock();
 	}
 
-	void RpcService::disconnected()
+	void RpcService::cancelAll(const char* reason)
 	{
 		_runningRequestsMutex.lock();
 		for (auto pair : _runningRequests)
@@ -317,5 +317,16 @@ namespace Stormancer
 		}
 		_runningRequests.clear();
 		_runningRequestsMutex.unlock();
+
+		_pendingRequestsMutex.lock();
+		for (auto pair : _pendingRequests)
+		{
+			if (!pair.second->hasCompleted)
+			{
+				pair.second->observer.on_error(std::make_exception_ptr<std::runtime_error>(std::runtime_error(reason)));
+			}
+		}
+		_pendingRequests.clear();
+		_pendingRequestsMutex.unlock();
 	}
 };

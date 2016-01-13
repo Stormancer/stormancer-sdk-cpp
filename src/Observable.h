@@ -18,9 +18,70 @@ namespace Stormancer
 		{
 		}
 
-		ISubscription* subscribe(std::function<void(T)> onNext)
+		std::weak_ptr<ISubscription> subscribe(std::function<void(T)> onNext, std::function<void(const char* errorMessage)> onError, std::function<void()> onComplete)
 		{
-			auto onError = [](std::exception_ptr ep) {
+			auto it = _subscriptions.insert(_subscriptions.end(), std::shared_ptr<ISubscription>());
+
+			auto& isubscription = *it;
+
+			auto onErrorWrapper = [onError](std::exception_ptr ep) {
+				try
+				{
+					std::rethrow_exception(ep);
+				}
+				catch (const std::exception& ex)
+				{
+					onError(ex.what());
+				}
+			};
+
+			auto onCompleteWrapper = [this, onComplete, it]() {
+				_subscriptions.erase(it);
+				onComplete();
+			};
+
+			auto subscription = _observable.subscribe(onNext, onErrorWrapper, onCompleteWrapper);
+
+			isubscription.reset(new Subscription([subscription]() { subscription.unsubscribe(); }));
+
+			return isubscription;
+		}
+
+		std::weak_ptr<ISubscription> subscribe(std::function<void(T)> onNext, std::function<void(const char* errorMessage)> onError)
+		{
+			auto it = _subscriptions.insert(_subscriptions.end(), std::shared_ptr<ISubscription>());
+
+			auto& isubscription = *it;
+
+			auto onErrorWrapper = [onError](std::exception_ptr ep) {
+				try
+				{
+					std::rethrow_exception(ep);
+				}
+				catch (const std::exception& ex)
+				{
+					onError(ex.what());
+				}
+			};
+
+			auto onCompleteWrapper = [this, it]() {
+				_subscriptions.erase(it);
+			};
+
+			auto subscription = _observable.subscribe(onNext, onErrorWrapper, onCompleteWrapper);
+
+			isubscription.reset(new Subscription([subscription]() { subscription.unsubscribe(); }));
+
+			return isubscription;
+		}
+
+		std::weak_ptr<ISubscription> subscribe(std::function<void(T)> onNext)
+		{
+			auto it = _subscriptions.insert(_subscriptions.end(), std::shared_ptr<ISubscription>());
+
+			auto& isubscription = *it;
+
+			auto onErrorWrapper = [](std::exception_ptr ep) {
 				try
 				{
 					std::rethrow_exception(ep);
@@ -31,52 +92,24 @@ namespace Stormancer
 				}
 			};
 
-			auto subscription = _observable.subscribe(onNext, onError);
+			auto onCompleteWrapper = [this, it]() {
+				_subscriptions.erase(it);
+			};
 
-			return new Subscription([subscription]() {
-				subscription.unsubscribe();
-			});
+			auto subscription = _observable.subscribe(onNext, onErrorWrapper, onCompleteWrapper);
+
+			isubscription.reset(new Subscription([subscription]() { subscription.unsubscribe(); }));
+
+			return isubscription;
 		}
 
-		ISubscription* subscribe(std::function<void(T)> onNext, std::function<void(const char* errorMessage)> onError)
+		std::weak_ptr<ISubscription> subscribe(std::function<void(T)> onNext, std::function<void()> onComplete)
 		{
-			auto subscription = _observable.subscribe(onNext, [onError](std::exception_ptr ep) {
-				try
-				{
-					std::rethrow_exception(ep);
-				}
-				catch (const std::exception& ex)
-				{
-					onError(ex.what());
-				}
-			});
+			auto it = _subscriptions.insert(_subscriptions.end(), std::shared_ptr<ISubscription>());
 
-			return new Subscription([subscription]() {
-				subscription.unsubscribe();
-			});
-		}
+			auto& isubscription = *it;
 
-		ISubscription* subscribe(std::function<void(T)> onNext, std::function<void(const char* errorMessage)> onError, std::function<void()> onComplete)
-		{
-			auto subscription = _observable.subscribe(onNext, [onError](std::exception_ptr ep){
-				try
-				{
-					std::rethrow_exception(ep);
-				}
-				catch (const std::exception& ex)
-				{
-					onError(ex.what());
-				}
-			}, onComplete);
-
-			return new Subscription([subscription]() {
-				subscription.unsubscribe();
-			});
-		}
-
-		ISubscription* subscribe(std::function<void(T)> onNext, std::function<void()> onComplete)
-		{
-			auto onError = [](std::exception_ptr ep){
+			auto onErrorWrapper = [](std::exception_ptr ep) {
 				try
 				{
 					std::rethrow_exception(ep);
@@ -87,11 +120,16 @@ namespace Stormancer
 				}
 			};
 
-			auto subscription = _observable.subscribe(onNext, onError, onComplete);
+			auto onCompleteWrapper = [this, onComplete, it]() {
+				_subscriptions.erase(it);
+				onComplete();
+			};
 
-			return new Subscription([subscription]() {
-				subscription.unsubscribe();
-			});
+			auto subscription = _observable.subscribe(onNext, onErrorWrapper, onCompleteWrapper);
+
+			isubscription.reset(new Subscription([subscription]() { subscription.unsubscribe(); }));
+
+			return isubscription;
 		}
 
 		void destroy()
@@ -101,5 +139,6 @@ namespace Stormancer
 
 	private:
 		rxcpp::observable<T> _observable;
+		std::list<std::shared_ptr<ISubscription>> _subscriptions;
 	};
 };

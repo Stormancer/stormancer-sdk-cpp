@@ -30,6 +30,10 @@ namespace Stormancer
 	{
 	}
 
+	void IPlugin::sceneDisconnecting(Scene* scene)
+	{
+	}
+
 	void IPlugin::sceneDisconnected(Scene* scene)
 	{
 	}

@@ -60,10 +60,15 @@ namespace Stormancer
 
 		const TAction& operator()(TParam data) const
 		{
-			for (auto f : _functions)
+			auto it = _functions.begin();
+			auto end = _functions.end();
+			while (it != end)
 			{
+				auto f = *it;
+				++it; // increment before exec because f can erase itself
 				f(data);
 			}
+
 			return *this;
 		}
 
@@ -149,10 +154,15 @@ namespace Stormancer
 
 		const TAction& operator()() const
 		{
-			for (auto f : _functions)
+			auto it = _functions.begin();
+			auto end = _functions.end();
+			while (it != end)
 			{
+				auto f = *it;
+				++it; // increment before exec because f can erase itself
 				f();
 			}
+
 			return *this;
 		}
 

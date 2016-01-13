@@ -43,6 +43,12 @@ namespace Stormancer
 		/// \param plugin The plugin instance to add.
 		STORMANCER_DLL_API void addPlugin(IPlugin* plugin);
 
+		template<typename T>
+		void addPlugin()
+		{
+			addPlugin(new T());
+		}
+
 	private:
 		// Set a metadata
 		Configuration& metadata(const char*, const char*);
@@ -62,7 +68,7 @@ namespace Stormancer
 		IPacketDispatcher* dispatcher = nullptr;
 
 		/// Maximum number of remote peers that can connect with this client.
-		uint16 maxPeers = 10;
+		uint16 maxPeers = 0;
 
 		/// Enable or disable the asynchrounous dispatch of received messages. Enabled by default.
 		bool asynchronousDispatch = true;

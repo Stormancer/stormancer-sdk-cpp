@@ -1,110 +1,152 @@
 #include <stormancer.h>
 #include "ConsoleLogger.h"
+#include "NatPlugin.h"
 
-using namespace Stormancer;
-using namespace std;
+auto logger = (ConsoleLogger*)Stormancer::ILogger::instance(new ConsoleLogger(Stormancer::LogLevel::Trace));
 
-auto logger = (ConsoleLogger*)ILogger::instance(new ConsoleLogger(Stormancer::LogLevel::Trace));
-const char* accountId = "997bc6ac-9021-2ad6-139b-da63edee8c58";
-const char* applicationName = "tester";
-const char* sceneName = "main";
-Configuration* config = nullptr;
-Client* client = nullptr;
-Scene* sceneMain = nullptr;
-
-void rpc(Scene* scene)
+class MyClient
 {
-	auto rpcService = scene->dependencyResolver()->resolve<IRpcService>();
+public:
+	Stormancer::Configuration* config = nullptr;
+	Stormancer::Client* client = nullptr;
+	Stormancer::Scene* scene = nullptr;
 
-	ISubscription* sub = nullptr;
+	MyClient* host = nullptr;
+	bool isHost = false;
+	std::string userId;
+	std::string name;
+	std::function<void()> clean;
+};
 
-	logger->log(Stormancer::LogLevel::Info, "rpc", "start rpc...", "");
-	auto observable = rpcService->rpc("rpc", [](bytestream* stream) {}, PacketPriority::MEDIUM_PRIORITY);
+MyClient* myHost = nullptr;
+MyClient* myClient = nullptr;
 
-	auto onNext = [&sub, scene](Packetisp_ptr packet) {
-		logger->log(Stormancer::LogLevel::Info, "rpc", "observable next", "");
-		//sub->destroy();
-		//rpc(scene);
-	};
+MyClient* create_host();
+MyClient* create_client();
+void test_nat();
 
-	auto onComplete = []() {
-		logger->log(Stormancer::LogLevel::Trace, "rpc", "observable complete", "");
-	};
+MyClient* create_client()
+{
+	auto myClient = new MyClient();
 
-	auto onError = [](const char* error) {
-		logger->log(Stormancer::LogLevel::Error, "rpc", "observable error", error);
-	};
+	static int sid = 0;
+	myClient->name = "client " + std::to_string(sid++);
 
-	sub = observable->subscribe(onNext, onError, onComplete);
+	auto config = Stormancer::Configuration::forAccount("ee59dae9-332d-519d-070e-f9353ae7bbce", "battlefeet-gothic");
+	//config->addPlugin(new MessagingPlugin());
+	config->addPlugin(new NatPlugin());
+	config->synchronisedClock = false;
+	config->maxPeers = 5;
+	auto client = Stormancer::Client::createClient(config);
+
+	myClient->config = config;
+	myClient->client = client;
+
+	auto authService = client->dependencyResolver()->resolve<Stormancer::IAuthenticationService>();
+	auto steamTicket = "SteamTicket " + myClient->name;
+	authService->steamLogin(steamTicket.c_str()).then([client, authService, myClient](Stormancer::Result<Stormancer::Scene*>* result) {
+		if (result->success())
+		{
+			myClient->userId = authService->userId();
+
+			auto sceneProfiles = result->get();
+			logger->log(Stormancer::LogLevel::Info, "create_client", "Steam authentication OK", myClient->name.c_str());
+
+			logger->log(Stormancer::LogLevel::Info, "create_client", "Profiles scene connect", "");
+			sceneProfiles->connect().then([client, authService, sceneProfiles, myClient](Stormancer::Result<>* result) {
+				if (result->success())
+				{
+					logger->log(Stormancer::LogLevel::Info, "create_client", "Profiles scene connect OK", myClient->name.c_str());
+
+					auto natService = client->dependencyResolver()->resolve<NatService>();
+
+					natService->onNewP2PConnection([myClient](RakNetPeer* rakNetPeer) {
+						logger->log(Stormancer::LogLevel::Info, "create_client", "New P2P connection", myClient->name.c_str());
+
+						rakNetPeer->onConnectionStateChanged([myClient](Stormancer::ConnectionState state) {
+							auto stateStr = std::to_string((int)state);
+							logger->log(Stormancer::LogLevel::Info, "create_client", "RakNetPeer onConnectionStateChanged", stateStr.c_str());
+						});
+
+						rakNetPeer->onPacketReceived([myClient](void* data) {
+							RakNet::Packet& packet = *(RakNet::Packet*)data;
+							std::string message((char*)packet.data, packet.length);
+							message = "NAT packet received " + message;
+							logger->log(Stormancer::LogLevel::Info, "create_client", message.c_str(), myClient->name.c_str());
+						});
+					});
+
+					if (!myClient->isHost)
+					{
+						while (1)
+						{
+							Sleep(1000);
+							if (myHost && myClient)
+							{
+								if (myHost->userId.size())
+								{
+									break;
+								}
+							}
+						}
+						logger->log(Stormancer::LogLevel::Info, "create_client", "WAIT FINISHED, START NAT PUNCH THROUGH", myClient->name.c_str());
+						auto hostId = myHost->userId;
+						
+						natService->openNat(hostId.c_str()).then([myClient](Stormancer::Result<RakNetPeer*>* result) {
+							if (result->success())
+							{
+								logger->log(Stormancer::LogLevel::Info, "create_client", "openNat succeed", myClient->name.c_str());
+								auto rakNetPeer = result->get();
+								logger->log(Stormancer::LogLevel::Info, "create_client", "NAT send packet", myClient->name.c_str());
+								rakNetPeer->sendPacket([myClient](Stormancer::bytestream* stream) {
+									*stream << "salut";
+								});
+							}
+							else
+							{
+								logger->log(Stormancer::LogLevel::Error, "create_client", "openNat failed", myClient->name.c_str());
+							}
+							delete result;
+						});
+					}
+				}
+				else
+				{
+					auto msg = std::string() + "Profiles scene connect failed" + result->reason();
+					logger->log(Stormancer::LogLevel::Info, "create_client", msg.c_str(), myClient->name.c_str());
+				}
+				Stormancer::destroy(result);
+			});
+
+			myClient->clean = [authService, client]() {
+				authService->logout().then([client](Stormancer::Result<>* result) {
+					client->disconnect();
+					Stormancer::destroy(result);
+				});
+			};
+		}
+		else
+		{
+			logger->log(Stormancer::LogLevel::Info, "create_client", "Steam authentication failed", result->reason());
+		}
+		Stormancer::destroy(result);
+	});
+
+	return myClient;
 }
 
-std::string connectionStateToString(ConnectionState connectionState)
+void test_nat()
 {
-	std::string stateStr = std::to_string((int)connectionState) + " ";
-	switch (connectionState)
-	{
-	case ConnectionState::Disconnected:
-		stateStr += "Disconnected";
-		break;
-	case ConnectionState::Connecting:
-		stateStr += "Connecting";
-		break;
-	case ConnectionState::Connected:
-		stateStr += "Connected";
-		break;
-	case ConnectionState::Disconnecting:
-		stateStr += "Disconnecting";
-		break;
-	}
-	return stateStr;
+	myHost = create_client();
+	myHost->name = "host";
+	myHost->isHost = true;
+	myClient = create_client();
+	myClient->name = "client 1";
 }
 
 int main()
 {
-	{
-		logger->log(LogLevel::Debug, "main", "Create client", "");
-		config = Configuration::forAccount(accountId, applicationName);
-		config->synchronisedClock = false;
-		client = Client::createClient(config);
-		logger->log(LogLevel::Info, "main", "Create client OK", "");
-
-		client->onConnectionStateChanged([](ConnectionState connectionState) {
-			auto stateStr = connectionStateToString(connectionState);
-			logger->log(LogLevel::Info, "main", "CLIENT ", stateStr.c_str());
-		});
-
-		client->getPublicScene(sceneName).then([](Result<Scene*>* result) {
-			if (result->success())
-			{
-				sceneMain = result->get();
-
-				sceneMain->onConnectionStateChanged([](ConnectionState connectionState) {
-					auto stateStr = connectionStateToString(connectionState);
-					logger->log(LogLevel::Info, "main", "SCENE MAIN ", stateStr.c_str());
-				});
-
-				sceneMain->connect().then([](Result<>* result2) {
-					if (result2->success())
-					{
-						logger->log(LogLevel::Info, "main", "Connect OK", "");
-
-						//rpc(sceneMain);
-						sceneMain->disconnect();
-					}
-					else
-					{
-						logger->log(LogLevel::Error, "main", "Failed to connect to the scene", result2->reason());
-					}
-					destroy(result2);
-				});
-			}
-			else
-			{
-				logger->log(LogLevel::Error, "main", "Failed to get the scene", result->reason());
-			}
-			destroy(result);
-		});
-	}
+	test_nat();
 
 	std::cin.ignore();
 

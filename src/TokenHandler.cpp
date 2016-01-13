@@ -12,6 +12,11 @@ namespace Stormancer
 
 	SceneEndpoint TokenHandler::decodeToken(std::string& token)
 	{
+		if (token.length() == 0)
+		{
+			throw std::invalid_argument("Empty token");
+		}
+
 		std::wstring wtoken(token.begin(), token.end());
 		wtoken = stringTrim(wtoken, L'"');
 		std::wstring data = stringSplit(wtoken, L"-")[0];

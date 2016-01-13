@@ -34,9 +34,6 @@ namespace Stormancer
 			void newConnection(IConnection* connection);
 			IConnection* getConnection(uint64 id);
 			void closeConnection(IConnection* connection, std::string reason);
-
-		private:
-			uint64 _current = 0;
 		};
 
 	private:
@@ -84,7 +81,7 @@ namespace Stormancer
 
 		/// Disconnect and close all connections.
 		/// this method returns nothing. So it's useful for application close.
-		STORMANCER_DLL_API void disconnect();
+		STORMANCER_DLL_API pplx::task<Result<>*> disconnect(bool immediate = false);
 
 		STORMANCER_DLL_API int64 clock();
 
@@ -113,16 +110,16 @@ namespace Stormancer
 		/// \param scene The scene.
 		/// \param sceneHandle Scene handle.
 		/// \return A task which complete when the disconnection is done.
-		pplx::task<void> disconnect(Scene* scene, byte sceneHandle);
+		pplx::task<void> disconnect(Scene* scene, byte sceneHandle, bool immediate = false);
+
+		/// Disconnect from all scenes.
+		pplx::task<void> disconnectAllScenes(bool immediate = false);
 
 		/// Get scene informations for connection.
 		/// \param sceneId Scene id.
 		/// \param sep Scene Endpoint retrieved by ApiClient::getSceneEndpoint
 		/// \return A task which complete when the scene informations are retrieved.
 		pplx::task<Scene*> getScene(std::string sceneId, SceneEndpoint sep);
-
-		/// Disconnect from all scenes.
-		void disconnectAllScenes();
 
 		/// Called by the transport when a packet has been received.
 		/// \param packet Received packet.
@@ -139,7 +136,18 @@ namespace Stormancer
 				// serialize request dto
 				msgpack::pack(stream, parameter);
 				//auto res = stream->str();
-			}).then([this](Packet_ptr packet) {
+			}).then([this](pplx::task<Packet_ptr> t) {
+				Packet_ptr packet;
+
+				try
+				{
+					packet = t.get();
+				}
+				catch (const std::exception& ex)
+				{
+					throw std::runtime_error(std::string() + "System request failed (" + ex.what() + ")");
+				}
+
 				// deserialize result dto
 				std::string buffer;
 				*packet->stream >> buffer;

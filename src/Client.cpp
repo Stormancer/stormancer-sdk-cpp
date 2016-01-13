@@ -15,6 +15,7 @@ namespace Stormancer
 
 	uint64 Client::ConnectionHandler::generateNewConnectionId()
 	{
+		static uint64 _current = 0;
 		return _current++;
 	}
 
@@ -80,7 +81,7 @@ namespace Stormancer
 #ifdef STORMANCER_LOG_CLIENT
 		ILogger::instance()->log(LogLevel::Trace, "Client destructor", "deleting the client...", "");
 #endif
-		disconnect();
+		disconnect(true);
 
 		for (auto plugin : _plugins)
 		{
@@ -239,7 +240,7 @@ namespace Stormancer
 	pplx::task<Scene*> Client::getScene(std::string sceneId, SceneEndpoint sep)
 	{
 		if (_cts.get_token().is_canceled()){
-			throw std::runtime_error("Client has been disconnected. A client can only connect once.");
+			throw std::runtime_error("This Stormancer client has been disconnected and should not be used anymore.");
 		}
 
 #ifdef STORMANCER_LOG_CLIENT
@@ -319,25 +320,15 @@ namespace Stormancer
 			_logger->log(LogLevel::Trace, "Client::getScene", "send SceneInfosRequestDto", "");
 #endif
 			return sendSystemRequest<SceneInfosRequestDto, SceneInfosDto>((byte)SystemRequestIDTypes::ID_GET_SCENE_INFOS, parameter);
-		}).then([this, sep, sceneId](pplx::task<SceneInfosDto> t) {
-			SceneInfosDto result;
-			try
-			{
-				result = t.get();
-			}
-			catch (const std::exception& e)
-			{
-				throw std::runtime_error(std::string(e.what()) + "\nFailed to get scene infos.");
-			}
-
+		}).then([this, sep, sceneId](SceneInfosDto sceneInfos) {
 			std::stringstream ss;
-			ss << result.SceneId << " " << result.SelectedSerializer << " Routes:[";
-			for (uint32 i = 0; i < result.Routes.size(); i++)
+			ss << sceneInfos.SceneId << " " << sceneInfos.SelectedSerializer << " Routes:[";
+			for (uint32 i = 0; i < sceneInfos.Routes.size(); i++)
 			{
-				ss << result.Routes.at(i).Handle << ":" << result.Routes.at(i).Name << ";";
+				ss << sceneInfos.Routes.at(i).Handle << ":" << sceneInfos.Routes.at(i).Name << ";";
 			}
 			ss << "] Metadata:[";
-			for (auto it : result.Metadata)
+			for (auto it : sceneInfos.Metadata)
 			{
 				ss << it.first << ":" << it.second << ";";
 			}
@@ -345,8 +336,8 @@ namespace Stormancer
 #ifdef STORMANCER_LOG_CLIENT
 			_logger->log(LogLevel::Trace, "Client::getScene", "SceneInfosDto received", ss.str().c_str());
 #endif
-			_serverConnection->metadata()["serializer"] = result.SelectedSerializer;
-			return updateServerMetadata().then([this, sep, sceneId, result](pplx::task<void> t) {
+			_serverConnection->metadata()["serializer"] = sceneInfos.SelectedSerializer;
+			return updateServerMetadata().then([this, sep, sceneId, sceneInfos](pplx::task<void> t) {
 				try
 				{
 					t.wait();
@@ -361,7 +352,7 @@ namespace Stormancer
 					}
 					else
 					{
-						scene = new Scene(_serverConnection, this, sceneId, sep.token, result, _dependencyResolver, [this, sceneId]() {
+						scene = new Scene(_serverConnection, this, sceneId, sep.token, sceneInfos, _dependencyResolver, [this, sceneId]() {
 							if (mapContains(_scenes, sceneId))
 							{
 								_scenes.erase(sceneId);
@@ -447,24 +438,72 @@ namespace Stormancer
 		});
 	}
 
-	void Client::disconnect()
+	pplx::task<Result<>*> Client::disconnect(bool immediate)
 	{
-		_cts.cancel();
+		pplx::task_completion_event<Result<>*> tce;
+		auto result = new Result<>();
 
-		if (_synchronisedClock)
+		try
 		{
-			stopSyncClock();
+			if (_serverConnection && _serverConnection->connectionState() == ConnectionState::Connected)
+			{
+				// Stops the synchronised clock, disconnect the scenes, closes the server connection then stops the underlying transports.
+
+				if (_synchronisedClock)
+				{
+					stopSyncClock();
+				}
+
+				auto dt = disconnectAllScenes(immediate);
+
+				auto end = [this, tce, result]() {
+					if (_serverConnection)
+					{
+						_serverConnection->close();
+					}
+
+					_cts.cancel(); // this will cause the transport to stop
+
+					result->set();
+					tce.set(result);
+				};
+
+				if (!immediate)
+				{
+					dt.then([tce, result, end](pplx::task<void> t) {
+						try
+						{
+							t.wait();
+							end();
+						}
+						catch (const std::exception& ex)
+						{
+							result->setError(1, ex.what());
+							tce.set(result);
+						}
+					});
+				}
+				else
+				{
+					end();
+				}
+			}
+			else
+			{
+				result->set();
+				tce.set(result);
+			}
+		}
+		catch (const std::exception& ex)
+		{
+			result->setError(1, ex.what());
+			tce.set(result);
 		}
 
-		disconnectAllScenes();
-
-		if (_serverConnection)
-		{
-			_serverConnection->close();
-		}
+		return pplx::create_task(tce);
 	}
 
-	pplx::task<void> Client::disconnect(Scene* scene, byte sceneHandle)
+	pplx::task<void> Client::disconnect(Scene* scene, byte sceneHandle, bool immediate)
 	{
 		if (!scene)
 		{
@@ -478,38 +517,80 @@ namespace Stormancer
 
 		scene->setConnectionState(ConnectionState::Disconnecting);
 
-		//for (auto plugin : _plugins)
-		//{
-		//	plugin->sceneDisconnecting(scene);
-		//}
-
-		scene->setConnectionState(ConnectionState::Disconnected);
-
 		for (auto plugin : _plugins)
 		{
-			plugin->sceneDisconnected(scene);
+			plugin->sceneDisconnecting(scene);
 		}
+
+		auto taskDisconnected = [this, scene]() {
+			scene->setConnectionState(ConnectionState::Disconnected);
+
+			for (auto plugin : _plugins)
+			{
+				plugin->sceneDisconnected(scene);
+			}
+
+#ifdef STORMANCER_LOG_CLIENT
+			ILogger::instance()->log(LogLevel::Info, "client", "Scene disconnected", scene->id());
+#endif
+		};
 
 		DisconnectFromSceneDto dto(sceneHandle);
 		_scenesDispatcher->removeScene(sceneHandle);
-		std::string sceneId = scene->id();
-		return sendSystemRequest<DisconnectFromSceneDto, EmptyDto>((byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, dto).then([sceneId](EmptyDto&) {
-#ifdef STORMANCER_LOG_CLIENT
-			ILogger::instance()->log(LogLevel::Info, "client", "Scene disconnected", sceneId.c_str());
-#endif
-		});
+		if (!immediate)
+		{
+			return sendSystemRequest<DisconnectFromSceneDto, EmptyDto>((byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, dto).then([taskDisconnected](EmptyDto&) {
+				taskDisconnected();
+			});
+		}
+		else
+		{
+			taskDisconnected();
+			return taskCompleted();
+		}
 	}
 
-	void Client::disconnectAllScenes()
+	pplx::task<void> Client::disconnectAllScenes(bool immediate)
 	{
+		pplx::task_completion_event<void> tce;
+
+		std::vector<pplx::task<Result<>*>> tasks;
 		for (auto it : _scenes)
 		{
 			auto scene = it.second;
 			if (scene)
 			{
-				scene->disconnect();
+				tasks.push_back(scene->disconnect(immediate));
 			}
 		}
+		pplx::when_all(std::begin(tasks), std::end(tasks)).then([tce](std::vector<Result<>*> results) {
+			bool success = true;
+			std::string reason;
+			for (auto result : results)
+			{
+				if (!result->success())
+				{
+					success = false;
+					if (reason.size())
+					{
+						reason += "\n";
+					}
+					reason += result->reason();
+				}
+				delete result;
+			}
+
+			if (success)
+			{
+				tce.set();
+			}
+			else
+			{
+				tce.set_exception<std::runtime_error>(std::runtime_error(reason));
+			}
+		});
+
+		return pplx::create_task(tce);
 	}
 
 	void Client::transport_packetReceived(Packet_ptr packet)
@@ -673,6 +754,6 @@ namespace Stormancer
 
 	ConnectionState Client::connectionState() const
 	{
-		return _serverConnection->connectionState();
+		return (_serverConnection ? _serverConnection->connectionState() : ConnectionState::Disconnected);
 	}
 };

@@ -9,8 +9,10 @@ namespace Stormancer
 	/// Connection to the network using RakNet.
 	class RakNetConnection : public IConnection
 	{
+		friend class RakNetTransport;
+
 	public:
-		RakNetConnection(RakNet::RakNetGUID guid, int64 id, RakNet::RakPeerInterface* peer, std::function<void(RakNetConnection*)> lambdaOnRequestClose);
+		RakNetConnection(RakNet::RakNetGUID guid, int64 id, RakNet::RakPeerInterface* peer, std::function<void(RakNetConnection*)> close);
 		virtual ~RakNetConnection();
 
 	public:
@@ -19,7 +21,6 @@ namespace Stormancer
 		std::string account();
 		std::string application();
 		ConnectionState connectionState();
-		void setConnectionState(ConnectionState connectionState);
 		Action<ConnectionState>& connectionStateChangedAction();
 		Action<ConnectionState>::TIterator onConnectionStateChanged(std::function<void(ConnectionState)> callback);
 		RakNet::RakNetGUID guid();
@@ -36,6 +37,8 @@ namespace Stormancer
 		void sendToScene(byte sceneIndex, uint16 route, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability);
 		int ping();
 		void setApplication(std::string account, std::string application);
+		Action<const char*>::TIterator onClose(std::function<void(const char*)> callback);
+		Action<const char*>& onCloseAction();
 
 		template<typename T>
 		void registerComponent(T* component)
@@ -60,9 +63,8 @@ namespace Stormancer
 			return false;
 		}
 
-	public:
-		std::function<void(std::string)> connectionClosed;
-		Action<RakNetConnection*> _closeAction;
+	protected:
+		void setConnectionState(ConnectionState connectionState);
 
 	private:
 		stringMap _metadata;
@@ -77,5 +79,7 @@ namespace Stormancer
 		DependencyResolver* _dependencyResolver = nullptr;
 		ConnectionState _connectionState = ConnectionState::Disconnected;
 		Action<ConnectionState> _onConnectionStateChanged;
+		Action<RakNetConnection*> _closeAction;
+		Action<const char*> _onClose;
 	};
 };

@@ -77,7 +77,7 @@ namespace Stormancer
 
 		if (!processed)
 		{
-			throw std::runtime_error(std::string("Couldn't process message. msgId: ") + std::to_string(msgType));
+			//throw std::runtime_error(std::string("Couldn't process message. msgId: ") + std::to_string(msgType));
 		}
 	}
 

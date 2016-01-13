@@ -1,13 +1,21 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="..\Tester\ConsoleLogger.cpp" />
+    <ClCompile Include="main2.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="NatPlugin.cpp" />
+    <ClCompile Include="NatService.cpp" />
+    <ClCompile Include="RakNetPeer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Tester\ConsoleLogger.h" />
+    <ClInclude Include="NatPlugin.h" />
+    <ClInclude Include="NatService.h" />
+    <ClInclude Include="RakNetPeer.h" />
+    <ClInclude Include="IPeer.h" />
   </ItemGroup>
 </Project>

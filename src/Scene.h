@@ -46,7 +46,7 @@ namespace Stormancer
 		STORMANCER_DLL_API pplx::task<Result<>*> connect();
 
 		/// Disconnect from the scene.
-		STORMANCER_DLL_API pplx::task<Result<>*> disconnect();
+		STORMANCER_DLL_API pplx::task<Result<>*> disconnect(bool immediate = false);
 
 		/// Add a route to the scene.
 		/// \param routeName Route name.
@@ -65,7 +65,7 @@ namespace Stormancer
 		/// Returns the connection state to the the scene.
 		STORMANCER_DLL_API ConnectionState connectionState();
 
-		STORMANCER_DLL_API Action<ConnectionState>& connectionStateChangedAction();
+		STORMANCER_DLL_API Action<ConnectionState>& onConnectionStateChangedAction();
 
 		STORMANCER_DLL_API Action<ConnectionState>::TIterator onConnectionStateChanged(std::function<void(ConnectionState)> callback);
 
@@ -156,7 +156,7 @@ namespace Stormancer
 		Client* _client;
 
 		/// RX subscriptions for disconnection.
-		std::vector<ISubscription*> _subscriptions;
+		std::vector<std::weak_ptr<ISubscription>> _subscriptions;
 
 		/// Scene peer connection
 		IScenePeer* _host = nullptr;

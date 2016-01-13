@@ -15,7 +15,7 @@ namespace Stormancer
 		STORMANCER_DLL_API IObservable<Packetisp_ptr>* rpc(const char* route, std::function<void(bytestream*)> writer, PacketPriority priority);
 		STORMANCER_DLL_API void addProcedure(const char* route, std::function<pplx::task<void>(RpcRequestContext_ptr)> handler, bool ordered);
 		STORMANCER_DLL_API uint16 pendingRequests();
-		STORMANCER_DLL_API void disconnected();
+		STORMANCER_DLL_API void cancelAll(const char* reason);
 
 	public:
 		void next(Packetisp_ptr packet);
