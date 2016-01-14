@@ -51,9 +51,10 @@ namespace Stormancer
 			auto id = reserveId();
 			request->id = id;
 
-			_pendingRequestsMutex.lock();
-			_pendingRequests[id] = request;
-			_pendingRequestsMutex.unlock();
+			{
+				std::lock_guard<std::mutex> lg(_pendingRequestsMutex);
+				_pendingRequests[id] = request;
+			}
 
 			auto result = _scene->sendPacket(route, [id, writer](bytestream* bs) {
 				*bs << id;
@@ -64,18 +65,16 @@ namespace Stormancer
 				ILogger::instance()->log(LogLevel::Error, "rpc.rpc", "sendPacket failed", result->reason());
 			}
 
-			subscriber.add([this, id, request]() {
+			subscriber.add([this, request]() {
 				if (!request->hasCompleted)
 				{
-					_pendingRequestsMutex.lock();
-					if (mapContains(_pendingRequests, id))
+					if (_scene->connectionState() == ConnectionState::Connected)
 					{
-						_pendingRequests.erase(id);
-						_scene->sendPacket(RpcPlugin::cancellationRouteName, [this, id](bytestream* bs) {
-							*bs << id;
+						_scene->sendPacket(RpcPlugin::cancellationRouteName, [this, request](bytestream* bs) {
+							*bs << request->id;
 						});
 					}
-					_pendingRequestsMutex.unlock();
+					eraseRequest(request->id);
 				}
 			});
 		});
@@ -85,9 +84,11 @@ namespace Stormancer
 
 	uint16 RpcService::pendingRequests()
 	{
-		_pendingRequestsMutex.lock();
-		uint16 size = (uint16)_pendingRequests.size();
-		_pendingRequestsMutex.unlock();
+		uint16 size = 0;
+		{
+			std::lock_guard<std::mutex> lg(_pendingRequestsMutex);
+			size = (uint16)_pendingRequests.size();
+		}
 		return size;
 	}
 
@@ -153,10 +154,8 @@ namespace Stormancer
 	uint16 RpcService::reserveId()
 	{
 		uint32 i = 0;
-		uint16 result = 0;
-		bool found = false;
 
-		_pendingRequestsMutex.lock();
+		std::lock_guard<std::mutex> lg(_pendingRequestsMutex);
 
 		static uint16 id = 0;
 
@@ -167,17 +166,9 @@ namespace Stormancer
 
 			if (!mapContains(_pendingRequests, id))
 			{
-				result = id;
-				found = true;
+				return id;
 				break;
 			}
-		}
-
-		_pendingRequestsMutex.unlock();
-
-		if (found)
-		{
-			return result;
 		}
 
 		throw std::overflow_error("Unable to create a new RPC request: Too many pending requests.");
@@ -190,12 +181,13 @@ namespace Stormancer
 
 		RpcRequest_ptr request;
 
-		_pendingRequestsMutex.lock();
-		if (mapContains(_pendingRequests, id))
 		{
-			request = _pendingRequests[id];
+			std::lock_guard<std::mutex> lg(_pendingRequestsMutex);
+			if (mapContains(_pendingRequests, id))
+			{
+				request = _pendingRequests[id];
+			}
 		}
-		_pendingRequestsMutex.unlock();
 
 		if (!request)
 		{
@@ -207,9 +199,8 @@ namespace Stormancer
 
 	void RpcService::eraseRequest(uint16 requestId)
 	{
-		_pendingRequestsMutex.lock();
+		std::lock_guard<std::mutex> lg(_pendingRequestsMutex);
 		_pendingRequests.erase(requestId);
-		_pendingRequestsMutex.unlock();
 	}
 
 	void RpcService::next(Packetisp_ptr packet)
@@ -242,9 +233,10 @@ namespace Stormancer
 
 			request->hasCompleted = true;
 
-			_pendingRequestsMutex.lock();
-			_pendingRequests.erase(request->id);
-			_pendingRequestsMutex.unlock();
+			{
+				std::lock_guard<std::mutex> lg(_pendingRequestsMutex);
+				_pendingRequests.erase(request->id);
+			}
 
 			std::string buf;
 			*packet->stream >> buf;
@@ -254,8 +246,8 @@ namespace Stormancer
 			std::string msg;
 			deserialized.convert(&msg);
 			request->observer.on_error(std::make_exception_ptr(std::runtime_error(msg)));
+			}
 		}
-	}
 
 	void RpcService::complete(Packetisp_ptr packet)
 	{
@@ -310,23 +302,33 @@ namespace Stormancer
 
 	void RpcService::cancelAll(const char* reason)
 	{
-		_runningRequestsMutex.lock();
-		for (auto pair : _runningRequests)
 		{
-			pair.second.cancel();
+			std::lock_guard<std::mutex> lg(_runningRequestsMutex);
+			for (auto pair : _runningRequests)
+			{
+				pair.second.cancel();
+			}
+			_runningRequests.clear();
 		}
-		_runningRequests.clear();
-		_runningRequestsMutex.unlock();
 
-		_pendingRequestsMutex.lock();
-		for (auto pair : _pendingRequests)
+		std::map<uint16, RpcRequest_ptr> pendingRequestsCopy;
+
+		{
+			std::lock_guard<std::mutex> lg(_pendingRequestsMutex);
+			pendingRequestsCopy = _pendingRequests;
+		}
+
+		for (auto pair : pendingRequestsCopy)
 		{
 			if (!pair.second->hasCompleted)
 			{
 				pair.second->observer.on_error(std::make_exception_ptr<std::runtime_error>(std::runtime_error(reason)));
 			}
 		}
-		_pendingRequests.clear();
-		_pendingRequestsMutex.unlock();
+
+		{
+			std::lock_guard<std::mutex> lg(_pendingRequestsMutex);
+			_pendingRequests.clear();
+		}
 	}
-};
+	};

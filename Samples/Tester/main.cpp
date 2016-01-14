@@ -168,13 +168,6 @@ void test_connect()
 				logger->log(ex);
 			}
 		});
-
-		//client->getPublicScene(sceneName).then([](Result<Scene*>* result) {
-		//	sceneMain = result->get();
-		//	sceneMain->connect().then([](Result<>* result2) {
-		//		destroy(result2);
-		//	});
-		//});
 	}
 	catch (const std::exception& ex)
 	{
@@ -210,6 +203,17 @@ void test_rpc_server()
 		}
 
 		//execNextTest(); // don't do that, the server send back a rpc for the next test!
+	});
+
+	client->disconnect().then([](Result<>* result) {
+		if (result->success())
+		{
+			logger->log(LogLevel::Info, "client.disconnect", "Disconnect OK", "");
+		}
+		else
+		{
+			logger->log(LogLevel::Error, "client.disconnect", "Disconnect failed", result->reason());
+		}
 	});
 }
 
@@ -298,10 +302,10 @@ int main(int argc, char* argv[])
 	tests.push_back(test_connect);
 	tests.push_back(test_echo);
 	tests.push_back(test_rpc_server);
-	tests.push_back(test_rpc_server_cancel);
-	tests.push_back(test_syncclock);
-	tests.push_back(test_disconnect);
-	tests.push_back(clean);
+	//tests.push_back(test_rpc_server_cancel);
+	//tests.push_back(test_syncclock);
+	//tests.push_back(test_disconnect);
+	//tests.push_back(clean);
 
 	tests.push_back(the_end);
 

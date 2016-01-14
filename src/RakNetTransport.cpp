@@ -89,13 +89,13 @@ namespace Stormancer
 					{
 						continue;
 					}
-					/*
+					
 #ifdef STORMANCER_LOG_RAKNET_PACKETS
 					std::string receivedData((char*)rakNetPacket->data, rakNetPacket->length);
 					auto bytes = stringifyBytesArray(receivedData, true);
 					ILogger::instance()->log(LogLevel::Trace, "onMessageReceived", "data", bytes.c_str());
 #endif
-					*/
+					
 					try
 					{
 						byte ID = rakNetPacket->data[0];
