@@ -60,8 +60,20 @@ MyClient* create_client()
 
 					auto natService = client->dependencyResolver()->resolve<NatService>();
 
-					natService->onNewP2PConnection([myClient](RakNetPeer* rakNetPeer) {
-						logger->log(Stormancer::LogLevel::Info, "create_client", "New P2P connection", myClient->name.c_str());
+					natService->onNewP2PConnection([myClient, natService](RakNetPeer* rakNetPeer) {
+						auto msg = std::string() + "New P2P connection. RakNetGUID = " + rakNetPeer->rakNetGUID().ToString();
+						logger->log(Stormancer::LogLevel::Info, "create_client", msg.c_str(), myClient->name.c_str());
+
+						RakNet::SystemAddress remoteSystems[5];
+						Stormancer::uint16 numberOfSystems;
+						natService->_rakPeerInterface->GetConnectionList(remoteSystems, &numberOfSystems);
+						std::string systems = "Connected systems : ";
+						for (auto i = 0; i < numberOfSystems; ++i)
+						{
+							systems += remoteSystems[i].ToString();
+							systems += "; ";
+						}
+						logger->log(Stormancer::LogLevel::Info, "create_client", systems.c_str(), myClient->name.c_str());
 
 						rakNetPeer->onConnectionStateChanged([myClient](Stormancer::ConnectionState state) {
 							auto stateStr = std::to_string((int)state);
@@ -74,9 +86,23 @@ MyClient* create_client()
 							message = "NAT packet received " + message;
 							logger->log(Stormancer::LogLevel::Info, "create_client", message.c_str(), myClient->name.c_str());
 						});
+
+						if (!myClient->isHost)
+						{
+							rakNetPeer->sendPacket([myClient](Stormancer::bytestream* stream) {
+								*stream << "salut";
+							});
+						}
 					});
 
-					if (!myClient->isHost)
+					auto guid = std::string() + "myRakNetGUID = " + natService->myRakNetGUID.ToString();
+					logger->log(Stormancer::LogLevel::Info, "create_client", guid.c_str(), myClient->name.c_str());
+
+					if (myClient->isHost)
+					{
+						//
+					}
+					else
 					{
 						while (1)
 						{
@@ -98,9 +124,6 @@ MyClient* create_client()
 								logger->log(Stormancer::LogLevel::Info, "create_client", "openNat succeed", myClient->name.c_str());
 								auto rakNetPeer = result->get();
 								logger->log(Stormancer::LogLevel::Info, "create_client", "NAT send packet", myClient->name.c_str());
-								rakNetPeer->sendPacket([myClient](Stormancer::bytestream* stream) {
-									*stream << "salut";
-								});
 							}
 							else
 							{

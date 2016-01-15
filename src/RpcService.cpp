@@ -52,7 +52,7 @@ namespace Stormancer
 			request->id = id;
 
 			{
-				std::lock_guard<std::mutex> lg(_pendingRequestsMutex);
+				std::lock_guard<std::mutex> lock(_pendingRequestsMutex);
 				_pendingRequests[id] = request;
 			}
 
@@ -86,7 +86,7 @@ namespace Stormancer
 	{
 		uint16 size = 0;
 		{
-			std::lock_guard<std::mutex> lg(_pendingRequestsMutex);
+			std::lock_guard<std::mutex> lock(_pendingRequestsMutex);
 			size = (uint16)_pendingRequests.size();
 		}
 		return size;
@@ -155,7 +155,7 @@ namespace Stormancer
 	{
 		uint32 i = 0;
 
-		std::lock_guard<std::mutex> lg(_pendingRequestsMutex);
+		std::lock_guard<std::mutex> lock(_pendingRequestsMutex);
 
 		static uint16 id = 0;
 
@@ -182,7 +182,7 @@ namespace Stormancer
 		RpcRequest_ptr request;
 
 		{
-			std::lock_guard<std::mutex> lg(_pendingRequestsMutex);
+			std::lock_guard<std::mutex> lock(_pendingRequestsMutex);
 			if (mapContains(_pendingRequests, id))
 			{
 				request = _pendingRequests[id];
@@ -199,7 +199,7 @@ namespace Stormancer
 
 	void RpcService::eraseRequest(uint16 requestId)
 	{
-		std::lock_guard<std::mutex> lg(_pendingRequestsMutex);
+		std::lock_guard<std::mutex> lock(_pendingRequestsMutex);
 		_pendingRequests.erase(requestId);
 	}
 
@@ -234,7 +234,7 @@ namespace Stormancer
 			request->hasCompleted = true;
 
 			{
-				std::lock_guard<std::mutex> lg(_pendingRequestsMutex);
+				std::lock_guard<std::mutex> lock(_pendingRequestsMutex);
 				_pendingRequests.erase(request->id);
 			}
 
@@ -314,7 +314,7 @@ namespace Stormancer
 		std::map<uint16, RpcRequest_ptr> pendingRequestsCopy;
 
 		{
-			std::lock_guard<std::mutex> lg(_pendingRequestsMutex);
+			std::lock_guard<std::mutex> lock(_pendingRequestsMutex);
 			pendingRequestsCopy = _pendingRequests;
 		}
 
@@ -327,7 +327,7 @@ namespace Stormancer
 		}
 
 		{
-			std::lock_guard<std::mutex> lg(_pendingRequestsMutex);
+			std::lock_guard<std::mutex> lock(_pendingRequestsMutex);
 			_pendingRequests.clear();
 		}
 	}

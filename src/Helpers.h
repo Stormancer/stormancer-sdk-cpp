@@ -429,7 +429,7 @@ namespace Stormancer
 		return *static_cast<uint64*>(static_cast<void*>(ptr));
 	}
 
-	std::string stringifyBytesArray(std::string bytes, bool hex = false);
+	STORMANCER_DLL_API std::string stringifyBytesArray(std::string bytes, bool hex = false);
 
 #pragma endregion
 };

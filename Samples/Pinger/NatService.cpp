@@ -21,7 +21,7 @@ pplx::task<Stormancer::Result<Stormancer::stringMap>*> NatService::getP2PData(co
 
 	std::string userId = userId2;
 
-	Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Info, "client.plugins.nat", "getP2PData for", userId2);
+	Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Info, "NatService::getP2PData", "getP2PData for", userId2);
 
 	_uploadTask.then([this, userId, tce, result]() {
 		auto observable = _rpcService->rpc("nat.getp2pdata", [this, userId](Stormancer::bytestream* stream) {
@@ -30,7 +30,7 @@ pplx::task<Stormancer::Result<Stormancer::stringMap>*> NatService::getP2PData(co
 		}, PacketPriority::MEDIUM_PRIORITY);
 
 		auto onNext = [this, tce, result](Stormancer::Packetisp_ptr packet) {
-			Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Info, "client.plugins.nat", "getP2PData next", "");
+			Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Info, "NatService::getP2PData", "getP2PData next", "");
 
 			std::string buffer;
 			*packet->stream >> buffer;
@@ -45,7 +45,7 @@ pplx::task<Stormancer::Result<Stormancer::stringMap>*> NatService::getP2PData(co
 		};
 
 		auto onError = [tce, result, observable](const char* error) {
-			Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Error, "client.plugins.nat", "getP2PData error", error);
+			Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Error, "NatService::getP2PData", "getP2PData error", error);
 
 			result->setError(1, error);
 			tce.set(result);
@@ -54,7 +54,7 @@ pplx::task<Stormancer::Result<Stormancer::stringMap>*> NatService::getP2PData(co
 		};
 
 		auto onComplete = [observable]() {
-			Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Info, "client.plugins.nat", "getP2PData complete", "");
+			Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Info, "NatService::getP2PData", "getP2PData complete", "");
 
 			observable->destroy();
 		};
@@ -65,14 +65,14 @@ pplx::task<Stormancer::Result<Stormancer::stringMap>*> NatService::getP2PData(co
 	return pplx::create_task(tce);
 }
 
-pplx::task<Stormancer::Result<RakNetPeer*>*> NatService::openNat(const char* userId2)
+pplx::task<Stormancer::Result<RakNetPeer*>*> NatService::openNat(const char* userId2, bool autoConnect)
 {
 	pplx::task_completion_event<Stormancer::Result<RakNetPeer*>*> tce;
 
 	std::string userId = userId2;
 
 	auto t = getP2PData(userId.c_str());
-	t.then([this, userId, tce](Stormancer::Result<Stormancer::stringMap>* r) {
+	t.then([this, userId, tce, autoConnect](Stormancer::Result<Stormancer::stringMap>* r) {
 		if (r->success())
 		{
 			auto p2pData = r->get();
@@ -80,7 +80,7 @@ pplx::task<Stormancer::Result<RakNetPeer*>*> NatService::openNat(const char* use
 			{
 				auto rakNetGUID = RakNet::RakNetGUID(std::stoull(p2pData["raknet"]));
 				auto serverSystemAddress = RakNet::SystemAddress(_transport->host(), _transport->port());
-				auto rakNetPeer = new RakNetPeer(rakNetGUID, _rakPeerInterface, userId);
+				auto rakNetPeer = new RakNetPeer(rakNetGUID, _rakPeerInterface, userId, autoConnect);
 				rakNetPeer->_tce = tce;
 				rakNetPeer->setConnectionState(Stormancer::ConnectionState::Connecting);
 				_peers[rakNetGUID] = rakNetPeer;
@@ -93,7 +93,7 @@ pplx::task<Stormancer::Result<RakNetPeer*>*> NatService::openNat(const char* use
 				auto openNatResult = _natPunchthroughClient->OpenNAT(rakNetGUID, serverSystemAddress);
 				if (!openNatResult)
 				{
-					Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Warn, "client.nat.openNat", "Can't open Nat", "RakNet OpenNat returned 'false'");
+					Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Warn, "NatService::openNat", "Can't open Nat", "RakNet OpenNat returned 'false'");
 				}
 			}
 		}
@@ -109,7 +109,7 @@ pplx::task<Stormancer::Result<RakNetPeer*>*> NatService::openNat(const char* use
 	return pplx::create_task(tce);
 }
 
-pplx::task<Stormancer::Result<std::vector<RakNetPeer*>>*> NatService::openNatGroup(std::vector<std::string> userIds)
+pplx::task<Stormancer::Result<std::vector<RakNetPeer*>>*> NatService::openNatGroup(std::vector<std::string> userIds, bool autoConnect)
 {
 	pplx::task_completion_event<Stormancer::Result<std::vector<RakNetPeer*>>*> tce;
 
@@ -117,7 +117,7 @@ pplx::task<Stormancer::Result<std::vector<RakNetPeer*>>*> NatService::openNatGro
 
 	for (auto userId : userIds)
 	{
-		tasks.push_back(openNat(userId.c_str()));
+		tasks.push_back(openNat(userId.c_str(), autoConnect));
 	}
 
 	auto task = pplx::when_all(std::begin(tasks), std::end(tasks)).then([this, userIds, tasks, tce](std::vector<Stormancer::Result<RakNetPeer*>*> rakNetGUIDs) {
@@ -181,15 +181,15 @@ void NatService::upload()
 		}, PacketPriority::MEDIUM_PRIORITY);
 
 		auto onNext = [this](Stormancer::Packetisp_ptr packet) {
-			Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Info, "client.plugins.nat", "Nat upload next", "");
+			Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Info, "NatService::upload", "Nat upload next", "");
 		};
 
 		auto onError = [](const char* error) {
-			Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Error, "client.plugins.nat", "Nat upload error", error);
+			Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Error, "NatService::upload", "Nat upload error", error);
 		};
 
 		auto onComplete = [tce]() {
-			Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Info, "client.plugins.nat", "Nat upload complete", "");
+			Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Info, "NatService::upload", "Nat upload complete", "");
 			tce.set();
 		};
 
@@ -201,6 +201,8 @@ void NatService::upload()
 
 void NatService::transportEvent(Stormancer::byte* ID, RakNet::Packet* packet, RakNet::RakPeerInterface* rakPeerInterface)
 {
+	myRakNetGUID = rakPeerInterface->GetGuidFromSystemAddress(RakNet::UNASSIGNED_SYSTEM_ADDRESS);
+
 	if (!_rakPeerInterface)
 	{
 		_rakPeerInterface = rakPeerInterface;
@@ -210,9 +212,37 @@ void NatService::transportEvent(Stormancer::byte* ID, RakNet::Packet* packet, Ra
 
 	switch (*ID)
 	{
+	case DefaultMessageIDTypes::ID_CONNECTION_REQUEST_ACCEPTED:
+	case DefaultMessageIDTypes::ID_NEW_INCOMING_CONNECTION:
+	{
+		Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Trace, "NatService::transportEvent", "New connection", packet->systemAddress.ToString(true, ':'));
+		auto rakNetPeer = _peers[rakNetGUID];
+		rakNetPeer->setConnectionState(Stormancer::ConnectionState::Connected);
+		if (_onNewP2PConnection)
+		{
+			_onNewP2PConnection(rakNetPeer);
+		}
+		break;
+	}
+	case DefaultMessageIDTypes::ID_NO_FREE_INCOMING_CONNECTIONS:
+	case DefaultMessageIDTypes::ID_CONNECTION_ATTEMPT_FAILED:
+	{
+		Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Trace, "NatService::transportEvent", "Connection failed", packet->systemAddress.ToString(true, ':'));
+		auto rakNetPeer = _peers[rakNetGUID];
+		rakNetPeer->setConnectionState(Stormancer::ConnectionState::Disconnected);
+		break;
+	}
+	case DefaultMessageIDTypes::ID_DISCONNECTION_NOTIFICATION:
+	case DefaultMessageIDTypes::ID_CONNECTION_LOST:
+	{
+		Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Trace, "NatService::transportEvent", "Peer lost the connection.", packet->systemAddress.ToString(true, ':'));
+		auto rakNetPeer = _peers[rakNetGUID];
+		rakNetPeer->setConnectionState(Stormancer::ConnectionState::Disconnected);
+		break;
+	}
 	case DefaultMessageIDTypes::ID_NAT_PUNCHTHROUGH_SUCCEEDED:
 	{
-		Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Info, "client.plugins.nat", "Open NAT succeed", "");
+		Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Info, "NatService::transportEvent", "Open NAT succeed", "");
 		RakNetPeer* rakNetPeer = nullptr;
 		if (Stormancer::mapContains(_peers, rakNetGUID))
 		{
@@ -220,10 +250,10 @@ void NatService::transportEvent(Stormancer::byte* ID, RakNet::Packet* packet, Ra
 		}
 		else
 		{
-			rakNetPeer = new RakNetPeer(rakNetGUID, _rakPeerInterface, "");
+			rakNetPeer = new RakNetPeer(rakNetGUID, _rakPeerInterface, "", false);
 			_peers[rakNetGUID] = rakNetPeer;
 		}
-		rakNetPeer->setConnectionState(Stormancer::ConnectionState::Connected);
+		rakNetPeer->setSystemAddress(packet->systemAddress);
 		rakNetPeer->_weAreSender = (packet->data[1] ? true : false);
 		if (rakNetPeer->weAreSender())
 		{
@@ -231,9 +261,11 @@ void NatService::transportEvent(Stormancer::byte* ID, RakNet::Packet* packet, Ra
 			result->set(rakNetPeer);
 			rakNetPeer->_tce.set(result);
 		}
-		if (_onNewP2PConnection)
+		if (rakNetPeer->autoConnect())
 		{
-			_onNewP2PConnection(rakNetPeer);
+			auto msg = std::string() + rakNetGUID.ToString() + " is connecting to " + rakNetPeer->systemAddress().ToString();
+			Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Trace, "NatService::transportEvent", msg.c_str(), "");
+			rakNetPeer->connect();
 		}
 		break;
 	}
@@ -244,11 +276,11 @@ void NatService::transportEvent(Stormancer::byte* ID, RakNet::Packet* packet, Ra
 	case DefaultMessageIDTypes::ID_NAT_ALREADY_IN_PROGRESS:
 	{
 		std::string error = "RakNet Message ID: " + std::to_string(*ID);
-		Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Info, "client.plugins.nat", "Open NAT failed", error.c_str());
+		Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Info, "NatService::transportEvent", "Open NAT failed", error.c_str());
 		if (Stormancer::mapContains(_peers, rakNetGUID))
 		{
 			auto rakNetPeer = _peers[rakNetGUID];
-			_peers.erase(rakNetGUID);
+			rakNetPeer->setConnectionState(Stormancer::ConnectionState::Disconnected);
 			auto result = new Stormancer::Result<RakNetPeer*>();
 			result->setError(1, "Open Nat failed");
 			rakNetPeer->_tce.set(result);
@@ -258,22 +290,22 @@ void NatService::transportEvent(Stormancer::byte* ID, RakNet::Packet* packet, Ra
 	}
 	default:
 	{
-		if (Stormancer::mapContains(_peers, rakNetGUID))
+		auto idstr = std::to_string(*ID);
+		Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Debug, "NatService::transportEvent", "ID", idstr.c_str());
+		if (*ID >= DefaultMessageIDTypes::ID_USER_PACKET_ENUM)
 		{
-			auto idstr = std::to_string(*ID);
-			Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Debug, "NAT", "ID", idstr.c_str());
-			if (*ID >= DefaultMessageIDTypes::ID_USER_PACKET_ENUM)
+			//auto idstr = std::to_string(*ID);
+			//Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Debug, "NAT", "Custom ID", idstr.c_str());
+			auto peer = _peers[rakNetGUID];
+			if (peer->_onPacketReceived)
 			{
-				//auto idstr = std::to_string(*ID);
-				//Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Debug, "NAT", "Custom ID", idstr.c_str());
-				auto peer = _peers[rakNetGUID];
 				peer->_onPacketReceived((void*)packet);
 			}
-			else
-			{
-				//auto idstr = std::to_string(*ID);
-				//Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Debug, "NAT", "Not custom ID", idstr.c_str());
-			}
+		}
+		else
+		{
+			//auto idstr = std::to_string(*ID);
+			//Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Debug, "NAT", "Not custom ID", idstr.c_str());
 		}
 		break;
 	}
@@ -282,7 +314,7 @@ void NatService::transportEvent(Stormancer::byte* ID, RakNet::Packet* packet, Ra
 
 void NatService::OnClientMessage(const char* msg)
 {
-	Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Info, "client.nat.OnClientMessage", "NAT RakNet message received", msg);
+	Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Info, "NatService::OnClientMessage", "NAT RakNet message received", msg);
 }
 
 void NatService::onNewP2PConnection(std::function<void(RakNetPeer*)> callback)

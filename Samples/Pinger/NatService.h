@@ -15,12 +15,15 @@ public:
 	NatService(const NatService&& other) = delete;
 	NatService& operator=(const NatService&& other) = delete;
 
-	pplx::task<Stormancer::Result<RakNetPeer*>*> openNat(const char* userId);
-	pplx::task<Stormancer::Result<std::vector<RakNetPeer*>>*> openNatGroup(std::vector<std::string> userIds);
+	pplx::task<Stormancer::Result<RakNetPeer*>*> openNat(const char* userId, bool autoConnect = true);
+	pplx::task<Stormancer::Result<std::vector<RakNetPeer*>>*> openNatGroup(std::vector<std::string> userIds, bool autoConnect = true);
 
 	void OnClientMessage(const char* msg);
 
 	void onNewP2PConnection(std::function<void(RakNetPeer*)> callback);
+
+	RakNet::RakNetGUID myRakNetGUID;
+	RakNet::RakPeerInterface* _rakPeerInterface = nullptr;
 
 private:
 	void transportEvent(Stormancer::byte* ID, RakNet::Packet* packet, RakNet::RakPeerInterface* rakPeerInterface);
@@ -33,7 +36,6 @@ private:
 	Stormancer::Client* _client = nullptr;
 	Stormancer::Scene* _scene = nullptr;
 	Stormancer::IRpcService* _rpcService = nullptr;
-	RakNet::RakPeerInterface* _rakPeerInterface = nullptr;
 	RakNet::NatPunchthroughClient* _natPunchthroughClient = nullptr;
 	Stormancer::ITransport* _transport = nullptr;
 	std::map<RakNet::RakNetGUID, RakNetPeer*> _peers;

@@ -82,9 +82,9 @@ namespace Stormancer
 		stream.flush();
 		auto bytes = stream.str();
 
-#ifdef LOG_STORMANCER_PACKETS
+#if defined(STORMANCER_LOG_PACKETS) || defined(STORMANCER_LOG_RAKNET_PACKETS)
 		auto bytes2 = stringifyBytesArray(bytes, true);
-		ILogger::instance()->log(LogLevel::Trace, "RakNetConnection::sendToScene", "send bytes", bytes2.c_str());
+		ILogger::instance()->log(LogLevel::Trace, "RakNetConnection::sendRaw", "RakNet packet sent", bytes2.c_str());
 #endif
 
 		auto result = _rakPeer->Send(bytes.data(), (int)bytes.length(), priority, reliability, channel, _guid, false);
@@ -102,9 +102,9 @@ namespace Stormancer
 		writer(&stream);
 		auto bytes = stream.str();
 
-#ifdef LOG_STORMANCER_PACKETS
+#if defined(STORMANCER_LOG_PACKETS) || defined(STORMANCER_LOG_RAKNET_PACKETS)
 		auto bytes2 = stringifyBytesArray(bytes, true);
-		ILogger::instance()->log(LogLevel::Trace, "RakNetConnection::sendToScene", "send bytes", bytes2.c_str());
+		ILogger::instance()->log(LogLevel::Trace, "RakNetConnection::sendToScene", "RakNet packet sent", bytes2.c_str());
 #endif
 
 		auto result = _rakPeer->Send(bytes.data(), (int)bytes.length(), priority, reliability, 0, _guid, false);

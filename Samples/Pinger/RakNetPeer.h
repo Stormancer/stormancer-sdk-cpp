@@ -7,7 +7,7 @@ class RakNetPeer : public IPeer
 	friend class NatService;
 
 public:
-	RakNetPeer(RakNet::RakNetGUID rakNetGUID, RakNet::RakPeerInterface* rakPeerInterface, std::string userId);
+	RakNetPeer(RakNet::RakNetGUID rakNetGUID, RakNet::RakPeerInterface* rakPeerInterface, std::string userId, bool autoConnect);
 	~RakNetPeer();
 
 	RakNetPeer(const RakNetPeer& other) = delete;
@@ -20,6 +20,7 @@ public:
 	/// (void*) should be casted to (RakNet::Packet*)
 	void onPacketReceived(std::function<void(void*)> callback);
 
+	void connect();
 	void disconnect();
 	const char* userId();
 	Stormancer::ConnectionState connectionState();
@@ -29,6 +30,10 @@ public:
 
 	RakNet::RakNetGUID rakNetGUID() const;
 	bool weAreSender() const;
+	bool autoConnect() const;
+
+	void setSystemAddress(RakNet::SystemAddress systemAddress);
+	RakNet::SystemAddress systemAddress() const;
 
 private:
 	void setConnectionState(Stormancer::ConnectionState connectionState);
@@ -41,5 +46,7 @@ private:
 	Stormancer::ConnectionState _connectionState = Stormancer::ConnectionState::Disconnected;
 	RakNet::RakPeerInterface* _rakPeerInterface = nullptr;
 	bool _weAreSender = false;
+	bool _autoConnect = true;
 	pplx::task_completion_event<Stormancer::Result<RakNetPeer*>*> _tce;
+	RakNet::SystemAddress _systemAddress;
 };

@@ -62,5 +62,6 @@ namespace Stormancer
 		std::string _host;
 		uint16 _port = 0;
 		std::function<void(void*, void*, void*)> _onTransportEvent;
+		RakNet::RakNetGUID _serverRakNetGUID;
 	};
 };
