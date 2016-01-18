@@ -7,10 +7,17 @@ namespace Stormancer
 	/// Logger which writing in a file.
 	class FileLogger : public ILogger
 	{
+	private:
+		enum class FileLoggerMode
+		{
+			Deferred = 0,
+			Immediate = 1
+		};
+
 	public:
 
 		/// Constructor.
-		STORMANCER_DLL_API FileLogger();
+		STORMANCER_DLL_API FileLogger(bool immediate = false);
 
 		/// Destructor.
 		STORMANCER_DLL_API virtual ~FileLogger();
@@ -30,7 +37,7 @@ namespace Stormancer
 		
 		/// Log details about an exception.
 		/// \param e The exception.
-		void log(const std::exception& e);
+		void log(const std::exception& ex);
 
 	private:
 	
@@ -44,5 +51,8 @@ namespace Stormancer
 		
 		/// Stream to the log file.
 		std::ofstream _myfile;
+
+		/// immediate mode
+		bool _immediate = false;
 	};
 };

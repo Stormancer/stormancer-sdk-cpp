@@ -2,9 +2,10 @@
 
 namespace Stormancer
 {
-	FileLogger::FileLogger()
+	FileLogger::FileLogger(bool immediate)
 		: _fileName(nowDateStr() + ".log"),
-		_myfile(_fileName, std::ofstream::out | std::ofstream::app)
+		_myfile(_fileName, std::ofstream::out | std::ofstream::app),
+		_immediate(immediate)
 	{
 		tryOpenFile();
 	}
@@ -16,39 +17,45 @@ namespace Stormancer
 
 	void FileLogger::log(const char* message)
 	{
-		_mutex.lock();
+		std::lock_guard<std::mutex> lg(_mutex);
 		if (tryOpenFile())
 		{
 			_myfile << message << std::endl;
-			_myfile.flush();
-			_myfile.close();
+			if (_immediate)
+			{
+				_myfile.flush();
+				_myfile.close();
+			}
 		}
-		_mutex.unlock();
 	}
 
 	void FileLogger::log(LogLevel level, const char* category, const char* message, const char* data)
 	{
-		_mutex.lock();
+		std::lock_guard<std::mutex> lg(_mutex);
 		if (tryOpenFile())
 		{
 			auto ptr = format(level, category, message, data);
 			_myfile << ptr.get() << std::endl;
-			_myfile.flush();
-			_myfile.close();
+			if (_immediate)
+			{
+				_myfile.flush();
+				_myfile.close();
+			}
 		}
-		_mutex.unlock();
 	}
 	
-	void FileLogger::log(const std::exception& e)
+	void FileLogger::log(const std::exception& ex)
 	{
-		_mutex.lock();
+		std::lock_guard<std::mutex> lg(_mutex);
 		if (tryOpenFile())
 		{
-			_myfile << formatException(e) << std::endl;
-			_myfile.flush();
-			_myfile.close();
+			_myfile << formatException(ex) << std::endl;
+			if (_immediate)
+			{
+				_myfile.flush();
+				_myfile.close();
+			}
 		}
-		_mutex.unlock();
 	}
 
 	bool FileLogger::tryOpenFile()
@@ -67,7 +74,14 @@ namespace Stormancer
 			else
 			{
 				_myfile.open(_fileName, std::ofstream::out | std::ofstream::trunc);
-				return _myfile.is_open();
+				if (_myfile.is_open())
+				{
+					return true;
+				}
+				else
+				{
+					throw std::runtime_error("FileLogger can't open the file " + _fileName + " to log.");
+				}
 			}
 		}
 	}
