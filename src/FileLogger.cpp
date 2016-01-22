@@ -2,8 +2,8 @@
 
 namespace Stormancer
 {
-	FileLogger::FileLogger(bool immediate)
-		: _fileName(nowDateStr() + ".log"),
+	FileLogger::FileLogger(const char* filepath, bool immediate)
+		: _fileName(std::strlen(filepath) ? filepath : "stormancer_" + nowDateStr() + ".log"),
 		_myfile(_fileName, std::ofstream::out | std::ofstream::app),
 		_immediate(immediate)
 	{
@@ -24,7 +24,6 @@ namespace Stormancer
 			if (_immediate)
 			{
 				_myfile.flush();
-				_myfile.close();
 			}
 		}
 	}
@@ -39,7 +38,6 @@ namespace Stormancer
 			if (_immediate)
 			{
 				_myfile.flush();
-				_myfile.close();
 			}
 		}
 	}
@@ -53,7 +51,6 @@ namespace Stormancer
 			if (_immediate)
 			{
 				_myfile.flush();
-				_myfile.close();
 			}
 		}
 	}

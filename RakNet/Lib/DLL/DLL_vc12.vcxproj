@@ -70,25 +70,25 @@
     <OutDir>$(SolutionDir)Lib\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
-    <TargetName>RakNet</TargetName>
+    <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)Lib\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
-    <TargetName>RakNet</TargetName>
+    <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)Lib\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>RakNet</TargetName>
+    <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)Lib\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>RakNet</TargetName>
+    <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -102,18 +102,18 @@
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <PrecompiledHeader />
-      <ProgramDataBaseFileName>$(OutDir)RakNet$(PlatformToolsetVersion)_$(Configuration)_$(Platform).pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName)$(PlatformToolsetVersion)_$(Configuration)_$(Platform).pdb</ProgramDataBaseFileName>
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
       <AdditionalDependencies>ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)RakNet$(PlatformToolsetVersion)_$(Configuration)_$(Platform).dll</OutputFile>
+      <OutputFile>$(OutDir)$(ProjectName)$(PlatformToolsetVersion)_$(Configuration)_$(Platform).dll</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
-      <ImportLibrary>$(OutDir)RakNet$(PlatformToolsetVersion)_$(Configuration)_$(Platform).lib</ImportLibrary>
+      <ImportLibrary>$(OutDir)$(ProjectName)$(PlatformToolsetVersion)_$(Configuration)_$(Platform).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -132,18 +132,18 @@
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <PrecompiledHeader />
-      <ProgramDataBaseFileName>$(OutDir)RakNet$(PlatformToolsetVersion)_$(Configuration)_$(Platform).pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName)$(PlatformToolsetVersion)_$(Configuration)_$(Platform).pdb</ProgramDataBaseFileName>
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
       <AdditionalDependencies>ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)RakNet$(PlatformToolsetVersion)_$(Configuration)_$(Platform).dll</OutputFile>
+      <OutputFile>$(OutDir)$(ProjectName)$(PlatformToolsetVersion)_$(Configuration)_$(Platform).dll</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
-      <ImportLibrary>$(OutDir)RakNet$(PlatformToolsetVersion)_$(Configuration)_$(Platform).lib</ImportLibrary>
+      <ImportLibrary>$(OutDir)$(ProjectName)$(PlatformToolsetVersion)_$(Configuration)_$(Platform).lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -156,20 +156,20 @@
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <PrecompiledHeader />
-      <ProgramDataBaseFileName>$(OutDir)RakNet$(PlatformToolsetVersion)_$(Configuration)_$(Platform).pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName)$(PlatformToolsetVersion)_$(Configuration)_$(Platform).pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
       <AdditionalDependencies>ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)RakNet$(PlatformToolsetVersion)_$(Configuration)_$(Platform).dll</OutputFile>
+      <OutputFile>$(OutDir)$(ProjectName)$(PlatformToolsetVersion)_$(Configuration)_$(Platform).dll</OutputFile>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
-      <ImportLibrary>$(OutDir)RakNet$(PlatformToolsetVersion)_$(Configuration)_$(Platform).lib</ImportLibrary>
+      <ImportLibrary>$(OutDir)$(ProjectName)$(PlatformToolsetVersion)_$(Configuration)_$(Platform).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -185,20 +185,20 @@
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <PrecompiledHeader />
-      <ProgramDataBaseFileName>$(OutDir)RakNet$(PlatformToolsetVersion)_$(Configuration)_$(Platform).pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName)$(PlatformToolsetVersion)_$(Configuration)_$(Platform).pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
       <AdditionalDependencies>ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)RakNet$(PlatformToolsetVersion)_$(Configuration)_$(Platform).dll</OutputFile>
+      <OutputFile>$(OutDir)$(ProjectName)$(PlatformToolsetVersion)_$(Configuration)_$(Platform).dll</OutputFile>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
-      <ImportLibrary>$(OutDir)RakNet$(PlatformToolsetVersion)_$(Configuration)_$(Platform).lib</ImportLibrary>
+      <ImportLibrary>$(OutDir)$(ProjectName)$(PlatformToolsetVersion)_$(Configuration)_$(Platform).lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>

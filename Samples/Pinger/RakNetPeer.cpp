@@ -15,7 +15,7 @@ RakNetPeer::~RakNetPeer()
 void RakNetPeer::sendPacket(std::function<void(Stormancer::bytestream*)> writer, PacketPriority priority, PacketReliability reliability)
 {
 	Stormancer::bytestream stream;
-	stream << (byte)255;
+	stream << (Stormancer::byte)255;
 	writer(&stream);
 	auto data = stream.str();
 

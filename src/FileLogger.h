@@ -17,7 +17,7 @@ namespace Stormancer
 	public:
 
 		/// Constructor.
-		STORMANCER_DLL_API FileLogger(bool immediate = false);
+		STORMANCER_DLL_API FileLogger(const char* filepath = "", bool immediate = false);
 
 		/// Destructor.
 		STORMANCER_DLL_API virtual ~FileLogger();

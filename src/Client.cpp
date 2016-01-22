@@ -125,7 +125,7 @@ namespace Stormancer
 		if (!config)
 		{
 #ifdef STORMANCER_LOG_CLIENT
-			ILogger::instance()->log(LogLevel::Error, "client", "Check the configuration", "");
+			ILogger::instance()->log(LogLevel::Error, "client", "Bad client configuration", "");
 #endif
 		}
 
