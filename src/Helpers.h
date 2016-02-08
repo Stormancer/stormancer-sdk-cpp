@@ -423,12 +423,6 @@ namespace Stormancer
 
 	bool ensureSuccessStatusCode(int statusCode);
 
-	template<typename T>
-	uint64 ptrToUint64(T* ptr)
-	{
-		return *static_cast<uint64*>(static_cast<void*>(ptr));
-	}
-
 	STORMANCER_DLL_API std::string stringifyBytesArray(std::string bytes, bool hex = false);
 
 #pragma endregion

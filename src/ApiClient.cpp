@@ -15,6 +15,7 @@ namespace Stormancer
 	pplx::task<SceneEndpoint> ApiClient::getSceneEndpoint(std::string accountId, std::string applicationName, std::string sceneId, std::string userData)
 	{
 		std::string baseUri = _config->getApiEndpoint();
+
 #if defined(_WIN32)
 		web::http::client::http_client client(std::wstring(baseUri.begin(), baseUri.end()));
 		web::http::http_request request(web::http::methods::POST);
@@ -43,15 +44,18 @@ namespace Stormancer
 			{
 				return t.get();
 			}
-			catch (web::http::http_exception& e)
+			catch (const std::exception& ex)
 			{
-				throw std::runtime_error(std::string(e.what()) + "Can't reach the stormancer API server.");
+				throw std::runtime_error(std::string() + ex.what() + "\nCan't reach the stormancer API server.");
+			}
+			catch (...)
+			{
+				throw std::runtime_error("Unknown error: Can't reach the stormancer API server.");
 			}
 		})
-			.then([this, accountId, applicationName, sceneId](pplx::task<web::http::http_response> t) {
+			.then([this, accountId, applicationName, sceneId](web::http::http_response response) {
 			try
 			{
-				web::http::http_response response = t.get();
 				uint16 statusCode = response.status_code();
 				ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", "client.request statusCode", to_string(statusCode).c_str());
 				auto ss = new concurrency::streams::stringstreambuf;
@@ -75,9 +79,9 @@ namespace Stormancer
 
 				return result;
 			}
-			catch (const std::exception& e)
+			catch (const std::exception& ex)
 			{
-				throw std::runtime_error(std::string(e.what()) + "\nCan't get the scene endpoint response.");
+				throw std::runtime_error(std::string(ex.what()) + "\nCan't get the scene endpoint response.");
 			}
 		});
 	}
