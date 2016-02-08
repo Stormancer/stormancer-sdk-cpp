@@ -337,39 +337,32 @@ namespace Stormancer
 			_logger->log(LogLevel::Trace, "Client::getScene", "SceneInfosDto received", ss.str().c_str());
 #endif
 			_serverConnection->metadata()["serializer"] = sceneInfos.SelectedSerializer;
-			return updateServerMetadata().then([this, sep, sceneId, sceneInfos](pplx::task<void> t) {
-				try
-				{
-					t.wait();
 
+			return updateServerMetadata().then([this, sep, sceneId, sceneInfos]() {
 #ifdef STORMANCER_LOG_CLIENT
-					_logger->log(LogLevel::Trace, "Client::getScene", "Returning the scene ", sceneId.c_str());
+				_logger->log(LogLevel::Trace, "Client::getScene", "Returning the scene ", sceneId.c_str());
 #endif
-					Scene* scene;
-					if (mapContains(_scenes, sceneId))
-					{
-						scene = _scenes[sceneId];
-					}
-					else
-					{
-						scene = new Scene(_serverConnection, this, sceneId, sep.token, sceneInfos, _dependencyResolver, [this, sceneId]() {
-							if (mapContains(_scenes, sceneId))
-							{
-								_scenes.erase(sceneId);
-							}
-						});
-						_scenes[sceneId] = scene;
-					}
-					for (auto plugin : _plugins)
-					{
-						plugin->sceneCreated(scene);
-					}
-					return scene;
-				}
-				catch (const std::exception& e)
+				Scene* scene;
+				if (mapContains(_scenes, sceneId))
 				{
-					throw e;
+					scene = _scenes[sceneId];
 				}
+				else
+				{
+					auto sceneDeleter = [this, sceneId]() {
+						if (mapContains(_scenes, sceneId))
+						{
+							_scenes.erase(sceneId);
+						}
+					};
+					scene = new Scene(_serverConnection, this, sceneId, sep.token, sceneInfos, _dependencyResolver, sceneDeleter);
+					_scenes[sceneId] = scene;
+				}
+				for (auto plugin : _plugins)
+				{
+					plugin->sceneCreated(scene);
+				}
+				return scene;
 			});
 		});
 	}
