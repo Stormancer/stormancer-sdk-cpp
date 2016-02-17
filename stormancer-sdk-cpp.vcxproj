@@ -258,6 +258,7 @@
     <ClInclude Include="src\IScenePeer.h" />
     <ClInclude Include="src\IScheduler.h" />
     <ClInclude Include="src\ISubscription.h" />
+    <ClInclude Include="src\ITask.h" />
     <ClInclude Include="src\ITokenHandler.h" />
     <ClInclude Include="src\ITransport.h" />
     <ClInclude Include="src\MessageIDTypes.h" />
@@ -286,6 +287,7 @@
     <ClInclude Include="src\stormancer.h" />
     <ClInclude Include="src\Subscription.h" />
     <ClInclude Include="src\SystemRequestIDTypes.h" />
+    <ClInclude Include="src\Task.h" />
     <ClInclude Include="src\TokenHandler.h" />
     <ClInclude Include="src\typedef.h" />
     <ClInclude Include="src\Watch.h" />

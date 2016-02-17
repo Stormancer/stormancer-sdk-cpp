@@ -239,7 +239,7 @@ namespace Stormancer
 		std::stringstream ss;
 		if (hex)
 		{
-			ss << std::hex;
+			ss << std::setfill('0') << std::setw(2) << std::hex << std::uppercase;
 		}
 		for (auto i = 0; i < bytes.length(); ++i)
 		{
@@ -247,9 +247,8 @@ namespace Stormancer
 			{
 				ss << ' ';
 			}
-			ss << std::to_string((byte)bytes[i]);
+			ss << std::setw(2) << (int)(byte)bytes[i];
 		}
-		ss << std::dec;
 		return ss.str();
 	}
 };

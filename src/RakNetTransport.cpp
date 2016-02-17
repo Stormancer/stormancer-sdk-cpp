@@ -289,7 +289,7 @@ namespace Stormancer
 
 		_handler->newConnection(c);
 
-		_connectionOpened(dynamic_cast<IConnection*>(c));
+		//_connectionOpened(dynamic_cast<IConnection*>(c));
 
 		c->sendSystem((byte)MessageIDTypes::ID_CONNECTION_RESULT, [c](bytestream* stream) {
 			int64 sid = c->id();
@@ -309,7 +309,7 @@ namespace Stormancer
 
 		_handler->closeConnection(c, reason);
 
-		_connectionClosed(dynamic_cast<IConnection*>(c));
+		//_connectionClosed(dynamic_cast<IConnection*>(c));
 
 		c->setConnectionState(ConnectionState::Disconnected);
 

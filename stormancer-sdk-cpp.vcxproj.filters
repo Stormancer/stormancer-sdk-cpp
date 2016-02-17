@@ -332,5 +332,11 @@
     <ClInclude Include="src\IPlugin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\ITask.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Task.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
