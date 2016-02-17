@@ -9,6 +9,7 @@ http://stormancer.github.io/stormancer-sdk-cpp/documentation/html/annotated.html
 ### Bundled libraries
 - RakNet *(pre-built for windows 32/64 bits)*  
 - MsgPack  
+- RxCpp
 
 ## Configure the samples
 For each sample, you have to do this:  
