@@ -2,12 +2,11 @@
 
 namespace Stormancer
 {
-	RakNetConnection::RakNetConnection(RakNet::RakNetGUID guid, int64 id, RakNet::RakPeerInterface* peer, std::function<void(RakNetConnection*)> close)
-		: _lastActivityDate(nowTime_t()),
-		_guid(guid),
-		_rakPeer(peer),
-		_id(id),
-		_closeAction(close)
+	RakNetConnection::RakNetConnection(RakNet::RakNetGUID guid, int64 id, RakNet::RakPeerInterface* peer)
+		: _lastActivityDate(nowTime_t())
+		, _guid(guid)
+		, _rakPeer(peer)
+		, _id(id)
 	{
 	}
 
@@ -55,11 +54,14 @@ namespace Stormancer
 		return _dependencyResolver;
 	}
 
-	void RakNetConnection::close()
+	void RakNetConnection::close(std::string reason)
 	{
-		setConnectionState(ConnectionState::Disconnecting);
-		_closeAction(this);
-		setConnectionState(ConnectionState::Disconnected);
+		if (_connectionState != ConnectionState::Disconnected && _connectionState != ConnectionState::Disconnecting)
+		{
+			setConnectionState(ConnectionState::Disconnecting);
+			_closeAction("");
+			setConnectionState(ConnectionState::Disconnected);
+		}
 	}
 
 	int RakNetConnection::ping()
@@ -167,8 +169,13 @@ namespace Stormancer
 		return _onConnectionStateChanged.push_back(callback);
 	}
 
-	Action<const char*>::TIterator RakNetConnection::onClose(std::function<void(const char*)> callback)
+	Action<std::string>::TIterator RakNetConnection::onClose(std::function<void(std::string)> callback)
 	{
-		return _onClose.push_back(callback);
+		return _closeAction.push_back(callback);
+	}
+
+	Action<std::string>& RakNetConnection::onCloseAction()
+	{
+		return _closeAction;
 	}
 };

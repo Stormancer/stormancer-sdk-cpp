@@ -30,7 +30,7 @@ namespace Stormancer
 		virtual void setApplication(std::string account, std::string application) = 0;
 		
 		/// Close the connection.
-		virtual void close() = 0;
+		virtual void close(std::string reason = "") = 0;
 		
 		/// Returns the ip address of the remote peer.
 		virtual std::string ipAddress() = 0;

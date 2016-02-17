@@ -154,7 +154,7 @@ namespace Stormancer
 							case DefaultMessageIDTypes::ID_CONNECTION_LOST:
 							{
 								_logger->log(LogLevel::Trace, "RakNetTransport::run", "Peer lost the connection.", rakNetPacket->systemAddress.ToString(true, ':'));
-								onDisconnection(rakNetPacket, _peer, "CONNECTION_LOST");
+								onDisconnection(rakNetPacket, _peer, "CLIENT_CONNECTION_LOST");
 								break;
 							}
 							case DefaultMessageIDTypes::ID_CONNECTION_ATTEMPT_FAILED:
@@ -303,7 +303,7 @@ namespace Stormancer
 
 	void RakNetTransport::onDisconnection(RakNet::Packet* packet, RakNet::RakPeerInterface* server, std::string reason)
 	{
-		_logger->log(LogLevel::Trace, "RakNetTransport::onDisconnection", (std::string(packet->systemAddress.ToString(true, ':')) + " disconnected.").c_str(), "");
+		_logger->log(LogLevel::Trace, "RakNetTransport::onDisconnection", (std::string(packet->systemAddress.ToString(true, ':')) + " disconnected.").c_str(), reason.c_str());
 
 		auto c = removeConnection(packet->guid);
 
@@ -313,7 +313,8 @@ namespace Stormancer
 
 		c->setConnectionState(ConnectionState::Disconnected);
 
-		c->_onClose(reason.c_str());
+		//c->_onClose(reason.c_str());
+		c->_closeAction(reason);
 
 		server->DeallocatePacket(packet);
 
@@ -356,10 +357,11 @@ namespace Stormancer
 	RakNetConnection* RakNetTransport::createNewConnection(RakNet::RakNetGUID raknetGuid, RakNet::RakPeerInterface* peer)
 	{
 		int64 cid = _handler->generateNewConnectionId();
-		auto onClose = [this](RakNetConnection* c) {
+		auto c = new RakNetConnection(raknetGuid, cid, peer);
+		c->onClose([this, c](std::string reason) {
+			ILogger::instance()->log(LogLevel::Trace, "RakNetTransport::createNewConnection::lambda", "onClose ", c->guid().ToString());
 			onRequestClose(c);
-		};
-		auto c = new RakNetConnection(raknetGuid, cid, peer, onClose);
+		});
 		_connections[raknetGuid.g] = c;
 		return c;
 	}
