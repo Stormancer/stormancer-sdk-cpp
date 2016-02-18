@@ -57,8 +57,6 @@ namespace Stormancer
 		std::string _name;
 		uint64 _id = 0;
 		Action<Packet_ptr> _onPacketReceived;
-		//Action<IConnection*> _connectionOpened;
-		//Action<IConnection*> _connectionClosed;
 		std::string _host;
 		uint16 _port = 0;
 		std::function<void(void*, void*, void*)> _onTransportEvent;

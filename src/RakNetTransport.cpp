@@ -289,8 +289,6 @@ namespace Stormancer
 
 		_handler->newConnection(c);
 
-		//_connectionOpened(dynamic_cast<IConnection*>(c));
-
 		c->sendSystem((byte)MessageIDTypes::ID_CONNECTION_RESULT, [c](bytestream* stream) {
 			int64 sid = c->id();
 			*stream << sid;
@@ -309,14 +307,11 @@ namespace Stormancer
 
 		_handler->closeConnection(c, reason);
 
-		//_connectionClosed(dynamic_cast<IConnection*>(c));
-
-		c->setConnectionState(ConnectionState::Disconnected);
-
-		//c->_onClose(reason.c_str());
 		c->_closeAction(reason);
 
 		server->DeallocatePacket(packet);
+
+		c->setConnectionState(ConnectionState::Disconnected);
 
 		delete c;
 	}
@@ -375,7 +370,10 @@ namespace Stormancer
 
 	void RakNetTransport::onRequestClose(RakNetConnection* c)
 	{
-		_peer->CloseConnection(c->guid(), true);
+		if (_peer)
+		{
+			_peer->CloseConnection(c->guid(), true);
+		}
 	}
 
 	bool RakNetTransport::isRunning() const

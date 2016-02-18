@@ -112,6 +112,10 @@ void test_connect()
 			{
 				auto stateStr = connectionStateToString(state);
 				logger->log(LogLevel::Info, "Client", "Client connection state changed", stateStr.c_str());
+				if (state == ConnectionState::Disconnected)
+				{
+					Stormancer::destroy(client);
+				}
 			}
 			catch (const std::exception& ex)
 			{
@@ -130,6 +134,10 @@ void test_connect()
 					sceneMain->onConnectionStateChanged([](ConnectionState state) {
 						auto stateStr = connectionStateToString(state);
 						logger->log(LogLevel::Info, "Scene", "Scene connection state changed", stateStr.c_str());
+						if (state == ConnectionState::Disconnected)
+						{
+							Stormancer::destroy(sceneMain);
+						}
 					});
 
 					logger->log(LogLevel::Info, "test_connect", "Get scene OK", "");
@@ -306,7 +314,7 @@ int main(int argc, char* argv[])
 	tests.push_back(test_rpc_server_cancel);
 	tests.push_back(test_syncclock);
 	tests.push_back(test_disconnect);
-	tests.push_back(clean);
+	//tests.push_back(clean);
 
 	tests.push_back(the_end);
 

@@ -60,12 +60,18 @@ namespace Stormancer
 
 		const TAction& operator()(TParam data) const
 		{
-			auto it = _functions.begin();
-			auto end = _functions.end();
-			while (it != end)
+			//auto it = _functions.begin();
+			//auto end = _functions.end();
+			//while (it != end)
+			//{
+			//	auto f = *it;
+			//	++it; // increment before exec because f can erase itself
+			//	f(data);
+			//}
+
+			auto functionsCopy = _functions; // copy _functions because f can erase itself in _functions
+			for (auto f : functionsCopy)
 			{
-				auto f = *it;
-				++it; // increment before exec because f can erase itself
 				f(data);
 			}
 
@@ -154,12 +160,18 @@ namespace Stormancer
 
 		const TAction& operator()() const
 		{
-			auto it = _functions.begin();
-			auto end = _functions.end();
-			while (it != end)
+			//auto it = _functions.begin();
+			//auto end = _functions.end();
+			//while (it != end)
+			//{
+			//	auto f = *it;
+			//	++it; // increment before exec because f can erase itself
+			//	f();
+			//}
+
+			auto functionsCopy = _functions; // copy _functions because f can erase itself in _functions
+			for (auto f : functionsCopy)
 			{
-				auto f = *it;
-				++it; // increment before exec because f can erase itself
 				f();
 			}
 

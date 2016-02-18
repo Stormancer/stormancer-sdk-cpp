@@ -450,15 +450,15 @@ namespace Stormancer
 				auto dt = disconnectAllScenes(immediate);
 
 				auto end = [this, tce, result]() {
-					if (_serverConnection)
-					{
-						_serverConnection->close();
-					}
-
 					_cts.cancel(); // this will cause the transport to stop
 
 					result->set();
 					tce.set(result);
+
+					if (_serverConnection)
+					{
+						_serverConnection->close();
+					}
 				};
 
 				if (!immediate)
@@ -516,15 +516,17 @@ namespace Stormancer
 		}
 
 		auto taskDisconnected = [this, scene]() {
-			scene->setConnectionState(ConnectionState::Disconnected);
-
 			for (auto plugin : _plugins)
 			{
 				plugin->sceneDisconnected(scene);
 			}
 
+			std::string sceneId = scene->id();
+
+			scene->setConnectionState(ConnectionState::Disconnected);
+
 #ifdef STORMANCER_LOG_CLIENT
-			ILogger::instance()->log(LogLevel::Info, "client", "Scene disconnected", scene->id());
+			ILogger::instance()->log(LogLevel::Info, "client", "Scene disconnected", sceneId.c_str());
 #endif
 		};
 
