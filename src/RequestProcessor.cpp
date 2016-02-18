@@ -24,7 +24,6 @@ namespace Stormancer
 
 	RequestProcessor::~RequestProcessor()
 	{
-		ILogger::instance()->log(LogLevel::Trace, "RequestProcessor destructor", "deleting the RequestProcessor...", "");
 	}
 
 	void RequestProcessor::registerProcessor(PacketProcessorConfig& config)

@@ -63,8 +63,24 @@ namespace Stormancer
 #endif
 		}
 
-		return client.request(request)
-			.then([](pplx::task<web::http::http_response> t) {
+		pplx::task<web::http::http_response> httpRequestTask;
+		
+		try
+		{
+			httpRequestTask = client.request(request);
+		}
+		catch (const std::exception& ex)
+		{
+			ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", "client.request failed.", ex.what());
+			return taskFromException<SceneEndpoint>(std::runtime_error(std::string() + "client.request failed." + ex.what()));
+		}
+		catch (...)
+		{
+			ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", "client.request failed.", "Unknown error");
+			return taskFromException<SceneEndpoint>(std::runtime_error(std::string() + "client.request failed."));
+		}
+
+		return httpRequestTask.then([](pplx::task<web::http::http_response> t) {
 			try
 			{
 				t.wait();
@@ -78,8 +94,7 @@ namespace Stormancer
 			{
 				throw std::runtime_error("Unknown error: Can't reach the stormancer API server.");
 			}
-		})
-			.then([this, accountId, applicationName, sceneId](web::http::http_response response) {
+		}).then([this, accountId, applicationName, sceneId](web::http::http_response response) {
 			try
 			{
 				uint16 statusCode = response.status_code();
