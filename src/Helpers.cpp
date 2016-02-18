@@ -2,14 +2,13 @@
 
 namespace Stormancer
 {
-	stringMap copyHeapSafe(const stringMap* map)
+	void copyHeapSafe(stringMap* dest, const stringMap* src)
 	{
-		stringMap map2;
-		for (auto it : *map)
+		stringMap& mDest = *dest;
+		for (auto it : *src)
 		{
-			map2[it.first.c_str()] = it.second.c_str();
+			mDest[std::string(it.first.c_str())] = std::string(it.second.c_str());
 		}
-		return map2;
 	}
 
 	ResultBase::~ResultBase()
@@ -43,6 +42,13 @@ namespace Stormancer
 	}
 
 
+	void deferredCall(std::function<void(void)> f, uint32 ms)
+	{
+		pplx::task<void>([f, ms]() {
+			Sleep(ms);
+			f();
+		});
+	}
 
 	void destroy(Configuration* ptr)
 	{

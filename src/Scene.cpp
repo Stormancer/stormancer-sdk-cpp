@@ -26,6 +26,10 @@ namespace Stormancer
 
 	Scene::~Scene()
 	{
+#ifdef STORMANCER_LOG_CLIENT
+		ILogger::instance()->log(LogLevel::Trace, "Scene destructor", "deleting the scene...", "");
+#endif
+
 		_peer->connectionStateChangedAction().erase(_peerConnectionStateEraseIterator);
 
 		_onDelete();
@@ -46,6 +50,10 @@ namespace Stormancer
 		{
 			delete _host;
 		}
+
+#ifdef STORMANCER_LOG_CLIENT
+		ILogger::instance()->log(LogLevel::Trace, "Scene destructor", "scene deleted", "");
+#endif
 	}
 	
 	const char* Scene::getHostMetadata(const char* key)

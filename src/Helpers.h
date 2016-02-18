@@ -5,7 +5,7 @@
 
 namespace Stormancer
 {
-	STORMANCER_DLL_API stringMap copyHeapSafe(const stringMap* map);
+	STORMANCER_DLL_API void copyHeapSafe(stringMap* dest, const stringMap* src);
 
 	class ResultBase
 	{
@@ -65,6 +65,8 @@ namespace Stormancer
 			_error = 0;
 		}
 	};
+
+	STORMANCER_DLL_API void deferredCall(std::function<void(void)>, uint32 ms);
 
 	class Configuration;
 	STORMANCER_DLL_API void destroy(Configuration* ptr);

@@ -118,6 +118,10 @@ namespace Stormancer
 			delete _transport;
 			_transport = nullptr;
 		}
+
+#ifdef STORMANCER_LOG_CLIENT
+		ILogger::instance()->log(LogLevel::Trace, "Client destructor", "client deleted", "");
+#endif
 	}
 
 	Client* Client::createClient(Configuration* config)

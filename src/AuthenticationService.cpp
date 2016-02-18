@@ -73,7 +73,8 @@ namespace Stormancer
 		auto result = new Result<Scene*>();
 		try
 		{
-			auto authContext = copyHeapSafe(authenticationContext);
+			stringMap authContext;
+			copyHeapSafe(&authContext, authenticationContext);
 
 			if (_authenticated)
 			{

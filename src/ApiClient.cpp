@@ -14,6 +14,16 @@ namespace Stormancer
 
 	pplx::task<SceneEndpoint> ApiClient::getSceneEndpoint(std::string accountId, std::string applicationName, std::string sceneId, std::string userData)
 	{
+		{ // TOREMOVE
+			std::stringstream ss1;
+			ss1 << '[' << accountId.size() << '|' << accountId << ']';
+			ss1 << '[' << applicationName.size() << '|' << applicationName << ']';
+			ss1 << '[' << sceneId.size() << '|' << sceneId << ']';
+			ss1 << '[' << userData.size() << '|' << userData << ']';
+			auto str = ss1.str();
+			ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", "data", str.c_str());
+		}
+
 		std::string baseUri = _config->getApiEndpoint();
 
 #if defined(_WIN32)
@@ -36,12 +46,28 @@ namespace Stormancer
 		request.set_body(userData);
 #endif
 
-		ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", baseUri.c_str(), relativeUri.c_str());
+		{ // TOREMOVE
+#if defined(_WIN32)
+			std::stringstream ss2;
+			auto absoluteUri = request.absolute_uri().to_string();
+			std::string absoluteUri2(absoluteUri.begin(), absoluteUri.end());
+			ss2 << '[' << absoluteUri2.size() << '|' << absoluteUri2 << ']';
+			std::string bodyUri;
+			auto ss3 = new concurrency::streams::stringstreambuf;
+			request.body().read_to_end(*ss3).then([ss3, &bodyUri](size_t size) {
+				bodyUri = ss3->collection();
+			}).wait();
+			ss2 << '[' << bodyUri.size() << '|' << bodyUri << ']';
+			auto requestStr = ss2.str();
+			ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", "request", requestStr.c_str());
+#endif
+		}
 
 		return client.request(request)
 			.then([](pplx::task<web::http::http_response> t) {
 			try
 			{
+				t.wait();
 				return t.get();
 			}
 			catch (const std::exception& ex)
