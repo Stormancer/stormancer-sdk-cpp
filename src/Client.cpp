@@ -79,7 +79,7 @@ namespace Stormancer
 	Client::~Client()
 	{
 #ifdef STORMANCER_LOG_CLIENT
-		ILogger::instance()->log(LogLevel::Trace, "Client destructor", "deleting the client...", "");
+		ILogger::instance()->log(LogLevel::Trace, "Client::~Client", "deleting the client...", "");
 #endif
 		disconnect(true);
 
@@ -103,7 +103,6 @@ namespace Stormancer
 
 		if (_serverConnection)
 		{
-			delete _serverConnection;
 			_serverConnection = nullptr;
 		}
 
@@ -120,7 +119,7 @@ namespace Stormancer
 		}
 
 #ifdef STORMANCER_LOG_CLIENT
-		ILogger::instance()->log(LogLevel::Trace, "Client destructor", "client deleted", "");
+		ILogger::instance()->log(LogLevel::Trace, "Client::~Client", "client deleted", "");
 #endif
 	}
 
@@ -129,7 +128,7 @@ namespace Stormancer
 		if (!config)
 		{
 #ifdef STORMANCER_LOG_CLIENT
-			ILogger::instance()->log(LogLevel::Error, "client", "Bad client configuration", "");
+			ILogger::instance()->log(LogLevel::Error, "Client::createClient", "Bad client configuration", "");
 #endif
 		}
 
@@ -179,7 +178,7 @@ namespace Stormancer
 		if (!sceneId)
 		{
 #ifdef STORMANCER_LOG_CLIENT
-			ILogger::instance()->log(LogLevel::Error, "client", "Bad scene id", "");
+			ILogger::instance()->log(LogLevel::Error, "Client::getPublicScene", "Bad scene id", "");
 #endif
 		}
 
@@ -212,8 +211,7 @@ namespace Stormancer
 			}
 			catch (const std::exception& ex)
 			{
-				std::runtime_error error(std::string(ex.what()) + "\nUnable to get the scene endpoint.");
-				ILogger::instance()->log(error);
+				ILogger::instance()->log(ex);
 				result->setError(1, ex.what());
 				return pplx::task<Result<Scene*>*>([result]() {
 					return result;
@@ -291,6 +289,16 @@ namespace Stormancer
 								{
 									_serverConnection->connectionStateChangedAction().erase(*peerConnectionStateEraseIterator);
 									delete peerConnectionStateEraseIterator;
+								}
+								auto scenes = _scenes;
+								for (auto sceneIt : scenes)
+								{
+									auto scene = sceneIt.second;
+									for (auto plugin : _plugins)
+									{
+										plugin->sceneDisconnected(scene);
+									}
+									scene->setConnectionState(ConnectionState::Disconnected);
 								}
 								_onConnectionStateChanged(connectionState);
 							});
@@ -402,12 +410,12 @@ namespace Stormancer
 			throw std::runtime_error("The scene is not in disconnected state");
 		}
 
-		scene->setConnectionState(ConnectionState::Connecting);
-
 		for (auto plugin : _plugins)
 		{
 			plugin->sceneConnecting(scene);
 		}
+
+		scene->setConnectionState(ConnectionState::Connecting);
 
 		ConnectToSceneMsg parameter;
 		parameter.Token = token;
@@ -424,11 +432,11 @@ namespace Stormancer
 		return Client::sendSystemRequest<ConnectToSceneMsg, ConnectionResult>((byte)SystemRequestIDTypes::ID_CONNECT_TO_SCENE, parameter).then([this, scene](ConnectionResult result) {
 			scene->completeConnectionInitialization(result);
 			_scenesDispatcher->addScene(scene);
-			scene->setConnectionState(ConnectionState::Connected);
 			for (auto plugin : _plugins)
 			{
 				plugin->sceneConnected(scene);
 			}
+			scene->setConnectionState(ConnectionState::Connected);
 #ifdef STORMANCER_LOG_CLIENT
 			ILogger::instance()->log(LogLevel::Info, "client", "Scene connected", scene->id());
 #endif
@@ -442,14 +450,11 @@ namespace Stormancer
 
 		try
 		{
+			stopSyncClock();
+
 			if (_serverConnection && _serverConnection->connectionState() == ConnectionState::Connected)
 			{
 				// Stops the synchronised clock, disconnect the scenes, closes the server connection then stops the underlying transports.
-
-				if (_synchronisedClock)
-				{
-					stopSyncClock();
-				}
 
 				auto dt = disconnectAllScenes(immediate);
 
@@ -512,12 +517,12 @@ namespace Stormancer
 			throw std::runtime_error("The scene is not in connected state");
 		}
 
-		scene->setConnectionState(ConnectionState::Disconnecting);
-
 		for (auto plugin : _plugins)
 		{
 			plugin->sceneDisconnecting(scene);
 		}
+
+		scene->setConnectionState(ConnectionState::Disconnecting);
 
 		auto taskDisconnected = [this, scene]() {
 			for (auto plugin : _plugins)
@@ -614,46 +619,58 @@ namespace Stormancer
 
 	void Client::startSyncClock()
 	{
+		ILogger::instance()->log(LogLevel::Trace, "Client::startSyncClock", "Starting syncClock...", "");
 		if (_scheduler)
 		{
-			auto delay = (_clockValues.size() < _maxClockValues ? _pingIntervalAtStart : _synchronisedClockInterval);
-			_syncClockSubscription = _scheduler->schedulePeriodic((int)delay, [this, delay]() {
-				if (delay == _pingIntervalAtStart && _clockValues.size() >= _maxClockValues)
+			int interval = (int)(_clockValues.size() >= _maxClockValues ? _synchronisedClockInterval : _pingIntervalAtStart);
+			_syncClockSubscription = _scheduler->schedulePeriodic(interval, [this, interval]() {
+				ILogger::instance()->log(LogLevel::Warn, "Client::stopSyncClock", "Lock...", "1");
+				std::lock_guard<std::mutex> lg(_syncClockMutex);
+				ILogger::instance()->log(LogLevel::Warn, "Client::stopSyncClock", "Locked", "1");
+				if (_syncClockSubscription && _syncClockSubscription->subscribed())
 				{
-					stopSyncClock();
-					startSyncClock();
-				}
-				else
-				{
+					if (interval == _pingIntervalAtStart && _clockValues.size() >= _maxClockValues)
+					{
+						_syncClockSubscription->unsubscribe();
+						_syncClockSubscription->destroy();
+						_syncClockSubscription = nullptr;
+						startSyncClock();
+					}
 					syncClockImpl();
 				}
+				ILogger::instance()->log(LogLevel::Warn, "Client::stopSyncClock", "Unlock...", "1");
 			});
 		}
 		syncClockImpl();
+		ILogger::instance()->log(LogLevel::Trace, "Client::startSyncClock", "SyncClock started", "");
 	}
 
 	void Client::stopSyncClock()
 	{
-		_syncClockSubscription->unsubscribe();
+		ILogger::instance()->log(LogLevel::Trace, "Client::stopSyncClock", "waiting to stop syncClock...", "");
+		ILogger::instance()->log(LogLevel::Warn, "Client::stopSyncClock", "Lock...", "2");
+		std::lock_guard<std::mutex> lg(_syncClockMutex);
+		ILogger::instance()->log(LogLevel::Warn, "Client::stopSyncClock", "Locked", "2");
+		ILogger::instance()->log(LogLevel::Trace, "Client::stopSyncClock", "SyncClock stopped", "");
+		if (_syncClockSubscription && _syncClockSubscription->subscribed())
+		{
+			_syncClockSubscription->unsubscribe();
+			_syncClockSubscription->destroy();
+			_syncClockSubscription = nullptr;
+		}
+		ILogger::instance()->log(LogLevel::Warn, "Client::stopSyncClock", "Unlock...", "2");
 	}
 
 	pplx::task<void> Client::syncClockImpl()
 	{
-		bool skipPing;
-		_syncClockMutex.lock();
-		skipPing = !lastPingFinished;
-		_syncClockMutex.unlock();
-
-		if (skipPing)
+		if (!lastPingFinished)
 		{
 			return taskCompleted();
 		}
 
 		try
 		{
-			_syncClockMutex.lock();
 			lastPingFinished = false;
-			_syncClockMutex.unlock();
 
 			uint64 timeStart = _watch.getElapsedTime();
 			return _requestProcessor->sendSystemRequest(_serverConnection, (byte)SystemRequestIDTypes::ID_PING, [&timeStart](bytestream* bs) {
@@ -673,8 +690,6 @@ namespace Stormancer
 				}
 
 				uint64 timeEnd = (uint16)this->_watch.getElapsedTime();
-
-				_syncClockMutex.lock();
 
 				lastPingFinished = true;
 
@@ -723,16 +738,14 @@ namespace Stormancer
 					}
 				}
 				_offset = offsetsAvg / lenOffsets;
-
-				_syncClockMutex.unlock();
 			});
 		}
-		catch (std::exception e)
+		catch (const std::exception& ex)
 		{
 #ifdef STORMANCER_LOG_CLIENT
-			_logger->log(LogLevel::Error, "Client::syncClockImpl", "Failed to ping server.", "");
+			_logger->log(LogLevel::Error, "Client::syncClockImpl", "Failed to ping server.", ex.what());
 #endif
-			throw std::runtime_error("Failed to ping server.");
+			throw std::runtime_error(std::string() + ex.what() + "\nFailed to ping server.");
 		}
 	}
 

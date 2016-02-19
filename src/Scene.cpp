@@ -15,22 +15,13 @@ namespace Stormancer
 		{
 			_remoteRoutesMap[routeDto.Name] = Route_ptr(new Route(this, routeDto.Name, routeDto.Handle, routeDto.Metadata));
 		}
-
-		_peerConnectionStateEraseIterator = _peer->onConnectionStateChanged([this](ConnectionState connectionState) {
-			if (connectionState == ConnectionState::Disconnected)
-			{
-				setConnectionState(ConnectionState::Disconnected);
-			}
-		});
 	}
 
 	Scene::~Scene()
 	{
 #ifdef STORMANCER_LOG_CLIENT
-		ILogger::instance()->log(LogLevel::Trace, "Scene destructor", "deleting the scene...", "");
+		ILogger::instance()->log(LogLevel::Trace, "Scene::~Scene", "deleting the scene...", "");
 #endif
-
-		_peer->connectionStateChangedAction().erase(_peerConnectionStateEraseIterator);
 
 		_onDelete();
 
@@ -52,7 +43,7 @@ namespace Stormancer
 		}
 
 #ifdef STORMANCER_LOG_CLIENT
-		ILogger::instance()->log(LogLevel::Trace, "Scene destructor", "scene deleted", "");
+		ILogger::instance()->log(LogLevel::Trace, "Scene::~Scene", "scene deleted", "");
 #endif
 	}
 	

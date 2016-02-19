@@ -122,6 +122,7 @@ namespace Stormancer
 		bool isHost() const;
 
 	private:
+
 		void setConnectionState(ConnectionState connectionState);
 
 	private:
@@ -183,6 +184,5 @@ namespace Stormancer
 		/// Scene connected state.
 		ConnectionState _connectionState = ConnectionState::Disconnected;
 		Action<ConnectionState> _onConnectionStateChanged;
-		Action<ConnectionState>::TIterator _peerConnectionStateEraseIterator;
 	};
 };

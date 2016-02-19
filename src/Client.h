@@ -188,7 +188,7 @@ namespace Stormancer
 		int64 _lastPing = 0;
 		bool _synchronisedClock = true;
 		int64 _synchronisedClockInterval = 5000;
-		int64 _pingIntervalAtStart = 100;
+		int64 _pingIntervalAtStart = 500;
 		bool lastPingFinished = true;
 		std::mutex _syncClockMutex;
 		std::deque<ClockValue> _clockValues;

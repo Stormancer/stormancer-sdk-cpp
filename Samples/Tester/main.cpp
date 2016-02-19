@@ -156,6 +156,10 @@ void test_connect()
 						if (result2->success())
 						{
 							logger->log(LogLevel::Info, "test_connect", "Connect OK", "");
+							logger->log(LogLevel::Warn, "test_connect", "Waiting 2000 ms...", "");
+							pplx::create_task([]() {
+								Sleep(2000);
+							}).wait();
 							execNextTest();
 						}
 						else
