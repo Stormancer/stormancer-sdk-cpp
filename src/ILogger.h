@@ -63,10 +63,6 @@ namespace Stormancer
 
 		STORMANCER_DLL_API virtual ~ILogger();
 
-	protected:
-
-		std::mutex _mutex;
-
 	private:
 		static ILogger* _logger;
 	};

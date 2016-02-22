@@ -58,21 +58,17 @@ namespace Stormancer
 			return *this;
 		}
 
-		const TAction& operator()(TParam data) const
+		const TAction& operator()(TParam data, bool async = false) const
 		{
-			//auto it = _functions.begin();
-			//auto end = _functions.end();
-			//while (it != end)
-			//{
-			//	auto f = *it;
-			//	++it; // increment before exec because f can erase itself
-			//	f(data);
-			//}
-
-			auto functionsCopy = _functions; // copy _functions because f can erase itself in _functions
-			for (auto f : functionsCopy)
+			if (async)
 			{
-				f(data);
+				pplx::task<void>([this, data]() {
+					exec(data);
+				});
+			}
+			else
+			{
+				exec(data);
 			}
 
 			return *this;
@@ -97,6 +93,17 @@ namespace Stormancer
 		void clear()
 		{
 			_functions.clear();
+		}
+
+	private:
+
+		inline void exec(const TParam& data) const
+		{
+			auto functionsCopy = _functions; // copy _functions because f can erase itself from the _functions
+			for (auto f : functionsCopy)
+			{
+				f(data);
+			}
 		}
 
 	private:
@@ -158,21 +165,17 @@ namespace Stormancer
 			return *this;
 		}
 
-		const TAction& operator()() const
+		const TAction& operator()(bool async = false) const
 		{
-			//auto it = _functions.begin();
-			//auto end = _functions.end();
-			//while (it != end)
-			//{
-			//	auto f = *it;
-			//	++it; // increment before exec because f can erase itself
-			//	f();
-			//}
-
-			auto functionsCopy = _functions; // copy _functions because f can erase itself in _functions
-			for (auto f : functionsCopy)
+			if (async)
 			{
-				f();
+				pplx::task<void>([this]() {
+					exec();
+				});
+			}
+			else
+			{
+				exec();
 			}
 
 			return *this;
@@ -197,6 +200,16 @@ namespace Stormancer
 		void clear()
 		{
 			_functions.clear();
+		}
+
+	private:
+		inline void exec() const
+		{
+			auto functionsCopy = _functions; // copy _functions because f can erase itself from the _functions
+			for (auto f : functionsCopy)
+			{
+				f();
+			}
 		}
 
 	private:

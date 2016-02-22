@@ -19,6 +19,7 @@
 
 // standart libs
 #include <mutex>
+#include <condition_variable>
 #include <algorithm>
 #include <chrono>
 #include <functional>

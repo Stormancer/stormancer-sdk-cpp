@@ -36,20 +36,20 @@ namespace Stormancer
 	// Client
 
 	Client::Client(Configuration* config)
-		: _initialized(false),
-		_accountId(config->account),
-		_applicationName(config->application),
-		_tokenHandler(new TokenHandler()),
-		_apiClient(new ApiClient(config, _tokenHandler)),
-		_dispatcher(config->dispatcher),
-		_requestProcessor(new RequestProcessor(_logger, std::vector<IRequestModule*>())),
-		_scenesDispatcher(new SceneDispatcher),
-		_metadata(config->_metadata),
-		_maxPeers(config->maxPeers),
-		_dependencyResolver(new DependencyResolver()),
-		_plugins(config->plugins()),
-		_synchronisedClock(config->synchronisedClock),
-		_synchronisedClockInterval(config->synchronisedClockInterval)
+		: _initialized(false)
+		, _accountId(config->account)
+		, _applicationName(config->application)
+		, _tokenHandler(new TokenHandler())
+		, _apiClient(new ApiClient(config, _tokenHandler))
+		, _dispatcher(config->dispatcher)
+		, _requestProcessor(new RequestProcessor(_logger, std::vector<IRequestModule*>()))
+		, _scenesDispatcher(new SceneDispatcher)
+		, _metadata(config->_metadata)
+		, _maxPeers(config->maxPeers)
+		, _dependencyResolver(new DependencyResolver())
+		, _plugins(config->plugins())
+		, _synchronisedClock(config->synchronisedClock)
+		, _synchronisedClockInterval(config->synchronisedClockInterval)
 	{
 		_dependencyResolver->registerDependency<ILogger>(ILogger::instance());
 		_dependencyResolver->registerDependency<IScheduler>(config->scheduler);
@@ -241,7 +241,8 @@ namespace Stormancer
 
 	pplx::task<Scene*> Client::getScene(std::string sceneId, SceneEndpoint sep)
 	{
-		if (_cts.get_token().is_canceled()){
+		if (_cts.get_token().is_canceled())
+		{
 			throw std::runtime_error("This Stormancer client has been disconnected and should not be used anymore.");
 		}
 
@@ -275,19 +276,22 @@ namespace Stormancer
 #endif
 					try
 					{
+						_onConnectionStateChanged(ConnectionState::Connecting);
+
 						return _transport->connect(endpoint).then([this](IConnection* connection) {
 #ifdef STORMANCER_LOG_CLIENT
 							_logger->log(LogLevel::Trace, "Client::getScene", "Client::transport connected", "");
 #endif
 							_serverConnection = connection;
 
-							_onConnectionStateChanged(_serverConnection->connectionState());
+							_onConnectionStateChanged(ConnectionState::Connected);
 
 							auto peerConnectionStateEraseIterator = new Action<ConnectionState>::TIterator();
 							*peerConnectionStateEraseIterator = _serverConnection->onConnectionStateChanged([this, peerConnectionStateEraseIterator](ConnectionState connectionState) {
 								if (connectionState == ConnectionState::Disconnected)
 								{
 									_serverConnection->connectionStateChangedAction().erase(*peerConnectionStateEraseIterator);
+									_serverConnection = nullptr;
 									delete peerConnectionStateEraseIterator;
 								}
 								auto scenes = _scenes;
@@ -517,12 +521,12 @@ namespace Stormancer
 			throw std::runtime_error("The scene is not in connected state");
 		}
 
+		scene->setConnectionState(ConnectionState::Disconnecting);
+
 		for (auto plugin : _plugins)
 		{
 			plugin->sceneDisconnecting(scene);
 		}
-
-		scene->setConnectionState(ConnectionState::Disconnecting);
 
 		auto taskDisconnected = [this, scene]() {
 			for (auto plugin : _plugins)
@@ -530,13 +534,12 @@ namespace Stormancer
 				plugin->sceneDisconnected(scene);
 			}
 
-			std::string sceneId = scene->id();
-
-			scene->setConnectionState(ConnectionState::Disconnected);
-
 #ifdef STORMANCER_LOG_CLIENT
+			std::string sceneId = scene->id();
 			ILogger::instance()->log(LogLevel::Info, "client", "Scene disconnected", sceneId.c_str());
 #endif
+
+			scene->setConnectionState(ConnectionState::Disconnected);
 		};
 
 		DisconnectFromSceneDto dto(sceneHandle);
@@ -620,25 +623,26 @@ namespace Stormancer
 	void Client::startSyncClock()
 	{
 		ILogger::instance()->log(LogLevel::Trace, "Client::startSyncClock", "Starting syncClock...", "");
+		std::lock_guard<std::mutex> lg(_syncClockMutex);
 		if (_scheduler)
 		{
 			int interval = (int)(_clockValues.size() >= _maxClockValues ? _synchronisedClockInterval : _pingIntervalAtStart);
 			_syncClockSubscription = _scheduler->schedulePeriodic(interval, [this, interval]() {
-				ILogger::instance()->log(LogLevel::Warn, "Client::stopSyncClock", "Lock...", "1");
 				std::lock_guard<std::mutex> lg(_syncClockMutex);
-				ILogger::instance()->log(LogLevel::Warn, "Client::stopSyncClock", "Locked", "1");
 				if (_syncClockSubscription && _syncClockSubscription->subscribed())
 				{
 					if (interval == _pingIntervalAtStart && _clockValues.size() >= _maxClockValues)
 					{
-						_syncClockSubscription->unsubscribe();
-						_syncClockSubscription->destroy();
-						_syncClockSubscription = nullptr;
-						startSyncClock();
+						pplx::task<void>([this]() {
+							stopSyncClock();
+							startSyncClock();
+						});
 					}
-					syncClockImpl();
+					else
+					{
+						syncClockImpl();
+					}
 				}
-				ILogger::instance()->log(LogLevel::Warn, "Client::stopSyncClock", "Unlock...", "1");
 			});
 		}
 		syncClockImpl();
@@ -648,17 +652,17 @@ namespace Stormancer
 	void Client::stopSyncClock()
 	{
 		ILogger::instance()->log(LogLevel::Trace, "Client::stopSyncClock", "waiting to stop syncClock...", "");
-		ILogger::instance()->log(LogLevel::Warn, "Client::stopSyncClock", "Lock...", "2");
 		std::lock_guard<std::mutex> lg(_syncClockMutex);
-		ILogger::instance()->log(LogLevel::Warn, "Client::stopSyncClock", "Locked", "2");
-		ILogger::instance()->log(LogLevel::Trace, "Client::stopSyncClock", "SyncClock stopped", "");
-		if (_syncClockSubscription && _syncClockSubscription->subscribed())
+		if (_syncClockSubscription)
 		{
-			_syncClockSubscription->unsubscribe();
+			if (_syncClockSubscription->subscribed())
+			{
+				_syncClockSubscription->unsubscribe();
+			}
 			_syncClockSubscription->destroy();
 			_syncClockSubscription = nullptr;
 		}
-		ILogger::instance()->log(LogLevel::Warn, "Client::stopSyncClock", "Unlock...", "2");
+		ILogger::instance()->log(LogLevel::Trace, "Client::stopSyncClock", "SyncClock stopped", "");
 	}
 
 	pplx::task<void> Client::syncClockImpl()
@@ -681,10 +685,10 @@ namespace Stormancer
 				{
 					packet = t.get();
 				}
-				catch (const std::exception& e)
+				catch (const std::exception& ex)
 				{
 #ifdef STORMANCER_LOG_CLIENT
-					ILogger::instance()->log(LogLevel::Warn, "syncClock", "Failed to ping the server", e.what());
+					ILogger::instance()->log(LogLevel::Warn, "syncClock", "Failed to ping the server", ex.what());
 #endif
 					return;
 				}

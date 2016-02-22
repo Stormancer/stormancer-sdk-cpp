@@ -124,7 +124,7 @@ namespace Stormancer
 							auto tce = _pendingConnections[packetSystemAddressStr];
 
 							_logger->log(LogLevel::Trace, "RakNetTransport::run", "Connection request accepted.", packetSystemAddressStr.c_str());
-							auto c = onConnection(rakNetPacket, _peer);
+							auto c = onConnection(rakNetPacket);
 							tce.set(c);
 						}
 						else
@@ -136,19 +136,19 @@ namespace Stormancer
 					case DefaultMessageIDTypes::ID_NEW_INCOMING_CONNECTION:
 					{
 						_logger->log(LogLevel::Trace, "RakNetTransport::run", "Incoming connection.", rakNetPacket->systemAddress.ToString(true, ':'));
-						onConnection(rakNetPacket, _peer);
+						onConnection(rakNetPacket);
 						break;
 					}
 					case DefaultMessageIDTypes::ID_DISCONNECTION_NOTIFICATION:
 					{
 						_logger->log(LogLevel::Trace, "RakNetTransport::run", "Peer disconnected.", rakNetPacket->systemAddress.ToString(true, ':'));
-						onDisconnection(rakNetPacket, _peer, "CLIENT_DISCONNECTED");
+						onDisconnection(rakNetPacket, "CLIENT_DISCONNECTED");
 						break;
 					}
 					case DefaultMessageIDTypes::ID_CONNECTION_LOST:
 					{
 						_logger->log(LogLevel::Trace, "RakNetTransport::run", "Peer lost the connection.", rakNetPacket->systemAddress.ToString(true, ':'));
-						onDisconnection(rakNetPacket, _peer, "CLIENT_CONNECTION_LOST");
+						onDisconnection(rakNetPacket, "CLIENT_CONNECTION_LOST");
 						break;
 					}
 					case DefaultMessageIDTypes::ID_CONNECTION_ATTEMPT_FAILED:
@@ -159,13 +159,11 @@ namespace Stormancer
 							auto tce = _pendingConnections[packetSystemAddressStr];
 							tce.set_exception<std::exception>(std::runtime_error("Connection attempt failed."));
 						}
-						_peer->DeallocatePacket(rakNetPacket);
 						break;
 					}
 					case DefaultMessageIDTypes::ID_ALREADY_CONNECTED:
 					{
 						_logger->log(LogLevel::Error, "RakNetTransport::run", "Peer already connected", rakNetPacket->systemAddress.ToString(true, ':'));
-						_peer->DeallocatePacket(rakNetPacket);
 						break;
 					}
 					case (byte)MessageIDTypes::ID_CONNECTION_RESULT:
@@ -173,15 +171,16 @@ namespace Stormancer
 						int64 sid = *(int64*)(rakNetPacket->data + 1);
 						_logger->log(LogLevel::Trace, "RakNetTransport::run", "Connection ID received.", std::to_string(sid).c_str());
 						onConnectionIdReceived(sid);
-						_peer->DeallocatePacket(rakNetPacket);
 						break;
 					}
 					default:
 					{
 						onMessageReceived(rakNetPacket);
+						rakNetPacket = nullptr;
 						break;
 					}
 					}
+					_peer->DeallocatePacket(rakNetPacket);
 				}
 				catch (const std::exception& ex)
 				{
@@ -232,6 +231,7 @@ namespace Stormancer
 		}
 
 		ILogger::instance()->log(LogLevel::Trace, "RakNetTransport::stop", "RakNet stopped", "");
+		_logger->log(LogLevel::Trace, "RakNetTransport::run", "unlocking...", "4");
 	}
 
 	void RakNetTransport::onConnectionIdReceived(uint64 p)
@@ -276,13 +276,11 @@ namespace Stormancer
 		return pplx::task<IConnection*>(tce);
 	}
 
-	RakNetConnection* RakNetTransport::onConnection(RakNet::Packet* packet, RakNet::RakPeerInterface* server)
+	RakNetConnection* RakNetTransport::onConnection(RakNet::Packet* packet)
 	{
 		_logger->log(LogLevel::Trace, "RakNetTransport::onConnection", (std::string(packet->systemAddress.ToString(true, ':')) + " connected.").c_str(), "");
 
 		auto c = createNewConnection(packet->guid, _peer);
-
-		c->setConnectionState(ConnectionState::Connected);
 
 		_handler->newConnection(c);
 
@@ -291,12 +289,15 @@ namespace Stormancer
 			*stream << sid;
 		});
 
-		server->DeallocatePacket(packet);
+		pplx::task<void>([c]() {
+			// Start this asynchronously because we locked the mutex in run and the user can do something that tries to lock again this mutex
+			c->setConnectionState(ConnectionState::Connected);
+		});
 
 		return c;
 	}
 
-	void RakNetTransport::onDisconnection(RakNet::Packet* packet, RakNet::RakPeerInterface* server, std::string reason)
+	void RakNetTransport::onDisconnection(RakNet::Packet* packet, std::string reason)
 	{
 		_logger->log(LogLevel::Trace, "RakNetTransport::onDisconnection", (std::string(packet->systemAddress.ToString(true, ':')) + " disconnected.").c_str(), reason.c_str());
 
@@ -306,11 +307,9 @@ namespace Stormancer
 
 		c->_closeAction(reason);
 
-		server->DeallocatePacket(packet);
-
 		pplx::task<void>([c]() {
-			c->setConnectionState(ConnectionState::Disconnected); // launch this asynchronously if the onConnectionStateChanged of the user stop / destroy the client
-
+			// Start this asynchronously because we locked the mutex in run and the user can do something that tries to lock again this mutex
+			c->setConnectionState(ConnectionState::Disconnected);
 			delete c;
 		});
 	}
@@ -341,7 +340,7 @@ namespace Stormancer
 		});
 
 		_onPacketReceived(packet);
-	}
+}
 
 	RakNetConnection* RakNetTransport::getConnection(RakNet::RakNetGUID guid)
 	{

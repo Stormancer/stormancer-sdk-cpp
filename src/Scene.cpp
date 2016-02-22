@@ -3,13 +3,13 @@
 namespace Stormancer
 {
 	Scene::Scene(IConnection* connection, Client* client, std::string id, std::string token, SceneInfosDto dto, DependencyResolver* parentDependencyResolver, std::function<void()> onDelete)
-		: _id(id),
-		_peer(connection),
-		_token(token),
-		_client(client),
-		_metadata(dto.Metadata),
-		_onDelete(onDelete),
-		_dependencyResolver(new DependencyResolver(parentDependencyResolver))
+		: _id(id)
+		, _peer(connection)
+		, _token(token)
+		, _client(client)
+		, _metadata(dto.Metadata)
+		, _onDelete(onDelete)
+		, _dependencyResolver(new DependencyResolver(parentDependencyResolver))
 	{
 		for (auto routeDto : dto.Routes)
 		{

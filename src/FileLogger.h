@@ -45,7 +45,9 @@ namespace Stormancer
 		bool tryOpenFile();
 
 	private:
-	
+
+		std::mutex _mutex;
+
 		/// Name of the log file.
 		std::string _fileName;
 		

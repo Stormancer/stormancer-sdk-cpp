@@ -23,5 +23,6 @@ public:
 	static void ConsoleLogger::setConsoleColorYellow();
 
 private:
+	std::mutex _mutex;
 	Stormancer::LogLevel _maximalLogLevel = Stormancer::LogLevel::Trace;
 };

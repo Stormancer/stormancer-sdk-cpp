@@ -24,8 +24,8 @@ namespace Stormancer
 		void initialize(uint16 maxConnections, uint16 serverPort = 0);
 		void run();
 		void onConnectionIdReceived(uint64 p);
-		RakNetConnection* onConnection(RakNet::Packet* packet, RakNet::RakPeerInterface* server);
-		void onDisconnection(RakNet::Packet* packet, RakNet::RakPeerInterface* server, std::string reason);
+		RakNetConnection* onConnection(RakNet::Packet* packet);
+		void onDisconnection(RakNet::Packet* packet, std::string reason);
 		void onMessageReceived(RakNet::Packet* packet);
 		RakNetConnection* getConnection(RakNet::RakNetGUID guid);
 		RakNetConnection* createNewConnection(RakNet::RakNetGUID raknetGuid, RakNet::RakPeerInterface* peer);
