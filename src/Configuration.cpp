@@ -33,18 +33,30 @@ namespace Stormancer
 		return *this;
 	}
 
-	std::string Configuration::getApiEndpoint()
+	void Configuration::addPlugin(IPlugin* plugin)
 	{
-		return (strlen(serverEndpoint) ? serverEndpoint : apiEndpoint);
+		_plugins.push_back(plugin);
 	}
 
-	const std::vector<IPlugin*>& Configuration::plugins()
+	const std::vector<IPlugin*> Configuration::plugins()
 	{
 		return _plugins;
 	}
 
-	void Configuration::addPlugin(IPlugin* plugin)
+	void Configuration::addServerEndpoint(const char* serverEndpoint)
 	{
-		_plugins.push_back(plugin);
+		_serverEndpoints.push_back(std::string(serverEndpoint));
+	}
+
+	std::vector<std::string> Configuration::getApiEndpoint()
+	{
+		if (_serverEndpoints.size())
+		{
+			return _serverEndpoints;
+		}
+		else
+		{
+			return std::vector<std::string>{ apiEndpoint };
+		}
 	}
 };

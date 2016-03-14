@@ -24,7 +24,47 @@ namespace Stormancer
 			ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", "data", str.c_str());
 		}
 
-		std::string baseUri = _config->getApiEndpoint();
+		std::vector<std::string> baseUris = _config->getApiEndpoint();
+
+		std::srand((uint32)std::time(0));
+
+		if (baseUris.size() == 0)
+		{
+			return taskFromException<SceneEndpoint>(std::runtime_error("No server endpoints available."));
+		}
+
+		if (_config->endpointSelectionMode == EndpointSelectionMode::FALLBACK)
+		{
+			return getSceneEndpointImpl(baseUris, accountId, applicationName, sceneId, userData);
+		}
+		else if (_config->endpointSelectionMode == EndpointSelectionMode::RANDOM)
+		{
+			std::vector<std::string> baseUris2;
+			while (baseUris.size())
+			{
+				int index = std::rand() % baseUris.size();
+				auto it = baseUris.begin() + index;
+				baseUris2.push_back(*it);
+				baseUris.erase(it);
+			}
+			return getSceneEndpointImpl(baseUris2, accountId, applicationName, sceneId, userData);
+		}
+
+		return taskFromException<SceneEndpoint>(std::runtime_error("Error selecting server endpoint."));
+	}
+
+	pplx::task<SceneEndpoint> ApiClient::getSceneEndpointImpl(std::vector<std::string> endpoints, std::string accountId, std::string applicationName, std::string sceneId, std::string userData)
+	{
+		if (endpoints.size() == 0)
+		{
+			return taskFromException<SceneEndpoint>(std::runtime_error("Can't connect to any server endpoint."));
+		}
+
+		auto it = endpoints.begin();
+		std::string baseUri = *it;
+		endpoints.erase(it);
+
+		ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", "Get Scene endpoint", baseUri.c_str());
 
 #if defined(_WIN32)
 		web::http::client::http_client client(std::wstring(baseUri.begin(), baseUri.end()));
@@ -64,61 +104,59 @@ namespace Stormancer
 		}
 
 		pplx::task<web::http::http_response> httpRequestTask;
-		
+
 		try
 		{
 			httpRequestTask = client.request(request);
 		}
 		catch (const std::exception& ex)
 		{
-			ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", "client.request failed.", ex.what());
+			ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", "pplx client.request failed.", ex.what());
 			return taskFromException<SceneEndpoint>(std::runtime_error(std::string() + "client.request failed." + ex.what()));
 		}
 		catch (...)
 		{
-			ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", "client.request failed.", "Unknown error");
+			ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", "pplx client.request failed.", "Unknown error");
 			return taskFromException<SceneEndpoint>(std::runtime_error(std::string() + "client.request failed."));
 		}
 
-		return httpRequestTask.then([](pplx::task<web::http::http_response> t) {
+		return httpRequestTask.then([this, endpoints, accountId, applicationName, sceneId, userData](pplx::task<web::http::http_response> task) {
+			web::http::http_response response;
 			try
 			{
-				t.wait();
-				return t.get();
+				response = task.get();
 			}
 			catch (const std::exception& ex)
 			{
-				throw std::runtime_error(std::string() + ex.what() + "\nCan't reach the stormancer API server.");
+				ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", "Can't reach the server endpoint.", ex.what());
+				//throw std::runtime_error(std::string() + ex.what() + "\nCan't reach the stormancer API server.");
+				return getSceneEndpointImpl(endpoints, accountId, applicationName, sceneId, userData);
 			}
 			catch (...)
 			{
-				throw std::runtime_error("Unknown error: Can't reach the stormancer API server.");
+				ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", "Can't reach the server endpoint.", "Unknown error");
+				//throw std::runtime_error("Unknown error: Can't reach the stormancer API server.");
+				return getSceneEndpointImpl(endpoints, accountId, applicationName, sceneId, userData);
 			}
-		}).then([this, accountId, applicationName, sceneId](web::http::http_response response) {
+
 			try
 			{
 				uint16 statusCode = response.status_code();
 				ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", "client.request statusCode", to_string(statusCode).c_str());
-				auto ss = new concurrency::streams::stringstreambuf;
-				auto result = response.body().read_to_end(*ss).then([this, ss, statusCode, accountId, applicationName, sceneId](size_t size) {
-					std::string responseText = ss->collection();
-					ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", "responseText", responseText.c_str());
-					if (ensureSuccessStatusCode(statusCode))
-					{
-						return _tokenHandler->decodeToken(responseText);
-					}
-					else
-					{
-						throw std::runtime_error(std::string("Unable to get scene endpoint ") + accountId + '/' + applicationName + '/' + sceneId + ". Please check your account and application informations.\nResponse from server: " + responseText);
-					}
-				});
-
-				result.then([ss](pplx::task<SceneEndpoint> t)
+				if (ensureSuccessStatusCode(statusCode))
 				{
-					delete ss;
-				});
-
-				return result;
+					auto ss = new concurrency::streams::stringstreambuf;
+					return response.body().read_to_end(*ss).then([this, endpoints, ss, statusCode, accountId, applicationName, sceneId, userData](size_t size) {
+						std::string responseText = ss->collection();
+						ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", "responseText", responseText.c_str());
+						delete ss;
+						return _tokenHandler->decodeToken(responseText);
+					});
+				}
+				else
+				{
+					return getSceneEndpointImpl(endpoints, accountId, applicationName, sceneId, userData);
+				}
 			}
 			catch (const std::exception& ex)
 			{

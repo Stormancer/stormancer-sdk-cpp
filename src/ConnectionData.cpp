@@ -14,7 +14,7 @@ namespace Stormancer
 	{
 		if (o.type != msgpack::type::MAP)
 		{
-			throw "Bad msgpack format";
+			throw std::runtime_error("Bad msgpack format. Msgpack type map expected.");
 		}
 
 		auto mapptr = o.via.map.ptr;

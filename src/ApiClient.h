@@ -14,6 +14,7 @@ namespace Stormancer
 		~ApiClient();
 
 		pplx::task<SceneEndpoint> getSceneEndpoint(std::string accountId, std::string applicationName, std::string sceneId, std::string userData = std::string());
+		pplx::task<SceneEndpoint> getSceneEndpointImpl(std::vector<std::string> endpoints, std::string accountId, std::string applicationName, std::string sceneId, std::string userData = std::string());
 
 	private:
 		Configuration* _config;
