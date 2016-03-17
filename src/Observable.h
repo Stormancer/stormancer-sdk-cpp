@@ -24,10 +24,17 @@ namespace Stormancer
 
 			auto& isubscription = *it;
 
-			auto onErrorWrapper = [onError](std::exception_ptr ep) {
+			auto onErrorWrapper = [onError](std::exception_ptr eptr) {
 				try
 				{
-					std::rethrow_exception(ep);
+					if (eptr)
+					{
+						std::rethrow_exception(eptr);
+					}
+					else
+					{
+						throw std::runtime_error("Unknown exception occured in Observable::subscribe(onNext, onError, onComplete)");
+					}
 				}
 				catch (const std::exception& ex)
 				{
@@ -53,10 +60,17 @@ namespace Stormancer
 
 			auto& isubscription = *it;
 
-			auto onErrorWrapper = [onError](std::exception_ptr ep) {
+			auto onErrorWrapper = [onError](std::exception_ptr eptr) {
 				try
 				{
-					std::rethrow_exception(ep);
+					if (eptr)
+					{
+						std::rethrow_exception(eptr);
+					}
+					else
+					{
+						throw std::runtime_error("Unknown exception occured in Observable::subscribe(onNext, onError)");
+					}
 				}
 				catch (const std::exception& ex)
 				{
@@ -81,10 +95,17 @@ namespace Stormancer
 
 			auto& isubscription = *it;
 
-			auto onErrorWrapper = [](std::exception_ptr ep) {
+			auto onErrorWrapper = [](std::exception_ptr eptr) {
 				try
 				{
-					std::rethrow_exception(ep);
+					if (eptr)
+					{
+						std::rethrow_exception(eptr);
+					}
+					else
+					{
+						throw std::runtime_error("Unknown exception");
+					}
 				}
 				catch (const std::exception& ex)
 				{
@@ -109,10 +130,17 @@ namespace Stormancer
 
 			auto& isubscription = *it;
 
-			auto onErrorWrapper = [](std::exception_ptr ep) {
+			auto onErrorWrapper = [](std::exception_ptr eptr) {
 				try
 				{
-					std::rethrow_exception(ep);
+					if (eptr)
+					{
+						std::rethrow_exception(eptr);
+					}
+					else
+					{
+						throw std::runtime_error("Unknown exception");
+					}
 				}
 				catch (const std::exception& ex)
 				{
