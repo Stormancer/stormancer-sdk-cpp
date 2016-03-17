@@ -246,8 +246,8 @@ namespace Stormancer
 			std::string msg;
 			deserialized.convert(&msg);
 			request->observer.on_error(std::make_exception_ptr(std::runtime_error(msg)));
-			}
 		}
+	}
 
 	void RpcService::complete(Packetisp_ptr packet)
 	{
@@ -331,4 +331,4 @@ namespace Stormancer
 			_pendingRequests.clear();
 		}
 	}
-	};
+};
