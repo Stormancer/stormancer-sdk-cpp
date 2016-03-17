@@ -120,7 +120,7 @@ namespace Stormancer
 			return taskFromException<SceneEndpoint>(std::runtime_error(std::string() + "client.request failed."));
 		}
 
-		return httpRequestTask.then([this, endpoints, accountId, applicationName, sceneId, userData](pplx::task<web::http::http_response> task) {
+		return httpRequestTask.then([this, endpoints, baseUri, accountId, applicationName, sceneId, userData](pplx::task<web::http::http_response> task) {
 			web::http::http_response response;
 			try
 			{
@@ -128,13 +128,15 @@ namespace Stormancer
 			}
 			catch (const std::exception& ex)
 			{
-				ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", "Can't reach the server endpoint.", ex.what());
+				auto msgStr = "Can't reach the server endpoint. " + baseUri;
+				ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", msgStr.c_str(), ex.what());
 				//throw std::runtime_error(std::string() + ex.what() + "\nCan't reach the stormancer API server.");
 				return getSceneEndpointImpl(endpoints, accountId, applicationName, sceneId, userData);
 			}
 			catch (...)
 			{
-				ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", "Can't reach the server endpoint.", "Unknown error");
+				auto msgStr = "Can't reach the server endpoint. " + baseUri;
+				ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", msgStr.c_str(), "Unknown error");
 				//throw std::runtime_error("Unknown error: Can't reach the stormancer API server.");
 				return getSceneEndpointImpl(endpoints, accountId, applicationName, sceneId, userData);
 			}
@@ -142,7 +144,8 @@ namespace Stormancer
 			try
 			{
 				uint16 statusCode = response.status_code();
-				ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", "client.request statusCode", to_string(statusCode).c_str());
+				auto msgStr = "http request on '" + baseUri + "' returned status code " + std::to_string(statusCode);
+				ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", msgStr.c_str(), "");
 				if (ensureSuccessStatusCode(statusCode))
 				{
 					auto ss = new concurrency::streams::stringstreambuf;
