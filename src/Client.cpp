@@ -772,4 +772,9 @@ namespace Stormancer
 	{
 		return (_serverConnection ? _serverConnection->connectionState() : ConnectionState::Disconnected);
 	}
+
+	void Client::SetMedatata(const char* key, const char* value)
+	{
+		_metadata[key] = value;
+	}
 };

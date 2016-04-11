@@ -95,6 +95,7 @@ namespace Stormancer
 
 		STORMANCER_DLL_API ConnectionState connectionState() const;
 
+		STORMANCER_DLL_API void SetMedatata(const char* key, const char* value);
 	private:
 
 		void initialize();

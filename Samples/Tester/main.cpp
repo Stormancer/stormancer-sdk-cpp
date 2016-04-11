@@ -6,7 +6,7 @@ using namespace std;
 
 auto logger = (ConsoleLogger*)ILogger::instance(new ConsoleLogger(Stormancer::LogLevel::Trace));
 bool stop = false;
-const char* accountId = "997bc6ac-9021-2ad6-139b-da63edee8c58";
+const char* accountId = "58ec9ba7-56e4-3d89-2c55-c9435e08b26b";
 const char* applicationName = "tester";
 const char* sceneName = "main";
 Configuration* config = nullptr;

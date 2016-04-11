@@ -30,7 +30,7 @@ namespace Stormancer
 
 		if (baseUris.size() == 0)
 		{
-			return taskFromException<SceneEndpoint>(std::runtime_error("No server endpoints available."));
+			return taskFromException<SceneEndpoint>(std::runtime_error("No server endpoints found in configuration."));
 		}
 
 		if (_config->endpointSelectionMode == EndpointSelectionMode::FALLBACK)
@@ -47,17 +47,23 @@ namespace Stormancer
 				baseUris2.push_back(*it);
 				baseUris.erase(it);
 			}
-			return getSceneEndpointImpl(baseUris2, accountId, applicationName, sceneId, userData);
+			std::vector<std::string> errors;
+			return getSceneEndpointImpl(baseUris2, errors, accountId, applicationName, sceneId, userData);
 		}
 
 		return taskFromException<SceneEndpoint>(std::runtime_error("Error selecting server endpoint."));
 	}
 
-	pplx::task<SceneEndpoint> ApiClient::getSceneEndpointImpl(std::vector<std::string> endpoints, std::string accountId, std::string applicationName, std::string sceneId, std::string userData)
+	pplx::task<SceneEndpoint> ApiClient::getSceneEndpointImpl(std::vector<std::string> & endpoints, std::vector<std::string> &errors, std::string accountId, std::string applicationName, std::string sceneId, std::string userData)
 	{
 		if (endpoints.size() == 0)
 		{
-			return taskFromException<SceneEndpoint>(std::runtime_error("Can't connect to any server endpoint."));
+			std::string errorMsg;
+			for (auto e : errors)
+			{
+				errorMsg = errorMsg + e;
+			}
+			return taskFromException<SceneEndpoint>(std::runtime_error("Failed to connect to the configured server endpoints : " + errorMsg));
 		}
 
 		auto it = endpoints.begin();
@@ -120,7 +126,7 @@ namespace Stormancer
 			return taskFromException<SceneEndpoint>(std::runtime_error(std::string() + "client.request failed."));
 		}
 
-		return httpRequestTask.then([this, endpoints, baseUri, accountId, applicationName, sceneId, userData](pplx::task<web::http::http_response> task) {
+		return httpRequestTask.then([this, &endpoints,&errors, baseUri, accountId, applicationName, sceneId, userData](pplx::task<web::http::http_response> task) {
 			web::http::http_response response;
 			try
 			{
@@ -130,15 +136,17 @@ namespace Stormancer
 			{
 				auto msgStr = "Can't reach the server endpoint. " + baseUri;
 				ILogger::instance()->log(LogLevel::Warn, "Client::getSceneEndpoint", msgStr.c_str(), ex.what());
+				errors.push_back("[" + msgStr + ":" + ex.what() + "]");
 				//throw std::runtime_error(std::string() + ex.what() + "\nCan't reach the stormancer API server.");
-				return getSceneEndpointImpl(endpoints, accountId, applicationName, sceneId, userData);
+				return getSceneEndpointImpl(endpoints, errors,accountId, applicationName, sceneId, userData);
 			}
 			catch (...)
 			{
 				auto msgStr = "Can't reach the server endpoint. " + baseUri;
 				ILogger::instance()->log(LogLevel::Warn, "Client::getSceneEndpoint", msgStr.c_str(), "Unknown error");
+				errors.push_back("[" + msgStr + ":" + "Unknown error]");
 				//throw std::runtime_error("Unknown error: Can't reach the stormancer API server.");
-				return getSceneEndpointImpl(endpoints, accountId, applicationName, sceneId, userData);
+				return getSceneEndpointImpl(endpoints,errors, accountId, applicationName, sceneId, userData);
 			}
 
 			try
@@ -158,7 +166,8 @@ namespace Stormancer
 				}
 				else
 				{
-					return getSceneEndpointImpl(endpoints, accountId, applicationName, sceneId, userData);
+					errors.push_back("[" + msgStr + ":" + std::to_string(statusCode)+"]");
+					return getSceneEndpointImpl(endpoints,errors, accountId, applicationName, sceneId, userData);
 				}
 			}
 			catch (const std::exception& ex)
