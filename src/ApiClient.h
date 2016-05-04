@@ -16,7 +16,7 @@ namespace Stormancer
 		pplx::task<SceneEndpoint> getSceneEndpoint(std::string accountId, std::string applicationName, std::string sceneId, std::string userData = std::string());
 		
 	private:
-		pplx::task<SceneEndpoint> getSceneEndpointImpl(std::vector<std::string> & endpoints, std::vector<std::string> &errors, std::string accountId, std::string applicationName, std::string sceneId, std::string userData = std::string());
+		pplx::task<SceneEndpoint> getSceneEndpointImpl(std::vector<std::string>  endpoints, std::shared_ptr<std::vector<std::string>> errors, std::string accountId, std::string applicationName, std::string sceneId, std::string userData = std::string());
 
 		Configuration* _config;
 		ITokenHandler* _tokenHandler;
