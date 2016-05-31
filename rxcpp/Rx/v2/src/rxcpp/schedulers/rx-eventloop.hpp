@@ -56,7 +56,7 @@ private:
 
     mutable thread_factory factory;
     scheduler newthread;
-    mutable std::atomic<size_t> count;
+    mutable std::atomic<std::size_t> count;
     std::vector<worker> loops;
 
 public:
@@ -68,7 +68,7 @@ public:
         , count(0)
     {
         auto remaining = std::max(std::thread::hardware_concurrency(), unsigned(4));
-        while (--remaining) {
+        while (remaining--) {
             loops.push_back(newthread.create_worker());
         }
     }
@@ -78,7 +78,7 @@ public:
         , count(0)
     {
         auto remaining = std::max(std::thread::hardware_concurrency(), unsigned(4));
-        while (--remaining) {
+        while (remaining--) {
             loops.push_back(newthread.create_worker());
         }
     }

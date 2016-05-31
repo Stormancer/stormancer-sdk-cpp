@@ -1,10 +1,4 @@
-#include "rxcpp/rx.hpp"
-namespace rxu=rxcpp::util;
-namespace rxs=rxcpp::sources;
-namespace rxsc=rxcpp::schedulers;
-
-#include "rxcpp/rx-test.hpp"
-#include "catch.hpp"
+#include "../test.h"
 
 #include <locale>
 
@@ -206,7 +200,7 @@ SCENARIO("group_by", "[group_by][operators]"){
             on.completed(570),
             on.next(580, "error"),
             on.completed(600),
-            on.error(650, new std::runtime_error("error in completed sequence"))
+            on.error(650, std::runtime_error("error in completed sequence"))
         });
 
         WHEN("group each int with the next 2 ints"){

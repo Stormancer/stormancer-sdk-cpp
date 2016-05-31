@@ -8,6 +8,7 @@
 #endif
 
 // DEFINES
+#define CPPREST_FORCE_PPLX true
 #define STORMANCER_LOG_CLIENT
 //#define STORMANCER_LOG_PACKETS
 //#define STORMANCER_LOG_RAKNET_PACKETS
@@ -17,7 +18,7 @@
 #include "AllowWindowsPlatformTypes.h"
 #endif
 
-// standart libs
+// standard libs
 #include <mutex>
 #include <condition_variable>
 #include <algorithm>
@@ -42,12 +43,12 @@
 
 // custom libs
 
-// restsdk
+// cpprestsdk
 #include <cpprest/http_client.h>
 #include <cpprest/filestream.h>
 #include <pplx/pplxtasks.h>
 
-// rx
+// rxcpp
 #include <rx.hpp>
 
 // raknet
@@ -58,7 +59,7 @@
 #include <DS_Map.h>
 #include <NatPunchthroughClient.h>
 
-// packed libs
+// msgpack
 #include <msgpack.hpp>
 
 // custom types

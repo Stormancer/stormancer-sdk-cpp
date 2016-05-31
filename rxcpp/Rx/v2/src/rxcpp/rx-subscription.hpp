@@ -16,11 +16,11 @@ struct is_unsubscribe_function
 {
     struct not_void {};
     template<class CF>
-	static auto checkRX(int) -> decltype((*(CF*)nullptr)());
+    static auto checkRX(int) -> decltype((*(CF*)nullptr)());
     template<class CF>
-	static not_void checkRX(...);
+    static not_void checkRX(...);
 
-	static const bool value = std::is_same<decltype(checkRX<rxu::decay_t<F>>(0)), void>::value;
+    static const bool value = std::is_same<decltype(checkRX<rxu::decay_t<F>>(0)), void>::value;
 };
 
 }
@@ -31,11 +31,11 @@ template<class T>
 class is_subscription
 {
     template<class C>
-	static typename C::subscription_tag* checkRX(int);
+    static typename C::subscription_tag* checkRX(int);
     template<class C>
-	static void checkRX(...);
+    static void checkRX(...);
 public:
-	static const bool value = std::is_convertible<decltype(checkRX<rxu::decay_t<T>>(0)), tag_subscription*>::value;
+    static const bool value = std::is_convertible<decltype(checkRX<rxu::decay_t<T>>(0)), tag_subscription*>::value;
 };
 
 template<class Unsubscribe>
