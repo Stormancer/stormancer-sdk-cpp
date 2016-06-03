@@ -216,4 +216,48 @@ namespace Stormancer
 	{
 		return _userId.c_str();
 	}
+
+	pplx::task<Result<Scene*>*> AuthenticationService::getPrivateScene(const char* sceneId)
+	{
+		auto result = new Result<Scene*>();
+		return this->getAuthenticationScene().then([sceneId, result, this](Scene* authScene) {
+
+			auto rpcService = authScene->dependencyResolver()->resolve<IRpcService>();
+			//Get scene token
+			auto observable = rpcService->rpc("sceneauthorization.gettoken", [sceneId](bytestream* stream) {
+				msgpack::pack(stream, sceneId);
+			}, PacketPriority::MEDIUM_PRIORITY);
+
+			auto tce = pplx::task_completion_event<Result<Scene*>*>();
+			observable->subscribe([tce, this,result](Stormancer::Packetisp_ptr packet) {
+
+				std::string buffer;
+				*packet->stream >> buffer;
+				msgpack::unpacked r;
+				msgpack::unpack(&r, buffer.data(), buffer.size());
+				std::string str;
+				r.get().convert(&str);
+
+				//Connect to scene using token
+				this->getPrivateScene(str.data()).then([tce,result](Stormancer::Result<Stormancer::Scene*>* r) {
+					if (r->success())
+					{
+						destroy(result);
+						tce.set(r);
+					}
+					else
+					{
+						result->setError(1, r->reason());
+						tce.set(result);
+					}
+				});
+
+			}, [tce, result](const char* errorMsg) {
+				result->setError(1, errorMsg);
+				tce.set(result);
+			});
+			return pplx::create_task(tce);
+
+		});
+	}
 };

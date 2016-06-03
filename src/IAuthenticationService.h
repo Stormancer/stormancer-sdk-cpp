@@ -21,6 +21,13 @@ namespace Stormancer
 		virtual pplx::task<Result<Scene*>*> steamLogin(const char* steamTicket) = 0;
 
 		virtual pplx::task<Scene*> getAuthenticationScene() = 0;
+		
+		/// <summary>
+		/// Gets a scene token from the server
+		/// </summary>
+		/// <param name="sceneId">Id of the scene to access.</param>
+		/// <returns>Scene object to configure then connect to.</returns>
+		virtual pplx::task<Result<Scene*>*> getPrivateScene(const char* sceneId) = 0;
 
 		virtual pplx::task<Result<>*> logout() = 0;
 

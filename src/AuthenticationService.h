@@ -36,7 +36,7 @@ namespace Stormancer
 
 		pplx::task<Result<Scene*>*> login(const char* pseudo, const char* password);
 		pplx::task<Result<Scene*>*> login(const stringMap* authenticationContext);
-
+		pplx::task<Result<Scene*>*> getPrivateScene(const char* sceneId);
 		pplx::task<Result<Scene*>*> steamLogin(const char* steamTicket);
 
 		pplx::task<Scene*> getAuthenticationScene();
