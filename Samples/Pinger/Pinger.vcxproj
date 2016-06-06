@@ -22,7 +22,7 @@
     <ProjectGuid>{324B6DC8-1A5C-4E59-9687-31E742373D1C}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Pinger</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.10240.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
   </PropertyGroup>
