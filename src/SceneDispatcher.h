@@ -10,7 +10,7 @@ namespace Stormancer
 		friend class Client;
 
 	public:
-		SceneDispatcher();
+		SceneDispatcher(std::function<void(std::function<void(void)>)> evDispatcher);
 		virtual ~SceneDispatcher();
 
 	public:
@@ -19,6 +19,7 @@ namespace Stormancer
 		void removeScene(uint8 sceneHandle);
 
 	private:
+		std::function<void(std::function<void(void)>)> _eventDispatcher;
 		bool handler_impl(uint8 sceneHandle, Packet_ptr packet);
 
 	private:

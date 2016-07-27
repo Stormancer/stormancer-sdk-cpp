@@ -191,7 +191,8 @@ namespace Stormancer
 
 		if (!request)
 		{
-			ILogger::instance()->log(LogLevel::Warn, "RpcService", "Pending RPC request not found", "");
+			auto idstr = std::to_string(id);
+			ILogger::instance()->log(LogLevel::Warn, "RpcService", "Pending RPC request not found", idstr.c_str());
 		}
 
 		return request;
@@ -200,6 +201,8 @@ namespace Stormancer
 	void RpcService::eraseRequest(uint16 requestId)
 	{
 		std::lock_guard<std::mutex> lock(_pendingRequestsMutex);
+		auto idstr = std::to_string(requestId);
+		ILogger::instance()->log(LogLevel::Trace, "RpcService::complete", "Erasing RPC", idstr.c_str());
 		_pendingRequests.erase(requestId);
 	}
 
@@ -210,7 +213,7 @@ namespace Stormancer
 		{
 #ifdef STORMANCER_LOG_RPC
 			auto idstr = std::to_string(request->id);
-			ILogger::instance()->log(LogLevel::Trace, "RpcService::next", "rpc next", idstr.c_str());
+			ILogger::instance()->log(LogLevel::Trace, "RpcService::next", "RPC next", idstr.c_str());
 #endif
 
 			request->observer.on_next(packet);
@@ -228,7 +231,7 @@ namespace Stormancer
 		{
 #ifdef STORMANCER_LOG_RPC
 			auto idstr = std::to_string(request->id);
-			ILogger::instance()->log(LogLevel::Trace, "RpcService::error", "rpc error", idstr.c_str());
+			ILogger::instance()->log(LogLevel::Trace, "RpcService::error", "RPC error", idstr.c_str());
 #endif
 
 			request->hasCompleted = true;
@@ -260,7 +263,9 @@ namespace Stormancer
 		{
 #ifdef STORMANCER_LOG_RPC
 			auto idstr = std::to_string(request->id);
-			ILogger::instance()->log(LogLevel::Trace, "RpcService::complete", "rpc complete", idstr.c_str());
+			ILogger::instance()->log(LogLevel::Trace, "RpcService::complete", "RPC complete", idstr.c_str());
+			std::string messageSentStr = std::string() + "messageSent == " + (messageSent ? "true" : "false");
+			ILogger::instance()->log(LogLevel::Trace, "RpcService::complete", messageSentStr.c_str(), idstr.c_str());
 #endif
 
 			request->hasCompleted = true;
@@ -287,7 +292,7 @@ namespace Stormancer
 
 #ifdef STORMANCER_LOG_RPC
 		auto idstr = std::to_string(id);
-		ILogger::instance()->log(LogLevel::Trace, "RpcService::cancel", "rpc cancel", idstr.c_str());
+		ILogger::instance()->log(LogLevel::Trace, "RpcService::cancel", "RPC cancel", idstr.c_str());
 #endif
 
 		_runningRequestsMutex.lock();

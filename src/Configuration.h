@@ -15,7 +15,7 @@ namespace Stormancer
 	};
 
 	/// Used by a Client for initialization.
-    /// For instance to target a custom Stormancer cluster change the ServerEndoint property to the http API endpoint of your custom cluster.
+	/// For instance to target a custom Stormancer cluster change the ServerEndoint property to the http API endpoint of your custom cluster.
 	class Configuration
 	{
 		friend class Client;
@@ -78,6 +78,14 @@ namespace Stormancer
 		/// Gets or sets the transport to be used by the client.
 		std::function<ITransport*(DependencyResolver*)> transportFactory;
 
+		/// <summary>
+		/// Dispatches events
+		/// </summary>
+		/// <remarks>
+		/// By default, events are dispatched on the network thread. Replace this function to dispatch events asynchronously to
+		/// your main game loop for instance.
+		/// </remarks>
+		std::function<void(std::function<void(void)>)> eventDispatcher = [](std::function<void(void)> ev) {ev(); };
 		/// use the syncClock
 		bool synchronisedClock = true;
 
@@ -89,6 +97,7 @@ namespace Stormancer
 	private:
 		const std::function<ITransport*(DependencyResolver*)> defaultTransportFactory = [](DependencyResolver* resolver)
 		{
+
 			return new RakNetTransport(resolver);
 		};
 

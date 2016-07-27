@@ -22,6 +22,7 @@ if(DOXYGEN_FOUND)
 
     # File with main page (index.html) content
     set(DOXY_MAIN_PAGE ${DOXY_CONF_DIR}/mainpage.dox)
+    set(DOXY_FOOTER_HTML ${DOXY_CONF_DIR}/footer.html)
 
     # Sources for processing location
     set(DOXY_INPUT_DIR "${IX_SRC_DIR} ${RX_SRC_DIR} ${DOXY_MAIN_PAGE}")
@@ -51,7 +52,10 @@ if(DOXYGEN_FOUND)
         ${DOXY_EXAMPLES_SRC_DIR}/concat_map.cpp
         ${DOXY_EXAMPLES_SRC_DIR}/create.cpp
         ${DOXY_EXAMPLES_SRC_DIR}/defer.cpp
+        ${DOXY_EXAMPLES_SRC_DIR}/delay.cpp
+        ${DOXY_EXAMPLES_SRC_DIR}/distinct.cpp
         ${DOXY_EXAMPLES_SRC_DIR}/distinct_until_changed.cpp
+        ${DOXY_EXAMPLES_SRC_DIR}/element_at.cpp
         ${DOXY_EXAMPLES_SRC_DIR}/empty.cpp
         ${DOXY_EXAMPLES_SRC_DIR}/error.cpp
         ${DOXY_EXAMPLES_SRC_DIR}/filter.cpp
@@ -59,6 +63,7 @@ if(DOXYGEN_FOUND)
         ${DOXY_EXAMPLES_SRC_DIR}/flat_map.cpp
         ${DOXY_EXAMPLES_SRC_DIR}/from.cpp
         ${DOXY_EXAMPLES_SRC_DIR}/group_by.cpp
+        ${DOXY_EXAMPLES_SRC_DIR}/ignore_elements.cpp
         ${DOXY_EXAMPLES_SRC_DIR}/interval.cpp
         ${DOXY_EXAMPLES_SRC_DIR}/iterate.cpp
         ${DOXY_EXAMPLES_SRC_DIR}/just.cpp
@@ -67,6 +72,7 @@ if(DOXYGEN_FOUND)
         ${DOXY_EXAMPLES_SRC_DIR}/merge.cpp
         ${DOXY_EXAMPLES_SRC_DIR}/never.cpp
         ${DOXY_EXAMPLES_SRC_DIR}/observe_on.cpp
+        ${DOXY_EXAMPLES_SRC_DIR}/on_error_resume_next.cpp
         ${DOXY_EXAMPLES_SRC_DIR}/pairwise.cpp
         ${DOXY_EXAMPLES_SRC_DIR}/publish.cpp
         ${DOXY_EXAMPLES_SRC_DIR}/range.cpp
@@ -74,6 +80,7 @@ if(DOXYGEN_FOUND)
         ${DOXY_EXAMPLES_SRC_DIR}/repeat.cpp
         ${DOXY_EXAMPLES_SRC_DIR}/replay.cpp
         ${DOXY_EXAMPLES_SRC_DIR}/retry.cpp
+        ${DOXY_EXAMPLES_SRC_DIR}/sample.cpp
         ${DOXY_EXAMPLES_SRC_DIR}/scan.cpp
         ${DOXY_EXAMPLES_SRC_DIR}/scope.cpp
         ${DOXY_EXAMPLES_SRC_DIR}/skip.cpp
@@ -84,6 +91,7 @@ if(DOXYGEN_FOUND)
         ${DOXY_EXAMPLES_SRC_DIR}/switch_on_next.cpp
         ${DOXY_EXAMPLES_SRC_DIR}/take.cpp
         ${DOXY_EXAMPLES_SRC_DIR}/take_until.cpp
+        ${DOXY_EXAMPLES_SRC_DIR}/tap.cpp
         ${DOXY_EXAMPLES_SRC_DIR}/timer.cpp
         ${DOXY_EXAMPLES_SRC_DIR}/window.cpp
         ${DOXY_EXAMPLES_SRC_DIR}/zip.cpp

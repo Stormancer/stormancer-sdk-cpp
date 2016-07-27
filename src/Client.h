@@ -168,8 +168,11 @@ namespace Stormancer
 
 		pplx::task<void> syncClockImpl();
 
+		void dispatchEvent(std::function<void(void)> ev);
+
 	private:
 		bool _initialized = false;
+		const std::function<void(std::function<void(void)>)> _eventDispatcher;
 		ILogger* _logger = nullptr;
 		std::string _accountId;
 		std::string _applicationName;

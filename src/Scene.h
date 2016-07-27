@@ -29,7 +29,14 @@ namespace Stormancer
 		/// \param id Scene id.
 		/// \param token Application token.
 		/// \param dto Scene informations.
-		Scene(IConnection* connection, Client* client, std::string id, std::string token, SceneInfosDto dto, DependencyResolver* parentDependencyResolver, std::function<void()> onDelete);
+		Scene(
+			IConnection* connection, 
+			Client* client, 
+			std::string id, 
+			std::string token, 
+			SceneInfosDto dto, 
+			DependencyResolver* parentDependencyResolver, 
+			std::function<void()> onDelete);
 
 		/// Destructor.
 		virtual ~Scene();

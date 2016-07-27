@@ -18,11 +18,11 @@ struct is_lift_function_for {
     template<class CS, class CF>
     static auto checkRX(int) -> decltype((*(CF*)nullptr)(*(CS*)nullptr));
     template<class CS, class CF>
-	static tag_not_valid checkRX(...);
+    static tag_not_valid checkRX(...);
 
     typedef rxu::decay_t<S> for_type;
     typedef rxu::decay_t<F> func_type;
-	typedef decltype(checkRX<for_type, func_type>(0)) detail_result;
+    typedef decltype(checkRX<for_type, func_type>(0)) detail_result;
     static const bool value = is_subscriber<detail_result>::value && is_subscriber<for_type>::value && std::is_convertible<V, typename rxu::value_type_from<detail_result>::type>::value;
 };
 

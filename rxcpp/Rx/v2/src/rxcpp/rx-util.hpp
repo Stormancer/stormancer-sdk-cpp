@@ -7,7 +7,7 @@
 
 #include "rx-includes.hpp"
 
-#if !defined(RXCPP_ON_IOS) && !defined(RXCPP_THREAD_LOCAL)
+#if !defined(RXCPP_ON_IOS) && !defined(RXCPP_ON_ANDROID) && !defined(RXCPP_THREAD_LOCAL)
 #if defined(_MSC_VER)
 #define RXCPP_THREAD_LOCAL __declspec(thread)
 #else
@@ -35,7 +35,7 @@ namespace util {
 template<class T> using value_type_t = typename T::value_type;
 template<class T> using decay_t = typename std::decay<T>::type;
 
-template<class T, size_t size>
+template<class T, std::size_t size>
 std::vector<T> to_vector(const T (&arr) [size]) {
     return std::vector<T>(std::begin(arr), std::end(arr));
 }
@@ -71,15 +71,15 @@ struct values_from
 template<bool... BN>
 struct all_true;
 
-template<bool B0>
-struct all_true<B0>
+template<bool B>
+struct all_true<B>
 {
-    static const bool value = B0;
+    static const bool value = B;
 };
-template<bool B0, bool... BN>
-struct all_true<B0, BN...>
+template<bool B, bool... BN>
+struct all_true<B, BN...>
 {
-    static const bool value = B0 && all_true<BN...>::value;
+    static const bool value = B && all_true<BN...>::value;
 };
 
 struct all_values_true {
@@ -122,14 +122,8 @@ struct value_type_from<T, typename types_checked_from<value_type_t<T>>::type>
     : public std::true_type {typedef value_type_t<T> type;};
 
 namespace detail {
-
 template<class F, class... ParamN, int... IndexN>
-auto apply(std::tuple<ParamN...> p, values<int, IndexN...>, F& f)
-    -> decltype(f(std::forward<ParamN>(std::get<IndexN>(p))...)) {
-    return      f(std::forward<ParamN>(std::get<IndexN>(p))...);
-}
-template<class F, class... ParamN, int... IndexN>
-auto apply(std::tuple<ParamN...> p, values<int, IndexN...>, const F& f)
+auto apply(std::tuple<ParamN...> p, values<int, IndexN...>, F&& f)
     -> decltype(f(std::forward<ParamN>(std::get<IndexN>(p))...)) {
     return      f(std::forward<ParamN>(std::get<IndexN>(p))...);
 }
@@ -147,16 +141,10 @@ auto apply_to_each(std::tuple<ParamN...>& p, values<int, IndexN...>, const F_inn
 }
 
 }
-
 template<class F, class... ParamN>
-auto apply(std::tuple<ParamN...> p, F& f)
-    -> decltype(detail::apply(std::move(p), typename values_from<int, sizeof...(ParamN)>::type(), f)) {
-    return      detail::apply(std::move(p), typename values_from<int, sizeof...(ParamN)>::type(), f);
-}
-template<class F, class... ParamN>
-auto apply(std::tuple<ParamN...> p, const F& f)
-    -> decltype(detail::apply(std::move(p), typename values_from<int, sizeof...(ParamN)>::type(), f)) {
-    return      detail::apply(std::move(p), typename values_from<int, sizeof...(ParamN)>::type(), f);
+auto apply(std::tuple<ParamN...> p, F&& f)
+    -> decltype(detail::apply(std::move(p), typename values_from<int, sizeof...(ParamN)>::type(), std::forward<F>(f))) {
+    return      detail::apply(std::move(p), typename values_from<int, sizeof...(ParamN)>::type(), std::forward<F>(f));
 }
 
 template<class F_inner, class F_outer, class... ParamN>
@@ -226,6 +214,31 @@ inline auto pack()
     return  detail::pack();
 }
 
+namespace detail {
+
+template<int Index>
+struct take_at
+{
+    template<class... ParamN>
+    auto operator()(ParamN... pn)
+        -> decay_t<decltype(std::get<Index>(std::make_tuple(std::move(pn)...)))> {
+        return              std::get<Index>(std::make_tuple(std::move(pn)...));
+    }
+    template<class... ParamN>
+    auto operator()(ParamN... pn) const
+        -> decay_t<decltype(std::get<Index>(std::make_tuple(std::move(pn)...)))> {
+        return              std::get<Index>(std::make_tuple(std::move(pn)...));
+    }
+};
+
+}
+
+template<int Index>
+inline auto take_at()
+    ->      detail::take_at<Index> {
+    return  detail::take_at<Index>();
+}
+
 template <class D>
 struct resolve_type;
 
@@ -239,9 +252,9 @@ struct defer_trait
     template<class... CN>
     static auto checkRX(int) -> tag_valid<resolved_type::value>;
     template<class... CN>
-	static tag_not_valid checkRX(...);
+    static tag_not_valid checkRX(...);
 
-	typedef decltype(checkRX<AN...>(0)) tag_type;
+    typedef decltype(checkRX<AN...>(0)) tag_type;
     static const bool valid = tag_type::valid;
     static const bool value = tag_type::value;
     static const bool not_value = valid && !value;
@@ -255,11 +268,11 @@ struct defer_type
     struct tag_not_valid {typedef void type; static const bool value = false;};
     typedef Deferred<typename resolve_type<AN>::type...> resolved_type;
     template<class... CN>
-	static auto checkRX(int)->tag_valid<resolved_type>;
+    static auto checkRX(int) -> tag_valid<resolved_type>;
     template<class... CN>
-	static tag_not_valid checkRX(...);
+    static tag_not_valid checkRX(...);
 
-	typedef decltype(checkRX<AN...>(0)) tag_type;
+    typedef decltype(checkRX<AN...>(0)) tag_type;
     typedef typename tag_type::type type;
     static const bool value = tag_type::value;
 };
@@ -272,11 +285,11 @@ struct defer_value_type
     struct tag_not_valid {typedef void type; static const bool value = false;};
     typedef Deferred<typename resolve_type<AN>::type...> resolved_type;
     template<class... CN>
-	static auto checkRX(int)->tag_valid<value_type_t<resolved_type>>;
+    static auto checkRX(int) -> tag_valid<value_type_t<resolved_type>>;
     template<class... CN>
-	static tag_not_valid checkRX(...);
+    static tag_not_valid checkRX(...);
 
-    typedef decltype(check<AN...>(0)) tag_type;
+    typedef decltype(checkRX<AN...>(0)) tag_type;
     typedef typename tag_type::type type;
     static const bool value = tag_type::value;
 };
@@ -289,11 +302,11 @@ struct defer_seed_type
     struct tag_not_valid {typedef void type; static const bool value = false;};
     typedef Deferred<typename resolve_type<AN>::type...> resolved_type;
     template<class... CN>
-	static auto checkRX(int)->tag_valid<typename resolved_type::seed_type>;
+    static auto checkRX(int) -> tag_valid<typename resolved_type::seed_type>;
     template<class... CN>
-	static tag_not_valid checkRX(...);
+    static tag_not_valid checkRX(...);
 
-	typedef decltype(checkRX<AN...>(0)) tag_type;
+    typedef decltype(checkRX<AN...>(0)) tag_type;
     typedef typename tag_type::type type;
     static const bool value = tag_type::value;
 };
@@ -353,7 +366,7 @@ struct print_function
     template<class... TN>
     void operator()(const TN&... tn) const {
         bool inserts[] = {(os << tn, true)...};
-        inserts[0] = *(inserts); // silence warning
+        inserts[0] = *reinterpret_cast<bool*>(inserts); // silence warning
         delimit();
     }
 
@@ -431,6 +444,14 @@ auto print_followed_by(OStream& os, DelimitValue dv)
     return      detail::print_followed_with(os, detail::insert_value<OStream, DelimitValue>(os, std::move(dv)));
 }
 
+inline std::string what(std::exception_ptr ep) {
+    try {std::rethrow_exception(ep);}
+    catch (const std::exception& ex) {
+        return ex.what();
+    }
+    return std::string();
+}
+                
 namespace detail {
 
 template <class T>
@@ -483,7 +504,7 @@ public:
         return !is_set;
     }
 
-    size_t size() const {
+    std::size_t size() const {
         return is_set ? 1 : 0;
     }
 
@@ -678,8 +699,68 @@ public:
 };
 #endif
 
+template<typename, typename C = types_checked>
+struct is_string : std::false_type {
+};
+
+template <typename T>
+struct is_string<T, 
+    typename types_checked_from<
+        typename T::value_type,
+        typename T::traits_type,
+        typename T::allocator_type>::type>
+    : std::is_base_of<
+            std::basic_string<
+                typename T::value_type,
+                typename T::traits_type,
+                typename T::allocator_type>, T> {
+};
+
 }
 namespace rxu=util;
+
+
+//
+// due to an noisy static_assert issue in more than one std lib impl, 
+// rxcpp maintains a whitelist filter for the types that are allowed 
+// to be hashed. this allows is_hashable<T> to work.
+//
+// NOTE: this should eventually be removed!
+//
+template <class T, typename = void> 
+struct filtered_hash;
+
+#if RXCPP_HASH_ENUM
+template <class T> 
+struct filtered_hash<T, typename std::enable_if<std::is_enum<T>::value>::type> : std::hash<T> {
+};
+#elif RXCPP_HASH_ENUM_UNDERLYING
+template <class T> 
+struct filtered_hash<T, typename std::enable_if<std::is_enum<T>::value>::type> : std::hash<typename std::underlying_type<T>::type> {
+};
+#endif
+
+template <class T> 
+struct filtered_hash<T, typename std::enable_if<std::is_integral<T>::value>::type> : std::hash<T> {
+};
+template <class T> 
+struct filtered_hash<T, typename std::enable_if<std::is_pointer<T>::value>::type> : std::hash<T> {
+};
+template <class T> 
+struct filtered_hash<T, typename std::enable_if<rxu::is_string<T>::value>::type> : std::hash<T> {
+};
+
+template<typename, typename C = rxu::types_checked>
+struct is_hashable
+    : std::false_type {};
+
+template<typename T>
+struct is_hashable<T, 
+    typename rxu::types_checked_from<
+        typename filtered_hash<T>::result_type, 
+        typename filtered_hash<T>::argument_type, 
+        typename std::result_of<filtered_hash<T>(T)>::type>::type>
+    : std::true_type {};
 
 }
 

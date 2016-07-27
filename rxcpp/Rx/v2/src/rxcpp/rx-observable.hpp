@@ -24,12 +24,12 @@ struct is_operator_factory_for
     template<class CS, class CF>
     static auto checkRX(int) -> decltype((*(CF*)nullptr)(*(CS*)nullptr));
     template<class CS, class CF>
-	static not_void checkRX(...);
+    static not_void checkRX(...);
 
     typedef rxu::decay_t<Source> source_type;
     typedef rxu::decay_t<F> function_type;
 
-    typedef decltype(checkRX<source_type, function_type>(0)) detail_result;
+    typedef decltype(check<source_type, function_type>(0)) detail_result;
     static const bool value = !std::is_same<detail_result, not_void>::value && is_observable<source_type>::value;
 };
 
@@ -38,9 +38,9 @@ struct has_on_subscribe_for
 {
     struct not_void {};
     template<class CS, class CT>
-	static auto checkRX(int) -> decltype((*(CT*)nullptr).on_subscribe(*(CS*)nullptr));
+    static auto checkRX(int) -> decltype((*(CT*)nullptr).on_subscribe(*(CS*)nullptr));
     template<class CS, class CT>
-	static not_void checkRX(...);
+    static not_void checkRX(...);
 
     typedef decltype(checkRX<rxu::decay_t<Subscriber>, T>(0)) detail_result;
     static const bool value = std::is_same<detail_result, void>::value;
@@ -422,6 +422,48 @@ public:
     double average() const {
         return source.average().as_blocking().last();
     }
+
+    /*! Return the max of all items emitted by this blocking_observable, or throw an std::runtime_error exception if it emits no items.
+
+    \return  The max of all items emitted by this blocking_observable.
+
+    \sample
+    When the source observable emits at least one item:
+    \snippet blocking_observable.cpp blocking max sample
+    \snippet output.txt blocking max sample
+
+    When the source observable is empty:
+    \snippet blocking_observable.cpp blocking max empty sample
+    \snippet output.txt blocking max empty sample
+
+    When the source observable calls on_error:
+    \snippet blocking_observable.cpp blocking max error sample
+    \snippet output.txt blocking max error sample
+*/
+    T max() const {
+        return source.max().as_blocking().last();
+    }
+
+    /*! Return the min of all items emitted by this blocking_observable, or throw an std::runtime_error exception if it emits no items.
+
+    \return  The min of all items emitted by this blocking_observable.
+
+    \sample
+    When the source observable emits at least one item:
+    \snippet blocking_observable.cpp blocking min sample
+    \snippet output.txt blocking min sample
+
+    When the source observable is empty:
+    \snippet blocking_observable.cpp blocking min empty sample
+    \snippet output.txt blocking min empty sample
+
+    When the source observable calls on_error:
+    \snippet blocking_observable.cpp blocking min error sample
+    \snippet output.txt blocking min error sample
+*/
+    T min() const {
+        return source.min().as_blocking().last();
+    }
 };
 
 template<>
@@ -702,6 +744,33 @@ public:
         return                    lift<T>(rxo::detail::filter<T, Predicate>(std::move(p)));
     }
 
+    /*! inspect calls to on_next, on_error and on_completed.
+
+        \tparam MakeObserverArgN...  these args are passed to make_observer
+
+        \param an  these args are passed to make_observer.
+
+        \return  Observable that emits the same items as the source observable to both the subscriber and the observer. 
+
+        \note If an on_error method is not supplied the observer will ignore errors rather than call std::abort()
+
+        \sample
+        \snippet tap.cpp tap sample
+        \snippet output.txt tap sample
+
+        If the source observable generates an error, the observer passed to tap is called:
+        \snippet tap.cpp error tap sample
+        \snippet output.txt error tap sample
+    */
+    template<class... MakeObserverArgN>
+    auto tap(MakeObserverArgN&&... an) const
+        /// \cond SHOW_SERVICE_MEMBERS
+        -> decltype(EXPLICIT_THIS lift<T>(rxo::detail::tap<T, std::tuple<MakeObserverArgN...>>(std::make_tuple(std::forward<MakeObserverArgN>(an)...))))
+        /// \endcond
+    {
+        return                    lift<T>(rxo::detail::tap<T, std::tuple<MakeObserverArgN...>>(std::make_tuple(std::forward<MakeObserverArgN>(an)...)));
+    }
+
     /*! Add a new action at the end of the new observable that is returned.
 
         \tparam LastCall  the type of the action function
@@ -727,6 +796,27 @@ public:
         return                    lift<T>(rxo::detail::finally<T, LastCall>(std::move(lc)));
     }
 
+    /*! If an error occurs, take the result from the Selector and subscribe to that instead.
+
+        \tparam Selector  the actual type of a function of the form `observable<T>(std::exception_ptr)`
+
+        \param s  the function of the form `observable<T>(std::exception_ptr)`
+
+        \return  Observable that emits the items from the source observable and switches to a new observable on error.
+
+        \sample
+        \snippet on_error_resume_next.cpp on_error_resume_next sample
+        \snippet output.txt on_error_resume_next sample
+    */
+    template<class Selector>
+    auto on_error_resume_next(Selector s) const
+        /// \cond SHOW_SERVICE_MEMBERS
+        -> decltype(EXPLICIT_THIS lift<rxu::value_type_t<rxo::detail::on_error_resume_next<T, Selector>>>(rxo::detail::on_error_resume_next<T, Selector>(std::move(s))))
+        /// \endcond
+    {
+        return                    lift<rxu::value_type_t<rxo::detail::on_error_resume_next<T, Selector>>>(rxo::detail::on_error_resume_next<T, Selector>(std::move(s)));
+    }
+
     /*! For each item from this observable use Selector to produce an item to emit from the new observable that is returned.
 
         \tparam Selector  the type of the transforming function
@@ -734,7 +824,7 @@ public:
         \param s  the selector function
 
         \return  Observable that emits the items from the source observable, transformed by the specified function.
-
+        
         \sample
         \snippet map.cpp map sample
         \snippet output.txt map sample
@@ -746,6 +836,68 @@ public:
         /// \endcond
     {
         return                    lift<rxu::value_type_t<rxo::detail::map<T, Selector>>>(rxo::detail::map<T, Selector>(std::move(s)));
+    }
+
+    /*! Return an observable that emits each item emitted by the source observable after the specified delay.
+
+        \tparam Duration      the type of time interval
+        \tparam Coordination  the type of the scheduler
+
+        \param period        the period of time each item is delayed
+        \param coordination  the scheduler for the delays
+
+        \return  Observable that emits each item emitted by the source observable after the specified delay.
+
+        \sample
+        \snippet delay.cpp delay period+coordination sample
+        \snippet output.txt delay period+coordination sample
+    */
+    template<class Duration, class Coordination>
+    auto delay(Duration period, Coordination coordination) const
+        /// \cond SHOW_SERVICE_MEMBERS
+        -> decltype(EXPLICIT_THIS lift<T>(rxo::detail::delay<T, Duration, Coordination>(period, coordination)))
+        /// \endcond
+    {
+        return                    lift<T>(rxo::detail::delay<T, Duration, Coordination>(period, coordination));
+    }
+
+    /*! Return an observable that emits each item emitted by the source observable after the specified delay.
+
+        \tparam Duration      the type of time interval
+
+        \param period        the period of time each item is delayed
+
+        \return  Observable that emits each item emitted by the source observable after the specified delay.
+
+        \sample
+        \snippet delay.cpp delay period sample
+        \snippet output.txt delay period sample
+    */
+    template<class Duration>
+    auto delay(Duration period) const
+        /// \cond SHOW_SERVICE_MEMBERS
+        -> decltype(EXPLICIT_THIS lift<T>(rxo::detail::delay<T, Duration, identity_one_worker>(period, identity_current_thread())))
+        /// \endcond
+    {
+        return                    lift<T>(rxo::detail::delay<T, Duration, identity_one_worker>(period, identity_current_thread()));
+    }
+       
+    /*! For each item from this observable, filter out repeated values and emit only items that have not already been emitted.
+
+        \return  Observable that emits those items from the source observable that are distinct.
+
+        \note distinct keeps an unordered_set<T> of past values. Due to an issue in multiple implementations of std::hash<T>, rxcpp maintains a whitelist of hashable types. new types can be added by specializing rxcpp::filtered_hash<T>
+
+        \sample
+        \snippet distinct.cpp distinct sample
+        \snippet output.txt distinct sample
+    */
+    auto distinct() const
+        /// \cond SHOW_SERVICE_MEMBERS
+        -> decltype(EXPLICIT_THIS lift<T>(rxo::detail::distinct<T>()))
+        /// \endcond
+    {
+        return                    lift<T>(rxo::detail::distinct<T>());
     }
 
     /*! For each item from this observable, filter out consequentially repeated values and emit only changes from the new observable that is returned.
@@ -764,7 +916,25 @@ public:
         return                    lift<T>(rxo::detail::distinct_until_changed<T>());
     }
 
-    /*! Rerurn an observable that emits connected, non-overlapping windows, each containing at most count items from the source observable.
+    /*! Pulls an item located at a specified index location in the sequence of items and emits that item as its own sole emission.
+
+        \param  index  the index of the element to return.
+
+        \return  An observable that emit an item located at a specified index location.
+
+        \sample
+        \snippet element_at.cpp element_at sample
+        \snippet output.txt element_at sample
+    */
+    auto element_at(int index) const
+        /// \cond SHOW_SERVICE_MEMBERS
+        ->      decltype(EXPLICIT_THIS lift<T>(rxo::detail::element_at<T>(index)))
+        /// \endcond
+    {
+        return                    lift<T>(rxo::detail::element_at<T>(index));
+    }
+
+    /*! Return an observable that emits connected, non-overlapping windows, each containing at most count items from the source observable.
 
         \param count  the maximum size of each window before it should be completed
 
@@ -782,7 +952,7 @@ public:
         return                    lift<observable<T>>(rxo::detail::window<T>(count, count));
     }
 
-    /*! Rerurn an observable that emits windows every skip items containing at most count items from the source observable.
+    /*! Return an observable that emits windows every skip items containing at most count items from the source observable.
 
         \param count  the maximum size of each window before it should be completed
         \param skip   how many items need to be skipped before starting a new window
@@ -801,7 +971,7 @@ public:
         return                    lift<observable<T>>(rxo::detail::window<T>(count, skip));
     }
 
-    /*! Rerurn an observable that emits observables every skip time interval and collects items from this observable for period of time into each produced observable, on the specified scheduler.
+    /*! Return an observable that emits observables every skip time interval and collects items from this observable for period of time into each produced observable, on the specified scheduler.
 
         \tparam Duration      the type of time intervals
         \tparam Coordination  the type of the scheduler
@@ -825,7 +995,7 @@ public:
         return                    lift<observable<T>>(rxo::detail::window_with_time<T, Duration, Coordination>(period, skip, coordination));
     }
 
-    /*! Rerurn an observable that emits observables every skip time interval and collects items from this observable for period of time into each produced observable.
+    /*! Return an observable that emits observables every skip time interval and collects items from this observable for period of time into each produced observable.
 
         \tparam Duration  the type of time intervals
 
@@ -847,7 +1017,7 @@ public:
         return                    lift<observable<T>>(rxo::detail::window_with_time<T, Duration, identity_one_worker>(period, skip, identity_current_thread()));
     }
 
-    /*! Rerurn an observable that emits observables every period time interval and collects items from this observable for period of time into each produced observable, on the specified scheduler.
+    /*! Return an observable that emits observables every period time interval and collects items from this observable for period of time into each produced observable, on the specified scheduler.
 
         \tparam Duration      the type of time intervals
         \tparam Coordination  the type of the scheduler
@@ -870,7 +1040,7 @@ public:
         return                    lift<observable<T>>(rxo::detail::window_with_time<T, Duration, Coordination>(period, period, coordination));
     }
 
-    /*! Rerurn an observable that emits connected, non-overlapping windows represending items emitted by the source observable during fixed, consecutive durations.
+    /*! Return an observable that emits connected, non-overlapping windows represending items emitted by the source observable during fixed, consecutive durations.
 
         \tparam Duration  the type of time intervals
 
@@ -891,7 +1061,7 @@ public:
         return                    lift<observable<T>>(rxo::detail::window_with_time<T, Duration, identity_one_worker>(period, period, identity_current_thread()));
     }
 
-    /*! Rerurn an observable that emits connected, non-overlapping windows of items from the source observable that were emitted during a fixed duration of time or when the window has reached maximum capacity (whichever occurs first), on the specified scheduler.
+    /*! Return an observable that emits connected, non-overlapping windows of items from the source observable that were emitted during a fixed duration of time or when the window has reached maximum capacity (whichever occurs first), on the specified scheduler.
 
         \tparam Duration      the type of time intervals
         \tparam Coordination  the type of the scheduler
@@ -915,7 +1085,7 @@ public:
         return                    lift<observable<T>>(rxo::detail::window_with_time_or_count<T, Duration, Coordination>(period, count, coordination));
     }
 
-    /*! Rerurn an observable that emits connected, non-overlapping windows of items from the source observable that were emitted during a fixed duration of time or when the window has reached maximum capacity (whichever occurs first).
+    /*! Return an observable that emits connected, non-overlapping windows of items from the source observable that were emitted during a fixed duration of time or when the window has reached maximum capacity (whichever occurs first).
 
         \tparam Duration  the type of time intervals
 
@@ -937,7 +1107,7 @@ public:
         return                    lift<observable<T>>(rxo::detail::window_with_time_or_count<T, Duration, identity_one_worker>(period, count, identity_current_thread()));
     }
 
-    /*! Rerurn an observable that emits connected, non-overlapping buffer, each containing at most count items from the source observable.
+    /*! Return an observable that emits connected, non-overlapping buffer, each containing at most count items from the source observable.
 
         \param count  the maximum size of each buffer before it should be emitted
 
@@ -955,7 +1125,7 @@ public:
         return                    lift_if<std::vector<T>>(rxo::detail::buffer_count<T>(count, count));
     }
 
-    /*! Rerurn an observable that emits buffers every skip items containing at most count items from the source observable.
+    /*! Return an observable that emits buffers every skip items containing at most count items from the source observable.
 
         \param count  the maximum size of each buffers before it should be emitted
         \param skip   how many items need to be skipped before starting a new buffers
@@ -974,7 +1144,7 @@ public:
         return                    lift_if<std::vector<T>>(rxo::detail::buffer_count<T>(count, skip));
     }
 
-    /*! Rerurn an observable that emits buffers every skip time interval and collects items from this observable for period of time into each produced buffer, on the specified scheduler.
+    /*! Return an observable that emits buffers every skip time interval and collects items from this observable for period of time into each produced buffer, on the specified scheduler.
 
         \tparam Coordination  the type of the scheduler
 
@@ -997,7 +1167,7 @@ public:
         return                    lift_if<std::vector<T>>(rxo::detail::buffer_with_time<T, rxsc::scheduler::clock_type::duration, Coordination>(period, skip, coordination));
     }
 
-    /*! Rerurn an observable that emits buffers every skip time interval and collects items from this observable for period of time into each produced buffer.
+    /*! Return an observable that emits buffers every skip time interval and collects items from this observable for period of time into each produced buffer.
 
         \param period        the period of time each buffer collects items before it is emitted
         \param skip          the period of time after which a new buffer will be created
@@ -1024,7 +1194,7 @@ public:
         return                    lift_if<std::vector<T>>(rxo::detail::buffer_with_time<T, rxsc::scheduler::clock_type::duration, identity_one_worker>(period, skip, identity_current_thread()));
     }
 
-    /*! Rerurn an observable that emits buffers every period time interval and collects items from this observable for period of time into each produced buffer, on the specified scheduler.
+    /*! Return an observable that emits buffers every period time interval and collects items from this observable for period of time into each produced buffer, on the specified scheduler.
 
         \tparam Coordination  the type of the scheduler
 
@@ -1047,7 +1217,7 @@ public:
         return                    lift_if<std::vector<T>>(rxo::detail::buffer_with_time<T, rxsc::scheduler::clock_type::duration, Coordination>(period, period, coordination));
     }
 
-    /*! Rerurn an observable that emits buffers every period time interval and collects items from this observable for period of time into each produced buffer.
+    /*! Return an observable that emits buffers every period time interval and collects items from this observable for period of time into each produced buffer.
 
         \param period  the period of time each buffer collects items before it is emitted and replaced with a new buffer
 
@@ -1065,7 +1235,7 @@ public:
         return                    lift_if<std::vector<T>>(rxo::detail::buffer_with_time<T, rxsc::scheduler::clock_type::duration, identity_one_worker>(period, period, identity_current_thread()));
     }
 
-    /*! Rerurn an observable that emits connected, non-overlapping buffers of items from the source observable that were emitted during a fixed duration of time or when the buffer has reached maximum capacity (whichever occurs first), on the specified scheduler.
+    /*! Return an observable that emits connected, non-overlapping buffers of items from the source observable that were emitted during a fixed duration of time or when the buffer has reached maximum capacity (whichever occurs first), on the specified scheduler.
 
         \tparam Coordination  the type of the scheduler
 
@@ -1088,7 +1258,7 @@ public:
         return                    lift_if<std::vector<T>>(rxo::detail::buffer_with_time_or_count<T, rxsc::scheduler::clock_type::duration, Coordination>(period, count, coordination));
     }
 
-    /*! Rerurn an observable that emits connected, non-overlapping buffers of items from the source observable that were emitted during a fixed duration of time or when the buffer has reached maximum capacity (whichever occurs first).
+    /*! Return an observable that emits connected, non-overlapping buffers of items from the source observable that were emitted during a fixed duration of time or when the buffer has reached maximum capacity (whichever occurs first).
 
         \param period        the period of time each buffer collects items before it is emitted and replaced with a new buffer
         \param count         the maximum size of each buffer before it is emitted and new buffer is created
@@ -1910,6 +2080,23 @@ public:
         return                    lift<typename rxo::detail::group_by_traits<T, this_type, KeySelector, MarbleSelector, rxu::less>::grouped_observable_type>(rxo::detail::group_by<T, this_type, KeySelector, MarbleSelector, rxu::less>(std::move(ks), std::move(ms), rxu::less()));
     }
 
+      /*! Do not emit any items from the source Observable, but allow termination notification (either onError or onCompleted) to pass through unchanged.
+
+        \return  Observable that emits termination notification from the source observable.
+
+        \sample
+        \snippet ignore_elements.cpp ignore_elements sample
+        \snippet output.txt ignore_elements sample
+    */
+    auto ignore_elements() const
+        /// \cond SHOW_SERVICE_MEMBERS
+        -> decltype(EXPLICIT_THIS lift<T>(rxo::detail::ignore_elements<T>()))
+        /// \endcond
+    {
+        return                    lift<T>(rxo::detail::ignore_elements<T>());
+    }
+
+
     /// \cond SHOW_SERVICE_MEMBERS
     /// multicast ->
     /// allows connections to the source to be independent of subscriptions
@@ -2035,7 +2222,7 @@ public:
         \snippet replay.cpp replay count sample
         \snippet output.txt replay count sample
     */
-    auto replay(size_t count, composite_subscription cs = composite_subscription()) const
+    auto replay(std::size_t count, composite_subscription cs = composite_subscription()) const
         /// \cond SHOW_SERVICE_MEMBERS
         -> decltype(EXPLICIT_THIS multicast(rxsub::replay<T, identity_one_worker>(count, identity_current_thread(), cs)))
         /// \endcond
@@ -2059,7 +2246,7 @@ public:
     */
     template<class Coordination,
         class Requires = typename std::enable_if<is_coordination<Coordination>::value, rxu::types_checked>::type>
-    auto replay(size_t count, Coordination cn, composite_subscription cs = composite_subscription()) const
+    auto replay(std::size_t count, Coordination cn, composite_subscription cs = composite_subscription()) const
         /// \cond SHOW_SERVICE_MEMBERS
         -> decltype(EXPLICIT_THIS multicast(rxsub::replay<T, Coordination>(count, std::move(cn), cs)))
         /// \endcond
@@ -2122,7 +2309,7 @@ public:
         \snippet replay.cpp replay count+period sample
         \snippet output.txt replay count+period sample
     */
-    auto replay(size_t count, rxsc::scheduler::clock_type::duration period, composite_subscription cs = composite_subscription()) const
+    auto replay(std::size_t count, rxsc::scheduler::clock_type::duration period, composite_subscription cs = composite_subscription()) const
         /// \cond SHOW_SERVICE_MEMBERS
         -> decltype(EXPLICIT_THIS multicast(rxsub::replay<T, identity_one_worker>(count, period, identity_current_thread(), cs)))
         /// \endcond
@@ -2147,7 +2334,7 @@ public:
     */
     template<class Coordination,
         class Requires = typename std::enable_if<is_coordination<Coordination>::value, rxu::types_checked>::type>
-    auto replay(size_t count, rxsc::scheduler::clock_type::duration period, Coordination cn, composite_subscription cs = composite_subscription()) const
+    auto replay(std::size_t count, rxsc::scheduler::clock_type::duration period, Coordination cn, composite_subscription cs = composite_subscription()) const
         /// \cond SHOW_SERVICE_MEMBERS
         -> decltype(EXPLICIT_THIS multicast(rxsub::replay<T, Coordination>(count, period, std::move(cn), cs)))
         /// \endcond
@@ -2220,6 +2407,8 @@ public:
         - rxcpp::observable::count
         - rxcpp::observable::sum
         - rxcpp::observable::average
+        - rxcpp::observable::min
+        - rxcpp::observable::max
 
         \sample
         Geometric mean of source values:
@@ -2358,6 +2547,54 @@ public:
         return      defer_reduce<rxu::defer_seed_type<rxo::detail::average, T>, rxu::defer_type<rxo::detail::average, T>, rxu::defer_type<rxo::detail::average, T>>::make(source_operator, rxo::detail::average<T>(), rxo::detail::average<T>(), rxo::detail::average<T>().seed());
     }
 
+    /*! For each item from this observable reduce it by taking the max value of the previous items.
+
+        \return  An observable that emits a single item: the max of elements emitted by the source observable.
+
+        \sample
+        \snippet math.cpp max sample
+        \snippet output.txt max sample
+
+        When the source observable completes without emitting any items:
+        \snippet math.cpp max empty sample
+        \snippet output.txt max empty sample
+
+        When the source observable calls on_error:
+        \snippet math.cpp max error sample
+        \snippet output.txt max error sample
+    */
+    auto max() const
+        /// \cond SHOW_SERVICE_MEMBERS
+        -> typename defer_reduce<rxu::defer_seed_type<rxo::detail::max, T>, rxu::defer_type<rxo::detail::max, T>, rxu::defer_type<rxo::detail::max, T>>::observable_type
+        /// \endcond
+    {
+        return      defer_reduce<rxu::defer_seed_type<rxo::detail::max, T>, rxu::defer_type<rxo::detail::max, T>, rxu::defer_type<rxo::detail::max, T>>::make(source_operator, rxo::detail::max<T>(), rxo::detail::max<T>(), rxo::detail::max<T>().seed());
+    }
+
+    /*! For each item from this observable reduce it by taking the min value of the previous items.
+
+        \return  An observable that emits a single item: the min of elements emitted by the source observable.
+
+        \sample
+        \snippet math.cpp min sample
+        \snippet output.txt min sample
+
+        When the source observable completes without emitting any items:
+        \snippet math.cpp min empty sample
+        \snippet output.txt min empty sample
+
+        When the source observable calls on_error:
+        \snippet math.cpp min error sample
+        \snippet output.txt min error sample
+    */
+    auto min() const
+        /// \cond SHOW_SERVICE_MEMBERS
+        -> typename defer_reduce<rxu::defer_seed_type<rxo::detail::min, T>, rxu::defer_type<rxo::detail::min, T>, rxu::defer_type<rxo::detail::min, T>>::observable_type
+        /// \endcond
+    {
+        return      defer_reduce<rxu::defer_seed_type<rxo::detail::min, T>, rxu::defer_type<rxo::detail::min, T>, rxu::defer_type<rxo::detail::min, T>>::make(source_operator, rxo::detail::min<T>(), rxo::detail::min<T>(), rxo::detail::min<T>().seed());
+    }
+
     /*! For each item from this observable use Accumulator to combine items into a value that will be emitted from the new observable that is returned.
 
         \tparam Seed         the type of the initial value for the accumulator
@@ -2380,6 +2617,45 @@ public:
     {
         return  observable<Seed,    rxo::detail::scan<T, this_type, Accumulator, Seed>>(
                                     rxo::detail::scan<T, this_type, Accumulator, Seed>(*this, std::forward<Accumulator>(a), seed));
+    }
+
+    /*! Return an Observable that emits the most recent items emitted by the source Observable within periodic time intervals.
+
+        \param period  the period of time to sample the source observable.
+        \param coordination  the scheduler for the items.
+
+        \return  Observable that emits the most recently emitted item since the previous sampling.
+
+        \sample
+        \snippet sample.cpp sample period sample
+        \snippet output.txt sample period sample
+    */
+    template<class Coordination,
+        class Requires = typename std::enable_if<is_coordination<Coordination>::value, rxu::types_checked>::type>
+    auto sample_with_time(rxsc::scheduler::clock_type::duration period, Coordination coordination) const
+        /// \cond SHOW_SERVICE_MEMBERS
+        -> decltype(EXPLICIT_THIS lift<T>(rxo::detail::sample_with_time<T, rxsc::scheduler::clock_type::duration, Coordination>(period, coordination)))
+        /// \endcond
+    {
+        return                    lift<T>(rxo::detail::sample_with_time<T, rxsc::scheduler::clock_type::duration, Coordination>(period, coordination));
+    }
+
+    /*! Return an Observable that emits the most recent items emitted by the source Observable within periodic time intervals.
+
+        \param period  the period of time to sample the source observable.
+
+        \return  Observable that emits the most recently emitted item since the previous sampling.
+
+        \sample
+        \snippet sample.cpp sample period sample
+        \snippet output.txt sample period sample
+    */
+    auto sample_with_time(rxsc::scheduler::clock_type::duration period) const
+        /// \cond SHOW_SERVICE_MEMBERS
+        -> decltype(EXPLICIT_THIS lift<T>(rxo::detail::sample_with_time<T, rxsc::scheduler::clock_type::duration, identity_one_worker>(period, identity_current_thread())))
+        /// \endcond
+    {
+        return                    lift<T>(rxo::detail::sample_with_time<T, rxsc::scheduler::clock_type::duration, identity_one_worker>(period, identity_current_thread()));
     }
 
     /*! Make new observable with skipped first count items from this observable.
@@ -2877,7 +3153,7 @@ public:
         \snippet output.txt range sample
     */
     template<class T>
-    static auto range(T first = 0, T last = std::numeric_limits<T>::max(), ptrdiff_t step = 1)
+    static auto range(T first = 0, T last = std::numeric_limits<T>::max(), std::ptrdiff_t step = 1)
         -> decltype(rxs::range<T>(first, last, step, identity_current_thread())) {
         return      rxs::range<T>(first, last, step, identity_current_thread());
     }
@@ -2904,13 +3180,13 @@ public:
         \snippet output.txt subscribe_on range sample
     */
     template<class T, class Coordination>
-    static auto range(T first, T last, ptrdiff_t step, Coordination cn)
+    static auto range(T first, T last, std::ptrdiff_t step, Coordination cn)
         -> decltype(rxs::range<T>(first, last, step, std::move(cn))) {
         return      rxs::range<T>(first, last, step, std::move(cn));
     }
     /// Returns an observable that sends values in the range ```first```-```last``` by adding 1 to the previous value. The values are sent on the specified scheduler.
     ///
-    /// \see       rxcpp::observable<void,void>#range(T first, T last, ptrdiff_t step, Coordination cn)
+    /// \see       rxcpp::observable<void,void>#range(T first, T last, std::ptrdiff_t step, Coordination cn)
     template<class T, class Coordination>
     static auto range(T first, T last, Coordination cn)
         -> decltype(rxs::range<T>(first, last, std::move(cn))) {
@@ -2918,7 +3194,7 @@ public:
     }
     /// Returns an observable that infinitely (until overflow) sends values starting from ```first```. The values are sent on the specified scheduler.
     ///
-    /// \see       rxcpp::observable<void,void>#range(T first, T last, ptrdiff_t step, Coordination cn)
+    /// \see       rxcpp::observable<void,void>#range(T first, T last, std::ptrdiff_t step, Coordination cn)
     template<class T, class Coordination>
     static auto range(T first, Coordination cn)
         -> decltype(rxs::range<T>(first, std::move(cn))) {

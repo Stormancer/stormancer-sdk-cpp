@@ -27,7 +27,7 @@ class is_source
     template<class C>
     static void checkRX(...);
 public:
-	static const bool value = std::is_convertible<decltype(checkRX<rxu::decay_t<T>>(0)), tag_source*>::value;
+    static const bool value = std::is_convertible<decltype(checkRX<rxu::decay_t<T>>(0)), tag_source*>::value;
 };
 
 }

@@ -43,13 +43,14 @@ namespace Stormancer
 		, _apiClient(new ApiClient(config, _tokenHandler))
 		, _dispatcher(config->dispatcher)
 		, _requestProcessor(new RequestProcessor(_logger, std::vector<IRequestModule*>()))
-		, _scenesDispatcher(new SceneDispatcher)
+		, _scenesDispatcher(new SceneDispatcher(config->eventDispatcher))
 		, _metadata(config->_metadata)
 		, _maxPeers(config->maxPeers)
 		, _dependencyResolver(new DependencyResolver())
 		, _plugins(config->plugins())
 		, _synchronisedClock(config->synchronisedClock)
 		, _synchronisedClockInterval(config->synchronisedClockInterval)
+		, _eventDispatcher(config->eventDispatcher)
 	{
 		_dependencyResolver->registerDependency<ILogger>(ILogger::instance());
 		_dependencyResolver->registerDependency<IScheduler>(config->scheduler);
@@ -276,7 +277,8 @@ namespace Stormancer
 #endif
 					try
 					{
-						_onConnectionStateChanged(ConnectionState::Connecting);
+						this->dispatchEvent([this]() {_onConnectionStateChanged(ConnectionState::Connecting); });
+						
 
 						return _transport->connect(endpoint).then([this](IConnection* connection) {
 #ifdef STORMANCER_LOG_CLIENT
@@ -284,7 +286,7 @@ namespace Stormancer
 #endif
 							_serverConnection = connection;
 
-							_onConnectionStateChanged(ConnectionState::Connected);
+							this->dispatchEvent([this]() {_onConnectionStateChanged(ConnectionState::Connected); });
 
 							auto peerConnectionStateEraseIterator = new Action<ConnectionState>::TIterator();
 							*peerConnectionStateEraseIterator = _serverConnection->onConnectionStateChanged([this, peerConnectionStateEraseIterator](ConnectionState connectionState) {
@@ -302,9 +304,11 @@ namespace Stormancer
 									{
 										plugin->sceneDisconnected(scene);
 									}
-									scene->setConnectionState(ConnectionState::Disconnected);
+									this->dispatchEvent([scene]() {scene->setConnectionState(ConnectionState::Disconnected); });
+									
 								}
-								_onConnectionStateChanged(connectionState);
+								this->dispatchEvent([this,connectionState]() {_onConnectionStateChanged(connectionState); });
+								;
 							});
 
 							_serverConnection->setMetadata(_metadata);
@@ -776,5 +780,10 @@ namespace Stormancer
 	void Client::SetMedatata(const char* key, const char* value)
 	{
 		_metadata[key] = value;
+	}
+
+	void Client::dispatchEvent(std::function<void(void)> ev)
+	{
+		_eventDispatcher(ev);
 	}
 };

@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="src\Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -120,16 +117,10 @@
     <ClCompile Include="src\DependencyResolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\AuthenticationPlugin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\RpcRequest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\RpcService.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\AuthenticationService.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\RpcPlugin.cpp">
@@ -296,9 +287,6 @@
     <ClInclude Include="src\DependencyResolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\AuthenticationPlugin.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\IObservable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -314,13 +302,7 @@
     <ClInclude Include="src\RpcService.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\AuthenticationService.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\ISubscription.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\IAuthenticationService.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\IRpcService.h">

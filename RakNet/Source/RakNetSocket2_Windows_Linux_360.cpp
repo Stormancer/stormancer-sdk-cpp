@@ -52,7 +52,7 @@ RNS2SendResult RNS2_Windows_Linux_360::Send_Windows_Linux_360NoVDP( RNS2Socket r
 
 		if (len<0)
 		{
-			RAKNET_DEBUG_PRINTF("sendto failed with code %i for char %i and length %i.\n", len, sendParameters->data[0], sendParameters->length);
+			RAKNET_DEBUG_PRINTF("sendto failed with code %i for char %i and length %i.\n", WSAGetLastError(), sendParameters->data[0], sendParameters->length);
 		}
 
 

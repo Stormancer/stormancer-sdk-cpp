@@ -54,9 +54,7 @@
 #include "Watch.h"
 #include "IObservable.h"
 #include "Observable.h"
-#include "AuthenticationPlugin.h"
-#include "IAuthenticationService.h"
-#include "AuthenticationService.h"
+
 
 #include "RakNetConnection.h"
 #include "RakNetTransport.h"
