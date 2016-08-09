@@ -162,7 +162,7 @@ oauth2_token oauth2_config::_parse_token_from_json(const json::value& token_json
     }
     else
     {
-        throw oauth2_exception(U("response json contains no 'access_token': ") + *token_json.serialize());
+        throw oauth2_exception(U("response json contains no 'access_token': ") + token_json.serialize());
     }
 
     if (token_json.has_field(oauth2_strings::token_type))
@@ -178,7 +178,7 @@ oauth2_token oauth2_config::_parse_token_from_json(const json::value& token_json
     }
     if (!utility::details::str_icmp(result.token_type(), oauth2_strings::bearer))
     {
-        throw oauth2_exception(U("only 'token_type=bearer' access tokens are currently supported: ") + *token_json.serialize());
+        throw oauth2_exception(U("only 'token_type=bearer' access tokens are currently supported: ") + token_json.serialize());
     }
 
     if (token_json.has_field(oauth2_strings::refresh_token))

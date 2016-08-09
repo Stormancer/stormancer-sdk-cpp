@@ -1,12 +1,12 @@
 #pragma once
 #include "headers.h"
 #include "ConnectionState.h"
-#include <PacketPriority.h>
 #include "basic_bytestream.h"
 #include "DependencyResolver.h"
 
 namespace Stormancer
 {
+	
 	/// Interface of a network connection.
 	class IConnection
 	{

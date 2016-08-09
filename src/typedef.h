@@ -13,8 +13,13 @@ namespace Stormancer
 	using uint64 = uint64_t;
 
 	using byte = uint8;
+	using string = std::string;
 
 	using cstringMap = std::map<const char*, const char*>;
-	using stringMap = std::map<std::string, std::string>;
-	using anyMap = std::map<std::string, void*>;
+	using stringMap = std::map<string, string>;
+	using anyMap = std::map<string, void*>;
+
+	
+	
+	using string_ptr = std::shared_ptr<string>;
 };

@@ -52,12 +52,9 @@
 #include <rx.hpp>
 
 // raknet
-#include <PacketPriority.h>
-#include <RakPeerInterface.h>
-#include <BitStream.h>
-#include <RakNetTypes.h>
-#include <DS_Map.h>
-#include <NatPunchthroughClient.h>
+#ifdef STORMANCER_DLL_EXPORT
+#include "headers_raknet.h"
+#endif
 
 // msgpack
 #include <msgpack.hpp>

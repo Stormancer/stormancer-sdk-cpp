@@ -68,6 +68,20 @@ namespace Stormancer
 	
 		/// metadatas.
 		anyMap _metadata;
+
+
+	public:
+		template<typename T>
+		T readObject()
+		{
+			std::string buffer;
+			this->stream >> buffer;
+			msgpack::unpacked unp;
+			msgpack::unpack(unp, buffer.data(), buffer.size());
+			T result;
+			unp.get().convert(&result);
+			return result;
+		}
 	};
 
 	using Packet_ptr = std::shared_ptr<Packet<>>;

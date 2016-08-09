@@ -1,7 +1,7 @@
 #include <stormancer.h>
 #include "ConsoleLogger.h"
 #include "NatPlugin.h"
-
+#include "headers.h"
 auto logger = (ConsoleLogger*)Stormancer::ILogger::instance(new ConsoleLogger(Stormancer::LogLevel::Trace));
 
 class MyClient

@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="ConsoleLogger.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="..\..\plugins\AuthenticationPlugin.cpp">
+      <Filter>plugins</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\plugins\AuthenticationService.cpp">
+      <Filter>plugins</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\plugins\GameSession.cpp">
+      <Filter>plugins</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\plugins\MatchmakingPlugin.cpp">
+      <Filter>plugins</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\plugins\MatchmakingService.cpp">
+      <Filter>plugins</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ConsoleLogger.h" />
+    <ClInclude Include="..\..\plugins\AuthenticationPlugin.h">
+      <Filter>plugins</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\plugins\AuthenticationService.h">
+      <Filter>plugins</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\plugins\GameSession.h">
+      <Filter>plugins</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\plugins\IAuthenticationService.h">
+      <Filter>plugins</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\plugins\MatchmakingPlugin.h">
+      <Filter>plugins</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\plugins\MatchMakingService.h">
+      <Filter>plugins</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="plugins">
+      <UniqueIdentifier>{ba5db5d3-c753-4e56-ae4b-f9e72d2b5750}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

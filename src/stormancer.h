@@ -6,7 +6,7 @@
 #include "basic_bytestream.h"
 
 #include "Action.h"
-
+#include "PacketPriority.h"
 #include "ConnectionData.h"
 #include "ConnectToSceneMsg.h"
 #include "ConnectionResult.h"

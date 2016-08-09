@@ -1,4 +1,7 @@
 #include "stormancer.h"
+#include "DefaultScheduler.h"
+#include "RakNetTransport.h"
+#include "DefaultPacketDispatcher.h"
 
 namespace Stormancer
 {
@@ -8,7 +11,11 @@ namespace Stormancer
 		dispatcher(new DefaultPacketDispatcher()),
 		scheduler(new DefaultScheduler())
 	{
-		transportFactory = defaultTransportFactory;
+		transportFactory = [](DependencyResolver* resolver)
+		{
+			return new RakNetTransport(resolver);
+		};
+		
 		_plugins.push_back(new RpcPlugin());
 	}
 

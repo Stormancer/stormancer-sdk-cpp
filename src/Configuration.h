@@ -1,9 +1,7 @@
 #pragma once
-#include "headers.h"
 #include "IPacketDispatcher.h"
-#include "DefaultScheduler.h"
-#include "RakNetTransport.h"
-#include "DefaultPacketDispatcher.h"
+#include "IScheduler.h"
+#include "ITransport.h"
 #include "IPlugin.h"
 
 namespace Stormancer
@@ -95,12 +93,7 @@ namespace Stormancer
 		EndpointSelectionMode endpointSelectionMode = EndpointSelectionMode::FALLBACK;
 
 	private:
-		const std::function<ITransport*(DependencyResolver*)> defaultTransportFactory = [](DependencyResolver* resolver)
-		{
-
-			return new RakNetTransport(resolver);
-		};
-
+		
 		stringMap _metadata;
 
 		std::string apiEndpoint = "https://api.stormancer.com/";
