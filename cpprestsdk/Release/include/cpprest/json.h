@@ -421,7 +421,7 @@ public:
         /// Serializes the current JSON value to a C++ string.
         /// </summary>
         /// <returns>A string representation of the value</returns>
-        _ASYNCRTIMP utility::string_t serialize() const;
+        _ASYNCRTIMP std::shared_ptr<utility::string_t> serialize() const;
 
         /// <summary>
         /// Serializes the current JSON value to a C++ string.
