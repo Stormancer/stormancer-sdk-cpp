@@ -74,7 +74,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(ProjectDir)bin\</OutDir>
+    <OutDir>$(SolutionDir)binaries\stormancer\$(Platform)\$(Configuration)</OutDir>
     <IntDir>$(ProjectDir)bin\$(Configuration)\$(Platform)\</IntDir>
     <TargetName>Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform)</TargetName>
   </PropertyGroup>
@@ -86,13 +86,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(ProjectDir)bin\</OutDir>
+    <OutDir>$(SolutionDir)binaries\stormancer\$(Platform)\$(Configuration)</OutDir>
     <IntDir>$(ProjectDir)bin\$(Configuration)\$(Platform)\</IntDir>
     <TargetName>Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(ProjectDir)bin\</OutDir>
+    <OutDir>$(SolutionDir)binaries\stormancer\$(Platform)\$(Configuration)</OutDir>
     <IntDir>$(ProjectDir)bin\$(Configuration)\$(Platform)\</IntDir>
     <TargetName>Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform)</TargetName>
   </PropertyGroup>
@@ -122,7 +122,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>STORMANCER_DLL_EXPORT;CPPREST_FORCE_PPLX;_DEBUG;_WINDOWS;_USRDLL;STORMANCERSDKCPP_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)src;$(SolutionDir)cpprestsdk\Release\include;$(SolutionDir)msgpack-c\include;$(SolutionDir)RakNet\Source;$(SolutionDir)rxcpp\Rx\v2\src\rxcpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)msgpack-c\include;$(SolutionDir)RakNet\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
@@ -219,69 +219,69 @@
     <ClCompile Include="src\Watch.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Action.h" />
-    <ClInclude Include="src\ApiClient.h" />
-    <ClInclude Include="src\basic_bytebuf.h" />
-    <ClInclude Include="src\basic_bytestream.h" />
-    <ClInclude Include="src\Client.h" />
-    <ClInclude Include="src\Configuration.h" />
-    <ClInclude Include="src\ConnectionData.h" />
-    <ClInclude Include="src\ConnectionResult.h" />
-    <ClInclude Include="src\ConnectionState.h" />
-    <ClInclude Include="src\ConnectToSceneMsg.h" />
-    <ClInclude Include="src\DefaultPacketDispatcher.h" />
-    <ClInclude Include="src\DefaultScheduler.h" />
-    <ClInclude Include="src\DependencyResolver.h" />
-    <ClInclude Include="src\DisconnectFromSceneDto.h" />
-    <ClInclude Include="src\EmptyDto.h" />
-    <ClInclude Include="src\FileLogger.h" />
-    <ClInclude Include="src\headers.h" />
-    <ClInclude Include="src\Helpers.h" />
-    <ClInclude Include="src\IPlugin.h" />
-    <ClInclude Include="src\IConnection.h" />
-    <ClInclude Include="src\IConnectionManager.h" />
-    <ClInclude Include="src\ILogger.h" />
-    <ClInclude Include="src\IObservable.h" />
-    <ClInclude Include="src\IPacketDispatcher.h" />
-    <ClInclude Include="src\IPacketProcessor.h" />
-    <ClInclude Include="src\IRequestModule.h" />
-    <ClInclude Include="src\IRpcService.h" />
-    <ClInclude Include="src\IScenePeer.h" />
-    <ClInclude Include="src\IScheduler.h" />
-    <ClInclude Include="src\ISubscription.h" />
-    <ClInclude Include="src\ITask.h" />
-    <ClInclude Include="src\ITokenHandler.h" />
-    <ClInclude Include="src\ITransport.h" />
-    <ClInclude Include="src\MessageIDTypes.h" />
-    <ClInclude Include="src\NullLogger.h" />
-    <ClInclude Include="src\Observable.h" />
-    <ClInclude Include="src\Packet.h" />
-    <ClInclude Include="src\PacketProcessorConfig.h" />
-    <ClInclude Include="src\RakNetConnection.h" />
-    <ClInclude Include="src\RakNetTransport.h" />
-    <ClInclude Include="src\RpcPlugin.h" />
-    <ClInclude Include="src\RpcRequest.h" />
-    <ClInclude Include="src\RpcRequestContext.h" />
-    <ClInclude Include="src\RpcService.h" />
-    <ClInclude Include="src\SystemRequest.h" />
-    <ClInclude Include="src\RequestContext.h" />
-    <ClInclude Include="src\RequestModuleBuilder.h" />
-    <ClInclude Include="src\RequestProcessor.h" />
-    <ClInclude Include="src\Route.h" />
-    <ClInclude Include="src\RouteDto.h" />
-    <ClInclude Include="src\Scene.h" />
-    <ClInclude Include="src\SceneDispatcher.h" />
-    <ClInclude Include="src\SceneEndpoint.h" />
-    <ClInclude Include="src\SceneInfosDto.h" />
-    <ClInclude Include="src\SceneInfosRequestDto.h" />
-    <ClInclude Include="src\ScenePeer.h" />
-    <ClInclude Include="src\stormancer.h" />
-    <ClInclude Include="src\Subscription.h" />
-    <ClInclude Include="src\SystemRequestIDTypes.h" />
-    <ClInclude Include="src\Task.h" />
-    <ClInclude Include="src\TokenHandler.h" />
-    <ClInclude Include="src\typedef.h" />
-    <ClInclude Include="src\Watch.h" />
+    <ClInclude Include="include\Action.h" />
+    <ClInclude Include="include\ApiClient.h" />
+    <ClInclude Include="include\basic_bytebuf.h" />
+    <ClInclude Include="include\basic_bytestream.h" />
+    <ClInclude Include="include\Client.h" />
+    <ClInclude Include="include\Configuration.h" />
+    <ClInclude Include="include\ConnectionData.h" />
+    <ClInclude Include="include\ConnectionResult.h" />
+    <ClInclude Include="include\ConnectionState.h" />
+    <ClInclude Include="include\ConnectToSceneMsg.h" />
+    <ClInclude Include="include\DefaultPacketDispatcher.h" />
+    <ClInclude Include="include\DefaultScheduler.h" />
+    <ClInclude Include="include\DependencyResolver.h" />
+    <ClInclude Include="include\DisconnectFromSceneDto.h" />
+    <ClInclude Include="include\EmptyDto.h" />
+    <ClInclude Include="include\FileLogger.h" />
+    <ClInclude Include="include\headers.h" />
+    <ClInclude Include="include\Helpers.h" />
+    <ClInclude Include="include\IConnection.h" />
+    <ClInclude Include="include\IConnectionManager.h" />
+    <ClInclude Include="include\ILogger.h" />
+    <ClInclude Include="include\IObservable.h" />
+    <ClInclude Include="include\IPacketDispatcher.h" />
+    <ClInclude Include="include\IPacketProcessor.h" />
+    <ClInclude Include="include\IPlugin.h" />
+    <ClInclude Include="include\IRequestModule.h" />
+    <ClInclude Include="include\IRpcService.h" />
+    <ClInclude Include="include\IScenePeer.h" />
+    <ClInclude Include="include\IScheduler.h" />
+    <ClInclude Include="include\ISubscription.h" />
+    <ClInclude Include="include\ITask.h" />
+    <ClInclude Include="include\ITokenHandler.h" />
+    <ClInclude Include="include\ITransport.h" />
+    <ClInclude Include="include\MessageIDTypes.h" />
+    <ClInclude Include="include\NullLogger.h" />
+    <ClInclude Include="include\Observable.h" />
+    <ClInclude Include="include\Packet.h" />
+    <ClInclude Include="include\PacketProcessorConfig.h" />
+    <ClInclude Include="include\RakNetConnection.h" />
+    <ClInclude Include="include\RakNetTransport.h" />
+    <ClInclude Include="include\RequestContext.h" />
+    <ClInclude Include="include\RequestModuleBuilder.h" />
+    <ClInclude Include="include\RequestProcessor.h" />
+    <ClInclude Include="include\Route.h" />
+    <ClInclude Include="include\RouteDto.h" />
+    <ClInclude Include="include\RpcPlugin.h" />
+    <ClInclude Include="include\RpcRequest.h" />
+    <ClInclude Include="include\RpcRequestContext.h" />
+    <ClInclude Include="include\RpcService.h" />
+    <ClInclude Include="include\Scene.h" />
+    <ClInclude Include="include\SceneDispatcher.h" />
+    <ClInclude Include="include\SceneEndpoint.h" />
+    <ClInclude Include="include\SceneInfosDto.h" />
+    <ClInclude Include="include\SceneInfosRequestDto.h" />
+    <ClInclude Include="include\ScenePeer.h" />
+    <ClInclude Include="include\stormancer.h" />
+    <ClInclude Include="include\Subscription.h" />
+    <ClInclude Include="include\SystemRequest.h" />
+    <ClInclude Include="include\SystemRequestIDTypes.h" />
+    <ClInclude Include="include\Task.h" />
+    <ClInclude Include="include\TokenHandler.h" />
+    <ClInclude Include="include\typedef.h" />
+    <ClInclude Include="include\Watch.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
@@ -291,6 +291,17 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
+    <ItemGroup>
+      <RxcppIncludes Include="$(SolutiontDir)rxcpp\Rx\v2\src\rxcpp\**\*.*" />
+      <RestSdkIncludes Include="$(SolutionDir)cpprestsdk\Release\include\**\*.*" />
+      <MsgpackIncludes Include="$(SolutionDir)msgpack-c\include\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(RxcppIncludes)" DestinationFiles="@(GitFiles->'$(OutDir)git\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(RestSdkIncludes)" DestinationFiles="@(GitFiles->'$(OutDir)git\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(MsgpackIncludes)" DestinationFiles="@(GitFiles->'$(OutDir)git\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(GitFiles)" DestinationFiles="@(GitFiles->'$(OutDir)git\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(GitFiles)" DestinationFiles="@(GitFiles->'$(OutDir)git\%(RecursiveDir)%(Filename)%(Extension)')" />
+
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
   </Target>
 </Project>
