@@ -80,7 +80,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)binaries\stormancer\$(Platform)\$(Configuration)</OutDir>
+    <OutDir>$(SolutionDir)binaries\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)bin\$(Configuration)\$(Platform)\</IntDir>
     <TargetName>Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform)</TargetName>
   </PropertyGroup>
@@ -122,7 +122,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>STORMANCER_DLL_EXPORT;CPPREST_FORCE_PPLX;_DEBUG;_WINDOWS;_USRDLL;STORMANCERSDKCPP_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)RakNet\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
@@ -179,71 +179,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\Action.h" />
-    <ClInclude Include="include\ApiClient.h" />
-    <ClInclude Include="include\basic_bytebuf.h" />
-    <ClInclude Include="include\basic_bytestream.h" />
-    <ClInclude Include="include\Client.h" />
-    <ClInclude Include="include\Configuration.h" />
-    <ClInclude Include="include\ConnectionData.h" />
-    <ClInclude Include="include\ConnectionResult.h" />
-    <ClInclude Include="include\ConnectionState.h" />
-    <ClInclude Include="include\ConnectToSceneMsg.h" />
-    <ClInclude Include="include\DefaultPacketDispatcher.h" />
-    <ClInclude Include="include\DefaultScheduler.h" />
-    <ClInclude Include="include\DependencyResolver.h" />
-    <ClInclude Include="include\DisconnectFromSceneDto.h" />
-    <ClInclude Include="include\EmptyDto.h" />
-    <ClInclude Include="include\FileLogger.h" />
-    <ClInclude Include="include\headers.h" />
-    <ClInclude Include="include\Helpers.h" />
-    <ClInclude Include="include\IConnection.h" />
-    <ClInclude Include="include\IConnectionManager.h" />
-    <ClInclude Include="include\ILogger.h" />
-    <ClInclude Include="include\IObservable.h" />
-    <ClInclude Include="include\IPacketDispatcher.h" />
-    <ClInclude Include="include\IPacketProcessor.h" />
-    <ClInclude Include="include\IPlugin.h" />
-    <ClInclude Include="include\IRequestModule.h" />
-    <ClInclude Include="include\IRpcService.h" />
-    <ClInclude Include="include\IScenePeer.h" />
-    <ClInclude Include="include\IScheduler.h" />
-    <ClInclude Include="include\ISubscription.h" />
-    <ClInclude Include="include\ITask.h" />
-    <ClInclude Include="include\ITokenHandler.h" />
-    <ClInclude Include="include\ITransport.h" />
-    <ClInclude Include="include\MessageIDTypes.h" />
-    <ClInclude Include="include\NullLogger.h" />
-    <ClInclude Include="include\Observable.h" />
-    <ClInclude Include="include\Packet.h" />
-    <ClInclude Include="include\PacketProcessorConfig.h" />
-    <ClInclude Include="include\RakNetConnection.h" />
-    <ClInclude Include="include\RakNetTransport.h" />
-    <ClInclude Include="include\RequestContext.h" />
-    <ClInclude Include="include\RequestModuleBuilder.h" />
-    <ClInclude Include="include\RequestProcessor.h" />
-    <ClInclude Include="include\Route.h" />
-    <ClInclude Include="include\RouteDto.h" />
-    <ClInclude Include="include\RpcPlugin.h" />
-    <ClInclude Include="include\RpcRequest.h" />
-    <ClInclude Include="include\RpcRequestContext.h" />
-    <ClInclude Include="include\RpcService.h" />
-    <ClInclude Include="include\Scene.h" />
-    <ClInclude Include="include\SceneDispatcher.h" />
-    <ClInclude Include="include\SceneEndpoint.h" />
-    <ClInclude Include="include\SceneInfosDto.h" />
-    <ClInclude Include="include\SceneInfosRequestDto.h" />
-    <ClInclude Include="include\ScenePeer.h" />
-    <ClInclude Include="include\stormancer.h" />
-    <ClInclude Include="include\Subscription.h" />
-    <ClInclude Include="include\SystemRequest.h" />
-    <ClInclude Include="include\SystemRequestIDTypes.h" />
-    <ClInclude Include="include\Task.h" />
-    <ClInclude Include="include\TokenHandler.h" />
-    <ClInclude Include="include\typedef.h" />
-    <ClInclude Include="include\Watch.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="stormancer\src\ApiClient.cpp" />
     <ClCompile Include="stormancer\src\Client.cpp" />
     <ClCompile Include="stormancer\src\Configuration.cpp" />
@@ -283,6 +218,71 @@
     <ClCompile Include="stormancer\src\TokenHandler.cpp" />
     <ClCompile Include="stormancer\src\Watch.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stormancer\include\Action.h" />
+    <ClInclude Include="stormancer\include\ApiClient.h" />
+    <ClInclude Include="stormancer\include\basic_bytebuf.h" />
+    <ClInclude Include="stormancer\include\basic_bytestream.h" />
+    <ClInclude Include="stormancer\include\Client.h" />
+    <ClInclude Include="stormancer\include\Configuration.h" />
+    <ClInclude Include="stormancer\include\ConnectionData.h" />
+    <ClInclude Include="stormancer\include\ConnectionResult.h" />
+    <ClInclude Include="stormancer\include\ConnectionState.h" />
+    <ClInclude Include="stormancer\include\ConnectToSceneMsg.h" />
+    <ClInclude Include="stormancer\include\DefaultPacketDispatcher.h" />
+    <ClInclude Include="stormancer\include\DefaultScheduler.h" />
+    <ClInclude Include="stormancer\include\DependencyResolver.h" />
+    <ClInclude Include="stormancer\include\DisconnectFromSceneDto.h" />
+    <ClInclude Include="stormancer\include\EmptyDto.h" />
+    <ClInclude Include="stormancer\include\FileLogger.h" />
+    <ClInclude Include="stormancer\include\headers.h" />
+    <ClInclude Include="stormancer\include\Helpers.h" />
+    <ClInclude Include="stormancer\include\IConnection.h" />
+    <ClInclude Include="stormancer\include\IConnectionManager.h" />
+    <ClInclude Include="stormancer\include\ILogger.h" />
+    <ClInclude Include="stormancer\include\IObservable.h" />
+    <ClInclude Include="stormancer\include\IPacketDispatcher.h" />
+    <ClInclude Include="stormancer\include\IPacketProcessor.h" />
+    <ClInclude Include="stormancer\include\IPlugin.h" />
+    <ClInclude Include="stormancer\include\IRequestModule.h" />
+    <ClInclude Include="stormancer\include\IRpcService.h" />
+    <ClInclude Include="stormancer\include\IScenePeer.h" />
+    <ClInclude Include="stormancer\include\IScheduler.h" />
+    <ClInclude Include="stormancer\include\ISubscription.h" />
+    <ClInclude Include="stormancer\include\ITask.h" />
+    <ClInclude Include="stormancer\include\ITokenHandler.h" />
+    <ClInclude Include="stormancer\include\ITransport.h" />
+    <ClInclude Include="stormancer\include\MessageIDTypes.h" />
+    <ClInclude Include="stormancer\include\NullLogger.h" />
+    <ClInclude Include="stormancer\include\Observable.h" />
+    <ClInclude Include="stormancer\include\Packet.h" />
+    <ClInclude Include="stormancer\include\PacketProcessorConfig.h" />
+    <ClInclude Include="stormancer\include\RakNetConnection.h" />
+    <ClInclude Include="stormancer\include\RakNetTransport.h" />
+    <ClInclude Include="stormancer\include\RequestContext.h" />
+    <ClInclude Include="stormancer\include\RequestModuleBuilder.h" />
+    <ClInclude Include="stormancer\include\RequestProcessor.h" />
+    <ClInclude Include="stormancer\include\Route.h" />
+    <ClInclude Include="stormancer\include\RouteDto.h" />
+    <ClInclude Include="stormancer\include\RpcPlugin.h" />
+    <ClInclude Include="stormancer\include\RpcRequest.h" />
+    <ClInclude Include="stormancer\include\RpcRequestContext.h" />
+    <ClInclude Include="stormancer\include\RpcService.h" />
+    <ClInclude Include="stormancer\include\Scene.h" />
+    <ClInclude Include="stormancer\include\SceneDispatcher.h" />
+    <ClInclude Include="stormancer\include\SceneEndpoint.h" />
+    <ClInclude Include="stormancer\include\SceneInfosDto.h" />
+    <ClInclude Include="stormancer\include\SceneInfosRequestDto.h" />
+    <ClInclude Include="stormancer\include\ScenePeer.h" />
+    <ClInclude Include="stormancer\include\stormancer.h" />
+    <ClInclude Include="stormancer\include\Subscription.h" />
+    <ClInclude Include="stormancer\include\SystemRequest.h" />
+    <ClInclude Include="stormancer\include\SystemRequestIDTypes.h" />
+    <ClInclude Include="stormancer\include\Task.h" />
+    <ClInclude Include="stormancer\include\TokenHandler.h" />
+    <ClInclude Include="stormancer\include\typedef.h" />
+    <ClInclude Include="stormancer\include\Watch.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
@@ -296,7 +296,9 @@
       <RestSdkIncludes Include="$(SolutionDir)cpprestsdk\Release\include\**\*.*" />
       <MsgpackIncludes Include="$(SolutionDir)msgpack-c\include\**\*.*" />
       <StormancerIncludes Include="$(SolutionDir)stormancer\include\**\*.*" />
+      <RaknetIncludes Include="$(SolutionDir)RakNet\Source\**\*.*" />
     </ItemGroup>
+    <Copy SourceFiles="@(RaknetIncludes)" DestinationFiles="@(RaknetIncludes->'$(SolutionDir)include\%(RecursiveDir)%(Filename)%(Extension)')" />
     <Copy SourceFiles="@(RxcppIncludes)" DestinationFiles="@(RxcppIncludes->'$(SolutionDir)include\%(RecursiveDir)%(Filename)%(Extension)')" />
     <Copy SourceFiles="@(RestSdkIncludes)" DestinationFiles="@(RestSdkIncludes->'$(SolutionDir)include\%(RecursiveDir)%(Filename)%(Extension)')" />
     <Copy SourceFiles="@(MsgpackIncludes)" DestinationFiles="@(MsgpackIncludes->'$(SolutionDir)include\%(RecursiveDir)%(Filename)%(Extension)')" />

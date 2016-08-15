@@ -39,7 +39,7 @@
     <TargetName>$(CppRestBaseFileName)140$(DebugFileSuffix)_$(CppRestSDKVersionFileSuffix)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(SolutionDir)binaries\cpprest\$(Platform)\$(Configuration)</OutDir>
+    <OutDir>$(SolutionDir)binaries\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemGroup>
     <None Include="packages.config">
