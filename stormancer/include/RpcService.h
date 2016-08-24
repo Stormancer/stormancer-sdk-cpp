@@ -17,6 +17,9 @@ namespace Stormancer
 		STORMANCER_DLL_API uint16 pendingRequests();
 		STORMANCER_DLL_API void cancelAll(const char* reason);
 
+		STORMANCER_DLL_API  pplx::task<std::shared_ptr<Stormancer::Result<>>> rpcVoid_with_writer(std::string procedure, std::function<void(Stormancer::bytestream*)> writer);
+
+
 	public:
 		void next(Packetisp_ptr packet);
 		void error(Packetisp_ptr packet);

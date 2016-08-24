@@ -1,13 +1,47 @@
 #pragma once
 
+//For static libs
+#define _NO_ASYNCRTIMP
+#define _NO_PPLXIMP
+#define _RAKNET_LIB
+
+#ifndef _STORMANCERSDKCPP
+#pragma comment(lib, "ws2_32.lib")
+#pragma comment(lib, "winhttp.lib")
+#pragma comment(lib, "Bcrypt.lib")
+#pragma comment(lib, "Crypt32.lib")
+#if _WIN64
+#if _DEBUG
+#pragma comment(lib, "Stormancer140_Debug_x64.lib")
+#else
+#pragma comment(lib, "Stormancer140_Debug_x64.lib")
+#endif
+#else
+#if _WIN32
+#if _DEBUG
+#pragma comment(lib, "Stormancer140_Release_x86.lib")
+#else
+#pragma comment(lib, "Stormancer140_Release_x86.lib")
+#endif
+#endif
+#endif
+
+#endif
 // DLL IMPORT / EXPORT
+#ifdef _NO_ASYNCRTIMP
+#define STORMANCER_DLL_API
+#else
 #ifdef STORMANCER_DLL_EXPORT
 #define STORMANCER_DLL_API __declspec(dllexport) 
 #else
 #define STORMANCER_DLL_API __declspec(dllimport) 
 #endif
+#endif
+
 
 // DEFINES
+
+
 #define CPPREST_FORCE_PPLX 1
 #define STORMANCER_LOG_CLIENT
 //#define STORMANCER_LOG_PACKETS

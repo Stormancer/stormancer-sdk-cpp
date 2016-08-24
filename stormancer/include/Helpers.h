@@ -36,9 +36,10 @@ namespace Stormancer
 		}
 
 		Result(T data)
-			: _data(data),
-			_error(0)
+			: _data(data)
+			
 		{
+			_error = 0;
 		}
 
 		void set(T data)

@@ -336,4 +336,40 @@ namespace Stormancer
 			_pendingRequests.clear();
 		}
 	}
+
+
+	pplx::task<std::shared_ptr<Stormancer::Result<>>> RpcService::rpcVoid_with_writer( std::string procedure, std::function<void(Stormancer::bytestream*)> writer)
+	{
+		pplx::task_completion_event<std::shared_ptr<Stormancer::Result<>>> tce;
+		std::shared_ptr<Stormancer::Result<>> result(new Stormancer::Result<>());
+
+		auto observable = this->rpc(procedure.c_str(), [&writer](Stormancer::bytestream* stream) {
+			writer(stream);
+		}, PacketPriority::MEDIUM_PRIORITY);
+
+		auto onNext = [tce, result](Stormancer::Packetisp_ptr packet) {			
+			result->set();
+			tce.set(result);
+		};
+
+		auto onError = std::function<void(const char*)>([tce, result, procedure](const char* error) {
+			std::string msg = "Rpc::" + procedure;
+			Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Error, "RpcHelpers", msg.c_str(), error);
+			result->setError(1, error);
+			tce.set(result);
+		});
+
+		auto onComplete = [observable]() {
+			observable->destroy();
+		};
+
+
+		observable->subscribe(onNext, onError, onComplete);
+
+		return pplx::create_task(tce);
+	}
 };
+
+
+
+
