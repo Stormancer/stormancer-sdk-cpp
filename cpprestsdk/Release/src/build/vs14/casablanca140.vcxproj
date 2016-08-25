@@ -36,9 +36,12 @@
     <DebugFileSuffix>d</DebugFileSuffix>
   </PropertyGroup>
   <PropertyGroup>
-    <TargetName>$(CppRestBaseFileName)140$(DebugFileSuffix)_$(CppRestSDKVersionFileSuffix)</TargetName>
+    <TargetName>$(CppRestBaseFileName)140_$(CppRestSDKVersionFileSuffix)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)binaries\$(Platform)\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)binaries\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemGroup>
