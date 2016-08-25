@@ -42,20 +42,13 @@ namespace Stormancer
 		return _plugins;
 	}
 
-	void Configuration::addServerEndpoint(const char* serverEndpoint)
+	void Configuration::addServerEndpoint(const std::string serverEndpoint)
 	{
 		_serverEndpoints.push_back(std::string(serverEndpoint));
 	}
 
 	std::vector<std::string> Configuration::getApiEndpoint()
 	{
-		if (_serverEndpoints.size())
-		{
-			return _serverEndpoints;
-		}
-		else
-		{
-			return std::vector<std::string>{ apiEndpoint };
-		}
+		return _serverEndpoints;
 	}
 };

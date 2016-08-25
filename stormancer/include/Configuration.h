@@ -39,7 +39,7 @@ namespace Stormancer
 		STORMANCER_DLL_API static Configuration* forAccount(const char* account, const char* application);
 
 		/// Add a server endpoint in the internal list
-		STORMANCER_DLL_API void addServerEndpoint(const char* serverEndpoint);
+		STORMANCER_DLL_API void addServerEndpoint(const std::string serverEndpoint);
 
 		// Get the Api endpoint.
 		std::vector<std::string> getApiEndpoint();
@@ -102,8 +102,6 @@ namespace Stormancer
 		};
 
 		stringMap _metadata;
-
-		std::string apiEndpoint = "https://api.stormancer.com/";
 
 		std::vector<IPlugin*> _plugins;
 
