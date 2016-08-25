@@ -36,7 +36,7 @@ namespace Stormancer
 
 	public:
 		/// Create an account with an account and an application name and returns a Configuration smart ptr.
-		STORMANCER_DLL_API static Configuration* forAccount(const char* account, const char* application);
+		STORMANCER_DLL_API static std::shared_ptr<Configuration> forAccount(const char* account, const char* application);
 
 		/// Add a server endpoint in the internal list
 		STORMANCER_DLL_API void addServerEndpoint(const std::string serverEndpoint);
@@ -68,6 +68,9 @@ namespace Stormancer
 
 		/// Maximum number of remote peers that can connect with this client.
 		uint16 maxPeers = 0;
+
+		// Optional server port
+		uint16 serverPort = 0;
 
 		/// Enable or disable the asynchrounous dispatch of received messages. Enabled by default.
 		bool asynchronousDispatch = true;
