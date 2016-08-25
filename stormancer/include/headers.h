@@ -14,12 +14,12 @@
 #if _DEBUG
 #pragma comment(lib, "Stormancer140_Debug_x64.lib")
 #else
-#pragma comment(lib, "Stormancer140_Debug_x64.lib")
+#pragma comment(lib, "Stormancer140_Release_x64.lib")
 #endif
 #else
 #if _WIN32
 #if _DEBUG
-#pragma comment(lib, "Stormancer140_Release_x86.lib")
+#pragma comment(lib, "Stormancer140_Debug_x86.lib")
 #else
 #pragma comment(lib, "Stormancer140_Release_x86.lib")
 #endif

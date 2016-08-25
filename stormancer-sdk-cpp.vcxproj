@@ -48,7 +48,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -92,7 +92,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)binaries\stormancer\$(Platform)\$(Configuration)</OutDir>
+    <OutDir>$(SolutionDir)binaries\$(Platform)\$(Configuration)</OutDir>
     <IntDir>$(ProjectDir)bin\$(Configuration)\$(Platform)\</IntDir>
     <TargetName>Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform)</TargetName>
   </PropertyGroup>
@@ -137,8 +137,7 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <Lib>
-      <Verbose>true</Verbose>
-      <AdditionalDependencies>RakNet$(PlatformToolsetVersion).lib;cpprest$(PlatformToolsetVersion)d_2_8.lib</AdditionalDependencies>
+      <AdditionalDependencies>RakNet$(PlatformToolsetVersion).lib;cpprest$(PlatformToolsetVersion)_2_8.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)binaries\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
@@ -169,11 +168,11 @@
       <WarningLevel>Level3</WarningLevel>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>STORMANCER_DLL_EXPORT;NDEBUG;_WINDOWS;_USRDLL;STORMANCERSDKCPP_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)src;$(SolutionDir)cpprestsdk\Release\include;$(SolutionDir)msgpack-c\include;$(SolutionDir)RakNet\Source;$(SolutionDir)rxcpp\Rx\v2\src\rxcpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -185,6 +184,11 @@
       <AdditionalDependencies>RakNet$(PlatformToolsetVersion)_$(Configuration)_$(Platform).lib;cpprest$(PlatformToolsetVersion)_2_8.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
+    <Lib>
+      <AdditionalDependencies>RakNet$(PlatformToolsetVersion).lib;cpprest$(PlatformToolsetVersion)_2_8.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)binaries\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="stormancer\src\ApiClient.cpp" />
