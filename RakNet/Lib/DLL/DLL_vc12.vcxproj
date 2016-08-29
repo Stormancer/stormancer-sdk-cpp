@@ -41,7 +41,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -209,12 +209,8 @@
     <ClCompile Include="..\..\Source\CCRakNetSlidingWindow.cpp" />
     <ClCompile Include="..\..\Source\CCRakNetUDT.cpp" />
     <ClCompile Include="..\..\Source\CheckSum.cpp" />
-    <ClCompile Include="..\..\Source\CloudClient.cpp" />
     <ClCompile Include="..\..\Source\CloudCommon.cpp" />
-    <ClCompile Include="..\..\Source\CloudServer.cpp" />
     <ClCompile Include="..\..\Source\CommandParserInterface.cpp" />
-    <ClCompile Include="..\..\Source\ConnectionGraph2.cpp" />
-    <ClCompile Include="..\..\Source\ConsoleServer.cpp" />
     <ClCompile Include="..\..\Source\DataCompressor.cpp" />
     <ClCompile Include="..\..\Source\DirectoryDeltaTransfer.cpp" />
     <ClCompile Include="..\..\Source\DR_SHA1.cpp" />
@@ -223,13 +219,8 @@
     <ClCompile Include="..\..\Source\DS_HuffmanEncodingTree.cpp" />
     <ClCompile Include="..\..\Source\DS_Table.cpp" />
     <ClCompile Include="..\..\Source\DynDNS.cpp" />
-    <ClCompile Include="..\..\Source\EmailSender.cpp" />
     <ClCompile Include="..\..\Source\EpochTimeToString.cpp" />
-    <ClCompile Include="..\..\Source\FileList.cpp" />
-    <ClCompile Include="..\..\Source\FileListTransfer.cpp" />
-    <ClCompile Include="..\..\Source\FileOperations.cpp" />
     <ClCompile Include="..\..\Source\FormatString.cpp" />
-    <ClCompile Include="..\..\Source\FullyConnectedMesh2.cpp" />
     <ClCompile Include="..\..\Source\Getche.cpp" />
     <ClCompile Include="..\..\Source\Gets.cpp" />
     <ClCompile Include="..\..\Source\GetTime.cpp" />
@@ -243,15 +234,8 @@
     <ClCompile Include="..\..\Source\LocklessTypes.cpp" />
     <ClCompile Include="..\..\Source\LogCommandParser.cpp" />
     <ClCompile Include="..\..\Source\MessageFilter.cpp" />
-    <ClCompile Include="..\..\Source\NatPunchthroughClient.cpp" />
-    <ClCompile Include="..\..\Source\NatPunchthroughServer.cpp" />
-    <ClCompile Include="..\..\Source\NatTypeDetectionClient.cpp" />
-    <ClCompile Include="..\..\Source\NatTypeDetectionCommon.cpp" />
-    <ClCompile Include="..\..\Source\NatTypeDetectionServer.cpp" />
     <ClCompile Include="..\..\Source\NetworkIDManager.cpp" />
     <ClCompile Include="..\..\Source\NetworkIDObject.cpp" />
-    <ClCompile Include="..\..\Source\PacketConsoleLogger.cpp" />
-    <ClCompile Include="..\..\Source\PacketFileLogger.cpp" />
     <ClCompile Include="..\..\Source\PacketizedTCP.cpp" />
     <ClCompile Include="..\..\Source\PacketLogger.cpp" />
     <ClCompile Include="..\..\Source\PacketOutputWindowLogger.cpp" />
@@ -283,9 +267,7 @@
     <ClCompile Include="..\..\Source\Rand.cpp" />
     <ClCompile Include="..\..\Source\RandSync.cpp" />
     <ClCompile Include="..\..\Source\ReadyEvent.cpp" />
-    <ClCompile Include="..\..\Source\RelayPlugin.cpp" />
     <ClCompile Include="..\..\Source\ReliabilityLayer.cpp" />
-    <ClCompile Include="..\..\Source\ReplicaManager3.cpp" />
     <ClCompile Include="..\..\Source\Router2.cpp" />
     <ClCompile Include="..\..\Source\RPC4Plugin.cpp" />
     <ClCompile Include="..\..\Source\SecureHandshake.cpp" />
@@ -299,15 +281,8 @@
     <ClCompile Include="..\..\Source\SuperFastHash.cpp" />
     <ClCompile Include="..\..\Source\TableSerializer.cpp" />
     <ClCompile Include="..\..\Source\TCPInterface.cpp" />
-    <ClCompile Include="..\..\Source\TeamBalancer.cpp" />
-    <ClCompile Include="..\..\Source\TeamManager.cpp" />
-    <ClCompile Include="..\..\Source\TelnetTransport.cpp" />
     <ClCompile Include="..\..\Source\ThreadsafePacketLogger.cpp" />
     <ClCompile Include="..\..\Source\TwoWayAuthentication.cpp" />
-    <ClCompile Include="..\..\Source\UDPForwarder.cpp" />
-    <ClCompile Include="..\..\Source\UDPProxyClient.cpp" />
-    <ClCompile Include="..\..\Source\UDPProxyCoordinator.cpp" />
-    <ClCompile Include="..\..\Source\UDPProxyServer.cpp" />
     <ClCompile Include="..\..\Source\VariableDeltaSerializer.cpp" />
     <ClCompile Include="..\..\Source\VariableListDeltaTracker.cpp" />
     <ClCompile Include="..\..\Source\VariadicSQLParser.cpp" />

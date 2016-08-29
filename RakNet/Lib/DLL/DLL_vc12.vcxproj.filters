@@ -29,22 +29,10 @@
     <ClCompile Include="..\..\Source\CheckSum.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\CloudClient.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\CloudCommon.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\CloudServer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\CommandParserInterface.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\ConnectionGraph2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\ConsoleServer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\DataCompressor.cpp">
@@ -71,25 +59,10 @@
     <ClCompile Include="..\..\Source\DynDNS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\EmailSender.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\EpochTimeToString.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\FileList.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\FileListTransfer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\FileOperations.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\FormatString.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\FullyConnectedMesh2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Getche.cpp">
@@ -131,31 +104,10 @@
     <ClCompile Include="..\..\Source\MessageFilter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\NatPunchthroughClient.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\NatPunchthroughServer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\NatTypeDetectionClient.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\NatTypeDetectionCommon.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\NatTypeDetectionServer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\NetworkIDManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\NetworkIDObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\PacketConsoleLogger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\PacketFileLogger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\PacketizedTCP.cpp">
@@ -251,13 +203,7 @@
     <ClCompile Include="..\..\Source\ReadyEvent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\RelayPlugin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\ReliabilityLayer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\ReplicaManager3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Router2.cpp">
@@ -299,31 +245,10 @@
     <ClCompile Include="..\..\Source\TCPInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\TeamBalancer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\TeamManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\TelnetTransport.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\ThreadsafePacketLogger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\TwoWayAuthentication.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\UDPForwarder.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\UDPProxyClient.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\UDPProxyCoordinator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\UDPProxyServer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\VariableDeltaSerializer.cpp">
