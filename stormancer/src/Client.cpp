@@ -35,9 +35,10 @@ namespace Stormancer
 
 	// Client
 
-	Client::Client(Configuration* config)
+	Client::Client(std::shared_ptr<Configuration> config)
 		: _initialized(false)
 		, _accountId(config->account)
+		, _config(config)
 		, _applicationName(config->application)
 		, _tokenHandler(new TokenHandler())
 		, _apiClient(new ApiClient(config, _tokenHandler))
@@ -65,7 +66,7 @@ namespace Stormancer
 
 		_metadata["serializers"] = "msgpack/array";
 		_metadata["transport"] = _transport->name();
-		_metadata["version"] = "1.0.0a";
+		_metadata["version"] = "1.1.0";
 		_metadata["platform"] = "cpp";
 		_metadata["protocol"] = "2";
 
@@ -124,7 +125,7 @@ namespace Stormancer
 #endif
 	}
 
-	Client* Client::createClient(Configuration* config)
+	Client* Client::createClient(std::shared_ptr<Configuration> config)
 	{
 		if (!config)
 		{
@@ -260,7 +261,7 @@ namespace Stormancer
 					if (!_transport->isRunning()) {
 						try
 						{
-							_transport->start("client", new ConnectionHandler(), _cts.get_token(), 0, (uint16)(_maxPeers + 1));
+							_transport->start("client", new ConnectionHandler(), _cts.get_token(), this->_config->serverPort, (uint16)(_maxPeers + 1));
 							for (auto plugin : _plugins)
 							{
 								plugin->transportStarted(_transport);

@@ -2,7 +2,7 @@
 
 namespace Stormancer
 {
-	ApiClient::ApiClient(Configuration* config, ITokenHandler* tokenHandler)
+	ApiClient::ApiClient(std::shared_ptr<Configuration> config, ITokenHandler* tokenHandler)
 		: _config(config),
 		_tokenHandler(tokenHandler)
 	{

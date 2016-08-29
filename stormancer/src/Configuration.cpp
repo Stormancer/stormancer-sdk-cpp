@@ -16,14 +16,14 @@ namespace Stormancer
 	{
 	}
 
-	Configuration* Configuration::forAccount(const char* account, const char* application)
+	std::shared_ptr<Configuration> Configuration::forAccount(const char* account, const char* application)
 	{
 		if (!account || !application)
 		{
 			throw std::invalid_argument("Check your account and application parameters");
 		}
 
-		return new Configuration(account, application);
+		return std::shared_ptr<Configuration>(new Configuration(account, application));
 	}
 
 	Configuration& Configuration::metadata(const char* key, const char* value)
@@ -42,20 +42,13 @@ namespace Stormancer
 		return _plugins;
 	}
 
-	void Configuration::addServerEndpoint(const char* serverEndpoint)
+	void Configuration::addServerEndpoint(const std::string serverEndpoint)
 	{
 		_serverEndpoints.push_back(std::string(serverEndpoint));
 	}
 
 	std::vector<std::string> Configuration::getApiEndpoint()
 	{
-		if (_serverEndpoints.size())
-		{
-			return _serverEndpoints;
-		}
-		else
-		{
-			return std::vector<std::string>{ apiEndpoint };
-		}
+		return _serverEndpoints;
 	}
 };

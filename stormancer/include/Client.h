@@ -44,7 +44,7 @@ namespace Stormancer
 		};
 
 	private:
-		Client(Configuration* config);
+		Client(std::shared_ptr<Configuration> config);
 
 	public:
 		/// Destructor.
@@ -60,7 +60,7 @@ namespace Stormancer
 	public:
 		/// Factory.
 		/// \param config A pointer to a Configuration.
-		STORMANCER_DLL_API static Client* createClient(Configuration* config);
+		STORMANCER_DLL_API static Client* createClient(std::shared_ptr<Configuration> config);
 
 		/// Get a public scene.
 		/// \param sceneId The scene Id as a string.
@@ -207,5 +207,6 @@ namespace Stormancer
 		pplx::task<void> _connectionTask;
 		bool _connectionTaskSet = false;
 		Action<ConnectionState> _onConnectionStateChanged;
+		std::shared_ptr<Configuration> _config = nullptr;
 	};
 };
