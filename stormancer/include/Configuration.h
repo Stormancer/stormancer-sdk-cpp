@@ -22,7 +22,7 @@ namespace Stormancer
 
 	private:
 		// Constructor.
-		Configuration(const char* account, const char* application);
+		Configuration(const std::string endpoint, const std::string account, const std::string application);
 
 		// Copy constructor deleted.
 		Configuration(Configuration& other) = delete;
@@ -36,7 +36,7 @@ namespace Stormancer
 
 	public:
 		/// Create an account with an account and an application name and returns a Configuration smart ptr.
-		STORMANCER_DLL_API static std::shared_ptr<Configuration> forAccount(const char* account, const char* application);
+		STORMANCER_DLL_API static std::shared_ptr<Configuration> create(const std::string endpoint, const std::string account, const std::string application);
 
 		/// Add a server endpoint in the internal list
 		STORMANCER_DLL_API void addServerEndpoint(const std::string serverEndpoint);
@@ -58,10 +58,10 @@ namespace Stormancer
 
 	public:
 		/// A string containing the account name of the application.
-		const char* account = "";
+		const std::string account = "";
 
 		/// A string containing the name of the application.
-		const char* application = "";
+		const std::string application = "";
 
 		/// Gets or Sets the dispatcher to be used by the client.
 		IPacketDispatcher* dispatcher = nullptr;

@@ -175,7 +175,7 @@ namespace Stormancer
 		}
 	}
 
-	pplx::task<Result<Scene*>*> Client::getPublicScene(const char* sceneId, const char* userData)
+	pplx::task<Result<Scene*>*> Client::getPublicScene(const char* sceneId)
 	{
 		if (!sceneId)
 		{
@@ -184,16 +184,11 @@ namespace Stormancer
 #endif
 		}
 
-		if (!userData)
-		{
-			userData = "";
-		}
-
 #ifdef STORMANCER_LOG_CLIENT
-		ILogger::instance()->log(LogLevel::Trace, "Client::getPublicScene", sceneId, userData);
+		ILogger::instance()->log(LogLevel::Trace, "Client::getPublicScene", sceneId, "");
 #endif
 
-		return _apiClient->getSceneEndpoint(_accountId, _applicationName, sceneId, userData).then([this, sceneId](pplx::task<SceneEndpoint> t) {
+		return _apiClient->getSceneEndpoint(_accountId, _applicationName, sceneId).then([this, sceneId](pplx::task<SceneEndpoint> t) {
 			auto result = new Result<Scene*>();
 			try
 			{

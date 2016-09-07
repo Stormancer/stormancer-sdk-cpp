@@ -13,14 +13,13 @@ namespace Stormancer
 	}
 
 
-	pplx::task<SceneEndpoint> ApiClient::getSceneEndpoint(std::string accountId, std::string applicationName, std::string sceneId, std::string userData)
+	pplx::task<SceneEndpoint> ApiClient::getSceneEndpoint(std::string accountId, std::string applicationName, std::string sceneId)
 	{
 		{ // TOREMOVE
 			std::stringstream ss1;
 			ss1 << '[' << accountId.size() << '|' << accountId << ']';
 			ss1 << '[' << applicationName.size() << '|' << applicationName << ']';
 			ss1 << '[' << sceneId.size() << '|' << sceneId << ']';
-			ss1 << '[' << userData.size() << '|' << userData << ']';
 			auto str = ss1.str();
 			ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", "data", str.c_str());
 		}
@@ -36,7 +35,7 @@ namespace Stormancer
 
 		if (_config->endpointSelectionMode == EndpointSelectionMode::FALLBACK)
 		{
-			return getSceneEndpointImpl(baseUris, errors, accountId, applicationName, sceneId, userData);
+			return getSceneEndpointImpl(baseUris, errors, accountId, applicationName, sceneId);
 		}
 		else if (_config->endpointSelectionMode == EndpointSelectionMode::RANDOM)
 		{
@@ -49,13 +48,13 @@ namespace Stormancer
 				baseUris.erase(it);
 			}
 
-			return getSceneEndpointImpl(baseUris2, errors, accountId, applicationName, sceneId, userData);
+			return getSceneEndpointImpl(baseUris2, errors, accountId, applicationName, sceneId);
 		}
 
 		return taskFromException<SceneEndpoint>(std::runtime_error("Error selecting server endpoint."));
 	}
 
-	pplx::task<SceneEndpoint> ApiClient::getSceneEndpointImpl(std::vector<std::string>  endpoints, std::shared_ptr<std::vector<std::string>> errors, std::string accountId, std::string applicationName, std::string sceneId, std::string userData)
+	pplx::task<SceneEndpoint> ApiClient::getSceneEndpointImpl(std::vector<std::string>  endpoints, std::shared_ptr<std::vector<std::string>> errors, std::string accountId, std::string applicationName, std::string sceneId)
 	{
 		if (endpoints.size() == 0)
 		{
@@ -85,7 +84,7 @@ namespace Stormancer
 		request.headers().add(L"Content-Type", L"application/msgpack");
 		request.headers().add(L"Accept", L"application/json");
 		request.headers().add(L"x-version", L"1.0.0");
-		request.set_body(std::wstring(userData.begin(), userData.end()));
+		request.set_body(std::wstring());
 #else
 		web::http::client::http_client client(baseUri);
 		web::http::http_request request(web::http::methods::POST);
@@ -131,7 +130,7 @@ namespace Stormancer
 			return taskFromException<SceneEndpoint>(std::runtime_error(std::string() + "client.request failed."));
 		}
 
-		return httpRequestTask.then([this, endpoints, errors, baseUri, accountId, applicationName, sceneId, userData](pplx::task<web::http::http_response> task) {
+		return httpRequestTask.then([this, endpoints, errors, baseUri, accountId, applicationName, sceneId](pplx::task<web::http::http_response> task) {
 			web::http::http_response response;
 			try
 			{
@@ -143,7 +142,7 @@ namespace Stormancer
 				ILogger::instance()->log(LogLevel::Warn, "Client::getSceneEndpoint", msgStr.c_str(), ex.what());
 				(*errors).push_back("[" + msgStr + ":" + ex.what() + "]");
 				//throw std::runtime_error(std::string() + ex.what() + "\nCan't reach the stormancer API server.");
-				return getSceneEndpointImpl(endpoints, errors, accountId, applicationName, sceneId, userData);
+				return getSceneEndpointImpl(endpoints, errors, accountId, applicationName, sceneId);
 			}
 			catch (...)
 			{
@@ -151,7 +150,7 @@ namespace Stormancer
 				ILogger::instance()->log(LogLevel::Warn, "Client::getSceneEndpoint", msgStr.c_str(), "Unknown error");
 				(*errors).push_back("[" + msgStr + ":" + "Unknown error]");
 				//throw std::runtime_error("Unknown error: Can't reach the stormancer API server.");
-				return getSceneEndpointImpl(endpoints, errors, accountId, applicationName, sceneId, userData);
+				return getSceneEndpointImpl(endpoints, errors, accountId, applicationName, sceneId);
 			}
 
 			try
@@ -162,7 +161,7 @@ namespace Stormancer
 				if (ensureSuccessStatusCode(statusCode))
 				{
 					auto ss = new concurrency::streams::stringstreambuf;
-					return response.body().read_to_end(*ss).then([this, endpoints, ss, statusCode, accountId, applicationName, sceneId, userData](size_t size) {
+					return response.body().read_to_end(*ss).then([this, endpoints, ss, statusCode, accountId, applicationName, sceneId](size_t size) {
 						std::string responseText = ss->collection();
 						ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", "responseText", responseText.c_str());
 						delete ss;
@@ -172,7 +171,7 @@ namespace Stormancer
 				else
 				{
 					(*errors).push_back("[" + msgStr + ":" + std::to_string(statusCode) + "]");
-					return getSceneEndpointImpl(endpoints, errors, accountId, applicationName, sceneId, userData);
+					return getSceneEndpointImpl(endpoints, errors, accountId, applicationName, sceneId);
 				}
 			}
 			catch (const std::exception& ex)

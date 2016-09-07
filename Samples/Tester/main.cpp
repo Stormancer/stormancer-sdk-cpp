@@ -6,8 +6,11 @@ using namespace std;
 
 auto logger = (ConsoleLogger*)ILogger::instance(new ConsoleLogger(Stormancer::LogLevel::Trace));
 bool stop = false;
-const char* accountId = "58ec9ba7-56e4-3d89-2c55-c9435e08b26b";
-const char* applicationName = "tester";
+const std::string endpoint = "https://api.stormancer.com/";
+const std::string accountId = "58ec9ba7-56e4-3d89-2c55-c9435e08b26b";
+//const std::string endpoint = "http://localhost:8081/";
+//const std::string accountId = "test";
+const std::string applicationName = "tester";
 const char* sceneName = "main";
 std::shared_ptr<Configuration> config = nullptr;
 Client* client = nullptr;
@@ -103,7 +106,7 @@ void test_connect()
 	try
 	{
 		logger->log(LogLevel::Debug, "test_connect", "Create client", "");
-		config = Configuration::forAccount(accountId, applicationName);
+		config = Configuration::create(endpoint, accountId, applicationName);
 		client = Client::createClient(config);
 		logger->log(LogLevel::Info, "test_connect", "Create client OK", "");
 

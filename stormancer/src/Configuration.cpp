@@ -2,13 +2,14 @@
 
 namespace Stormancer
 {
-	Configuration::Configuration(const char* account, const char* application)
+	Configuration::Configuration(const std::string endpoint, const std::string account, const std::string application)
 		: account(account),
 		application(application),
 		dispatcher(new DefaultPacketDispatcher()),
 		scheduler(new DefaultScheduler())
 	{
 		transportFactory = defaultTransportFactory;
+		addServerEndpoint(endpoint);
 		_plugins.push_back(new RpcPlugin());
 	}
 
@@ -16,14 +17,14 @@ namespace Stormancer
 	{
 	}
 
-	std::shared_ptr<Configuration> Configuration::forAccount(const char* account, const char* application)
+	std::shared_ptr<Configuration> Configuration::create(const std::string endpoint, const std::string account, const std::string application)
 	{
-		if (!account || !application)
+		if (account == "" || application == "" || endpoint == "")
 		{
 			throw std::invalid_argument("Check your account and application parameters");
 		}
 
-		return std::shared_ptr<Configuration>(new Configuration(account, application));
+		return std::shared_ptr<Configuration>(new Configuration(endpoint, account, application));
 	}
 
 	Configuration& Configuration::metadata(const char* key, const char* value)
