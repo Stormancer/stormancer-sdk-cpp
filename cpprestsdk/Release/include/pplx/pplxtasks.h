@@ -193,6 +193,9 @@ template <> class task<void>;
 /// This needs to be defined as a macro rather than a function so that if we're only gathering one frame, _ReturnAddress()
 /// will evaluate to client code, rather than a helper function inside of _TaskCreationCallstack, itself.
 /// </remarks>
+#ifndef _CAPTURE_CALLSTACK
+#undef _CAPTURE_CALLSTACK
+#endif
 #if PPL_TASK_SAVE_FRAME_COUNT > 1
 #if defined(__cplusplus_winrt) && !defined(_DEBUG)
 #pragma message ("WARNING: Redefinning PPL_TASK_SAVE_FRAME_COUNT under Release build for non-desktop applications is not supported; only one frame will be captured!")

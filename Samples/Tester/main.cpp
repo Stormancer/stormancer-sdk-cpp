@@ -104,6 +104,7 @@ void test_connect()
 	{
 		logger->log(LogLevel::Debug, "test_connect", "Create client", "");
 		config = Configuration::forAccount(accountId, applicationName);
+		config->addServerEndpoint("https://api.stormancer.com");
 		client = Client::createClient(config);
 		logger->log(LogLevel::Info, "test_connect", "Create client OK", "");
 
