@@ -74,25 +74,25 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)binaries\$(Platform)\$(Configuration)</OutDir>
+    <OutDir>$(ProjectDir)output\libs\</OutDir>
     <IntDir>$(ProjectDir)bin\$(Configuration)\$(Platform)\</IntDir>
     <TargetName>Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)binaries\$(Platform)\$(Configuration)</OutDir>
+    <OutDir>$(ProjectDir)output\libs\</OutDir>
     <IntDir>$(ProjectDir)bin\$(Configuration)\$(Platform)\</IntDir>
     <TargetName>Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)binaries\$(Platform)\$(Configuration)</OutDir>
+    <OutDir>$(ProjectDir)output\libs\</OutDir>
     <IntDir>$(ProjectDir)bin\$(Configuration)\$(Platform)\</IntDir>
     <TargetName>Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)binaries\$(Platform)\$(Configuration)</OutDir>
+    <OutDir>$(ProjectDir)output\libs\</OutDir>
     <IntDir>$(ProjectDir)bin\$(Configuration)\$(Platform)\</IntDir>
     <TargetName>Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform)</TargetName>
   </PropertyGroup>
@@ -342,11 +342,11 @@
       <StormancerIncludes Include="$(SolutionDir)stormancer\include\**\*.*" />
       <RaknetIncludes Include="$(SolutionDir)RakNet\Source\**\*.*" />
     </ItemGroup>
-    <Copy SourceFiles="@(RaknetIncludes)" DestinationFiles="@(RaknetIncludes->'$(SolutionDir)include\%(RecursiveDir)%(Filename)%(Extension)')" />
-    <Copy SourceFiles="@(RxcppIncludes)" DestinationFiles="@(RxcppIncludes->'$(SolutionDir)include\%(RecursiveDir)%(Filename)%(Extension)')" />
-    <Copy SourceFiles="@(RestSdkIncludes)" DestinationFiles="@(RestSdkIncludes->'$(SolutionDir)include\%(RecursiveDir)%(Filename)%(Extension)')" />
-    <Copy SourceFiles="@(MsgpackIncludes)" DestinationFiles="@(MsgpackIncludes->'$(SolutionDir)include\%(RecursiveDir)%(Filename)%(Extension)')" />
-    <Copy SourceFiles="@(StormancerIncludes)" DestinationFiles="@(StormancerIncludes->'$(SolutionDir)include\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(RaknetIncludes)" DestinationFiles="@(RaknetIncludes->'$(SolutionDir)output\include\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(RxcppIncludes)" DestinationFiles="@(RxcppIncludes->'$(SolutionDir)output\include\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(RestSdkIncludes)" DestinationFiles="@(RestSdkIncludes->'$(SolutionDir)output\include\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(MsgpackIncludes)" DestinationFiles="@(MsgpackIncludes->'$(SolutionDir)output\include\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(StormancerIncludes)" DestinationFiles="@(StormancerIncludes->'$(SolutionDir)output\include\%(RecursiveDir)%(Filename)%(Extension)')" />
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
     <Error Condition="!Exists('packages\zlib.v140.windesktop.msvcstl.static.rt-dyn.1.2.8.8\build\native\zlib.v140.windesktop.msvcstl.static.rt-dyn.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\zlib.v140.windesktop.msvcstl.static.rt-dyn.1.2.8.8\build\native\zlib.v140.windesktop.msvcstl.static.rt-dyn.targets'))" />
     <Error Condition="!Exists('packages\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.1.0.2.1\build\native\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.1.0.2.1\build\native\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.targets'))" />
