@@ -78,12 +78,12 @@
 // custom libs
 
 // cpprestsdk
-#include <../cpprestsdk/Release/include/cpprest/http_client.h>
-#include <../cpprestsdk/Release/include/cpprest/filestream.h>
-#include <../cpprestsdk/Release/include/pplx/pplxtasks.h>
+#include <cpprest/http_client.h>
+#include <cpprest/filestream.h>
+#include <pplx/pplxtasks.h>
 
 // rxcpp
-#include <../rxcpp/Rx/v2/src/rxcpp/rx.hpp>
+#include <rx.hpp>
 
 // raknet
 #include <PacketPriority.h>

@@ -1,6 +1,6 @@
 #pragma once
 #include "headers.h"
-#include "../RakNet/Source/MessageIdentifiers.h"
+#include "MessageIdentifiers.h"
 
 namespace Stormancer
 {

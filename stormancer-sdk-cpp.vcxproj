@@ -150,7 +150,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>STORMANCER_DLL_EXPORT;CPPREST_FORCE_PPLX;WIN32;NDEBUG;_WINDOWS;_USRDLL;STORMANCERSDKCPP_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Source\Repos\stormancer-sdk-cpp\stormancer\include;$(SolutionDir)cpprestsdk\Release\include;$(SolutionDir)msgpack-c\include;$(SolutionDir)RakNet\Source;$(SolutionDir)rxcpp\Rx\v2\src\rxcpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)stormancer\include;$(SolutionDir)cpprestsdk\Release\include;$(SolutionDir)msgpack-c\include;$(SolutionDir)RakNet\Source;$(SolutionDir)rxcpp\Rx\v2\src\rxcpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -172,7 +172,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>STORMANCER_DLL_EXPORT;NDEBUG;_WINDOWS;_USRDLL;STORMANCERSDKCPP_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Source\Repos\stormancer-sdk-cpp\stormancer\include;$(SolutionDir)cpprestsdk\Release\include;$(SolutionDir)msgpack-c\include;$(SolutionDir)RakNet\Source;$(SolutionDir)rxcpp\Rx\v2\src\rxcpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)stormancer\include;$(SolutionDir)cpprestsdk\Release\include;$(SolutionDir)msgpack-c\include;$(SolutionDir)RakNet\Source;$(SolutionDir)rxcpp\Rx\v2\src\rxcpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>

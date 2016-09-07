@@ -9,7 +9,7 @@ bool stop = false;
 const char* accountId = "58ec9ba7-56e4-3d89-2c55-c9435e08b26b";
 const char* applicationName = "tester";
 const char* sceneName = "main";
-Configuration* config = nullptr;
+std::shared_ptr<Configuration> config = nullptr;
 Client* client = nullptr;
 Scene* sceneMain = nullptr;
 pplx::task<void> syncclockTask;
@@ -296,7 +296,6 @@ void clean()
 	sceneMain = nullptr;
 	destroy(client);
 	client = nullptr;
-	destroy(config);
 	config = nullptr;
 	logger->log(LogLevel::Debug, "clean", "scene and client deleted", "");
 
