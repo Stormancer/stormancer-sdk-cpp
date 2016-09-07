@@ -5,6 +5,9 @@
 #define _NO_PPLXIMP
 #define _RAKNET_LIB
 
+
+
+
 #ifndef _STORMANCERSDKCPP
 #pragma comment(lib, "ws2_32.lib")
 #pragma comment(lib, "winhttp.lib")
@@ -19,9 +22,9 @@
 #else
 #if _WIN32
 #if _DEBUG
-#pragma comment(lib, "Stormancer140_Debug_x86.lib")
+#pragma comment(lib, "Stormancer140_Debug_win32.lib")
 #else
-#pragma comment(lib, "Stormancer140_Release_x86.lib")
+#pragma comment(lib, "Stormancer140_Release_win32.lib")
 #endif
 #endif
 #endif
