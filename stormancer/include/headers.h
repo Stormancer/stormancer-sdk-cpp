@@ -5,7 +5,16 @@
 #define _NO_PPLXIMP
 #define _RAKNET_LIB
 
-
+//Name    Version  _MSC_VER
+//VS 6        6.0      1200
+//VS 2002     7.0      1300
+//VS 2003     7.1      1310
+//VS 2005     8.0      1400
+//VS 2008     9.0      1500
+//VS 2010    10.0      1600
+//VS 2012    11.0      1700
+//VS 2013    12.0      1800
+//VS 2015    13.0      1900
 
 
 #ifndef _STORMANCERSDKCPP
@@ -13,22 +22,7 @@
 #pragma comment(lib, "winhttp.lib")
 #pragma comment(lib, "Bcrypt.lib")
 #pragma comment(lib, "Crypt32.lib")
-#if _WIN64
-#if _DEBUG
-#pragma comment(lib, "Stormancer140_Debug_x64.lib")
-#else
-#pragma comment(lib, "Stormancer140_Release_x64.lib")
-#endif
-#else
-#if _WIN32
-#if _DEBUG
-#pragma comment(lib, "Stormancer140_Debug_win32.lib")
-#else
-#pragma comment(lib, "Stormancer140_Release_win32.lib")
-#endif
-#endif
-#endif
-
+#pragma comment(lib,_STORMANCER_LIB_NAME )
 #endif
 // DLL IMPORT / EXPORT
 #ifdef _NO_ASYNCRTIMP
