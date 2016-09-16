@@ -106,7 +106,7 @@ namespace Stormancer
 
 		/// Get a vector containing the scene host connections.
 		/// \return A vector containing the scene host connections.
-		STORMANCER_DLL_API DataStructures::List<IScenePeer*> remotePeers();
+		STORMANCER_DLL_API std::vector<IScenePeer*> remotePeers();
 
 		/// Returns the peer connection to the host.
 		STORMANCER_DLL_API IScenePeer* host();

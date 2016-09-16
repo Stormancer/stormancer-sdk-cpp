@@ -295,10 +295,10 @@ namespace Stormancer
 		delete packet->metadata()["routeId"];
 	}
 
-	DataStructures::List<IScenePeer*> Scene::remotePeers()
+	std::vector<IScenePeer*> Scene::remotePeers()
 	{
-		DataStructures::List<IScenePeer*> container;
-		container.Insert(host(), __FILE__, __LINE__);
+		std::vector<IScenePeer*> container;
+		container.push_back(host());
 		return container;
 	}
 
