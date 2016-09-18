@@ -79,8 +79,7 @@ namespace Stormancer
 	STORMANCER_DLL_API void destroy(Scene* ptr);
 	STORMANCER_DLL_API void destroy(Result<Scene*>* ptr);
 
-	class AuthenticationPlugin;
-	STORMANCER_DLL_API void destroy(AuthenticationPlugin* ptr);
+
 
 	class RpcPlugin;
 	STORMANCER_DLL_API void destroy(RpcPlugin* ptr);

@@ -75,10 +75,7 @@ namespace Stormancer
 		delete ptr;
 	}
 
-	void destroy(AuthenticationPlugin* ptr)
-	{
-		delete ptr;
-	}
+	
 
 	void destroy(RpcPlugin* ptr)
 	{

@@ -22,7 +22,6 @@
 #pragma comment(lib, "winhttp.lib")
 #pragma comment(lib, "Bcrypt.lib")
 #pragma comment(lib, "Crypt32.lib")
-#pragma comment(lib,_STORMANCER_LIB_NAME )
 #endif
 // DLL IMPORT / EXPORT
 #ifdef _NO_ASYNCRTIMP

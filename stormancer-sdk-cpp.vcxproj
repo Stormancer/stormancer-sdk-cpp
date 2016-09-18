@@ -107,6 +107,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
+      <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -131,6 +132,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
+      <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -159,6 +161,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)stormancer\include;$(SolutionDir)cpprestsdk\Release\include;$(SolutionDir)msgpack-c\include;$(SolutionDir)RakNet\Source;$(SolutionDir)rxcpp\Rx\v2\src\rxcpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <WholeProgramOptimization>false</WholeProgramOptimization>
+      <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -189,6 +192,7 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
+      <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -338,9 +342,9 @@
       <MsgpackIncludes Include="$(SolutionDir)msgpack-c\include\**\*.*" />
       <StormancerIncludes Include="$(SolutionDir)stormancer\include\**\*.*" />
       <RaknetIncludes Include="$(SolutionDir)RakNet\Source\**\*.*" />
-	  <BuildFiles Include="$(SolutionDir)Build\**\*.*" />
+      <BuildFiles Include="$(SolutionDir)Build\**\*.*" />
     </ItemGroup>
-	<Copy SourceFiles="@(BuildFiles)" DestinationFiles="@(BuildFiles->'$(SolutionDir)output\build\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(BuildFiles)" DestinationFiles="@(BuildFiles->'$(SolutionDir)output\build\%(RecursiveDir)%(Filename)%(Extension)')" />
     <Copy SourceFiles="@(RaknetIncludes)" DestinationFiles="@(RaknetIncludes->'$(SolutionDir)output\include\%(RecursiveDir)%(Filename)%(Extension)')" />
     <Copy SourceFiles="@(RxcppIncludes)" DestinationFiles="@(RxcppIncludes->'$(SolutionDir)output\include\%(RecursiveDir)%(Filename)%(Extension)')" />
     <Copy SourceFiles="@(RestSdkIncludes)" DestinationFiles="@(RestSdkIncludes->'$(SolutionDir)output\include\%(RecursiveDir)%(Filename)%(Extension)')" />

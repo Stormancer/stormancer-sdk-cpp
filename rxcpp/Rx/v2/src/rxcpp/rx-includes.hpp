@@ -149,7 +149,11 @@
 #include <mutex>
 #include <deque>
 #include <thread>
+#if !CPPREST_FORCE_PPLX
 #include <future>
+#else
+#include "pplx\pplx.h"
+#endif
 #include <vector>
 #include <list>
 #include <queue>
