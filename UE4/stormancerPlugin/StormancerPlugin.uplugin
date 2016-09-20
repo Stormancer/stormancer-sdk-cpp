@@ -1,0 +1,41 @@
+{
+
+	"FileVersion" : 3,
+
+
+
+	"FriendlyName" : "Stormancer plugin",
+
+	"Version" : 2,
+
+	"VersionName" : "1.1",
+
+	"CreatedBy" : "Stormancer SAS",
+
+	"CreatedByURL" : "http://www.stormancer.com",
+
+	"EngineVersion" : "4.9.0",
+
+	"Description" : "Integrates the Stormancer Lib in UE4",
+
+	"Category" : "Network",
+
+	"EnabledByDefault" : true,
+
+
+
+	"Modules" :
+
+	[
+
+		{
+
+			"Name" : "Stormancer",
+
+			"Type" : "Runtime"
+
+		}
+
+	]
+
+}

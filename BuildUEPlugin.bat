@@ -1,0 +1,1 @@
+xcopy output UE4\StormancerPlugin\3rdParty\Stormancer /E
