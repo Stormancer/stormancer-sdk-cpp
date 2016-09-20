@@ -172,7 +172,7 @@ namespace Stormancer
 
 	private:
 		bool _initialized = false;
-		const std::function<void(std::function<void(void)>)> _eventDispatcher;
+		const std::shared_ptr<IActionDispatcher> _eventDispatcher;
 		ILogger* _logger = nullptr;
 		std::string _accountId;
 		std::string _applicationName;

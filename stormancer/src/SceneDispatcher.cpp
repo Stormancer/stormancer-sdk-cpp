@@ -2,7 +2,7 @@
 
 namespace Stormancer
 {
-	SceneDispatcher::SceneDispatcher(std::function<void(std::function<void(void)>)> evDispatcher)
+	SceneDispatcher::SceneDispatcher(std::shared_ptr<IActionDispatcher> evDispatcher)
 		: _scenes((uint32)0xff - (uint32)MessageIDTypes::ID_SCENES + 1, nullptr)
 		, _eventDispatcher(evDispatcher)
 	{
@@ -48,7 +48,7 @@ namespace Stormancer
 		{
 			packet->metadata()["scene"] = scene;
 
-			this->_eventDispatcher([scene,packet]() {scene->handleMessage(packet); });
+			this->_eventDispatcher->post([scene,packet]() {scene->handleMessage(packet); });
 			return true;
 		}
 

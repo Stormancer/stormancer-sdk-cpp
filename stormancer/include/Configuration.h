@@ -5,6 +5,7 @@
 #include "RakNetTransport.h"
 #include "DefaultPacketDispatcher.h"
 #include "IPlugin.h"
+#include "IActionDispatcher.h"
 
 namespace Stormancer
 {
@@ -85,10 +86,10 @@ namespace Stormancer
 		/// Dispatches events
 		/// </summary>
 		/// <remarks>
-		/// By default, events are dispatched on the network thread. Replace this function to dispatch events asynchronously to
+		/// By default, events are dispatched on the current network thread. Replace the dispatcher with a MainThreadActionDispatcher to dispatch to your main thread.
 		/// your main game loop for instance.
 		/// </remarks>
-		std::function<void(std::function<void(void)>)> eventDispatcher = [](std::function<void(void)> ev) {ev(); };
+		std::shared_ptr<IActionDispatcher> actionDispatcher = std::make_shared<SameThreadActionDispatcher>();
 		/// use the syncClock
 		bool synchronisedClock = true;
 

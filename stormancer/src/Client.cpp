@@ -44,14 +44,14 @@ namespace Stormancer
 		, _apiClient(new ApiClient(config, _tokenHandler))
 		, _dispatcher(config->dispatcher)
 		, _requestProcessor(new RequestProcessor(_logger, std::vector<IRequestModule*>()))
-		, _scenesDispatcher(new SceneDispatcher(config->eventDispatcher))
+		, _scenesDispatcher(new SceneDispatcher(config->actionDispatcher))
 		, _metadata(config->_metadata)
 		, _maxPeers(config->maxPeers)
 		, _dependencyResolver(new DependencyResolver())
 		, _plugins(config->plugins())
 		, _synchronisedClock(config->synchronisedClock)
 		, _synchronisedClockInterval(config->synchronisedClockInterval)
-		, _eventDispatcher(config->eventDispatcher)
+		, _eventDispatcher(config->actionDispatcher)
 	{
 		_dependencyResolver->registerDependency<ILogger>(ILogger::instance());
 		_dependencyResolver->registerDependency<IScheduler>(config->scheduler);
@@ -84,6 +84,12 @@ namespace Stormancer
 		ILogger::instance()->log(LogLevel::Trace, "Client::~Client", "deleting the client...", "");
 #endif
 		disconnect(true);
+
+		_eventDispatcher->stop();
+		while (_eventDispatcher->isRunning()) //Wait for dispatcher to stop.
+		{
+			Sleep(10);
+		}
 
 		for (auto plugin : _plugins)
 		{
@@ -142,6 +148,8 @@ namespace Stormancer
 		if (!_initialized)
 		{
 			_initialized = true;
+			_eventDispatcher->start();
+
 			_transport->onPacketReceived([this](Packet_ptr packet) { transport_packetReceived(packet); });
 			_transport->onTransportEvent([this](void* data, void* data2, void* data3) {
 				for (auto plugin : _plugins)
@@ -780,6 +788,6 @@ namespace Stormancer
 
 	void Client::dispatchEvent(std::function<void(void)> ev)
 	{
-		_eventDispatcher(ev);
+		_eventDispatcher->post(ev);
 	}
 };

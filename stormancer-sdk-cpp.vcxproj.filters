@@ -129,6 +129,9 @@
     <ClCompile Include="stormancer\src\Watch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="stormancer\src\IActionDispatcher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stormancer\include\Action.h">
@@ -318,6 +321,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="stormancer\include\Watch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stormancer\include\IActionDispatcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

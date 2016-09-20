@@ -224,6 +224,7 @@
     <ClCompile Include="stormancer\src\EmptyDto.cpp" />
     <ClCompile Include="stormancer\src\FileLogger.cpp" />
     <ClCompile Include="stormancer\src\Helpers.cpp" />
+    <ClCompile Include="stormancer\src\IActionDispatcher.cpp" />
     <ClCompile Include="stormancer\src\ILogger.cpp" />
     <ClCompile Include="stormancer\src\IPlugin.cpp" />
     <ClCompile Include="stormancer\src\NullLogger.cpp" />
@@ -268,6 +269,7 @@
     <ClInclude Include="stormancer\include\FileLogger.h" />
     <ClInclude Include="stormancer\include\headers.h" />
     <ClInclude Include="stormancer\include\Helpers.h" />
+    <ClInclude Include="stormancer\include\IActionDispatcher.h" />
     <ClInclude Include="stormancer\include\IConnection.h" />
     <ClInclude Include="stormancer\include\IConnectionManager.h" />
     <ClInclude Include="stormancer\include\ILogger.h" />
