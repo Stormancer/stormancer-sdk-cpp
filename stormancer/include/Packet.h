@@ -57,7 +57,7 @@ namespace Stormancer
 		T readObject()
 		{
 			std::string buffer;
-			this->stream >> buffer;
+			this->stream->operator>>(buffer);
 			msgpack::unpacked unp;
 			msgpack::unpack(unp, buffer.data(), buffer.size());
 			T result;
