@@ -18,6 +18,11 @@ namespace Stormancer
 	{
 	}
 
+	void IPlugin::registerSceneDependencies(Scene* scene)
+	{
+
+	}
+
 	void IPlugin::sceneCreated(Scene* scene)
 	{
 	}

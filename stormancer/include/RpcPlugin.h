@@ -7,6 +7,8 @@ namespace Stormancer
 	class RpcPlugin : public IPlugin
 	{
 	public:
+		void registerSceneDependencies(Scene* scene);
+
 		void sceneCreated(Scene* scene);
 		
 		void sceneDisconnected(Scene* scene);

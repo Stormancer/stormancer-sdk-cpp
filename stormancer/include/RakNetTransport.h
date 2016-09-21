@@ -43,13 +43,13 @@ namespace Stormancer
 	private:
 		DependencyResolver* _dependencyResolver = nullptr;
 		IConnectionManager* _handler = nullptr;
-		RakNet::RakPeerInterface* _peer = nullptr;
-		ILogger* _logger = nullptr;
+		std::shared_ptr<RakNet::RakPeerInterface> _peer = nullptr;
+		std::shared_ptr<ILogger> _logger = nullptr;
 		std::string _type;
 		std::map<uint64, RakNetConnection*> _connections;
 		const int connectionTimeout = 5000;
 		std::map<std::string, pplx::task_completion_event<IConnection*>> _pendingConnections;
-		IScheduler* _scheduler = nullptr;
+		std::shared_ptr<IScheduler> _scheduler = nullptr;
 		ISubscription* _scheduledTransportLoop = nullptr;
 		RakNet::SocketDescriptor* _socketDescriptor = nullptr;
 		std::mutex _mutex;

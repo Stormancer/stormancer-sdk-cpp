@@ -14,8 +14,16 @@ namespace Stormancer
 		virtual uint16 pendingRequests() = 0;
 		virtual void cancelAll(const char* reason) = 0;
 
+		
+		virtual  pplx::task<std::shared_ptr<Stormancer::Result<>>> rpcVoid_with_writer(std::string procedure, std::function<void(Stormancer::bytestream*)> writer) = 0;
+
+		virtual std::shared_ptr<IActionDispatcher> getDispatcher() = 0;
+
+
+	public:
+
 		template<typename TOutput>
-		pplx::task<std::shared_ptr<Stormancer::Result<TOutput>>> rpc( std::string procedure, std::function<void(Stormancer::bytestream*)> writer, std::function<Stormancer::Result<TOutput>(Stormancer::Packetisp_ptr)> deserializer)
+		pplx::task<std::shared_ptr<Stormancer::Result<TOutput>>> rpc(std::string procedure, std::function<void(Stormancer::bytestream*)> writer, std::function<Stormancer::Result<TOutput>(Stormancer::Packetisp_ptr)> deserializer)
 		{
 			pplx::task_completion_event<std::shared_ptr<Stormancer::Result<TOutput>>> tce;
 			std::shared_ptr<Stormancer::Result<TOutput>> result(new Stormancer::Result<TOutput>());
@@ -46,27 +54,24 @@ namespace Stormancer
 
 			observable->subscribe(onNext, onError, onComplete);
 
-			return pplx::create_task(tce);
+			return pplx::create_task(tce, pplx::task_options(getDispatcher()));
 		}
 
+
 		template<typename TInput>
-		pplx::task<std::shared_ptr<Stormancer::Result<>>> rpcVoid( std::string procedure, TInput parameter)
+		pplx::task<std::shared_ptr<Stormancer::Result<>>> rpcVoid(std::string procedure, TInput parameter)
 		{
-			return rpcVoid_with_writer( procedure, [&parameter](Stormancer::bytestream* stream) {
+			return rpcVoid_with_writer(procedure, [&parameter](Stormancer::bytestream* stream) {
 				msgpack::pack(stream, parameter);
 			});
 		}
 
-
-		virtual  pplx::task<std::shared_ptr<Stormancer::Result<>>> rpcVoid_with_writer(std::string procedure, std::function<void(Stormancer::bytestream*)> writer) = 0;
-
-
 		template<typename TInput, typename TOutput>
 		pplx::task<std::shared_ptr<Stormancer::Result<TOutput>>> rpc(std::string procedure, TInput parameter)
 		{
-			return rpc<TOutput>( procedure, [&parameter](Stormancer::bytestream* stream) {
+			return rpc<TOutput>(procedure, [&parameter](Stormancer::bytestream* stream) {
 				msgpack::pack(stream, parameter);
-			}, 
+			},
 				[](Stormancer::Packetisp_ptr packet) {
 				std::string buffer;
 				*packet->stream >> buffer;
@@ -81,8 +86,8 @@ namespace Stormancer
 		template<typename TOutput>
 		pplx::task<std::shared_ptr<Stormancer::Result<TOutput>>> rpc(std::string procedure)
 		{
-			return rpc<TOutput>(procedure, 
-				[](Stormancer::bytestream* stream) {}, 
+			return rpc<TOutput>(procedure,
+				[](Stormancer::bytestream* stream) {},
 				[](Stormancer::Packetisp_ptr packet) {
 				std::string buffer;
 				*packet->stream >> buffer;

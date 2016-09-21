@@ -7,6 +7,11 @@ namespace Stormancer
 		return _isRunning;
 	}
 
+	void SameThreadActionDispatcher::schedule(pplx::TaskProc_t task, void * param)
+	{
+		task(param);
+	}
+
 
 	void SameThreadActionDispatcher::start()
 	{
@@ -53,18 +58,18 @@ namespace Stormancer
 		}
 	}
 
-	void MainThreadActionDispatcher::update(uint32 maxDuration)
+	void MainThreadActionDispatcher::update(std::chrono::milliseconds maxDuration)
 	{
 		if (!_isRunning)
 		{
 			return;
 		}
-
+		auto start  = std::chrono::system_clock::now();
 		while (_actions.size() || _stopRequested)
 		{
 
 			if (_stopRequested)
-			{				
+			{
 				while (_actions.size())
 				{
 					_actions.pop();
@@ -76,6 +81,15 @@ namespace Stormancer
 			auto action = _actions.front();
 			action();
 			_actions.pop();
+
+			if (std::chrono::system_clock::now() - start > maxDuration)
+			{
+				return;
+			}
 		}
+	}
+	void MainThreadActionDispatcher::schedule(pplx::TaskProc_t task, void * param)
+	{
+		post([task, param]() {task(param); });
 	}
 }

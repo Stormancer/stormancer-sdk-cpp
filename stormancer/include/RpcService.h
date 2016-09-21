@@ -8,7 +8,7 @@ namespace Stormancer
 	class RpcService : public IRpcService
 	{
 	public:
-		RpcService(Scene* scene);
+		RpcService(Scene* scene, std::shared_ptr<IActionDispatcher> dispatcher);
 		~RpcService();
 
 	public:
@@ -18,6 +18,10 @@ namespace Stormancer
 		STORMANCER_DLL_API void cancelAll(const char* reason);
 
 		STORMANCER_DLL_API  pplx::task<std::shared_ptr<Stormancer::Result<>>> rpcVoid_with_writer(std::string procedure, std::function<void(Stormancer::bytestream*)> writer);
+
+		std::shared_ptr<IActionDispatcher> getDispatcher();
+		
+
 
 
 	public:
@@ -32,6 +36,7 @@ namespace Stormancer
 		void eraseRequest(uint16 requestId);
 
 	private:
+		std::shared_ptr<IActionDispatcher> _dispatcher;
 		std::map<uint16, RpcRequest_ptr> _pendingRequests;
 		std::mutex _pendingRequestsMutex;
 		std::map<uint16, pplx::cancellation_token_source> _runningRequests;

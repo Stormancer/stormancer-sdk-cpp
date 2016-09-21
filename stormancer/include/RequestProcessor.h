@@ -15,7 +15,7 @@ namespace Stormancer
 		/// Constructor.
 		/// \param logger The logger instance.
 		/// \param modules A vector of modules.
-		RequestProcessor(ILogger* logger, std::vector<IRequestModule*> modules);
+		RequestProcessor(std::shared_ptr<ILogger> logger, std::vector<IRequestModule*> modules);
 		
 		/// Destructor
 		virtual ~RequestProcessor();
@@ -49,7 +49,7 @@ namespace Stormancer
 	protected:
 		std::map<uint16, SystemRequest_ptr> _pendingRequests;
 		std::mutex _mutexPendingRequests;
-		ILogger* _logger;
+		std::shared_ptr<ILogger> _logger;
 		bool _isRegistered = false;
 		std::map<byte, std::function<pplx::task<void>(RequestContext*)>> _handlers;
 

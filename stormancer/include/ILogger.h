@@ -26,12 +26,12 @@ namespace Stormancer
 	public:
 
 		/// Get the instance of the current logger.
-		STORMANCER_DLL_API static ILogger* instance();
+		STORMANCER_DLL_API static std::shared_ptr<ILogger> instance();
 
 		/// Set the instance of the current logger.
 		/// \param logger The instance to set.
 		/// \return The set instance.
-		STORMANCER_DLL_API static ILogger* instance(ILogger* logger);
+		STORMANCER_DLL_API static std::shared_ptr<ILogger> instance(std::shared_ptr<ILogger> logger);
 
 	public:
 
@@ -64,6 +64,6 @@ namespace Stormancer
 		STORMANCER_DLL_API virtual ~ILogger();
 
 	private:
-		static ILogger* _logger;
+		static std::shared_ptr<ILogger> _logger;
 	};
 };

@@ -4,7 +4,7 @@
 using namespace Stormancer;
 using namespace std;
 
-auto logger = (ConsoleLogger*)ILogger::instance(new ConsoleLogger(Stormancer::LogLevel::Trace));
+auto logger = ILogger::instance(std::make_shared<ConsoleLogger>(Stormancer::LogLevel::Trace));
 bool stop = false;
 const std::string endpoint = "https://api.stormancer.com/";
 const std::string accountId = "58ec9ba7-56e4-3d89-2c55-c9435e08b26b";

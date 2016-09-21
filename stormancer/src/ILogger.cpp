@@ -3,18 +3,18 @@
 
 namespace Stormancer
 {
-	ILogger* ILogger::_logger = nullptr;
+	std::shared_ptr<ILogger> ILogger::_logger;
 
-	ILogger* ILogger::instance()
+	std::shared_ptr<ILogger> ILogger::instance()
 	{
 		if (!ILogger::_logger)
 		{
-			ILogger::_logger = new NullLogger;
+			ILogger::_logger = std::make_shared<NullLogger>();
 		}
 		return ILogger::_logger;
 	}
 
-	ILogger* ILogger::instance(ILogger* logger)
+	std::shared_ptr<ILogger> ILogger::instance(std::shared_ptr<ILogger> logger)
 	{
 		_logger = logger;
 		return _logger;

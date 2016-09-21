@@ -10,6 +10,17 @@ namespace Stormancer
 	const char* RpcPlugin::completeRouteName = "stormancer.rpc.completed";
 	const char* RpcPlugin::cancellationRouteName = "stormancer.rpc.cancel";
 
+	void RpcPlugin::registerSceneDependencies(Scene* scene)
+	{
+		scene->dependencyResolver()->registerDependency<IRpcService>([scene](DependencyResolver* resolver) {
+
+			return std::make_shared<RpcService>(scene, resolver->resolve<IActionDispatcher>());
+			/*return std::shared_ptr<RpcService>(new RpcService(scene), [](RpcService* service) {
+				printf("test");
+			});*/
+		},true);
+	}
+
 	void RpcPlugin::sceneCreated(Scene* scene)
 	{
 		if (scene)
@@ -18,19 +29,27 @@ namespace Stormancer
 
 			if (strcmp(rpcParams, version) == 0)
 			{
-				auto rpcService = new RpcService(scene);
-				scene->dependencyResolver()->registerDependency<IRpcService>(rpcService);
-				scene->addRoute(nextRouteName, [rpcService](Packetisp_ptr p) {
-					rpcService->next(p);
+				auto rpc = scene->dependencyResolver()->resolve<IRpcService>();
+				
+				scene->addRoute(nextRouteName, [scene](Packetisp_ptr p) {
+					auto rpc = scene->dependencyResolver()->resolve<IRpcService>().get();
+					
+					static_cast<RpcService*>(rpc)->next(p);
 				});
-				scene->addRoute(cancellationRouteName, [rpcService](Packetisp_ptr p) {
-					rpcService->cancel(p);
+				scene->addRoute(cancellationRouteName, [scene](Packetisp_ptr p) {
+					auto rpc = scene->dependencyResolver()->resolve<IRpcService>().get();
+
+					static_cast<RpcService*>(rpc)->cancel(p);
 				});
-				scene->addRoute(errorRouteName, [rpcService](Packetisp_ptr p) {
-					rpcService->error(p);
+				scene->addRoute(errorRouteName, [scene](Packetisp_ptr p) {
+					auto rpc = scene->dependencyResolver()->resolve<IRpcService>().get();
+
+					static_cast<RpcService*>(rpc)->error(p);
 				});
-				scene->addRoute(completeRouteName, [rpcService](Packetisp_ptr p) {
-					rpcService->complete(p);
+				scene->addRoute(completeRouteName, [scene](Packetisp_ptr p) {
+					auto rpc = scene->dependencyResolver()->resolve<IRpcService>().get();
+
+					static_cast<RpcService*>(rpc)->complete(p);
 				});
 			}
 		}

@@ -2,7 +2,7 @@
 
 namespace Stormancer
 {
-	RequestProcessor::RequestProcessor(ILogger* logger, std::vector<IRequestModule*> modules)
+	RequestProcessor::RequestProcessor(std::shared_ptr<ILogger> logger, std::vector<IRequestModule*> modules)
 		: _logger(logger)
 	{
 		addSystemRequestHandler = [this](byte msgId, std::function<pplx::task<void>(RequestContext*)> handler)

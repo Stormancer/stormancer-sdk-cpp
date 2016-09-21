@@ -20,6 +20,8 @@ namespace Stormancer
 
 		STORMANCER_DLL_API virtual void transportEvent(void* data, void* data2, void* data3);
 
+		virtual void registerSceneDependencies(Scene* scene);
+
 		/// Event fired when a scene object is created.
 		STORMANCER_DLL_API virtual void sceneCreated(Scene* scene);
 

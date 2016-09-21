@@ -9,15 +9,36 @@ namespace Stormancer
 		DependencyResolver(DependencyResolver* parent = nullptr);
 		virtual ~DependencyResolver();
 
+	private:
+		struct Registration
+		{
+		public:
+			std::function<std::shared_ptr<void>(DependencyResolver* resolver)> factory;
+			bool singleInstance;
+			std::shared_ptr<void> instance;
+		};
+
 	public:
 		template<typename T>
-		T* resolve()
+		std::shared_ptr<T> resolve()
 		{
 			auto& t = typeid(T);
 			auto h = t.hash_code();
 			if (mapContains(_factories, h))
 			{
-				return (T*)(_factories[h](this));
+				auto registration = &_factories[h];
+				if (registration->singleInstance)
+				{
+					if (registration->instance == nullptr)
+					{
+						registration->instance = registration->factory(this);
+					}
+					return std::static_pointer_cast<T>(registration->instance);
+				}
+				else
+				{
+					return std::static_pointer_cast<T>(registration->factory(this));
+				}
 			}
 			else if (_parent)
 			{
@@ -25,20 +46,26 @@ namespace Stormancer
 			}
 			else
 			{
-				return nullptr;
+				return std::shared_ptr<T>();
 			}
 		}
 
 		template<typename T>
-		void registerDependency(std::function<T*(DependencyResolver* resolver)> factory)
+		void registerDependency(std::function<std::shared_ptr<T>(DependencyResolver* resolver)> factory, bool singleInstance = false)
 		{
 			auto& t = typeid(T);
 			auto h = t.hash_code();
-			_factories[h] = factory;
+			Registration registration;
+			registration.factory = factory;
+			registration.singleInstance = singleInstance;
+
+
+			_factories[h] = registration;
+
 		}
 
 		template<typename T>
-		void registerDependency(T* instance)
+		void registerDependency(std::shared_ptr<T> instance)
 		{
 			registerDependency<T>([instance](DependencyResolver* resolver) {
 				return instance;
@@ -46,7 +73,9 @@ namespace Stormancer
 		}
 
 	private:
-		std::map<std::size_t, std::function<void*(DependencyResolver* resolver)>> _factories;
+		std::map<std::size_t, Registration> _factories;
 		DependencyResolver* _parent = nullptr;
+
+
 	};
 };

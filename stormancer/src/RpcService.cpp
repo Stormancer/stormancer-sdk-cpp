@@ -2,7 +2,7 @@
 
 namespace Stormancer
 {
-	RpcService::RpcService(Scene* scene)
+	RpcService::RpcService(Scene* scene, std::shared_ptr<IActionDispatcher> dispatcher )
 		: _scene(scene)
 	{
 	}
@@ -366,7 +366,11 @@ namespace Stormancer
 
 		observable->subscribe(onNext, onError, onComplete);
 
-		return pplx::create_task(tce);
+		return pplx::create_task(tce,pplx::task_options(_dispatcher));
+	}
+	std::shared_ptr<IActionDispatcher> RpcService::getDispatcher()
+	{
+		return _dispatcher;
 	}
 };
 

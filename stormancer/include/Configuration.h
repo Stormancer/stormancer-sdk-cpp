@@ -77,10 +77,10 @@ namespace Stormancer
 		bool asynchronousDispatch = true;
 
 		/// The scheduler used by the client to run the transport and other repeated tasks.
-		IScheduler* scheduler = nullptr;
+		std::shared_ptr<IScheduler> scheduler = nullptr;
 
 		/// Gets or sets the transport to be used by the client.
-		std::function<ITransport*(DependencyResolver*)> transportFactory;
+		std::function<std::shared_ptr<ITransport>(DependencyResolver*)> transportFactory;
 
 		/// <summary>
 		/// Dispatches events
@@ -99,10 +99,10 @@ namespace Stormancer
 		EndpointSelectionMode endpointSelectionMode = EndpointSelectionMode::FALLBACK;
 
 	private:
-		const std::function<ITransport*(DependencyResolver*)> defaultTransportFactory = [](DependencyResolver* resolver)
+		const std::function<std::shared_ptr<ITransport>(DependencyResolver*)> defaultTransportFactory = [](DependencyResolver* resolver)
 		{
 
-			return new RakNetTransport(resolver);
+			return std::make_shared<RakNetTransport>(resolver);
 		};
 
 		stringMap _metadata;

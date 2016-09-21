@@ -66,10 +66,11 @@ namespace Stormancer
 
 		_metadata["serializers"] = "msgpack/array";
 		_metadata["transport"] = _transport->name();
-		_metadata["version"] = "1.1.0";
-		_metadata["platform"] = "cpp";
+		_metadata["version"] = "1.2.0";
+		_metadata["platform"] = __PLATFORM__;
 		_metadata["protocol"] = "2";
 
+		dependencyResolver()->registerDependency<IActionDispatcher>(config->actionDispatcher);
 		for (auto plugin : _plugins)
 		{
 			plugin->clientCreated(this);
@@ -120,11 +121,7 @@ namespace Stormancer
 			_dispatcher = nullptr;
 		}
 
-		if (_transport)
-		{
-			delete _transport;
-			_transport = nullptr;
-		}
+		
 
 #ifdef STORMANCER_LOG_CLIENT
 		ILogger::instance()->log(LogLevel::Trace, "Client::~Client", "client deleted", "");
@@ -166,22 +163,11 @@ namespace Stormancer
 		return _applicationName;
 	}
 
-	ILogger* Client::logger()
+	std::shared_ptr<ILogger> Client::logger()
 	{
-		return _logger;
+		return this->dependencyResolver()->resolve<ILogger>();
 	}
 
-	void Client::setLogger(ILogger* logger)
-	{
-		if (logger != nullptr)
-		{
-			_logger = logger;
-		}
-		else
-		{
-			_logger = ILogger::instance();
-		}
-	}
 
 	pplx::task<Result<Scene*>*> Client::getPublicScene(const char* sceneId)
 	{
@@ -267,7 +253,7 @@ namespace Stormancer
 							_transport->start("client", new ConnectionHandler(), _cts.get_token(), this->_config->serverPort, (uint16)(_maxPeers + 1));
 							for (auto plugin : _plugins)
 							{
-								plugin->transportStarted(_transport);
+								plugin->transportStarted(_transport.get());
 							}
 						}
 						catch (const std::exception& e)
@@ -384,6 +370,12 @@ namespace Stormancer
 				}
 				for (auto plugin : _plugins)
 				{
+
+					plugin->registerSceneDependencies(scene);
+				}
+				for (auto plugin : _plugins)
+				{
+					
 					plugin->sceneCreated(scene);
 				}
 				return scene;

@@ -57,7 +57,9 @@ namespace Stormancer
 		try
 		{
 			_logger->log(LogLevel::Trace, "RakNetTransport::initialize", "Starting raknet transport", _type.c_str());
-			_peer = RakNet::RakPeerInterface::GetInstance();
+			_peer = std::shared_ptr<RakNet::RakPeerInterface>(RakNet::RakPeerInterface::GetInstance(), [](RakNet::RakPeerInterface* peer) {
+				RakNet::RakPeerInterface::DestroyInstance(peer);
+			});
 			_dependencyResolver->registerDependency(_peer);
 			_socketDescriptor = (serverPort != 0 ? new RakNet::SocketDescriptor(serverPort, nullptr) : new RakNet::SocketDescriptor());
 			auto startupResult = _peer->Startup(maxConnections, _socketDescriptor, 1);
@@ -101,7 +103,7 @@ namespace Stormancer
 
 					if (_onTransportEvent)
 					{
-						_onTransportEvent((void*)&ID, (void*)rakNetPacket, (void*)_peer);
+						_onTransportEvent((void*)&ID, (void*)rakNetPacket, (void*)_peer.get());
 					}
 					continue;
 				}
@@ -214,8 +216,7 @@ namespace Stormancer
 				{
 					_peer->Shutdown(1000);
 				}
-				RakNet::RakPeerInterface::DestroyInstance(_peer);
-				_peer = nullptr;
+				
 			}
 			if (_socketDescriptor)
 			{
@@ -280,7 +281,7 @@ namespace Stormancer
 	{
 		_logger->log(LogLevel::Trace, "RakNetTransport::onConnection", (std::string(packet->systemAddress.ToString(true, ':')) + " connected.").c_str(), "");
 
-		auto c = createNewConnection(packet->guid, _peer);
+		auto c = createNewConnection(packet->guid, _peer.get());
 
 		_handler->newConnection(c);
 

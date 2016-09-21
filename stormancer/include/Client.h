@@ -74,10 +74,9 @@ namespace Stormancer
 		STORMANCER_DLL_API std::string applicationName();
 
 		/// Returns the used logger.
-		STORMANCER_DLL_API ILogger* logger();
+		STORMANCER_DLL_API std::shared_ptr<ILogger> logger();
 
-		/// Set the logger
-		STORMANCER_DLL_API void setLogger(ILogger* logger);
+		
 
 		/// Disconnect and close all connections.
 		/// this method returns nothing. So it's useful for application close.
@@ -173,12 +172,12 @@ namespace Stormancer
 	private:
 		bool _initialized = false;
 		const std::shared_ptr<IActionDispatcher> _eventDispatcher;
-		ILogger* _logger = nullptr;
+		std::shared_ptr<ILogger> _logger = nullptr;
 		std::string _accountId;
 		std::string _applicationName;
 		IConnection* _serverConnection = nullptr;
-		IScheduler* _scheduler = nullptr;
-		ITransport* _transport = nullptr;
+		std::shared_ptr<IScheduler> _scheduler = nullptr;
+		std::shared_ptr<ITransport> _transport = nullptr;
 		ITokenHandler* _tokenHandler = nullptr;
 		ApiClient* _apiClient = nullptr;
 		RequestProcessor* _requestProcessor = nullptr;
