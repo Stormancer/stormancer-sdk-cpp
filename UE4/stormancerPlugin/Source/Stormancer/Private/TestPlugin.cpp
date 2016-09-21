@@ -17,12 +17,9 @@ IMPLEMENT_MODULE( FStormancerPlugin, StormancerPlugin )
 
 
 
-void FTestPlugin::StartupModule()
+void FStormancerPlugin::StartupModule()
 {
 	// This code will execute after your module is loaded into memory (but after global variables are initialized, of course.)
-	auto value = new npp::DummyDynamicLoader();
-	delete value;
-  auto v2 = rs_trigger(100);
 }
 
 
