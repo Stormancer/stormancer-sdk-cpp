@@ -89,7 +89,7 @@ namespace Stormancer
 		_eventDispatcher->stop();
 		while (_eventDispatcher->isRunning()) //Wait for dispatcher to stop.
 		{
-			Sleep(10);
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		}
 
 		for (auto plugin : _plugins)
