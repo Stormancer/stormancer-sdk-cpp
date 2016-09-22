@@ -220,6 +220,7 @@
     <ClCompile Include="stormancer\src\EmptyDto.cpp" />
     <ClCompile Include="stormancer\src\FileLogger.cpp" />
     <ClCompile Include="stormancer\src\Helpers.cpp" />
+    <ClCompile Include="stormancer\src\IActionDispatcher.cpp" />
     <ClCompile Include="stormancer\src\ILogger.cpp" />
     <ClCompile Include="stormancer\src\IPlugin.cpp" />
     <ClCompile Include="stormancer\src\NullLogger.cpp" />
@@ -264,6 +265,7 @@
     <ClInclude Include="stormancer\include\FileLogger.h" />
     <ClInclude Include="stormancer\include\headers.h" />
     <ClInclude Include="stormancer\include\Helpers.h" />
+    <ClInclude Include="stormancer\include\IActionDispatcher.h" />
     <ClInclude Include="stormancer\include\IConnection.h" />
     <ClInclude Include="stormancer\include\IConnectionManager.h" />
     <ClInclude Include="stormancer\include\ILogger.h" />
@@ -316,6 +318,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+    <Import Project="packages\StormancerClient.Native.120.1.0.2\build\native\StormancerClient.Native.120.targets" Condition="Exists('packages\StormancerClient.Native.120.1.0.2\build\native\StormancerClient.Native.120.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <ItemGroup>
@@ -332,5 +335,6 @@
     <Copy SourceFiles="@(RestSdkIncludes)" DestinationFiles="@(RestSdkIncludes->'$(SolutionDir)output\include\%(RecursiveDir)%(Filename)%(Extension)')" />
     <Copy SourceFiles="@(MsgpackIncludes)" DestinationFiles="@(MsgpackIncludes->'$(SolutionDir)output\include\%(RecursiveDir)%(Filename)%(Extension)')" />
     <Copy SourceFiles="@(StormancerIncludes)" DestinationFiles="@(StormancerIncludes->'$(SolutionDir)output\include\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Error Condition="!Exists('packages\StormancerClient.Native.120.1.0.2\build\native\StormancerClient.Native.120.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\StormancerClient.Native.120.1.0.2\build\native\StormancerClient.Native.120.targets'))" />
   </Target>
 </Project>

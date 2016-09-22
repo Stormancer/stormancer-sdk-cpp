@@ -106,7 +106,7 @@ nuget {
 
         // All .h and .hpp  files in <src_root>\include, but not in subdirectories.
         // Included for all conditions.
-        include: { output\include\**\* }; 
+       
 
         // All files in <src_root>\doc\, including all subdirectories recursively.
         // Included for all conditions.
@@ -116,17 +116,21 @@ nuget {
         // under these pivot conditions.
 		[x64,dynamic, v120,Release]{
 			lib: { output\libs\stormancer120_Release_x64.lib };
+			 include: { output\include\**\* }; 
 		}
 		
        	[x64,dynamic, v120,Debug]{
 			lib: { output\libs\stormancer120_Debug_x64.lib };
+			 include: { output\include\**\* }; 
 		}
        
 	    [win32,dynamic, v120,Release]{
 			lib: { output\libs\stormancer120_Release_win32.lib };
+			 include: { output\include\**\* }; 
 		}
 		[win32,dynamic, v120,Debug]{
 			lib: { output\libs\stormancer120_Debug_win32.lib };
+			 include: { output\include\**\* }; 
 		}
 
     };
