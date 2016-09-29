@@ -77,7 +77,7 @@ namespace Stormancer
 		STORMANCER_DLL_API Action<ConnectionState>::TIterator onConnectionStateChanged(std::function<void(ConnectionState)> callback);
 
 		/// Returns the scene id.
-		STORMANCER_DLL_API const char* id();
+		STORMANCER_DLL_API const std::string id();
 
 		/// Returns the scene handle.
 		STORMANCER_DLL_API byte handle();
@@ -158,7 +158,7 @@ namespace Stormancer
 		std::map<std::string, Route_ptr> _remoteRoutesMap;
 
 		/// Route handlers.
-		std::map<uint16, std::list<std::function<void(Packet_ptr)>>> _handlers;
+		std::map<uint16, Route_ptr> _handlers;
 
 		/// Owner client.
 		Client* _client;

@@ -20,7 +20,7 @@ namespace Stormancer
 	Scene::~Scene()
 	{
 #ifdef STORMANCER_LOG_CLIENT
-		ILogger::instance()->log(LogLevel::Trace, "Scene::~Scene", "deleting the scene...", "");
+		ILogger::instance()->log(LogLevel::Trace, "Scene::~Scene", "deleting the scene...");
 #endif
 
 		_onDelete();
@@ -43,10 +43,10 @@ namespace Stormancer
 		}
 
 #ifdef STORMANCER_LOG_CLIENT
-		ILogger::instance()->log(LogLevel::Trace, "Scene::~Scene", "scene deleted", "");
+		ILogger::instance()->log(LogLevel::Trace, "Scene::~Scene", "scene deleted");
 #endif
 	}
-	
+
 	const char* Scene::getHostMetadata(const char* key)
 	{
 		return (mapContains(_metadata, std::string(key)) ? _metadata[key].c_str() : nullptr);
@@ -57,9 +57,9 @@ namespace Stormancer
 		return _handle;
 	}
 
-	const char* Scene::id()
+	const std::string Scene::id()
 	{
-		return _id.c_str();
+		return _id;
 	}
 
 	ConnectionState Scene::connectionState()
@@ -203,7 +203,7 @@ namespace Stormancer
 	pplx::task<Result<>*> Scene::connect()
 	{
 		auto result = new Result<>();
-		
+
 		try
 		{
 			if (_connectionState == ConnectionState::Disconnected && _client)
@@ -225,7 +225,7 @@ namespace Stormancer
 			}
 			catch (const std::exception& ex)
 			{
-				ILogger::instance()->log(LogLevel::Error, "scene.connect", "Failed to connect the scene", ex.what());
+				ILogger::instance()->log(LogLevel::Error, "scene.connect", "Failed to connect the scene : " + std::string(ex.what()));
 				result->setError(1, ex.what());
 			}
 			return result;
@@ -270,7 +270,7 @@ namespace Stormancer
 		for (auto pair : _localRoutesMap)
 		{
 			pair.second->setHandle(cr.RouteMappings[pair.first]);
-			_handlers[pair.second->handle()] = pair.second->handlers;
+			_handlers[pair.second->handle()] = pair.second;
 		}
 	}
 
@@ -285,11 +285,16 @@ namespace Stormancer
 
 		if (mapContains(_handlers, routeId))
 		{
-			auto observers = _handlers[routeId];
+			auto route = _handlers[routeId];
+			auto observers = route->handlers;
+
+			ILogger::instance()->log(LogLevel::Trace, "scene::handleMessage", "packet received on route " + route->name() + "|" + std::to_string(routeId));
+
 			for (auto f : observers)
 			{
 				f(packet);
 			}
+
 		}
 
 		delete packet->metadata()["routeId"];

@@ -15,14 +15,7 @@ namespace Stormancer
 
 	pplx::task<SceneEndpoint> ApiClient::getSceneEndpoint(std::string accountId, std::string applicationName, std::string sceneId)
 	{
-		{ // TOREMOVE
-			std::stringstream ss1;
-			ss1 << '[' << accountId.size() << '|' << accountId << ']';
-			ss1 << '[' << applicationName.size() << '|' << applicationName << ']';
-			ss1 << '[' << sceneId.size() << '|' << sceneId << ']';
-			auto str = ss1.str();
-			ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", "data", str.c_str());
-		}
+
 
 		std::vector<std::string> baseUris = _config->getApiEndpoint();
 		auto errors = std::make_shared<std::vector<std::string>>();
@@ -71,7 +64,7 @@ namespace Stormancer
 		std::string baseUri = *it;
 		endpoints.erase(it);
 
-		ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", "Get Scene endpoint", baseUri.c_str());
+		ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", "Get Scene endpoint on : " + baseUri);
 
 #if defined(_WIN32)
 		auto config = web::http::client::http_client_config();
@@ -109,7 +102,7 @@ namespace Stormancer
 			}).wait();
 			ss2 << '[' << bodyUri.size() << '|' << bodyUri << ']';
 			auto requestStr = ss2.str();
-			ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", "request", requestStr.c_str());
+			ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", "sending request : " + requestStr);
 #endif
 		}
 
@@ -121,12 +114,12 @@ namespace Stormancer
 		}
 		catch (const std::exception& ex)
 		{
-			ILogger::instance()->log(LogLevel::Warn, "Client::getSceneEndpoint", "pplx client.request failed.", ex.what());
+			ILogger::instance()->log(LogLevel::Warn, "Client::getSceneEndpoint", "pplx client.request failed : " + std::string(ex.what()));
 			return taskFromException<SceneEndpoint>(std::runtime_error(std::string() + "client.request failed." + ex.what()));
 		}
 		catch (...)
 		{
-			ILogger::instance()->log(LogLevel::Warn, "Client::getSceneEndpoint", "pplx client.request failed.", "Unknown error");
+			ILogger::instance()->log(LogLevel::Warn, "Client::getSceneEndpoint", "pplx client.request failed.");
 			return taskFromException<SceneEndpoint>(std::runtime_error(std::string() + "client.request failed."));
 		}
 
@@ -139,7 +132,7 @@ namespace Stormancer
 			catch (const std::exception& ex)
 			{
 				auto msgStr = "Can't reach the server endpoint. " + baseUri;
-				ILogger::instance()->log(LogLevel::Warn, "Client::getSceneEndpoint", msgStr.c_str(), ex.what());
+				ILogger::instance()->log(LogLevel::Warn, "Client::getSceneEndpoint", msgStr + " : " + std::string(ex.what()));
 				(*errors).push_back("[" + msgStr + ":" + ex.what() + "]");
 				//throw std::runtime_error(std::string() + ex.what() + "\nCan't reach the stormancer API server.");
 				return getSceneEndpointImpl(endpoints, errors, accountId, applicationName, sceneId);
@@ -147,7 +140,7 @@ namespace Stormancer
 			catch (...)
 			{
 				auto msgStr = "Can't reach the server endpoint. " + baseUri;
-				ILogger::instance()->log(LogLevel::Warn, "Client::getSceneEndpoint", msgStr.c_str(), "Unknown error");
+				ILogger::instance()->log(LogLevel::Warn, "Client::getSceneEndpoint", msgStr);
 				(*errors).push_back("[" + msgStr + ":" + "Unknown error]");
 				//throw std::runtime_error("Unknown error: Can't reach the stormancer API server.");
 				return getSceneEndpointImpl(endpoints, errors, accountId, applicationName, sceneId);
@@ -157,13 +150,13 @@ namespace Stormancer
 			{
 				uint16 statusCode = response.status_code();
 				auto msgStr = "http request on '" + baseUri + "' returned status code " + std::to_string(statusCode);
-				ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", msgStr.c_str(), "");
+				ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", msgStr);
 				if (ensureSuccessStatusCode(statusCode))
 				{
 					auto ss = new concurrency::streams::stringstreambuf;
 					return response.body().read_to_end(*ss).then([this, endpoints, ss, statusCode, accountId, applicationName, sceneId](size_t size) {
 						std::string responseText = ss->collection();
-						ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", "responseText", responseText.c_str());
+						ILogger::instance()->log(LogLevel::Trace, "Client::getSceneEndpoint", "response received : " + responseText);
 						delete ss;
 						return _tokenHandler->decodeToken(responseText);
 					});

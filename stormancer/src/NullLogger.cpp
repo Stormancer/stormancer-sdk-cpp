@@ -10,11 +10,11 @@ namespace Stormancer
 	{
 	}
 
-	void NullLogger::log(const char* message)
+	void NullLogger::log(const std::string message)
 	{
 	}
 
-	void NullLogger::log(LogLevel level, const char* category, const char* message, const char* data)
+	void NullLogger::log(LogLevel level, const std::string category, const std::string message)
 	{
 	}
 

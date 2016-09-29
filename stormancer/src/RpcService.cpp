@@ -2,7 +2,7 @@
 
 namespace Stormancer
 {
-	RpcService::RpcService(Scene* scene, std::shared_ptr<IActionDispatcher> dispatcher )
+	RpcService::RpcService(Scene* scene, std::shared_ptr<IActionDispatcher> dispatcher)
 		: _scene(scene)
 	{
 	}
@@ -11,11 +11,11 @@ namespace Stormancer
 	{
 	}
 
-	IObservable<Packetisp_ptr>* RpcService::rpc(const char* route, std::function<void(bytestream*)> writer, PacketPriority priority)
+	IObservable<Packetisp_ptr>* RpcService::rpc(const std::string route, std::function<void(bytestream*)> writer, PacketPriority priority)
 	{
 		if (!_scene)
 		{
-			ILogger::instance()->log(LogLevel::Error, "rpc.rpc", "Invalid scene", "");
+			ILogger::instance()->log(LogLevel::Error, "rpc.rpc", "Invalid scene");
 			throw std::runtime_error("The scene ptr is invalid");
 		}
 
@@ -27,7 +27,7 @@ namespace Stormancer
 			for (uint32 i = 0; i < sz; ++i)
 			{
 				auto r = rr[i];
-				if (strcmp(r->name(), route) == 0)
+				if (r->name().compare( route) == 0)
 				{
 					relevantRoute = r;
 					break;
@@ -36,14 +36,14 @@ namespace Stormancer
 
 			if (!relevantRoute)
 			{
-				ILogger::instance()->log(LogLevel::Error, "rpc.rpc", "The target route does not exist on the remote host.", "");
+				ILogger::instance()->log(LogLevel::Error, "rpc.rpc", "The target route does not exist on the remote host.");
 				throw std::runtime_error("The target route does not exist on the remote host.");
 			}
 
 			if (relevantRoute->metadata()[RpcPlugin::pluginName] != RpcPlugin::version)
 			{
 				auto errorMsg = std::string("The target remote route does not support the plugin RPC version ") + RpcPlugin::version;
-				ILogger::instance()->log(LogLevel::Error, "rpc.rpc", errorMsg.c_str(), "");
+				ILogger::instance()->log(LogLevel::Error, "rpc.rpc", errorMsg);
 				throw std::runtime_error(errorMsg);
 			}
 
@@ -56,13 +56,13 @@ namespace Stormancer
 				_pendingRequests[id] = request;
 			}
 
-			auto result = _scene->sendPacket(route, [id, writer](bytestream* bs) {
+			auto result = _scene->sendPacket(route.c_str(), [id, writer](bytestream* bs) {
 				*bs << id;
 				writer(bs);
 			}, priority, PacketReliability::RELIABLE_ORDERED);
 			if (!result->success())
 			{
-				ILogger::instance()->log(LogLevel::Error, "rpc.rpc", "sendPacket failed", result->reason());
+				ILogger::instance()->log(LogLevel::Error, "rpc.rpc", "sendPacket failed : " + std::string(result->reason()));
 			}
 
 			subscriber.add([this, request]() {
@@ -192,7 +192,7 @@ namespace Stormancer
 		if (!request)
 		{
 			auto idstr = std::to_string(id);
-			ILogger::instance()->log(LogLevel::Warn, "RpcService", "Pending RPC request not found", idstr.c_str());
+			ILogger::instance()->log(LogLevel::Warn, "RpcService", "Pending RPC request not found : " + idstr);
 		}
 
 		return request;
@@ -202,7 +202,7 @@ namespace Stormancer
 	{
 		std::lock_guard<std::mutex> lock(_pendingRequestsMutex);
 		auto idstr = std::to_string(requestId);
-		ILogger::instance()->log(LogLevel::Trace, "RpcService::complete", "Erasing RPC", idstr.c_str());
+		ILogger::instance()->log(LogLevel::Trace, "RpcService::complete", "Erasing RPC " + idstr);
 		_pendingRequests.erase(requestId);
 	}
 
@@ -338,7 +338,7 @@ namespace Stormancer
 	}
 
 
-	pplx::task<std::shared_ptr<Stormancer::Result<>>> RpcService::rpcVoid_with_writer( std::string procedure, std::function<void(Stormancer::bytestream*)> writer)
+	pplx::task<std::shared_ptr<Stormancer::Result<>>> RpcService::rpcVoid_with_writer(std::string procedure, std::function<void(Stormancer::bytestream*)> writer)
 	{
 		pplx::task_completion_event<std::shared_ptr<Stormancer::Result<>>> tce;
 		std::shared_ptr<Stormancer::Result<>> result(new Stormancer::Result<>());
@@ -347,14 +347,13 @@ namespace Stormancer
 			writer(stream);
 		}, PacketPriority::MEDIUM_PRIORITY);
 
-		auto onNext = [tce, result](Stormancer::Packetisp_ptr packet) {			
+		auto onNext = [tce, result](Stormancer::Packetisp_ptr packet) {
 			result->set();
 			tce.set(result);
 		};
 
 		auto onError = std::function<void(const char*)>([tce, result, procedure](const char* error) {
-			std::string msg = "Rpc::" + procedure;
-			Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Error, "RpcHelpers", msg.c_str(), error);
+			
 			result->setError(1, error);
 			tce.set(result);
 		});
@@ -366,7 +365,7 @@ namespace Stormancer
 
 		observable->subscribe(onNext, onError, onComplete);
 
-		return pplx::create_task(tce,pplx::task_options(_dispatcher));
+		return pplx::create_task(tce, pplx::task_options(_dispatcher));
 	}
 	std::shared_ptr<IActionDispatcher> RpcService::getDispatcher()
 	{

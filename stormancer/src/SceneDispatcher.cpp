@@ -47,10 +47,12 @@ namespace Stormancer
 		if (scene)
 		{
 			packet->metadata()["scene"] = scene;
+			ILogger::instance()->log(LogLevel::Trace, "sceneDispatcher::handle", "dispatching packet to scene " + scene->id());
 
 			this->_eventDispatcher->post([scene,packet]() {scene->handleMessage(packet); });
 			return true;
 		}
+		ILogger::instance()->log(LogLevel::Trace, "sceneDispatcher::handle", "no scene found to dispatch packet handle=" + std::to_string(sceneHandle));
 
 		return false;
 	}

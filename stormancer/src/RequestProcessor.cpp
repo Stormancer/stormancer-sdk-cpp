@@ -76,7 +76,7 @@ namespace Stormancer
 			else
 			{
 				std::string idstr = std::to_string(id);
-				ILogger::instance()->log(LogLevel::Warn, "RequestProcessor/next", "Unknow request id.", idstr.c_str());
+				ILogger::instance()->log(LogLevel::Warn, "RequestProcessor/next", "Unknow request id. " + idstr);
 			}
 
 			return true;
@@ -100,7 +100,7 @@ namespace Stormancer
 				}
 				else
 				{
-					ILogger::instance()->log(LogLevel::Warn, "RequestProcessor/complete", "Unknow request id.", to_string(id).c_str());
+					ILogger::instance()->log(LogLevel::Warn, "RequestProcessor/complete", "Unknow request id " + to_string(id));
 				}
 			}
 
@@ -110,7 +110,7 @@ namespace Stormancer
 		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_ERROR, new handlerFunction([this](Packet_ptr p) {
 			uint16 id;
 			*(p->stream) >> id;
-			
+
 			SystemRequest_ptr request = freeRequestSlot(id);
 
 			if (request)
@@ -127,7 +127,7 @@ namespace Stormancer
 			}
 			else
 			{
-				ILogger::instance()->log(LogLevel::Warn, "RequestProcessor/error", "Unknow request id.", to_string(id).c_str());
+				ILogger::instance()->log(LogLevel::Warn, "RequestProcessor/error", "Unknow request id :" + to_string(id));
 			}
 
 			return true;
@@ -154,7 +154,7 @@ namespace Stormancer
 
 		uint16 selectedId;
 		SystemRequest_ptr request;
-		
+
 		{ // this unamed scope ensures the id is not used outside the locked mutex.
 			static uint16 id = 0;
 			// i is used to know if we tested all uint16 available values, whatever the current value of id.

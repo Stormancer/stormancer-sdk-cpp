@@ -29,9 +29,9 @@ namespace Stormancer
 		return _scene;
 	}
 
-	const char* Route::name()
+	const std::string Route::name()
 	{
-		return _name.c_str();
+		return _name;
 	}
 
 	uint16 Route::handle()

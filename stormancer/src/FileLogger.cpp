@@ -15,7 +15,7 @@ namespace Stormancer
 		_myfile.close();
 	}
 
-	void FileLogger::log(const char* message)
+	void FileLogger::log(const std::string message)
 	{
 		std::lock_guard<std::mutex> lg(_mutex);
 		if (tryOpenFile())
@@ -28,13 +28,13 @@ namespace Stormancer
 		}
 	}
 
-	void FileLogger::log(LogLevel level, const char* category, const char* message, const char* data)
+	void FileLogger::log(LogLevel level, const std::string category, const std::string message)
 	{
 		std::lock_guard<std::mutex> lg(_mutex);
 		if (tryOpenFile())
 		{
-			auto ptr = format(level, category, message, data);
-			_myfile << ptr.get() << std::endl;
+			auto str = format(level, category, message);
+			_myfile << str << std::endl;
 			if (_immediate)
 			{
 				_myfile.flush();

@@ -18,10 +18,10 @@ namespace Stormancer
 	public:
 	
 		/// Empty implementation.
-		void log(const char* message);
+		void log(const std::string message);
 		
 		/// Empty implementation.
-		void log(LogLevel level, const char* category, const char* message, const char* data);
+		void log(LogLevel level, const std::string category, const std::string message);
 		
 		/// Empty implementation.
 		void log(const std::exception& e);

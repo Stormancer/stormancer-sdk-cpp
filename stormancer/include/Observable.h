@@ -109,7 +109,7 @@ namespace Stormancer
 				}
 				catch (const std::exception& ex)
 				{
-					ILogger::instance()->log(LogLevel::Error, "Observable::subscribe(onNext)", "Observable error", ex.what());
+					ILogger::instance()->log(LogLevel::Error, "Observable::subscribe(onNext)", "Observable error" + std::string(ex.what()));
 				}
 			};
 
@@ -144,7 +144,7 @@ namespace Stormancer
 				}
 				catch (const std::exception& ex)
 				{
-					ILogger::instance()->log(LogLevel::Error, "Observable::subscribe(onNext, onComplete)", "Observable error", ex.what());
+					ILogger::instance()->log(LogLevel::Error, "Observable::subscribe(onNext, onComplete)", "Observable error :" + std::string(ex.what()));
 				}
 			};
 

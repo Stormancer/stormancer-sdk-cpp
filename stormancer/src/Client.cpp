@@ -82,7 +82,7 @@ namespace Stormancer
 	Client::~Client()
 	{
 #ifdef STORMANCER_LOG_CLIENT
-		ILogger::instance()->log(LogLevel::Trace, "Client::~Client", "deleting the client...", "");
+		ILogger::instance()->log(LogLevel::Trace, "Client::~Client", "deleting the client...");
 #endif
 		disconnect(true);
 
@@ -121,10 +121,10 @@ namespace Stormancer
 			_dispatcher = nullptr;
 		}
 
-		
+
 
 #ifdef STORMANCER_LOG_CLIENT
-		ILogger::instance()->log(LogLevel::Trace, "Client::~Client", "client deleted", "");
+		ILogger::instance()->log(LogLevel::Trace, "Client::~Client", "client deleted");
 #endif
 	}
 
@@ -133,7 +133,7 @@ namespace Stormancer
 		if (!config)
 		{
 #ifdef STORMANCER_LOG_CLIENT
-			ILogger::instance()->log(LogLevel::Error, "Client::createClient", "Bad client configuration", "");
+			ILogger::instance()->log(LogLevel::Error, "Client::createClient", "Bad client configuration");
 #endif
 		}
 
@@ -174,12 +174,13 @@ namespace Stormancer
 		if (!sceneId)
 		{
 #ifdef STORMANCER_LOG_CLIENT
-			ILogger::instance()->log(LogLevel::Error, "Client::getPublicScene", "Bad scene id", "");
+			ILogger::instance()->log(LogLevel::Error, "Client::getPublicScene", "Invalid scene id");
+			throw std::exception("Invalid scene id");
 #endif
 		}
 
 #ifdef STORMANCER_LOG_CLIENT
-		ILogger::instance()->log(LogLevel::Trace, "Client::getPublicScene", sceneId, "");
+		ILogger::instance()->log(LogLevel::Trace, "Client::getPublicScene", "connecting to : " + std::string(sceneId));
 #endif
 
 		return _apiClient->getSceneEndpoint(_accountId, _applicationName, sceneId).then([this, sceneId](pplx::task<SceneEndpoint> t) {
@@ -237,9 +238,6 @@ namespace Stormancer
 			throw std::runtime_error("This Stormancer client has been disconnected and should not be used anymore.");
 		}
 
-#ifdef STORMANCER_LOG_CLIENT
-		_logger->log(LogLevel::Trace, "Client::getScene", sceneId.c_str(), sep.token.c_str());
-#endif
 		if (!_connectionTaskSet)
 		{
 			_connectionMutex.lock();
@@ -263,16 +261,16 @@ namespace Stormancer
 					}
 					std::string endpoint = sep.tokenData.Endpoints.at(_transport->name());
 #ifdef STORMANCER_LOG_CLIENT
-					_logger->log(LogLevel::Trace, "Client::getScene", "Connecting transport", "");
+					_logger->log(LogLevel::Trace, "Client::getScene", "Connecting transport");
 #endif
 					try
 					{
 						this->dispatchEvent([this]() {_onConnectionStateChanged(ConnectionState::Connecting); });
-						
+
 
 						return _transport->connect(endpoint).then([this](IConnection* connection) {
 #ifdef STORMANCER_LOG_CLIENT
-							_logger->log(LogLevel::Trace, "Client::getScene", "Client::transport connected", "");
+							_logger->log(LogLevel::Trace, "Client::getScene", "Transport connected");
 #endif
 							_serverConnection = connection;
 
@@ -295,9 +293,9 @@ namespace Stormancer
 										plugin->sceneDisconnected(scene);
 									}
 									this->dispatchEvent([scene]() {scene->setConnectionState(ConnectionState::Disconnected); });
-									
+
 								}
-								this->dispatchEvent([this,connectionState]() {_onConnectionStateChanged(connectionState); });
+								this->dispatchEvent([this, connectionState]() {_onConnectionStateChanged(connectionState); });
 								;
 							});
 
@@ -322,12 +320,12 @@ namespace Stormancer
 			_connectionMutex.unlock();
 		}
 
-		return _connectionTask.then([this, sep](){
+		return _connectionTask.then([this, sep]() {
 			SceneInfosRequestDto parameter;
 			parameter.Metadata = _serverConnection->metadata();
 			parameter.Token = sep.token;
 #ifdef STORMANCER_LOG_CLIENT
-			_logger->log(LogLevel::Trace, "Client::getScene", "send SceneInfosRequestDto", "");
+			_logger->log(LogLevel::Trace, "Client::getScene", "send SceneInfosRequestDto");
 #endif
 			return sendSystemRequest<SceneInfosRequestDto, SceneInfosDto>((byte)SystemRequestIDTypes::ID_GET_SCENE_INFOS, parameter);
 		}).then([this, sep, sceneId](SceneInfosDto sceneInfos) {
@@ -344,13 +342,13 @@ namespace Stormancer
 			}
 			ss << "]";
 #ifdef STORMANCER_LOG_CLIENT
-			_logger->log(LogLevel::Trace, "Client::getScene", "SceneInfosDto received", ss.str().c_str());
+			_logger->log(LogLevel::Trace, "Client::getScene", "SceneInfosDto received : " + ss.str());
 #endif
 			_serverConnection->metadata()["serializer"] = sceneInfos.SelectedSerializer;
 
 			return updateServerMetadata().then([this, sep, sceneId, sceneInfos]() {
 #ifdef STORMANCER_LOG_CLIENT
-				_logger->log(LogLevel::Trace, "Client::getScene", "Returning the scene ", sceneId.c_str());
+				_logger->log(LogLevel::Trace, "Client::getScene", "Connecting to scene " + sceneId);
 #endif
 				Scene* scene;
 				if (mapContains(_scenes, sceneId))
@@ -375,7 +373,7 @@ namespace Stormancer
 				}
 				for (auto plugin : _plugins)
 				{
-					
+
 					plugin->sceneCreated(scene);
 				}
 				return scene;
@@ -386,7 +384,7 @@ namespace Stormancer
 	pplx::task<void> Client::updateServerMetadata()
 	{
 #ifdef STORMANCER_LOG_CLIENT
-		_logger->log(LogLevel::Trace, "Client::updateServerMetadata", "sending system request.", "");
+		_logger->log(LogLevel::Trace, "Client::updateServerMetadata", "sync serverside connection metadata.");
 #endif
 		return _requestProcessor->sendSystemRequest(_serverConnection, (byte)SystemRequestIDTypes::ID_SET_METADATA, [this](bytestream* bs) {
 			msgpack::pack(bs, _serverConnection->metadata());
@@ -442,7 +440,7 @@ namespace Stormancer
 			}
 			scene->setConnectionState(ConnectionState::Connected);
 #ifdef STORMANCER_LOG_CLIENT
-			ILogger::instance()->log(LogLevel::Info, "client", "Scene connected", scene->id());
+			ILogger::instance()->log(LogLevel::Info, "client", "Scene connected " + scene->id());
 #endif
 		});
 	}
@@ -536,7 +534,7 @@ namespace Stormancer
 
 #ifdef STORMANCER_LOG_CLIENT
 			std::string sceneId = scene->id();
-			ILogger::instance()->log(LogLevel::Info, "client", "Scene disconnected", sceneId.c_str());
+			ILogger::instance()->log(LogLevel::Info, "client", "Scene disconnected " + sceneId);
 #endif
 
 			scene->setConnectionState(ConnectionState::Disconnected);
@@ -622,7 +620,7 @@ namespace Stormancer
 
 	void Client::startSyncClock()
 	{
-		ILogger::instance()->log(LogLevel::Trace, "Client::startSyncClock", "Starting syncClock...", "");
+		ILogger::instance()->log(LogLevel::Trace, "Client::startSyncClock", "Starting syncClock...");
 		std::lock_guard<std::mutex> lg(_syncClockMutex);
 		if (_scheduler)
 		{
@@ -646,12 +644,12 @@ namespace Stormancer
 			});
 		}
 		syncClockImpl();
-		ILogger::instance()->log(LogLevel::Trace, "Client::startSyncClock", "SyncClock started", "");
+		ILogger::instance()->log(LogLevel::Trace, "Client::startSyncClock", "SyncClock started");
 	}
 
 	void Client::stopSyncClock()
 	{
-		ILogger::instance()->log(LogLevel::Trace, "Client::stopSyncClock", "waiting to stop syncClock...", "");
+		ILogger::instance()->log(LogLevel::Trace, "Client::stopSyncClock", "waiting to stop syncClock...");
 		std::lock_guard<std::mutex> lg(_syncClockMutex);
 		if (_syncClockSubscription)
 		{
@@ -662,7 +660,7 @@ namespace Stormancer
 			_syncClockSubscription->destroy();
 			_syncClockSubscription = nullptr;
 		}
-		ILogger::instance()->log(LogLevel::Trace, "Client::stopSyncClock", "SyncClock stopped", "");
+		ILogger::instance()->log(LogLevel::Trace, "Client::stopSyncClock", "SyncClock stopped");
 	}
 
 	pplx::task<void> Client::syncClockImpl()
@@ -688,7 +686,7 @@ namespace Stormancer
 				catch (const std::exception& ex)
 				{
 #ifdef STORMANCER_LOG_CLIENT
-					ILogger::instance()->log(LogLevel::Warn, "syncClock", "Failed to ping the server", ex.what());
+					ILogger::instance()->log(LogLevel::Warn, "syncClock", "Failed to ping the server : " + std::string(ex.what()));
 #endif
 					return;
 				}
@@ -747,7 +745,7 @@ namespace Stormancer
 		catch (const std::exception& ex)
 		{
 #ifdef STORMANCER_LOG_CLIENT
-			_logger->log(LogLevel::Error, "Client::syncClockImpl", "Failed to ping server.", ex.what());
+			_logger->log(LogLevel::Error, "Client::syncClockImpl", "Failed to ping server : "+std::string( ex.what()));
 #endif
 			throw std::runtime_error(std::string() + ex.what() + "\nFailed to ping server.");
 		}
