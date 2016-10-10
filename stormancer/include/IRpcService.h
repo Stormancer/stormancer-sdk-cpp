@@ -14,7 +14,7 @@ namespace Stormancer
 		virtual uint16 pendingRequests() = 0;
 		virtual void cancelAll(const char* reason) = 0;
 
-		
+
 		virtual  pplx::task<std::shared_ptr<Stormancer::Result<>>> rpcVoid_with_writer(std::string procedure, std::function<void(Stormancer::bytestream*)> writer) = 0;
 
 		virtual std::shared_ptr<IActionDispatcher> getDispatcher() = 0;
@@ -57,6 +57,10 @@ namespace Stormancer
 			return pplx::create_task(tce, pplx::task_options(getDispatcher()));
 		}
 
+		pplx::task<std::shared_ptr<Stormancer::Result<>>> rpcVoid(std::string procedure)
+		{
+			return rpcVoid_with_writer(procedure, [](Stormancer::bytestream* stream) {});
+		}
 
 		template<typename TInput>
 		pplx::task<std::shared_ptr<Stormancer::Result<>>> rpcVoid(std::string procedure, TInput parameter)
