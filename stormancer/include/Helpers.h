@@ -69,30 +69,12 @@ namespace Stormancer
 
 	STORMANCER_DLL_API void deferredCall(std::function<void(void)>, uint32 ms);
 
-	class Configuration;
-	STORMANCER_DLL_API void destroy(Configuration* ptr);
-
-	class Client;
-	STORMANCER_DLL_API void destroy(Client* ptr);
-
-	class Scene;
-	STORMANCER_DLL_API void destroy(Scene* ptr);
-	STORMANCER_DLL_API void destroy(Result<Scene*>* ptr);
-
-
-
-	class RpcPlugin;
-	STORMANCER_DLL_API void destroy(RpcPlugin* ptr);
+	
 
 	template<typename T>
 	class Packet;
 	class IScenePeer;
-	template<typename T>
-	class Observable;
 	using Packetisp_ptr = std::shared_ptr<Packet<IScenePeer>>;
-	STORMANCER_DLL_API void destroy(Observable<Packetisp_ptr>* ptr);
-
-	STORMANCER_DLL_API void destroy(Result<>* ptr);
 
 	template<typename T>
 	class MsgPackMaybe
@@ -340,27 +322,10 @@ namespace Stormancer
 
 #pragma region task
 
-	pplx::task<void> taskCompleted();
-
-	template<typename T>
-	pplx::task<T> taskCompleted(T& result)
-	{
-		pplx::task_completion_event<T> tce;
-		tce.set(result);
-		return pplx::create_task(tce);
-	}
-
-	template<typename T>
-	pplx::task<T> taskFromException(const std::exception& e)
-	{
-		pplx::task_completion_event<T> tce;
-		tce.set_exception<std::exception>(e);
-		return create_task(tce);
-	}
 
 	pplx::task<void> taskIf(bool condition, std::function<pplx::task<void>()> action);
 
-	template<typename T>
+	/*template<typename T>
 	pplx::task<T> invokeWrapping(std::function<pplx::task<T>()> func)
 	{
 		try
@@ -371,18 +336,18 @@ namespace Stormancer
 		{
 			return taskFromException<T>(e);
 		}
-	}
+	}*/
 
-	template<typename T, typename U>
-	pplx::task<T> invokeWrapping(std::function<pplx::task<T>(U)> func, U& argument)
+	template<typename T, typename... U>
+	pplx::task<T> invokeWrapping(std::function<pplx::task<T>(U...)> func, U&... argument)
 	{
 		try
 		{
-			return func(argument);
+			return func(argument...);
 		}
 		catch (const std::exception& e)
 		{
-			return taskFromException<T>(e);
+			return pplx::task_from_exception<T>(e);
 		}
 	}
 

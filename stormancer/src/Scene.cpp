@@ -15,6 +15,10 @@ namespace Stormancer
 		{
 			_remoteRoutesMap[routeDto.Name] = Route_ptr(new Route(this, routeDto.Name, routeDto.Handle, routeDto.Metadata));
 		}
+
+		_connectionStateObservable.get_observable().subscribe([this](ConnectionState state) {
+			this->_connectionState = state;
+		});
 	}
 
 	Scene::~Scene()
@@ -29,7 +33,7 @@ namespace Stormancer
 
 		for (auto weakSub : _subscriptions)
 		{
-			auto sub = weakSub.lock();
+			auto sub = weakSub.get_weak().lock();
 			if (sub)
 			{
 				sub->unsubscribe();
@@ -46,10 +50,10 @@ namespace Stormancer
 		ILogger::instance()->log(LogLevel::Trace, "Scene::~Scene", "scene deleted", "");
 #endif
 	}
-	
-	const char* Scene::getHostMetadata(const char* key)
+
+	const std::string Scene::getHostMetadata(const std::string key)
 	{
-		return (mapContains(_metadata, std::string(key)) ? _metadata[key].c_str() : nullptr);
+		return (mapContains(_metadata, key) ? _metadata[key] : std::string());
 	}
 
 	byte Scene::handle()
@@ -57,25 +61,21 @@ namespace Stormancer
 		return _handle;
 	}
 
-	const char* Scene::id()
+	const std::string Scene::id()
 	{
-		return _id.c_str();
+		return _id;
 	}
 
-	ConnectionState Scene::connectionState()
+	ConnectionState Scene::GetCurrentConnectionState()
 	{
 		return _connectionState;
 	}
 
-	Action<ConnectionState>& Scene::onConnectionStateChangedAction()
+	rxcpp::observable<ConnectionState> Scene::GetConnectionStateChangedObservable()
 	{
-		return _onConnectionStateChanged;
+		return _connectionStateObservable.get_observable();
 	}
 
-	Action<ConnectionState>::TIterator Scene::onConnectionStateChanged(std::function<void(ConnectionState)> callback)
-	{
-		return _onConnectionStateChanged.push_back(callback);
-	}
 
 	IConnection* Scene::hostConnection()
 	{
@@ -92,9 +92,8 @@ namespace Stormancer
 		return mapToRakListValues(_remoteRoutesMap);
 	}
 
-	Result<>* Scene::addRoute(const char* routeName2, std::function<void(Packetisp_ptr)> handler, const stringMap* metadata2)
+	void Scene::addRoute(const std::string routeName2, std::function<void(Packetisp_ptr)> handler, const stringMap* metadata2)
 	{
-		auto result = new Result<>();
 		try
 		{
 			std::string routeName = routeName2;
@@ -110,7 +109,7 @@ namespace Stormancer
 				throw std::invalid_argument("A route cannot be empty or start with the '@' character.");
 			}
 
-			if (_connectionState == ConnectionState::Connected)
+			if (GetCurrentConnectionState() == ConnectionState::Connected)
 			{
 				throw std::runtime_error("You cannot register handles once the scene is connected.");
 			}
@@ -120,18 +119,17 @@ namespace Stormancer
 				_localRoutesMap[routeName] = Route_ptr(new Route(this, routeName, metadata));
 			}
 
-			auto subscription = onMessage(routeName2)->subscribe(handler);
+			auto subscription = onMessage(routeName2).subscribe(handler);
 			_subscriptions.push_back(subscription);
-			result->set();
+
 		}
-		catch (const std::exception& ex)
+		catch (const std::exception&)
 		{
-			result->setError(1, ex.what());
+			throw;
 		}
-		return result;
 	}
 
-	IObservable<Packetisp_ptr>* Scene::onMessage(Route_ptr route)
+	rxcpp::observable<Packetisp_ptr> Scene::onMessage(Route_ptr route)
 	{
 		auto observable = rxcpp::observable<>::create<Packetisp_ptr>([this, route](rxcpp::subscriber<Packetisp_ptr> subscriber) {
 			auto handler = std::function<void(Packet_ptr)>([this, subscriber](Packet_ptr p) {
@@ -146,14 +144,14 @@ namespace Stormancer
 				route->handlers.erase(it);
 			});
 		});
-		IObservable<Packetisp_ptr>* res = new Observable<Packetisp_ptr>(observable.as_dynamic());
-		return res;
+		return observable.as_dynamic();
+
 	}
 
-	IObservable<Packetisp_ptr>* Scene::onMessage(const char* routeName2)
+	rxcpp::observable<Packetisp_ptr> Scene::onMessage(const std::string routeName2)
 	{
 		std::string routeName = routeName2;
-		if (_connectionState == ConnectionState::Connected)
+		if (GetCurrentConnectionState() == ConnectionState::Connected)
 		{
 			throw std::runtime_error("You cannot register handles once the scene is connected.");
 		}
@@ -168,17 +166,16 @@ namespace Stormancer
 		return onMessage(route);
 	}
 
-	Result<>* Scene::sendPacket(const char* routeName2, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability)
+	void Scene::sendPacket(const std::string routeName2, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability)
 	{
-		auto result = new Result<>();
 		try
 		{
-			if (!std::strlen(routeName2))
+			if (routeName2.length() == 0)
 			{
 				throw std::invalid_argument("routeName is empty.");
 			}
 
-			if (_connectionState != ConnectionState::Connected)
+			if (GetCurrentConnectionState() != ConnectionState::Connected)
 			{
 				throw std::runtime_error("The scene must be connected to perform this operation.");
 			}
@@ -191,71 +188,61 @@ namespace Stormancer
 			Route_ptr route = _remoteRoutesMap[routeName];
 
 			_peer->sendToScene(_handle, route->handle(), writer, priority, reliability);
-			result->set();
+
 		}
-		catch (const std::exception& ex)
+		catch (const std::exception&)
 		{
-			result->setError(1, ex.what());
+			throw;
 		}
-		return result;
+
 	}
 
-	pplx::task<Result<>*> Scene::connect()
+	pplx::task<void> Scene::connect()
 	{
-		auto result = new Result<>();
-		
+
 		try
 		{
-			if (_connectionState == ConnectionState::Disconnected && _client)
+			if (GetCurrentConnectionState() == ConnectionState::Disconnected && _client)
 			{
-				_connectTask = _client->connectToScene(this, _token, mapValues(_localRoutesMap));
+				_connectTask = _client->connectToScene(this->shared_from_this(), _token, mapValues(_localRoutesMap));
 			}
 		}
 		catch (const std::exception& ex)
 		{
-			result->setError(1, ex.what());
-			return taskCompleted(result);
+
+			return pplx::task_from_exception<void>(ex);
 		}
 
-		return _connectTask.then([result](pplx::task<void> t) {
+		return _connectTask.then([](pplx::task<void> t) {
 			try
 			{
 				t.wait();
-				result->set();
+
 			}
 			catch (const std::exception& ex)
 			{
 				ILogger::instance()->log(LogLevel::Error, "scene.connect", "Failed to connect the scene", ex.what());
-				result->setError(1, ex.what());
+				throw;
 			}
-			return result;
+
 		});
 	}
 
-	pplx::task<Result<>*> Scene::disconnect(bool immediate)
+	pplx::task<void> Scene::disconnect(bool immediate)
 	{
-		if (_connectionState == ConnectionState::Connected && _client)
+		if (GetCurrentConnectionState() == ConnectionState::Connected && _client)
 		{
-			_disconnectTask = _client->disconnect(this, _handle, immediate);
+			_disconnectTask = _client->disconnect(this, _handle, immediate).then([this](pplx::task<void> t) {
+
+				this->setConnectionState(ConnectionState::Disconnected);
+			});
 		}
-		else
+		else if(GetCurrentConnectionState() != ConnectionState::Disconnecting)
 		{
-			_disconnectTask = taskCompleted();
+			_disconnectTask = pplx::task_from_result();
 		}
 
-		return _disconnectTask.then([](pplx::task<void> t) {
-			auto result = new Result<>();
-			try
-			{
-				t.wait();
-				result->set();
-			}
-			catch (const std::exception& ex)
-			{
-				result->setError(1, ex.what());
-			}
-			return result;
-		});
+		return _disconnectTask;
 	}
 
 	DependencyResolver* Scene::dependencyResolver() const
@@ -330,8 +317,11 @@ namespace Stormancer
 	{
 		if (_connectionState != state)
 		{
-			_connectionState = state;
-			_onConnectionStateChanged(state);
+			_connectionStateObservable.get_subscriber().on_next(state);
+		}
+		if (_connectionState == ConnectionState::Disconnected)
+		{
+			_connectionStateObservable.get_subscriber().on_completed();
 		}
 	}
 };

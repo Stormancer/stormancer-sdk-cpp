@@ -56,8 +56,7 @@ namespace Stormancer
 
 		/// Returns the connection state.
 		virtual ConnectionState connectionState() = 0;
-		virtual Action<ConnectionState>& connectionStateChangedAction() = 0;
-		virtual Action<ConnectionState>::TIterator onConnectionStateChanged(std::function<void(ConnectionState)> callback) = 0;
+		virtual rxcpp::observable<ConnectionState> GetConnectionStateChangedObservable() = 0;
 
 	protected:
 		virtual void setConnectionState(ConnectionState connectionState) = 0;

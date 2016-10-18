@@ -39,10 +39,10 @@ namespace Stormancer
 
 		_type = type;
 		_handler = handler;
-		initialize(serverPort, maxConnections);
+		initialize(maxConnections,serverPort);
 		_scheduledTransportLoop = _scheduler->schedulePeriodic(15, [this]() {
 			std::lock_guard<std::mutex> lock(_mutex);
-			if (_scheduledTransportLoop && _scheduledTransportLoop->subscribed())
+			if (_scheduledTransportLoop.is_subscribed())
 			{
 				run();
 			}
@@ -57,7 +57,8 @@ namespace Stormancer
 		try
 		{
 			_logger->log(LogLevel::Trace, "RakNetTransport::initialize", "Starting raknet transport", _type.c_str());
-			_peer = std::shared_ptr<RakNet::RakPeerInterface>(RakNet::RakPeerInterface::GetInstance(), [](RakNet::RakPeerInterface* peer) {
+			auto p = RakNet::RakPeerInterface::GetInstance();
+			_peer = std::shared_ptr<RakNet::RakPeerInterface>(p, [](RakNet::RakPeerInterface* peer) {
 				RakNet::RakPeerInterface::DestroyInstance(peer);
 			});
 			_dependencyResolver->registerDependency(_peer);
@@ -204,11 +205,10 @@ namespace Stormancer
 		std::lock_guard<std::mutex> lg(_mutex);
 		ILogger::instance()->log(LogLevel::Trace, "RakNetTransport::stop", "RakNet loop stopped", "");
 
-		if (_scheduledTransportLoop && _scheduledTransportLoop->subscribed())
+		if (_scheduledTransportLoop.is_subscribed())
 		{
-			_scheduledTransportLoop->unsubscribe();
-			_scheduledTransportLoop->destroy();
-			_scheduledTransportLoop = nullptr;
+			_scheduledTransportLoop.unsubscribe();
+			
 
 			if (_peer)
 			{
@@ -377,7 +377,7 @@ namespace Stormancer
 
 	bool RakNetTransport::isRunning() const
 	{
-		return (_scheduledTransportLoop && _scheduledTransportLoop->subscribed());
+		return (_scheduledTransportLoop.is_subscribed());
 	}
 
 	std::string RakNetTransport::name() const

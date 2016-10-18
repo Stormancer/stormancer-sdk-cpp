@@ -8,6 +8,9 @@ namespace Stormancer
 		, _rakPeer(peer)
 		, _id(id)
 	{
+		_connectionStateObservable.get_observable().subscribe([this](ConnectionState state) {
+			this->_connectionState = state;
+		});
 	}
 
 	RakNetConnection::~RakNetConnection()
@@ -152,22 +155,15 @@ namespace Stormancer
 
 	void RakNetConnection::setConnectionState(ConnectionState connectionState)
 	{
-		if (_connectionState != connectionState)
-		{
-			_connectionState = connectionState;
-			_onConnectionStateChanged(_connectionState);
-		}
+		_connectionStateObservable.get_subscriber().on_next(connectionState);
 	}
 
-	Action<ConnectionState>& RakNetConnection::connectionStateChangedAction()
+	rxcpp::observable<ConnectionState> RakNetConnection::GetConnectionStateChangedObservable()
 	{
-		return _onConnectionStateChanged;
+		return _connectionStateObservable.get_observable();
 	}
 
-	Action<ConnectionState>::TIterator RakNetConnection::onConnectionStateChanged(std::function<void(ConnectionState)> callback)
-	{
-		return _onConnectionStateChanged.push_back(callback);
-	}
+	
 
 	Action<std::string>::TIterator RakNetConnection::onClose(std::function<void(std::string)> callback)
 	{

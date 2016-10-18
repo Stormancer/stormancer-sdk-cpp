@@ -49,13 +49,10 @@
 #include "ITokenHandler.h"
 #include "TokenHandler.h"
 #include "ISubscription.h"
-#include "Subscription.h"
 #include "IScheduler.h"
 #include "DefaultScheduler.h"
 #include "Watch.h"
-#include "IObservable.h"
-#include "Observable.h"
-
+#include "SyncClock.h"
 
 #include "RakNetConnection.h"
 #include "RakNetTransport.h"

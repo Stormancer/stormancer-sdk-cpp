@@ -3,6 +3,7 @@
 
 namespace Stormancer
 {
+	
 	class DependencyResolver
 	{
 	public:

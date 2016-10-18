@@ -65,7 +65,7 @@ namespace Stormancer
 		const std::string application = "";
 
 		/// Gets or Sets the dispatcher to be used by the client.
-		IPacketDispatcher* dispatcher = nullptr;
+		std::function<std::shared_ptr<IPacketDispatcher>(DependencyResolver*)> dispatcher;
 
 		/// Maximum number of remote peers that can connect with this client.
 		uint16 maxPeers = 0;

@@ -2,16 +2,19 @@
 
 namespace Stormancer
 {
-	RpcService::RpcService(Scene* scene, std::shared_ptr<IActionDispatcher> dispatcher )
-		: _scene(scene)
+	RpcService::RpcService(Scene* scene, std::shared_ptr<IActionDispatcher> dispatcher)
+		: _dispatcher(dispatcher),
+		_scene(scene)
+	
 	{
+		
 	}
 
 	RpcService::~RpcService()
 	{
 	}
 
-	IObservable<Packetisp_ptr>* RpcService::rpc(const char* route, std::function<void(bytestream*)> writer, PacketPriority priority)
+	rxcpp::observable<Packetisp_ptr> RpcService::rpc(const std::string route, std::function<void(bytestream*)> writer, PacketPriority priority)
 	{
 		if (!_scene)
 		{
@@ -27,7 +30,7 @@ namespace Stormancer
 			for (uint32 i = 0; i < sz; ++i)
 			{
 				auto r = rr[i];
-				if (strcmp(r->name(), route) == 0)
+				if (r->name() == route)
 				{
 					relevantRoute = r;
 					break;
@@ -55,20 +58,25 @@ namespace Stormancer
 				std::lock_guard<std::mutex> lock(_pendingRequestsMutex);
 				_pendingRequests[id] = request;
 			}
-
-			auto result = _scene->sendPacket(route, [id, writer](bytestream* bs) {
-				*bs << id;
-				writer(bs);
-			}, priority, PacketReliability::RELIABLE_ORDERED);
-			if (!result->success())
+			try
 			{
-				ILogger::instance()->log(LogLevel::Error, "rpc.rpc", "sendPacket failed", result->reason());
+				_scene->sendPacket(route, [id, writer](bytestream* bs) {
+					*bs << id;
+					writer(bs);
+				}, priority, PacketReliability::RELIABLE_ORDERED);
+			}
+			catch (std::exception& ex)
+			{
+
+				subscriber.on_error(std::make_exception_ptr(ex));
+				ILogger::instance()->log(LogLevel::Error, "rpc.rpc", ("Failed to send rpc packet on route " + route).c_str(), ex.what());
+				return;
 			}
 
 			subscriber.add([this, request]() {
 				if (!request->hasCompleted)
 				{
-					if (_scene->connectionState() == ConnectionState::Connected)
+					if (_scene->GetCurrentConnectionState() == ConnectionState::Connected)
 					{
 						_scene->sendPacket(RpcPlugin::cancellationRouteName, [this, request](bytestream* bs) {
 							*bs << request->id;
@@ -79,7 +87,7 @@ namespace Stormancer
 			});
 		});
 
-		return new Observable<Packetisp_ptr>(observable.as_dynamic());
+		return observable.as_dynamic();
 	}
 
 	uint16 RpcService::pendingRequests()
@@ -221,8 +229,8 @@ namespace Stormancer
 			{
 				request->tce.set();
 			}
-		}
 	}
+}
 
 	void RpcService::error(Packetisp_ptr packet)
 	{
@@ -249,7 +257,7 @@ namespace Stormancer
 			std::string msg;
 			deserialized.convert(&msg);
 			request->observer.on_error(std::make_exception_ptr(std::runtime_error(msg)));
-		}
+	}
 	}
 
 	void RpcService::complete(Packetisp_ptr packet)
@@ -282,7 +290,7 @@ namespace Stormancer
 				eraseRequest(request->id);
 				request->observer.on_completed();
 			}
-		}
+	}
 	}
 
 	void RpcService::cancel(Packetisp_ptr packet)
@@ -338,35 +346,51 @@ namespace Stormancer
 	}
 
 
-	pplx::task<std::shared_ptr<Stormancer::Result<>>> RpcService::rpcVoid_with_writer( std::string procedure, std::function<void(Stormancer::bytestream*)> writer)
+	pplx::task<void> RpcService::rpcVoid_with_writer(std::string procedure, std::function<void(Stormancer::bytestream*)> writer)
 	{
-		pplx::task_completion_event<std::shared_ptr<Stormancer::Result<>>> tce;
-		std::shared_ptr<Stormancer::Result<>> result(new Stormancer::Result<>());
+		pplx::task_completion_event<void> tce;
+
 
 		auto observable = this->rpc(procedure.c_str(), [&writer](Stormancer::bytestream* stream) {
 			writer(stream);
 		}, PacketPriority::MEDIUM_PRIORITY);
 
-		auto onNext = [tce, result](Stormancer::Packetisp_ptr packet) {			
-			result->set();
-			tce.set(result);
+		auto onNext = [tce](Stormancer::Packetisp_ptr packet) {
+
+			tce.set();
 		};
 
-		auto onError = std::function<void(const char*)>([tce, result, procedure](const char* error) {
-			std::string msg = "Rpc::" + procedure;
-			Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Error, "RpcHelpers", msg.c_str(), error);
-			result->setError(1, error);
-			tce.set(result);
+		auto onError = std::function<void(std::exception_ptr)>([tce, procedure](std::exception_ptr eptr) {
+
+			try
+			{
+				if (eptr)
+				{
+					std::rethrow_exception(eptr);
+				}
+				else
+				{
+					throw std::runtime_error("Unknown exception");
+				}
+			}
+			catch (const std::exception& ex)
+			{
+				std::string msg = "Rpc::" + procedure;
+				Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Error, "RpcHelpers", msg.c_str(), ex.what());
+
+				tce.set_exception(ex);
+			}
+
 		});
 
-		auto onComplete = [observable]() {
-			observable->destroy();
+		auto onComplete = []() {
+
 		};
 
 
-		observable->subscribe(onNext, onError, onComplete);
+		observable.subscribe(onNext, onError, onComplete);
 
-		return pplx::create_task(tce,pplx::task_options(_dispatcher));
+		return pplx::create_task(tce, pplx::task_options(_dispatcher));
 	}
 	std::shared_ptr<IActionDispatcher> RpcService::getDispatcher()
 	{

@@ -4,11 +4,11 @@ namespace Stormancer
 {
 	Configuration::Configuration(const std::string endpoint, const std::string account, const std::string application)
 		: account(account),
-		application(application),
-		dispatcher(new DefaultPacketDispatcher())		
+		application(application)			
 	{
 		scheduler = std::make_shared<DefaultScheduler>();
 		transportFactory = defaultTransportFactory;
+		dispatcher = [](DependencyResolver* resolver) { return std::make_shared<DefaultPacketDispatcher>(); };
 		addServerEndpoint(endpoint);
 		_plugins.push_back(new RpcPlugin());
 	}

@@ -50,7 +50,7 @@ namespace Stormancer
 		const int connectionTimeout = 5000;
 		std::map<std::string, pplx::task_completion_event<IConnection*>> _pendingConnections;
 		std::shared_ptr<IScheduler> _scheduler = nullptr;
-		ISubscription* _scheduledTransportLoop = nullptr;
+		rxcpp::subscription _scheduledTransportLoop;
 		RakNet::SocketDescriptor* _socketDescriptor = nullptr;
 		std::mutex _mutex;
 		std::string _name;

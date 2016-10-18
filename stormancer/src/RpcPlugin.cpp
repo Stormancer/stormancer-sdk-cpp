@@ -4,7 +4,7 @@ namespace Stormancer
 {
 	const char* RpcPlugin::pluginName = "stormancer.plugins.rpc";
 	const char* RpcPlugin::serviceName = "rpcService";
-	const char* RpcPlugin::version = "1.1.0";
+	const std::string RpcPlugin::version = "1.1.0";
 	const char* RpcPlugin::nextRouteName = "stormancer.rpc.next";
 	const char* RpcPlugin::errorRouteName = "stormancer.rpc.error";
 	const char* RpcPlugin::completeRouteName = "stormancer.rpc.completed";
@@ -18,7 +18,7 @@ namespace Stormancer
 			/*return std::shared_ptr<RpcService>(new RpcService(scene), [](RpcService* service) {
 				printf("test");
 			});*/
-		},true);
+		}, true);
 	}
 
 	void RpcPlugin::sceneCreated(Scene* scene)
@@ -27,13 +27,13 @@ namespace Stormancer
 		{
 			auto rpcParams = scene->getHostMetadata(pluginName);
 
-			if (strcmp(rpcParams, version) == 0)
+			if (rpcParams == version)
 			{
 				auto rpc = scene->dependencyResolver()->resolve<IRpcService>();
-				
+
 				scene->addRoute(nextRouteName, [scene](Packetisp_ptr p) {
 					auto rpc = scene->dependencyResolver()->resolve<IRpcService>().get();
-					
+
 					static_cast<RpcService*>(rpc)->next(p);
 				});
 				scene->addRoute(cancellationRouteName, [scene](Packetisp_ptr p) {
@@ -66,6 +66,6 @@ namespace Stormancer
 
 	void RpcPlugin::destroy()
 	{
-		Stormancer::destroy(this);
+		delete this;
 	}
 };

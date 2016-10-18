@@ -20,7 +20,7 @@ namespace Stormancer
 		config.addCatchAllProcessor(handler);
 	}
 
-	void SceneDispatcher::addScene(Scene* scene)
+	void SceneDispatcher::addScene(ScenePtr scene)
 	{
 		if (scene)
 		{
@@ -43,12 +43,14 @@ namespace Stormancer
 		}
 
 		unsigned int sceneIndex = sceneHandle - (uint8)MessageIDTypes::ID_SCENES;
-		auto scene = _scenes[sceneIndex];
-		if (scene)
-		{
-			packet->metadata()["scene"] = scene;
 
-			this->_eventDispatcher->post([scene,packet]() {scene->handleMessage(packet); });
+
+		if (_scenes.size() > sceneIndex)
+		{
+			auto scene = _scenes[sceneIndex];
+			packet->metadata()["scene"] = scene.get();
+
+			this->_eventDispatcher->post([scene, packet]() {scene->handleMessage(packet); });
 			return true;
 		}
 

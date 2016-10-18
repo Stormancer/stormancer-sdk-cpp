@@ -117,9 +117,6 @@
     <ClCompile Include="stormancer\src\ScenePeer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="stormancer\src\Subscription.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="stormancer\src\SystemRequest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -130,6 +127,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="stormancer\src\IActionDispatcher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stormancer\src\SyncClock.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -197,9 +197,6 @@
     <ClInclude Include="stormancer\include\ILogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="stormancer\include\IObservable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="stormancer\include\IPacketDispatcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -221,9 +218,6 @@
     <ClInclude Include="stormancer\include\IScheduler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="stormancer\include\ISubscription.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="stormancer\include\ITask.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -237,9 +231,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="stormancer\include\NullLogger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="stormancer\include\Observable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="stormancer\include\Packet.h">
@@ -302,9 +293,6 @@
     <ClInclude Include="stormancer\include\stormancer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="stormancer\include\Subscription.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="stormancer\include\SystemRequest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -324,6 +312,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="stormancer\include\IActionDispatcher.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stormancer\include\SyncClock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -81,7 +81,7 @@ namespace Stormancer
 		}
 	}
 
-	void DefaultPacketDispatcher::addProcessor(IPacketProcessor* processor)
+	void DefaultPacketDispatcher::addProcessor(std::shared_ptr<IPacketProcessor> processor)
 	{
 		PacketProcessorConfig config(_handlers, _defaultProcessors);
 		processor->registerProcessor(config);

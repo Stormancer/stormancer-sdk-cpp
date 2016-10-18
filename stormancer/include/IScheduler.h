@@ -1,7 +1,6 @@
 #pragma once
 #include "headers.h"
 #include "Action.h"
-#include "Subscription.h"
 
 namespace Stormancer
 {
@@ -10,6 +9,6 @@ namespace Stormancer
 	{
 	public:
 		/// Schedule a periodic task on the scheculder
-		virtual ISubscription* schedulePeriodic(int delay, std::function<void()> funct) = 0;
+		virtual rxcpp::subscription schedulePeriodic(int delay, std::function<void()> funct) = 0;
 	};
 };

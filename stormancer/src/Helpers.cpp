@@ -50,44 +50,6 @@ namespace Stormancer
 		});
 	}
 
-	void destroy(Configuration* ptr)
-	{
-		delete ptr;
-	}
-
-	void destroy(Client* ptr)
-	{
-		delete ptr;
-	}
-
-	void destroy(Scene* ptr)
-	{
-		delete ptr;
-	}
-
-	void destroy(Result<Scene*>* ptr)
-	{
-		delete ptr;
-	}
-
-	void destroy(Result<>* ptr)
-	{
-		delete ptr;
-	}
-
-	
-
-	void destroy(RpcPlugin* ptr)
-	{
-		delete ptr;
-	}
-
-	void destroy(Observable<Packetisp_ptr>* ptr)
-	{
-		delete ptr;
-	}
-
-
 
 	bool ensureSuccessStatusCode(int statusCode)
 	{
@@ -146,12 +108,6 @@ namespace Stormancer
 		return str;
 	};
 
-	pplx::task<void> taskCompleted()
-	{
-		pplx::task_completion_event<void> tce;
-		tce.set();
-		return create_task(tce);
-	}
 
 	pplx::task<void> taskIf(bool condition, std::function<pplx::task<void>()> action)
 	{
@@ -161,7 +117,7 @@ namespace Stormancer
 		}
 		else
 		{
-			return taskCompleted();
+			return pplx::task_from_result();
 		}
 	}
 

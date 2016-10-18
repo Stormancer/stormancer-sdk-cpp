@@ -241,7 +241,6 @@
     <ClCompile Include="stormancer\src\SceneInfosDto.cpp" />
     <ClCompile Include="stormancer\src\SceneInfosRequestDto.cpp" />
     <ClCompile Include="stormancer\src\ScenePeer.cpp" />
-    <ClCompile Include="stormancer\src\Subscription.cpp" />
     <ClCompile Include="stormancer\src\SystemRequest.cpp" />
     <ClCompile Include="stormancer\src\TokenHandler.cpp" />
     <ClCompile Include="stormancer\src\Watch.cpp" />
@@ -269,7 +268,6 @@
     <ClInclude Include="stormancer\include\IConnection.h" />
     <ClInclude Include="stormancer\include\IConnectionManager.h" />
     <ClInclude Include="stormancer\include\ILogger.h" />
-    <ClInclude Include="stormancer\include\IObservable.h" />
     <ClInclude Include="stormancer\include\IPacketDispatcher.h" />
     <ClInclude Include="stormancer\include\IPacketProcessor.h" />
     <ClInclude Include="stormancer\include\IPlugin.h" />
@@ -277,7 +275,6 @@
     <ClInclude Include="stormancer\include\IRpcService.h" />
     <ClInclude Include="stormancer\include\IScenePeer.h" />
     <ClInclude Include="stormancer\include\IScheduler.h" />
-    <ClInclude Include="stormancer\include\ISubscription.h" />
     <ClInclude Include="stormancer\include\ITask.h" />
     <ClInclude Include="stormancer\include\ITokenHandler.h" />
     <ClInclude Include="stormancer\include\ITransport.h" />
@@ -304,7 +301,6 @@
     <ClInclude Include="stormancer\include\SceneInfosRequestDto.h" />
     <ClInclude Include="stormancer\include\ScenePeer.h" />
     <ClInclude Include="stormancer\include\stormancer.h" />
-    <ClInclude Include="stormancer\include\Subscription.h" />
     <ClInclude Include="stormancer\include\SystemRequest.h" />
     <ClInclude Include="stormancer\include\SystemRequestIDTypes.h" />
     <ClInclude Include="stormancer\include\Task.h" />

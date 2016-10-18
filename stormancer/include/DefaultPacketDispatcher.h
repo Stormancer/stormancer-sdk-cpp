@@ -13,7 +13,7 @@ namespace Stormancer
 		virtual ~DefaultPacketDispatcher();
 
 		void dispatchPacket(Packet_ptr packet);
-		void addProcessor(IPacketProcessor* processor);
+		void addProcessor(std::shared_ptr<IPacketProcessor> processor);
 
 	private:
 		void dispatchImpl(Packet_ptr packet);

@@ -14,7 +14,7 @@ const std::string applicationName = "tester";
 const char* sceneName = "main";
 std::shared_ptr<Configuration> config = nullptr;
 Client* client = nullptr;
-Scene* sceneMain = nullptr;
+ScenePtr sceneMain = nullptr;
 pplx::task<void> syncclockTask;
 
 std::deque<std::function<void()>> tests;
@@ -110,14 +110,14 @@ void test_connect()
 		client = Client::createClient(config);
 		logger->log(LogLevel::Info, "test_connect", "Create client OK", "");
 
-		client->onConnectionStateChanged([](ConnectionState state) {
+		client->GetConnectionStateChangedObservable().subscribe([](ConnectionState state) {
 			try
 			{
 				auto stateStr = connectionStateToString(state);
 				logger->log(LogLevel::Info, "Client", "Client connection state changed", stateStr.c_str());
 				if (state == ConnectionState::Disconnected)
 				{
-					Stormancer::destroy(client);
+					Client::destroy(client);
 				}
 			}
 			catch (const std::exception& ex)
@@ -127,59 +127,57 @@ void test_connect()
 		});
 
 		logger->log(LogLevel::Debug, "test_connect", "Get scene", "");
-		client->getPublicScene(sceneName).then([](Result<Scene*>* result) {
+		client->getPublicScene(sceneName).then([](pplx::task<ScenePtr> task) {
 			try
 			{
-				if (result->success())
-				{
-					sceneMain = result->get();
+				sceneMain = task.get();
 
-					sceneMain->onConnectionStateChanged([](ConnectionState state) {
-						auto stateStr = connectionStateToString(state);
-						logger->log(LogLevel::Info, "Scene", "Scene connection state changed", stateStr.c_str());
-						if (state == ConnectionState::Disconnected)
-						{
-							Stormancer::destroy(sceneMain);
-						}
-					});
+				
 
-					logger->log(LogLevel::Info, "test_connect", "Get scene OK", "");
+				sceneMain->GetConnectionStateChangedObservable().subscribe([](ConnectionState state) {
+					auto stateStr = connectionStateToString(state);
+					logger->log(LogLevel::Info, "Scene", "Scene connection state changed", stateStr.c_str());
+					if (state == ConnectionState::Disconnected)
+					{
+						logger->log(LogLevel::Info, "test_connect", "Scene disconnected", "");
+					}
+				});
 
-					logger->log(LogLevel::Debug, "test_connect", "Add route", "");
-					sceneMain->addRoute("echo", test_echo_received);
-					sceneMain->addRoute("rpcservercancelled", test_rpc_server_cancelled);
-					logger->log(LogLevel::Info, "test_connect", "Add route OK", "");
+				logger->log(LogLevel::Info, "test_connect", "Get scene OK", "");
 
-					logger->log(LogLevel::Debug, "test_connect", "Add procedure", "");
-					sceneMain->dependencyResolver()->resolve<IRpcService>()->addProcedure("rpc", test_rpc_client, true);
-					logger->log(LogLevel::Info, "test_connect", "Add procedure OK", "");
+				logger->log(LogLevel::Debug, "test_connect", "Add route", "");
+				sceneMain->addRoute("echo", test_echo_received);
+				sceneMain->addRoute("rpcservercancelled", test_rpc_server_cancelled);
+				logger->log(LogLevel::Info, "test_connect", "Add route OK", "");
 
-					logger->log(LogLevel::Debug, "test_connect", "Connect to scene", "");
-					sceneMain->connect().then([](Result<>* result2) {
-						if (result2->success())
-						{
-							logger->log(LogLevel::Info, "test_connect", "Connect OK", "");
-							logger->log(LogLevel::Warn, "test_connect", "Waiting 2000 ms...", "");
-							pplx::create_task([]() {
-								Sleep(2000);
-							}).wait();
-							execNextTest();
-						}
-						else
-						{
-							logger->log(LogLevel::Error, "test_connect", "Failed to connect to the scene", result2->reason());
-						}
-						destroy(result2);
-					});
-				}
-				else
-				{
-					logger->log(LogLevel::Error, "test_connect", "Failed to get the scene", result->reason());
-				}
-				destroy(result);
+				logger->log(LogLevel::Debug, "test_connect", "Add procedure", "");
+				sceneMain->dependencyResolver()->resolve<IRpcService>()->addProcedure("rpc", test_rpc_client, true);
+				logger->log(LogLevel::Info, "test_connect", "Add procedure OK", "");
+
+				logger->log(LogLevel::Debug, "test_connect", "Connect to scene", "");
+				sceneMain->connect().then([](auto result2) {
+					try
+					{
+						result2.get();
+					
+						logger->log(LogLevel::Info, "test_connect", "Connect OK", "");
+						logger->log(LogLevel::Warn, "test_connect", "Waiting 2000 ms...", "");
+						pplx::create_task([]() {
+							Sleep(2000);
+						}).wait();
+						execNextTest();
+					}
+					catch(std::exception& e)
+					{
+						logger->log(LogLevel::Error, "test_connect", "Failed to connect to the scene", e.what());
+					}
+					
+				});
+
 			}
 			catch (const std::exception& ex)
 			{
+				logger->log(LogLevel::Error, "test_connect", "Failed to get the scene", ex.what());
 				logger->log(ex);
 			}
 		});
@@ -193,13 +191,16 @@ void test_connect()
 void test_echo()
 {
 	logger->log(LogLevel::Debug, "test_echo", "test_echo", "");
-	auto result = sceneMain->sendPacket("echo", [](bytestream* stream) {
-		*stream << "stormancer";
-		logger->log(LogLevel::Debug, "test_echo", "Sending message...", "");
-	});
-	if (!result->success())
+	try
 	{
-		logger->log(LogLevel::Error, "test_echo", "Can't send data to the scene through the 'echo' route.", result->reason());
+		sceneMain->sendPacket("echo", [](bytestream* stream) {
+			*stream << "stormancer";
+			logger->log(LogLevel::Debug, "test_echo", "Sending message...", "");
+		});
+	} 
+	catch(std::exception& ex)
+	{
+		logger->log(LogLevel::Error, "test_echo", "Can't send data to the scene through the 'echo' route.", ex.what());
 	}
 }
 
@@ -208,7 +209,7 @@ void test_rpc_server()
 	logger->log(LogLevel::Debug, "test_rpc_server", "RPC on server", "");
 	sceneMain->dependencyResolver()->resolve<IRpcService>()->rpc("rpc", std::function<void(bytestream*)>([](bytestream* stream) {
 		*stream << "stormancer";
-	}), PacketPriority::MEDIUM_PRIORITY)->subscribe([](Packetisp_ptr packet) {
+	}), PacketPriority::MEDIUM_PRIORITY).subscribe([](Packetisp_ptr packet) {
 		std::string message;
 		*packet->stream >> message;
 		logger->log(LogLevel::Debug, "test_rpc_server", ("rpc response received (" + message + ")").c_str(), "");
@@ -238,13 +239,13 @@ void test_rpc_server_cancel()
 	logger->log(LogLevel::Debug, "test_rpc_server_cancel", "Rpc on server cancel", "");
 	auto subscription = sceneMain->dependencyResolver()->resolve<IRpcService>()->rpc("rpc", std::function<void(bytestream*)>([](bytestream* stream) {
 		*stream << "stormancer";
-	}), PacketPriority::MEDIUM_PRIORITY)->subscribe([](Packetisp_ptr packet) {
+	}), PacketPriority::MEDIUM_PRIORITY).subscribe([](Packetisp_ptr packet) {
 		logger->log(LogLevel::Debug, "test_rpc_server_cancel", "rpc response received, but this RPC should be cancelled.", "");
 	});
-	auto sub = subscription.lock();
-	if (sub)
+
+	if (subscription.is_subscribed())
 	{
-		sub->unsubscribe();
+		subscription.unsubscribe();
 	}
 	else
 	{
@@ -277,17 +278,19 @@ void test_syncclock()
 void test_disconnect()
 {
 	logger->log(LogLevel::Debug, "test_disconnect", "test disconnect", "");
-	client->disconnect().then([](Result<>* result2) {
-		if (result2->success())
+	client->disconnect().then([](auto t) {
+		try
 		{
 			logger->log(LogLevel::Info, "test_disconnect", "Disconnect client OK", "");
 			execNextTest();
 		}
-		else
+		catch (std::exception& e)
 		{
-			logger->log(LogLevel::Error, "test_disconnect", "Failed to disconnect client", result2->reason());
+			logger->log(LogLevel::Error, "test_disconnect", "Failed to disconnect client", e.what());
 		}
-		destroy(result2);
+		{
+
+		}
 	});
 }
 
@@ -295,9 +298,12 @@ void clean()
 {
 	logger->log(LogLevel::Debug, "clean", "deleting scene and client", "");
 	stop = true;
-	destroy(sceneMain);
 	sceneMain = nullptr;
-	destroy(client);
+	if (client)
+	{
+		Stormancer::Client::destroy(client);
+	}
+	
 	client = nullptr;
 	config = nullptr;
 	logger->log(LogLevel::Debug, "clean", "scene and client deleted", "");

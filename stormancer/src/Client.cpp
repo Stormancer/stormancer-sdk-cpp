@@ -40,37 +40,56 @@ namespace Stormancer
 		, _accountId(config->account)
 		, _config(config)
 		, _applicationName(config->application)
-		, _tokenHandler(new TokenHandler())
-		, _apiClient(new ApiClient(config, _tokenHandler))
-		, _dispatcher(config->dispatcher)
-		, _requestProcessor(new RequestProcessor(_logger, std::vector<IRequestModule*>()))
-		, _scenesDispatcher(new SceneDispatcher(config->actionDispatcher))
 		, _metadata(config->_metadata)
 		, _maxPeers(config->maxPeers)
 		, _dependencyResolver(new DependencyResolver())
 		, _plugins(config->plugins())
 		, _synchronisedClock(config->synchronisedClock)
-		, _synchronisedClockInterval(config->synchronisedClockInterval)
-		, _eventDispatcher(config->actionDispatcher)
 	{
-		_dependencyResolver->registerDependency<ILogger>(ILogger::instance());
-		_dependencyResolver->registerDependency<IScheduler>(config->scheduler);
-		_dependencyResolver->registerDependency(config->transportFactory);
+		dependencyResolver()->registerDependency<ITokenHandler>([](DependencyResolver* resolver) {return std::make_shared<TokenHandler>(); });
+		dependencyResolver()->registerDependency<ApiClient>([config](DependencyResolver* resolver) {
+			auto tokenHandler = resolver->resolve<ITokenHandler>();
+			return std::make_shared<ApiClient>(config,tokenHandler);
+		},true);
+		dependencyResolver()->registerDependency<ILogger>(ILogger::instance());
+		dependencyResolver()->registerDependency<IScheduler>(config->scheduler);
+		dependencyResolver()->registerDependency(config->transportFactory, true);
+		dependencyResolver()->registerDependency<IActionDispatcher>(config->actionDispatcher);
+		dependencyResolver()->registerDependency<SceneDispatcher>([](DependencyResolver* resolver) {
+			return std::make_shared<SceneDispatcher>(resolver->resolve<IActionDispatcher>());
+		}, true);
+		dependencyResolver()->registerDependency<SyncClock>([config](DependencyResolver* resolver) {
+			return std::make_shared<SyncClock>(resolver, config->synchronisedClockInterval);
+		}, true);
+		dependencyResolver()->registerDependency<RequestProcessor>([](DependencyResolver* resolver) {
+			return std::make_shared<RequestProcessor>(resolver->resolve<ILogger>(), std::vector<IRequestModule*>());
+		}, true);
+
+		dependencyResolver()->registerDependency<IPacketDispatcher>([this](DependencyResolver* resolver) {
+			auto dispatcher = _config->dispatcher(resolver);
+			dispatcher->addProcessor(resolver->resolve<RequestProcessor>());
+			dispatcher->addProcessor(resolver->resolve<SceneDispatcher>());
+			return dispatcher;
+		}, true);
+
+		_connectionStateObservable;
 
 		_logger = _dependencyResolver->resolve<ILogger>();
-		_scheduler = _dependencyResolver->resolve<IScheduler>();
-		_transport = _dependencyResolver->resolve<ITransport>();
 
-		_dispatcher->addProcessor(_requestProcessor);
-		_dispatcher->addProcessor(_scenesDispatcher);
+
+
+
 
 		_metadata["serializers"] = "msgpack/array";
-		_metadata["transport"] = _transport->name();
+		_metadata["transport"] = _dependencyResolver->resolve<ITransport>()->name();
 		_metadata["version"] = "1.2.0";
 		_metadata["platform"] = __PLATFORM__;
 		_metadata["protocol"] = "2";
 
-		dependencyResolver()->registerDependency<IActionDispatcher>(config->actionDispatcher);
+		_connectionStateObservable.get_observable().subscribe([this](ConnectionState state) {
+			this->_connectionState = state;
+		});
+
 		for (auto plugin : _plugins)
 		{
 			plugin->clientCreated(this);
@@ -79,15 +98,15 @@ namespace Stormancer
 		initialize();
 	}
 
+	
 	Client::~Client()
 	{
-#ifdef STORMANCER_LOG_CLIENT
-		ILogger::instance()->log(LogLevel::Trace, "Client::~Client", "deleting the client...", "");
-#endif
-		disconnect(true);
 
-		_eventDispatcher->stop();
-		while (_eventDispatcher->isRunning()) //Wait for dispatcher to stop.
+		ILogger::instance()->log(LogLevel::Trace, "Client::~Client", "deleting the client...", "");
+
+
+		dependencyResolver()->resolve<IActionDispatcher>()->stop();
+		while (dependencyResolver()->resolve<IActionDispatcher>()->isRunning()) //Wait for dispatcher to stop.
 		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		}
@@ -98,46 +117,37 @@ namespace Stormancer
 		}
 		_plugins.clear();
 
-		delete _scenesDispatcher;
-		_scenesDispatcher = nullptr;
 
-		delete _requestProcessor;
-		_requestProcessor = nullptr;
 
-		delete _apiClient;
-		_apiClient = nullptr;
-
-		delete _tokenHandler;
-		_tokenHandler = nullptr;
+		
 
 		if (_serverConnection)
 		{
 			_serverConnection = nullptr;
 		}
 
-		if (_dispatcher)
-		{
-			delete _dispatcher;
-			_dispatcher = nullptr;
-		}
+		delete _dependencyResolver;
 
-		
-
-#ifdef STORMANCER_LOG_CLIENT
 		ILogger::instance()->log(LogLevel::Trace, "Client::~Client", "client deleted", "");
-#endif
+
 	}
 
 	Client* Client::createClient(std::shared_ptr<Configuration> config)
 	{
 		if (!config)
 		{
-#ifdef STORMANCER_LOG_CLIENT
-			ILogger::instance()->log(LogLevel::Error, "Client::createClient", "Bad client configuration", "");
-#endif
+			ILogger::instance()->log(LogLevel::Error, "Client::createClient", "Provided client configuration is null", "");
 		}
 
 		return new Client(config);
+	}
+
+	pplx::task<void> Client::destroy(Client * client)
+	{
+		return client->disconnect(true).then([client]() {
+			delete client;
+		});
+		
 	}
 
 	void Client::initialize()
@@ -145,16 +155,16 @@ namespace Stormancer
 		if (!_initialized)
 		{
 			_initialized = true;
-			_eventDispatcher->start();
-
-			_transport->onPacketReceived([this](Packet_ptr packet) { transport_packetReceived(packet); });
-			_transport->onTransportEvent([this](void* data, void* data2, void* data3) {
+			dependencyResolver()->resolve<IActionDispatcher>()->start();
+			auto transport = _dependencyResolver->resolve<ITransport>();
+			transport->onPacketReceived([this](Packet_ptr packet) { transport_packetReceived(packet); });
+			transport->onTransportEvent([this](void* data, void* data2, void* data3) {
 				for (auto plugin : _plugins)
 				{
 					plugin->transportEvent(data, data2, data3);
 				}
 			});
-			_watch.reset();
+
 		}
 	}
 
@@ -169,7 +179,7 @@ namespace Stormancer
 	}
 
 
-	pplx::task<Result<Scene*>*> Client::getPublicScene(const char* sceneId)
+	pplx::task<std::shared_ptr<Scene>> Client::getPublicScene(const char* sceneId)
 	{
 		if (!sceneId)
 		{
@@ -182,153 +192,133 @@ namespace Stormancer
 		ILogger::instance()->log(LogLevel::Trace, "Client::getPublicScene", sceneId, "");
 #endif
 
-		return _apiClient->getSceneEndpoint(_accountId, _applicationName, sceneId).then([this, sceneId](pplx::task<SceneEndpoint> t) {
-			auto result = new Result<Scene*>();
+		return dependencyResolver()->resolve<ApiClient>()->getSceneEndpoint(_accountId, _applicationName, sceneId).then([this, sceneId](pplx::task<SceneEndpoint> t) {
+
 			try
 			{
 				SceneEndpoint sep = t.get();
-				return this->getScene(sceneId, sep).then([result](pplx::task<Scene*> t) {
-					try
-					{
-						auto scene = t.get();
-						result->set(scene);
-					}
-					catch (const std::exception& ex)
-					{
-						result->setError(1, ex.what());
-					}
-					return result;
-				});
+				return this->getScene(sceneId, sep);
 			}
 			catch (const std::exception& ex)
 			{
-				ILogger::instance()->log(ex);
-				result->setError(1, ex.what());
-				return pplx::task<Result<Scene*>*>([result]() {
-					return result;
-				});
+				logger()->log(ex);
+
+				throw std::runtime_error((std::string("An error occured while obtaining the scene endpoints for public scene '") + sceneId + " :" + ex.what()).c_str());
 			}
 		});
 	}
 
-	pplx::task<Result<Scene*>*> Client::getScene(const char* token2)
+	pplx::task<std::shared_ptr<Scene>> Client::getScene(const char* token2)
 	{
 		std::string token = token2;
-		auto sep = _tokenHandler->decodeToken(token);
-		return getScene(sep.tokenData.SceneId, sep).then([](pplx::task<Scene*> t) {
-			auto result = new Result<Scene*>();
-			try
-			{
-				auto scene = t.get();
-				result->set(scene);
-			}
-			catch (const std::exception& ex)
-			{
-				result->setError(1, ex.what());
-			}
-			return result;
-		});
+		auto sep = dependencyResolver()->resolve<TokenHandler>()->decodeToken(token);
+		return getScene(sep.tokenData.SceneId, sep);
 	}
 
-	pplx::task<Scene*> Client::getScene(std::string sceneId, SceneEndpoint sep)
+	pplx::task<void> Client::tryConnectToServer(SceneEndpoint endpoint)
 	{
-		if (_cts.get_token().is_canceled())
-		{
-			throw std::runtime_error("This Stormancer client has been disconnected and should not be used anymore.");
-		}
 
-#ifdef STORMANCER_LOG_CLIENT
-		_logger->log(LogLevel::Trace, "Client::getScene", sceneId.c_str(), sep.token.c_str());
-#endif
-		if (!_connectionTaskSet)
+		if (this->GetCurrentConnectionState() == ConnectionState::Disconnected)
 		{
-			_connectionMutex.lock();
-			if (!_connectionTaskSet)
+			std::lock_guard<std::mutex> lock(_connectionMutex);
+			if (this->GetCurrentConnectionState() == ConnectionState::Disconnected)
 			{
-				_connectionTask = taskIf(_serverConnection == nullptr, [this, sep]() {
+				_connectionState = ConnectionState::Connecting;
+				setConnectionState(ConnectionState::Connecting);
 
-					if (!_transport->isRunning()) {
-						try
-						{
-							_transport->start("client", new ConnectionHandler(), _cts.get_token(), this->_config->serverPort, (uint16)(_maxPeers + 1));
-							for (auto plugin : _plugins)
-							{
-								plugin->transportStarted(_transport.get());
-							}
-						}
-						catch (const std::exception& e)
-						{
-							throw std::runtime_error(std::string(e.what()) + "\nFailed to start the transport.");
-						}
-					}
-					std::string endpoint = sep.tokenData.Endpoints.at(_transport->name());
-#ifdef STORMANCER_LOG_CLIENT
-					_logger->log(LogLevel::Trace, "Client::getScene", "Connecting transport", "");
-#endif
-					try
+				assert(_serverConnection == nullptr);
+				try
+				{
+					auto transport = dependencyResolver()->resolve<ITransport>();
+
+					_logger->log(LogLevel::Trace, "Client::getScene", "Starting transport", ("port :" + std::to_string(this->_config->serverPort) + ", maxPeers:" + std::to_string((uint16)_maxPeers + 1)).c_str());
+					//Start transport and execute plugin event
+					transport->start("client", new ConnectionHandler(), _cts.get_token(), (uint16)_maxPeers + 1, this->_config->serverPort);
+					for (auto plugin : _plugins)
 					{
-						this->dispatchEvent([this]() {_onConnectionStateChanged(ConnectionState::Connecting); });
-						
+						plugin->transportStarted(transport.get());
+					}
 
-						return _transport->connect(endpoint).then([this](IConnection* connection) {
-#ifdef STORMANCER_LOG_CLIENT
-							_logger->log(LogLevel::Trace, "Client::getScene", "Client::transport connected", "");
-#endif
-							_serverConnection = connection;
+					//Connect to server
+					std::string endpointUrl = endpoint.tokenData.Endpoints.at(transport->name());
 
-							this->dispatchEvent([this]() {_onConnectionStateChanged(ConnectionState::Connected); });
+					_logger->log(LogLevel::Trace, "Client::getScene", "Connecting transport to server.", endpointUrl.c_str());
+					return transport->connect(endpointUrl)
+						.then([this](pplx::task<IConnection*> t)
+					{
+						auto connection = t.get();
 
-							auto peerConnectionStateEraseIterator = new Action<ConnectionState>::TIterator();
-							*peerConnectionStateEraseIterator = _serverConnection->onConnectionStateChanged([this, peerConnectionStateEraseIterator](ConnectionState connectionState) {
-								if (connectionState == ConnectionState::Disconnected)
-								{
-									_serverConnection->connectionStateChangedAction().erase(*peerConnectionStateEraseIterator);
-									_serverConnection = nullptr;
-									delete peerConnectionStateEraseIterator;
-								}
+						connection->GetConnectionStateChangedObservable().subscribe([this](ConnectionState state) {
+
+							if (state == ConnectionState::Disconnected)
+							{
 								auto scenes = _scenes;
 								for (auto sceneIt : scenes)
 								{
 									auto scene = sceneIt.second;
 									for (auto plugin : _plugins)
 									{
-										plugin->sceneDisconnected(scene);
+										plugin->sceneDisconnected(scene.get());
 									}
 									this->dispatchEvent([scene]() {scene->setConnectionState(ConnectionState::Disconnected); });
-									
-								}
-								this->dispatchEvent([this,connectionState]() {_onConnectionStateChanged(connectionState); });
-								;
-							});
 
-							_serverConnection->setMetadata(_metadata);
+								}
+								setConnectionState(state);
+
+								_serverConnection = nullptr;
+							}
 						});
-					}
-					catch (const std::exception& ex)
+						connection->setMetadata(_metadata);
+						this->_serverConnection = connection;
+						return;
+					})
+						.then([this](pplx::task<void>)
 					{
-						throw std::runtime_error(std::string(ex.what()) + "\nFailed to connect the transport.");
-					}
-				}).then([this, sep]() {
-					return updateServerMetadata();
-				}).then([this, sep]() {
-					if (_synchronisedClock && sep.tokenData.Version > 0)
+						return this->updateServerMetadata();
+					})
+						.then([this, endpoint](pplx::task<void> t)
 					{
-						startSyncClock();
-					}
-				});
+
+						try
+						{
+							if (_synchronisedClock && endpoint.tokenData.Version > 0)
+							{
+								dependencyResolver()->resolve<SyncClock>()->Start(_serverConnection);
+							}
+						}
+						catch (std::exception& ex)
+						{
+							throw ex;
+						}
+
+					});
+				}
+				catch (std::exception& ex)
+				{
+
+					return pplx::task_from_exception<void, std::runtime_error>(std::runtime_error(std::string(ex.what()) + ": Failed to start transport."));
+
+				}
 			}
 
-			_connectionTaskSet = true;
-			_connectionMutex.unlock();
 		}
 
-		return _connectionTask.then([this, sep](){
+		return _connectionTask;
+	}
+
+	pplx::task<std::shared_ptr<Scene>> Client::getScene(std::string sceneId, SceneEndpoint sep)
+	{
+		_logger->log(LogLevel::Trace, "Client::getScene", sceneId.c_str(), sep.token.c_str());
+
+
+
+		return this->tryConnectToServer(sep).then([this, sep]() {
 			SceneInfosRequestDto parameter;
 			parameter.Metadata = _serverConnection->metadata();
 			parameter.Token = sep.token;
-#ifdef STORMANCER_LOG_CLIENT
+
 			_logger->log(LogLevel::Trace, "Client::getScene", "send SceneInfosRequestDto", "");
-#endif
+
 			return sendSystemRequest<SceneInfosRequestDto, SceneInfosDto>((byte)SystemRequestIDTypes::ID_GET_SCENE_INFOS, parameter);
 		}).then([this, sep, sceneId](SceneInfosDto sceneInfos) {
 			std::stringstream ss;
@@ -343,43 +333,46 @@ namespace Stormancer
 				ss << it.first << ":" << it.second << ";";
 			}
 			ss << "]";
-#ifdef STORMANCER_LOG_CLIENT
+
 			_logger->log(LogLevel::Trace, "Client::getScene", "SceneInfosDto received", ss.str().c_str());
-#endif
+
 			_serverConnection->metadata()["serializer"] = sceneInfos.SelectedSerializer;
 
-			return updateServerMetadata().then([this, sep, sceneId, sceneInfos]() {
-#ifdef STORMANCER_LOG_CLIENT
-				_logger->log(LogLevel::Trace, "Client::getScene", "Returning the scene ", sceneId.c_str());
-#endif
-				Scene* scene;
-				if (mapContains(_scenes, sceneId))
-				{
-					scene = _scenes[sceneId];
-				}
-				else
-				{
-					auto sceneDeleter = [this, sceneId]() {
-						if (mapContains(_scenes, sceneId))
-						{
-							_scenes.erase(sceneId);
-						}
-					};
-					scene = new Scene(_serverConnection, this, sceneId, sep.token, sceneInfos, _dependencyResolver, sceneDeleter);
-					_scenes[sceneId] = scene;
-				}
-				for (auto plugin : _plugins)
-				{
-
-					plugin->registerSceneDependencies(scene);
-				}
-				for (auto plugin : _plugins)
-				{
-					
-					plugin->sceneCreated(scene);
-				}
-				return scene;
+			return updateServerMetadata().then([sceneInfos]() {
+				return sceneInfos;
 			});
+		}).then([this, sep, sceneId](pplx::task<SceneInfosDto> t) {
+
+			auto sceneInfos = t.get();
+			_logger->log(LogLevel::Trace, "Client::getScene", "Returning the scene ", sceneId.c_str());
+
+			ScenePtr scene;
+			if (mapContains(_scenes, sceneId))
+			{
+				scene = _scenes[sceneId];
+			}
+			else
+			{
+				auto sceneDeleter = [this, sceneId]() {
+					if (mapContains(_scenes, sceneId))
+					{
+						_scenes.erase(sceneId);
+					}
+				};
+				scene = std::make_shared<Scene>(_serverConnection, this, sceneId, sep.token, sceneInfos, _dependencyResolver, sceneDeleter);
+				_scenes[sceneId] = scene;
+			}
+			for (auto plugin : _plugins)
+			{
+
+				plugin->registerSceneDependencies(scene.get());
+			}
+			for (auto plugin : _plugins)
+			{
+
+				plugin->sceneCreated(scene.get());
+			}
+			return scene;
 		});
 	}
 
@@ -388,7 +381,7 @@ namespace Stormancer
 #ifdef STORMANCER_LOG_CLIENT
 		_logger->log(LogLevel::Trace, "Client::updateServerMetadata", "sending system request.", "");
 #endif
-		return _requestProcessor->sendSystemRequest(_serverConnection, (byte)SystemRequestIDTypes::ID_SET_METADATA, [this](bytestream* bs) {
+		return dependencyResolver()->resolve<RequestProcessor>()->sendSystemRequest(_serverConnection, (byte)SystemRequestIDTypes::ID_SET_METADATA, [this](bytestream* bs) {
 			msgpack::pack(bs, _serverConnection->metadata());
 		}).then([](pplx::task<Packet_ptr> t) {
 			try
@@ -402,21 +395,21 @@ namespace Stormancer
 		});
 	}
 
-	pplx::task<void> Client::connectToScene(Scene* scene, std::string& token, std::vector<Route_ptr> localRoutes)
+	pplx::task<void> Client::connectToScene(std::shared_ptr<Scene> scene, std::string& token, std::vector<Route_ptr> localRoutes)
 	{
 		if (!scene)
 		{
 			throw std::runtime_error("The scene ptr is invalid");
 		}
 
-		if (scene->connectionState() != ConnectionState::Disconnected)
+		if (scene->GetCurrentConnectionState() != ConnectionState::Disconnected)
 		{
 			throw std::runtime_error("The scene is not in disconnected state");
 		}
 
 		for (auto plugin : _plugins)
 		{
-			plugin->sceneConnecting(scene);
+			plugin->sceneConnecting(scene.get());
 		}
 
 		scene->setConnectionState(ConnectionState::Connecting);
@@ -435,26 +428,26 @@ namespace Stormancer
 
 		return Client::sendSystemRequest<ConnectToSceneMsg, ConnectionResult>((byte)SystemRequestIDTypes::ID_CONNECT_TO_SCENE, parameter).then([this, scene](ConnectionResult result) {
 			scene->completeConnectionInitialization(result);
-			_scenesDispatcher->addScene(scene);
+			dependencyResolver()->resolve<SceneDispatcher>()->addScene(scene);
 			for (auto plugin : _plugins)
 			{
-				plugin->sceneConnected(scene);
+				plugin->sceneConnected(scene.get());
 			}
 			scene->setConnectionState(ConnectionState::Connected);
 #ifdef STORMANCER_LOG_CLIENT
-			ILogger::instance()->log(LogLevel::Info, "client", "Scene connected", scene->id());
+			logger()->log(LogLevel::Info, "client", "Scene connected", scene->id().c_str());
 #endif
 		});
 	}
 
-	pplx::task<Result<>*> Client::disconnect(bool immediate)
+	pplx::task<void> Client::disconnect(bool immediate)
 	{
-		pplx::task_completion_event<Result<>*> tce;
-		auto result = new Result<>();
+		pplx::task_completion_event<void> tce;
+
 
 		try
 		{
-			stopSyncClock();
+			dependencyResolver()->resolve<SyncClock>()->Stop();
 
 			if (_serverConnection && _serverConnection->connectionState() == ConnectionState::Connected)
 			{
@@ -462,21 +455,22 @@ namespace Stormancer
 
 				auto dt = disconnectAllScenes(immediate);
 
-				auto end = [this, tce, result]() {
+				auto end = [this, tce]() {
 					_cts.cancel(); // this will cause the transport to stop
 
-					result->set();
-					tce.set(result);
+
+
 
 					if (_serverConnection)
 					{
 						_serverConnection->close();
 					}
+					tce.set();
 				};
 
 				if (!immediate)
 				{
-					dt.then([tce, result, end](pplx::task<void> t) {
+					dt.then([tce, end](pplx::task<void> t) {
 						try
 						{
 							t.wait();
@@ -484,8 +478,8 @@ namespace Stormancer
 						}
 						catch (const std::exception& ex)
 						{
-							result->setError(1, ex.what());
-							tce.set(result);
+
+							tce.set_exception(ex);
 						}
 					});
 				}
@@ -496,14 +490,14 @@ namespace Stormancer
 			}
 			else
 			{
-				result->set();
-				tce.set(result);
+
+				tce.set();
 			}
 		}
 		catch (const std::exception& ex)
 		{
-			result->setError(1, ex.what());
-			tce.set(result);
+
+			tce.set_exception(ex);
 		}
 
 		return pplx::create_task(tce);
@@ -516,7 +510,7 @@ namespace Stormancer
 			throw std::runtime_error("The scene ptr is null");
 		}
 
-		if (scene->connectionState() != ConnectionState::Connected)
+		if (scene->GetCurrentConnectionState() != ConnectionState::Connected)
 		{
 			throw std::runtime_error("The scene is not in connected state");
 		}
@@ -543,7 +537,7 @@ namespace Stormancer
 		};
 
 		DisconnectFromSceneDto dto(sceneHandle);
-		_scenesDispatcher->removeScene(sceneHandle);
+		dependencyResolver()->resolve<SceneDispatcher>()->removeScene(sceneHandle);
 		if (!immediate)
 		{
 			return sendSystemRequest<DisconnectFromSceneDto, EmptyDto>((byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, dto).then([taskDisconnected](EmptyDto&) {
@@ -553,48 +547,62 @@ namespace Stormancer
 		else
 		{
 			taskDisconnected();
-			return taskCompleted();
+			return pplx::task_from_result();
 		}
 	}
 
 	pplx::task<void> Client::disconnectAllScenes(bool immediate)
 	{
+		//Use TCE because compiler cannot determine when_all return type...
 		pplx::task_completion_event<void> tce;
-
-		std::vector<pplx::task<Result<>*>> tasks;
+		std::vector<pplx::task<bool>> tasks;
 		for (auto it : _scenes)
 		{
 			auto scene = it.second;
 			if (scene)
 			{
-				tasks.push_back(scene->disconnect(immediate));
+				tasks.push_back(scene->disconnect(immediate).then([](pplx::task<void> t) {
+					try
+					{
+						t.get();
+						return true;
+					}
+					catch (std::exception&)
+					{
+						return false;
+					}
+				}));
 			}
 		}
-		pplx::when_all(std::begin(tasks), std::end(tasks)).then([tce](std::vector<Result<>*> results) {
+		pplx::when_all(std::begin(tasks), std::end(tasks)).then([tce](pplx::task<std::vector<bool>> t) {
 			bool success = true;
 			std::string reason;
+			auto results = t.get();
 			for (auto result : results)
 			{
-				if (!result->success())
+				try
+				{
+					success &= result;
+				}
+				catch (std::exception& ex)
 				{
 					success = false;
 					if (reason.size())
 					{
 						reason += "\n";
 					}
-					reason += result->reason();
+					reason += ex.what();
 				}
-				delete result;
 			}
-
-			if (success)
+			if (!success)
 			{
-				tce.set();
+				tce.set_exception(std::runtime_error(reason));
 			}
 			else
 			{
-				tce.set_exception<std::runtime_error>(std::runtime_error(reason));
+				tce.set();
 			}
+
 		});
 
 		return pplx::create_task(tce);
@@ -607,179 +615,61 @@ namespace Stormancer
 			plugin->packetReceived(packet);
 		}
 
-		this->_dispatcher->dispatchPacket(packet);
+		this->dependencyResolver()->resolve<IPacketDispatcher>()->dispatchPacket(packet);
 	}
 
 	int64 Client::clock()
 	{
-		return (int64)(_watch.getElapsedTime() + _offset);
+		return dependencyResolver()->resolve<SyncClock>()->Clock();
 	}
 
 	int64 Client::lastPing()
 	{
-		return _lastPing;
+		auto clock = dependencyResolver()->resolve<SyncClock>();
+		return clock->LastPing();
 	}
 
-	void Client::startSyncClock()
-	{
-		ILogger::instance()->log(LogLevel::Trace, "Client::startSyncClock", "Starting syncClock...", "");
-		std::lock_guard<std::mutex> lg(_syncClockMutex);
-		if (_scheduler)
-		{
-			int interval = (int)(_clockValues.size() >= _maxClockValues ? _synchronisedClockInterval : _pingIntervalAtStart);
-			_syncClockSubscription = _scheduler->schedulePeriodic(interval, [this, interval]() {
-				std::lock_guard<std::mutex> lg(_syncClockMutex);
-				if (_syncClockSubscription && _syncClockSubscription->subscribed())
-				{
-					if (interval == _pingIntervalAtStart && _clockValues.size() >= _maxClockValues)
-					{
-						pplx::task<void>([this]() {
-							stopSyncClock();
-							startSyncClock();
-						});
-					}
-					else
-					{
-						syncClockImpl();
-					}
-				}
-			});
-		}
-		syncClockImpl();
-		ILogger::instance()->log(LogLevel::Trace, "Client::startSyncClock", "SyncClock started", "");
-	}
 
-	void Client::stopSyncClock()
-	{
-		ILogger::instance()->log(LogLevel::Trace, "Client::stopSyncClock", "waiting to stop syncClock...", "");
-		std::lock_guard<std::mutex> lg(_syncClockMutex);
-		if (_syncClockSubscription)
-		{
-			if (_syncClockSubscription->subscribed())
-			{
-				_syncClockSubscription->unsubscribe();
-			}
-			_syncClockSubscription->destroy();
-			_syncClockSubscription = nullptr;
-		}
-		ILogger::instance()->log(LogLevel::Trace, "Client::stopSyncClock", "SyncClock stopped", "");
-	}
-
-	pplx::task<void> Client::syncClockImpl()
-	{
-		if (!lastPingFinished)
-		{
-			return taskCompleted();
-		}
-
-		try
-		{
-			lastPingFinished = false;
-
-			uint64 timeStart = _watch.getElapsedTime();
-			return _requestProcessor->sendSystemRequest(_serverConnection, (byte)SystemRequestIDTypes::ID_PING, [&timeStart](bytestream* bs) {
-				*bs << timeStart;
-			}, PacketPriority::IMMEDIATE_PRIORITY).then([this, timeStart](pplx::task<Packet_ptr> t) {
-				Packet_ptr packet;
-				try
-				{
-					packet = t.get();
-				}
-				catch (const std::exception& ex)
-				{
-#ifdef STORMANCER_LOG_CLIENT
-					ILogger::instance()->log(LogLevel::Warn, "syncClock", "Failed to ping the server", ex.what());
-#endif
-					return;
-				}
-
-				uint64 timeEnd = (uint16)this->_watch.getElapsedTime();
-
-				lastPingFinished = true;
-
-				uint64 timeServer;
-				*packet->stream >> timeServer;
-
-				uint16 ping = (uint16)(timeEnd - timeStart);
-				_lastPing = ping;
-				double latency = ping / 2.0;
-
-				double offset = timeServer - timeEnd + latency;
-
-				_clockValues.push_back(ClockValue{ latency, offset });
-				if (_clockValues.size() > _maxClockValues)
-				{
-					_clockValues.pop_front();
-				}
-				auto len = _clockValues.size();
-
-				std::vector<double> latencies(len);
-				for (auto i = 0; i < len; i++)
-				{
-					latencies[i] = _clockValues[i].latency;
-				}
-				std::sort(latencies.begin(), latencies.end());
-				_medianLatency = latencies[len / 2];
-				double pingAvg = std::accumulate(latencies.begin(), latencies.end(), 0.0) / len;
-				double varianceLatency = 0;
-				for (auto v : latencies)
-				{
-					auto tmp = v - pingAvg;
-					varianceLatency += (tmp * tmp);
-				}
-				varianceLatency /= len;
-				_standardDeviationLatency = std::sqrt(varianceLatency);
-
-				double offsetsAvg = 0;
-				uint32 lenOffsets = 0;
-				double latencyMax = _medianLatency + _standardDeviationLatency;
-				for (auto v : _clockValues)
-				{
-					if (v.latency < latencyMax)
-					{
-						offsetsAvg += v.offset;
-						lenOffsets++;
-					}
-				}
-				_offset = offsetsAvg / lenOffsets;
-			});
-		}
-		catch (const std::exception& ex)
-		{
-#ifdef STORMANCER_LOG_CLIENT
-			_logger->log(LogLevel::Error, "Client::syncClockImpl", "Failed to ping server.", ex.what());
-#endif
-			throw std::runtime_error(std::string() + ex.what() + "\nFailed to ping server.");
-		}
-	}
 
 	DependencyResolver* Client::dependencyResolver() const
 	{
 		return _dependencyResolver;
 	}
 
-	Action<ConnectionState>& Client::connectionStateChangedAction()
+	rxcpp::observable<ConnectionState> Client::GetConnectionStateChangedObservable()
 	{
-		return _onConnectionStateChanged;
+		return _connectionStateObservable.get_observable();
 	}
 
-	Action<ConnectionState>::TIterator Client::onConnectionStateChanged(std::function<void(ConnectionState)> callback)
-	{
-		return _onConnectionStateChanged.push_back(callback);
-	}
-
-	ConnectionState Client::connectionState() const
+	ConnectionState Client::GetCurrentConnectionState() const
 	{
 		return (_serverConnection ? _serverConnection->connectionState() : ConnectionState::Disconnected);
 	}
 
-	void Client::SetMedatata(const char* key, const char* value)
+	void Client::SetMedatata(const std::string key, const std::string value)
 	{
 		_metadata[key] = value;
 	}
 
 	void Client::dispatchEvent(std::function<void(void)> ev)
 	{
-		_eventDispatcher->post(ev);
+		dependencyResolver()->resolve<IActionDispatcher>()->post(ev);
+	}
+	void Client::setConnectionState(ConnectionState state)
+	{
+		if (state != _connectionState)
+		{
+			_connectionState = state;
+			auto subscriber = this->_connectionStateObservable.get_subscriber();
+			this->dispatchEvent([subscriber, state]() 
+			{
+				
+				subscriber.on_next(state); 
+				if (state == ConnectionState::Disconnected)
+				{
+					subscriber.on_completed();
+				}
+			});
+		}
 	}
 };

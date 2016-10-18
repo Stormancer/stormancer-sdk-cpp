@@ -78,7 +78,10 @@ namespace Stormancer
 		std::map<size_t, void*> _localData;
 		DependencyResolver* _dependencyResolver = nullptr;
 		ConnectionState _connectionState = ConnectionState::Disconnected;
-		Action<ConnectionState> _onConnectionStateChanged;
+		rxcpp::subjects::subject<ConnectionState> _connectionStateObservable;
 		Action<std::string> _closeAction;
+
+		// Inherited via IConnection
+		virtual rxcpp::observable<ConnectionState> GetConnectionStateChangedObservable() override;
 	};
 };

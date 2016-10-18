@@ -36,19 +36,14 @@ namespace Stormancer
 			void closeConnection(IConnection* connection, std::string reason);
 		};
 
-	private:
-		struct ClockValue
-		{
-			double latency;
-			double offset;
-		};
+		
 
 	private:
 		Client(std::shared_ptr<Configuration> config);
 
 	public:
 		/// Destructor.
-		~Client();
+		
 
 	private:
 		/// Copy constructor deleted.
@@ -56,45 +51,43 @@ namespace Stormancer
 
 		/// Copy operator deleted.
 		Client& operator=(Client& other) = delete;
-
+		~Client();
 	public:
 		/// Factory.
 		/// \param config A pointer to a Configuration.
-		STORMANCER_DLL_API static Client* createClient(std::shared_ptr<Configuration> config);
-
+		static Client* createClient(std::shared_ptr<Configuration> config);
+		static pplx::task<void> destroy(Client* client);
 		/// Get a public scene.
 		/// \param sceneId The scene Id as a string.
 		/// \param userData Some custom user data as a string.
 		/// \return a task to the connection to the scene.
-		STORMANCER_DLL_API pplx::task<Result<Scene*>*> getPublicScene(const char* sceneId);
+		pplx::task<std::shared_ptr<Scene>> getPublicScene(const char* sceneId);
 
-		STORMANCER_DLL_API pplx::task<Result<Scene*>*> getScene(const char* token);
+		pplx::task<std::shared_ptr<Scene>> getScene(const char* token);
 
 		/// Returns the name of the application.
-		STORMANCER_DLL_API std::string applicationName();
+		std::string applicationName();
 
 		/// Returns the used logger.
-		STORMANCER_DLL_API std::shared_ptr<ILogger> logger();
+		std::shared_ptr<ILogger> logger();
 
-		
+
 
 		/// Disconnect and close all connections.
 		/// this method returns nothing. So it's useful for application close.
-		STORMANCER_DLL_API pplx::task<Result<>*> disconnect(bool immediate = false);
+		pplx::task<void> disconnect(bool immediate = false);
 
-		STORMANCER_DLL_API int64 clock();
+		int64 clock();
 
-		STORMANCER_DLL_API int64 lastPing();
+		int64 lastPing();
 
-		STORMANCER_DLL_API DependencyResolver* dependencyResolver() const;
+		DependencyResolver* dependencyResolver() const;
 
-		STORMANCER_DLL_API Action<ConnectionState>& connectionStateChangedAction();
+		rxcpp::observable<ConnectionState> GetConnectionStateChangedObservable();
 
-		STORMANCER_DLL_API Action<ConnectionState>::TIterator onConnectionStateChanged(std::function<void(ConnectionState)> callback);
+		ConnectionState GetCurrentConnectionState() const;
 
-		STORMANCER_DLL_API ConnectionState connectionState() const;
-
-		STORMANCER_DLL_API void SetMedatata(const char* key, const char* value);
+		void SetMedatata(const std::string key, const std::string value);
 	private:
 
 		void initialize();
@@ -104,7 +97,7 @@ namespace Stormancer
 		/// \param token Application token.
 		/// \param localRoutes Local routes declared.
 		/// \return A task which complete when the connection is done.
-		pplx::task<void> connectToScene(Scene* scene, std::string& token, std::vector<Route_ptr> localRoutes);
+		pplx::task<void> connectToScene(std::shared_ptr<Scene> scene, std::string& token, std::vector<Route_ptr> localRoutes);
 
 		/// Disconnect from a scene.
 		/// \param scene The scene.
@@ -119,7 +112,7 @@ namespace Stormancer
 		/// \param sceneId Scene id.
 		/// \param sep Scene Endpoint retrieved by ApiClient::getSceneEndpoint
 		/// \return A task which complete when the scene informations are retrieved.
-		pplx::task<Scene*> getScene(std::string sceneId, SceneEndpoint sep);
+		pplx::task<std::shared_ptr<Scene>> getScene(std::string sceneId, SceneEndpoint sep);
 
 		/// Called by the transport when a packet has been received.
 		/// \param packet Received packet.
@@ -132,7 +125,7 @@ namespace Stormancer
 		template<typename T1, typename T2>
 		pplx::task<T2> sendSystemRequest(byte id, T1& parameter)
 		{
-			return _requestProcessor->sendSystemRequest(_serverConnection, id, [this, &parameter](bytestream* stream) {
+			return dependencyResolver()->resolve<RequestProcessor>()->sendSystemRequest(_serverConnection, id, [this, &parameter](bytestream* stream) {
 				// serialize request dto
 				msgpack::pack(stream, parameter);
 				//auto res = stream->str();
@@ -160,46 +153,39 @@ namespace Stormancer
 		}
 
 		pplx::task<void> updateServerMetadata();
-
-		void startSyncClock();
-
-		void stopSyncClock();
-
-		pplx::task<void> syncClockImpl();
+		pplx::task<void> tryConnectToServer(SceneEndpoint endpoint);
+		
 
 		void dispatchEvent(std::function<void(void)> ev);
 
+		void setConnectionState(ConnectionState state);
 	private:
+		//Connection state
+		ConnectionState _connectionState = ConnectionState::Disconnected;
+		rxcpp::subjects::subject<ConnectionState> _connectionStateObservable;
+		
+		//completed task
+		pplx::task<void> _currentTask = pplx::task_from_result();
+
 		bool _initialized = false;
-		const std::shared_ptr<IActionDispatcher> _eventDispatcher;
 		std::shared_ptr<ILogger> _logger = nullptr;
 		std::string _accountId;
 		std::string _applicationName;
 		IConnection* _serverConnection = nullptr;
-		std::shared_ptr<IScheduler> _scheduler = nullptr;
-		std::shared_ptr<ITransport> _transport = nullptr;
-		ITokenHandler* _tokenHandler = nullptr;
-		ApiClient* _apiClient = nullptr;
-		RequestProcessor* _requestProcessor = nullptr;
-		SceneDispatcher* _scenesDispatcher = nullptr;
+		
 		pplx::cancellation_token_source _cts;
 		uint16 _maxPeers = 0;
 		stringMap _metadata;
-		IPacketDispatcher* _dispatcher = nullptr;
-		Watch _watch;
+		
 		double _offset = 0;
-		int64 _lastPing = 0;
+		
 		bool _synchronisedClock = true;
-		int64 _synchronisedClockInterval = 5000;
-		int64 _pingIntervalAtStart = 100;
-		bool lastPingFinished = true;
-		std::mutex _syncClockMutex;
-		std::deque<ClockValue> _clockValues;
-		double _medianLatency = 0;
-		double _standardDeviationLatency = 0;
-		uint16 _maxClockValues = 24;
-		ISubscription* _syncClockSubscription = nullptr;
-		std::map<std::string, Scene*> _scenes;
+		
+		
+		
+		
+		
+		std::map<std::string, ScenePtr> _scenes;
 		DependencyResolver* _dependencyResolver = nullptr;
 		std::vector<IPlugin*> _plugins;
 		std::mutex _connectionMutex;

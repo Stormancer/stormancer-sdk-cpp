@@ -16,6 +16,6 @@ namespace Stormancer
 
 		/// Adds a packet processor to the dispatcher.
 		/// \param processor An 'IPacketProcessor' object.
-		virtual void addProcessor(IPacketProcessor* processor) = 0;
+		virtual void addProcessor(std::shared_ptr<IPacketProcessor> processor) = 0;
 	};
 };

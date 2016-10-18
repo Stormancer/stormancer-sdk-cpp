@@ -12,12 +12,12 @@ namespace Stormancer
 		~RpcService();
 
 	public:
-		STORMANCER_DLL_API IObservable<Packetisp_ptr>* rpc(const char* route, std::function<void(bytestream*)> writer, PacketPriority priority);
-		STORMANCER_DLL_API void addProcedure(const char* route, std::function<pplx::task<void>(RpcRequestContext_ptr)> handler, bool ordered);
-		STORMANCER_DLL_API uint16 pendingRequests();
-		STORMANCER_DLL_API void cancelAll(const char* reason);
+		rxcpp::observable<Packetisp_ptr> rpc(const std::string route, std::function<void(bytestream*)> writer, PacketPriority priority);
+		void addProcedure(const char* route, std::function<pplx::task<void>(RpcRequestContext_ptr)> handler, bool ordered);
+		uint16 pendingRequests();
+		void cancelAll(const char* reason);
 
-		STORMANCER_DLL_API  pplx::task<std::shared_ptr<Stormancer::Result<>>> rpcVoid_with_writer(std::string procedure, std::function<void(Stormancer::bytestream*)> writer);
+		pplx::task<void> rpcVoid_with_writer(std::string procedure, std::function<void(Stormancer::bytestream*)> writer);
 
 		std::shared_ptr<IActionDispatcher> getDispatcher();
 		

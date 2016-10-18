@@ -1,6 +1,5 @@
 #pragma once
 #include "headers.h"
-#include "IObservable.h"
 #include "RpcRequestContext.h"
 #include "Scene.h"
 
@@ -9,13 +8,13 @@ namespace Stormancer
 	class IRpcService
 	{
 	public:
-		virtual IObservable<Packetisp_ptr>* rpc(const char* route, std::function<void(bytestream*)> writer_ptr, PacketPriority priority) = 0;
+		virtual rxcpp::observable<Packetisp_ptr> rpc(const std::string route, std::function<void(bytestream*)> writer_ptr, PacketPriority priority) = 0;
 		virtual void addProcedure(const char* route, std::function<pplx::task<void>(RpcRequestContext_ptr)> handler, bool ordered) = 0;
 		virtual uint16 pendingRequests() = 0;
 		virtual void cancelAll(const char* reason) = 0;
 
 		
-		virtual  pplx::task<std::shared_ptr<Stormancer::Result<>>> rpcVoid_with_writer(std::string procedure, std::function<void(Stormancer::bytestream*)> writer) = 0;
+		virtual  pplx::task<void> rpcVoid_with_writer(std::string procedure, std::function<void(Stormancer::bytestream*)> writer) = 0;
 
 		virtual std::shared_ptr<IActionDispatcher> getDispatcher() = 0;
 
@@ -23,10 +22,10 @@ namespace Stormancer
 	public:
 
 		template<typename TOutput>
-		pplx::task<std::shared_ptr<Stormancer::Result<TOutput>>> rpc(std::string procedure, std::function<void(Stormancer::bytestream*)> writer, std::function<Stormancer::Result<TOutput>(Stormancer::Packetisp_ptr)> deserializer)
+		pplx::task<TOutput> rpc(std::string procedure, std::function<void(Stormancer::bytestream*)> writer, std::function<TOutput(Stormancer::Packetisp_ptr)> deserializer)
 		{
-			pplx::task_completion_event<std::shared_ptr<Stormancer::Result<TOutput>>> tce;
-			std::shared_ptr<Stormancer::Result<TOutput>> result(new Stormancer::Result<TOutput>());
+			pplx::task_completion_event<TOutput> tce;
+			TOutput result;
 
 			auto observable = this->rpc(procedure.c_str(), [&writer](Stormancer::bytestream* stream) {
 				writer(stream);
@@ -34,15 +33,15 @@ namespace Stormancer
 
 			auto onNext = [tce, result, deserializer](Stormancer::Packetisp_ptr packet) {
 				TOutput data = deserializer(packet).get();
-				result->set(data);
-				tce.set(result);
+				
+				tce.set(data);
 			};
 
 			auto onError = std::function<void(const char*)>([tce, result, procedure](const char* error) {
 				std::string msg = "Rpc::" + procedure;
 				Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Error, "RpcHelpers", msg.c_str(), error);
-				result->setError(1, error);
-				tce.set(result);
+
+				tce.set_exception(std::exception(error));
 			});
 
 			auto onComplete = [observable]() {
@@ -59,7 +58,7 @@ namespace Stormancer
 
 
 		template<typename TInput>
-		pplx::task<std::shared_ptr<Stormancer::Result<>>> rpcVoid(std::string procedure, TInput parameter)
+		pplx::task<void> rpcVoid(std::string procedure, TInput parameter)
 		{
 			return rpcVoid_with_writer(procedure, [&parameter](Stormancer::bytestream* stream) {
 				msgpack::pack(stream, parameter);
@@ -67,7 +66,7 @@ namespace Stormancer
 		}
 
 		template<typename TInput, typename TOutput>
-		pplx::task<std::shared_ptr<Stormancer::Result<TOutput>>> rpc(std::string procedure, TInput parameter)
+		pplx::task<TOutput> rpc(std::string procedure, TInput parameter)
 		{
 			return rpc<TOutput>(procedure, [&parameter](Stormancer::bytestream* stream) {
 				msgpack::pack(stream, parameter);
@@ -84,7 +83,7 @@ namespace Stormancer
 		}
 
 		template<typename TOutput>
-		pplx::task<std::shared_ptr<Stormancer::Result<TOutput>>> rpc(std::string procedure)
+		pplx::task<TOutput> rpc(std::string procedure)
 		{
 			return rpc<TOutput>(procedure,
 				[](Stormancer::bytestream* stream) {},

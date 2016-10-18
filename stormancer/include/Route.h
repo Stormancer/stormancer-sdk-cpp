@@ -16,7 +16,7 @@ namespace Stormancer
 
 	public:
 		Scene* scene();
-		STORMANCER_DLL_API const char* name();
+		STORMANCER_DLL_API const std::string name();
 		STORMANCER_DLL_API uint16 handle();
 		STORMANCER_DLL_API stringMap& metadata();
 		void setHandle(uint16 newHandle);

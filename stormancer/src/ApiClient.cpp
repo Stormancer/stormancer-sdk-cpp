@@ -2,7 +2,7 @@
 
 namespace Stormancer
 {
-	ApiClient::ApiClient(std::shared_ptr<Configuration> config, ITokenHandler* tokenHandler)
+	ApiClient::ApiClient(std::shared_ptr<Configuration> config, std::shared_ptr<ITokenHandler> tokenHandler)
 		: _config(config),
 		_tokenHandler(tokenHandler)
 	{
@@ -30,7 +30,7 @@ namespace Stormancer
 
 		if (baseUris.size() == 0)
 		{
-			return taskFromException<SceneEndpoint>(std::runtime_error("No server endpoints found in configuration."));
+			return pplx::task_from_exception<SceneEndpoint>(std::runtime_error("No server endpoints found in configuration."));
 		}
 
 		if (_config->endpointSelectionMode == EndpointSelectionMode::FALLBACK)
@@ -51,7 +51,7 @@ namespace Stormancer
 			return getSceneEndpointImpl(baseUris2, errors, accountId, applicationName, sceneId);
 		}
 
-		return taskFromException<SceneEndpoint>(std::runtime_error("Error selecting server endpoint."));
+		return pplx::task_from_exception<SceneEndpoint>(std::runtime_error("Error selecting server endpoint."));
 	}
 
 	pplx::task<SceneEndpoint> ApiClient::getSceneEndpointImpl(std::vector<std::string>  endpoints, std::shared_ptr<std::vector<std::string>> errors, std::string accountId, std::string applicationName, std::string sceneId)
@@ -64,7 +64,7 @@ namespace Stormancer
 				errorMsg = errorMsg + e;
 			}
 
-			return taskFromException<SceneEndpoint>(std::runtime_error("Failed to connect to the configured server endpoints : " + errorMsg));
+			return pplx::task_from_exception<SceneEndpoint>(std::runtime_error("Failed to connect to the configured server endpoints : " + errorMsg));
 		}
 
 		auto it = endpoints.begin();
@@ -122,12 +122,12 @@ namespace Stormancer
 		catch (const std::exception& ex)
 		{
 			ILogger::instance()->log(LogLevel::Warn, "Client::getSceneEndpoint", "pplx client.request failed.", ex.what());
-			return taskFromException<SceneEndpoint>(std::runtime_error(std::string() + "client.request failed." + ex.what()));
+			return pplx::task_from_exception<SceneEndpoint>(std::runtime_error(std::string() + "client.request failed." + ex.what()));
 		}
 		catch (...)
 		{
 			ILogger::instance()->log(LogLevel::Warn, "Client::getSceneEndpoint", "pplx client.request failed.", "Unknown error");
-			return taskFromException<SceneEndpoint>(std::runtime_error(std::string() + "client.request failed."));
+			return pplx::task_from_exception<SceneEndpoint>(std::runtime_error(std::string() + "client.request failed."));
 		}
 
 		return httpRequestTask.then([this, endpoints, errors, baseUri, accountId, applicationName, sceneId](pplx::task<web::http::http_response> task) {

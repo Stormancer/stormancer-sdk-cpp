@@ -81,7 +81,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(ProjectDir)output\libs\</OutDir>
-    <IntDir>$(ProjectDir)bin\$(Configuration)\$(Platform)\</IntDir>
+    <IntDir>$(SolutionDir)intermediate\$(ProjectName)\$(Configuration)\$(Platform)\</IntDir>
     <TargetName>Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -93,7 +93,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(ProjectDir)output\libs\</OutDir>
-    <IntDir>$(ProjectDir)bin\$(Configuration)\$(Platform)\</IntDir>
+    <IntDir>$(SolutionDir)intermediate\$(ProjectName)\$(Configuration)\$(Platform)\</IntDir>
     <TargetName>Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -245,7 +245,7 @@
     <ClCompile Include="stormancer\src\SceneInfosDto.cpp" />
     <ClCompile Include="stormancer\src\SceneInfosRequestDto.cpp" />
     <ClCompile Include="stormancer\src\ScenePeer.cpp" />
-    <ClCompile Include="stormancer\src\Subscription.cpp" />
+    <ClCompile Include="stormancer\src\SyncClock.cpp" />
     <ClCompile Include="stormancer\src\SystemRequest.cpp" />
     <ClCompile Include="stormancer\src\TokenHandler.cpp" />
     <ClCompile Include="stormancer\src\Watch.cpp" />
@@ -273,7 +273,6 @@
     <ClInclude Include="stormancer\include\IConnection.h" />
     <ClInclude Include="stormancer\include\IConnectionManager.h" />
     <ClInclude Include="stormancer\include\ILogger.h" />
-    <ClInclude Include="stormancer\include\IObservable.h" />
     <ClInclude Include="stormancer\include\IPacketDispatcher.h" />
     <ClInclude Include="stormancer\include\IPacketProcessor.h" />
     <ClInclude Include="stormancer\include\IPlugin.h" />
@@ -281,13 +280,11 @@
     <ClInclude Include="stormancer\include\IRpcService.h" />
     <ClInclude Include="stormancer\include\IScenePeer.h" />
     <ClInclude Include="stormancer\include\IScheduler.h" />
-    <ClInclude Include="stormancer\include\ISubscription.h" />
     <ClInclude Include="stormancer\include\ITask.h" />
     <ClInclude Include="stormancer\include\ITokenHandler.h" />
     <ClInclude Include="stormancer\include\ITransport.h" />
     <ClInclude Include="stormancer\include\MessageIDTypes.h" />
     <ClInclude Include="stormancer\include\NullLogger.h" />
-    <ClInclude Include="stormancer\include\Observable.h" />
     <ClInclude Include="stormancer\include\Packet.h" />
     <ClInclude Include="stormancer\include\PacketProcessorConfig.h" />
     <ClInclude Include="stormancer\include\RakNetConnection.h" />
@@ -308,7 +305,7 @@
     <ClInclude Include="stormancer\include\SceneInfosRequestDto.h" />
     <ClInclude Include="stormancer\include\ScenePeer.h" />
     <ClInclude Include="stormancer\include\stormancer.h" />
-    <ClInclude Include="stormancer\include\Subscription.h" />
+    <ClInclude Include="stormancer\include\SyncClock.h" />
     <ClInclude Include="stormancer\include\SystemRequest.h" />
     <ClInclude Include="stormancer\include\SystemRequestIDTypes.h" />
     <ClInclude Include="stormancer\include\Task.h" />
