@@ -35,7 +35,7 @@ namespace Stormancer
 				}
 				catch (const std::exception& e)
 				{
-					ILogger::instance()->log(LogLevel::Error, "client.dispatchPacket", "Exception unhandled in dispatchPacketImpl", e.what());
+					ILogger::instance()->log(LogLevel::Error, "client.dispatchPacket", "Exception unhandled in dispatchPacketImpl :" + std::string(e.what()));
 					throw e;
 				}
 			});

@@ -36,10 +36,11 @@ namespace Stormancer
 	public:
 
 		/// Logs a simple message
-		virtual void log(const char* message) = 0;
+		virtual void log(const std::string message) = 0;
 
 		/// Logs a full message
-		virtual void log(LogLevel level, const char* category, const char* message, const char* data) = 0;
+		virtual void log(LogLevel level, const std::string category, const std::string message, const std::string data = "") = 0;
+
 
 		/// Logs an exception
 		virtual void log(const std::exception& e) = 0;
@@ -50,7 +51,7 @@ namespace Stormancer
 		/// \param message The message of the log.
 		/// \param data Some additional data.
 		/// \return The formatted message.
-		STORMANCER_DLL_API static std::shared_ptr<const char> format(LogLevel level, const char* category, const char* message, const char* data);
+		STORMANCER_DLL_API static std::string format(LogLevel level, const std::string category, const std::string message, const std::string data);
 
 		/// A basic format of an exception.
 		/// \param e The exception.

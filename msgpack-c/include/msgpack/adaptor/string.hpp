@@ -34,6 +34,8 @@ struct convert<std::string> {
         case msgpack::type::STR:
             v.assign(o.via.str.ptr, o.via.str.size);
             break;
+		case msgpack::type::NIL:
+			v.assign("");
         default:
             throw msgpack::type_error();
             break;

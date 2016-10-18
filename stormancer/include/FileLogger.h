@@ -26,14 +26,14 @@ namespace Stormancer
 	
 		/// A basic message log.
 		/// \message The message to log.
-		void log(const char* message);
+		void log(const std::string message) override;
 		
 		/// A detailed message log.
 		/// \param level The level.
 		/// \param category The category (typically the source).
 		/// \param message The message.
 		/// \param data Some extra data.
-		void log(LogLevel level, const char* category, const char* message, const char* data);
+		void log(LogLevel level, const std::string category, const std::string message, const std::string data) override;
 		
 		/// Log details about an exception.
 		/// \param e The exception.
