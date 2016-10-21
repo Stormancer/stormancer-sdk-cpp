@@ -180,4 +180,95 @@ namespace Stormancer
 			}
 		});
 	}
+	pplx::task<web::http::http_response> ApiClient::requestWithRetries(std::function<web::http::http_request(std::string)> requestFactory)
+	{
+		auto errors = std::make_shared<std::vector<std::string>>();
+		std::vector<std::string> baseUris = _config->getApiEndpoint();
+
+		return requestWithRetriesImpl(requestFactory, baseUris, errors);
+	}
+	pplx::task<ServerEndpoints> ApiClient::GetServerEndpints()
+	{
+		return requestWithRetries([this](std::string) {
+			web::http::http_request request(web::http::methods::POST);
+
+			std::string relativeUri = std::string("/") + this->_config->account + "/" + this->_config->application + "/_endpoints";
+			request.set_request_uri(std::wstring(relativeUri.begin(), relativeUri.end()));
+			request.headers().add(L"Accept", L"application/json");
+			request.headers().add(L"x-version", L"1.0.0");
+			request.set_body(std::wstring());
+			return request;
+		}).then([](pplx::task<web::http::http_response> t) {
+			return t.get().extract_json();
+		}).then([](pplx::task < web::json::value> t) {
+
+			ServerEndpoints result;
+
+			return result;
+		});
+	}
+
+	pplx::task<web::http::http_response> ApiClient::requestWithRetriesImpl(std::function<web::http::http_request(std::string)> requestFactory, std::vector<std::string> endpoints, std::shared_ptr<std::vector<std::string>> errors)
+	{
+
+		auto it = endpoints.begin();
+		if (this->_config->endpointSelectionMode == Stormancer::EndpointSelectionMode::RANDOM)
+		{
+			int index = std::rand() % endpoints.size();
+			it += index;
+		}
+		std::string baseUri = *it;
+		endpoints.erase(it);
+
+		auto rq = requestFactory(baseUri);
+
+		auto config = web::http::client::http_client_config();
+		config.set_timeout(std::chrono::seconds(3));
+		web::http::client::http_client client(std::wstring(baseUri.begin(), baseUri.end()), config);
+
+		return client.request(rq).then([baseUri, this, errors, requestFactory, endpoints](pplx::task<web::http::http_response> t) {
+
+			bool success = false;
+			web::http::http_response response;
+			try
+			{
+				response = t.get();
+				if (response.status_code() == 200)
+				{
+					success = true;
+				}
+				else
+				{
+					auto error = response.extract_string(true).get();
+					errors->push_back("An error occured while performing an http request to" + baseUri + " status code : '" + std::to_string(response.status_code()) + "', message : '" + std::string(error.begin(), error.end()));
+				}
+
+			}
+			catch (std::exception &ex)
+			{
+				errors->push_back("An exception occured while performing an http request to" + baseUri + ex.what());
+			}
+			if (!success)
+			{
+				if (endpoints.size() > 0)
+				{
+					return this->requestWithRetriesImpl(requestFactory, endpoints, errors);
+				}
+				else
+				{
+					auto str = std::stringstream();
+					for (auto error : *errors)
+					{
+						str << error << '\n';
+					}
+					throw std::runtime_error(str.str());
+				}
+			}
+			else
+			{
+				return pplx::task_from_result(response);
+			}
+
+		});
+	}
 };
