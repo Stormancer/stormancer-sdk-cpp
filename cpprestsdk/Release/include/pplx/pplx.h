@@ -64,6 +64,7 @@
 // Common implementation across all the non-concrt versions
 #include "pplx/pplxcancellation_token.h"
 #include <functional>
+#include <cassert>
 
 // conditional expression is constant
 #if defined(_MSC_VER)
@@ -152,6 +153,7 @@ namespace details
         _TaskCollectionImpl(scheduler_ptr _PScheduler) 
             : _M_pScheduler(_PScheduler)
         {
+			assert(_PScheduler);
         }
 
         void _ScheduleTask(_TaskProcHandle_t* _PTaskHandle, _TaskInliningMode _InliningMode)
