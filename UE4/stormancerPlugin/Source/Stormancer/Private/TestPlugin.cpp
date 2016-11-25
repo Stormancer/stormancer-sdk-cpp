@@ -2,9 +2,6 @@
 
 #include "StormancerPluginPrivatePCH.h"
 
-extern "C" {
-	#include "extern/extern.h"
-}
 
 class FStormancerPlugin : public IStormancerPlugin
 {
@@ -23,7 +20,7 @@ void FStormancerPlugin::StartupModule()
 }
 
 
-void FTestPlugin::ShutdownModule()
+void FStormancerPlugin::ShutdownModule()
 {
 	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
 	// we call this function before unloading the module.

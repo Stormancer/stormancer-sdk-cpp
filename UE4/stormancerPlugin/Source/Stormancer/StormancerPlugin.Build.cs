@@ -6,7 +6,8 @@ namespace UnrealBuildTool.Rules
 {
 	public class StormancerPlugin : ModuleRules
 	{
-		public TestPlugin(TargetInfo target)
+		private const string VS_TOOLSET = "140";
+		public StormancerPlugin(TargetInfo target)
 		{
 			/** Setup an external C++ module */
 			LoadLibrary(target, "3rdparty/stormancer/include", "3rdparty/stormancer/libs", "stormancer");
@@ -18,8 +19,8 @@ namespace UnrealBuildTool.Rules
 
 		/** Perform all the normal module setup for plugin local c++ files. */
 		private void SetupLocal(TargetInfo target) {
-			PublicIncludePaths.AddRange(new string[] {"Developer/TestPlugin/Public" });
-			PrivateIncludePaths.AddRange(new string[] {"Developer/TestPlugin/Private" });
+			PublicIncludePaths.AddRange(new string[] {"source/Stormancer/Public" });
+			PrivateIncludePaths.AddRange(new string[] {"Source/Stormancer/Private" });
 			PublicDependencyModuleNames.AddRange(new string[] {"Core"});
 			PrivateDependencyModuleNames.AddRange(new string[] {});
 			DynamicallyLoadedModuleNames.AddRange(new string[] {});
@@ -49,11 +50,23 @@ namespace UnrealBuildTool.Rules
 				Fail("Invalid build path: " + full_build_path + " (Did you build the 3rdparty module already?)");
 			}
 
+			string platform = "";
+			switch(target.Platform)
+			{
+				case UnrealTargetPlatform.Win64:
+				platform = "x64";
+				break;
+				case UnrealTargetPlatform.Win32:
+				platform = "x86";
+				break;
+				default:
+				break;
+			}
 			// Look at all the files in the build path; we need to smartly locate
 			// the static library based on the current platform. For dynamic libraries
 			// this is more difficult, but for static libraries, it's just .lib or .a
 			string [] fileEntries = Directory.GetFiles(full_build_path);
-			var pattern = ".*" + library_name + ".*\\.";
+			var pattern = ".*" + library_name + VS_TOOLSET+"_Release_"+platform+".";
 			if ((target.Platform == UnrealTargetPlatform.Win64) || (target.Platform == UnrealTargetPlatform.Win32)) {
 				pattern += "lib";
 			}
@@ -99,7 +112,7 @@ namespace UnrealBuildTool.Rules
 		/** Get the absolute root to the plugin folder */
 		private string PluginPath {
 			get {
-				return Path.GetFullPath(Path.Combine(Path.GetDirectoryName(RulesCompiler.GetModuleFilename(this.GetType().Name)), "../.."));
+				return Path.GetFullPath(Path.Combine(ModuleDirectory, "../.."));
 			}
 		}
 
