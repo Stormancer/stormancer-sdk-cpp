@@ -22,13 +22,18 @@
 #define MSGPACK_VREFBUFFER_CHUNK_SIZE 8192
 #endif
 
-#ifndef _WIN32
-#include <sys/uio.h>
-#else
+#ifdef _WIN32
 struct iovec {
-    void  *iov_base;
-    size_t iov_len;
+	void  *iov_base;
+	size_t iov_len;
 };
+
+
+
+
+
+#else
+#include <sys/uio.h>
 #endif
 
 namespace msgpack {

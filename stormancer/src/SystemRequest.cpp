@@ -1,13 +1,19 @@
-#include "stormancer.h"
+#include "stdafx.h"
+#include "SystemRequest.h"
 
 namespace Stormancer
 {
-	SystemRequest::SystemRequest(pplx::task_completion_event<Packet_ptr> tce)
+	SystemRequest::SystemRequest(byte msgId, pplx::task_completion_event<Packet_ptr> tce)
 		: tce(tce)
+		, _msgId(msgId)
 	{
 	}
 
 	SystemRequest::~SystemRequest()
 	{
+		if (!complete)
+		{
+			tce.set_exception(std::runtime_error("System request is not finished and has been deleted"));
+		}
 	}
 };

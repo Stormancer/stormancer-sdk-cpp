@@ -8,9 +8,11 @@
  *
  */
 
-#if   defined(_WIN32)
+#if defined(_XBOX) || defined(_XBOX_720_COMPILE_AS_WINDOWS) || defined(X360)
+
+#elif defined(_WIN32) && !defined(_XBOX) && !defined(_XBOX_720_COMPILE_AS_WINDOWS) && !defined(X360)
 #include <conio.h> /* getche() */
-#elif  defined(__S3E__)
+#elif defined(__S3E__)
 
 #else
 
@@ -20,16 +22,16 @@ char getche()
 {
 
 
-  struct termios oldt,
-                 newt;
-  char            ch;
-  tcgetattr( STDIN_FILENO, &oldt );
-  newt = oldt;
-  newt.c_lflag &= ~( ICANON | ECHO );
-  tcsetattr( STDIN_FILENO, TCSANOW, &newt );
-  ch = getchar();
-  tcsetattr( STDIN_FILENO, TCSANOW, &oldt );
-  return ch;
+	struct termios oldt,
+		newt;
+	char            ch;
+	tcgetattr(STDIN_FILENO, &oldt);
+	newt = oldt;
+	newt.c_lflag &= ~(ICANON | ECHO);
+	tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+	ch = getchar();
+	tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+	return ch;
 
-} 
+}
 #endif

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "headers.h"
 #include "ConnectionData.h"
 
@@ -9,7 +10,7 @@ namespace Stormancer
 	{
 	public:
 		SceneEndpoint();
-		SceneEndpoint(std::string& token, ConnectionData& tokenData);
+		SceneEndpoint(const std::string& token, const ConnectionData& tokenData);
 		virtual ~SceneEndpoint();
 
 	public:

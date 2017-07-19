@@ -1,4 +1,5 @@
-#include "stormancer.h"
+#include "stdafx.h"
+#include "DefaultScheduler.h"
 
 namespace Stormancer
 {
@@ -10,20 +11,40 @@ namespace Stormancer
 	{
 	}
 
-	rxcpp::subscription DefaultScheduler::schedulePeriodic(int delay, std::function<void()> func)
+	void DefaultScheduler::schedulePeriodic(int delay, std::function<void()> work, pplx::cancellation_token ct)
 	{
 		if (delay <= 0)
 		{
 			throw std::out_of_range("Scheduler periodic delay must be positive.");
 		}
 		
-		auto scheduler = rxcpp::schedulers::make_same_worker(rxcpp::schedulers::make_event_loop().create_worker());
-		auto coordination = rxcpp::identity_one_worker(scheduler);
-
-		return rxcpp::observable<>::interval(std::chrono::milliseconds(delay), coordination).subscribe([func](int time) {
-			func();
-		});
-
-		
+		std::weak_ptr<TimerThread> weakTimer(_timer);
+		auto delayMs = std::chrono::milliseconds(delay);
+		_timer->schedule([work, ct, weakTimer, delayMs]()
+		{
+			periodicFunc(work, ct, weakTimer, delayMs);
+		}, clock_type::now());
 	}
-};
+
+	void DefaultScheduler::schedule(clock_type::time_point when, std::function<void()> work)
+	{
+		_timer->schedule(work, when);
+	}
+
+	void DefaultScheduler::periodicFunc(std::function<void()> work, pplx::cancellation_token ct, std::weak_ptr<TimerThread> weakTimer, std::chrono::milliseconds delay)
+	{
+		if (!ct.is_canceled())
+		{
+			work();
+
+			auto timer = weakTimer.lock();
+			if (timer)
+			{
+				timer->schedule([work, ct, weakTimer, delay]()
+				{
+					periodicFunc(work, ct, weakTimer, delay);
+				}, clock_type::now() + delay);
+			}
+		}
+	}
+}

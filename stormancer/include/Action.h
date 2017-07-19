@@ -1,4 +1,5 @@
 #pragma once
+
 #include "headers.h"
 
 namespace Stormancer
@@ -8,12 +9,14 @@ namespace Stormancer
 	class Action
 	{
 	public:
+
 		using TFunction = std::function<void(TParam)>;
 		using TContainer = std::list<TFunction>;
 		using TIterator = typename TContainer::iterator;
 		using TAction = Action<TParam>;
 
-	public:
+#pragma region public_methods
+
 		Action()
 		{
 		}
@@ -27,7 +30,6 @@ namespace Stormancer
 		{
 		}
 
-	public:
 		Action(const TAction& other)
 			: _functions(other._functions)
 		{
@@ -38,7 +40,6 @@ namespace Stormancer
 		{
 		}
 
-	public:
 		TAction& operator=(const TAction& other)
 		{
 			_functions = other._functions;
@@ -74,7 +75,6 @@ namespace Stormancer
 			return *this;
 		}
 
-	public:
 		TIterator push_front(TFunction f)
 		{
 			return _functions.insert(_functions.begin(), f);
@@ -95,7 +95,11 @@ namespace Stormancer
 			_functions.clear();
 		}
 
+#pragma endregion
+
 	private:
+
+#pragma region private_methods
 
 		inline void exec(const TParam& data) const
 		{
@@ -106,8 +110,13 @@ namespace Stormancer
 			}
 		}
 
-	private:
+#pragma endregion
+
+#pragma region private_members
+
 		TContainer _functions;
+
+#pragma endregion
 	};
 
 	/// Aggregates procedure pointers to be run simultaneously.
@@ -115,12 +124,14 @@ namespace Stormancer
 	class Action<void>
 	{
 	public:
+
 		using TFunction = std::function<void(void)>;
 		using TContainer = std::list<TFunction>;
 		using TIterator = TContainer::iterator;
 		using TAction = Action<>;
 
-	public:
+#pragma region public_methods
+
 		Action()
 		{
 		}
@@ -134,7 +145,6 @@ namespace Stormancer
 		{
 		}
 
-	public:
 		Action(const TAction& other)
 			: _functions(other._functions)
 		{
@@ -145,7 +155,6 @@ namespace Stormancer
 		{
 		}
 
-	public:
 		TAction& operator=(const TAction& other)
 		{
 			_functions = other._functions;
@@ -181,7 +190,6 @@ namespace Stormancer
 			return *this;
 		}
 
-	public:
 		TIterator push_front(TFunction f)
 		{
 			return _functions.insert(_functions.begin(), f);
@@ -202,7 +210,12 @@ namespace Stormancer
 			_functions.clear();
 		}
 
+#pragma endregion
+
 	private:
+
+#pragma region private_methods
+
 		inline void exec() const
 		{
 			auto functionsCopy = _functions; // copy _functions because f can erase itself from the _functions
@@ -212,7 +225,12 @@ namespace Stormancer
 			}
 		}
 
-	private:
+#pragma endregion
+
+#pragma region private_members
+
 		TContainer _functions;
+
+#pragma endregion
 	};
 };

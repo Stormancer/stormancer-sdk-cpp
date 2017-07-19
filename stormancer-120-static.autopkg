@@ -33,7 +33,7 @@ nuget {
         id = StormancerClient.Native.120;
 
         // Version number. Follows NuGet standards. (currently SemVer 1.0)
-        version : 1.0.2;
+        version : 2.2.0-pre;
 
         // Display name for package.
         title: Stormancer native client for VS2013;

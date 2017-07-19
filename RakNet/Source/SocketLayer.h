@@ -125,11 +125,12 @@ public:
 //	static void SetNonBlocking( RakNetSocket* listenSocket);
 
 
+#if !defined(_XBOX) && !defined(_XBOX_720_WITH_XBOX_LIVE) && !defined(X360)
 	/// Retrieve all local IP address in a string format.
 	/// \param[in] s The socket whose port we are referring to
 	/// \param[in] ipList An array of ip address in dotted notation.
-	static void GetMyIP( SystemAddress addresses[MAXIMUM_NUMBER_OF_INTERNAL_IDS] );
-
+	static void GetMyIP(SystemAddress addresses[MAXIMUM_NUMBER_OF_INTERNAL_IDS]);
+#endif
 	
 	/// Call sendto (UDP obviously)
 	/// \param[in] s the socket
@@ -183,10 +184,10 @@ public:
 // 	static void SetSocketOptions( RakNetSocket* listenSocket, bool blockingSocket, bool setBroadcast);
 	static void SetSocketOptions( __UDPSOCKET__ listenSocket, bool blockingSocket, bool setBroadcast);
 	
-
+#if !defined(_XBOX) && !defined(_XBOX_720_WITH_XBOX_LIVE) && !defined(X360)
 	// AF_INET (default). For IPV6, use AF_INET6. To autoselect, use AF_UNSPEC.
 	static bool GetFirstBindableIP(char firstBindable[128], int ipProto);
-
+#endif
 private:
 
 //	static SocketLayerOverride *slo;

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "headers.h"
 #include "MessageIdentifiers.h"
 
@@ -7,6 +8,10 @@ namespace Stormancer
 	/// Used by the protocol for identifying the nature of the system messages
 	enum class MessageIDTypes
 	{
+		/// Re-use RakNet NAT messages id types
+		ID_P2P_RELAY = 58,
+		ID_P2P_TUNNEL = 59,
+		
 		/// System request
 		ID_SYSTEM_REQUEST = DefaultMessageIDTypes::ID_USER_PACKET_ENUM,
 
@@ -23,6 +28,6 @@ namespace Stormancer
 		ID_CONNECTION_RESULT = 140,
 
 		/// First id for scene handles
-		ID_SCENES = 141
+		ID_SCENES = 141,
 	};
 };

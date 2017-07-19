@@ -1,1 +1,1 @@
-xcopy output UE4\StormancerPlugin\3rdParty\Stormancer /E
+xcopy output UE4\stormancerPlugin\3rdParty\Stormancer /E

@@ -145,7 +145,7 @@ struct is_on_error_for
     template<class CF>
     static not_void checkRX(...);
 
-    static const bool value = std::is_same<decltype(check<rxu::decay_t<F>>(0)), void>::value;
+    static const bool value = std::is_same<decltype(checkRX<rxu::decay_t<F>>(0)), void>::value;
 };
 
 template<class F>

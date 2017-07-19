@@ -1,4 +1,5 @@
 #pragma once
+
 #include "headers.h"
 #include "RequestModuleBuilder.h"
 
@@ -8,6 +9,7 @@ namespace Stormancer
 	class IRequestModule
 	{
 	public:
+
 		virtual void registerModule(RequestModuleBuilder* builder) = 0;
 	};
 };

@@ -165,10 +165,12 @@ ADD_LIST_TYPE(RakNet::SystemAddress,SystemAddress,RakNetListSystemAddress)
 ADD_LIST_TYPE(RakNet::RakString,RakString,RakNetListRakString)
 ADD_LIST_TYPE(Cell,Cell,RakNetListCell)
 ADD_LIST_TYPE(ColumnDescriptor,ColumnDescriptor,RakNetListColumnDescriptor)
-ADD_LIST_TYPE(Row,Row,RakNetListTableRow);
-ADD_LIST_TYPE(RakNet::FileListNode,FileListNode,RakNetListFileListNode);
-ADD_LIST_TYPE(FilterQuery,FilterQuery,RakNetListFilterQuery);
-ADD_LIST_TYPE(SortQuery,SortQuery,RakNetListSortQuery);
+ADD_LIST_TYPE(Row,Row,RakNetListTableRow)
+ADD_LIST_TYPE(RakNet::FileListNode,FileListNode,RakNetListFileListNode)
+ADD_LIST_TYPE(FilterQuery,FilterQuery,RakNetListFilterQuery)
+ADD_LIST_TYPE(SortQuery,SortQuery,RakNetListSortQuery)
+ADD_LIST_TYPE(SocketDescriptor,SocketDescriptor,RakNetListSocketDescriptor)
+
 
 // 1/1/2011 Commented out below line: Doesn't build into RakNet_wrap.cxx properly
 // %template(RakNetSmartPtrRakNetSocket) RakNetSmartPtr<RakNetSocket>;

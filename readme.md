@@ -1,76 +1,46 @@
 # Stormancer SDK C++
 
+
+## Introduction
+
+A NuGet Package is available. Use it for a simpler setup.  
+
+
+## Unreal Engine 4
+
+You can download the UE4 plugin in the Releases section of the github repository.  
+https://github.com/Stormancer/stormancer-sdk-cpp/releases
+
+
 ## Documentation
 
 http://stormancer.github.io/stormancer-sdk-cpp/documentation/html/annotated.html
 
-## prerequisites
 
-### Bundled libraries
-- RakNet  
-- MsgPack-c  
-- RxCpp  
-- CppRestSDK *(casablanca)*  
+## Configure your project
 
-## Configure the samples
-For each sample, you have to do this:  
-- Change the **Environment path**  
-*(Project properties > Configuration Properties > Debugging > Environment)*  
-```
-PATH=$(SolutionDir)..\stormancer-sdk-cpp\cpprestsdk\Binaries\$(Platform)\$(Configuration);$(SolutionDir)..\stormancer-sdk-cpp\RakNet\Lib\DLL\Lib;$(SolutionDir)..\stormancer-sdk-cpp\bin;%PATH%
-```
+We will suppose you are using Visual Studio. The library uses C++11 features, so requires at least VS 2013. However, we recommand you to use VS 2015 if possible. Deployment bugs regarding the runtime version may subsist on VS 2013.  
 
-## Configure a project
+*Don't forget to adjust the paths. We assume your project is in a directory beside your local stormancer-sdk-cpp repository.*  
 
-*Don't forget to adjust the paths. We assume your project is in a directory beside the stormancer-sdk-cpp.*  
-- Build the SDK and the samples before continuing.  
-*You only need to restore the NuGet packages and set the envrionment path of the sdk and the sample projects to achieve this.*  
+- Open and build the stormancer-sdk-cpp solution. This will build CppRestSDK, Raknet and the library itself as a single Windows static lib.  
+*We recently changed our build process and we add to temporarily remove dynamic library outputs, but please ask if you need other kind of build outputs.*
 - Create / open your project.  
 - Open the **project properties**  
-- Select **All Configurations** and **All Platforms** *(or your target platform)* on top of the property window.  
-- Change the **Environment path**  
-*(Configuration Properties > Debugging > Environment)*  
-```
-PATH=$(SolutionDir)..\stormancer-sdk-cpp\cpprestsdk\Binaries\$(Platform)\$(Configuration);$(SolutionDir)..\stormancer-sdk-cpp\RakNet\Lib\DLL\Lib;$(SolutionDir)..\stormancer-sdk-cpp\bin;%PATH%
-```
+- Select **All Configurations** and **All Platforms** on top of the property window.  
 - Change the **Additional include directories**  
 *(Configuration Properties > C/C++ > General > Additional include directories)*  
 ```
-$(SolutionDir)..\stormancer-sdk-cpp\src
-$(SolutionDir)..\stormancer-sdk-cpp\cpprestsdk\Release\include
-$(SolutionDir)..\stormancer-sdk-cpp\msgpack-c\include
-$(SolutionDir)..\stormancer-sdk-cpp\RakNet\Source
-$(SolutionDir)..\stormancer-sdk-cpp\rxcpp\Rx\v2\src\rxcpp
+$(SolutionDir)..\stormancer-sdk-cpp\output\include\
 ```
 - Change the **Additional library directories**  
 *(Configuration Properties > Linker > General > Additional library directories)*  
 ```
-$(SolutionDir)..\stormancer-sdk-cpp\bin
-$(SolutionDir)..\stormancer-sdk-cpp\RakNet\Lib\DLL\Lib
-$(SolutionDir)..\stormancer-sdk-cpp\cpprestsdk\Binaries\$(Platform)\$(Configuration)
+$(SolutionDir)..\stormancer-sdk-cpp\output\libs\
 ```
 - Change the **Additional dependencies**  
 *(Configuration Properties > Linker > Input > Additional dependencies)*  
 ```
 Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform).lib
-RakNet$(PlatformToolsetVersion)_$(Configuration)_$(Platform).lib
 ```
-- Build the project.  
-
-
-## Configure an **Unreal Engine 4** Visual Studio project
-
-You can now download the UE4 plugin in the Releases section of the github repository  
-https://github.com/Stormancer/stormancer-sdk-cpp/releases
-
-
-## Generate the docs
-
-- switch to master branch  
-- Get the last version of the stormancer sdk  
-- Get doxygen here : www.doxygen.org  
-- Install and open doxygen  
-- Open the configuration file *./documentation/Doxyfile* with doxygen  
-- Generate the documentation  
-- Merge the master branch in the gh-pages branch  
-- Push the master and gh-pages branches in the github repositotry  
+- Build your project.  

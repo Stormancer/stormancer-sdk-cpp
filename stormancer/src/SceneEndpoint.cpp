@@ -1,4 +1,5 @@
-#include "stormancer.h"
+#include "stdafx.h"
+#include "SceneEndpoint.h"
 
 namespace Stormancer
 {
@@ -6,9 +7,9 @@ namespace Stormancer
 	{
 	}
 
-	SceneEndpoint::SceneEndpoint(std::string& token, ConnectionData& tokenData)
-		: token(token),
-		tokenData(tokenData)
+	SceneEndpoint::SceneEndpoint(const std::string& token, const ConnectionData& tokenData)
+		: token(token)
+		, tokenData(tokenData)
 	{
 	}
 

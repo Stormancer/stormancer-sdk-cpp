@@ -1,8 +1,20 @@
-#include "stormancer.h"
+#include "stdafx.h"
+#include "RequestProcessor.h"
+#include "MessageIDTypes.h"
 
 namespace Stormancer
 {
-	RequestProcessor::RequestProcessor(std::shared_ptr<ILogger> logger, std::vector<IRequestModule*> modules)
+	void RequestProcessor::Initialize(std::shared_ptr<RequestProcessor> processor, std::vector<std::shared_ptr<IRequestModule>> modules)
+	{
+		RequestModuleBuilder builder(processor->addSystemRequestHandler);
+		for (size_t i = 0; i < modules.size(); i++)
+		{
+			auto module = modules[i];
+			module->registerModule(&builder);
+		}
+	}
+
+	RequestProcessor::RequestProcessor(std::shared_ptr<ILogger> logger)
 		: _logger(logger)
 	{
 		addSystemRequestHandler = [this](byte msgId, std::function<pplx::task<void>(RequestContext*)> handler)
@@ -14,12 +26,7 @@ namespace Stormancer
 			_handlers[msgId] = handler;
 		};
 
-		RequestModuleBuilder builder(addSystemRequestHandler);
-		for (size_t i = 0; i < modules.size(); i++)
-		{
-			auto module = modules[i];
-			module->registerModule(&builder);
-		}
+
 	}
 
 	RequestProcessor::~RequestProcessor()
@@ -30,48 +37,67 @@ namespace Stormancer
 	{
 		_isRegistered = true;
 
-		for (auto it : _handlers)
-		{
-			config.addProcessor(it.first, new handlerFunction([it](Packet_ptr p) {
-				RequestContext context(p);
-				it.second(&context).then([&context, p](pplx::task<void> t) {
-					if (!context.isComplete())
-					{
-						// task faulted
-						try
-						{
-							t.wait();
-						}
-						catch (const std::exception& e)
-						{
-							context.error([p, e](bytestream* stream) {
-								msgpack::packer<bytestream> pk(stream);
-								pk.pack(std::string("An error occured on the server. ") + e.what());
-							});
-							return;
-						}
+		config.addProcessor((byte)MessageIDTypes::ID_SYSTEM_REQUEST, new handlerFunction([this](Packet_ptr  p) {
+			Stormancer::byte sysRequestId;
+			*(p->stream) >> sysRequestId;
+			std::shared_ptr<RequestContext> context = std::make_shared<RequestContext>(p);
+			auto it = _handlers.find(sysRequestId);
 
-						// task completed
-						context.complete();
-					}
+			if (it == _handlers.end())
+			{
+				context->error([](bytestream* stream) {
+					msgpack::packer<bytestream> pk(stream);
+					pk.pack(std::string("No system request handler found."));
 				});
 				return true;
-			}));
-		}
+			}
+			auto ctxPtr = context.get();
+			std::function<pplx::task<void>(RequestContext*)> handler = it->second;
+			invokeWrapping(handler, ctxPtr).then([context, p](pplx::task<void> t) {
+				//Clean the packet to deallocate resources
+				p->clean();
+				if (!context->isComplete())
+				{
+					// task faulted
+					try
+					{
+						t.get();
+					}
+					catch (const std::exception& e)
+					{
+						context->error([e](bytestream* stream) {
+							msgpack::packer<bytestream> pk(stream);
+							pk.pack(std::string("An error occured on the server. ") + e.what());
+						});
+						return;
+					}
+
+					// task completed
+					context->complete();
+				}
+
+			});
+
+			return true;
+		}));
 
 		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG, new handlerFunction([this](Packet_ptr p) {
 			uint16 id;
 			*(p->stream) >> id;
 
-			static const void * saddress = static_cast<const void*>(this);
+			static const void* saddress = static_cast<const void*>(this);
 
 			SystemRequest_ptr request = freeRequestSlot(id);
 
 			if (request)
 			{
-				p->metadata()["request"] = (void*)request.get();
+				p->metadata["request"] = std::to_string(request->id);
 				time(&request->lastRefresh);
-				request->tce.set(p);
+				if (!request->complete)
+				{
+					request->complete = true;
+					request->tce.set(p);
+				}
 			}
 			else
 			{
@@ -95,8 +121,12 @@ namespace Stormancer
 
 				if (request)
 				{
-					p->metadata()["request"] = (void*)request.get();
-					request->tce.set(nullptr);
+					p->metadata["request"] = std::to_string(request->id);
+					if (!request->complete)
+					{
+						request->complete = true;
+						request->tce.set(nullptr);
+					}
 				}
 				else
 				{
@@ -115,7 +145,7 @@ namespace Stormancer
 
 			if (request)
 			{
-				p->metadata()["request"] = (void*)request.get();
+				p->metadata["request"] = std::to_string(request->id);
 				std::string buf;
 				*p->stream >> buf;
 				msgpack::unpacked result;
@@ -123,11 +153,15 @@ namespace Stormancer
 				msgpack::object deserialized = result.get();
 				std::string msg;
 				deserialized.convert(&msg);
-				request->tce.set_exception<std::exception>(std::runtime_error(msg));
+				if (!request->complete)
+				{
+					request->complete = true;
+					request->tce.set_exception<std::exception>(std::runtime_error(msg));
+				}
 			}
 			else
 			{
-				ILogger::instance()->log(LogLevel::Warn, "RequestProcessor/error", "Unknow request id :" + to_string(id));
+				ILogger::instance()->log(LogLevel::Warn, "RequestProcessor", "Unknown request id :" + to_string(id));
 			}
 
 			return true;
@@ -137,25 +171,38 @@ namespace Stormancer
 	pplx::task<Packet_ptr> RequestProcessor::sendSystemRequest(IConnection* peer, byte msgId, std::function<void(bytestream*)> writer, PacketPriority priority)
 	{
 		auto tce = pplx::task_completion_event<Packet_ptr>();
-		auto request = reserveRequestSlot(tce);
+		if (peer)
+		{
+			auto request = reserveRequestSlot(msgId,tce);
 
-		peer->sendSystem((byte)MessageIDTypes::ID_SYSTEM_REQUEST, [request, &writer, msgId](bytestream* stream) {
-			*stream << msgId;
-			*stream << request->id;
-			writer(stream);
-		}, priority);
-
+			try
+			{
+				peer->sendSystem((byte)MessageIDTypes::ID_SYSTEM_REQUEST, [request, &writer, msgId](bytestream* stream) {
+					*stream << msgId;
+					*stream << request->id;
+					writer(stream);
+				}, priority);
+			}
+			catch (std::exception& e)
+			{
+				tce.set_exception(e);
+			}
+		}
+		else
+		{
+			tce.set_exception(std::invalid_argument("peer should not be nullptr"));
+		}
 		return pplx::create_task(tce);
 	}
 
-	SystemRequest_ptr RequestProcessor::reserveRequestSlot(pplx::task_completion_event<Packet_ptr> tce)
+	SystemRequest_ptr RequestProcessor::reserveRequestSlot(byte msgId, pplx::task_completion_event<Packet_ptr> tce)
 	{
-		_mutexPendingRequests.lock();
-
-		uint16 selectedId;
 		SystemRequest_ptr request;
+		uint16 selectedId;
 
-		{ // this unamed scope ensures the id is not used outside the locked mutex.
+		{ // this scope ensures the static id is not used outside the locked mutex.
+			std::lock_guard<std::mutex> lock(_mutexPendingRequests);
+
 			static uint16 id = 0;
 			// i is used to know if we tested all uint16 available values, whatever the current value of id.
 			uint32 i = 0;
@@ -166,14 +213,12 @@ namespace Stormancer
 
 				if (!mapContains(_pendingRequests, id))
 				{
-					request = SystemRequest_ptr(new SystemRequest(tce));
+					request = std::make_shared<SystemRequest>(msgId,tce);
 					break;
 				}
 			}
 			selectedId = id;
 		}
-
-		_mutexPendingRequests.unlock();
 
 		if (request)
 		{

@@ -265,14 +265,11 @@ const utility::string_t & web::json::value::as_string() const
 	return m_value->as_string();
 }
 
-
-std::shared_ptr<utility::string_t> json::value::serialize() const
+utility::string_t json::value::serialize() const
 {
 #ifndef _WIN32
 	utility::details::scoped_c_thread_locale locale;
 #endif
 
-	utility::string_t* str = new utility::string_t(m_value->to_string());
-	std::shared_ptr<utility::string_t> ptr(str, [](utility::string_t* p) { delete p; });
-	return ptr;
+	return m_value->to_string();
 }

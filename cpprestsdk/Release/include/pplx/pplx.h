@@ -49,6 +49,7 @@
 #endif
 
 #include "cpprest/details/cpprest_compat.h"
+#include <cassert>
 
 // Use PPLx
 #ifdef _WIN32
@@ -57,6 +58,10 @@
 #undef _PPLXIMP
 #define _PPLXIMP
 #include "pplx/pplxlinux.h"
+
+
+
+
 #else
 #include "pplx/pplxlinux.h"
 #endif // _WIN32
@@ -158,7 +163,7 @@ namespace details
 
         void _ScheduleTask(_TaskProcHandle_t* _PTaskHandle, _TaskInliningMode _InliningMode)
         {
-            if (_InliningMode == _ForceInline)
+            if (_InliningMode == _ForceInline || !_M_pScheduler)
             {
                 _TaskProcHandle_t::_RunChoreBridge(_PTaskHandle);
             }

@@ -29,17 +29,22 @@ struct timeval {
 int gettimeofday(struct timeval *tv, struct timezone *tz);
 
 
+#elif defined(__APPLE__)
+
+#include <sys/time.h>
+
 #else
 
 
 
 
-#include <sys/time.h>
 
-#include <unistd.h>
 
 // Uncomment this if you need to
 /*
+#include <sys/time.h>
+
+#include <unistd.h>
 // http://www.halcode.com/archives/2008/08/26/retrieving-system-time-gettimeofday/
 struct timezone
 {

@@ -25,6 +25,8 @@
 
 #include "stdafx.h"
 
+
+
 using namespace utility::conversions;
 
 namespace web { namespace details
@@ -54,7 +56,9 @@ utility::string_t uri_components::join()
     }
 
     utility::ostringstream_t os;
+
     os.imbue(std::locale::classic());
+
 
     if (!m_scheme.empty())
     {
@@ -264,7 +268,9 @@ std::vector<utility::string_t> uri::split_path(const utility::string_t &path)
 {
     std::vector<utility::string_t> results;
     utility::istringstream_t iss(path);
+
     iss.imbue(std::locale::classic());
+
     utility::string_t s;
 
     while (std::getline(iss, s, _XPLATSTR('/')))

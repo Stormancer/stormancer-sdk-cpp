@@ -1,4 +1,5 @@
 #pragma once
+
 #include "headers.h"
 
 namespace Stormancer
@@ -36,6 +37,6 @@ namespace Stormancer
 	public:
 		std::string Name;
 		uint16 Handle;
-		stringMap Metadata;
+		std::map<std::string, std::string> Metadata;
 	};
 };

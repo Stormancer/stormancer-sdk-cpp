@@ -15,6 +15,7 @@
 // From http://www.openasthra.com/c-tidbits/gettimeofday-function-for-windows/
 
 #include "WindowsIncludes.h"
+#include <time.h>
 
 #if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
   #define DELTA_EPOCH_IN_MICROSECS  11644473600000000Ui64

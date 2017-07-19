@@ -42,7 +42,7 @@ struct scan : public operator_base<rxu::decay_t<Seed>>
     scan(source_type o, accumulator_type a, seed_type s)
         : initial(std::move(o), a, s)
     {
-        static_assert(std::is_convertible<decltype(check<T, seed_type, accumulator_type>(0)), seed_type>::value, "scan Accumulator must be a function with the signature Seed(Seed, T)");
+        static_assert(std::is_convertible<decltype(checkRX<T, seed_type, accumulator_type>(0)), seed_type>::value, "scan Accumulator must be a function with the signature Seed(Seed, T)");
     }
     template<class Subscriber>
     void on_subscribe(Subscriber o) const {

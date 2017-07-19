@@ -12,7 +12,7 @@
 
 #if USE_SLIDING_WINDOW_CONGESTION_CONTROL==1
 
-static const double UNSET_TIME_US=-1;
+static const int UNSET_TIME_US=-1;
 
 #if CC_TIME_TYPE_BYTES==4
 static const CCTimeType SYN=10;
@@ -91,7 +91,7 @@ bool CCRakNetSlidingWindow::ShouldSendACKs(CCTimeType curTime, CCTimeType estima
 	(void) estimatedTimeToNextTick;
 
 	// iphone crashes on comparison between double and int64 http://www.jenkinssoftware.com/forum/index.php?topic=2717.0
-	if (rto==(CCTimeType) UNSET_TIME_US)
+	if (rto==static_cast<CCTimeType>( UNSET_TIME_US))
 	{
 		// Unknown how long until the remote system will retransmit, so better send right away
 		return true;

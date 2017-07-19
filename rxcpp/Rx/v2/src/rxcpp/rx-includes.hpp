@@ -60,8 +60,14 @@
 // force with RXCPP_FORCE_HASH_ENUM & RXCPP_FORCE_HASH_ENUM_UNDERLYING
 // in time use ifdef to detect library support for std::hash<> of enum
 //
+#if defined _WIN32
+#define RXCPP_HASH_ENUM 1
+#define RXCPP_HASH_ENUM_UNDERLYING 0
+#else
 #define RXCPP_HASH_ENUM 0
 #define RXCPP_HASH_ENUM_UNDERLYING 1
+#endif
+
 
 #if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
 #define RXCPP_USE_WINRT 0
@@ -152,7 +158,7 @@
 #if !CPPREST_FORCE_PPLX
 #include <future>
 #else
-#include "pplx\pplx.h"
+#include "pplx/pplx.h"
 #endif
 #include <vector>
 #include <list>

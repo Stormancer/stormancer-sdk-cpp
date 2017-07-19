@@ -243,6 +243,9 @@ IGNORERAKPEERANDINTERFACE(SetIncomingDatagramEventHandler( bool (*_incomingDatag
 %ignore DataStructures::List <Cell>::GetIndexOf;
 %ignore DataStructures::List <FilterQuery>::GetIndexOf;
 %ignore DataStructures::List <SortQuery>::GetIndexOf;
+
+//SocketDescriptor List
+%ignore DataStructures::List <SocketDescriptor>::GetIndexOf;
  
 //BPlusTree
 //The next two use C function pointers

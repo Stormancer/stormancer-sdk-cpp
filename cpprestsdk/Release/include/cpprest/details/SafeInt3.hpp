@@ -84,6 +84,10 @@ Please read the leading comments before using the class.
 #include <cstddef>
 #include <cstdlib>
 
+
+
+
+
 #if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER && defined _M_AMD64
     #include <intrin.h>
     #define SAFEINT_USE_INTRINSICS 1
@@ -822,11 +826,11 @@ template < typename T > class NumericType
         enum
         { 
             isBool = false, // We specialized out a bool  
-            isFloat = std::is_floating_point<T>::value,
+            isFloat = ::std::is_floating_point<T>::value,
             // If it is an enum, then consider it an int type
             // This does allow someone to make a SafeInt from an enum type, which is not recommended,
             // but it also allows someone to add an enum value to a SafeInt, which is handy.
-            isInt = std::is_integral<T>::value || std::is_enum<T>::value
+            isInt = ::std::is_integral<T>::value || ::std::is_enum<T>::value
         };
 };
 

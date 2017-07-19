@@ -31,6 +31,7 @@
 
 namespace web { namespace http {
 
+
 /// <summary>
 /// Binds an individual reference to a string value.
 /// </summary>
@@ -308,7 +309,9 @@ private:
     bool bind_impl(const key_type &text, _t &ref) const
     {
         utility::istringstream_t iss(text);
+
         iss.imbue(std::locale::classic());
+
         iss >> ref;
         if (iss.fail() || !iss.eof())
         {

@@ -313,7 +313,7 @@ public:
         /// <param name="fields">Field names associated with JSON values</param>
         /// <param name="keep_order">Whether to preserve the original order of the fields</param>
         /// <returns>A non-empty JSON object value</returns>
-        static _ASYNCRTIMP json::value __cdecl object(std::vector<std::pair<::utility::string_t, value>> fields, bool keep_order = false);
+        static _ASYNCRTIMP json::value __cdecl object(std::vector< std::pair< ::utility::string_t, value > > fields, bool keep_order = false);
 
         /// <summary>
         /// Creates an empty JSON array
@@ -421,7 +421,8 @@ public:
         /// Serializes the current JSON value to a C++ string.
         /// </summary>
         /// <returns>A string representation of the value</returns>
-        _ASYNCRTIMP std::shared_ptr<utility::string_t> serialize() const;
+        _ASYNCRTIMP utility::string_t serialize() const;
+
 
         /// <summary>
         /// Serializes the current JSON value to a C++ string.
@@ -429,6 +430,7 @@ public:
         /// <returns>A string representation of the value</returns>
         CASABLANCA_DEPRECATED("This API is deprecated and has been renamed to avoid confusion with as_string(), use ::web::json::value::serialize() instead.")
         _ASYNCRTIMP utility::string_t to_string() const;
+
 
         /// <summary>
         /// Parses a JSON value from the contents of an input stream using the native platform character width.
@@ -556,13 +558,6 @@ public:
         /// <returns>True if the field exists, false otherwise.</returns>
         bool has_field(const utility::string_t &key) const;
 
-        /// <summary>
-        /// Accesses a field of a JSON object.
-        /// </summary>
-        /// <param name="key">The name of the field</param>
-        /// <returns>The value kept in the field; null if the field does not exist</returns>
-        CASABLANCA_DEPRECATED("This API is deprecated and will be removed in a future release, use json::value::at() instead.")
-        value get(const utility::string_t &key) const;
 
         /// <summary>
         /// Erases an element of a JSON array. Throws if index is out of bounds.
@@ -622,13 +617,7 @@ private:
 public:
 #endif
 
-        /// <summary>
-        /// Accesses an element of a JSON array.
-        /// </summary>
-        /// <param name="index">The index of an element in the JSON array</param>
-        /// <returns>The value kept at the array index; null if outside the boundaries of the array</returns>
-        CASABLANCA_DEPRECATED("This API is deprecated and will be removed in a future release, use json::value::at() instead.")
-        value get(size_t index) const;
+
 
         /// <summary>
         /// Accesses an element of a JSON array.
@@ -1896,25 +1885,8 @@ public:
         return m_value->has_field(key);
     }
 
-    /// <summary>
-    /// Access a field of a JSON object.
-    /// </summary>
-    /// <param name="key">The name of the field</param>
-    /// <returns>The value kept in the field; null if the field does not exist</returns>
-    inline json::value json::value::get(const utility::string_t& key) const
-    {
-        return m_value->get_field(key);
-    }
+ 
 
-    /// <summary>
-    /// Access an element of a JSON array.
-    /// </summary>
-    /// <param name="index">The index of an element in the JSON array</param>
-    /// <returns>The value kept at the array index; null if outside the boundaries of the array</returns>
-    inline json::value json::value::get(size_t index) const
-    {
-        return m_value->get_element(index);
-    }
 
     /// <summary>
     /// A standard <c>std::ostream</c> operator to facilitate writing JSON values to streams.

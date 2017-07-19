@@ -27,9 +27,9 @@ struct zip_traits {
     template<class CS, class... CVN>
     static tag_not_valid checkRX(...);
 
-    static_assert(!std::is_same<decltype(check<selector_type, typename ObservableN::value_type...>(0)), tag_not_valid>::value, "zip Selector must be a function with the signature value_type(Observable::value_type...)");
+    static_assert(!std::is_same<decltype(checkRX<selector_type, typename ObservableN::value_type...>(0)), tag_not_valid>::value, "zip Selector must be a function with the signature value_type(Observable::value_type...)");
 
-    typedef decltype(check<selector_type, typename ObservableN::value_type...>(0)) value_type;
+    typedef decltype(checkRX<selector_type, typename ObservableN::value_type...>(0)) value_type;
 };
 
 template<class Coordination, class Selector, class... ObservableN>

@@ -1,11 +1,13 @@
 #pragma once
+
 #include "headers.h"
 #include "IPacketDispatcher.h"
 #include "DefaultScheduler.h"
-#include "RakNetTransport.h"
 #include "DefaultPacketDispatcher.h"
 #include "IPlugin.h"
 #include "IActionDispatcher.h"
+#include "ITransport.h"
+#include "Logger/NullLogger.h"
 
 namespace Stormancer
 {
@@ -15,35 +17,29 @@ namespace Stormancer
 		RANDOM = 1
 	};
 
+	class Configuration;
+	using Configuration_ptr = std::shared_ptr<Configuration>;
+
 	/// Used by a Client for initialization.
 	/// For instance to target a custom Stormancer cluster change the ServerEndoint property to the http API endpoint of your custom cluster.
 	class Configuration
 	{
+	public:
+
 		friend class Client;
 
-	private:
-		// Constructor.
-		Configuration(const std::string endpoint, const std::string account, const std::string application);
+#pragma region public_methods
 
-		// Copy constructor deleted.
-		Configuration(Configuration& other) = delete;
-
-		// Copy deleted.
-		Configuration& operator=(Configuration& other) = delete;
-
-	public:
-		// Destructor.
 		~Configuration();
 
-	public:
 		/// Create an account with an account and an application name and returns a Configuration smart ptr.
-		STORMANCER_DLL_API static std::shared_ptr<Configuration> create(const std::string endpoint, const std::string account, const std::string application);
+		STORMANCER_DLL_API static Configuration_ptr create(const std::string& endpoint, const std::string& account, const std::string& application);
 
 		/// Add a server endpoint in the internal list
-		STORMANCER_DLL_API void addServerEndpoint(const std::string serverEndpoint);
+		STORMANCER_DLL_API void addServerEndpoint(const std::string& serverEndpoint);
 
-		// Get the Api endpoint.
-		std::vector<std::string> getApiEndpoint();
+		/// Get the Api endpoint.
+		STORMANCER_DLL_API std::vector<std::string> getApiEndpoint();
 
 		/// Add a plugin to the client.
 		/// Plugins enable developpers to plug custom code in the stormancer client's extensibility points. Possible uses include: custom high level protocols, logger or analyzers.
@@ -51,13 +47,12 @@ namespace Stormancer
 		STORMANCER_DLL_API void addPlugin(IPlugin* plugin);
 
 		/// Get a reference to the plugins list
-		const std::vector<IPlugin*> plugins();
+		STORMANCER_DLL_API const std::vector<IPlugin*> plugins();
 
-	private:
-		// Set a metadata
-		Configuration& metadata(const char*, const char*);
+#pragma endregion
 
-	public:
+#pragma region public_members
+
 		/// A string containing the account name of the application.
 		const std::string account = "";
 
@@ -68,19 +63,25 @@ namespace Stormancer
 		std::function<std::shared_ptr<IPacketDispatcher>(DependencyResolver*)> dispatcher;
 
 		/// Maximum number of remote peers that can connect with this client.
-		uint16 maxPeers = 0;
+		uint16 maxPeers = 10;
 
-		// Optional server port
+		/// Optional server port
 		uint16 serverPort = 0;
 
 		/// Enable or disable the asynchrounous dispatch of received messages. Enabled by default.
 		bool asynchronousDispatch = true;
 
+		///Size of the threadpool. Defaults to 5. Less than 3 can provoke deadlocks.
+		int threadpoolSize = 5;
+
 		/// The scheduler used by the client to run the transport and other repeated tasks.
-		std::shared_ptr<IScheduler> scheduler = nullptr;
+		std::shared_ptr<IScheduler> scheduler;
 
 		/// Gets or sets the transport to be used by the client.
 		std::function<std::shared_ptr<ITransport>(DependencyResolver*)> transportFactory;
+
+		///Gets or sets the default p2p host port. 0 For automatic attribution.
+		unsigned short p2pServerPort = 7777;
 
 		/// <summary>
 		/// Dispatches events
@@ -90,6 +91,7 @@ namespace Stormancer
 		/// your main game loop for instance.
 		/// </remarks>
 		std::shared_ptr<IActionDispatcher> actionDispatcher = std::make_shared<SameThreadActionDispatcher>();
+
 		/// use the syncClock
 		bool synchronisedClock = true;
 
@@ -98,18 +100,39 @@ namespace Stormancer
 
 		EndpointSelectionMode endpointSelectionMode = EndpointSelectionMode::FALLBACK;
 
+		ILogger_ptr logger = std::make_shared<NullLogger>();
+
+#pragma endregion
+
 	private:
-		const std::function<std::shared_ptr<ITransport>(DependencyResolver*)> defaultTransportFactory = [](DependencyResolver* resolver)
-		{
 
-			return std::make_shared<RakNetTransport>(resolver);
-		};
+#pragma region private_methods
 
-		stringMap _metadata;
+		// Constructor.
+		Configuration(const std::string& endpoint, const std::string& account, const std::string& application);
+
+		// Copy constructor deleted.
+		Configuration(const Configuration& other) = delete;
+
+		// Assignment operator deleted.
+		Configuration& operator=(const Configuration& other) = delete;
+
+		// Set a metadata
+		Configuration& setMetadata(const std::string& key, const std::string& value);
+
+#pragma endregion
+
+#pragma region private_members
+
+		std::map<std::string, std::string> _metadata;
 
 		std::vector<IPlugin*> _plugins;
 
 		/// A string containing the target server endpoint.
 		std::vector<std::string> _serverEndpoints;
+
+		static const std::function<std::shared_ptr<ITransport>(DependencyResolver*)> _defaultTransportFactory;
+
+#pragma endregion
 	};
 };

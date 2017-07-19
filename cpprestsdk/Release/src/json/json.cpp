@@ -237,7 +237,7 @@ web::json::value web::json::value::object(bool keep_order)
             );
 }
 
-web::json::value web::json::value::object(std::vector<std::pair<::utility::string_t, value>> fields, bool keep_order)
+web::json::value web::json::value::object(std::vector<std::pair< ::utility::string_t, value>> fields, bool keep_order)
 {
     std::unique_ptr<details::_Value> ptr = utility::details::make_unique<details::_Object>(std::move(fields), keep_order);
     return web::json::value(std::move(ptr)
@@ -394,13 +394,6 @@ bool web::json::details::_Object::has_field(const utility::string_t &key) const
     return m_object.find(key) != m_object.end();
 }
 
-utility::string_t json::value::to_string() const
-{
-#ifndef _WIN32
-    utility::details::scoped_c_thread_locale locale;
-#endif
-    return m_value->to_string();
-}
 
 bool json::value::operator==(const json::value &other) const
 {
@@ -462,7 +455,7 @@ web::json::value& web::json::value::operator [] (const utility::string_t &key)
 {
     if ( this->is_null() )
     {
-        m_value.reset(new web::json::details::_Object(details::g_keep_json_object_unsorted));
+        m_value.reset(static_cast<web::json::details::_Value*>(new web::json::details::_Object(details::g_keep_json_object_unsorted)));
 #ifdef ENABLE_JSON_VALUE_VISUALIZER
         m_kind = value::Object;
 #endif
@@ -474,7 +467,7 @@ web::json::value& web::json::value::operator[](size_t index)
 {
     if ( this->is_null() )
     {
-        m_value.reset(new web::json::details::_Array());
+        m_value.reset(static_cast<web::json::details::_Value*>(new web::json::details::_Array()));
 #ifdef ENABLE_JSON_VALUE_VISUALIZER
         m_kind = value::Array;
 #endif

@@ -12,6 +12,25 @@
 #define __SOCKET_DEFINES_H
 
 /// Internal
+#ifdef GFWL
+#define accept__ XSocketAccept
+#define connect__ XSocketConnect
+#define closesocket__ XSocketClose
+#define socket__ XSocketCreate
+#define bind__ XSocketBind
+#define getsockname__ XSocketGetSockName
+#define getsockopt__ XSocketGetSockOpt
+#define inet_addr__ XSocketInet_Addr
+#define ioctlsocket__ XSocketIOCTLSocket
+#define listen__ XSocketListen
+#define recv__ XSocketRecv
+#define recvfrom__ XSocketRecvFrom
+#define select__ XSocketSelect
+#define send__ XSocketSend
+#define sendto__ XSocketSendTo
+#define setsockopt__ XSocketSetSockOpt
+#define shutdown__ XSocketShutdown
+#define WSASendTo__ XWSASendTo
 
 
 
@@ -47,7 +66,31 @@
 
 
 
-#if   defined(WINDOWS_STORE_RT)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#elif   defined(WINDOWS_STORE_RT)
 	#include "WinRTSocketAdapter.h"
 	#define accept__ WinRTAccept
 	#define connect__ WinRTConnect
@@ -71,10 +114,7 @@
 
 
 
-
-
-
-	#if   defined(_WIN32)
+	#if defined(_WIN32)
 		#define closesocket__ closesocket
 		#define select__ select
 	#elif defined(__native_client__)
@@ -84,6 +124,8 @@
 	#else
 		#define closesocket__ close
 		#define select__ select
+		// On Unix-like systems, sockets are ints (see SocketIncludes.h)
+		typedef int SOCKET;
 	#endif
 	#define accept__ accept
 	#define connect__ connect
@@ -113,7 +155,7 @@
 
 
 
-		#define setsockopt__ setsockopt
+#define setsockopt__ setsockopt
 
 	#define shutdown__ shutdown
 	#define WSASendTo__ WSASendTo

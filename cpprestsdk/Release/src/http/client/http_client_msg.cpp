@@ -73,7 +73,9 @@ void details::_http_request::set_request_uri(const uri& relative)
 utility::string_t details::_http_request::to_string() const
 {
     utility::ostringstream_t buffer;
+
     buffer.imbue(std::locale::classic());
+
     buffer << m_method << _XPLATSTR(" ") << (this->m_uri.is_empty() ? _XPLATSTR("/") : this->m_uri.to_string()) << _XPLATSTR(" HTTP/1.1\r\n");
     buffer << http_msg_base::to_string();
     return buffer.str();
@@ -90,7 +92,9 @@ utility::string_t details::_http_response::to_string() const
     }
 
     utility::ostringstream_t buffer;
+
     buffer.imbue(std::locale::classic());
+
     buffer << _XPLATSTR("HTTP/1.1 ") << m_status_code << _XPLATSTR(" ") << reason_phrase << _XPLATSTR("\r\n");
 
     buffer << http_msg_base::to_string();
@@ -100,7 +104,7 @@ utility::string_t details::_http_response::to_string() const
 // Macros to help build string at compile time and avoid overhead.
 #define STRINGIFY(x) _XPLATSTR(#x)
 #define TOSTRING(x) STRINGIFY(x)
-#define USERAGENT _XPLATSTR("cpprestsdk/") TOSTRING(CPPREST_VERSION_MAJOR) _XPLATSTR(".") TOSTRING(CPPREST_VERSION_MINOR) _XPLATSTR(".") TOSTRING(CPPREST_VERSION_REVISION)
+#define USERAGENT _XPLATSTR("cpprestsdk/") TOSTRING(CPPREST_VERSION_MAJOR) _XPLATSTR(".") TOSTRING(CPPREST_VERSION_MINOR) _XPLATSTR(".") TOSTRING(CPPREST_VERSION_REVISION) TOSTRING(CPPREST_PLATFORM)
 
 pplx::task<http_response> client::http_client::request(http_request request, const pplx::cancellation_token &token)
 {

@@ -44,7 +44,11 @@ namespace details
 
         _PPLXIMP void __cdecl YieldExecution()
         {
+
+
+
             YieldProcessor();
+
         }
 
         _PPLXIMP size_t __cdecl CaptureCallstack(void **stackData, size_t skipFrames, size_t captureFrames)

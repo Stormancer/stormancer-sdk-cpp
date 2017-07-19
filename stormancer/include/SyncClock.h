@@ -1,22 +1,27 @@
 #pragma once
-#include "stormancer.h"
+
+#include "headers.h"
+#include "DependencyResolver.h"
+#include "IConnection.h"
+#include "Watch.h"
+
 namespace Stormancer
 {
 	class SyncClock
 	{
 	public:
-		SyncClock(DependencyResolver* resolver, int interval);
-		void Start(IConnection* connection);
-		void Stop();
 
-		int LastPing();
-		bool IsRunning();
-
-		int64 Clock();
-	private:
-		pplx::task<void> syncClockImpl();
+		SyncClock(DependencyResolver* resolver, int interval = 1000);
+		~SyncClock();
+		void start(std::weak_ptr<IConnection> connection, pplx::cancellation_token ct);
+		int lastPing();
+		bool isRunning();
+		int64 clock();
 
 	private:
+
+		void stop();
+		void syncClockImplAsync();
 
 		struct ClockValue
 		{
@@ -24,23 +29,20 @@ namespace Stormancer
 			double offset;
 		};
 
-		IConnection* _remoteConnection;
-
-		DependencyResolver* _resolver;
-		std::mutex _syncClockMutex;
+		pplx::cancellation_token _cancellationToken = pplx::cancellation_token::none();
+		std::weak_ptr<IConnection> _remoteConnection;
+		DependencyResolver* _dependencyResolver;
+		std::mutex _mutex;
 		std::deque<ClockValue> _clockValues;
+		Watch _watch;
+		bool _isRunning = false;
+		bool _lastPingFinished = true;
+		unsigned int _maxValues = 24;
+		int _lastPing = 0;
+		int _interval = 1000;
+		int _intervalAtStart = 100;
 		double _medianLatency = 0;
 		double _standardDeviationLatency = 0;
-		uint16 _maxClockValues = 24;
-
-		int64 _synchronisedClockInterval = 5000;
-		int64 _pingIntervalAtStart = 100;
-
-		rxcpp::subscription _syncClockSubscription;
-		bool lastPingFinished = true;
-		bool _isRunning = false;
-		Watch _watch;
-		int _lastPing = 0;
 		double _offset = 0;
 	};
 };

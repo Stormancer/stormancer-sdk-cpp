@@ -12,7 +12,8 @@
 #define __SIGNALED_EVENT_H
 
 
-
+#include <mutex>
+#include <condition_variable>
 #if   defined(_WIN32)
 #include "WindowsIncludes.h"
 
@@ -45,23 +46,9 @@ public:
 	void WaitOnEvent(int timeoutMs);
 
 protected:
-#ifdef _WIN32
-	HANDLE eventList;
-
-
-
-
-
-#else
-	SimpleMutex isSignaledMutex;
-	bool isSignaled;
-#if !defined(ANDROID)
-	pthread_condattr_t condAttr;
-#endif
-	pthread_cond_t eventList;
-	pthread_mutex_t hMutex;
-	pthread_mutexattr_t mutexAttr;
-#endif
+	
+	std::mutex _signalLock;
+	std::condition_variable condition;
 };
 
 } // namespace RakNet

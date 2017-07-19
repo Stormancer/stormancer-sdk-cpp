@@ -20,7 +20,7 @@ struct has_on_connect
     template<class CT>
     static not_void checkRX(...);
 
-    typedef decltype(check<T>(0)) detail_result;
+    typedef decltype(checkRX<T>(0)) detail_result;
     static const bool value = std::is_same<detail_result, void>::value;
 };
 

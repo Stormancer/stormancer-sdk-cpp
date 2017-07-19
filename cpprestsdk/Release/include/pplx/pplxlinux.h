@@ -38,23 +38,17 @@
 
 #if defined(__APPLE__)
 #include <dispatch/dispatch.h>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/condition_variable.hpp>
-#else
+#endif
 #include <mutex>   
 #include <condition_variable>
-#endif
 
 #include "pplx/pplxinterface.h"
 
 
 namespace pplx
 {
-#if defined(__APPLE__)
-    namespace cpprest_synchronization = ::boost;
-#else
-    namespace cpprest_synchronization = ::std;
-#endif
+namespace cpprest_synchronization = ::std;
+
 namespace details
 {
 namespace platform

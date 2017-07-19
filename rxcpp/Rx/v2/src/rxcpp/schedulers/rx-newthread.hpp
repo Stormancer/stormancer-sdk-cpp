@@ -4,178 +4,124 @@
 
 #if !defined(RXCPP_RX_SCHEDULER_NEW_THREAD_HPP)
 #define RXCPP_RX_SCHEDULER_NEW_THREAD_HPP
-
 #include "../rx-includes.hpp"
+#include "TimerThread.h"
+#include <mutex>
 
 namespace rxcpp {
 
-namespace schedulers {
+	namespace schedulers {
 
-typedef std::function<std::thread(std::function<void()>)> thread_factory;
+		typedef std::function<std::thread(std::function<void()>)> thread_factory;
 
-struct new_thread : public scheduler_interface
-{
-private:
-    typedef new_thread this_type;
-    new_thread(const this_type&);
+		struct new_thread : public scheduler_interface
+		{
+		private:
+			typedef new_thread this_type;
+			new_thread(const this_type&);
 
-    struct new_worker : public worker_interface
-    {
-    private:
-        typedef new_worker this_type;
+			static Stormancer::TimerThread& timer()
+			{
+				static Stormancer::TimerThread s_timer;
+				return s_timer;
+			}
 
-        typedef detail::action_queue queue_type;
+			struct new_worker : public worker_interface
+			{
+			private:
+				typedef new_worker this_type;
 
-        new_worker(const this_type&);
+				typedef detail::action_queue queue_type;
 
-        struct new_worker_state : public std::enable_shared_from_this<new_worker_state>
-        {
-            typedef detail::schedulable_queue<
-                typename clock_type::time_point> queue_item_time;
+				new_worker(const this_type&);
 
-            typedef queue_item_time::item_type item_type;
+				struct new_worker_state : public std::enable_shared_from_this<new_worker_state>
+				{
+					virtual ~new_worker_state()
+					{
+						lifetime.unsubscribe();
+					}
 
-            virtual ~new_worker_state()
-            {
-                std::unique_lock<std::mutex> guard(lock);
-                if (worker.joinable() && worker.get_id() != std::this_thread::get_id()) {
-                    lifetime.unsubscribe();
-                    guard.unlock();
-                    worker.join();
-                }
-                else {
-                    lifetime.unsubscribe();
-                    worker.detach();
-                }
-            }
+					explicit new_worker_state(composite_subscription cs)
+						: lifetime(cs)
+					{
+					}
 
-            explicit new_worker_state(composite_subscription cs)
-                : lifetime(cs)
-            {
-            }
+					composite_subscription lifetime;
+					recursion r;
+				};
 
-            composite_subscription lifetime;
-            mutable std::mutex lock;
-            mutable std::condition_variable wake;
-            mutable queue_item_time q;
-            std::thread worker;
-            recursion r;
-        };
+				std::shared_ptr<new_worker_state> state;
 
-        std::shared_ptr<new_worker_state> state;
+			public:
+				virtual ~new_worker()
+				{
+				}
 
-    public:
-        virtual ~new_worker()
-        {
-        }
+				explicit new_worker(std::shared_ptr<new_worker_state> ws)
+					: state(ws)
+				{
+				}
 
-        explicit new_worker(std::shared_ptr<new_worker_state> ws)
-            : state(ws)
-        {
-        }
+				new_worker(composite_subscription cs)
+					: state(std::make_shared<new_worker_state>(cs))
+				{
 
-        new_worker(composite_subscription cs, thread_factory& tf)
-            : state(std::make_shared<new_worker_state>(cs))
-        {
-            auto keepAlive = state;
+				}
 
-            state->lifetime.add([keepAlive](){
-                std::unique_lock<std::mutex> guard(keepAlive->lock);
-                auto expired = std::move(keepAlive->q);
-                if (!keepAlive->q.empty()) abort();
-                keepAlive->wake.notify_one();
-            });
+				virtual clock_type::time_point now() const {
+					return clock_type::now();
+				}
 
-            state->worker = tf([keepAlive](){
+				virtual void schedule(const schedulable& scbl) const {
+					schedule(now(), scbl);
+				}
 
-                // take ownership
-                queue_type::ensureRX(std::make_shared<new_worker>(keepAlive));
-                // release ownership
-                RXCPP_UNWIND_AUTO([]{
-                    queue_type::destroy();
-                });
+				virtual void schedule(clock_type::time_point when, const schedulable& scbl) const {
+					if (scbl.is_subscribed()) {
+						state->r.reset(false);
+						auto statePtr = state; // needed to pass state to the task
 
-                for(;;) {
-                    std::unique_lock<std::mutex> guard(keepAlive->lock);
-                    if (keepAlive->q.empty()) {
-                        keepAlive->wake.wait(guard, [keepAlive](){
-                            return !keepAlive->lifetime.is_subscribed() || !keepAlive->q.empty();
-                        });
-                    }
-                    if (!keepAlive->lifetime.is_subscribed()) {
-                        break;
-                    }
-                    auto& peek = keepAlive->q.top();
-                    if (!peek.what.is_subscribed()) {
-                        keepAlive->q.pop();
-                        continue;
-                    }
-                    if (clock_type::now() < peek.when) {
-                        keepAlive->wake.wait_until(guard, peek.when);
-                        continue;
-                    }
-                    auto what = peek.what;
-                    keepAlive->q.pop();
-                    keepAlive->r.reset(keepAlive->q.empty());
-                    guard.unlock();
-                    what(keepAlive->r.get_recurse());
-                }
-            });
-        }
+						timer().schedule([statePtr, scbl]()
+						{
+							if (scbl.is_subscribed())
+							{
+								statePtr->r.reset(true);
+								scbl(statePtr->r.get_recurse());
+							}
+						}, when);
+					}
+				}
+			};
 
-        virtual clock_type::time_point now() const {
-            return clock_type::now();
-        }
+		public:
+			new_thread()
+			{
+			}
+			explicit new_thread(thread_factory) {}
 
-        virtual void schedule(const schedulable& scbl) const {
-            schedule(now(), scbl);
-        }
+			virtual ~new_thread()
+			{
+			}
 
-        virtual void schedule(clock_type::time_point when, const schedulable& scbl) const {
-            if (scbl.is_subscribed()) {
-                std::unique_lock<std::mutex> guard(state->lock);
-                state->q.push(new_worker_state::item_type(when, scbl));
-                state->r.reset(false);
-            }
-            state->wake.notify_one();
-        }
-    };
+			virtual clock_type::time_point now() const {
+				return clock_type::now();
+			}
 
-    mutable thread_factory factory;
+			virtual worker create_worker(composite_subscription cs) const {
+				return worker(cs, std::make_shared<new_worker>(cs));
+			}
+		};
 
-public:
-    new_thread()
-        : factory([](std::function<void()> start){
-            return std::thread(std::move(start));
-        })
-    {
-    }
-    explicit new_thread(thread_factory tf)
-        : factory(tf)
-    {
-    }
-    virtual ~new_thread()
-    {
-    }
-
-    virtual clock_type::time_point now() const {
-        return clock_type::now();
-    }
-
-    virtual worker create_worker(composite_subscription cs) const {
-        return worker(cs, std::make_shared<new_worker>(cs, factory));
-    }
-};
-
-inline scheduler make_new_thread() {
-    static scheduler instance = make_scheduler<new_thread>();
-    return instance;
-}
-inline scheduler make_new_thread(thread_factory tf) {
-    return make_scheduler<new_thread>(tf);
-}
-
-}
+		inline scheduler make_new_thread() {
+			static scheduler instance = make_scheduler<new_thread>();
+			return instance;
+		}
+		inline scheduler make_new_thread(thread_factory) {
+			static scheduler instance = make_scheduler<new_thread>();
+			return instance;
+		}
+	}
 
 }
 

@@ -1,6 +1,6 @@
 #pragma once
+
 #include "basic_bytebuf.h"
-#include "ILogger.h"
 
 namespace Stormancer
 {
@@ -183,6 +183,11 @@ namespace Stormancer
 				return (*this);
 			}
 
+			_Myt& readTo(std::string& target)
+			{
+				return ((*this) >> target);
+			}
+
 			_Myt& operator>>(std::string& target)
 			{
 				Stormancer::uint32 len = (Stormancer::uint32)this->rdbuf()->in_avail();
@@ -198,7 +203,7 @@ namespace Stormancer
 			{
 				Stormancer::uint32 len = (Stormancer::uint32)this->rdbuf()->in_avail();
 				Stormancer::uint32 nbChars = len / 2;
-				str.reserve(nbChars);
+				target.reserve(nbChars);
 				char* data = new char[len];
 				this->read(data, len);
 				target.assign((wchar_t*)data, nbChars);

@@ -1,11 +1,10 @@
 #pragma once
 
-
 #include "headers.h"
 
-#include "basic_bytebuf.h"
-#include "basic_bytestream.h"
+#include "bytestream.h"
 
+#include "PacketPriority.h"
 #include "Action.h"
 
 #include "ConnectionData.h"
@@ -19,13 +18,14 @@
 
 #include "DependencyResolver.h"
 #include "Helpers.h"
-#include "ApiClient.h"
+
 #include "Client.h"
 #include "Configuration.h"
 #include "ConnectionState.h"
-#include "ILogger.h"
-#include "NullLogger.h"
-#include "FileLogger.h"
+#include "Logger/ILogger.h"
+#include "Logger/NullLogger.h"
+#include "Logger/ConsoleLogger.h"
+#include "Logger/FileLogger.h"
 #include "DefaultPacketDispatcher.h"
 #include "IConnection.h"
 #include "IConnectionManager.h"
@@ -36,6 +36,7 @@
 #include "SystemRequestIDTypes.h"
 #include "Packet.h"
 #include "PacketProcessorConfig.h"
+#include "PeerFilter.h"
 #include "RequestContext.h"
 #include "RequestModuleBuilder.h"
 #include "RequestProcessor.h"
@@ -48,18 +49,14 @@
 #include "IRequestModule.h"
 #include "ITokenHandler.h"
 #include "TokenHandler.h"
-#include "ISubscription.h"
 #include "IScheduler.h"
 #include "DefaultScheduler.h"
 #include "Watch.h"
 #include "SyncClock.h"
 
-#include "RakNetConnection.h"
-#include "RakNetTransport.h"
-
 #include "IPlugin.h"
 
-#include "RpcPlugin.h"
-#include "RpcService.h"
-#include "RpcRequest.h"
-#include "RpcRequestContext.h"
+#include "RPC/RpcPlugin.h"
+#include "RPC/RpcService.h"
+#include "RPC/RpcRequest.h"
+#include "RPC/RpcRequestContext.h"

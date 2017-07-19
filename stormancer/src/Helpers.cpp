@@ -1,72 +1,18 @@
-#include "stormancer.h"
+#include "stdafx.h"
+#include "Helpers.h"
+
+
+
+
 
 namespace Stormancer
 {
-	void copyHeapSafe(stringMap* dest, const stringMap* src)
-	{
-		stringMap& mDest = *dest;
-		for (auto it : *src)
-		{
-			mDest[std::string(it.first.c_str())] = std::string(it.second.c_str());
-		}
-	}
-
-	ResultBase::~ResultBase()
-	{
-	}
-
-	bool ResultBase::finished()
-	{
-		return (_error != -1);
-	}
-
-	bool ResultBase::success()
-	{
-		return (_error == 0);
-	}
-
-	void ResultBase::setError(int error, const char* reason)
-	{
-		_error = error;
-		_reason = reason;
-	}
-
-	int ResultBase::error()
-	{
-		return _error;
-	}
-
-	const char* ResultBase::reason()
-	{
-		return _reason.c_str();
-	}
-
-
-	void deferredCall(std::function<void(void)> f, uint32 ms)
-	{
-		pplx::task<void>([f, ms]() {
-			Sleep(ms);
-			f();
-		});
-	}
-
-
 	bool ensureSuccessStatusCode(int statusCode)
 	{
 		return (statusCode >= 200 && statusCode < 300);
 	}
 
-	anyMap stringMapToAnyMap(stringMap& sm)
-	{
-		anyMap am;
-		for (auto it = sm.begin(); it != sm.end(); ++it)
-		{
-			am[it->first] = (void*)&it->second;
-		}
-		return am;
-	}
-
-	std::string vectorJoin(std::vector<std::string>& vector, std::string glue)
+	std::string vectorJoin(const std::vector<std::string>& vector, const std::string& glue)
 	{
 		std::stringstream ss;
 		for (size_t i = 0; i < vector.size(); ++i)
@@ -80,7 +26,36 @@ namespace Stormancer
 		return ss.str();
 	}
 
-	std::vector<std::wstring> stringSplit(const std::wstring& str, const std::wstring separator)
+	std::vector<std::string> stringSplit(const std::string& str, const std::string& separator)
+	{
+		std::vector<std::string> splitted;
+		size_t cursor = 0, lastCursor = 0;
+		while ((cursor = str.find(separator, cursor)) != std::string::npos)
+		{
+			splitted << str.substr(lastCursor, cursor - lastCursor);
+			lastCursor = cursor;
+			cursor++;
+		}
+		splitted << str.substr(lastCursor + 1, str.length() - lastCursor);
+		return splitted;
+	}
+
+	std::string stringTrim(const std::string& str2, char ch)
+	{
+		auto str = str2;
+		std::function<int(int)> ischar = [ch](int c) -> int {
+			if (c == ch)
+			{
+				return 1;
+			}
+			return 0;
+		};
+		str.erase(str.begin(), find_if(str.begin(), str.end(), not1(ischar)));
+		str.erase(find_if(str.rbegin(), str.rend(), not1(ischar)).base(), str.end());
+		return str;
+	};
+
+	std::vector<std::wstring> wstringSplit(const std::wstring& str, const std::wstring& separator)
 	{
 		std::vector<std::wstring> splitted;
 		size_t cursor = 0, lastCursor = 0;
@@ -94,8 +69,9 @@ namespace Stormancer
 		return splitted;
 	}
 
-	std::wstring stringTrim(std::wstring& str, wchar_t ch)
+	std::wstring wstringTrim(const std::wstring& str2, wchar_t ch)
 	{
+		auto str = str2;
 		std::function<int(int)> ischar = [ch](int c) -> int {
 			if (c == ch)
 			{
@@ -121,6 +97,28 @@ namespace Stormancer
 		}
 	}
 
+	pplx::task<void> taskDelay(int milliseconds, pplx::cancellation_token token)
+	{
+		pplx::task<void> sleepTask = pplx::task<void>([milliseconds]() {
+			std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
+		}, pplx::task_options(token));
+
+		if (token.is_cancelable())
+		{
+			pplx::task_completion_event<void> tce;
+			token.register_callback([tce]() { tce.set(); });
+			pplx::task<void> t(tce);
+
+			std::vector<pplx::task<void>> v{ t, sleepTask };
+
+			return pplx::when_any(v.begin(), v.end()).then([](size_t) {});
+		}
+		else
+		{
+			return sleepTask;
+		}
+	}
+
 	char* readToEnd(bytestream* stream, std::streamsize* length)
 	{
 		*length = stream->rdbuf()->in_avail();
@@ -129,27 +127,30 @@ namespace Stormancer
 		return data;
 	}
 
-	time_t nowTime_t()
+	std::time_t nowTime_t()
 	{
 		return std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 	}
 
-	std::string time_tToStr(time_t& time, bool local)
+	std::string time_tToStr(std::time_t time, bool local)
 	{
 		return time_tToStr(time, (local ? "%x %X" : "%Y-%m-%dT%H:%M:%SZ"));
 	}
 
-	std::string time_tToStr(time_t& time, const char* format)
+	std::string time_tToStr(std::time_t time, const char* format)
 	{
 		std::stringstream ss;
 #if defined(_WIN32)
 		struct tm timeinfo;
-		localtime_s(&timeinfo, &time);
-		ss << std::put_time((tm*)&timeinfo, format);
+		auto err = localtime_s(&timeinfo, &time);
+		if (err == 0)
+		{
+			ss << std::put_time((tm*)&timeinfo, format);
+		}
 #else
-//		struct tm timeinfo;
-//		localtime_r(&time, &timeinfo); // POSIX
-//		ss << std::put_time((tm*)&timeinfo, format); // put_time not implemented in libstdc++4.9
+		//		struct tm timeinfo;
+		//		localtime_r(&time, &timeinfo); // POSIX
+		//		ss << std::put_time((tm*)&timeinfo, format); // put_time not implemented in libstdc++4.9
 		writetime(ss, time, format);
 #endif
 		return ss.str();
@@ -157,16 +158,23 @@ namespace Stormancer
 
 	void writetime(std::ostream &os, std::time_t time, const char* format)
 	{
+
+
+
+
 		std::locale loc;
 		struct tm timeinfo;
 		const std::time_put<char>& tmput = std::use_facet<std::time_put<char>>(loc);
 		//std::tm* now = std::localtime(&time);
 #if defined(_WIN32)
 		localtime_s(&timeinfo, &time);
+
+
 #else
 		localtime_r(&time, &timeinfo); // POSIX
 #endif
 		tmput.put(os, os, ' ', &timeinfo, format, format + strlen(format));
+
 	}
 
 	std::string nowStr(bool local)
@@ -181,13 +189,13 @@ namespace Stormancer
 		return time_tToStr(now, format);
 	}
 
-	std::string nowDateStr(bool local)
+	std::string nowDateStr(bool)
 	{
 		time_t now = nowTime_t();
 		return time_tToStr(now, "%Y-%m-%d");
 	}
 
-	std::string nowTimeStr(bool local)
+	std::string nowTimeStr(bool)
 	{
 		time_t now = nowTime_t();
 		return time_tToStr(now, "%H:%M:%S");
@@ -200,7 +208,7 @@ namespace Stormancer
 		{
 			ss << std::setfill('0') << std::setw(2) << std::hex << std::uppercase;
 		}
-		for (auto i = 0; i < bytes.length(); ++i)
+		for (std::size_t i = 0; i < bytes.length(); ++i)
 		{
 			if (i)
 			{
@@ -209,5 +217,29 @@ namespace Stormancer
 			ss << std::setw(2) << (int)(byte)bytes[i];
 		}
 		return ss.str();
+	}
+
+	bool compareExchange(std::function<bool()> const compare, std::function<void()> exchange)
+	{
+		if (compare())
+		{
+			exchange();
+			return true;
+		}
+		return false;
+	}
+
+	bool compareExchange(std::mutex& mutex, std::function<bool()> const compare, std::function<void()> exchange)
+	{
+		if (compare())
+		{
+			std::lock_guard<std::mutex> lg(mutex);
+			if (compare())
+			{
+				exchange();
+				return true;
+			}
+		}
+		return false;
 	}
 };

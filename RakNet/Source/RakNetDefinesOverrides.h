@@ -8,5 +8,11 @@
  *
  */
 
+
+#define RAKNET_SUPPORT_IPV6 1
+
+
+
+
 // USER EDITABLE FILE
 

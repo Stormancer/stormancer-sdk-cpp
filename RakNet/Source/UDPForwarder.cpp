@@ -20,7 +20,11 @@
 #include "DS_OrderedList.h"
 #include "LinuxStrings.h"
 #include "SocketDefines.h"
-#include "VitaIncludes.h"
+// ajout Vincent
+#if !defined(_NO_PPLX)
+	#include "VitaIncludes.h"
+#endif
+// fin ajout Vincent
 #include "errno.h"
 
 #ifndef INVALID_SOCKET

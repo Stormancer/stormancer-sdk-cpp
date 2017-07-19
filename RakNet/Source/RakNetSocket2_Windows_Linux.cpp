@@ -15,9 +15,17 @@
 #ifndef RAKNETSOCKET2_WINDOWS_LINUX_CPP
 #define RAKNETSOCKET2_WINDOWS_LINUX_CPP
 
-#if !defined(WINDOWS_STORE_RT) && !defined(__native_client__)
+#if !defined(WINDOWS_STORE_RT) && !defined(_XBOX) && !defined(X360) && !defined(__native_client__)
 
-#if RAKNET_SUPPORT_IPV6==1
+#if RAKNET_SUPPORT_IPV6==1 || defined(IOS)
+
+#include <sys/types.h>
+#if defined (_WIN32)
+#include <WinSock2.h>
+#else
+#include <sys/socket.h>
+#include <netdb.h>
+#endif
 
 void PrepareAddrInfoHints2(addrinfo *hints)
 {
@@ -106,7 +114,7 @@ void GetMyIP_Windows_Linux_IPV4( SystemAddress addresses[MAXIMUM_NUMBER_OF_INTER
 
 void GetMyIP_Windows_Linux( SystemAddress addresses[MAXIMUM_NUMBER_OF_INTERNAL_IDS] )
 {
-	#if RAKNET_SUPPORT_IPV6==1
+	#if RAKNET_SUPPORT_IPV6==1 || defined(IOS)
 		GetMyIP_Windows_Linux_IPV4And6(addresses);
 	#else
 		GetMyIP_Windows_Linux_IPV4(addresses);

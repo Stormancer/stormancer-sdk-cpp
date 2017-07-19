@@ -16,9 +16,9 @@
 #ifndef __NETWORK_TYPES_H
 #define __NETWORK_TYPES_H
 
-
-
-
+#if defined(_XBOX_720_WITH_XBOX_LIVE)
+#include <collection.h>
+#endif
 
 #include "RakNetDefines.h"
 #include "NativeTypes.h"
@@ -28,6 +28,7 @@
 #include "XBox360Includes.h"
 #include "SocketIncludes.h"
 
+#include "SocketDefines.h"
 
 
 
@@ -197,15 +198,15 @@ struct RAK_DLL_EXPORT SystemAddress
 	SystemAddress();
 	SystemAddress(const char *str);
 	SystemAddress(const char *str, unsigned short port);
-
-
-
-
-
-
-
-
-
+#if defined(_XBOX) || defined(X360) || defined(GFWL)
+	/// On the XBOX, never transmit SystemAddress. Instead, transmit XSESSION_INFO and use SetFromXSessionInfo() to get the address of a remote console
+	explicit SystemAddress(XSESSION_INFO *addr, unsigned short _port);
+	void SetFromXSessionInfo(XSESSION_INFO *addr, unsigned short _port);
+	void SetFromXNADDRAndXNKID(XNADDR *xnaddr, XNKID *xnkid, unsigned short _port);
+#endif
+#if defined(_XBOX_720_WITH_XBOX_LIVE)
+	void SetFromSecureDeviceAssociation(SecureDeviceAssociation^ association, unsigned short _port);
+#endif
 
 	/// SystemAddress, with RAKNET_SUPPORT_IPV6 defined, holds both an sockaddr_in6 and a sockaddr_in
 	union// In6OrIn4

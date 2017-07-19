@@ -1,4 +1,5 @@
 #pragma once
+
 #include "headers.h"
 #include "ITokenHandler.h"
 
@@ -8,9 +9,13 @@ namespace Stormancer
 	class TokenHandler : public ITokenHandler
 	{
 	public:
+
+#pragma region public_methods
+
 		TokenHandler();
 		virtual ~TokenHandler();
+		SceneEndpoint decodeToken(const std::string& token);
 
-		SceneEndpoint decodeToken(std::string& token);
+#pragma endregion
 	};
 };

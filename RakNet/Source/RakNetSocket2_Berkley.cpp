@@ -12,6 +12,10 @@
 
 #ifdef RAKNET_SOCKET_2_INLINE_FUNCTIONS
 
+#if RAKNET_SUPPORT_IPV6==1
+#include "LinuxStrings.h"
+#endif
+
 #ifndef RAKNETSOCKET2_BERKLEY_CPP
 #define RAKNETSOCKET2_BERKLEY_CPP
 
@@ -30,11 +34,11 @@ void RNS2_Berkley::SetSocketOptions(void)
 
 	// Immediate hard close. Don't linger the socket, or recreating the socket quickly on Vista fails.
 	// Fail with voice and xbox
-
+#if !defined(_XBOX) && !defined(_XBOX_720_WITH_XBOX_LIVE) && !defined(X360)
 	sock_opt=0;
 	r = setsockopt__( rns2Socket, SOL_SOCKET, SO_LINGER, ( char * ) & sock_opt, sizeof ( sock_opt ) );
 	// Do not assert, ignore failure
-
+#endif
 
 
 	// This doesn't make much difference: 10% maybe
@@ -64,14 +68,14 @@ void RNS2_Berkley::SetBroadcastSocket(int broadcast)
 }
 void RNS2_Berkley::SetIPHdrIncl(int ipHdrIncl)
 {
-
-		setsockopt__( rns2Socket, IPPROTO_IP, IP_HDRINCL, ( char * ) & ipHdrIncl, sizeof( ipHdrIncl ) );
-
+#if !defined(_XBOX)
+	setsockopt__( rns2Socket, IPPROTO_IP, IP_HDRINCL, ( char * ) & ipHdrIncl, sizeof( ipHdrIncl ) );
+#endif
 }
 void RNS2_Berkley::SetDoNotFragment( int opt )
 {
 	#if defined( IP_DONTFRAGMENT )
- #if defined(_WIN32) && !defined(_DEBUG)
+#if defined(_WIN32) && !defined(_XBOX) && !defined(_XBOX_720_COMPILE_AS_WINDOWS) && !defined(_DEBUG) && !defined(X360)
 		// If this assert hit you improperly linked against WSock32.h
 		RakAssert(IP_DONTFRAGMENT==14);
 	#endif
@@ -96,7 +100,8 @@ void RNS2_Berkley::GetSystemAddressIPV4 ( RNS2Socket rns2Socket, SystemAddress *
 
 
 
-			systemAddressOut->address.addr4.sin_addr.s_addr=inet_addr__("127.0.0.1");
+
+		systemAddressOut->address.addr4.sin_addr.s_addr=inet_addr__("127.0.0.1");
 
 	}
 }
@@ -117,7 +122,7 @@ void RNS2_Berkley::GetSystemAddressIPV4And6 ( RNS2Socket rns2Socket, SystemAddre
 			NULL, dwIOError, MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),  // Default language
 			( LPTSTR ) & messageBuffer, 0, NULL );
 		// something has gone wrong here...
-		RAKNET_DEBUG_PRINTF( "getsockname failed:Error code - %d\n%s", dwIOError, messageBuffer );
+		RAKNET_DEBUG_PRINTF( "getsockname failed:Error code - %d\n%s", dwIOError, (char*)messageBuffer );
 
 		//Free the buffer.
 		LocalFree( messageBuffer );
@@ -190,6 +195,7 @@ RNS2BindResult RNS2_Berkley::BindSharedIPV4( RNS2_BerkleyBindParameters *bindPar
 
 
 
+
 		boundAddress.address.addr4.sin_addr.s_addr = inet_addr__( bindParameters->hostAddress );
 
 	}
@@ -216,7 +222,8 @@ RNS2BindResult RNS2_Berkley::BindSharedIPV4( RNS2_BerkleyBindParameters *bindPar
 
 
 
-#if defined(_WIN32)
+
+#if defined(_WIN32) && !defined(_XBOX) && !defined(_XBOX_720_WITH_XBOX_LIVE) && !defined(X360)
 		closesocket__(rns2Socket);
 		return BR_FAILED_TO_BIND_SOCKET;
 #elif (defined(__GNUC__) || defined(__GCCXML__) ) && !defined(_WIN32)
@@ -224,7 +231,6 @@ RNS2BindResult RNS2_Berkley::BindSharedIPV4( RNS2_BerkleyBindParameters *bindPar
 		switch (ret)
 		{
 		case EBADF:
-			RAKNET_DEBUG_PRINTF("bind__(): sockfd is not a valid descriptor.\n"); break;
 
 		case ENOTSOCK:
 			RAKNET_DEBUG_PRINTF("bind__(): Argument is a descriptor for a file, not a socket.\n"); break;
@@ -245,7 +251,6 @@ RNS2BindResult RNS2_Berkley::BindSharedIPV4( RNS2_BerkleyBindParameters *bindPar
 			RAKNET_DEBUG_PRINTF("bind__(): A component of the path prefix is not a directory.\n"); break;
 		case EACCES:
 			// Port reserved on PS4
-			RAKNET_DEBUG_PRINTF("bind__(): Search permission is denied on a component of the path prefix.\n"); break;
 
 		case ELOOP:
 			RAKNET_DEBUG_PRINTF("bind__(): Too many symbolic links were encountered in resolving my_addr.\n"); break;
@@ -279,16 +284,18 @@ RNS2BindResult RNS2_Berkley::BindSharedIPV4And6( RNS2_BerkleyBindParameters *bin
 	char portStr[32];
 	Itoa(bindParameters->port,portStr,10);
 
-
+	int result;
 	// On Ubuntu, "" returns "No address associated with hostname" while 0 works.
 	if (bindParameters->hostAddress && 
 		(_stricmp(bindParameters->hostAddress,"UNASSIGNED_SYSTEM_ADDRESS")==0 || bindParameters->hostAddress[0]==0))
 	{
-		getaddrinfo(0, portStr, &hints, &servinfo);
+		result = getaddrinfo(0, portStr, &hints, &servinfo);
 	}
 	else
 	{
-		getaddrinfo(bindParameters->hostAddress, portStr, &hints, &servinfo);
+		result = getaddrinfo(bindParameters->hostAddress, portStr, &hints, &servinfo);
+
+		
 	}
 
 	// Try all returned addresses until one works
@@ -296,28 +303,27 @@ RNS2BindResult RNS2_Berkley::BindSharedIPV4And6( RNS2_BerkleyBindParameters *bin
 	{
 		// Open socket. The address type depends on what
 		// getaddrinfo() gave us.
-		rns2Socket = socket__(aip->ai_family, aip->ai_socktype, aip->ai_protocol);
+		rns2Socket = (RakNet::RNS2Socket)socket__(aip->ai_family, aip->ai_socktype, aip->ai_protocol);
 
 		if (rns2Socket == -1)
 			return BR_FAILED_TO_BIND_SOCKET;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#ifdef _XBOX_720_COMPILE_AS_WINDOWS
+		// Set the v6only socket option to false.  This is mandatory, as
+		// SecureDeviceAssociationTemplate::CreateAssociationAsync will use every
+		// means possible to identify the best network path to the remote device,
+		// including paths that leverage "dual-IP-stack" support on the socket.
+		// Despite how the option name might sound, apps will still only ever work
+		// with IPv6 addresses.
+		int v6only = 0;
+		setsockopt(
+			rns2Socket,
+			IPPROTO_IPV6,
+			IPV6_V6ONLY,
+			(char*) &v6only,
+			sizeof( v6only )
+			);
+#endif
 
 		ret = bind__(rns2Socket, aip->ai_addr, (int) aip->ai_addrlen );
 		if (ret>=0)
@@ -375,41 +381,40 @@ void RNS2_Berkley::RecvFromBlockingIPV4And6(RNS2RecvStruct *recvFromStruct)
 		sockLen=sizeof(their_addr);
 		sockAddrPtr=(sockaddr*) &their_addr;
 	}
-
-
-
-
+#if defined(_XBOX) || defined(_XBOX_720_WITH_XBOX_LIVE) || defined(X360) || defined(GFWL)
+	dataOutSize=MAXIMUM_MTU_SIZE*2;
+#else
 	dataOutSize=MAXIMUM_MTU_SIZE;
-
+#endif
 
 	recvFromStruct->bytesRead = recvfrom__(rns2Socket, recvFromStruct->data, dataOutSize, flag, sockAddrPtr, socketlenPtr );
-
-#if defined(_WIN32) && defined(_DEBUG) && !defined(WINDOWS_PHONE_8)
+	//RAKNET_DEBUG_PRINTF("Received %i bytes \n", recvFromStruct->bytesRead);
+#if defined(_WIN32) && defined(_DEBUG) && !defined(WINDOWS_PHONE_8) && !defined(_XBOX_720_COMPILE_AS_WINDOWS)
 	if (recvFromStruct->bytesRead==-1)
 	{
 		DWORD dwIOError = GetLastError();
-		if (dwIoError != 10035)
+		if (dwIOError != 10035)
 		{
 			LPVOID messageBuffer;
 			FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 				NULL, dwIOError, MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),  // Default language
 				( LPTSTR ) & messageBuffer, 0, NULL );
 			// I see this hit on XP with IPV6 for some reason
-			RAKNET_DEBUG_PRINTF( "Warning: recvfrom failed:Error code - %d\n%s", dwIOError, messageBuffer );
+			RAKNET_DEBUG_PRINTF( "Warning: recvfrom failed:Error code - %d\n%s", dwIOError, (char*)messageBuffer );
 			LocalFree( messageBuffer );
 		}
 	}	
 #endif
 
-
-
-
-
-
-
-
-
-
+#if defined(_XBOX) || defined(_XBOX_720_WITH_XBOX_LIVE) || defined(X360) || defined(GFWL)
+	if (s->GetBindings()->protocol==IPPROTO_VDP)
+	{
+		if (*bytesReadOut<2)
+			return;
+		*bytesReadOut=*bytesReadOut-2;
+		memmove(dataOut,dataOut+2,*bytesReadOut);
+	}
+#endif
 	if (recvFromStruct->bytesRead<=0)
 		return;
 	recvFromStruct->timeRead=RakNet::GetTimeUS();
@@ -480,15 +485,15 @@ void RNS2_Berkley::RecvFromBlockingIPV4(RNS2RecvStruct *recvFromStruct)
 	}
 
 	recvFromStruct->bytesRead = recvfrom__( GetSocket(), recvFromStruct->data, sizeof(recvFromStruct->data), flag, sockAddrPtr, socketlenPtr );
-
-
-
-
-
-
-
-
-
+#if defined(_XBOX) || defined(_XBOX_720_WITH_XBOX_LIVE) || defined(X360) || defined(GFWL)
+	if (GetBindings()->protocol==IPPROTO_VDP)
+	{
+		if (recvFromStruct->bytesRead<2)
+			return;
+		recvFromStruct->bytesRead=recvFromStruct->bytesRead-2;
+		memmove(recvFromStruct->data,recvFromStruct->data+2,recvFromStruct->bytesRead);
+	}
+#endif
 	if (recvFromStruct->bytesRead<=0)
 	{
 		/*

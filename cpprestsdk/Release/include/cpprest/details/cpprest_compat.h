@@ -45,7 +45,11 @@
 #define __declspec(x) __attribute__ ((x))
 #define dllimport
 #define novtable /* no novtable equivalent */
+
 #define __assume(x) do { if (!(x)) __builtin_unreachable(); } while (false)
+
+
+
 #define CASABLANCA_UNREFERENCED_PARAMETER(x) (void)x
 #define CPPREST_NOEXCEPT noexcept
 

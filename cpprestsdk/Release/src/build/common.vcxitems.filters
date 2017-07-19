@@ -110,9 +110,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\cpprest\http_headers.h">
       <Filter>Header Files\cpprest</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\cpprest\http_listener.h">
-      <Filter>Header Files\cpprest</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\cpprest\http_msg.h">
       <Filter>Header Files\cpprest</Filter>
     </ClInclude>
@@ -179,9 +176,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\cpprest\details\x509_cert_utilities.h">
       <Filter>Header Files\cpprest\details</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\pch\stdafx.h">
-      <Filter>Header Files\pch</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\pplx\pplx.h">
       <Filter>Header Files\pplx</Filter>
     </ClInclude>
@@ -209,13 +203,12 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\cpprest\details\resource.h">
       <Filter>Header Files\cpprest\details</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)..\..\include\cpprest\details\http_constants.dat">
-      <Filter>Header Files\cpprest\details</Filter>
-    </None>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="$(MSBuildThisFileDirectory)package_info.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)..\..\include\cpprest\details\http_constants.h" />
   </ItemGroup>
 </Project>

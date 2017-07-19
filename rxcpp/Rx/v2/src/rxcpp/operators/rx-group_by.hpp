@@ -25,7 +25,7 @@ struct is_group_by_selector_for {
     template<class CV, class CS>
     static tag_not_valid checkRX(...);
 
-    typedef decltype(check<source_value_type, selector_type>(0)) type;
+    typedef decltype(checkRX<source_value_type, selector_type>(0)) type;
     static const bool value = !std::is_same<type, tag_not_valid>::value;
 };
 

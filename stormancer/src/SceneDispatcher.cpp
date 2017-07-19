@@ -1,13 +1,17 @@
-#include "stormancer.h"
+#include "stdafx.h"
+#include "SceneDispatcher.h"
+#include "IActionDispatcher.h"
+#include "Scene.h"
+#include "MessageIDTypes.h"
 
 namespace Stormancer
 {
 	SceneDispatcher::SceneDispatcher(std::shared_ptr<IActionDispatcher> evDispatcher)
-		: _scenes((uint32)0xff - (uint32)MessageIDTypes::ID_SCENES + 1, nullptr)
+		: _scenes((uint32)0xff - (uint32)MessageIDTypes::ID_SCENES + 1)
 		, _eventDispatcher(evDispatcher)
 	{
 		handler = new processorFunction([this](uint8 sceneHandle, Packet_ptr packet) {
-			return this->handler_impl(sceneHandle, packet);
+			return handler_impl(sceneHandle, packet);
 		});
 	}
 
@@ -20,7 +24,7 @@ namespace Stormancer
 		config.addCatchAllProcessor(handler);
 	}
 
-	void SceneDispatcher::addScene(ScenePtr scene)
+	void SceneDispatcher::addScene(Scene_ptr scene)
 	{
 		if (scene)
 		{
@@ -32,7 +36,10 @@ namespace Stormancer
 	void SceneDispatcher::removeScene(uint8 sceneHandle)
 	{
 		size_t index = sceneHandle - (uint8)MessageIDTypes::ID_SCENES;
-		_scenes[index] = nullptr;
+		if (index < _scenes.size())
+		{
+			_scenes[index].reset();
+		}
 	}
 
 	bool SceneDispatcher::handler_impl(uint8 sceneHandle, Packet_ptr packet)
@@ -44,16 +51,22 @@ namespace Stormancer
 
 		unsigned int sceneIndex = sceneHandle - (uint8)MessageIDTypes::ID_SCENES;
 
-
-		if (_scenes.size() > sceneIndex)
+		if (sceneIndex < _scenes.size())
 		{
-			auto scene = _scenes[sceneIndex];
-			packet->metadata()["scene"] = scene.get();
-
-			this->_eventDispatcher->post([scene, packet]() {scene->handleMessage(packet); });
+			auto scene_weak = _scenes[sceneIndex];
+			auto scene = scene_weak.lock();
+			if (scene)
+			{
+				packet->metadata["scene"] = scene->id();
+				_eventDispatcher->post([scene_weak, packet]() {
+					if (auto scene = scene_weak.lock())
+					{
+						scene->handleMessage(packet);
+					}
+				});
+			}
 			return true;
 		}
-
 		return false;
 	}
 };

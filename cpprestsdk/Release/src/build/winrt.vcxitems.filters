@@ -15,10 +15,10 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\http\client\http_client_winrt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\websockets\client\ws_client_winrt.cpp">
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\pplx\pplxwin.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\pplx\pplxwin.cpp">
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\websockets\client\ws_client_winrt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

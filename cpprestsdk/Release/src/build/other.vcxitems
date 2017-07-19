@@ -14,10 +14,16 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\http\client\http_client_asio.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\http\client\x509_cert_utilities_apple.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\pplx\pplxapple.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\pplx\threadpool.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\pplx\pplxlinux.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\pplx\threadpool.h" />
   </ItemGroup>
 </Project>

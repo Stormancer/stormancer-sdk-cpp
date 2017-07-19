@@ -76,11 +76,11 @@ struct RNS2_SendParameters
 
 struct RNS2RecvStruct
 {
-
-
-
+#if defined(_XBOX) || defined(_XBOX_720_COMPILE_AS_WINDOWS) || defined(X360) || defined(GFWL)
+	char data[MAXIMUM_MTU_SIZE * 2];
+#else
 	char data[MAXIMUM_MTU_SIZE];
-
+#endif
 	int bytesRead;
 	SystemAddress systemAddress;
 	RakNet::TimeUS timeRead;
@@ -164,11 +164,11 @@ public:
 	   int optname,
 	   const char * optval,
 	   socklen_t optlen);
-   
+
 	static int WinRTIOCTLSocket(Windows::Networking::Sockets::DatagramSocket ^s,
 		long cmd,
 		unsigned long *argp);
-	
+
 	static int WinRTGetSockName(Windows::Networking::Sockets::DatagramSocket ^s,
 		struct sockaddr *name,
 		socklen_t* namelen);
@@ -182,7 +182,7 @@ protected:
 	// Platform::Collections::Map<Windows::Storage::Streams::IOutputStream> ^outputStreamMap;
 	// Platform::Collections::Map<String^, int>^ m;
 	//std::map<> m;
-    ListenerContext^ listenerContext;
+	ListenerContext^ listenerContext;
 };
 #elif defined(__native_client__)
 struct NativeClientBindParameters
@@ -287,7 +287,13 @@ class RNS2_Berkley : public IRNS2_Berkley
 public:
 	RNS2_Berkley();
 	virtual ~RNS2_Berkley();
-	int CreateRecvPollingThread(int threadPriority);
+	// ajout Vincent
+	#if defined(_NO_PPLX)
+		int CreateRecvPollingThread(int threadPriority);
+	#else
+		pplx::task<void> CreateRecvPollingThread(int threadPriority);
+	#endif
+	// fin ajout vincent
 	void SignalStopRecvPollingThread(void);
 	void BlockOnStopRecvPollingThread(void);
 	const RNS2_BerkleyBindParameters *GetBindings(void) const;
@@ -335,16 +341,16 @@ protected:
 
 
 
+#if defined(_XBOX) || defined(X360) || defined(_XBOX_720_WITH_XBOX_LIVE) || defined(_XBOX_720_COMPILE_AS_WINDOWS)
+class RNS2_360_720 : public RNS2_Berkley
+{
+public:
+	RNS2BindResult Bind(RNS2_BerkleyBindParameters *bindParameters, const char *file, unsigned int line);
+	RNS2SendResult SendWithVDP_360_720(RNS2_SendParameters *sendParameters, const char *voiceData, int voiceLength, const char *file, unsigned int line);
+};
+#endif
 
-
-
-
-
-
-
-
-
-#if defined(_WIN32) || defined(__GNUC__)  || defined(__GCCXML__) || defined(__S3E__)
+#if (defined(_WIN32) || defined(_XBOX_720_COMPILE_AS_WINDOWS) || defined(_XBOX_720_WITH_XBOX_LIVE) || defined(__GNUC__) || defined(__GCCXML__) || defined(__S3E__) || defined(_XBOX) || defined(X360))
 class RNS2_Windows_Linux_360
 {
 public:
@@ -379,25 +385,25 @@ protected:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#if   defined(_WIN32)
+#if defined(_XBOX) || defined(X360)
+class RNS2_360 : public RNS2_360_720, RNS2_Windows_Linux_360
+{
+public:
+	RNS2SendResult Send(RNS2_SendParameters *sendParameters, const char *file, unsigned int line);
+	// ----------- STATICS ------------
+	static void GetMyIP(SystemAddress addresses[MAXIMUM_NUMBER_OF_INTERNAL_IDS]);
+	static void DomainNameToIP(const char *domainName, char ip[65]);
+};
+#elif defined(_XBOX_720_WITH_XBOX_LIVE) || defined(_XBOX_720_COMPILE_AS_WINDOWS)
+class RNS2_720 : public RNS2_360_720, RNS2_Windows_Linux_360
+{
+public:
+	RNS2SendResult Send(RNS2_SendParameters *sendParameters, const char *file, unsigned int line);
+	// ----------- STATICS ------------
+	static void GetMyIP(SystemAddress addresses[MAXIMUM_NUMBER_OF_INTERNAL_IDS]);
+	static void DomainNameToIP(const char *domainName, char ip[65]);
+};
+#elif  defined(_WIN32)
 
 class RAK_DLL_EXPORT SocketLayerOverride
 {

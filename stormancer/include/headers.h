@@ -1,11 +1,13 @@
 #pragma once
 
 //For static libs
+#ifndef _NO_ASYNCRTIMP
 #define _NO_ASYNCRTIMP
+#endif
 #define _NO_PPLXIMP
 #define _RAKNET_LIB
 
-//Name    Version  _MSC_VER
+//Name      Version  _MSC_VER
 //VS 6        6.0      1200
 //VS 2002     7.0      1300
 //VS 2003     7.1      1310
@@ -14,14 +16,48 @@
 //VS 2010    10.0      1600
 //VS 2012    11.0      1700
 //VS 2013    12.0      1800
-//VS 2015    13.0      1900
+//VS 2015    14.0      1900
+//VS 2017    15.0      1910
+
+#if !defined(_STORMANCERSDKCPP) 
 
 
-#ifndef _STORMANCERSDKCPP
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #pragma comment(lib, "ws2_32.lib")
+
+#pragma comment(lib, "iphlpapi.lib") // Needed by libupnp
 #pragma comment(lib, "winhttp.lib")
-#pragma comment(lib, "Bcrypt.lib")
 #pragma comment(lib, "Crypt32.lib")
+
+#pragma comment(lib, "Bcrypt.lib")
+
 #endif
 // DLL IMPORT / EXPORT
 #ifdef _NO_ASYNCRTIMP
@@ -35,16 +71,16 @@
 #endif
 
 
-// DEFINES
-
-
 #define CPPREST_FORCE_PPLX 1
+
 #define STORMANCER_LOG_CLIENT
+//#define STORMANCER_LOG_RPC
 //#define STORMANCER_LOG_PACKETS
 //#define STORMANCER_LOG_RAKNET_PACKETS
-//#define STORMANCER_LOG_RPC
+//#define STORMANCER_PACKETFILELOGGER
 
-#if defined(UE_EDITOR) || defined(UE_GAME)
+
+#if (defined(UE_EDITOR) || defined(UE_GAME)) && defined(_WIN32)
 #include "AllowWindowsPlatformTypes.h"
 #endif
 
@@ -70,31 +106,66 @@
 #include <numeric>
 #include <list>
 #include <forward_list>
+#include <string>
 
-// custom libs
+#if defined(_WIN32) //&& defined(_STORMANCERSDKCPP)
+// msgpack needs windows.h, RakNet needs WinSock2.h
+// WinSock2.h must be included before windows.h
+// But msgpack must be included before RakNet on iOS because of a conflict with the 'nil' symbol
+// Including WinSock2 directly from here before msgpack and RakNet solves this problem.
+#include <WinSock2.h>
+#include <WS2tcpip.h>
+#endif
 
 // cpprestsdk
+#ifdef _STORMANCERSDKCPP
 #include <cpprest/http_client.h>
 #include <cpprest/filestream.h>
+#endif
 #include <pplx/pplxtasks.h>
 
 // rxcpp
 #include <rx.hpp>
 
-// raknet
-#include <PacketPriority.h>
-#include <RakPeerInterface.h>
-#include <BitStream.h>
-#include <RakNetTypes.h>
-#include <DS_Map.h>
-#include <NatPunchthroughClient.h>
-
 // msgpack
 #include <msgpack.hpp>
 
-// custom types
-#include "typedef.h"
-
 #if defined(UE_EDITOR) || defined(UE_GAME)
-#include "HideWindowsPlatformTypes.h"
+#undef check
 #endif
+
+// custom types
+namespace Stormancer
+{
+#if defined(_STDINT)
+	using int8 = int8_t;
+	using int16 = int16_t;
+	using int32 = int32_t;
+	using int64 = int64_t;
+
+	using uint8 = uint8_t;
+	using uint16 = uint16_t;
+	using uint32 = uint32_t;
+	using uint64 = uint64_t;
+#else
+	using int8 = signed char;
+	using int16 = signed short int;
+	using int32 = signed long int;
+	using int64 = signed long long int;
+
+	using uint8 = unsigned char;
+	using uint16 = unsigned short int;
+	using uint32 = unsigned long int;
+	using uint64 = unsigned long long int;
+#endif
+
+	using byte = uint8;
+};
+
+#if (defined(UE_EDITOR) || defined(UE_GAME))
+//Copy paste from UnrealEngine\Engine\Source\Runtime\Core\Public\Misc\AssertionMacros.h
+#define check(expr)				{ if(UNLIKELY(!(expr))) { FDebug::LogAssertFailedMessage( #expr, __FILE__, __LINE__ ); _DebugBreakAndPromptForRemote(); FDebug::AssertFailed( #expr, __FILE__, __LINE__ ); CA_ASSUME(false); } }
+#ifdef _WIN32
+#include "HideWindowsPlatformTypes.h"
+#endif // _WIN32
+#endif // UE_EDITOR || UE_GAME

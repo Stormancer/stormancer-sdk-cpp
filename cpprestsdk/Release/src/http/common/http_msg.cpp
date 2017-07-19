@@ -80,7 +80,11 @@ utility::size64_t http_headers::content_length() const
 
 void http_headers::set_content_length(utility::size64_t length)
 {
+
+
+
     m_headers[http::header_names::content_length] = utility::conversions::print_string(length, std::locale::classic());
+
 }
 
 static const utility::char_t * stream_was_set_explicitly = _XPLATSTR("A stream was set on the message and extraction is not possible");
@@ -599,6 +603,7 @@ static utility::string_t convert_body_to_string_t(const utility::string_t &conte
 static utility::string_t http_headers_body_to_string(const http_headers &headers, concurrency::streams::istream instream)
 {
     utility::ostringstream_t buffer;
+
     buffer.imbue(std::locale::classic());
 
     for (const auto &header : headers)
@@ -689,25 +694,25 @@ details::_http_request::_http_request(std::unique_ptr<http::details::_http_serve
 
 #define _METHODS
 #define DAT(a,b) const method methods::a = b;
-#include "cpprest/details/http_constants.dat"
+#include "cpprest/details/http_constants.h"
 #undef _METHODS
 #undef DAT
 
 #define _HEADER_NAMES
 #define DAT(a,b) const utility::string_t header_names::a = _XPLATSTR(b);
-#include "cpprest/details/http_constants.dat"
+#include "cpprest/details/http_constants.h"
 #undef _HEADER_NAMES
 #undef DAT
 
 #define _MIME_TYPES
 #define DAT(a,b) const utility::string_t mime_types::a = _XPLATSTR(b);
-#include "cpprest/details/http_constants.dat"
+#include "cpprest/details/http_constants.h"
 #undef _MIME_TYPES
 #undef DAT
 
 #define _CHARSET_TYPES
 #define DAT(a,b) const utility::string_t charset_types::a = _XPLATSTR(b);
-#include "cpprest/details/http_constants.dat"
+#include "cpprest/details/http_constants.h"
 #undef _CHARSET_TYPES
 #undef DAT
 
@@ -715,7 +720,7 @@ details::_http_request::_http_request(std::unique_ptr<http::details::_http_serve
 #ifndef _WIN32
 #define _PHRASES
 #define DAT(a,b,c) const status_code status_codes::a;
-#include "cpprest/details/http_constants.dat"
+#include "cpprest/details/http_constants.h"
 #undef _PHRASES
 #undef DAT
 #endif

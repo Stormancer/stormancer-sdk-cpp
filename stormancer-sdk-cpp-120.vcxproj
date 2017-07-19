@@ -223,6 +223,7 @@
     <ClCompile Include="stormancer\src\IActionDispatcher.cpp" />
     <ClCompile Include="stormancer\src\ILogger.cpp" />
     <ClCompile Include="stormancer\src\IPlugin.cpp" />
+    <ClCompile Include="stormancer\src\IRpcService.cpp" />
     <ClCompile Include="stormancer\src\NullLogger.cpp" />
     <ClCompile Include="stormancer\src\PacketProcessorConfig.cpp" />
     <ClCompile Include="stormancer\src\RakNetConnection.cpp" />
@@ -241,7 +242,10 @@
     <ClCompile Include="stormancer\src\SceneInfosDto.cpp" />
     <ClCompile Include="stormancer\src\SceneInfosRequestDto.cpp" />
     <ClCompile Include="stormancer\src\ScenePeer.cpp" />
+    <ClCompile Include="stormancer\src\SyncClock.cpp" />
     <ClCompile Include="stormancer\src\SystemRequest.cpp" />
+    <ClCompile Include="stormancer\src\TcpConnection.cpp" />
+    <ClCompile Include="stormancer\src\TcpTransport.cpp" />
     <ClCompile Include="stormancer\src\TokenHandler.cpp" />
     <ClCompile Include="stormancer\src\Watch.cpp" />
   </ItemGroup>
@@ -275,7 +279,6 @@
     <ClInclude Include="stormancer\include\IRpcService.h" />
     <ClInclude Include="stormancer\include\IScenePeer.h" />
     <ClInclude Include="stormancer\include\IScheduler.h" />
-    <ClInclude Include="stormancer\include\ITask.h" />
     <ClInclude Include="stormancer\include\ITokenHandler.h" />
     <ClInclude Include="stormancer\include\ITransport.h" />
     <ClInclude Include="stormancer\include\MessageIDTypes.h" />
@@ -301,9 +304,11 @@
     <ClInclude Include="stormancer\include\SceneInfosRequestDto.h" />
     <ClInclude Include="stormancer\include\ScenePeer.h" />
     <ClInclude Include="stormancer\include\stormancer.h" />
+    <ClInclude Include="stormancer\include\SyncClock.h" />
     <ClInclude Include="stormancer\include\SystemRequest.h" />
     <ClInclude Include="stormancer\include\SystemRequestIDTypes.h" />
-    <ClInclude Include="stormancer\include\Task.h" />
+    <ClInclude Include="stormancer\include\TcpConnection.h" />
+    <ClInclude Include="stormancer\include\TcpTransport.h" />
     <ClInclude Include="stormancer\include\TokenHandler.h" />
     <ClInclude Include="stormancer\include\typedef.h" />
     <ClInclude Include="stormancer\include\Watch.h" />
@@ -313,12 +318,10 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
-    <Import Project="packages\StormancerClient.Native.120.1.0.2\build\native\StormancerClient.Native.120.targets" Condition="Exists('packages\StormancerClient.Native.120.1.0.2\build\native\StormancerClient.Native.120.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <ItemGroup>
-      <RxcppIncludes Include="$(SolutionDir)rxcpp\Rx\v2\src\rxcpp\**\*.*" />
+      <RxcppIncludes Include="$(SolutionDir)rxcpp\Rx\v2\src\rxcpp\**\*.*" Exclude="$(SolutionDir)rxcpp\Rx\v2\src\rxcpp\**\*.cpp" />
       <RestSdkIncludes Include="$(SolutionDir)cpprestsdk\Release\include\**\*.*" />
       <MsgpackIncludes Include="$(SolutionDir)msgpack-c\include\**\*.*" />
       <StormancerIncludes Include="$(SolutionDir)stormancer\include\**\*.*" />
@@ -331,6 +334,5 @@
     <Copy SourceFiles="@(RestSdkIncludes)" DestinationFiles="@(RestSdkIncludes->'$(SolutionDir)output\include\%(RecursiveDir)%(Filename)%(Extension)')" />
     <Copy SourceFiles="@(MsgpackIncludes)" DestinationFiles="@(MsgpackIncludes->'$(SolutionDir)output\include\%(RecursiveDir)%(Filename)%(Extension)')" />
     <Copy SourceFiles="@(StormancerIncludes)" DestinationFiles="@(StormancerIncludes->'$(SolutionDir)output\include\%(RecursiveDir)%(Filename)%(Extension)')" />
-    <Error Condition="!Exists('packages\StormancerClient.Native.120.1.0.2\build\native\StormancerClient.Native.120.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\StormancerClient.Native.120.1.0.2\build\native\StormancerClient.Native.120.targets'))" />
   </Target>
 </Project>

@@ -15,7 +15,7 @@
 #ifndef RAKNETSOCKET2_WINDOWS_LINUX_360_CPP
 #define RAKNETSOCKET2_WINDOWS_LINUX_360_CPP
 
-#if (defined(_WIN32) || defined(__GNUC__)  || defined(__GCCXML__) || defined(__S3E__) ) && !defined(WINDOWS_STORE_RT) && !defined(__native_client__)
+#if !defined(WINDOWS_STORE_RT) && !defined(_XBOX) && !defined(X360) && !defined(__native_client__)
 
 RNS2SendResult RNS2_Windows_Linux_360::Send_Windows_Linux_360NoVDP( RNS2Socket rns2Socket, RNS2_SendParameters *sendParameters, const char *file, unsigned int line ) {
 
@@ -45,14 +45,29 @@ RNS2SendResult RNS2_Windows_Linux_360::Send_Windows_Linux_360NoVDP( RNS2Socket r
 		}
 		else
 		{
+
 #if RAKNET_SUPPORT_IPV6==1
+			
 			len = sendto__( rns2Socket, sendParameters->data, sendParameters->length, 0, ( const sockaddr* ) & sendParameters->systemAddress.address.addr6, sizeof( sockaddr_in6 ) );
 #endif
 		}
 
 		if (len<0)
 		{
-			RAKNET_DEBUG_PRINTF("sendto failed with code %i for char %i and length %i.\n", WSAGetLastError(), sendParameters->data[0], sendParameters->length);
+#if defined(_WIN32)
+			int error = WSAGetLastError();
+			RAKNET_DEBUG_PRINTF("sendto failed with code %i for char %i and length %i.\n",error, sendParameters->data[0], sendParameters->length);
+			if (error == 10040)
+			{
+				len = 10040;
+			}
+#else
+			//RAKNET_DEBUG_PRINTF("sendto failed with code %i for char %i and length %i.\n", errno, sendParameters->data[0], sendParameters->length);
+#endif
+		}
+		else
+		{
+			//RAKNET_DEBUG_PRINTF("sendto success %i sent to %s.\n", len,sendParameters->systemAddress.ToString());
 		}
 
 

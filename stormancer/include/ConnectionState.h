@@ -1,10 +1,11 @@
 #pragma once
+
 #include "headers.h"
 
 namespace Stormancer
 {
 	/// State of a network connection.
-	enum class ConnectionState
+	enum ConnectionState
 	{
 		/// disconnected.
 		Disconnected = 0,

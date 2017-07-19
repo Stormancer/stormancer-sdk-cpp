@@ -1,4 +1,7 @@
-#include "stormancer.h"
+#include "stdafx.h"
+#include "TokenHandler.h"
+#include "Helpers.h"
+#include "Logger/ILogger.h"
 
 namespace Stormancer
 {
@@ -10,22 +13,17 @@ namespace Stormancer
 	{
 	}
 
-	SceneEndpoint TokenHandler::decodeToken(std::string& token)
+	SceneEndpoint TokenHandler::decodeToken(const std::string& token2)
 	{
-		if (token.length() == 0)
+		if (token2.length() == 0)
 		{
 			throw std::invalid_argument("Empty token");
 		}
 
-		std::wstring wtoken(token.begin(), token.end());
-		wtoken = stringTrim(wtoken, L'"');
-		std::wstring data = stringSplit(wtoken, L"-")[0];
-#if defined(_WIN32)
-		auto vectorData = utility::conversions::from_base64(data);
-#else
-		std::string data2(data.begin(), data.end());
+		auto token = stringTrim(token2, '"');
+		auto data = stringSplit(token, "-")[0];
+		utility::string_t data2(data.begin(), data.end());
 		auto vectorData = utility::conversions::from_base64(data2);
-#endif
 		std::string buffer(vectorData.begin(), vectorData.end());
 
 		msgpack::unpacked result;
@@ -34,7 +32,6 @@ namespace Stormancer
 
 		ConnectionData cData;
 		obj.convert(&cData);
-		token = std::string(wtoken.begin(), wtoken.end());
 
 		std::stringstream ss;
 		ss << cData.AccountId
@@ -48,7 +45,7 @@ namespace Stormancer
 			<< " " << cData.SceneId
 			<< " " << cData.UserData
 			<< " " << cData.Version;
-		ILogger::instance()->log(LogLevel::Trace, "TokenHandler::decodeToken", "ConnectionData received : " + ss.str());
+		ILogger::instance()->log(LogLevel::Trace, "TokenHandler", "Decoded token : " + ss.str());
 
 		return SceneEndpoint(token, cData);
 	}

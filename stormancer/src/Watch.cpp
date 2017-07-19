@@ -1,4 +1,5 @@
-#include "stormancer.h"
+#include "stdafx.h"
+#include "Watch.h"
 
 namespace Stormancer
 {
@@ -13,11 +14,13 @@ namespace Stormancer
 
 	void Watch::reset()
 	{
+		std::lock_guard<std::mutex> lock(_mutex);
 		_startTime = std::chrono::high_resolution_clock::now();
 	}
 
 	int64 Watch::getElapsedTime()
 	{
+		std::lock_guard<std::mutex> lock(_mutex);
 		auto now = std::chrono::high_resolution_clock::now();
 		auto dif = now - _startTime;
 		auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(dif);
@@ -27,6 +30,7 @@ namespace Stormancer
 	void Watch::setBaseTime(int64 baseTime)
 	{
 		reset();
+		std::lock_guard<std::mutex> lock(_mutex);
 		_baseTime = baseTime;
 	}
 };

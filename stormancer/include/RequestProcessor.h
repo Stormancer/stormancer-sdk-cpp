@@ -1,31 +1,35 @@
 #pragma once
+
 #include "headers.h"
 #include "IPacketProcessor.h"
-#include "ILogger.h"
+#include "Logger/ILogger.h"
 #include "IRequestModule.h"
 #include "SystemRequest.h"
+#include "PacketPriority.h"
 
 namespace Stormancer
 {
+
+
+
 	/// Processes system requests.
 	class RequestProcessor : public IPacketProcessor
 	{
 	public:
-	
+		static void Initialize(std::shared_ptr<RequestProcessor> processor, std::vector<std::shared_ptr<IRequestModule>> modules);
+
 		/// Constructor.
 		/// \param logger The logger instance.
 		/// \param modules A vector of modules.
-		RequestProcessor(std::shared_ptr<ILogger> logger, std::vector<IRequestModule*> modules);
-		
+		RequestProcessor(std::shared_ptr<ILogger> logger);
+
 		/// Destructor
 		virtual ~RequestProcessor();
 
-	public:
-	
 		/// Registers the processor into the dispatcher.
 		/// \param config The configuration of the processor.
 		void registerProcessor(PacketProcessorConfig& config);
-		
+
 		/// Sends a system request to the remote peer.
 		/// \param peer A target peer.
 		/// \param msgId The message id.
@@ -33,20 +37,30 @@ namespace Stormancer
 		/// \return An observable returning the request responses.
 		pplx::task<Packet_ptr> sendSystemRequest(IConnection* peer, byte msgId, std::function<void(bytestream*)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY);
 
-	private:
-	
-		SystemRequest_ptr reserveRequestSlot(pplx::task_completion_event<Packet_ptr> tce);
-		
-		SystemRequest_ptr freeRequestSlot(uint16 requestId);
-
-	public:
-	
 		/// Register a new system request handlers for the specified message Id.
 		/// \param msgId The system message id.
 		/// \param handler A function that handles message with the provided id.
 		std::function<void(byte, std::function<pplx::task<void>(RequestContext*)>)> addSystemRequestHandler;
 
+		template<typename T1, typename T2>
+		pplx::task<T2> sendSystemRequest(IConnection* peer, byte id, const T1& parameter)
+		{
+			return sendSystemRequest(peer, id, [this, &parameter](bytestream* stream) {
+				msgpack::pack(stream, parameter);
+			}).then([this](Packet_ptr packet) {
+				// deserialize result dto
+				std::string buffer;
+				*packet->stream >> buffer;
+				msgpack::unpacked result;
+				msgpack::unpack(&result, buffer.data(), buffer.size());
+				T2 t2;
+				result.get().convert(&t2);
+				return t2;
+			});
+		}
+
 	protected:
+
 		std::map<uint16, SystemRequest_ptr> _pendingRequests;
 		std::mutex _mutexPendingRequests;
 		std::shared_ptr<ILogger> _logger;
@@ -54,6 +68,9 @@ namespace Stormancer
 		std::map<byte, std::function<pplx::task<void>(RequestContext*)>> _handlers;
 
 	private:
+
+		SystemRequest_ptr reserveRequestSlot(byte msgId,pplx::task_completion_event<Packet_ptr> tce);
+		SystemRequest_ptr freeRequestSlot(uint16 requestId);
 		PacketProcessorConfig* _requestProcessorConfig;
 	};
 };

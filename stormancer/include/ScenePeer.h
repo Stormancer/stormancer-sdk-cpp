@@ -1,8 +1,10 @@
 #pragma once
+
 #include "headers.h"
 #include "IScenePeer.h"
 #include "Scene.h"
 #include "Route.h"
+#include "PacketPriority.h"
 
 namespace Stormancer
 {
@@ -10,18 +12,26 @@ namespace Stormancer
 	class ScenePeer : public IScenePeer
 	{
 	public:
-		ScenePeer(IConnection* connection, byte sceneHandle, std::map<std::string, Route_ptr>& routeMapping, Scene* scene);
-		virtual ~ScenePeer();
 
-	public:
-		void send(std::string& routeName, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability);
-		void disconnect();
-		uint64 id();
+#pragma region public_methods
+
+		ScenePeer(IConnection* connection, byte sceneHandle, std::map<std::string, Route_ptr>& routeMapping, Scene* scene);
+		~ScenePeer();
+		void send(std::string& routeName, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability) override;
+		void disconnect() override;
+		uint64 id() override;
+
+#pragma endregion
 
 	private:
+
+#pragma region private_members
+
 		IConnection* _connection;
 		byte _sceneHandle;
 		std::map<std::string, Route_ptr> _routeMapping;
 		Scene* _scene;
+
+#pragma endregion
 	};
 };

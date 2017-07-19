@@ -9,7 +9,6 @@
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
-[Rr]elease/
 [Rr]eleases/
 x64/
 x86/
@@ -18,8 +17,10 @@ bld/
 [Bb]in/
 [Oo]bj/
 [Oo]utput/
-UE4/StormancerPlugin/3rdParty/
+[Bb]inaries/
+[Ii]ntermediate/
 
+UE4/stormancerPlugin/3rdParty/
 # Roslyn cache directories
 *.ide/
 
@@ -42,6 +43,7 @@ dlldata.c
 *.ilk
 *.meta
 *.obj
+*.o
 *.pch
 *.pdb
 *.pgc
@@ -54,6 +56,8 @@ dlldata.c
 *.tmp
 *.tmp_proj
 *.log
+*.tlog
+*.lastbuildstate
 *.vspscc
 *.vssscc
 .builds
@@ -72,7 +76,9 @@ ipch/
 *.opensdf
 *.sdf
 *.cachefile
-*.vc.db
+*.VC.db
+*.VC.opendb
+.vs
 
 # Visual Studio profiler
 *.psess
@@ -189,3 +195,15 @@ FakesAssemblies/
 *Thumbs.db
 
 include/*
+*.elf
+/StormancerClient.Native.*-propertiesui-cc9f67ef-747b-4dcf-879e-8fb099bd223b.xml
+
+# libupnp's build directory contains Visual Studio projects and a few header files
+!libupnp/build
+
+# Visual Studio iOS build payload list
+*.payload.desc
+
+# Mac stuff
+.DS_Store
+xcuserdata/

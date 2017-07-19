@@ -1,4 +1,5 @@
 #pragma once
+
 #include "headers.h"
 
 namespace Stormancer
@@ -33,6 +34,6 @@ namespace Stormancer
 		std::string Token;
 		
 		/// Connexion metadatas.
-		stringMap Metadata;
+		std::map<std::string, std::string> Metadata;
 	};
 };

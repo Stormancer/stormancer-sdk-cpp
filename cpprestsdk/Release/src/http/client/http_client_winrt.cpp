@@ -28,13 +28,17 @@
 
 #include "cpprest/details/http_client_impl.h"
 
+
 #include <Strsafe.h>
+
 // Important for WP8
 #if !defined(__WRL_NO_DEFAULT_LIB__)
 #define __WRL_NO_DEFAULT_LIB__
 #endif
 #include <wrl.h>
+
 #include <msxml6.h>
+
 using namespace std;
 using namespace Platform;
 using namespace Microsoft::WRL;
@@ -398,7 +402,11 @@ protected:
         HRESULT hr = CoCreateInstance(
             __uuidof(FreeThreadedXMLHTTP60),
             nullptr,
+
+
+
             CLSCTX_INPROC,
+
             __uuidof(IXMLHTTPRequest2),
             reinterpret_cast<void**>(winrt_context->m_hRequest.GetAddressOf()));
         if (FAILED(hr))

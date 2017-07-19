@@ -1,4 +1,6 @@
-#include "stormancer.h"
+#include "stdafx.h"
+#include "IPlugin.h"
+#include "Packet.h"
 
 namespace Stormancer
 {
@@ -6,44 +8,39 @@ namespace Stormancer
 	{
 	}
 
-	void IPlugin::clientCreated(Client* client)
+	void IPlugin::clientCreated(Client*)
 	{
 	}
 
-	void IPlugin::transportStarted(ITransport* transport)
+	void IPlugin::transportStarted(ITransport*)
 	{
 	}
 
-	void IPlugin::transportEvent(void* data, void* data2, void* data3)
+	void IPlugin::registerSceneDependencies(Scene*)
 	{
 	}
 
-	void IPlugin::registerSceneDependencies(Scene* scene)
-	{
-
-	}
-
-	void IPlugin::sceneCreated(Scene* scene)
+	void IPlugin::sceneCreated(Scene*)
 	{
 	}
 
-	void IPlugin::sceneConnecting(Scene* scene)
+	void IPlugin::sceneConnecting(Scene*)
 	{
 	}
 
-	void IPlugin::sceneConnected(Scene* scene)
+	void IPlugin::sceneConnected(Scene*)
 	{
 	}
 
-	void IPlugin::sceneDisconnecting(Scene* scene)
+	void IPlugin::sceneDisconnecting(Scene*)
 	{
 	}
 
-	void IPlugin::sceneDisconnected(Scene* scene)
+	void IPlugin::sceneDisconnected(Scene*)
 	{
 	}
 
-	void IPlugin::packetReceived(Packet_ptr packet)
+	void IPlugin::packetReceived(Packet_ptr)
 	{
 	}
 };

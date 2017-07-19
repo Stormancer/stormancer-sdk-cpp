@@ -42,7 +42,7 @@ namespace details
     public:
     #define _MIME_TYPES
     #define DAT(a,b) _ASYNCRTIMP const static utility::string_t a;
-    #include "cpprest/details/http_constants.dat"
+    #include "cpprest/details/http_constants.h"
     #undef _MIME_TYPES
     #undef DAT
     };
@@ -55,7 +55,7 @@ namespace details
     public:
     #define _CHARSET_TYPES
     #define DAT(a,b) _ASYNCRTIMP const static utility::string_t a;
-    #include "cpprest/details/http_constants.dat"
+    #include "cpprest/details/http_constants.h"
     #undef _CHARSET_TYPES
     #undef DAT
     };

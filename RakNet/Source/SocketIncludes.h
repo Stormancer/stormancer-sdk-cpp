@@ -9,6 +9,11 @@
 #define _PP_Instance_ int
 #endif
 
+#if defined(_XBOX) || defined(_XBOX_720_COMPILE_AS_WINDOWS) || defined(X360)
+#include "XBOX360Includes.h"
+typedef int socklen_t;
+typedef SOCKET __UDPSOCKET__;
+typedef SOCKET __TCPSOCKET__;
 
 
 
@@ -23,12 +28,7 @@
 
 
 
-
-
-
-
-
-#if   defined(WINDOWS_STORE_RT)
+#elif defined(WINDOWS_STORE_RT)
 	#include <windows.h>
 	#include "WinRTSockAddr.h"
 	typedef Windows::Networking::Sockets::DatagramSocket^ __UDPSOCKET__;

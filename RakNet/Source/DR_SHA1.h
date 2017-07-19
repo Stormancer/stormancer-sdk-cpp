@@ -109,7 +109,7 @@
 #include "RakMemoryOverride.h"
 #include <stdio.h> // Needed for file access
 
-#include <memory.h> // Needed for memset and memcpy
+#include <memory> // Needed for memset and memcpy
 
 #include <string.h> // Needed for strcat and strcpy
 #include "Export.h"
@@ -130,7 +130,7 @@
 #endif
 
 
-#include <memory.h>
+#include <memory>
 
 #include <limits.h>
 

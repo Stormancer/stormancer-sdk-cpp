@@ -117,7 +117,7 @@ namespace RakNet
 
 }
 
-const RakNet::RakWString RAK_DLL_EXPORT operator+(const RakNet::RakWString &lhs, const RakNet::RakWString &rhs);
+//const RakNet::RakWString RAK_DLL_EXPORT operator+(const RakNet::RakWString &lhs, const RakNet::RakWString &rhs);
 
 
 #endif

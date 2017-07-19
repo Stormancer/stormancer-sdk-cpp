@@ -20,7 +20,7 @@
 #include "GetTime.h"
 #include "LinuxStrings.h"
 #include "SocketDefines.h"
-#if (defined(__GNUC__)  || defined(__GCCXML__)) && !defined(__WIN32__)
+#if (defined(__GNUC__) || defined(__GCCXML__)) && !defined(__WIN32__)
 #include <netdb.h>
 #endif
 
@@ -71,9 +71,13 @@ using namespace pp;
 
 
 
-#if   defined(_WIN32)
+
+#if defined(_XBOX) || defined(_XBOX_720_COMPILE_AS_WINDOWS) || defined(X360)
+#include "WSAStartupSingleton.h"
+#elif   defined(_WIN32)
 #include "WSAStartupSingleton.h"
 #include "WindowsIncludes.h"
+
 
 #else
 #include <unistd.h>
@@ -124,16 +128,16 @@ void SocketLayer::SetSocketOptions( __UDPSOCKET__ listenSocket, bool blockingSoc
 
 	// Immediate hard close. Don't linger the socket, or recreating the socket quickly on Vista fails.
 	// Fail with voice and xbox
-
-	sock_opt=0;
-	setsockopt__(listenSocket, SOL_SOCKET, SO_LINGER, ( char * ) & sock_opt, sizeof ( sock_opt ) );
-
+#if !defined(_XBOX) && !defined(_XBOX_720_WITH_XBOX_LIVE) && !defined(X360)
+	sock_opt = 0;
+	setsockopt__(listenSocket, SOL_SOCKET, SO_LINGER, (char *)& sock_opt, sizeof(sock_opt));
+#endif
 
 
 	// This doesn't make much difference: 10% maybe
 	// Not supported on console 2
-	sock_opt=1024*16;
-	setsockopt__(listenSocket, SOL_SOCKET, SO_SNDBUF, ( char * ) & sock_opt, sizeof ( sock_opt ) );
+	sock_opt = 1024 * 16;
+	setsockopt__(listenSocket, SOL_SOCKET, SO_SNDBUF, (char *)& sock_opt, sizeof(sock_opt));
 
 
 	if (blockingSocket==false)
@@ -156,7 +160,7 @@ void SocketLayer::SetSocketOptions( __UDPSOCKET__ listenSocket, bool blockingSoc
 		if ( setsockopt__(listenSocket, SOL_SOCKET, SO_BROADCAST, ( char * ) & sock_opt, sizeof( sock_opt ) ) == -1 )
 		{
 #if defined(_WIN32) && defined(_DEBUG)
-#if  !defined(WINDOWS_PHONE_8)
+#if !defined(_XBOX) && !defined(_XBOX_720_COMPILE_AS_WINDOWS) && !defined(X360) && !defined(WINDOWS_PHONE_8)
 			DWORD dwIOError = GetLastError();
 			// On Vista, can get WSAEACCESS (10013)
 			// See http://support.microsoft.com/kb/819124
@@ -167,7 +171,7 @@ void SocketLayer::SetSocketOptions( __UDPSOCKET__ listenSocket, bool blockingSoc
 				NULL, dwIOError, MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),  // Default language
 				( LPTSTR ) & messageBuffer, 0, NULL );
 			// something has gone wrong here...
-			RAKNET_DEBUG_PRINTF( "setsockopt__(SO_BROADCAST) failed:Error code - %d\n%s", dwIOError, messageBuffer );
+			RAKNET_DEBUG_PRINTF( "setsockopt__(SO_BROADCAST) failed:Error code - %d\n%s", dwIOError, static_cast<char*>(messageBuffer) );
 			//Free the buffer.
 			LocalFree( messageBuffer );
 #endif
@@ -186,11 +190,11 @@ RakNet::RakString SocketLayer::GetSubNetForSocketAndIp(__UDPSOCKET__ inSock, Rak
 	RakNet::RakString netMaskString;
 	RakNet::RakString ipString;
 
+#if defined(_XBOX) || defined(_XBOX_720_WITH_XBOX_LIVE) || defined(X360)
+	return "";
 
 
-
-
-#if   defined(WINDOWS_STORE_RT)
+#elif   defined(WINDOWS_STORE_RT)
 	RakAssert("Not yet supported" && 0);
 	return "";
 #elif defined(_WIN32)
@@ -271,6 +275,7 @@ RakNet::RakString SocketLayer::GetSubNetForSocketAndIp(__UDPSOCKET__ inSock, Rak
 #endif
 
 }
+#if defined(_XBOX) || defined(_XBOX_720_WITH_XBOX_LIVE) || defined(X360)
 
 
 
@@ -347,7 +352,7 @@ RakNet::RakString SocketLayer::GetSubNetForSocketAndIp(__UDPSOCKET__ inSock, Rak
 
 
 
-#if   defined(WINDOWS_STORE_RT)
+#elif defined(WINDOWS_STORE_RT)
 void GetMyIP_WinRT( SystemAddress addresses[MAXIMUM_NUMBER_OF_INTERNAL_IDS] )
 {
 	// Perhaps DatagramSocket.BindEndpointAsynch, use localHostName as an empty string, then query what it bound to?
@@ -368,10 +373,10 @@ void GetMyIP_Win32( SystemAddress addresses[MAXIMUM_NUMBER_OF_INTERNAL_IDS] )
 			NULL, dwIOError, MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),  // Default language
 			( LPTSTR ) & messageBuffer, 0, NULL );
 		// something has gone wrong here...
-		RAKNET_DEBUG_PRINTF( "gethostname failed:Error code - %d\n%s", dwIOError, messageBuffer );
+		RAKNET_DEBUG_PRINTF( "gethostname failed:Error code - %d\n%s", dwIOError, static_cast<char*>(messageBuffer) );
 		//Free the buffer.
 		LocalFree( messageBuffer );
-		#endif
+#endif
 		return ;
 	}
 
@@ -410,7 +415,7 @@ void GetMyIP_Win32( SystemAddress addresses[MAXIMUM_NUMBER_OF_INTERNAL_IDS] )
 			NULL, dwIOError, MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),  // Default language
 			( LPTSTR ) & messageBuffer, 0, NULL );
 		// something has gone wrong here...
-		RAKNET_DEBUG_PRINTF( "gethostbyname failed:Error code - %d\n%s", dwIOError, messageBuffer );
+		RAKNET_DEBUG_PRINTF( "gethostbyname failed:Error code - %d\n%s", dwIOError, static_cast<char*>(messageBuffer) );
 
 		//Free the buffer.
 		LocalFree( messageBuffer );
@@ -445,7 +450,7 @@ void SocketLayer::GetMyIP( SystemAddress addresses[MAXIMUM_NUMBER_OF_INTERNAL_ID
 
 
 
-#if   defined(WINDOWS_STORE_RT)
+#if defined(WINDOWS_STORE_RT)
 	GetMyIP_WinRT(addresses);
 #elif defined(_WIN32)
 	GetMyIP_Win32(addresses);
@@ -480,14 +485,14 @@ void SocketLayer::GetSystemAddress_Old ( __UDPSOCKET__ s, SystemAddress *systemA
 	socklen_t len = sizeof(sa);
 	if (getsockname__(s, (sockaddr*)&sa, &len)!=0)
 	{
-#if defined(_WIN32) && defined(_DEBUG) && !defined(WINDOWS_PHONE_8)
+#if defined(_WIN32) && !defined(_XBOX) && !defined(X360) && defined(_DEBUG) && !defined(WINDOWS_PHONE_8) && !defined(_XBOX_720_COMPILE_AS_WINDOWS)
 		DWORD dwIOError = GetLastError();
 		LPVOID messageBuffer;
 		FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 			NULL, dwIOError, MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),  // Default language
 			( LPTSTR ) & messageBuffer, 0, NULL );
 		// something has gone wrong here...
-		RAKNET_DEBUG_PRINTF( "getsockname failed:Error code - %d\n%s", dwIOError, messageBuffer );
+		RAKNET_DEBUG_PRINTF( "getsockname failed:Error code - %d\n%s", dwIOError, static_cast<char*>(messageBuffer) );
 
 		//Free the buffer.
 		LocalFree( messageBuffer );
@@ -524,7 +529,7 @@ void SocketLayer::GetSystemAddress ( __UDPSOCKET__ s, SystemAddress *systemAddre
 			NULL, dwIOError, MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),  // Default language
 			( LPTSTR ) & messageBuffer, 0, NULL );
 		// something has gone wrong here...
-		RAKNET_DEBUG_PRINTF( "getsockname failed:Error code - %d\n%s", dwIOError, messageBuffer );
+		RAKNET_DEBUG_PRINTF( "getsockname failed:Error code - %d\n%s", dwIOError, (char*)messageBuffer );
 
 		//Free the buffer.
 		LocalFree( messageBuffer );
@@ -582,6 +587,7 @@ bool SocketLayer::GetFirstBindableIP(char firstBindable[128], int ipProto)
 		return true;
 	}		
 
+
 	// Find the first valid host address
 	unsigned int l;
 	for (l=0; l < MAXIMUM_NUMBER_OF_INTERNAL_IDS; l++)
@@ -590,8 +596,10 @@ bool SocketLayer::GetFirstBindableIP(char firstBindable[128], int ipProto)
 			break;
 		if (ipList[l].GetIPVersion()==4 && ipProto==AF_INET)
 			break;
+
 		if (ipList[l].GetIPVersion()==6 && ipProto==AF_INET6)
 			break;
+
 	}
 
 	if (ipList[l]==UNASSIGNED_SYSTEM_ADDRESS || l==MAXIMUM_NUMBER_OF_INTERNAL_IDS)

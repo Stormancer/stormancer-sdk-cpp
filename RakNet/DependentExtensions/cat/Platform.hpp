@@ -242,9 +242,9 @@ namespace cat {
 
 //// Instruction Set Architecture ////
 
-#if defined(__powerpc__) || defined(__ppc__) || defined(_POWER) || defined(_M_PPC) || \
-	defined(_M_MPPC) || defined(__POWERPC) || defined(powerpc) || defined(__ppc64__) || \
-	defined(_PS3) || defined(__PS3__) || defined(SN_TARGET_PS3) || defined(__POWERPC__)
+#if defined(__powerpc__) || defined(__ppc__) || defined(_POWER) || defined(_M_PPC) ||  defined(_M_MPPC) || defined(__POWERPC) || defined(powerpc) || defined(__ppc64__) || defined(__POWERPC__)
+
+
 # define CAT_ISA_PPC
 
 #elif defined(__i386__) || defined(i386) || defined(intel) || defined(_M_IX86) || \
@@ -339,8 +339,8 @@ namespace cat {
 #elif defined(_XBOX) || defined(_X360)
 # define CAT_OS_XBOX
 
-#elif defined(_PS3) || defined(__PS3__) || defined(SN_TARGET_PS3)
-# define CAT_OS_PS3
+
+
 
 #elif defined(__OS2__)
 # define CAT_OS_OS2

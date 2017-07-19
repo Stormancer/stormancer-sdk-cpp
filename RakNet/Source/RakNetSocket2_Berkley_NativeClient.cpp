@@ -21,7 +21,7 @@
 #include "Itoa.h"
 
 // Shared on most platforms, but excluded from the listed
-
+#if !defined(_XBOX) && !defined(X360) && !defined(_XBOX_720_WITH_XBOX_LIVE) && !defined(_XBOX_720_COMPILE_AS_WINDOWS)
 
 void DomainNameToIP_Berkley_IPV4And6( const char *domainName, char ip[65] )
 {
@@ -106,7 +106,7 @@ void DomainNameToIP_Berkley( const char *domainName, char ip[65] )
 
 
 
-
+#endif // Exclusions for DomainNameToIP
 #endif // !defined(WINDOWS_STORE_RT) && !defined(__native_client__)
 
 #endif // file header

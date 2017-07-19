@@ -263,7 +263,7 @@ namespace Concurrency { namespace streams {
                 return pplx::task_from_result((this->write(&ch, 1) == 1) ? static_cast<int_type>(ch) : traits::eof());
             }
 
-            virtual pplx::task<size_t> _putn(const _CharType *ptr, size_t count)
+            virtual pplx::task<size_t> _putn(const _CharType *ptr, size_t count) override
             {
                 return pplx::task_from_result<size_t>(this->write(ptr, count));
             }

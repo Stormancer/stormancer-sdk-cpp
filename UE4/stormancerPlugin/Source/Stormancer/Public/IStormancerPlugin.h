@@ -1,10 +1,13 @@
 #pragma once
 #include "ModuleManager.h"
+#include "stormancer.h"
 
 /**
  * The public interface to this module.  In most cases, this interface is only public to sibling modules 
  * within this plugin.
  */
+
+DECLARE_LOG_CATEGORY_EXTERN(StormancerLog, Log, All);
 
 class IStormancerPlugin : public IModuleInterface
 {
@@ -33,4 +36,6 @@ public:
 		return FModuleManager::Get().IsModuleLoaded( "StormancerPlugin" );
 	}
 
+	virtual std::shared_ptr<Stormancer::Client> CreateClient(std::string endpoint, std::string account, std::string application) = 0;
+	virtual std::shared_ptr<Stormancer::Client> GetClient() = 0;
 };

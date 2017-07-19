@@ -32,7 +32,11 @@
 #define __WRL_NO_DEFAULT_LIB__
 #endif
 #include <wrl.h>
+
+
+
 #include <msxml6.h>
+
 namespace web { namespace http{namespace client{
 typedef IXMLHTTPRequest2* native_handle;}}}
 #else
@@ -51,18 +55,25 @@ typedef void* native_handle;}}}
 #include "cpprest/details/basic_types.h"
 #include "cpprest/asyncrt_utils.h"
 
+
 #if !defined(CPPREST_TARGET_XP)
 #include "cpprest/oauth1.h"
 #endif
 
 #include "cpprest/oauth2.h"
 
+
 #if !defined(_WIN32) && !defined(__cplusplus_winrt)
 #if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wconversion"
 #endif
+
 #include "boost/asio/ssl.hpp"
+
+
+
+
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif
@@ -103,11 +114,19 @@ public:
         , m_ssl_context_callback([](boost::asio::ssl::context&)->void{})
         , m_tlsext_sni_enabled(true)
 #endif
+
+
+
+
 #if defined(_WIN32) && !defined(__cplusplus_winrt)
         , m_buffer_request(false)
 #endif
     {
+
+
+
     }
+
 
 #if !defined(CPPREST_TARGET_XP)
     /// <summary>
@@ -192,15 +211,7 @@ public:
         return m_guarantee_order;
     }
 
-    /// <summary>
-    /// Set the 'guarantee order' property
-    /// </summary>
-    /// <param name="guarantee_order">The value of the property.</param>
-    CASABLANCA_DEPRECATED("Confusing API will be removed in future releases. If you need to order HTTP requests use task continuations.")
-    void set_guarantee_order(bool guarantee_order)
-    {
-        m_guarantee_order = guarantee_order;
-    }
+
 
     /// <summary>
     /// Get the timeout
@@ -279,6 +290,22 @@ public:
         m_validate_certificates = validate_certs;
     }
 #endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #ifdef _WIN32
 #if !defined(__cplusplus_winrt)
@@ -370,11 +397,14 @@ public:
 #endif
 
 private:
+
 #if !defined(CPPREST_TARGET_XP)
     std::shared_ptr<oauth1::experimental::oauth1_config> m_oauth1;
 #endif
 
     std::shared_ptr<oauth2::experimental::oauth2_config> m_oauth2;
+
+
     web_proxy m_proxy;
     http::client::credentials m_credentials;
     // Whether or not to guarantee ordering, i.e. only using one underlying TCP connection.
@@ -394,6 +424,9 @@ private:
     std::function<void(boost::asio::ssl::context&)> m_ssl_context_callback;
     bool m_tlsext_sni_enabled;
 #endif
+
+
+
 #if defined(_WIN32) && !defined(__cplusplus_winrt)
     bool m_buffer_request;
 #endif
@@ -444,7 +477,7 @@ public:
     /// <param name="handler">A function object representing the pipeline stage.</param>
     void add_handler(const std::function<pplx::task<http_response>(http_request, std::shared_ptr<http::http_pipeline_stage>)> &handler)
     {
-        m_pipeline->append(std::make_shared<::web::http::details::function_pipeline_wrapper>(handler));
+        m_pipeline->append(std::make_shared< ::web::http::details::function_pipeline_wrapper >(handler));
     }
 
     /// <summary>
@@ -729,7 +762,7 @@ private:
 
     void build_pipeline(const uri &base_uri, const http_client_config &client_config);
 
-    std::shared_ptr<::web::http::http_pipeline> m_pipeline;
+    std::shared_ptr< ::web::http::http_pipeline> m_pipeline;
 };
 
 }}}

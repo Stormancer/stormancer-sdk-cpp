@@ -19,7 +19,7 @@
 	char *_strlwr(char * str );
 	#define _vsnprintf vsnprintf
 #else
- #if (defined(__GNUC__)  || defined(__GCCXML__) || defined(__S3E__) ) && !defined(_WIN32)
+ #if (defined(__GNUC__) ||defined(__GCCXML__) || defined(__S3E__) ) && !defined(_WIN32)
 		#ifndef _stricmp
 			int _stricmp(const char* s1, const char* s2);
 		#endif 

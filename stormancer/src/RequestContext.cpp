@@ -1,14 +1,18 @@
-#include "stormancer.h"
+#include "stdafx.h"
+#include "RequestContext.h"
+#include "MessageIDTypes.h"
 
 namespace Stormancer
 {
 	RequestContext::RequestContext(Packet_ptr packet)
-		: _packet(packet),
-		_stream(packet->stream)
+		: _packet(packet)
+		, _stream(packet->stream)
+		, _isComplete(false)
 	{
 		(*packet->stream) >> _requestId;
 
 		streamCopy(packet->stream, _stream);
+		_stream->seekg(0, std::ios_base::beg);
 	}
 
 	RequestContext::~RequestContext()
@@ -38,15 +42,17 @@ namespace Stormancer
 		}
 		_didSendValues = true;
 		_packet->connection->sendSystem((byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG, [this, &writer](bytestream* stream) {
-			stream->write((char*)_requestId, 2);
+			auto rqIdPtr = &_requestId;
+			stream->write((char*)rqIdPtr, 2);
 			writer(stream);
 		});
 	}
 
 	void RequestContext::complete()
 	{
+		_isComplete = true;
 		_packet->connection->sendSystem((byte)MessageIDTypes::ID_REQUEST_RESPONSE_COMPLETE, [this](bytestream* stream) {
-			stream->write((char*)_requestId, 2);
+			stream->write((char*)&_requestId, 2);
 			char c = (_didSendValues ? 1 : 0);
 			stream->write(&c, 1);
 		});
@@ -55,7 +61,7 @@ namespace Stormancer
 	void RequestContext::error(std::function<void(bytestream*)> writer)
 	{
 		_packet->connection->sendSystem((byte)MessageIDTypes::ID_REQUEST_RESPONSE_ERROR, [this, &writer](bytestream* stream) {
-			stream->write((char*)_requestId, 2);
+			stream->write((char*)&_requestId, 2);
 			writer(stream);
 		});
 	}

@@ -45,7 +45,7 @@ class zero_memory_deleter
 public:
     _ASYNCRTIMP void operator()(::utility::string_t *data) const;
 };
-typedef std::unique_ptr<::utility::string_t, zero_memory_deleter> plaintext_string;
+typedef std::unique_ptr< ::utility::string_t, zero_memory_deleter > plaintext_string;
 
 #if defined(_WIN32) && !defined(CPPREST_TARGET_XP)
 #if defined(__cplusplus_winrt)
@@ -102,19 +102,6 @@ public:
     /// <returns>A string containing the user name.</returns>
     const utility::string_t &username() const { return m_username; }
 
-    /// <summary>
-    /// The password for the user name associated with the credentials.
-    /// </summary>
-    /// <returns>A string containing the password.</returns>
-    CASABLANCA_DEPRECATED("This API is deprecated for security reasons to avoid unnecessary password copies stored in plaintext.")
-        utility::string_t password() const
-    {
-#if defined(_WIN32) && !defined(CPPREST_TARGET_XP)
-        return utility::string_t(*m_password.decrypt());
-#else
-        return m_password;
-#endif
-    }
 
     /// <summary>
     /// Checks if credentials have been set

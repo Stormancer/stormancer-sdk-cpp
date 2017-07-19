@@ -22,12 +22,10 @@
 
 #if   defined(_WIN32)
 #include "WindowsIncludes.h"
-
-
-#else
-#include <pthread.h>
-#include <sys/types.h>
 #endif
+
+#include <mutex>
+
 #include "Export.h"
 
 namespace RakNet
@@ -61,13 +59,9 @@ public:
 
 private:
 	void Init(void);
-#ifdef _WIN32
-	CRITICAL_SECTION criticalSection; /// Docs say this is faster than a mutex for single process access
 
+	std::mutex hMutex;
 
-#else
-	pthread_mutex_t hMutex;
-#endif
 	// Not threadsafe
 	//	bool isInitialized;
 };

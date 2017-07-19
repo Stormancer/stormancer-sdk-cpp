@@ -150,28 +150,28 @@ RakString& RakString::operator = ( const char c )
 	buff[1]=0;
 	return operator = ((const char*)buff);
 }
-void RakString::Realloc(SharedString *sharedString, size_t bytes)
+void RakString::Realloc(SharedString *sharedString2, size_t bytes)
 {
-	if (bytes<=sharedString->bytesUsed)
+	if (bytes<=sharedString2->bytesUsed)
 		return;
 
 	RakAssert(bytes>0);
-	size_t oldBytes = sharedString->bytesUsed;
+	size_t oldBytes = sharedString2->bytesUsed;
 	size_t newBytes;
 	const size_t smallStringSize = 128-sizeof(unsigned int)-sizeof(size_t)-sizeof(char*)*2;
 	newBytes = GetSizeToAllocate(bytes);
 	if (oldBytes <=(size_t) smallStringSize && newBytes > (size_t) smallStringSize)
 	{
-		sharedString->bigString=(char*) rakMalloc_Ex(newBytes, _FILE_AND_LINE_);
-		strcpy(sharedString->bigString, sharedString->smallString);
-		sharedString->c_str=sharedString->bigString;
+		sharedString2->bigString=(char*) rakMalloc_Ex(newBytes, _FILE_AND_LINE_);
+		strcpy(sharedString2->bigString, sharedString2->smallString);
+		sharedString2->c_str=sharedString2->bigString;
 	}
 	else if (oldBytes > smallStringSize)
 	{
-		sharedString->bigString=(char*) rakRealloc_Ex(sharedString->bigString,newBytes, _FILE_AND_LINE_);
-		sharedString->c_str=sharedString->bigString;
+		sharedString2->bigString=(char*) rakRealloc_Ex(sharedString2->bigString,newBytes, _FILE_AND_LINE_);
+		sharedString2->c_str=sharedString2->bigString;
 	}
-	sharedString->bytesUsed=newBytes;
+	sharedString2->bytesUsed=newBytes;
 }
 RakString& RakString::operator +=( const RakString& rhs)
 {
@@ -468,7 +468,7 @@ WCHAR * RakString::ToWideChar(void)
 		CP_UTF8,                // convert from UTF-8
 		0,						// Flags
 		sharedString->c_str,            // source UTF-8 string
-		GetLength()+1,                 // total length of source UTF-8 string,
+		(int)GetLength()+1,                 // total length of source UTF-8 string,
 		// in CHAR's (= bytes), including end-of-string \0
 		NULL,                   // unused - no conversion done in this step
 		0                       // request size of destination buffer, in WCHAR's
@@ -492,7 +492,7 @@ WCHAR * RakString::ToWideChar(void)
 		CP_UTF8,                // convert from UTF-8
 		0,						// Buffer
 		sharedString->c_str,            // source UTF-8 string
-		GetLength()+1,                 // total length of source UTF-8 string,
+		(int)GetLength()+1,                 // total length of source UTF-8 string,
 		// in CHAR's (= bytes), including end-of-string \0
 		pszUTF16,               // destination buffer
 		cchUTF16                // size of destination buffer, in WCHAR's
@@ -513,7 +513,7 @@ void RakString::DeallocWideChar(WCHAR * w)
 void RakString::FromWideChar(const wchar_t *source)
 {
 	Clear();
-	int bufSize = wcslen(source)*4;
+	int bufSize = (int)wcslen(source)*4;
 	Allocate(bufSize);
 	WideCharToMultiByte ( CP_ACP,                // ANSI code page
 
@@ -662,7 +662,7 @@ void RakString::StartAfterLastCharacter(char c)
 			++i;
 			if (i < len)
 			{
-				*this = SubStr(i,GetLength()-i);
+				*this = SubStr(i,(unsigned int)GetLength()-i);
 			}
 			return;
 		}
@@ -693,7 +693,7 @@ void RakString::StartAfterFirstCharacter(char c)
 			++i;
 			if (i < len)
 			{
-				*this = SubStr(i,GetLength()-i);
+				*this = SubStr(i,(unsigned int)GetLength()-i);
 			}
 			return;
 		}
@@ -739,7 +739,9 @@ int RakString::StrNCmp(const RakString &rhs, size_t num) const
 }
 int RakString::StrICmp(const RakString &rhs) const
 {
+
 	return _stricmp(sharedString->c_str, rhs.C_String());
+
 }
 void RakString::Printf(void)
 {

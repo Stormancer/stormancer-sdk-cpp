@@ -1,6 +1,9 @@
 #pragma once
+
 #include "headers.h"
 #include "IPacketProcessor.h"
+#include "IActionDispatcher.h"
+#include "Scene.h"
 
 namespace Stormancer
 {
@@ -15,7 +18,7 @@ namespace Stormancer
 
 	public:
 		void registerProcessor(PacketProcessorConfig& config);
-		void addScene(ScenePtr scene);
+		void addScene(Scene_ptr scene);
 		void removeScene(uint8 sceneHandle);
 
 	private:
@@ -24,6 +27,6 @@ namespace Stormancer
 
 	private:
 		processorFunction* handler = nullptr;
-		std::vector<ScenePtr> _scenes;
+		std::vector<std::weak_ptr<Scene>> _scenes;
 	};
 };

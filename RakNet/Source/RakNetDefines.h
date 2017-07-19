@@ -77,10 +77,10 @@
 #endif
 
 #ifndef RakAssert
-
-
-
-#if   defined(__native_client__)
+#if defined(_XBOX) || defined(X360)
+#include "XBox360Includes.h"
+#define RakAssert(x) XMASSERT(x)
+#elif defined(__native_client__)
 #define RakAssert(x)
 #else
 #if defined(_DEBUG)
@@ -137,10 +137,10 @@
 
 
 
-
-
-
-
+#if defined(_XBOX) || defined(X360)
+// Doesn't support IPV6
+#undef RAKNET_SUPPORT_IPV6
+#endif
 
 #ifndef RAKSTRING_TYPE
 #if defined(_UNICODE)
@@ -185,11 +185,10 @@
 #define USE_ALLOCA 1
 #endif
 
-
-
-
-
-
+#if defined(_XBOX) || defined(_XBOX_720_COMPILE_AS_WINDOWS) || defined(X360)
+#undef USE_ALLOCA
+#define USE_ALLOCA 0
+#endif
 //#define USE_THREADED_SEND
 
 #endif // __RAKNET_DEFINES_H

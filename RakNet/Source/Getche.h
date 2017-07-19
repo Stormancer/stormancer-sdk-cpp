@@ -8,7 +8,9 @@
  *
  */
 
-#if   defined(_WIN32)
+#if defined(_XBOX) || defined(_XBOX_720_COMPILE_AS_WINDOWS) || defined(X360)
+
+#elif defined(_WIN32) && !defined(_XBOX) && !defined(_XBOX_720_COMPILE_AS_WINDOWS) && !defined(X360)
 #include <conio.h> /* getche() */
 
 #else

@@ -30,7 +30,7 @@
 
 
 
-#define MAXIMUM_MTU_SIZE 1492
+#define MAXIMUM_MTU_SIZE 1200
 
 
 #define MINIMUM_MTU_SIZE 400

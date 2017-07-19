@@ -1,4 +1,5 @@
 #pragma once
+
 #include "headers.h"
 #include "IConnection.h"
 #include "Helpers.h"
@@ -12,74 +13,86 @@ namespace Stormancer
 	class Packet
 	{
 	public:
-	
-		/// Constructor.
+
+#pragma region public_methods
+
+		/// Constructor
 		/// \param source Generic source of the packets.
 		/// \param stream Data stream attached to the packet.
 		Packet(T* source, bytestream* stream)
-			: connection(source),
-			stream(stream)
+			: connection(source)
+			, stream(stream)
 		{
 		}
 
-		/// Constructor.
+		/// Constructor
 		/// \param source Generic source of the packets.
 		/// \param stream Data stream attached to the packet.
 		/// \param metadata Metadata attached to this packet.
-		Packet(T* source, bytestream* stream, anyMap& metadata)
-			: connection(source),
-			stream(stream),
-			_metadata(metadata)
+		Packet(T* source, bytestream* stream, const std::map<std::string, std::string>& metadata)
+			: connection(source)
+			, stream(stream)
+			, metadata(metadata)
 		{
 		}
-		
-		/// Copy constructor deleted.
-		Packet(const Packet<T>&) = delete;
-		
-		/// Copy operator deleted.
-		Packet<T>& operator=(const Packet<T>&) = delete;
 
-		/// Destructor.
+		/// Destructor
 		virtual ~Packet()
 		{
+			clean();
+		}
+
+		void clean()
+		{
 			cleanup();
+			cleanup.clear();
 		}
 
-	public:
-	
-		/// Returns a copy of the packet metadatas.
-		anyMap& metadata()
+		/// Read a msgpack object
+		template<typename TOut>
+		TOut readObject()
 		{
-			return _metadata;
-		}
-
-		template<typename T>
-		T readObject()
-		{
+			auto g = stream->tellg();
 			std::string buffer;
-			this->stream->operator>>(buffer);
+			*stream >> buffer;
 			msgpack::unpacked unp;
-			msgpack::unpack(unp, buffer.data(), buffer.size());
-			T result;
+			auto readOffset = msgpack::unpack(unp, buffer.data(), buffer.size());
+			g += readOffset;
+			stream->seekg(g);
+			TOut result;
 			unp.get().convert(&result);
 			return result;
 		}
 
-	public:
-	
-		/// source.
+#pragma endregion
+
+#pragma region public_members
+
+		/// Source
 		T* connection = nullptr;
-		
-		/// data stream.
+
+		/// Data stream
 		bytestream* stream = nullptr;
-		
-		/// Clean-up operations.
+
+		/// Clean-up operations
 		Action<> cleanup;
 
+		/// Metadata
+		std::map<std::string, std::string> metadata;
+
+#pragma endregion
+
 	private:
-	
-		/// metadatas.
-		anyMap _metadata;
+
+#pragma region private_methods
+
+		/// Copy constructor deleted.
+		Packet(const Packet<T>&) = delete;
+
+		/// Copy operator deleted.
+		Packet<T>& operator=(const Packet<T>&) = delete;
+
+#pragma endregion
 	};
 
 	using Packet_ptr = std::shared_ptr<Packet<>>;

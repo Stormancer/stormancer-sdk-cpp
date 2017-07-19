@@ -5,9 +5,9 @@
 #include <stdio.h>
 #include <math.h>
 #include <memory.h>
-#ifndef SN_TARGET_PS3
+
 #include <malloc.h>
-#endif
+
 #include <stdlib.h>
 
 #ifdef __cplusplus

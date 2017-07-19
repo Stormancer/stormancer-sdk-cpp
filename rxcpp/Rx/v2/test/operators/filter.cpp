@@ -43,15 +43,15 @@ SCENARIO("filter stops on completion", "[filter][operators]"){
         WHEN("filtered to ints that are primes"){
             auto res = w.start(
                 [&xs, &invoked]() {
-#if 0 && RXCPP_USE_OBSERVABLE_MEMBERS
-                    return xs
-                        .filter([&invoked](int x) {
-                            invoked++;
-                            return IsPrime(x);
-                        })
-                        // forget type to workaround lambda deduction bug on msvc 2013
-                        .as_dynamic();
-#else
+
+
+
+
+
+
+
+
+
                     return xs
                         >> rxo::filter([&invoked](int x) {
                             invoked++;
@@ -63,7 +63,7 @@ SCENARIO("filter stops on completion", "[filter][operators]"){
                         }
                         // forget type to workaround lambda deduction bug on msvc 2013
                         >> rxo::as_dynamic();
-#endif
+
                 }
             );
             THEN("the output only contains primes"){

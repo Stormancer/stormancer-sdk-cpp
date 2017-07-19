@@ -126,6 +126,7 @@ void _finish_create(Streams::IRandomAccessStream^ stream, _In_ _filestream_callb
 /// True does not signal that the file will eventually be successfully opened, just that the process was started.
 /// This is only available for WinRT.
 /// </remarks>
+
 bool __cdecl _open_fsb_stf_str(_In_ Concurrency::streams::details::_filestream_callback *callback, ::Windows::Storage::StorageFile^ file, std::ios_base::openmode mode, int prot)
 {
     _ASSERTE(callback != nullptr);
@@ -151,6 +152,7 @@ bool __cdecl _open_fsb_stf_str(_In_ Concurrency::streams::details::_filestream_c
 
     return true;
 }
+
 
 bool __cdecl _sync_fsb_winrt(_In_ Concurrency::streams::details::_file_info *info, _In_opt_ Concurrency::streams::details::_filestream_callback *callback)
 {

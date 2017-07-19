@@ -1,4 +1,5 @@
 #pragma once
+
 #include "headers.h"
 #include "Packet.h"
 
@@ -47,6 +48,6 @@ namespace Stormancer
 		bytestream* _stream = nullptr;
 		
 		bool _didSendValues = false;
-		bool _isComplete;
+		bool _isComplete = false;
 	};
 };

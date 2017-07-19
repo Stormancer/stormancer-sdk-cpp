@@ -1,4 +1,5 @@
 #pragma once
+
 #include "headers.h"
 #include "RouteDto.h"
 
@@ -8,9 +9,6 @@ namespace Stormancer
 	class ConnectToSceneMsg
 	{
 	public:
-
-		/// Constructor.
-		ConnectToSceneMsg();
 
 		/// Destructor.
 		virtual ~ConnectToSceneMsg();
@@ -43,9 +41,9 @@ namespace Stormancer
 		std::vector<RouteDto> Routes;
 
 		/// Scene Metadatas.
-		stringMap SceneMetadata;
+		std::map<std::string, std::string> SceneMetadata;
 
 		/// Connection Metadatas.
-		stringMap ConnectionMetadata;
+		std::map<std::string, std::string> ConnectionMetadata;
 	};
 };

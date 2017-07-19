@@ -15,14 +15,14 @@
 #include <stdlib.h>
 #include <stddef.h>
 #if defined(_MSC_VER) && _MSC_VER < 1600
-    typedef __int8 int8_t;
-    typedef unsigned __int8 uint8_t;
-    typedef __int16 int16_t;
-    typedef unsigned __int16 uint16_t;
-    typedef __int32 int32_t;
-    typedef unsigned __int32 uint32_t;
-    typedef __int64 int64_t;
-    typedef unsigned __int64 uint64_t;
+typedef __int8 int8_t;
+typedef unsigned __int8 uint8_t;
+typedef __int16 int16_t;
+typedef unsigned __int16 uint16_t;
+typedef __int32 int32_t;
+typedef unsigned __int32 uint32_t;
+typedef __int64 int64_t;
+typedef unsigned __int64 uint64_t;
 #elif defined(_MSC_VER)  // && _MSC_VER >= 1600
 #   include <stdint.h>
 #else
@@ -40,7 +40,7 @@
 
 #ifdef _WIN32
 #   define _msgpack_atomic_counter_header <windows.h>
-    typedef long _msgpack_atomic_counter_t;
+typedef long _msgpack_atomic_counter_t;
 #   define _msgpack_sync_decr_and_fetch(ptr) InterlockedDecrement(ptr)
 #   define _msgpack_sync_incr_and_fetch(ptr) InterlockedIncrement(ptr)
 #elif defined(__GNUC__) && ((__GNUC__*10 + __GNUC_MINOR__) < 41)
@@ -52,7 +52,7 @@
 #   endif
 
 #else
-    typedef unsigned int _msgpack_atomic_counter_t;
+typedef unsigned int _msgpack_atomic_counter_t;
 #   define _msgpack_sync_decr_and_fetch(ptr) __sync_sub_and_fetch(ptr, 1)
 #   define _msgpack_sync_incr_and_fetch(ptr) __sync_add_and_fetch(ptr, 1)
 #endif
@@ -60,7 +60,7 @@
 #ifdef _WIN32
 
 #   ifdef __cplusplus
-    /* numeric_limits<T>::min,max */
+/* numeric_limits<T>::min,max */
 #       ifdef max
 #           undef max
 #       endif
@@ -69,8 +69,28 @@
 #       endif
 #   endif
 
-#else /* _*/
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#else /* _*/
 #include <arpa/inet.h>  /* __BYTE_ORDER */
 #   if defined(linux)
 #       include <byteswap.h>
@@ -161,11 +181,11 @@
 
 /*
 #define _msgpack_load16(cast, from) \
-    ({ cast val; memcpy(&val, (char*)from, 2); _msgpack_be16(val); })
+	({ cast val; memcpy(&val, (char*)from, 2); _msgpack_be16(val); })
 #define _msgpack_load32(cast, from) \
-    ({ cast val; memcpy(&val, (char*)from, 4); _msgpack_be32(val); })
+	({ cast val; memcpy(&val, (char*)from, 4); _msgpack_be32(val); })
 #define _msgpack_load64(cast, from) \
-    ({ cast val; memcpy(&val, (char*)from, 8); _msgpack_be64(val); })
+	({ cast val; memcpy(&val, (char*)from, 8); _msgpack_be64(val); })
 */
 
 

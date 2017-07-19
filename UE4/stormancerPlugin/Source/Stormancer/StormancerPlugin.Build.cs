@@ -1,16 +1,19 @@
 using System;
 using System.IO;
 using System.Text.RegularExpressions;
-
 namespace UnrealBuildTool.Rules
 {
 	public class StormancerPlugin : ModuleRules
 	{
-		private const string VS_TOOLSET = "140";
+		private string VS_TOOLSET = "140";
 		public StormancerPlugin(TargetInfo target)
 		{
-			/** Setup an external C++ module */
-			LoadLibrary(target, "3rdparty/stormancer/include", "3rdparty/stormancer/libs", "stormancer");
+            // Stormancer needs RTTI and exceptions
+            UEBuildConfiguration.bForceEnableExceptions = true;
+            bUseRTTI = true;
+
+            /** Setup an external C++ module */
+            LoadLibrary(target, "3rdparty/stormancer/include", "3rdparty/stormancer/libs", "stormancer");
 
 			/** Setup files in this plugin locally */
 			SetupLocal(target);
@@ -19,11 +22,17 @@ namespace UnrealBuildTool.Rules
 
 		/** Perform all the normal module setup for plugin local c++ files. */
 		private void SetupLocal(TargetInfo target) {
-			PublicIncludePaths.AddRange(new string[] {"source/Stormancer/Public" });
+            //var process = System.Diagnostics.Process.Start(System.IO.Path.Combine(PluginPath, "install.ps1"), "");
+            //process.WaitForExit();
+            PublicIncludePaths.AddRange(new string[] {"source/Stormancer/Public" });
 			PrivateIncludePaths.AddRange(new string[] {"Source/Stormancer/Private" });
-			PublicDependencyModuleNames.AddRange(new string[] {"Core"});
-			PrivateDependencyModuleNames.AddRange(new string[] {});
-			DynamicallyLoadedModuleNames.AddRange(new string[] {});
+			PublicDependencyModuleNames.AddRange(new string[] { "Core" });
+			PrivateDependencyModuleNames.AddRange(new string[] { "Engine", "CoreUObject" });
+            if (UEBuildConfiguration.bBuildEditor == true)
+            {
+                PrivateDependencyModuleNames.AddRange(new string[] { "UnrealEd" });
+            }
+            DynamicallyLoadedModuleNames.AddRange(new string[] {});
 		}
 
 		/**
@@ -54,19 +63,50 @@ namespace UnrealBuildTool.Rules
 			switch(target.Platform)
 			{
 				case UnrealTargetPlatform.Win64:
-				platform = "x64";
-				break;
+				    platform = "x64";
+				    break;
 				case UnrealTargetPlatform.Win32:
-				platform = "x86";
-				break;
+				    platform = "x86";
+				    break;
+        case UnrealTargetPlatform.PS4:
+            platform = "ORBIS";
+            VS_TOOLSET = "";
+            break;
+				case UnrealTargetPlatform.IOS:
+						platform = "iOS";
+						VS_TOOLSET = "";
+						break;
 				default:
-				break;
+				    break;
 			}
 			// Look at all the files in the build path; we need to smartly locate
 			// the static library based on the current platform. For dynamic libraries
 			// this is more difficult, but for static libraries, it's just .lib or .a
 			string [] fileEntries = Directory.GetFiles(full_build_path);
-			var pattern = ".*" + library_name + VS_TOOLSET+"_Release_"+platform+".";
+
+            string configuration = "_Release_";
+            switch (target.Configuration)
+            {
+				case UnrealTargetConfiguration.Debug:
+					configuration = "_Debug_";
+					break;
+				case UnrealTargetConfiguration.DebugGame:
+					// DebugUE4 is only needed on Windows
+					if (target.Platform == UnrealTargetPlatform.Win64 || target.Platform == UnrealTargetPlatform.Win32)
+					{
+						configuration = "_DebugUE4_";
+					}
+					else
+					{
+						configuration = "_Debug_";
+					}
+					break;
+				default:
+					configuration = "_Release_";
+					break;
+			}
+
+			var pattern = ".*" + library_name + VS_TOOLSET+configuration+platform+".";
 			if ((target.Platform == UnrealTargetPlatform.Win64) || (target.Platform == UnrealTargetPlatform.Win32)) {
 				pattern += "lib";
 			}

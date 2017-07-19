@@ -1,4 +1,5 @@
 #pragma once
+
 #include "headers.h"
 #include "IConnection.h"
 
@@ -8,12 +9,16 @@ namespace Stormancer
 	class IConnectionManager
 	{
 	public:
-		virtual uint64 generateNewConnectionId() = 0;
-		virtual void newConnection(IConnection* connection) = 0;
-		virtual void closeConnection(IConnection* connection, std::string reason) = 0;
-		virtual IConnection* getConnection(uint64 id) = 0;
 
-	public:
-		int connectionCount = 0;
+#pragma region public_methods
+
+		virtual pplx::task<std::shared_ptr<IConnection>> addPendingConnection(const std::string& address, uint64 id) = 0;
+		virtual uint64 generateNewConnectionId(const std::string& address) = 0;
+		virtual void newConnection(std::shared_ptr<IConnection> connection) = 0;
+		virtual void closeConnection(std::shared_ptr<IConnection> connection, const std::string& reason) = 0;
+		virtual std::shared_ptr<IConnection> getConnection(uint64 id) = 0;
+		virtual int getConnectionCount() = 0;
+
+#pragma endregion
 	};
 };

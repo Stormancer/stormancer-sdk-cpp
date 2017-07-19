@@ -31,6 +31,7 @@
 #include <math.h>
 #include <float.h>
 
+//#include "SocketDefines.h"
 #ifdef _MSC_VER
 #pragma warning( push )
 #endif

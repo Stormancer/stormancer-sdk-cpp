@@ -191,7 +191,7 @@ Table::Cell::Cell(double numericValue, char *charValue, void *ptr, ColumnType ty
 {
 	SetByType(numericValue,charValue,ptr,type);
 }
-void Table::Cell::SetByType(double numericValue, char *charValue, void *ptr, ColumnType type)
+void Table::Cell::SetByType(double numericValue, char *charValue, void *pointer, ColumnType type)
 {
 	isEmpty=true;
 	if (type==NUMERIC)
@@ -208,11 +208,11 @@ void Table::Cell::SetByType(double numericValue, char *charValue, void *ptr, Col
 	}
 	else if (type==POINTER)
 	{
-		SetPtr(ptr);
+		SetPtr(pointer);
 	}
 	else
 	{
-		ptr=(void*) charValue;
+		pointer =(void*) charValue;
 	}
 }
 Table::ColumnType Table::Cell::EstimateColumnType(void) const

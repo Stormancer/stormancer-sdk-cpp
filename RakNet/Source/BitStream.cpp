@@ -25,9 +25,9 @@
 #include "SocketIncludes.h"
 #include "RakNetDefines.h"
 
-
-
-#if   defined(_WIN32)
+#if defined(_XBOX) || defined(_XBOX_720_COMPILE_AS_WINDOWS) || defined(X360)
+#include "XBOX360Includes.h"
+#elif   defined(_WIN32)
 #include "WindowsIncludes.h"
 #include <memory.h>
 #include <cmath>

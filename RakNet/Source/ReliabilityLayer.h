@@ -92,12 +92,12 @@ public:
 		data = RakNet::OP_NEW_ARRAY<InternalPacket*>(allocation_size, file, line);
 		packetId = internalPacket->splitPacketId;
 
-		for (int i = 0; i < allocation_size; ++i)
+		for (unsigned int i = 0; i < allocation_size; ++i)
 		{
 			data[i] = NULL;
 		}
 	}
-	bool Add(InternalPacket * internalPacket, const char *file, unsigned int line)
+	bool Add(InternalPacket * internalPacket, const char*, unsigned int)
 	{
 		RakAssert(data != NULL);
 		RakAssert(internalPacket->splitPacketIndex < allocation_size);

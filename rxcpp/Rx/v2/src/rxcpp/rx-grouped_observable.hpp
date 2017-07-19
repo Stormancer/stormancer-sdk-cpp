@@ -20,7 +20,7 @@ struct has_on_get_key_for
     template<class CS>
     static not_void checkRX(...);
 
-    typedef decltype(check<Source>(0)) detail_result;
+    typedef decltype(checkRX<Source>(0)) detail_result;
     static const bool value = std::is_same<detail_result, rxu::decay_t<K>>::value;
 };
 

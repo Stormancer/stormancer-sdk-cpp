@@ -27,10 +27,11 @@
 *
 * =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ****/
+
 #include "stdafx.h"
 #include "cpprest/details/fileio.h"
 
-using namespace boost::asio;
+//using namespace boost::asio;
 using namespace Concurrency::streams::details;
 
 namespace Concurrency { namespace streams { namespace details {
@@ -640,3 +641,5 @@ size_t _seekwrpos_fsb(Concurrency::streams::details::_file_info *info, size_t po
     fInfo->m_wrpos = pos;
     return fInfo->m_wrpos;
 }
+
+

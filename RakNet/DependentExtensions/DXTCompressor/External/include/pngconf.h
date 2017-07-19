@@ -1270,8 +1270,8 @@ typedef z_stream FAR *  png_zstreamp;
 #     endif
 #  endif
 
-#  if !defined(PNG_IMPEXP) && (!defined(PNG_DLL) || \
-       0 /* WINCOMPILER_WITH_NO_SUPPORT_FOR_DECLIMPEXP */)
+# if !defined(PNG_IMPEXP) && !defined(PNG_DLL) /* WINCOMPILER_WITH_NO_SUPPORT_FOR_DECLIMPEXP */
+
 #     define PNG_IMPEXP
 #  endif
 

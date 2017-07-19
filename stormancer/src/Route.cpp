@@ -1,4 +1,5 @@
-#include "stormancer.h"
+#include "stdafx.h"
+#include "Route.h"
 
 namespace Stormancer
 {
@@ -7,16 +8,16 @@ namespace Stormancer
 	{
 	}
 
-	Route::Route(Scene* scene, std::string& routeName, uint16 handle, stringMap metadata)
+	Route::Route(const std::string& routeName, uint16 handle, MessageOriginFilter filter, std::map<std::string, std::string> metadata)
 		: _name(routeName),
-		_scene(scene),
 		_metadata(metadata),
-		_handle(handle)
+		_handle(handle),
+		_filter(filter)
 	{
 	}
 
-	Route::Route(Scene* scene, std::string& routeName, stringMap metadata)
-		: Route(scene, routeName, 0, metadata)
+	Route::Route(const std::string& routeName, std::map<std::string, std::string> metadata)
+		: Route(routeName, 0, MessageOriginFilter::Host, metadata)
 	{
 	}
 
@@ -24,22 +25,17 @@ namespace Stormancer
 	{
 	}
 
-	Scene* Route::scene()
-	{
-		return _scene;
-	}
-
-	const std::string Route::name()
+	const std::string& Route::name() const
 	{
 		return _name;
 	}
 
-	uint16 Route::handle()
+	uint16 Route::handle() const
 	{
 		return _handle;
 	}
 
-	stringMap& Route::metadata()
+	const std::map<std::string, std::string>& Route::metadata() const
 	{
 		return _metadata;
 	}
@@ -47,5 +43,10 @@ namespace Stormancer
 	void Route::setHandle(uint16 newHandle)
 	{
 		_handle = newHandle;
+	}
+
+	MessageOriginFilter Route::filter() const
+	{
+		return _filter;
 	}
 };

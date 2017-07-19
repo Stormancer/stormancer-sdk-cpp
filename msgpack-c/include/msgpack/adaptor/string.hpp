@@ -36,6 +36,7 @@ struct convert<std::string> {
             break;
 		case msgpack::type::NIL:
 			v.assign("");
+			break;
         default:
             throw msgpack::type_error();
             break;

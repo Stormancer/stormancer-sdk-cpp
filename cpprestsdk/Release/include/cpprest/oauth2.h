@@ -27,6 +27,8 @@
 #ifndef _CASA_OAUTH2_H
 #define _CASA_OAUTH2_H
 
+
+
 #include "cpprest/http_msg.h"
 #include "cpprest/details/web_utilities.h"
 
@@ -55,7 +57,7 @@ class oauth2_strings
 public:
 #define _OAUTH2_STRINGS
 #define DAT(a_, b_) _ASYNCRTIMP static const oauth2_string a_;
-#include "cpprest/details/http_constants.dat"
+#include "cpprest/details/http_constants.h"
 #undef _OAUTH2_STRINGS
 #undef DAT
 };
@@ -540,5 +542,7 @@ private:
 };
 
 }}}}
+
+
 
 #endif

@@ -56,7 +56,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\cpprest\details\http_server.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\cpprest\details\http_server_api.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\cpprest\details\nosal.h" />
-	<ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\cpprest\details\resource.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\cpprest\details\resource.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\cpprest\details\SafeInt3.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\cpprest\details\uri_parser.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\cpprest\details\web_utilities.h" />
@@ -64,7 +64,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\cpprest\filestream.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\cpprest\http_client.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\cpprest\http_headers.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\cpprest\http_listener.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\cpprest\http_msg.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\cpprest\interopstream.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\cpprest\json.h" />
@@ -83,10 +82,10 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\pplx\pplxconv.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\pplx\pplxinterface.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\pplx\pplxtasks.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\pch\stdafx.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)..\..\include\cpprest\details\http_constants.dat" />
+    <None Include="$(MSBuildThisFileDirectory)..\..\include\cpprest\details\http_constants.h" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="$(MSBuildThisFileDirectory)package_info.xml">

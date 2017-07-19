@@ -1,14 +1,17 @@
-#include "stormancer.h"
+#include "stdafx.h"
+#include "Configuration.h"
+#include "RakNet/RakNetTransport.h"
+#include "RPC/RpcPlugin.h"
 
 namespace Stormancer
 {
-	Configuration::Configuration(const std::string endpoint, const std::string account, const std::string application)
-		: account(account),
-		application(application)			
+	Configuration::Configuration(const std::string& endpoint, const std::string& account, const std::string& application)
+		: account(account)
+		, application(application)			
 	{
 		scheduler = std::make_shared<DefaultScheduler>();
-		transportFactory = defaultTransportFactory;
-		dispatcher = [](DependencyResolver* resolver) { return std::make_shared<DefaultPacketDispatcher>(); };
+		transportFactory = _defaultTransportFactory;
+		dispatcher = [](DependencyResolver*) { return std::make_shared<DefaultPacketDispatcher>(); };
 		addServerEndpoint(endpoint);
 		_plugins.push_back(new RpcPlugin());
 	}
@@ -17,9 +20,9 @@ namespace Stormancer
 	{
 	}
 
-	std::shared_ptr<Configuration> Configuration::create(const std::string endpoint, const std::string account, const std::string application)
+	std::shared_ptr<Configuration> Configuration::create(const std::string& endpoint, const std::string& account, const std::string& application)
 	{
-		if (account == "" || application == "" || endpoint == "")
+		if (account.empty() || application.empty() || endpoint.empty())
 		{
 			throw std::invalid_argument("Check your account and application parameters");
 		}
@@ -27,7 +30,7 @@ namespace Stormancer
 		return std::shared_ptr<Configuration>(new Configuration(endpoint, account, application));
 	}
 
-	Configuration& Configuration::metadata(const char* key, const char* value)
+	Configuration& Configuration::setMetadata(const std::string& key, const std::string& value)
 	{
 		_metadata[key] = value;
 		return *this;
@@ -43,7 +46,7 @@ namespace Stormancer
 		return _plugins;
 	}
 
-	void Configuration::addServerEndpoint(const std::string serverEndpoint)
+	void Configuration::addServerEndpoint(const std::string& serverEndpoint)
 	{
 		_serverEndpoints.push_back(std::string(serverEndpoint));
 	}
@@ -52,4 +55,9 @@ namespace Stormancer
 	{
 		return _serverEndpoints;
 	}
+
+	const std::function<std::shared_ptr<ITransport>(DependencyResolver*)> Configuration::_defaultTransportFactory = [](DependencyResolver* resolver)
+	{
+		return std::make_shared<Stormancer::RakNetTransport>(resolver);
+	};
 };

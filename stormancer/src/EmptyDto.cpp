@@ -1,4 +1,5 @@
-#include "stormancer.h"
+#include "stdafx.h"
+#include "EmptyDto.h"
 
 namespace Stormancer
 {
@@ -10,7 +11,7 @@ namespace Stormancer
 	{
 	}
 
-	void EmptyDto::msgpack_unpack(msgpack::object const& o)
+	void EmptyDto::msgpack_unpack(msgpack::object const&)
 	{
 		// do nothing
 	}

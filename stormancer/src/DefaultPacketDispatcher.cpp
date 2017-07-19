@@ -1,4 +1,6 @@
-#include "stormancer.h"
+#include "stdafx.h"
+#include "DefaultPacketDispatcher.h"
+#include "Logger/ILogger.h"
 
 namespace Stormancer
 {
@@ -33,10 +35,10 @@ namespace Stormancer
 				{
 					t.wait();
 				}
-				catch (const std::exception& e)
+				catch (const std::exception& ex)
 				{
-					ILogger::instance()->log(LogLevel::Error, "client.dispatchPacket", "Exception unhandled in dispatchPacketImpl :" + std::string(e.what()));
-					throw e;
+					ILogger::instance()->log(LogLevel::Error, "client.dispatchPacket", "Exception unhandled in dispatchPacketImpl :" + std::string(ex.what()));
+					throw ex;
 				}
 			});
 		}
@@ -66,7 +68,7 @@ namespace Stormancer
 			}
 		}
 
-		for (auto processor : this->_defaultProcessors)
+		for (auto processor : _defaultProcessors)
 		{
 			if ((*processor)(msgType, packet))
 			{

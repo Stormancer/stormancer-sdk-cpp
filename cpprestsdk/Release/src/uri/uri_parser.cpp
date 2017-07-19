@@ -23,7 +23,11 @@
 * =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ****/
 #include "stdafx.h"
+
 #include <locale>
+
+
+
 
 namespace web { namespace details { namespace uri_parser
 {
@@ -100,7 +104,12 @@ bool parse(const utility::string_t &encoded_string, uri_components &components)
 
             // convert scheme to lowercase
             std::transform(components.m_scheme.begin(), components.m_scheme.end(), components.m_scheme.begin(), [](utility::char_t c) {
-                return std::tolower(c, std::locale::classic());
+
+                return std::tolower(c
+
+					, std::locale::classic()
+
+				);
             });
         }
         else
@@ -119,7 +128,11 @@ bool parse(const utility::string_t &encoded_string, uri_components &components)
 
             // convert host to lowercase
             std::transform(components.m_host.begin(), components.m_host.end(), components.m_host.begin(), [](utility::char_t c) {
-                return std::tolower(c, std::locale::classic());
+				return std::tolower(c
+
+					, std::locale::classic()
+
+				);
             });
         }
         else
@@ -133,7 +146,19 @@ bool parse(const utility::string_t &encoded_string, uri_components &components)
         }
         else
         {
-            components.m_port = 0;
+			if (components.m_scheme == _XPLATSTR("https"))
+			{
+				components.m_port = 443;
+			}
+			else if (components.m_scheme == _XPLATSTR("http"))
+			{
+				components.m_port = 80;
+			}
+			else
+			{
+				components.m_port = 0;
+			}
+            
         }
 
         if (path_begin)
@@ -277,7 +302,11 @@ bool inner_parse(
                 //skip the colon
                 port_begin++;
 
-                *port = utility::conversions::scan_string<int>(utility::string_t(port_begin, authority_end), std::locale::classic());
+                *port = utility::conversions::scan_string<int>(utility::string_t(port_begin, authority_end)
+
+					, std::locale::classic()
+
+					);
             }
             else
             {

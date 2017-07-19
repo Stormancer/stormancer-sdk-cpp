@@ -1,4 +1,5 @@
 #pragma once
+
 #include "headers.h"
 #include "RouteDto.h"
 
@@ -24,7 +25,7 @@ namespace Stormancer
 		std::string SceneId;
 		
 		/// The scene metadatas.
-		stringMap Metadata;
+		std::map<std::string, std::string> Metadata;
 		
 		/// Vector of routes declared on the scene host.
 		std::vector<RouteDto> Routes;

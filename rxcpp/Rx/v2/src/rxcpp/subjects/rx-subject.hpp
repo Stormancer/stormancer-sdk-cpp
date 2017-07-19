@@ -144,7 +144,7 @@ public:
                 o.on_completed();
                 return;
             }
-            break;
+           
         case mode::Errored:
             {
                 auto e = b->state->error;
@@ -152,14 +152,14 @@ public:
                 o.on_error(e);
                 return;
             }
-            break;
+          
         case mode::Disposed:
             {
                 guard.unlock();
                 o.unsubscribe();
                 return;
             }
-            break;
+          
         default:
             abort();
         }

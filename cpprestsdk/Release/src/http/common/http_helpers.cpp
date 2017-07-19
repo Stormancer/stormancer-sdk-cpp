@@ -25,6 +25,9 @@
 
 #include "stdafx.h"
 
+
+
+
 using namespace web;
 using namespace utility;
 using namespace utility::conversions;
@@ -178,7 +181,7 @@ utility::string_t get_default_charset(const utility::string_t &content_type)
 static const http_status_to_phrase idToPhraseMap [] = {
 #define _PHRASES
 #define DAT(a,b,c) {status_codes::a, c},
-#include "cpprest/details/http_constants.dat"
+#include "cpprest/details/http_constants.h"
 #undef _PHRASES
 #undef DAT
 };
@@ -192,7 +195,7 @@ utility::string_t get_default_reason_phrase(status_code code)
     static const http_status_to_phrase idToPhraseMap [] = {
 #define _PHRASES
 #define DAT(a,b,c) {status_codes::a, c},
-#include "cpprest/details/http_constants.dat"
+#include "cpprest/details/http_constants.h"
 #undef _PHRASES
 #undef DAT
     };

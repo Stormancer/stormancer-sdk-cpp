@@ -69,7 +69,7 @@ class methods
 public:
 #define _METHODS
 #define DAT(a,b) _ASYNCRTIMP const static method a;
-#include "cpprest/details/http_constants.dat"
+#include "cpprest/details/http_constants.h"
 #undef _METHODS
 #undef DAT
 };
@@ -84,7 +84,7 @@ class status_codes
 public:
 #define _PHRASES
 #define DAT(a,b,c) const static status_code a=b;
-#include "cpprest/details/http_constants.dat"
+#include "cpprest/details/http_constants.h"
 #undef _PHRASES
 #undef DAT
 };
@@ -119,7 +119,7 @@ class header_names
 public:
 #define _HEADER_NAMES
 #define DAT(a,b) _ASYNCRTIMP const static utility::string_t a;
-#include "cpprest/details/http_constants.dat"
+#include "cpprest/details/http_constants.h"
 #undef _HEADER_NAMES
 #undef DAT
 };
@@ -575,7 +575,7 @@ public:
     /// </remarks>
     void set_body(const json::value &body_data)
     {
-        auto body_text = utility::conversions::to_utf8string(*body_data.serialize());
+        auto body_text = utility::conversions::to_utf8string(body_data.serialize());
         auto length = body_text.size();
         set_body(concurrency::streams::bytestream::open_istream(std::move(body_text)), length, _XPLATSTR("application/json"));
     }
@@ -973,7 +973,7 @@ public:
     /// </remarks>
     void set_body(const json::value &body_data)
     {
-        auto body_text = utility::conversions::to_utf8string(*body_data.serialize());
+        auto body_text = utility::conversions::to_utf8string(body_data.serialize());
         auto length = body_text.size();
         _m_impl->set_body(concurrency::streams::bytestream::open_istream(std::move(body_text)), length, _XPLATSTR("application/json"));
     }

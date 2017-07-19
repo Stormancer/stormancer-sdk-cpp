@@ -1,7 +1,8 @@
+#pragma once
 
+#include <net.h>
 
-
-
+int doResolverNtoa(const char *hostname, SceNetInAddr *addr);
 
 
 

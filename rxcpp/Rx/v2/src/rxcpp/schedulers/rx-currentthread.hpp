@@ -205,7 +205,11 @@ private:
             });
 
             const auto& recursor = queue_type::get_recursion().get_recurse();
-            std::this_thread::sleep_until(when);
+			bool should_sleep = when > now();
+			if (should_sleep)
+			{
+				std::this_thread::sleep_until(when);
+			}
             if (scbl.is_subscribed()) {
                 scbl(recursor);
             }
