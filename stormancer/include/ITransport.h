@@ -28,6 +28,7 @@ namespace Stormancer
 		virtual std::vector<std::string> externalAddresses() const = 0;
 		virtual std::vector<std::string> getAvailableEndpoints() const = 0;
 		virtual pplx::task<int> sendPing(const std::string& address) = 0;
+		virtual pplx::task<int> sendPing(const std::string& address, const int nb) = 0;
 		virtual void openNat(const std::string& address) = 0;
 
 #pragma endregion

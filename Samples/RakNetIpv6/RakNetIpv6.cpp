@@ -68,9 +68,9 @@ int main(int argc, const char* argv[])
 	if (client)
 	{
 		auto host = std::string(argv[1]);
-		std::cout << "connecting to " << host << std::endl;
+		//std::cout << "connecting to " << host << std::endl;
 		auto result = peer->Connect(host.c_str(), 7777, nullptr, 0);
-		std::cout << result << std::endl;
+		//std::cout << result << std::endl;
 	}
 
 

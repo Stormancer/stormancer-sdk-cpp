@@ -9,6 +9,10 @@ namespace Stormancer
 		, _scene(scene)
 		, _p2p(p2p)
 	{
+		if (!_connection)
+		{
+			throw std::runtime_error("Connection cannot be null");
+		}
 	}
 
 	std::string P2PScenePeer::getSceneId() const

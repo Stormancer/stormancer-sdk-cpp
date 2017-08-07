@@ -430,6 +430,8 @@ StartupResult RakNet::RakPeer::Startup(unsigned int maxConnections, const DataSt
 
 
 	unsigned int i;
+	unsigned int socketsCreated = 0;
+	StartupResult lastError;
 	// Go through all socket descriptors and precreate sockets on the specified addresses
 	for (i = 0; i < socketDescriptorCount; i++)
 	{
@@ -477,7 +479,7 @@ StartupResult RakNet::RakPeer::Startup(unsigned int maxConnections, const DataSt
 			*/
 
 		RakNetSocket2 *r2 = RakNetSocket2Allocator::AllocRNS2();
-		r2->SetUserConnectionSocketIndex(i);
+		r2->SetUserConnectionSocketIndex(socketsCreated);
 #if defined(__native_client__)
 		NativeClientBindParameters ncbp;
 		RNS2_NativeClient * nativeClientSocket = (RNS2_NativeClient*)r2;
@@ -521,21 +523,21 @@ StartupResult RakNet::RakPeer::Startup(unsigned int maxConnections, const DataSt
 #endif
 				br == BR_REQUIRES_RAKNET_SUPPORT_IPV6_DEFINE)
 			{
-				RakNetSocket2Allocator::DeallocRNS2(r2);
-				DerefAllSockets();
-				return SOCKET_FAMILY_NOT_SUPPORTED;
+				RakNetSocket2Allocator::DeallocRNS2(r2);				
+				lastError = SOCKET_FAMILY_NOT_SUPPORTED;
+				continue;
 			}
 			else if (br == BR_FAILED_TO_BIND_SOCKET)
 			{
 				RakNetSocket2Allocator::DeallocRNS2(r2);
-				DerefAllSockets();
-				return SOCKET_PORT_ALREADY_IN_USE;
+				lastError = SOCKET_PORT_ALREADY_IN_USE;
+				continue;
 			}
 			else if (br == BR_FAILED_SEND_TEST)
 			{
-				RakNetSocket2Allocator::DeallocRNS2(r2);
-				DerefAllSockets();
-				return SOCKET_FAILED_TEST_SEND;
+				RakNetSocket2Allocator::DeallocRNS2(r2);				
+				lastError = SOCKET_FAILED_TEST_SEND;
+				continue;
 			}
 			else
 			{
@@ -575,11 +577,16 @@ StartupResult RakNet::RakPeer::Startup(unsigned int maxConnections, const DataSt
 				*/
 
 		socketList.Push(r2, _FILE_AND_LINE_);
-
+		socketsCreated++;
+	}
+	if (socketsCreated == 0)
+	{
+		DerefAllSockets();
+		return lastError;
 	}
 
 #if !defined(__native_client__) && !defined(WINDOWS_STORE_RT)
-	for (i = 0; i < socketDescriptorCount; i++)
+	for (i = 0; i < socketsCreated; i++)
 	{
 		if (socketList[i]->IsBerkleySocket())
 		{

@@ -9,9 +9,6 @@
 
 namespace Stormancer
 {
-
-
-
 	/// Processes system requests.
 	class RequestProcessor : public IPacketProcessor
 	{

@@ -8,31 +8,22 @@ namespace Stormancer
 	{
 	}
 
-	pplx::task<std::shared_ptr<IConnection>> Stormancer::ConnectionsRepository::addPendingConnection(const std::string& address, uint64 id)
+	pplx::task<std::shared_ptr<IConnection>> Stormancer::ConnectionsRepository::addPendingConnection( uint64 id)
 	{
 		auto tce = pplx::task_completion_event<std::shared_ptr<IConnection>>();
 		PendingConnection pc;
 		pc.id = id;
 		pc.tce = tce;
-		_pendingP2PConnections[address] = pc;
+		_pendingP2PConnections[id] = pc;
+		ILogger::instance()->log(LogLevel::Info, "P2P", "Added pending connection from id ", std::to_string(id));
 		return pplx::create_task(tce);
 	}
 
-	uint64 ConnectionsRepository::generateNewConnectionId(const std::string& address)
-	{
-		auto it = _pendingP2PConnections.find(address);
-		if (it == _pendingP2PConnections.end())
-		{
-			return 0;
-		}
-		else
-		{
-			return it->second.id;
-		}
-	}
+	
 
 	void ConnectionsRepository::newConnection(std::shared_ptr<IConnection> connection)
 	{
+		ILogger::instance()->log(LogLevel::Info, "P2P", "Adding connection " + connection->ipAddress(), std::to_string(connection->id()));
 		if (connection == nullptr)
 		{
 			throw std::runtime_error("connection is null");
@@ -40,20 +31,20 @@ namespace Stormancer
 
 		if (connection->id() != 0)
 		{
-			auto it = _pendingP2PConnections.find(connection->ipAddress());
+			auto it = _pendingP2PConnections.find(connection->id());
 			if (it != _pendingP2PConnections.end())
 			{
 				auto pc = it->second;
 				_pendingP2PConnections.erase(it);
 
 				_connections[connection->id()] = connection;
-				ILogger::instance()->log(LogLevel::Info, "P2P", "Added pending connection , id", std::to_string(connection->id()));
+				ILogger::instance()->log(LogLevel::Info, "P2P", "Transitioning connection from pending", std::to_string(connection->id()));
 				pc.tce.set(connection);
 			}
 			else
 			{
 				_connections[connection->id()] = connection;
-				ILogger::instance()->log(LogLevel::Info, "P2P", "Added unknown connection, id", std::to_string(connection->id()));
+				ILogger::instance()->log(LogLevel::Info, "P2P", "Added connection without pending, id", std::to_string(connection->id()));
 			}
 		}
 		else

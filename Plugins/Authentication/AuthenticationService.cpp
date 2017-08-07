@@ -14,10 +14,10 @@ namespace Stormancer
 			case ConnectionState::Connecting:
 			case ConnectionState::Disconnecting:
 			case ConnectionState::Disconnected:
-				setConnectionState((GameConnectionState)state);
-				break;
+			setConnectionState((GameConnectionState)state);
+			break;
 			default:
-				break;
+			break;
 			}
 		});
 	}
@@ -154,25 +154,19 @@ namespace Stormancer
 
 	pplx::task<Scene_ptr> AuthenticationService::getAuthenticationScene()
 	{
-		if (!_authenticationSceneRetrieving)
+		if (_client)
 		{
-			_authenticationSceneRetrieving = true;
-
-			if (_client)
-			{
-				_authenticationScene = _client->getPublicScene(_authenticationSceneName)
-					.then([](Scene_ptr scene)
+			_authenticationScene = _client->connectToPublicScene(_authenticationSceneName).then([](Scene_ptr scene) {
+				if (scene->getCurrentConnectionState() != ConnectionState::Connected)
 				{
-					return scene->connect().then([scene]()
-					{
-						return scene;
-					});
-				});
-			}
-			else
-			{
-				throw std::runtime_error("Client is invalid.");
-			}
+					throw std::runtime_error("Scene is not connected.");
+				}
+				return scene;
+			});
+		}
+		else
+		{
+			throw std::runtime_error("Client is invalid.");
 		}
 		return _authenticationScene;
 	}

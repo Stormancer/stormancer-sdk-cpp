@@ -23,9 +23,10 @@ namespace Stormancer
 	{
 		_configurators[id] = configurator;
 	}
+
 	std::shared_ptr<Client> ClientFactory::GetClient(size_t id)
 	{
-		std::lock_guard<std::mutex>::lock_guard(_mutex);
+		std::lock_guard<std::mutex> lg(_mutex);
 
 		auto it = _clients.find(id);
 		if (it == _clients.end())
@@ -45,11 +46,13 @@ namespace Stormancer
 			return it->second;
 		}
 	}
+
 	void ClientFactory::ReleaseClient(size_t id)
 	{
-		std::lock_guard<std::mutex>::lock_guard(_mutex);
+		std::lock_guard<std::mutex> lg(_mutex);
 		_clients.erase(id);
 	}
+
 	std::mutex ClientFactory::_mutex;
 	std::unordered_map<size_t, std::shared_ptr<Client>> ClientFactory::_clients;
 	std::unordered_map<size_t, std::function<std::shared_ptr<Configuration>()>> ClientFactory::_configurators;

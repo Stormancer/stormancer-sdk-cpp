@@ -207,3 +207,8 @@ include/*
 # Mac stuff
 .DS_Store
 xcuserdata/
+/ARM/Release/*.so
+/PSVita_Release/*.self
+/ARM/Release
+Release
+*.self

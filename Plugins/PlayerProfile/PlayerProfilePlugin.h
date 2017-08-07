@@ -15,7 +15,7 @@ namespace Stormancer
 
 				if (!name.empty())
 				{
-					auto service = std::make_shared<PlayerProfileService<T>>(scene->dependencyResolver());
+					auto service = std::make_shared<PlayerProfileService<T>>();
 					service->setScene(scene);
 					scene->dependencyResolver()->registerDependency(service);
 				}

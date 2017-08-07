@@ -4,96 +4,117 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="StormancerWrapper.cpp" />
     <ClCompile Include="..\..\Plugins\Authentication\AuthenticationPlugin.cpp">
-      <Filter>Plugins</Filter>
+      <Filter>Plugins\Authentication</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Plugins\Authentication\AuthenticationService.cpp">
-      <Filter>Plugins</Filter>
+      <Filter>Plugins\Authentication</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Plugins\BugReport\BugReportPlugin.cpp">
-      <Filter>Plugins</Filter>
+      <Filter>Plugins\BugReport</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Plugins\BugReport\BugReportService.cpp">
-      <Filter>Plugins</Filter>
+      <Filter>Plugins\BugReport</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Plugins\GameSession\GameSessionPlugin.cpp">
-      <Filter>Plugins</Filter>
+      <Filter>Plugins\GameSession</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Plugins\GameSession\GameSessionService.cpp">
-      <Filter>Plugins</Filter>
+      <Filter>Plugins\GameSession</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Plugins\GameVersion\GameVersionPlugin.cpp">
-      <Filter>Plugins</Filter>
+      <Filter>Plugins\GameVersion</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Plugins\GameVersion\GameVersionService.cpp">
-      <Filter>Plugins</Filter>
+      <Filter>Plugins\GameVersion</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Plugins\Leaderboard\LeaderboardPlugin.cpp">
-      <Filter>Plugins</Filter>
+      <Filter>Plugins\Leaderboard</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Plugins\Leaderboard\LeaderboardService.cpp">
-      <Filter>Plugins</Filter>
+      <Filter>Plugins\Leaderboard</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Plugins\Matchmaking\MatchmakingPlugin.cpp">
-      <Filter>Plugins</Filter>
+      <Filter>Plugins\Matchmaking</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Plugins\Matchmaking\MatchmakingService.cpp">
-      <Filter>Plugins</Filter>
+      <Filter>Plugins\Matchmaking</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StormancerWrapper.h" />
     <ClInclude Include="..\..\Plugins\Authentication\AuthenticationPlugin.h">
-      <Filter>Plugins</Filter>
+      <Filter>Plugins\Authentication</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Plugins\Authentication\AuthenticationService.h">
-      <Filter>Plugins</Filter>
+      <Filter>Plugins\Authentication</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Plugins\BugReport\BugReportPlugin.h">
-      <Filter>Plugins</Filter>
+      <Filter>Plugins\BugReport</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Plugins\BugReport\BugReportService.h">
-      <Filter>Plugins</Filter>
+      <Filter>Plugins\BugReport</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Plugins\GameSession\GameSessionPlugin.h">
-      <Filter>Plugins</Filter>
+      <Filter>Plugins\GameSession</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Plugins\GameSession\GameSessionService.h">
-      <Filter>Plugins</Filter>
+      <Filter>Plugins\GameSession</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Plugins\GameVersion\GameVersionPlugin.h">
-      <Filter>Plugins</Filter>
+      <Filter>Plugins\GameVersion</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Plugins\GameVersion\GameVersionService.h">
-      <Filter>Plugins</Filter>
+      <Filter>Plugins\GameVersion</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Plugins\Leaderboard\LeaderboardDto.h">
-      <Filter>Plugins</Filter>
+      <Filter>Plugins\Leaderboard</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Plugins\Leaderboard\LeaderboardPlugin.h">
-      <Filter>Plugins</Filter>
+      <Filter>Plugins\Leaderboard</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Plugins\Leaderboard\LeaderboardService.h">
-      <Filter>Plugins</Filter>
+      <Filter>Plugins\Leaderboard</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Plugins\Matchmaking\MatchmakingPlugin.h">
-      <Filter>Plugins</Filter>
+      <Filter>Plugins\Matchmaking</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Plugins\Matchmaking\MatchMakingService.h">
-      <Filter>Plugins</Filter>
+      <Filter>Plugins\Matchmaking</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Plugins\PlayerProfile\PlayerProfile.h">
-      <Filter>Plugins</Filter>
+      <Filter>Plugins\PlayerProfile</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Plugins\PlayerProfile\PlayerProfilePlugin.h">
-      <Filter>Plugins</Filter>
+      <Filter>Plugins\PlayerProfile</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Plugins\PlayerProfile\PlayerProfileService.h">
-      <Filter>Plugins</Filter>
+      <Filter>Plugins\PlayerProfile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Plugins">
       <UniqueIdentifier>{62ff109e-390a-4aba-a478-9ef8317a1dbb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins\Authentication">
+      <UniqueIdentifier>{8503a62c-02d0-4e49-84df-f833c4c3ca0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins\BugReport">
+      <UniqueIdentifier>{d541ebcb-afcd-4b86-9e67-39442ac492ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins\GameSession">
+      <UniqueIdentifier>{8e28f486-3be4-4f48-94e1-c764b4d57c6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins\GameVersion">
+      <UniqueIdentifier>{4c4355c9-3759-4667-ac90-7464a75cbe54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins\Leaderboard">
+      <UniqueIdentifier>{056a2778-03b6-449a-994b-aa477d4aa347}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins\Matchmaking">
+      <UniqueIdentifier>{3c0bd910-5620-4f3b-93f8-6967971cca20}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins\PlayerProfile">
+      <UniqueIdentifier>{06422710-b112-46e4-83fe-8ab8123a6d2d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

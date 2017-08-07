@@ -38,7 +38,7 @@ namespace Stormancer
 		
 		/// Log details about an exception.
 		/// \param e The exception.
-		void log(const std::exception& ex);
+		void log(const std::exception& ex) override;
 
 	private:
 	

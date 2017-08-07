@@ -28,7 +28,7 @@
 // winsock.h must be linked against WSock32.lib.  If these two are mixed up the flag won't work correctly
 #include "WindowsIncludes.h"
 
-#elif defined(ANDROID)
+#elif defined(ANDROID) || defined(IOSBUILD)
 #include <netdb.h>
 #else
 #include <sys/socket.h>

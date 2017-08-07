@@ -25,8 +25,6 @@ namespace Stormancer
 			}
 			_handlers[msgId] = handler;
 		};
-
-
 	}
 
 	RequestProcessor::~RequestProcessor()
@@ -63,11 +61,11 @@ namespace Stormancer
 					{
 						t.get();
 					}
-					catch (const std::exception& e)
+					catch (const std::exception& ex)
 					{
-						context->error([e](bytestream* stream) {
+						context->error([ex](bytestream* stream) {
 							msgpack::packer<bytestream> pk(stream);
-							pk.pack(std::string("An error occured on the server. ") + e.what());
+							pk.pack(std::string("An error occured on the server. ") + ex.what());
 						});
 						return;
 					}
@@ -84,8 +82,6 @@ namespace Stormancer
 		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG, new handlerFunction([this](Packet_ptr p) {
 			uint16 id;
 			*(p->stream) >> id;
-
-			static const void* saddress = static_cast<const void*>(this);
 
 			SystemRequest_ptr request = freeRequestSlot(id);
 
@@ -156,12 +152,12 @@ namespace Stormancer
 				if (!request->complete)
 				{
 					request->complete = true;
-					request->tce.set_exception<std::exception>(std::runtime_error(msg));
+					request->tce.set_exception(std::runtime_error(msg+"(msgId:"+std::to_string(request->operation())+ ")"));
 				}
 			}
 			else
 			{
-				ILogger::instance()->log(LogLevel::Warn, "RequestProcessor", "Unknown request id :" + to_string(id));
+				ILogger::instance()->log(LogLevel::Warn, "RequestProcessor/error", "Unknown request id :" + to_string(id));
 			}
 
 			return true;
@@ -174,7 +170,7 @@ namespace Stormancer
 		if (peer)
 		{
 			auto request = reserveRequestSlot(msgId,tce);
-
+			
 			try
 			{
 				peer->sendSystem((byte)MessageIDTypes::ID_SYSTEM_REQUEST, [request, &writer, msgId](bytestream* stream) {
@@ -183,9 +179,9 @@ namespace Stormancer
 					writer(stream);
 				}, priority);
 			}
-			catch (std::exception& e)
+			catch (const std::exception& ex)
 			{
-				tce.set_exception(e);
+				tce.set_exception(ex);
 			}
 		}
 		else

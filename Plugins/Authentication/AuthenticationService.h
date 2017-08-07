@@ -122,7 +122,6 @@ namespace Stormancer
 		std::string _loginRoute = "login";
 		bool _authenticated = false;
 		bool _authenticationInProgress = false;
-		bool _authenticationSceneRetrieving = false;
 		std::string _userId;
 		std::string _username;
 		Client* _client;

@@ -395,14 +395,14 @@ namespace Stormancer
 						setConnectionState(connection->getConnectionState());
 
 						// Flatten all external addresses into a comma-separated string
-						std::stringstream addrs;
+						/*std::stringstream addrs;
 						auto transport = _dependencyResolver->resolve<ITransport>();
 						for (const std::string& addr : transport->externalAddresses())
 						{
 							addrs << addr << ",";
 						}
 						_metadata["externalAddrs"] = addrs.str();
-						_metadata["externalAddrs"].pop_back();
+						_metadata["externalAddrs"].pop_back();*/
 
 						connection->setMetadata(_metadata);
 						_serverConnection = weakptr;

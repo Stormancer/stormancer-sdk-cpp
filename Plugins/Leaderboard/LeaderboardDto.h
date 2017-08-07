@@ -1,9 +1,13 @@
 #pragma once
-#include <headers.h>
+#include <string>
+#include <vector>
 #include <msgpack_define.h>
 
 namespace Stormancer
 {
+	using int8 = signed char;
+	using int32 = int;
+
 	enum class ComparisonOperator : int8
 	{
 		GREATER_THAN_OR_EQUAL = 0,

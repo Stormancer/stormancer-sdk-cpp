@@ -59,7 +59,7 @@ namespace Stormancer
 
 		builder->service((byte)SystemRequestIDTypes::ID_P2P_TEST_CONNECTIVITY_CLIENT, [this](RequestContext* ctx) {
 			auto candidate = _serializer->deserialize<ConnectivityCandidate>(ctx->inputStream());
-
+			_logger->log(LogLevel::Debug, "p2p", "Starting connectivity test (CLIENT) " + candidate.clientEndpointCandidate.address + " => " + candidate.listeningEndpointCandidate.address);
 			return _transport->sendPing(candidate.listeningEndpointCandidate.address).then([this, ctx, candidate](pplx::task<int> t) {
 				auto latency = (int)t.get();
 				_logger->log(LogLevel::Debug, "p2p", "Connectivity test complete : " + candidate.clientEndpointCandidate.address + " => " + candidate.listeningEndpointCandidate.address + " ping : " + std::to_string(latency));
@@ -74,7 +74,7 @@ namespace Stormancer
 
 		builder->service((byte)SystemRequestIDTypes::ID_P2P_TEST_CONNECTIVITY_HOST, [this](RequestContext* ctx) {
 			auto candidate = _serializer->deserialize<ConnectivityCandidate>(ctx->inputStream());
-
+			_logger->log(LogLevel::Debug, "p2p", "Starting connectivity test (LISTENER) " + candidate.clientEndpointCandidate.address + " => " + candidate.listeningEndpointCandidate.address);
 			_transport->openNat(candidate.clientEndpointCandidate.address);
 			ctx->send([](bytestream*) {});
 			return pplx::task_from_result();
@@ -82,7 +82,8 @@ namespace Stormancer
 
 		builder->service((byte)SystemRequestIDTypes::ID_P2P_CONNECT_HOST, [this](RequestContext* ctx) {
 			auto candidate = _serializer->deserialize<ConnectivityCandidate>(ctx->inputStream());
-			_connections->addPendingConnection(candidate.clientEndpointCandidate.address, candidate.clientPeer)
+			_logger->log(LogLevel::Debug, "p2p", "Waiting connection " + candidate.clientEndpointCandidate.address + " => " + candidate.listeningEndpointCandidate.address);
+			_connections->addPendingConnection(candidate.clientPeer)
 				.then([this, candidate](pplx::task<std::shared_ptr<IConnection>> t) {
 
 				std::string sessionId(candidate.sessionId.begin(), candidate.sessionId.end());
@@ -95,7 +96,8 @@ namespace Stormancer
 
 		builder->service((byte)SystemRequestIDTypes::ID_P2P_CONNECT_CLIENT, [this](RequestContext* ctx) {
 			auto candidate = _serializer->deserialize<ConnectivityCandidate>(ctx->inputStream());
-			_connections->addPendingConnection(candidate.listeningEndpointCandidate.address, candidate.listeningPeer)
+			_logger->log(LogLevel::Debug, "p2p", "Connecting... " + candidate.clientEndpointCandidate.address + " => " + candidate.listeningEndpointCandidate.address);
+			_connections->addPendingConnection(candidate.listeningPeer)
 				.then([this, candidate](pplx::task<std::shared_ptr<IConnection>> t) {
 
 				std::string sessionId(candidate.sessionId.begin(), candidate.sessionId.end());

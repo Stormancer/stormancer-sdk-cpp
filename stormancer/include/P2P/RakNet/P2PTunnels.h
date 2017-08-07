@@ -7,6 +7,7 @@
 #include "P2P/P2PTunnel.h"
 #include "P2P/ServerDescriptor.h"
 #include "Configuration.h"
+#include "Logger/ILogger.h"
 namespace RakNet
 {
 	struct RNS2RecvStruct;
@@ -34,7 +35,9 @@ namespace Stormancer
 
 #pragma region public_methods
 
-		P2PTunnels(std::shared_ptr<RequestProcessor> sysCall, std::shared_ptr<IConnectionManager> connections, std::shared_ptr<Serializer> serializer, std::shared_ptr<Configuration> configuration);
+		P2PTunnels(std::shared_ptr<RequestProcessor> sysCall, std::shared_ptr<IConnectionManager> connections, std::shared_ptr<Serializer> serializer
+			, std::shared_ptr<Configuration> configuration
+			, std::shared_ptr<ILogger> logger);
 		void receiveFrom(uint64 id, bytestream* stream);
 		std::shared_ptr<P2PTunnel> createServer(std::string serverId, std::shared_ptr<P2PTunnels> tunnels);
 		pplx::task<std::shared_ptr<P2PTunnel>> openTunnel(uint64 connectionId, std::string serverId);
@@ -53,6 +56,7 @@ namespace Stormancer
 		std::shared_ptr<RequestProcessor> _sysClient;
 		std::shared_ptr<IConnectionManager> _connections;
 		std::shared_ptr<Serializer> _serializer;
+		std::shared_ptr<ILogger> _logger;
 		std::shared_ptr<Configuration> _config;
 		std::unordered_map<std::string, ServerDescriptor> _servers;
 		//Tunnel targeting the key [remotePeerId,handle]

@@ -19,6 +19,7 @@ namespace Stormancer
 		pplx::task_completion_event<Packet_ptr> tce;
 		bool complete = false;
 
+		byte operation();
 #pragma endregion
 
 	private:

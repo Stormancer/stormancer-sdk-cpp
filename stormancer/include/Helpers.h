@@ -123,7 +123,7 @@ namespace Stormancer
 
 	pplx::task<void> taskIf(bool condition, std::function<pplx::task<void>()> action);
 
-	pplx::task<void> taskDelay(int milliseconds, pplx::cancellation_token token = pplx::cancellation_token::none());
+	pplx::task<void> taskDelay(std::chrono::milliseconds timeOffset, pplx::cancellation_token token = pplx::cancellation_token::none());
 
 	template<typename T, typename... U>
 	pplx::task<T> invokeWrapping(std::function<pplx::task<T>(U...)> func, U&... argument)
@@ -264,7 +264,7 @@ namespace Stormancer
 			return true;
 		});
 		// Create a task that returns false after the specified timeout.
-		pplx::task<bool> failure_task = taskDelay(timeout).then([]
+		pplx::task<bool> failure_task = taskDelay(std::chrono::milliseconds(timeout)).then([]
 		{
 			return false;
 		});

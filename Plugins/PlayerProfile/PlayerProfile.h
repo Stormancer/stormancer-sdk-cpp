@@ -1,5 +1,6 @@
 #pragma once
-#include <headers.h>
+#include <string>
+#include <msgpack_define.h>
 
 namespace Stormancer
 {

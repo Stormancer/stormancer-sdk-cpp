@@ -14,6 +14,7 @@
 
 void Stormancer::ConfigureContainer(DependencyResolver* dr, Configuration_ptr config)
 {
+	dr->registerDependency<Configuration>(config);
 	dr->registerDependency<ILogger>(config->logger);
 
 	dr->registerDependency<ITokenHandler>([](DependencyResolver*) {
@@ -37,7 +38,7 @@ void Stormancer::ConfigureContainer(DependencyResolver* dr, Configuration_ptr co
 
 
 	dr->registerDependency<P2PPacketDispatcher>([](DependencyResolver* dr) {
-		return std::make_shared<P2PPacketDispatcher>(dr->resolve<P2PTunnels>(), dr->resolve<IConnectionManager>());
+		return std::make_shared<P2PPacketDispatcher>(dr->resolve<P2PTunnels>(), dr->resolve<IConnectionManager>(), dr->resolve<ILogger>());
 	}, true);
 	dr->registerDependency<SceneDispatcher>([](DependencyResolver* resolver) {
 		return std::make_shared<SceneDispatcher>(resolver->resolve<IActionDispatcher>());
@@ -73,7 +74,8 @@ void Stormancer::ConfigureContainer(DependencyResolver* dr, Configuration_ptr co
 			dr->resolve<RequestProcessor>(),
 			dr->resolve<IConnectionManager>(),
 			dr->resolve<Serializer>(), 
-			dr->resolve<Configuration>());
+			dr->resolve<Configuration>(),
+			dr->resolve<ILogger>());
 	}, true);
 
 	dr->registerDependency<P2PService>([](DependencyResolver* dr) {

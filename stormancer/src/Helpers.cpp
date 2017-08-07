@@ -97,10 +97,10 @@ namespace Stormancer
 		}
 	}
 
-	pplx::task<void> taskDelay(int milliseconds, pplx::cancellation_token token)
+	pplx::task<void> taskDelay(std::chrono::milliseconds milliseconds, pplx::cancellation_token token)
 	{
 		pplx::task<void> sleepTask = pplx::task<void>([milliseconds]() {
-			std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
+			std::this_thread::sleep_for(milliseconds);
 		}, pplx::task_options(token));
 
 		if (token.is_cancelable())

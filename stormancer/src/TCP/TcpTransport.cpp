@@ -298,11 +298,11 @@ namespace Stormancer
 	std::shared_ptr<TcpConnection> TcpTransport::createNewConnection(std::string endpoint)
 	{
 		_logger->log(LogLevel::Trace, "TcpTransport", "Connected", endpoint.c_str());
-		uint64 cid = _handler->generateNewConnectionId(endpoint);
+		uint64 cid = 0;
 		std::shared_ptr<TcpConnection> connection = std::make_shared<TcpConnection>(_socketId, cid, _host);
 		connection->onClose([this, endpoint](std::string reason) {
 			_logger->log(LogLevel::Trace, "tcpTransport", "Closed ", endpoint.c_str());
-			onRequestClose(_connection);
+			onRequestClose();
 		});
 		_connection = connection;
 
@@ -326,7 +326,7 @@ namespace Stormancer
 		}
 	}
 
-	void TcpTransport::onRequestClose(std::shared_ptr<TcpConnection>  connection)
+	void TcpTransport::onRequestClose()
 	{
 		_socketId = nullptr;
 	}

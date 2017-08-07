@@ -137,7 +137,7 @@ namespace
 
 		logger->log(LogLevel::Debug, "test_rpc_client", "RPC request received", message);
 
-		Stormancer::taskDelay(1000, rc->cancellationToken()).wait();
+		Stormancer::taskDelay(std::chrono::milliseconds(1000), rc->cancellationToken()).wait();
 
 		if (!rc->cancellationToken().is_canceled())
 		{

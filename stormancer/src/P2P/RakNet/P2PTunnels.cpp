@@ -8,8 +8,12 @@
 
 namespace Stormancer
 {
-	P2PTunnels::P2PTunnels(std::shared_ptr<RequestProcessor> sysCall, std::shared_ptr<IConnectionManager> connections, std::shared_ptr<Serializer> serializer, std::shared_ptr<Configuration> configuration)
+	P2PTunnels::P2PTunnels(std::shared_ptr<RequestProcessor> sysCall, std::shared_ptr<IConnectionManager> connections, 
+		std::shared_ptr<Serializer> serializer, 
+		std::shared_ptr<Configuration> configuration,
+		std::shared_ptr<ILogger> logger)
 	{
+		_logger = logger;
 		_sysClient = sysCall;
 		_connections = connections;
 		_serializer = serializer;
@@ -188,6 +192,7 @@ namespace Stormancer
 			{
 				client->hostPort = recvStruct->systemAddress.GetPort();
 			}
+			_logger->log(LogLevel::Trace, "Sending  packet through tunnel. destination: ", std::to_string(connection->id()));
 			connection->sendRaw((byte)MessageIDTypes::ID_P2P_TUNNEL, [client, recvStruct](bytestream* s) {
 				*s << client->handle;
 				s->write(recvStruct->data, recvStruct->bytesRead);

@@ -108,20 +108,24 @@ namespace Stormancer
 				uint16 statusCode = response.status_code();
 				auto msgStr = "HTTP request on '" + baseUri + "' returned status code " + std::to_string(statusCode);
 				ILogger::instance()->log(LogLevel::Trace, "ApiClient", msgStr);
-				if (ensureSuccessStatusCode(statusCode))
-				{
-					concurrency::streams::stringstreambuf ss;
-					return response.body().read_to_end(ss).then([this, endpoints, ss](size_t) {
-						std::string responseText = ss.collection();
-						ILogger::instance()->log(LogLevel::Trace, "ApiClient", "Response", responseText);
-						return _tokenHandler->decodeToken(responseText);
-					});
-				}
-				else
-				{
-					(*errors).push_back("[" + msgStr + ":" + std::to_string(statusCode) + "]");
-					return getSceneEndpointImpl(endpoints, errors, accountId, applicationName, sceneId);
-				}
+				concurrency::streams::stringstreambuf ss;
+				return response.body().read_to_end(ss).then([this, endpoints, ss,statusCode,errors,msgStr,accountId,applicationName,sceneId](size_t) {
+					std::string responseText = ss.collection();
+					ILogger::instance()->log(LogLevel::Trace, "ApiClient", "Response", responseText);
+
+					if (ensureSuccessStatusCode(statusCode))
+					{
+						return pplx::task_from_result(_tokenHandler->decodeToken(responseText));
+					}
+					else
+					{
+						(*errors).push_back("[" + msgStr + ":" + std::to_string(statusCode) + "]");
+						return getSceneEndpointImpl(endpoints, errors, accountId, applicationName, sceneId);
+					}
+					
+				});
+
+				
 			}
 			catch (const std::exception& ex)
 			{
