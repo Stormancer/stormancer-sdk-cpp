@@ -36,7 +36,8 @@ namespace Stormancer
 		DependencyResolver* dependencyResolver() override;
 		ConnectionState getConnectionState() const override;
 		rxcpp::observable<ConnectionState> getConnectionStateChangedObservable() const override;
-		Action<std::string>::TIterator onClose(std::function<void(std::string)> callback);
+		Action<std::string>::TIterator onClose(std::function<void(std::string)> callback) override;
+		Action<std::string>& onCloseAction() override;
 
 #pragma endregion
 

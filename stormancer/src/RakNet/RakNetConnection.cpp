@@ -15,7 +15,8 @@ namespace Stormancer
 	}
 
 	RakNetConnection::~RakNetConnection()
-	{
+	{		
+		close("Connection object destroyed");
 	}
 
 	RakNet::RakNetGUID RakNetConnection::guid() const

@@ -22,6 +22,7 @@
 
 
 
+
 namespace
 {
 
@@ -55,7 +56,7 @@ namespace Stormancer
 		, _synchronisedClock(config->synchronisedClock)
 	{
 		ILogger::setInstance(config->logger);
-		
+
 		ConfigureContainer(this->dependencyResolver(), config);
 
 #ifdef STORMANCER_LOG_CLIENT
@@ -81,30 +82,31 @@ namespace Stormancer
 #endif
 	}
 
-	Client::~Client()
+	pplx::task<void> Client::destroy()
 	{
 		auto logger = _dependencyResolver->resolve<ILogger>();
 
-#ifdef STORMANCER_LOG_CLIENT
+#ifdef STORMANCER_LOG_CLIETN
 		logger->log(LogLevel::Trace, "Client", "Deleting client...");
 #endif
 
 		_cts.cancel();
 
-		if (_connectionState == ConnectionState::Connected)
-		{
-			disconnect(true).then([logger](pplx::task<void> t) {
-				try
-				{
-					t.get();
-				}
-				catch (const std::exception& ex)
-				{
-					logger->log(LogLevel::Warn, "Client", "Client disconnection failed", ex.what());
-				}
-			}).wait();
-		}
 
+		return disconnect().then([logger](pplx::task<void> t) {
+			try
+			{
+				t.get();
+			}
+			catch (const std::exception& ex)
+			{
+				logger->log(LogLevel::Warn, "Client", "Client disconnection failed", ex.what());
+			}
+		});
+	}
+
+	Client::~Client()
+	{
 		for (auto plugin : _plugins)
 		{
 			delete plugin;
@@ -115,10 +117,6 @@ namespace Stormancer
 			std::lock_guard<std::mutex> lg(_scenesMutex);
 			_scenes.clear();
 		}
-
-#ifdef STORMANCER_LOG_CLIENT
-		logger->log(LogLevel::Trace, "Client", "Client deleted");
-#endif
 	}
 
 	Client_ptr Client::create(Configuration_ptr config)
@@ -131,7 +129,14 @@ namespace Stormancer
 
 		auto client = std::shared_ptr<Client>(new Client(config), [](Client* client)
 		{
-			delete client;
+			client->destroy().then([client](pplx::task<void> t) {
+				try
+				{
+					t.get();
+				}
+				catch (const std::exception&) {}
+				delete client;
+			});
 		});
 		client->initialize();
 		return client;
@@ -173,7 +178,15 @@ namespace Stormancer
 
 	ILogger_ptr Client::logger() const
 	{
-		return _dependencyResolver->resolve<ILogger>();
+		auto result = _dependencyResolver->resolve<ILogger>();
+		if (result)
+		{
+			return result;
+		}
+		else
+		{
+			return NullLogger::instance();
+		}
 	}
 
 	pplx::task<Scene_ptr> Client::connectToPublicScene(const std::string& sceneId, const SceneInitializer& initializer)
@@ -582,9 +595,29 @@ namespace Stormancer
 		return task.then([](Scene_ptr) {});
 	}
 
-	pplx::task<void> Client::disconnect(bool immediate)
+	pplx::task<void> Client::disconnect()
 	{
-		if (_connectionState == ConnectionState::Connected)
+		bool proceedToDisconnection = false;
+
+		{
+			std::lock_guard<std::mutex> lg(_connectionMutex);
+			if (_connectionState == ConnectionState::Connected)
+			{
+				proceedToDisconnection = true;
+				setConnectionState(ConnectionState::Disconnecting);
+			}
+			else if (_connectionState == ConnectionState::Connecting)
+			{
+				return pplx::task_from_exception<void>(std::runtime_error("Client is connecting"));
+			}
+			else if (_connectionState == ConnectionState::Disconnected)
+			{
+				return pplx::task_from_result();
+			}
+		}
+
+
+		if (proceedToDisconnection)
 		{
 			// Stops the synchronised clock, disconnect the scenes, closes the server connection then stops the underlying transports.
 
@@ -597,34 +630,24 @@ namespace Stormancer
 				}
 			};
 
-			_disconnectionTask = disconnectAllScenes(immediate);
+			disconnectAllScenes().then([this, clientDisconnected](pplx::task<void> t) {
+				try
+				{
+					t.get();
+				}
+				catch (const std::exception&)
+				{
 
-			if (immediate)
-			{
+				}
 				clientDisconnected();
-			}
-			else
-			{
-				// Keep the client alive until properly disconnected.
-				auto sharedThis = shared_from_this();
-				_disconnectionTask = _disconnectionTask.then([clientDisconnected, sharedThis]() {
-					clientDisconnected();
-				});
-			}
-		}
-		else if (_connectionState == ConnectionState::Connecting)
-		{
-			_disconnectionTask = pplx::task_from_exception<void>(std::runtime_error("Client is connecting"));
-		}
-		else if (_connectionState == ConnectionState::Disconnected)
-		{
-			_disconnectionTask = pplx::task_from_result();
+				_disconnectionTce.set();
+			});
 		}
 
-		return _disconnectionTask;
+		return pplx::create_task(_disconnectionTce);;
 	}
 
-	pplx::task<void> Client::disconnect(Scene* scene, bool immediate)
+	pplx::task<void> Client::disconnect(Scene* scene)
 	{
 		if (!scene)
 		{
@@ -659,10 +682,9 @@ namespace Stormancer
 				plugin->sceneDisconnected(scene);
 			}
 
-#ifdef STORMANCER_LOG_CLIENT
-			auto logger = _dependencyResolver->resolve<ILogger>();
-			logger->log(LogLevel::Debug, "client", "Scene disconnected", sceneId);
-#endif
+			//#ifdef STORMANCER_LOG_CLIENT			
+			//			logger()->log(LogLevel::Debug, "client", "Scene disconnected", sceneId);
+			//#endif
 
 			scene->setConnectionState(ConnectionState::Disconnected);
 		};
@@ -673,36 +695,18 @@ namespace Stormancer
 				t.get();
 			}
 			catch (...) {}
-		
+
 		});
 
-		if (immediate)
-		{
-			// If the disconnection is immediate, we stop propagating any exception and assume the disconnection succeed
-			disconnectTask.then([this](pplx::task<void> t) {
-				try
-				{
-					t.wait();
-				}
-				catch (const std::exception& ex)
-				{
-					ILogger::instance()->log(LogLevel::Warn, "Client", "Scene disconnection failed", ex.what());
-				}
-			});
-			disconnectTask = pplx::task_from_result();
+		disconnectTask = disconnectTask.then([sceneDisconnected]() {
 			sceneDisconnected();
-		}
-		else
-		{
-			disconnectTask = disconnectTask.then([sceneDisconnected]() {
-				sceneDisconnected();
-			});
-		}
+		});
+
 
 		return disconnectTask;
 	}
 
-	pplx::task<void> Client::disconnectAllScenes(bool immediate)
+	pplx::task<void> Client::disconnectAllScenes()
 	{
 		std::vector<pplx::task<void>> tasks;
 
@@ -710,8 +714,8 @@ namespace Stormancer
 		auto scenesToDisconnect = _scenes;
 		for (auto it : scenesToDisconnect)
 		{
-			tasks.push_back(it.second.task.then([this, immediate](Scene_ptr scene) {
-				return disconnect(scene.get(), immediate);
+			tasks.push_back(it.second.task.then([this](Scene_ptr scene) {
+				return disconnect(scene.get());
 			}));
 		}
 

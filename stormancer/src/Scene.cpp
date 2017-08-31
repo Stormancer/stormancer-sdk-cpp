@@ -258,7 +258,7 @@ namespace Stormancer
 			auto client = _client.lock();
 			if (client)
 			{
-				_disconnectTask = client->disconnect(this, immediate);
+				_disconnectTask = client->disconnect(this);
 			}
 			else
 			{

@@ -175,6 +175,8 @@
     <ClCompile Include="..\..\Plugins\Authentication\AuthenticationService.cpp" />
     <ClCompile Include="..\..\Plugins\BugReport\BugReportPlugin.cpp" />
     <ClCompile Include="..\..\Plugins\BugReport\BugReportService.cpp" />
+    <ClCompile Include="..\..\Plugins\Friends\Friends.cpp" />
+    <ClCompile Include="..\..\Plugins\Friends\FriendsPlugin.cpp" />
     <ClCompile Include="..\..\Plugins\GameSession\GameSessionPlugin.cpp" />
     <ClCompile Include="..\..\Plugins\GameSession\GameSessionService.cpp" />
     <ClCompile Include="..\..\Plugins\GameVersion\GameVersionPlugin.cpp" />
@@ -191,6 +193,8 @@
     <ClInclude Include="..\..\Plugins\Authentication\AuthenticationService.h" />
     <ClInclude Include="..\..\Plugins\BugReport\BugReportPlugin.h" />
     <ClInclude Include="..\..\Plugins\BugReport\BugReportService.h" />
+    <ClInclude Include="..\..\Plugins\Friends\Friends.h" />
+    <ClInclude Include="..\..\Plugins\Friends\FriendsPlugin.h" />
     <ClInclude Include="..\..\Plugins\GameSession\GameSessionPlugin.h" />
     <ClInclude Include="..\..\Plugins\GameSession\GameSessionService.h" />
     <ClInclude Include="..\..\Plugins\GameVersion\GameVersionPlugin.h" />

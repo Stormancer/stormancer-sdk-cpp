@@ -101,6 +101,8 @@ namespace Stormancer
 		std::string userId();
 		std::string getUsername();
 
+		pplx::task<std::string> getUserIdByPseudo(std::string pseudo);
+
 		GameConnectionState connectionState() const;
 		Action<GameConnectionState>& connectionStateChangedAction();
 		Action<GameConnectionState>::TIterator onConnectionStateChanged(const std::function<void(GameConnectionState)>& callback);

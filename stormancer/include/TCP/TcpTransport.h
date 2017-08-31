@@ -19,7 +19,7 @@ namespace Stormancer
 		TcpTransport(DependencyResolver* resolver);
 		~TcpTransport();
 		void start(std::string type, std::shared_ptr<IConnectionManager> handler, pplx::cancellation_token token = pplx::cancellation_token::none(), uint16 port = 0, uint16 maxConnections = 0) override;
-		pplx::task<std::weak_ptr<IConnection>> connect(std::string endpoint) override;
+		pplx::task<std::shared_ptr<IConnection>> connect(std::string endpoint) override;
 		bool isRunning() const override;
 		std::string name() const override;
 		uint64 id() const override;

@@ -10,25 +10,27 @@ namespace Stormancer
 	public:
 
 		RelayConnection(std::shared_ptr<IConnection> serverConnection, std::string address, uint64 id);
-		virtual void sendSystem(byte msgId, std::function<void(bytestream*)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY) override;
-		virtual void sendToScene(byte sceneIndex, uint16 route, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability) override;
-		virtual void sendRaw(byte msgId, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability) override;
-		virtual void setApplication(std::string account, std::string application) override;
-		virtual void close(std::string reason = "") override;
-		virtual std::string ipAddress() const override;
-		virtual int ping() const override;
-		virtual uint64 id() const override;
-		virtual time_t connectionDate() const override;
-		virtual const std::string& account() const override;
-		virtual const std::string& application() const override;
-		virtual const std::map<std::string, std::string>& metadata() const override;
-		virtual std::string metadata(const std::string& key) const override;
-		virtual void setMetadata(const std::map<std::string, std::string>& metadata) override;
-		virtual void setMetadata(const std::string& key, const std::string & value) override;
-		virtual DependencyResolver* dependencyResolver() override;
-		virtual ConnectionState getConnectionState() const override;
-		virtual rxcpp::observable<ConnectionState> getConnectionStateChangedObservable() const override;
-		virtual void setConnectionState(ConnectionState connectionState) override;
+		void sendSystem(byte msgId, std::function<void(bytestream*)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY) override;
+		void sendToScene(byte sceneIndex, uint16 route, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability) override;
+		void sendRaw(byte msgId, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability) override;
+		void setApplication(std::string account, std::string application) override;
+		void close(std::string reason = "") override;
+		std::string ipAddress() const override;
+		int ping() const override;
+		uint64 id() const override;
+		time_t connectionDate() const override;
+		const std::string& account() const override;
+		const std::string& application() const override;
+		const std::map<std::string, std::string>& metadata() const override;
+		std::string metadata(const std::string& key) const override;
+		void setMetadata(const std::map<std::string, std::string>& metadata) override;
+		void setMetadata(const std::string& key, const std::string & value) override;
+		DependencyResolver* dependencyResolver() override;
+		ConnectionState getConnectionState() const override;
+		rxcpp::observable<ConnectionState> getConnectionStateChangedObservable() const override;
+		void setConnectionState(ConnectionState connectionState) override;
+		Action<std::string>::TIterator onClose(std::function<void(std::string)> callback) override;
+		Action<std::string>& onCloseAction() override;
 
 	private:
 		std::shared_ptr<IConnection> _serverConnection;

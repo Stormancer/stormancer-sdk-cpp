@@ -51,7 +51,7 @@ namespace Stormancer
 
 		/// Disconnect and close all connections.
 		/// this method returns nothing. So it's useful for application close.
-		STORMANCER_DLL_API pplx::task<void> disconnect(bool immediate = false);
+		STORMANCER_DLL_API pplx::task<void> disconnect();
 
 		/// Get sync clock value
 		STORMANCER_DLL_API int64 clock() const;
@@ -95,8 +95,9 @@ namespace Stormancer
 		~Client();
 		void initialize();
 		pplx::task<void> connectToScene(const std::string& sceneId, const std::string& sceneToken, const std::vector<Route_ptr>& localRoutes);
-		pplx::task<void> disconnect(Scene* scene, bool immediate = false);
-		pplx::task<void> disconnectAllScenes(bool immediate = false);
+		pplx::task<void> disconnect(Scene* scene);
+		pplx::task<void> disconnectAllScenes();
+		pplx::task<void> destroy();
 		pplx::task<Scene_ptr> getSceneInternal(const std::string& sceneId, const SceneEndpoint& sceneEndpoint);
 		void transport_packetReceived(Packet_ptr packet);
 		pplx::task<void> updateServerMetadata();
@@ -123,6 +124,7 @@ namespace Stormancer
 #pragma region private_members
 
 		std::shared_ptr<DependencyResolver> _dependencyResolver;
+		std::mutex _connectionStateMutex;
 		ConnectionState _connectionState = ConnectionState::Disconnected;
 		bool _connectionStateObservableCompleted = false;
 		rxcpp::subjects::subject<ConnectionState> _connectionStateObservable;
@@ -141,7 +143,7 @@ namespace Stormancer
 		std::vector<IPlugin*> _plugins;
 		std::mutex _connectionMutex;
 		pplx::task<void> _connectionTask;
-		pplx::task<void> _disconnectionTask;
+		pplx::task_completion_event<void> _disconnectionTce;
 		bool _connectionTaskSet = false;
 		Action<ConnectionState> _onConnectionStateChanged;
 		std::shared_ptr<Configuration> _config;

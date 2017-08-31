@@ -192,7 +192,7 @@ namespace Stormancer
 			{
 				client->hostPort = recvStruct->systemAddress.GetPort();
 			}
-			_logger->log(LogLevel::Trace, "Sending  packet through tunnel. destination: ", std::to_string(connection->id()));
+			//_logger->log(LogLevel::Trace, "Sending  packet through tunnel. destination: ", std::to_string(connection->id()));
 			connection->sendRaw((byte)MessageIDTypes::ID_P2P_TUNNEL, [client, recvStruct](bytestream* s) {
 				*s << client->handle;
 				s->write(recvStruct->data, recvStruct->bytesRead);

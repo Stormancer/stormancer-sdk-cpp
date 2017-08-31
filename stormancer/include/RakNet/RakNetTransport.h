@@ -15,7 +15,7 @@ namespace Stormancer
 	class ConnectionRequest
 	{
 	public:
-		pplx::task_completion_event<std::weak_ptr<IConnection>> tce;
+		pplx::task_completion_event<std::shared_ptr<IConnection>> tce;
 		std::string endpoint;
 	};
 
@@ -28,7 +28,7 @@ namespace Stormancer
 		RakNetTransport(DependencyResolver* resolver);
 		~RakNetTransport();
 		void start(std::string type, std::shared_ptr<IConnectionManager> handler, pplx::cancellation_token token = pplx::cancellation_token::none(), uint16 maxConnections = 10, uint16 serverPort = 0) override;
-		pplx::task<std::weak_ptr<IConnection>> connect(std::string endpoint) override;
+		pplx::task<std::shared_ptr<IConnection>> connect(std::string endpoint) override;
 		bool isRunning() const override;
 		std::string name() const override;
 		uint64 id() const override;

@@ -60,6 +60,15 @@ namespace Stormancer
 		builder->service((byte)SystemRequestIDTypes::ID_P2P_TEST_CONNECTIVITY_CLIENT, [this](RequestContext* ctx) {
 			auto candidate = _serializer->deserialize<ConnectivityCandidate>(ctx->inputStream());
 			_logger->log(LogLevel::Debug, "p2p", "Starting connectivity test (CLIENT) " + candidate.clientEndpointCandidate.address + " => " + candidate.listeningEndpointCandidate.address);
+			/*auto connection = _connections->getConnection(candidate.listeningPeer);
+			if (connection && connection->getConnectionState() == ConnectionState::Connected)
+			{
+				ctx->send([this](bytestream* s) {
+					_serializer->serialize(0, s);
+				});
+				return pplx::task_from_result();
+			}*/
+			
 			return _transport->sendPing(candidate.listeningEndpointCandidate.address).then([this, ctx, candidate](pplx::task<int> t) {
 				auto latency = (int)t.get();
 				_logger->log(LogLevel::Debug, "p2p", "Connectivity test complete : " + candidate.clientEndpointCandidate.address + " => " + candidate.listeningEndpointCandidate.address + " ping : " + std::to_string(latency));
@@ -75,6 +84,14 @@ namespace Stormancer
 		builder->service((byte)SystemRequestIDTypes::ID_P2P_TEST_CONNECTIVITY_HOST, [this](RequestContext* ctx) {
 			auto candidate = _serializer->deserialize<ConnectivityCandidate>(ctx->inputStream());
 			_logger->log(LogLevel::Debug, "p2p", "Starting connectivity test (LISTENER) " + candidate.clientEndpointCandidate.address + " => " + candidate.listeningEndpointCandidate.address);
+			/*auto connection = _connections->getConnection(candidate.clientPeer);
+			if (connection && connection->getConnectionState() == ConnectionState::Connected)
+			{
+				ctx->send([this](bytestream* s) {
+				});
+				return pplx::task_from_result();
+			}*/
+
 			_transport->openNat(candidate.clientEndpointCandidate.address);
 			ctx->send([](bytestream*) {});
 			return pplx::task_from_result();
@@ -82,6 +99,14 @@ namespace Stormancer
 
 		builder->service((byte)SystemRequestIDTypes::ID_P2P_CONNECT_HOST, [this](RequestContext* ctx) {
 			auto candidate = _serializer->deserialize<ConnectivityCandidate>(ctx->inputStream());
+			
+			auto connection = _connections->getConnection(candidate.clientPeer);
+			if (connection && connection->getConnectionState() == ConnectionState::Connected)
+			{
+				ctx->send([](bytestream*) {});
+				return pplx::task_from_result();
+			}
+			
 			_logger->log(LogLevel::Debug, "p2p", "Waiting connection " + candidate.clientEndpointCandidate.address + " => " + candidate.listeningEndpointCandidate.address);
 			_connections->addPendingConnection(candidate.clientPeer)
 				.then([this, candidate](pplx::task<std::shared_ptr<IConnection>> t) {
@@ -96,6 +121,16 @@ namespace Stormancer
 
 		builder->service((byte)SystemRequestIDTypes::ID_P2P_CONNECT_CLIENT, [this](RequestContext* ctx) {
 			auto candidate = _serializer->deserialize<ConnectivityCandidate>(ctx->inputStream());
+			
+			auto connection = _connections->getConnection(candidate.listeningPeer);
+			if (connection && connection->getConnectionState() == ConnectionState::Connected)
+			{
+				ctx->send([this](bytestream* s) {
+					_serializer->serialize(true, s);
+				});
+				return pplx::task_from_result();
+			}
+			
 			_logger->log(LogLevel::Debug, "p2p", "Connecting... " + candidate.clientEndpointCandidate.address + " => " + candidate.listeningEndpointCandidate.address);
 			_connections->addPendingConnection(candidate.listeningPeer)
 				.then([this, candidate](pplx::task<std::shared_ptr<IConnection>> t) {
@@ -105,11 +140,11 @@ namespace Stormancer
 			});
 
 			return _transport->connect(candidate.listeningEndpointCandidate.address)
-				.then([this, candidate, ctx](pplx::task<std::weak_ptr<IConnection>> t) {
+				.then([this, candidate, ctx](pplx::task<std::shared_ptr<IConnection>> t) {
 
 				auto connection = t.get();
 				ctx->send([this, connection](bytestream* s) {
-					_serializer->serialize(!connection.expired(), s);
+					_serializer->serialize(connection && connection->getConnectionState() == ConnectionState::Connected, s);
 				});
 			});
 

@@ -39,6 +39,12 @@
     <ClCompile Include="..\..\Plugins\Matchmaking\MatchmakingService.cpp">
       <Filter>Plugins\Matchmaking</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Plugins\Friends\Friends.cpp">
+      <Filter>Plugins\Friends</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Plugins\Friends\FriendsPlugin.cpp">
+      <Filter>Plugins\Friends</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StormancerWrapper.h" />
@@ -90,6 +96,12 @@
     <ClInclude Include="..\..\Plugins\PlayerProfile\PlayerProfileService.h">
       <Filter>Plugins\PlayerProfile</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Plugins\Friends\Friends.h">
+      <Filter>Plugins\Friends</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Plugins\Friends\FriendsPlugin.h">
+      <Filter>Plugins\Friends</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Plugins">
@@ -115,6 +127,9 @@
     </Filter>
     <Filter Include="Plugins\PlayerProfile">
       <UniqueIdentifier>{06422710-b112-46e4-83fe-8ab8123a6d2d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins\Friends">
+      <UniqueIdentifier>{f98b77c6-7dbe-434b-8758-622e3db2ee9a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -27,7 +27,7 @@ namespace Stormancer
 
 		void init(const std::string& endpoint, const std::string& account, const std::string& application);
 		void update();
-		void shutdown(bool immediate = false);
+		void shutdown();
 
 		pplx::task<void> Authenticate(const std::string& provider, const std::string& authenticationToken);
 

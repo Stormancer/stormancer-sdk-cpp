@@ -17,7 +17,7 @@ namespace Stormancer
 
 		virtual ~ITransport() {}
 		virtual void start(std::string name, std::shared_ptr<IConnectionManager> handler, pplx::cancellation_token token = pplx::cancellation_token::none(), uint16 port = 0, uint16 maxConnections = 0) = 0;
-		virtual pplx::task<std::weak_ptr<IConnection>> connect(std::string endpoint) = 0;
+		virtual pplx::task<std::shared_ptr<IConnection>> connect(std::string endpoint) = 0;
 		virtual bool isRunning() const = 0;
 		virtual std::string name() const = 0;
 		virtual uint64 id() const = 0;

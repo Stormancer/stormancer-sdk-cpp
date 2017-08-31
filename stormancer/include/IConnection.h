@@ -72,6 +72,10 @@ namespace Stormancer
 		virtual ConnectionState getConnectionState() const = 0;
 		virtual rxcpp::observable<ConnectionState> getConnectionStateChangedObservable() const = 0;
 
+
+		virtual Action<std::string>::TIterator onClose(std::function<void(std::string)> callback) = 0;
+		virtual Action<std::string>& onCloseAction() = 0;
+
 #pragma endregion
 
 	protected:

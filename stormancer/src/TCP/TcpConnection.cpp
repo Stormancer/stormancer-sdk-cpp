@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "TCP/TcpConnection.h"
+#include "..\..\include\TCP\TcpConnection.h"
 
 namespace Stormancer
 {
@@ -128,6 +129,11 @@ namespace Stormancer
 	Action<std::string>::TIterator TcpConnection::onClose(std::function<void(std::string)> callback)
 	{
 		return _closeAction.push_back(callback);
+	}
+
+	Action<std::string>& TcpConnection::onCloseAction()
+	{
+		return _closeAction;
 	}
 
 	void TcpConnection::sendRaw(std::function<void(bytestream*)> writer, PacketPriority, PacketReliability)

@@ -25,7 +25,7 @@ namespace Stormancer
 		auto observable = rxcpp::observable<>::create<Packetisp_ptr>([this, writer, route, priority](rxcpp::subscriber<Packetisp_ptr> subscriber) {
 			if (!_scene)
 			{
-				throw std::runtime_error("The scene has been deleted.");
+				throw std::runtime_error("The scene ptr is invalid");
 			}
 
 			auto rr = _scene->remoteRoutes();
@@ -80,18 +80,13 @@ namespace Stormancer
 			}
 
 			subscriber.add([this, request]() {
-				if (!_scene)
-				{
-					throw std::runtime_error("The scene has been deleted.");
-				}
-
 				if (!request->hasCompleted)
 				{
 #ifdef STORMANCER_LOG_RPC
 					auto idStr = std::to_string(request->id);
 					ILogger::instance()->log(LogLevel::Trace, "RpcService", "Cancel RPC", idStr.c_str());
 #endif
-					if (_scene->getCurrentConnectionState() == ConnectionState::Connected)
+					if (_scene && _scene->getCurrentConnectionState() == ConnectionState::Connected)
 					{
 						_scene->sendPacket(RpcPlugin::cancellationRouteName, [this, request](bytestream* bs) {
 							*bs << request->id;

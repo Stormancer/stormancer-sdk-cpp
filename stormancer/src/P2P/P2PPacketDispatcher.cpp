@@ -30,7 +30,7 @@ namespace Stormancer
 			return false;
 		}));
 		config.addProcessor((byte)MessageIDTypes::ID_P2P_TUNNEL, new handlerFunction([this](Packet_ptr p) {
-			_logger->log(LogLevel::Trace, "Received packet from tunnel. Origin: ",std::to_string(p->connection->id()));
+			//_logger->log(LogLevel::Trace, "Received packet from tunnel. Origin: ",std::to_string(p->connection->id()));
 			_tunnels->receiveFrom(p->connection->id(), p->stream);
 
 			return true;

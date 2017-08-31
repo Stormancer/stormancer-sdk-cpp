@@ -194,6 +194,8 @@ namespace Stormancer
 						}
 						break;
 					}
+					case DefaultMessageIDTypes::ID_INCOMPATIBLE_PROTOCOL_VERSION:
+					case DefaultMessageIDTypes::ID_NO_FREE_INCOMING_CONNECTIONS:
 					case DefaultMessageIDTypes::ID_CONNECTION_ATTEMPT_FAILED:
 					{
 						std::lock_guard<std::mutex> lg(_pendingConnection_mtx);
@@ -230,11 +232,6 @@ namespace Stormancer
 						_peer->Send(&data, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE, 0, rakNetPacket->guid, false);
 						break;
 					}
-					case DefaultMessageIDTypes::ID_NO_FREE_INCOMING_CONNECTIONS:
-					{
-						_logger->log(LogLevel::Trace, "RakNetTransport", "The system we attempted to connect to is not accepting new connections", rakNetPacket->systemAddress.ToString(true, ':'));
-						break;
-					}
 					case DefaultMessageIDTypes::ID_DISCONNECTION_NOTIFICATION:
 					{
 						_logger->log(LogLevel::Trace, "RakNetTransport", "Peer disconnected", rakNetPacket->systemAddress.ToString(true, ':'));
@@ -255,11 +252,6 @@ namespace Stormancer
 					case DefaultMessageIDTypes::ID_INVALID_PASSWORD:
 					{
 						_logger->log(LogLevel::Trace, "RakNetTransport", "The remote system is using a password and has refused our connection because we did not set the correct password", rakNetPacket->systemAddress.ToString(true, ':'));
-						break;
-					}
-					case DefaultMessageIDTypes::ID_INCOMPATIBLE_PROTOCOL_VERSION:
-					{
-						_logger->log(LogLevel::Trace, "RakNetTransport", "RakNetVersion.h does not match on the remote system what we have on our system", rakNetPacket->systemAddress.ToString(true, ':'));
 						break;
 					}
 					case DefaultMessageIDTypes::ID_IP_RECENTLY_CONNECTED:
@@ -412,7 +404,7 @@ namespace Stormancer
 		_id = p;
 	}
 
-	pplx::task<std::weak_ptr<IConnection>> RakNetTransport::connect(std::string endpoint)
+	pplx::task<std::shared_ptr<IConnection>> RakNetTransport::connect(std::string endpoint)
 	{
 		std::lock_guard<std::mutex> lock(_pendingConnection_mtx);
 
@@ -425,7 +417,7 @@ namespace Stormancer
 			startNextPendingConnections();
 		}
 
-		return pplx::task<std::weak_ptr<IConnection>>(rq.tce);
+		return pplx::task<std::shared_ptr<IConnection>>(rq.tce);
 	}
 
 	void RakNetTransport::startNextPendingConnections()

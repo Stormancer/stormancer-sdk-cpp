@@ -75,7 +75,7 @@ namespace Stormancer
 		_logger->log(LogLevel::Trace, "TcpTransport", "TCP transport started");
 	}
 
-	pplx::task<std::weak_ptr<IConnection>> TcpTransport::connect(std::string endpoint)
+	pplx::task<std::shared_ptr<IConnection>> TcpTransport::connect(std::string endpoint)
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
 
@@ -109,7 +109,10 @@ namespace Stormancer
 
 		_listeningThread = std::make_shared<std::thread>(&TcpTransport::listen, this, endpoint);
 
-		return pplx::task<std::weak_ptr<IConnection>>(tce);
+		return pplx::create_task(tce).then([] (std::weak_ptr<IConnection> connection)
+		{
+			return connection.lock();
+		});
 	}
 
 	bool TcpTransport::isRunning() const

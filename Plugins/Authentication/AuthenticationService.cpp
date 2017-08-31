@@ -197,6 +197,16 @@ namespace Stormancer
 		return _username;
 	}
 
+	pplx::task<std::string> AuthenticationService::getUserIdByPseudo(std::string pseudo)
+	{
+		return getAuthenticationScene().then([pseudo, this](Scene_ptr authScene)
+		{
+			auto rpcService = authScene->dependencyResolver()->resolve<RpcService>();
+
+			return rpcService->rpc<std::string, std::string>("users.getuseridbypseudo", pseudo);
+		});
+	}
+
 	pplx::task<Scene_ptr> AuthenticationService::getPrivateScene(const std::string& sceneId)
 	{
 		return getAuthenticationScene().then([sceneId, this](Scene_ptr authScene)

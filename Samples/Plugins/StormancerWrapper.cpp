@@ -22,7 +22,7 @@ namespace Stormancer
 
 	StormancerWrapper::~StormancerWrapper()
 	{
-		shutdown(true);
+		shutdown();
 	}
 
 	void StormancerWrapper::init(const std::string& endpoint, const std::string& account, const std::string& application)
@@ -57,11 +57,11 @@ namespace Stormancer
 		}
 	}
 
-	void StormancerWrapper::shutdown(bool immediate)
+	void StormancerWrapper::shutdown()
 	{
 		if (_client && _client->getConnectionState() == ConnectionState::Connected)
 		{
-			_client->disconnect(immediate).wait();
+			_client->disconnect().wait();
 			_authService.reset();
 			_scenes.clear();
 			_actionDispatcher.reset();

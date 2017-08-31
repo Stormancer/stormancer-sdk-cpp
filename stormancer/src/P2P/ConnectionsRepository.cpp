@@ -37,7 +37,13 @@ namespace Stormancer
 				auto pc = it->second;
 				_pendingP2PConnections.erase(it);
 
-				_connections[connection->id()] = connection;
+				auto id = connection->id();
+				_connections[id] = connection;
+				
+				connection->onClose([this,id](std::string reason) {
+					_connections.erase(id);
+				});
+
 				ILogger::instance()->log(LogLevel::Info, "P2P", "Transitioning connection from pending", std::to_string(connection->id()));
 				pc.tce.set(connection);
 			}

@@ -24,31 +24,38 @@ namespace Stormancer
 		auto h = t.hash_code();
 		if (mapContains(_factories, h))
 		{
-			auto registration = &_factories[h];
-			if (registration->singleInstance)
+			auto& registration = _factories[h];
+			if (registration.singleInstance)
 			{
-				if (registration->instance == nullptr)
+				if (registration.instance == nullptr)
 				{
-					registration->instance = registration->factory(this);
+					if (registration.factory)
+					{
+						registration.instance = registration.factory(this);
+					}
 				}
-				return registration->instance;
+				if (registration.instance)
+				{
+					return registration.instance;
+				}
 			}
 			else
 			{
-				return registration->factory(this);
+				if (registration.factory)
+				{
+					return registration.factory(this);
+				}
 			}
+		}
+
+		auto parent = _parent.lock();
+		if (parent)
+		{
+			return parent->resolveInternal(t);
 		}
 		else
 		{
-			auto parent = _parent.lock();
-			if (parent)
-			{
-				return parent->resolveInternal(t);
-			}
-			else
-			{
-				return nullptr;
-			}
+			return nullptr;
 		}
 	}
 };

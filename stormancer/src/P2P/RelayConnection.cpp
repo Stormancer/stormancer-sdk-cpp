@@ -124,4 +124,14 @@ namespace Stormancer
 	{
 		throw std::runtime_error("Not supported");
 	}
+
+	Action<std::string>::TIterator RelayConnection::onClose(std::function<void(std::string)> callback)
+	{
+		throw std::runtime_error("Not supported");
+	}
+
+	Action<std::string>& RelayConnection::onCloseAction()
+	{
+		throw std::runtime_error("Not supported");
+	}
 }

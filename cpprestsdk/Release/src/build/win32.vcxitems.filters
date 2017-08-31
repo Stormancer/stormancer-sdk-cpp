@@ -36,7 +36,4 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="$(MSBuildThisFileDirectory)..\utilities\Resource.rc" />
-  </ItemGroup>
 </Project>
