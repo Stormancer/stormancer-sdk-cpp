@@ -165,9 +165,6 @@ namespace Stormancer
 		builder->service((byte)SystemRequestIDTypes::ID_P2P_CLOSE_TUNNEL, [this](RequestContext* ctx) {
 			auto handle = _serializer->deserialize<byte>(ctx->inputStream());
 			_tunnels->closeTunnel(handle, ctx->packet()->connection->id());
-			ctx->send([this, handle](bytestream*) {
-
-			});
 			return pplx::task_from_result();
 		});
 		builder->service((byte)SystemRequestIDTypes::ID_P2P_RELAY_OPEN, [this](RequestContext* ctx) {

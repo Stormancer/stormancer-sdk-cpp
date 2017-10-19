@@ -4,7 +4,9 @@
 #ifndef _NO_ASYNCRTIMP
 #define _NO_ASYNCRTIMP
 #endif
+#ifndef _NO_PPLXIMP
 #define _NO_PPLXIMP
+#endif
 #define _RAKNET_LIB
 
 //Name      Version  _MSC_VER
@@ -118,6 +120,9 @@
 #endif
 
 // cpprestsdk
+
+
+
 #ifdef _STORMANCERSDKCPP
 #include <cpprest/http_client.h>
 #include <cpprest/filestream.h>
@@ -127,12 +132,13 @@
 // rxcpp
 #include <rx.hpp>
 
-// msgpack
-#include <msgpack.hpp>
 
 #if defined(UE_EDITOR) || defined(UE_GAME)
 #undef check
 #endif
+
+// msgpack
+#include <msgpack.hpp>
 
 // custom types
 namespace Stormancer

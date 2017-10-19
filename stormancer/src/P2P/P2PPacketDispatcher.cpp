@@ -25,7 +25,7 @@ namespace Stormancer
 			auto connection = _connections->getConnection(peerId);
 			if (connection)
 			{
-				p->connection = connection.get();
+				p->connection = connection;
 			}
 			return false;
 		}));

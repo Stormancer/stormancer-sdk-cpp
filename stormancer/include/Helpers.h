@@ -354,4 +354,9 @@ namespace Stormancer
 		//    return true;
 	}
 
+
+	// The PS Vita doesn't have the codecvt header, which is used by these functions.
+	std::wstring utf8_to_wstring(const std::string& str);
+	std::string wstring_to_utf8(const std::wstring& str);
+
 };

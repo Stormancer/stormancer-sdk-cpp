@@ -5,6 +5,18 @@
 namespace Stormancer
 {
 
+std::unique_ptr<TimerThread> TimerThread::_sInstance;
+
+TimerThread& TimerThread::getInstance()
+{
+	if (!_sInstance)
+	{
+		_sInstance.reset(new TimerThread);
+	}
+
+	return *_sInstance;
+}
+
 TimerThread::TimerThread() :
 	_thread(&TimerThread::_threadLoop, this)
 {

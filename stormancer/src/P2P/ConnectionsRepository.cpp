@@ -40,8 +40,12 @@ namespace Stormancer
 				auto id = connection->id();
 				_connections[id] = connection;
 				
-				connection->onClose([this,id](std::string reason) {
-					_connections.erase(id);
+				std::weak_ptr<ConnectionsRepository> weakThis(shared_from_this());
+				connection->onClose([weakThis,id](std::string reason) {
+					if (auto thiz = weakThis.lock())
+					{
+						thiz->_connections.erase(id);
+					}
 				});
 
 				ILogger::instance()->log(LogLevel::Info, "P2P", "Transitioning connection from pending", std::to_string(connection->id()));

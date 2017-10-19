@@ -6,6 +6,7 @@
 #include <queue>
 #include <chrono>
 #include <functional>
+#include <memory>
 
 namespace Stormancer
 {
@@ -17,6 +18,8 @@ public:
 	using clock_type = std::chrono::steady_clock;
 
 #pragma region public_methods
+
+	static TimerThread& getInstance();
 
 	TimerThread();
 
@@ -57,6 +60,8 @@ private:
 #pragma endregion
 
 #pragma region private_members
+
+	static std::unique_ptr<TimerThread> _sInstance;
 
 	std::mutex _mutex;
 	std::condition_variable _cond;

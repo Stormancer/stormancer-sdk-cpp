@@ -45,6 +45,12 @@
     <ClCompile Include="..\..\Plugins\Friends\FriendsPlugin.cpp">
       <Filter>Plugins\Friends</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Plugins\Invitations\InvitationsPlugin.cpp">
+      <Filter>Plugins\Invitations</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Plugins\Invitations\Invitations.cpp">
+      <Filter>Plugins\Invitations</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StormancerWrapper.h" />
@@ -102,6 +108,12 @@
     <ClInclude Include="..\..\Plugins\Friends\FriendsPlugin.h">
       <Filter>Plugins\Friends</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Plugins\Invitations\InvitationsPlugin.h">
+      <Filter>Plugins\Invitations</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Plugins\Invitations\Invitations.h">
+      <Filter>Plugins\Invitations</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Plugins">
@@ -130,6 +142,9 @@
     </Filter>
     <Filter Include="Plugins\Friends">
       <UniqueIdentifier>{f98b77c6-7dbe-434b-8758-622e3db2ee9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins\Invitations">
+      <UniqueIdentifier>{dd379733-112b-4042-b566-f4868414828c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

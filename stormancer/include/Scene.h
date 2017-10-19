@@ -197,7 +197,7 @@ namespace Stormancer
 		std::vector<rxcpp::subscription> _subscriptions;
 
 		/// Scene peer connection
-		IScenePeer* _host = nullptr;
+		std::shared_ptr<IScenePeer> _host = nullptr;
 
 		/// Connection requested state (when not completed).
 		bool _connecting = false;
@@ -227,6 +227,7 @@ namespace Stormancer
 
 		std::shared_ptr<P2PService> _p2p;
 
+		ILogger_ptr _logger;
 #pragma endregion
 	};
 

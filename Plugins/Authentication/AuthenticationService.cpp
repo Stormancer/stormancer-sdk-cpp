@@ -7,7 +7,7 @@ namespace Stormancer
 	AuthenticationService::AuthenticationService(Client* client)
 		: _client(client)
 	{
-		client->getConnectionStateChangedObservable().subscribe([this](ConnectionState state)
+		_connectionSubscription = client->getConnectionStateChangedObservable().subscribe([this](ConnectionState state)
 		{
 			switch (state)
 			{
@@ -24,6 +24,7 @@ namespace Stormancer
 
 	AuthenticationService::~AuthenticationService()
 	{
+		_connectionSubscription.unsubscribe();
 	}
 
 	std::string AuthenticationService::authenticationSceneName()
@@ -236,6 +237,15 @@ namespace Stormancer
 	Action<GameConnectionState>::TIterator AuthenticationService::onConnectionStateChanged(const std::function<void(GameConnectionState)>& callback)
 	{
 		return _onConnectionStateChanged.push_back(callback);
+	}
+
+	pplx::task<std::unordered_map<std::string, std::string>> AuthenticationService::getPseudos(std::vector<std::string> userIds)
+	{
+		return getAuthenticationScene().then([userIds, this](Scene_ptr authScene)
+		{
+			auto rpcService = authScene->dependencyResolver()->resolve<RpcService>();
+			return rpcService->rpc<std::unordered_map<std::string, std::string>, std::vector<std::string>>("users.getpseudos", userIds);
+		});
 	}
 
 	GameConnectionState AuthenticationService::connectionState() const

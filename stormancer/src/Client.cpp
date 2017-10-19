@@ -107,6 +107,10 @@ namespace Stormancer
 
 	Client::~Client()
 	{
+		if (_connectionSubscription.is_subscribed())
+		{
+			_connectionSubscription.unsubscribe();
+		}
 		for (auto plugin : _plugins)
 		{
 			delete plugin;
@@ -345,7 +349,7 @@ namespace Stormancer
 							return;
 						}
 
-						connection->getConnectionStateChangedObservable().subscribe([this](ConnectionState state)
+						_connectionSubscription = connection->getConnectionStateChangedObservable().subscribe([this](ConnectionState state)
 						{
 							if (state == ConnectionState::Disconnecting)
 							{

@@ -88,9 +88,17 @@ namespace Stormancer
 #endif
 					if (_scene && _scene->getCurrentConnectionState() == ConnectionState::Connected)
 					{
-						_scene->sendPacket(RpcPlugin::cancellationRouteName, [this, request](bytestream* bs) {
-							*bs << request->id;
-						});
+						try
+						{
+							_scene->sendPacket(RpcPlugin::cancellationRouteName, [this, request](bytestream* bs)
+							{
+								*bs << request->id;
+							});
+						}
+						catch (std::exception& e)
+						{
+							ILogger::instance()->log(LogLevel::Error, "RpcService", "Failed to send rpc cancellation packet", e.what());
+						}
 					}
 					eraseRequest(request->id);
 				}
@@ -134,7 +142,7 @@ namespace Stormancer
 					if (!mapContains(_runningRequests, id))
 					{
 						_runningRequests[id] = cts;
-						ctx = RpcRequestContext_ptr(new RpcRequestContext<IScenePeer>(p->connection, _scene, id, ordered, p->stream, cts.get_token()));
+						ctx = RpcRequestContext_ptr(new RpcRequestContext<IScenePeer>(p->connection.get(), _scene, id, ordered, p->stream, cts.get_token()));
 					}
 				}
 
@@ -376,7 +384,14 @@ namespace Stormancer
 
 		auto onError = [tce, procedure](const std::exception_ptr error) {
 			ILogger::instance()->log(LogLevel::Trace, "RpcHelpers", "An exception occurred during the rpc " + procedure);
-			tce.set_exception(error);
+			try
+			{
+				std::rethrow_exception(error);
+			}
+			catch (std::exception& e)
+			{
+				tce.set_exception(e);
+			}
 		};
 
 		std::function<void()> onComplete = [tce]() {

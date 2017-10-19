@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "RakNet/RakNetConnection.h"
+#include "Logger/ILogger.h"
 
 namespace Stormancer
 {

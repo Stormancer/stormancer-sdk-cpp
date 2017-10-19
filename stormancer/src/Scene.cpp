@@ -12,6 +12,7 @@ namespace Stormancer
 		, _client(client)
 		, _metadata(dto.Metadata)
 		, _dependencyResolver(std::make_shared<DependencyResolver>(parentDependencyResolver))
+		, _logger(_dependencyResolver->resolve<ILogger>())
 	{
 		for (auto routeDto : dto.Routes)
 		{
@@ -26,17 +27,17 @@ namespace Stormancer
 	Scene::~Scene()
 	{
 #ifdef STORMANCER_LOG_CLIENT
-		ILogger::instance()->log(LogLevel::Trace, "Scene", "deleting scene...", _id);
+		_logger->log(LogLevel::Trace, "Scene", "deleting scene...", _id);
 #endif
-
-		disconnect(true).then([](pplx::task<void> t) {
+		auto& logger = _logger;
+		disconnect(true).then([logger](pplx::task<void> t) {
 			try
 			{
 				t.get();
 			}
 			catch (const std::exception& ex)
 			{
-				ILogger::instance()->log(LogLevel::Trace, "Scene", "Scene disconnection failed.", ex.what());
+				logger->log(LogLevel::Trace, "Scene", "Scene disconnection failed.", ex.what());
 			}
 		}).wait();
 
@@ -50,22 +51,17 @@ namespace Stormancer
 		}
 		_subscriptions.clear();
 
-		if (_host)
-		{
-			delete _host;
-		}
-
 		_localRoutesMap.clear();
 		_remoteRoutesMap.clear();
 
 #ifdef STORMANCER_LOG_CLIENT
-		ILogger::instance()->log(LogLevel::Trace, "Scene", "Scene deleted.", _id);
+		_logger->log(LogLevel::Trace, "Scene", "Scene deleted.", _id);
 #endif
 	}
 
 	void Scene::initialize()
 	{
-		_host = new ScenePeer(_peer, _handle, _remoteRoutesMap, this);
+		_host = std::make_shared<ScenePeer>(_peer, _handle, _remoteRoutesMap, this);
 	}
 
 	std::string Scene::getHostMetadata(const std::string& key) const
@@ -114,7 +110,22 @@ namespace Stormancer
 
 	void Scene::addRoute(const std::string& routeName, std::function<void(Packetisp_ptr)> handler, MessageOriginFilter filter, const std::map<std::string, std::string>& metadata)
 	{
-		auto subscription = onMessage(routeName, filter, metadata).subscribe(handler);
+		auto subscription = onMessage(routeName, filter, metadata)
+			.subscribe(
+				handler,
+				// On error
+				[this, routeName](std::exception_ptr eptr)
+				{
+					try
+					{
+						std::rethrow_exception(eptr);
+					}
+					catch (std::exception& e)
+					{
+						_logger->log(LogLevel::Error, "Scene", "Error reading message on route " + routeName, e.what());
+					}
+				}
+		);
 		_subscriptions.push_back(subscription);
 	}
 
@@ -152,16 +163,16 @@ namespace Stormancer
 	{
 		auto observable = rxcpp::observable<>::create<Packetisp_ptr>([this, route](rxcpp::subscriber<Packetisp_ptr> subscriber) {
 			auto handler = std::function<void(Packet_ptr)>([this, subscriber, route](Packet_ptr p) {
-				IScenePeer* origin = nullptr;
+				std::shared_ptr<IScenePeer> origin = nullptr;
 				bool isOriginHost = false;
 				if (p->connection->id() == host()->id())
 				{
 					isOriginHost = true;
-					origin = host();
+					origin = _host;
 				}
 				else
 				{
-					origin = _connectedPeers[p->connection->id()].get();
+					origin = _connectedPeers[p->connection->id()];
 				}
 				if (origin)
 				{
@@ -248,7 +259,7 @@ namespace Stormancer
 	pplx::task<void> Scene::disconnect(bool immediate)
 	{
 #ifdef STORMANCER_LOG_CLIENT
-		ILogger::instance()->log(LogLevel::Trace, "Scene", std::string() + "Scene disconnecting, immediate=" + (immediate ? "true" : "false"));
+		_logger->log(LogLevel::Trace, "Scene", std::string() + "Scene disconnecting, immediate=" + (immediate ? "true" : "false"));
 #endif
 
 		std::lock_guard<std::mutex> lg(_disconnectMutex);
@@ -262,7 +273,7 @@ namespace Stormancer
 			}
 			else
 			{
-				ILogger::instance()->log(LogLevel::Warn, "Scene", "Client is invalid.");
+				_logger->log(LogLevel::Warn, "Scene", "Client is invalid.");
 				_disconnectTask = pplx::task_from_exception<void>(std::runtime_error("Client is invalid."));
 			}
 		}
@@ -289,7 +300,7 @@ namespace Stormancer
 				}
 				catch (const std::exception& ex)
 				{
-					ILogger::instance()->log(LogLevel::Warn, "Scene", "Scene disconnection failed.", ex.what());
+					_logger->log(LogLevel::Warn, "Scene", "Scene disconnection failed.", ex.what());
 				}
 			});
 		}
@@ -343,7 +354,7 @@ namespace Stormancer
 
 	IScenePeer* Scene::host() const
 	{
-		return _host;
+		return _host.get();
 	}
 
 	bool Scene::isHost() const

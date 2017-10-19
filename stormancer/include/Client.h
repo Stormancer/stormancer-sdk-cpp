@@ -147,6 +147,7 @@ namespace Stormancer
 		bool _connectionTaskSet = false;
 		Action<ConnectionState> _onConnectionStateChanged;
 		std::shared_ptr<Configuration> _config;
+		rxcpp::composite_subscription _connectionSubscription;
 
 #pragma endregion
 	};

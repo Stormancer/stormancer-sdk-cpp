@@ -5,7 +5,7 @@
 
 namespace Stormancer
 {
-	class ConnectionsRepository : public IConnectionManager
+	class ConnectionsRepository : public IConnectionManager, public std::enable_shared_from_this<ConnectionsRepository>
 	{
 	public:
 

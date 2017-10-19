@@ -181,6 +181,8 @@
     <ClCompile Include="..\..\Plugins\GameSession\GameSessionService.cpp" />
     <ClCompile Include="..\..\Plugins\GameVersion\GameVersionPlugin.cpp" />
     <ClCompile Include="..\..\Plugins\GameVersion\GameVersionService.cpp" />
+    <ClCompile Include="..\..\Plugins\Invitations\Invitations.cpp" />
+    <ClCompile Include="..\..\Plugins\Invitations\InvitationsPlugin.cpp" />
     <ClCompile Include="..\..\Plugins\Leaderboard\LeaderboardPlugin.cpp" />
     <ClCompile Include="..\..\Plugins\Leaderboard\LeaderboardService.cpp" />
     <ClCompile Include="..\..\Plugins\Matchmaking\MatchmakingPlugin.cpp" />
@@ -199,6 +201,8 @@
     <ClInclude Include="..\..\Plugins\GameSession\GameSessionService.h" />
     <ClInclude Include="..\..\Plugins\GameVersion\GameVersionPlugin.h" />
     <ClInclude Include="..\..\Plugins\GameVersion\GameVersionService.h" />
+    <ClInclude Include="..\..\Plugins\Invitations\Invitations.h" />
+    <ClInclude Include="..\..\Plugins\Invitations\InvitationsPlugin.h" />
     <ClInclude Include="..\..\Plugins\Leaderboard\LeaderboardDto.h" />
     <ClInclude Include="..\..\Plugins\Leaderboard\LeaderboardPlugin.h" />
     <ClInclude Include="..\..\Plugins\Leaderboard\LeaderboardService.h" />

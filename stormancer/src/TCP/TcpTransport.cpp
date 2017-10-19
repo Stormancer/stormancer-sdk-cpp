@@ -276,7 +276,7 @@ namespace Stormancer
 
 			auto stream = new bytestream;
 			stream->rdbuf()->pubsetbuf((char*)buffer, msgLength);
-			Packet_ptr packet(new Packet<>(_connection.get(), stream), deleter<Packet<>>());
+			Packet_ptr packet(new Packet<>(_connection, stream), deleter<Packet<>>());
 			packet->cleanup += std::function<void(void)>([stream, buffer]() {
 				if (stream)
 				{

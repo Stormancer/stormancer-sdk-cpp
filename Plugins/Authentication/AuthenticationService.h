@@ -103,6 +103,15 @@ namespace Stormancer
 
 		pplx::task<std::string> getUserIdByPseudo(std::string pseudo);
 
+		template<typename Iter>
+		pplx::task<std::unordered_map<std::string, std::string>> getPseudos(Iter begin, Iter   end)
+		{
+			std::vector<std::string> input(begin, end);
+
+			return getPseudos(input);
+		}
+		pplx::task<std::unordered_map<std::string, std::string>> getPseudos(std::vector<std::string> userIds);
+
 		GameConnectionState connectionState() const;
 		Action<GameConnectionState>& connectionStateChangedAction();
 		Action<GameConnectionState>::TIterator onConnectionStateChanged(const std::function<void(GameConnectionState)>& callback);
@@ -123,13 +132,13 @@ namespace Stormancer
 		std::string _createUserRoute = "provider.loginpassword.createAccount";
 		std::string _loginRoute = "login";
 		bool _authenticated = false;
-		bool _authenticationInProgress = false;
 		std::string _userId;
 		std::string _username;
 		Client* _client;
 		pplx::task<Scene_ptr> _authenticationScene;
 		Action<GameConnectionState> _onConnectionStateChanged;
 		GameConnectionState _connectionState;
+		rxcpp::composite_subscription _connectionSubscription;
 
 #pragma endregion
 	};
