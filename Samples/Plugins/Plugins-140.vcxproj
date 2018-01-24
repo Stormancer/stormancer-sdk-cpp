@@ -56,6 +56,7 @@
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="Shared">
+    <Import Project="..\..\Plugins\plugins-sources\plugins-sources.vcxitems" Label="Shared" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -171,46 +172,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Plugins\Authentication\AuthenticationPlugin.cpp" />
-    <ClCompile Include="..\..\Plugins\Authentication\AuthenticationService.cpp" />
-    <ClCompile Include="..\..\Plugins\BugReport\BugReportPlugin.cpp" />
-    <ClCompile Include="..\..\Plugins\BugReport\BugReportService.cpp" />
-    <ClCompile Include="..\..\Plugins\Friends\Friends.cpp" />
-    <ClCompile Include="..\..\Plugins\Friends\FriendsPlugin.cpp" />
-    <ClCompile Include="..\..\Plugins\GameSession\GameSessionPlugin.cpp" />
-    <ClCompile Include="..\..\Plugins\GameSession\GameSessionService.cpp" />
-    <ClCompile Include="..\..\Plugins\GameVersion\GameVersionPlugin.cpp" />
-    <ClCompile Include="..\..\Plugins\GameVersion\GameVersionService.cpp" />
-    <ClCompile Include="..\..\Plugins\Invitations\Invitations.cpp" />
-    <ClCompile Include="..\..\Plugins\Invitations\InvitationsPlugin.cpp" />
-    <ClCompile Include="..\..\Plugins\Leaderboard\LeaderboardPlugin.cpp" />
-    <ClCompile Include="..\..\Plugins\Leaderboard\LeaderboardService.cpp" />
-    <ClCompile Include="..\..\Plugins\Matchmaking\MatchmakingPlugin.cpp" />
-    <ClCompile Include="..\..\Plugins\Matchmaking\MatchmakingService.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="StormancerWrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Plugins\Authentication\AuthenticationPlugin.h" />
-    <ClInclude Include="..\..\Plugins\Authentication\AuthenticationService.h" />
-    <ClInclude Include="..\..\Plugins\BugReport\BugReportPlugin.h" />
-    <ClInclude Include="..\..\Plugins\BugReport\BugReportService.h" />
-    <ClInclude Include="..\..\Plugins\Friends\Friends.h" />
-    <ClInclude Include="..\..\Plugins\Friends\FriendsPlugin.h" />
-    <ClInclude Include="..\..\Plugins\GameSession\GameSessionPlugin.h" />
-    <ClInclude Include="..\..\Plugins\GameSession\GameSessionService.h" />
-    <ClInclude Include="..\..\Plugins\GameVersion\GameVersionPlugin.h" />
-    <ClInclude Include="..\..\Plugins\GameVersion\GameVersionService.h" />
-    <ClInclude Include="..\..\Plugins\Invitations\Invitations.h" />
-    <ClInclude Include="..\..\Plugins\Invitations\InvitationsPlugin.h" />
-    <ClInclude Include="..\..\Plugins\Leaderboard\LeaderboardDto.h" />
-    <ClInclude Include="..\..\Plugins\Leaderboard\LeaderboardPlugin.h" />
-    <ClInclude Include="..\..\Plugins\Leaderboard\LeaderboardService.h" />
-    <ClInclude Include="..\..\Plugins\Matchmaking\MatchmakingPlugin.h" />
-    <ClInclude Include="..\..\Plugins\Matchmaking\MatchMakingService.h" />
-    <ClInclude Include="..\..\Plugins\PlayerProfile\PlayerProfile.h" />
-    <ClInclude Include="..\..\Plugins\PlayerProfile\PlayerProfilePlugin.h" />
-    <ClInclude Include="..\..\Plugins\PlayerProfile\PlayerProfileService.h" />
     <ClInclude Include="StormancerWrapper.h" />
   </ItemGroup>
   <ItemGroup>

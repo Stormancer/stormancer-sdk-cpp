@@ -2,7 +2,7 @@
 
 #include "headers.h"
 
-#include "bytestream.h"
+#include "Streams/bytestream.h"
 
 #include "PacketPriority.h"
 #include "Action.h"
@@ -11,7 +11,6 @@
 #include "ConnectToSceneMsg.h"
 #include "ConnectionResult.h"
 #include "DisconnectFromSceneDto.h"
-#include "EmptyDto.h"
 #include "RouteDto.h"
 #include "SceneInfosDto.h"
 #include "SceneInfosRequestDto.h"

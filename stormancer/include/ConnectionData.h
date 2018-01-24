@@ -9,12 +9,6 @@ namespace Stormancer
 	{
 	public:
 
-		ConnectionData();
-		virtual ~ConnectionData();
-		void msgpack_unpack(msgpack::object const& o);
-
-	public:
-
 		std::string AccountId;
 		std::string Application;
 		std::string ContentType;
@@ -26,5 +20,7 @@ namespace Stormancer
 		std::string SceneId;
 		std::string UserData;
 		int32 Version;
+
+		MSGPACK_DEFINE_MAP(AccountId, Application, ContentType, DeploymentId, Endpoints, Expiration, Issued, Routing, SceneId, UserData, Version);
 	};
 };

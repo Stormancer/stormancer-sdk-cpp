@@ -33,12 +33,12 @@ namespace Stormancer
 			return pplx::task_from_exception<std::shared_ptr<IConnection>>(std::runtime_error("Cannot establish P2P connection. The client must be connected to the server"));
 		}
 
-		return _sysCall->sendSystemRequest(server.get(), (byte)SystemRequestIDTypes::ID_P2P_CREATE_SESSION, [this, token](bytestream* s) {
-			_serializer->serialize(token, s);
+		return _sysCall->sendSystemRequest(server.get(), (byte)SystemRequestIDTypes::ID_P2P_CREATE_SESSION, [=](obytestream* stream) {
+			_serializer->serialize(stream, token);
 		})
-			.then([this](pplx::task<Packet_ptr> t) {
+			.then([=](pplx::task<Packet_ptr> t) {
 			auto packet = t.get();
-			auto session = _serializer->deserialize<P2PSession>(packet->stream);
+			auto session = _serializer->deserializeOne<P2PSession>(packet->stream);
 			return _connections->getConnection(session.remotePeer);
 		});
 	}

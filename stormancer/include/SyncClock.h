@@ -7,7 +7,7 @@
 
 namespace Stormancer
 {
-	class SyncClock
+	class SyncClock : public std::enable_shared_from_this<SyncClock>
 	{
 	public:
 

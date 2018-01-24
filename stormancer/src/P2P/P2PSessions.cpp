@@ -16,7 +16,7 @@ namespace Stormancer
 		auto it = _sessions.find(sessionId);
 		if (it != _sessions.end())
 		{
-			_sessions[it->first].Status = sessionState;
+			it->second.Status = sessionState;
 		}
 
 	}
@@ -40,9 +40,9 @@ namespace Stormancer
 			throw std::runtime_error("Session not found");
 		}
 
-		_sessions.erase((*it).first);
-		auto session = (*it).second;
+		auto& session = (*it).second;
 		auto connection = _connections->getConnection(session.remotePeer);
+		_sessions.erase(it);
 		if (connection)
 		{
 			connection->close();

@@ -10,7 +10,7 @@ namespace Stormancer
 		: _scenes((uint32)0xff - (uint32)MessageIDTypes::ID_SCENES + 1)
 		, _eventDispatcher(evDispatcher)
 	{
-		handler = new processorFunction([this](uint8 sceneHandle, Packet_ptr packet) {
+		handler = new processorFunction([=](uint8 sceneHandle, Packet_ptr packet) {
 			return handler_impl(sceneHandle, packet);
 		});
 	}
@@ -58,7 +58,7 @@ namespace Stormancer
 			if (scene)
 			{
 				packet->metadata["scene"] = scene->id();
-				_eventDispatcher->post([scene_weak, packet]() {
+				_eventDispatcher->post([=]() {
 					if (auto scene = scene_weak.lock())
 					{
 						scene->handleMessage(packet);

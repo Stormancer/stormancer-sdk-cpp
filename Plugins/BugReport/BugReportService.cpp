@@ -1,4 +1,4 @@
-#include <stdafx.h>
+#include "stdafx.h"
 #include "BugReportService.h"
 
 namespace Stormancer
@@ -23,8 +23,8 @@ namespace Stormancer
 			metadata.files.push_back(attachedFile);
 		}
 
-		return _rpc->rpcWriter( "bugreporting.report", [&](bytestream* stream) {
-			msgpack::pack(stream, metadata);
+		return _rpc->rpcWriter( "bugreporting.report", [&](obytestream* stream) {
+			_serializer.serialize(stream, metadata);
 			for (const auto& f : files)
 			{
 				stream->write((char*)f.content, f.contentLength);

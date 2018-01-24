@@ -63,7 +63,7 @@ namespace Stormancer
 		{
 			if (async)
 			{
-				pplx::task<void>([this, data]() {
+				pplx::task<void>([=]() {
 					exec(data);
 				});
 			}
@@ -178,7 +178,7 @@ namespace Stormancer
 		{
 			if (async)
 			{
-				pplx::task<void>([this]() {
+				pplx::task<void>([=]() {
 					exec();
 				});
 			}

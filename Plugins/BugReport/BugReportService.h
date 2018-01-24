@@ -2,6 +2,7 @@
 #include <headers.h>
 #include <Scene.h>
 #include <RPC/RpcService.h>
+#include <Serializer.h>
 
 namespace Stormancer
 {
@@ -50,6 +51,7 @@ namespace Stormancer
 
 		Scene_ptr _scene;
 		std::shared_ptr<RpcService> _rpc;
+		Serializer _serializer;
 
 #pragma endregion
 	};

@@ -3,9 +3,11 @@
 #include "headers.h"
 #include "PacketPriority.h"
 #include "ConnectionState.h"
-#include "bytestream.h"
+#include "Streams/bytestream.h"
 #include "DependencyResolver.h"
 #include "Action.h"
+#include "ChannelUidStore.h"
+#include "TransformMetadata.h"
 
 namespace Stormancer
 {
@@ -16,26 +18,16 @@ namespace Stormancer
 
 #pragma region public_methods
 
-		virtual ~IConnection() {}
+		virtual ~IConnection()
+		{
+		}
 
 		/// Sends a system msg to the remote peer.
-		/// \param msgId The id of the system message.
-		/// \param writer The function to write in the stream.
-		virtual void sendSystem(byte msgId, std::function<void(bytestream*)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY) = 0;
-		
-		/// Sends a scene msg to the remote peer.
-		/// \param sceneIndex The scene index.
-		/// \param route The route handle.
 		/// \param writer A function to write in the stream.
 		/// \param priority The priority of the message.
 		/// \param reliability The reliability of the message.
-		virtual void sendToScene(byte sceneIndex, uint16 route, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability) = 0;
+		virtual void send(const Writer& writer, int channelUid, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const TransformMetadata& transformMetadata = TransformMetadata()) = 0;
 		
-		/// Sends a raw msg to the remote peer.
-		/// \param msgId The id of the system message.
-		/// \param writer The function to write in the stream.
-		virtual void sendRaw(byte msgId, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability) = 0;
-
 		/// Set the account id and the application name.
 		/// \param account The account id.
 		/// \param application The application name.
@@ -72,9 +64,13 @@ namespace Stormancer
 		virtual ConnectionState getConnectionState() const = 0;
 		virtual rxcpp::observable<ConnectionState> getConnectionStateChangedObservable() const = 0;
 
-
 		virtual Action<std::string>::TIterator onClose(std::function<void(std::string)> callback) = 0;
 		virtual Action<std::string>& onCloseAction() = 0;
+
+		ChannelUidStore& getChannelUidStore()
+		{
+			return _channelUidStore;
+		}
 
 #pragma endregion
 
@@ -83,6 +79,12 @@ namespace Stormancer
 #pragma region protected_methods
 
 		virtual void setConnectionState(ConnectionState connectionState) = 0;
+
+#pragma endregion
+
+#pragma region protected_members
+
+		ChannelUidStore _channelUidStore;
 
 #pragma endregion
 	};

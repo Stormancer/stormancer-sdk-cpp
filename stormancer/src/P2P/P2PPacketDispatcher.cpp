@@ -14,12 +14,7 @@ namespace Stormancer
 
 	void P2PPacketDispatcher::registerProcessor(PacketProcessorConfig& config)
 	{
-		config.addProcessor((byte)MessageIDTypes::ID_P2P_RELAY, new handlerFunction([this](Packet_ptr p) {
-			/*(*s) << this->id();
-			(*s) << priority;
-			(*s) << reliability;
-			(*s) << msgId;*/
-
+		config.addProcessor((byte)MessageIDTypes::ID_P2P_RELAY, new handlerFunction([=](Packet_ptr p) {
 			uint64 peerId;
 			*p->stream >> peerId;
 			auto connection = _connections->getConnection(peerId);
@@ -29,10 +24,9 @@ namespace Stormancer
 			}
 			return false;
 		}));
-		config.addProcessor((byte)MessageIDTypes::ID_P2P_TUNNEL, new handlerFunction([this](Packet_ptr p) {
+		config.addProcessor((byte)MessageIDTypes::ID_P2P_TUNNEL, new handlerFunction([=](Packet_ptr p) {
 			//_logger->log(LogLevel::Trace, "Received packet from tunnel. Origin: ",std::to_string(p->connection->id()));
 			_tunnels->receiveFrom(p->connection->id(), p->stream);
-
 			return true;
 		}));
 	}

@@ -10,21 +10,60 @@
     <Filter Include="Header Files\Compatibility">
       <UniqueIdentifier>{569fa282-667c-4c20-aa6d-12149788b0de}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Logger">
+      <UniqueIdentifier>{eb7bdae8-78d8-4d4e-a386-22f340c02180}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\P2P">
+      <UniqueIdentifier>{ea33c29b-a3fa-4bb8-957e-d6d3544a4c31}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\P2P\RakNet">
+      <UniqueIdentifier>{76fedf9a-c1bc-4d76-8200-8f6dbdc9e3c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\RakNet">
+      <UniqueIdentifier>{d0dd9a28-a36e-4f17-bc6f-08e5ab841a7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\RPC">
+      <UniqueIdentifier>{05aad83d-92b0-4544-ab64-f94ba5dbca02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\TCP">
+      <UniqueIdentifier>{feccb33e-4306-458a-b615-fa0bb35fa3af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Logger">
+      <UniqueIdentifier>{ec34b893-d6f1-4ab2-9054-d0dab3301f13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\P2P">
+      <UniqueIdentifier>{545cdcef-9999-4632-a916-43d47e085876}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\RakNet">
+      <UniqueIdentifier>{e50abc84-6d3c-4e58-870b-4f409e831560}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\P2P\RakNet">
+      <UniqueIdentifier>{cac81e8d-4573-4806-aae9-5d2b782a5209}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\RPC">
+      <UniqueIdentifier>{cf45ac12-9922-4096-b84a-5549f4e2d5ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\TCP">
+      <UniqueIdentifier>{41944fec-d3ee-4654-b943-0b9ed030da62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Streams">
+      <UniqueIdentifier>{5534fc1d-c953-4fe1-941f-225069d5e0b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Streams">
+      <UniqueIdentifier>{9c0bdb90-cdbc-43a4-b15f-92eefa185f33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\AES">
+      <UniqueIdentifier>{b71409f6-fc96-4248-86db-c2cbbf8bfb61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\AES">
+      <UniqueIdentifier>{f6b714b8-9eed-4953-b9aa-4508b544dea0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\Action.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\ApiClient.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\basic_bytebuf.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\basic_bytestream.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\bytestream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\Client.h">
@@ -58,9 +97,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\DisconnectFromSceneDto.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\EmptyDto.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\headers.h">
@@ -183,110 +219,153 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\Watch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\Compatibility\IStormancerTask.h">
+      <Filter>Header Files\Compatibility</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\Compatibility\pplxtasks_noexcept.h">
+      <Filter>Header Files\Compatibility</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\Compatibility\StormancerResult.h">
+      <Filter>Header Files\Compatibility</Filter>
+    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\Logger\ConsoleLogger.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Logger</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\Logger\ConsoleLoggerWindows.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Logger</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\Logger\FileLogger.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Logger</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\Logger\ILogger.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Logger</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\Logger\NullLogger.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Logger</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\P2P\ConnectionsRepository.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\P2P</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\P2P\ConnectivityCandidate.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\P2P</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\P2P\EndpointCandidate.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\P2P</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\P2P\OpenRelayParameters.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\P2P\P2PEnums.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\P2P\P2PPacketDispatcher.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\P2P\P2PRequestModule.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\P2P\P2PScenePeer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\P2P\P2PService.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\P2P\P2PSession.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\P2P\P2PSessions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\P2P\P2PTunnel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\P2P\RelayConnection.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\P2P\ServerDescriptor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\RakNet\RakNetConnection.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\RakNet\RakNetTransport.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\RPC\RpcPlugin.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\RPC\RpcRequest.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\RPC\RpcRequestContext.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\RPC\RpcService.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\TCP\TcpConnection.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\TCP\TcpTransport.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\P2P</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\P2P\P2PConnectionStateChangedArgs.h">
+      <Filter>Header Files\P2P</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\P2P\P2PEnums.h">
+      <Filter>Header Files\P2P</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\P2P\P2PPacketDispatcher.h">
+      <Filter>Header Files\P2P</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\P2P\P2PRequestModule.h">
+      <Filter>Header Files\P2P</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\P2P\P2PScenePeer.h">
+      <Filter>Header Files\P2P</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\P2P\P2PService.h">
+      <Filter>Header Files\P2P</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\P2P\P2PSession.h">
+      <Filter>Header Files\P2P</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\P2P\P2PSessions.h">
+      <Filter>Header Files\P2P</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\P2P\P2PTunnel.h">
+      <Filter>Header Files\P2P</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\P2P\RelayConnection.h">
+      <Filter>Header Files\P2P</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\P2P\ServerDescriptor.h">
+      <Filter>Header Files\P2P</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\P2P\RakNet\P2PTunnels.h">
+      <Filter>Header Files\P2P\RakNet</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\P2P\RakNet\P2PTunnelClient.h">
+      <Filter>Header Files\P2P\RakNet</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\RakNet\RakNetConnection.h">
+      <Filter>Header Files\RakNet</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\RakNet\RakNetTransport.h">
+      <Filter>Header Files\RakNet</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\RPC\RpcPlugin.h">
+      <Filter>Header Files\RPC</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\RPC\RpcRequest.h">
+      <Filter>Header Files\RPC</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\RPC\RpcRequestContext.h">
+      <Filter>Header Files\RPC</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\RPC\RpcService.h">
+      <Filter>Header Files\RPC</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\TCP\TcpConnection.h">
+      <Filter>Header Files\TCP</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\TCP\TcpTransport.h">
+      <Filter>Header Files\TCP</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\ClientFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\msgpack_define.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\ClientFactory.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\Compatibility\IStormancerTask.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\Compatibility\pplxtasks_noexcept.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\Compatibility\StormancerResult.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\IClientFactory.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\P2P\RakNet\P2PTunnelClient.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\P2P\RakNet\P2PTunnels.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\IClientFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\msgpack_define.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancerTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\ChannelUidStore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\IPacketTransform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\Streams\bytestreambuf.h">
+      <Filter>Header Files\Streams</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\Streams\obytestream.h">
+      <Filter>Header Files\Streams</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\Streams\ibytestream.h">
+      <Filter>Header Files\Streams</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\Streams\bytestream.h">
+      <Filter>Header Files\Streams</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\AES\AESEncryptStream.h">
+      <Filter>Header Files\AES</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\AES\AESPacketTransform.h">
+      <Filter>Header Files\AES</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\AES\AESDecryptStream.h">
+      <Filter>Header Files\AES</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\AES\AES.h">
+      <Filter>Header Files\AES</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\AES\IAES.h">
+      <Filter>Header Files\AES</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Configuration.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\ConnectionData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\ConnectionResult.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\ConnectToSceneMsg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\ContainerConfigurator.cpp">
@@ -301,13 +380,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\DependencyResolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\DisconnectFromSceneDto.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\dllmain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\EmptyDto.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Helpers.cpp">
@@ -340,9 +413,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Route.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\RouteDto.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -350,12 +420,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\SceneEndpoint.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\SceneInfosDto.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\SceneInfosRequestDto.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\ScenePeer.cpp">
@@ -379,77 +443,110 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Watch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Logger\ConsoleLogger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Logger\ConsoleLoggerWindows.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Logger\FileLogger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Logger\ILogger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Logger\NullLogger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\P2P\ConnectionsRepository.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\P2P\EndpointCandidate.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\P2P\P2PPacketDispatcher.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\P2P\P2PRequestModule.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\P2P\P2PScenePeer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\P2P\P2PService.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\P2P\P2PSessions.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\P2P\P2PTunnel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\P2P\RelayConnection.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\RakNet\RakNetConnection.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\RakNet\RakNetTransport.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\RPC\RpcPlugin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\RPC\RpcRequest.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\RPC\RpcService.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\TCP\TcpConnection.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\TCP\TcpTransport.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\ApiClient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Client.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\ClientFactory.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\P2P\RakNet\P2PTunnelClient.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\P2P\RakNet\P2PTunnels.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\ClientFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Logger\ConsoleLogger.cpp">
+      <Filter>Source Files\Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Logger\ConsoleLoggerWindows.cpp">
+      <Filter>Source Files\Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Logger\FileLogger.cpp">
+      <Filter>Source Files\Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Logger\NullLogger.cpp">
+      <Filter>Source Files\Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Logger\ILogger.cpp">
+      <Filter>Source Files\Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\P2P\ConnectionsRepository.cpp">
+      <Filter>Source Files\P2P</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\P2P\EndpointCandidate.cpp">
+      <Filter>Source Files\P2P</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\P2P\P2PPacketDispatcher.cpp">
+      <Filter>Source Files\P2P</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\P2P\P2PRequestModule.cpp">
+      <Filter>Source Files\P2P</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\P2P\P2PScenePeer.cpp">
+      <Filter>Source Files\P2P</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\P2P\P2PService.cpp">
+      <Filter>Source Files\P2P</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\P2P\P2PSessions.cpp">
+      <Filter>Source Files\P2P</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\P2P\P2PTunnel.cpp">
+      <Filter>Source Files\P2P</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\P2P\RelayConnection.cpp">
+      <Filter>Source Files\P2P</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\P2P\RakNet\P2PTunnelClient.cpp">
+      <Filter>Source Files\P2P\RakNet</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\P2P\RakNet\P2PTunnels.cpp">
+      <Filter>Source Files\P2P\RakNet</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\RakNet\RakNetConnection.cpp">
+      <Filter>Source Files\RakNet</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\RakNet\RakNetTransport.cpp">
+      <Filter>Source Files\RakNet</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\RPC\RpcPlugin.cpp">
+      <Filter>Source Files\RPC</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\RPC\RpcRequest.cpp">
+      <Filter>Source Files\RPC</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\RPC\RpcService.cpp">
+      <Filter>Source Files\RPC</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\TCP\TcpConnection.cpp">
+      <Filter>Source Files\TCP</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\TCP\TcpTransport.cpp">
+      <Filter>Source Files\TCP</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Serializer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\ChannelUidStore.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\IPacketTransform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Streams\bytestreambuf.cpp">
+      <Filter>Source Files\Streams</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Streams\ibytestream.cpp">
+      <Filter>Source Files\Streams</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Streams\obytestream.cpp">
+      <Filter>Source Files\Streams</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\AES\AESEncryptStream.cpp">
+      <Filter>Source Files\AES</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\AES\AESPacketTransform.cpp">
+      <Filter>Source Files\AES</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\AES\AESDecryptStream.cpp">
+      <Filter>Source Files\AES</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

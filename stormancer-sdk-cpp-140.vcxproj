@@ -347,6 +347,12 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stormancer\include\Windows\AES\AES_windows.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stormancer\src\Windows\AES\AES_windows.cpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

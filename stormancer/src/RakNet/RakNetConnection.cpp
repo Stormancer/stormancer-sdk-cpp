@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "RakNet/RakNetConnection.h"
 #include "Logger/ILogger.h"
+#include "AES/AESPacketTransform.h"
 
 namespace Stormancer
 {
@@ -10,8 +11,19 @@ namespace Stormancer
 		, _peer(peer)
 		, _id(id)
 	{
-		_connectionStateObservable.get_observable().subscribe([this](ConnectionState state) {
+		_connectionStateObservable.get_observable().subscribe([=](ConnectionState state) {
+			// On next
 			_connectionState = state;
+		}, [](std::exception_ptr exptr) {
+			// On error
+			try
+			{
+				std::rethrow_exception(exptr);
+			}
+			catch (const std::exception& ex)
+			{
+				ILogger::instance()->log(LogLevel::Error, "RakNetConnection", "Connection state change failed", ex.what());
+			}
 		});
 	}
 
@@ -105,49 +117,20 @@ namespace Stormancer
 		}
 	}
 
-	void RakNetConnection::sendSystem(byte msgId, std::function<void(bytestream*)> writer, PacketPriority priority)
+	void RakNetConnection::send(const Writer& writer, int channelUid, PacketPriority priority, PacketReliability reliability, const TransformMetadata& transformMetadata)
 	{
-		sendRaw([msgId, &writer](bytestream* stream) {
-			(*stream) << msgId;
-			writer(stream);
-		}, priority, PacketReliability::RELIABLE_ORDERED, (byte)0);
-	}
-
-	void RakNetConnection::sendRaw(std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability, char channel)
-	{
-		bytestream stream;
-		writer(&stream);
-		stream.flush();
-		auto bytes = stream.str();
-
-#if defined(STORMANCER_LOG_PACKETS) || defined(STORMANCER_LOG_RAKNET_PACKETS)
-		auto bytes2 = stringifyBytesArray(bytes, true);
-		ILogger::instance()->log(LogLevel::Trace, "RakNetConnection", "Send raw packet", bytes2.c_str());
-#endif
-
-		auto peer = _peer.lock();
-		if (peer)
+		obytestream stream;
+		std::vector<std::unique_ptr<IPacketTransform>> packetTransforms;
+		packetTransforms.emplace_back(new AESPacketTransform());
+		Writer writer2 = writer;
+		for (auto& packetTransform : packetTransforms)
 		{
-			auto result = peer->Send(bytes.data(), (int)bytes.length(), priority, reliability, channel, _guid, false);
-			if (result == 0)
-			{
-				throw std::runtime_error("Raknet failed to send the message.");
-			}
+			packetTransform->onSend(writer2, transformMetadata);
 		}
-		else
-		{
-			throw std::runtime_error("RakNet::RakPeerInterface has been destroyed.");
-		}
-	}
-
-	void RakNetConnection::sendToScene(byte sceneIndex, uint16 route, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability)
-	{
-		bytestream stream;
-		stream << sceneIndex;
-		stream << route;
-		writer(&stream);
+		writer2(&stream);
 		stream.flush();
-		auto bytes = stream.str();
+		byte* dataPtr = stream.ptr();
+		std::streamsize dataSize = stream.pcount();
 
 #if defined(STORMANCER_LOG_PACKETS) || defined(STORMANCER_LOG_RAKNET_PACKETS)
 		auto bytes2 = stringifyBytesArray(bytes, true);
@@ -157,7 +140,8 @@ namespace Stormancer
 		auto peer = _peer.lock();
 		if (peer)
 		{
-			auto result = peer->Send(bytes.data(), (int)bytes.length(), priority, reliability, 0, _guid, false);
+			char orderingChannel = channelUid % 16;
+			auto result = peer->Send((const char*)dataPtr, (int)dataSize, priority, reliability, orderingChannel, _guid, false);
 			if (result == 0)
 			{
 				throw std::runtime_error("Raknet failed to send the message.");
@@ -215,14 +199,6 @@ namespace Stormancer
 				_connectionStateObservable.get_subscriber().on_completed();
 			}
 		}
-	}
-
-	void RakNetConnection::sendRaw(byte msgId, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability)
-	{
-		sendRaw([msgId, writer](bytestream* s) {
-			*s << msgId;
-			writer(s);
-		}, priority, reliability,0);
 	}
 
 	rxcpp::observable<ConnectionState> RakNetConnection::getConnectionStateChangedObservable() const

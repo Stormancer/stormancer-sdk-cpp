@@ -38,26 +38,41 @@ namespace Stormancer
 		}
 		_remoteConnection = connection;
 
+		std::weak_ptr<SyncClock> weakThis(shared_from_this());
 		auto  scheduler = _dependencyResolver->resolve<IScheduler>();
 		if (scheduler)
 		{
 			_cancellationToken = ct;
 
-			scheduler->schedulePeriodic(_interval, [this]() {
-				std::lock_guard<std::mutex> lg(_mutex);
-				syncClockImplAsync();
+			auto cts = pplx::cancellation_token_source::create_linked_source(ct);
+			scheduler->schedulePeriodic(_interval, [weakThis, cts]
+			{
+				if (auto thiz = weakThis.lock())
+				{
+					std::lock_guard<std::mutex> lg(thiz->_mutex);
+					thiz->syncClockImplAsync();
+				}
+				else
+				{
+					cts.cancel();
+				}
 			}, ct);
 
 			// Do multiple pings at start
-			auto cts2 = pplx::cancellation_token_source::create_linked_source(ct);
-			auto ct2 = cts2.get_token();
-			scheduler->schedulePeriodic(_intervalAtStart, [this, cts2]() {
+			scheduler->schedulePeriodic(_intervalAtStart, [weakThis, cts]
+			{
+				auto thiz = weakThis.lock();
+				if (!thiz)
+				{
+					cts.cancel();
+					return;
+				}
 				bool shouldCallSyncClockImpl = false;
 				{
-					std::lock_guard<std::mutex> lg(_mutex);
-					if (_clockValues.size() >= _maxValues)
+					std::lock_guard<std::mutex> lg(thiz->_mutex);
+					if (thiz->_clockValues.size() >= thiz->_maxValues)
 					{
-						cts2.cancel();
+						cts.cancel();
 					}
 					else
 					{
@@ -66,17 +81,21 @@ namespace Stormancer
 				}
 				if(shouldCallSyncClockImpl)
 				{
-					syncClockImplAsync();
+					thiz->syncClockImplAsync();
 				}
-			}, ct2);
+			}, ct);
 		}
 		else
 		{
 			logger->log(LogLevel::Warn, "synchronizedClock", "Missing scheduler");
 		}
 
-		ct.register_callback([this]() {
-			stop();
+		ct.register_callback([weakThis]
+		{
+			if (auto thiz = weakThis.lock())
+			{
+				thiz->stop();
+			}
 		});
 
 		logger->log(LogLevel::Trace, "synchronizedClock", "SyncClock started");
@@ -132,9 +151,9 @@ namespace Stormancer
 			auto logger = _dependencyResolver->resolve<ILogger>();
 			auto ct = _cancellationToken;
 
-			requestProcessor->sendSystemRequest(remoteConnection.get(), (byte)SystemRequestIDTypes::ID_PING, [timeStart](bytestream* bs) {
+			requestProcessor->sendSystemRequest(remoteConnection.get(), (byte)SystemRequestIDTypes::ID_PING, [=](obytestream* bs) {
 				*bs << timeStart;
-			}, PacketPriority::IMMEDIATE_PRIORITY).then([this, timeStart, logger, ct](pplx::task<Packet_ptr> t) {
+			}, PacketPriority::IMMEDIATE_PRIORITY).then([=](pplx::task<Packet_ptr> t) {
 				Packet_ptr packet;
 				try
 				{

@@ -13,6 +13,15 @@
 
 namespace Stormancer
 {
+
+namespace
+{
+ServiceOptions playerProfileServiceOptions{
+	ServiceContextFlags::Scene | ServiceContextFlags::CreateWithScene | ServiceContextFlags::SingleInstance,
+	"profiles"
+};
+}
+
 	std::shared_ptr<StormancerWrapper> StormancerWrapper::_instance;
 
 	StormancerWrapper::StormancerWrapper()
@@ -41,10 +50,7 @@ namespace Stormancer
 		_config->addPlugin(new LeaderboardPlugin());
 		_config->addPlugin(new MatchmakingPlugin());
 
-		ServiceOptions playerProfileServiceOptions;
-		playerProfileServiceOptions.contextFlags = (ServiceContextFlags::Scene & ServiceContextFlags::CreateWithScene & ServiceContextFlags::SingleInstance);
-		playerProfileServiceOptions.metadataKey = "profiles";
-		_config->addPlugin(new SingleServicePlugin<PlayerProfileService<PlayerProfile>>(playerProfileServiceOptions));
+		_config->addPlugin(new SingleServicePlugin<PlayerProfileService<PlayerProfile>, playerProfileServiceOptions>());
 
 		_client = Client::create(_config);
 	}

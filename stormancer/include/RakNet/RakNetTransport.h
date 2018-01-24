@@ -59,6 +59,7 @@ namespace Stormancer
 		std::shared_ptr<RakNetConnection> removeConnection(RakNet::RakNetGUID guid);
 		void onRequestClose(RakNet::RakNetGUID guid);
 		pplx::task<int> sendPing(const std::string& address) override;
+		bool sendPingImpl(const std::string& address);
 		pplx::task<int> sendPing(const std::string& address, const int nb) override;
 		void openNat(const std::string& address) override;
 		std::vector<std::string> getAvailableEndpoints() const override;
@@ -88,7 +89,7 @@ namespace Stormancer
 		RakNet::RakNetGUID _serverRakNetGUID;
 		bool _serverConnected = false;
 		std::mutex _pendingPingsMutex;
-		std::unordered_map<std::string, pplx::task_completion_event<uint64>> _pendingPings;
+		std::unordered_map<std::string, pplx::task_completion_event<int>> _pendingPings;
 		
 
 #pragma endregion

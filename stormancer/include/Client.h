@@ -95,7 +95,7 @@ namespace Stormancer
 		~Client();
 		void initialize();
 		pplx::task<void> connectToScene(const std::string& sceneId, const std::string& sceneToken, const std::vector<Route_ptr>& localRoutes);
-		pplx::task<void> disconnect(Scene* scene);
+		pplx::task<void> disconnect(Scene_ptr scene);
 		pplx::task<void> disconnectAllScenes();
 		pplx::task<void> destroy();
 		pplx::task<Scene_ptr> getSceneInternal(const std::string& sceneId, const SceneEndpoint& sceneEndpoint);
@@ -148,6 +148,7 @@ namespace Stormancer
 		Action<ConnectionState> _onConnectionStateChanged;
 		std::shared_ptr<Configuration> _config;
 		rxcpp::composite_subscription _connectionSubscription;
+		Serializer _serializer;
 
 #pragma endregion
 	};

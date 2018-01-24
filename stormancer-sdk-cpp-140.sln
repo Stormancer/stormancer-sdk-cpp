@@ -57,15 +57,19 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libupnp-sources", "libupnp\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RaknetAndroid", "RaknetAndroid\RaknetAndroid.vcxproj", "{43D8B92C-4987-445B-84C7-C5224A98FFD6}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RaknetDll", "RaknetDll\RaknetDll.vcxproj", "{73703B65-9D12-4836-8C66-3FB48D3A721E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RaknetDll", "RaknetDll\RaknetDll-vc140.vcxproj", "{73703B65-9D12-4836-8C66-3FB48D3A721E}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SmokeTest", "SmokeTest\SmokeTest.vcxproj", "{DA8EAA28-D2DF-46E8-937E-E061E31EC539}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SmokeTest", "SmokeTest\SmokeTest-vc140.vcxproj", "{DA8EAA28-D2DF-46E8-937E-E061E31EC539}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RakNetIpv6", "Samples\RakNetIpv6\RakNetIpv6.vcxproj", "{CD827855-C824-4CBF-B736-B7FDA2ACD036}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RakNetIpv6", "Samples\RakNetIpv6\RakNetIpv6-vc140.vcxproj", "{CD827855-C824-4CBF-B736-B7FDA2ACD036}"
 	ProjectSection(ProjectDependencies) = postProject
 		{1014C621-BC2D-4813-B8C1-6D83AD6F9249} = {1014C621-BC2D-4813-B8C1-6D83AD6F9249}
 		{BC75CD23-CB75-4233-A305-B7328825A9A5} = {BC75CD23-CB75-4233-A305-B7328825A9A5}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tester-sources", "Samples\tester-sources\tester-sources.vcxitems", "{9781E681-CF17-48EA-BF81-6895F30E10FC}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "plugins-sources", "Plugins\plugins-sources\plugins-sources.vcxitems", "{89CE20EA-ACE0-44DF-8254-E19797639C16}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -75,8 +79,13 @@ Global
 		RakNet\raknet-sources.vcxitems*{45d41acc-2c3c-43d2-bc10-02aa73ffc7c7}*SharedItemsImports = 9
 		cpprestsdk\Release\src\build\common.vcxitems*{594dcb5f-07e3-4084-a2ce-268611fa629f}*SharedItemsImports = 9
 		libupnp\build\libupnp-sources\libupnp-sources.vcxitems*{5eeba6db-45f0-4437-9b6e-1eccdf3d8753}*SharedItemsImports = 9
+		Plugins\plugins-sources\plugins-sources.vcxitems*{89ce20ea-ace0-44df-8254-e19797639c16}*SharedItemsImports = 9
+		Samples\tester-sources\tester-sources.vcxitems*{9781e681-cf17-48ea-bf81-6895f30e10fc}*SharedItemsImports = 9
+		Plugins\plugins-sources\plugins-sources.vcxitems*{a91c2062-b9f2-4f9d-a04f-8710f81d8d24}*SharedItemsImports = 4
 		RakNet\raknet-sources.vcxitems*{bc75cd23-cb75-4233-a305-b7328825a9a5}*SharedItemsImports = 4
 		stormancer-sources.vcxitems*{d8cf547f-8b5b-4651-a48f-d6e56ee0b8c1}*SharedItemsImports = 4
+		Plugins\plugins-sources\plugins-sources.vcxitems*{dfb15956-69e5-4d05-89c2-e7390f884d50}*SharedItemsImports = 4
+		Samples\tester-sources\tester-sources.vcxitems*{dfb15956-69e5-4d05-89c2-e7390f884d50}*SharedItemsImports = 4
 		stormancer-sources.vcxitems*{f2476793-1238-43ab-9574-526f57986e4c}*SharedItemsImports = 9
 		cpprestsdk\Release\src\build\win32.vcxitems*{f40f4804-50f9-4257-8d74-b9cbb19ac4c3}*SharedItemsImports = 9
 	EndGlobalSection
@@ -360,5 +369,7 @@ Global
 		{5EEBA6DB-45F0-4437-9B6E-1ECCDF3D8753} = {D9F8F27A-441E-40C1-957C-8665976E7500}
 		{DA8EAA28-D2DF-46E8-937E-E061E31EC539} = {D796A1C3-82DC-4845-8F6E-521F9B757D84}
 		{CD827855-C824-4CBF-B736-B7FDA2ACD036} = {D796A1C3-82DC-4845-8F6E-521F9B757D84}
+		{9781E681-CF17-48EA-BF81-6895F30E10FC} = {D796A1C3-82DC-4845-8F6E-521F9B757D84}
+		{89CE20EA-ACE0-44DF-8254-E19797639C16} = {D796A1C3-82DC-4845-8F6E-521F9B757D84}
 	EndGlobalSection
 EndGlobal

@@ -11,31 +11,15 @@ namespace Stormancer
 	{
 	}
 
-	void RelayConnection::sendSystem(byte msgId, std::function<void(bytestream*)> writer, PacketPriority priority)
+	void RelayConnection::send(const Writer& writer, int channelUid, PacketPriority priority, PacketReliability reliability, const TransformMetadata& /*transformMetadata*/)
 	{
-		sendRaw(msgId, [writer](bytestream* stream) {
-			writer(stream);
-		}, priority, PacketReliability::RELIABLE_ORDERED);
-	}
-
-	void RelayConnection::sendToScene(byte sceneIndex, uint16 route, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability)
-	{
-		sendRaw(sceneIndex, [writer, route](bytestream* stream) {
-			(*stream) << route;
-			writer(stream);
-		}, priority, reliability);
-	}
-
-	void RelayConnection::sendRaw(byte msgId, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability)
-	{
-		_serverConnection->sendRaw((byte)MessageIDTypes::ID_P2P_RELAY, [this, msgId, writer, reliability, priority](bytestream* s) {
-			(*s) << this->id();
+		_serverConnection->send([=](obytestream* s) {
+			(*s) << (byte)MessageIDTypes::ID_P2P_RELAY;
+			(*s) << id();
 			(*s) << priority;
 			(*s) << reliability;
-			(*s) << msgId;
 			writer(s);
-
-		}, priority, reliability);
+		}, channelUid, priority, reliability);
 	}
 
 	void RelayConnection::setApplication(std::string account, std::string application)

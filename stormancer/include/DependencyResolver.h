@@ -59,7 +59,7 @@ namespace Stormancer
 		template<typename T>
 		void registerDependency(std::shared_ptr<T> instance)
 		{
-			registerDependency<T>([instance](DependencyResolver*) {
+			registerDependency<T>([=](DependencyResolver*) {
 				return instance;
 			});
 		}

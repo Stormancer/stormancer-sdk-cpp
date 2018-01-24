@@ -2,6 +2,7 @@
 #include "Scene.h"
 #include "ScenePeer.h"
 #include "Client.h"
+#include "TransformMetadata.h"
 
 namespace Stormancer
 {
@@ -19,8 +20,19 @@ namespace Stormancer
 			_remoteRoutesMap[routeDto.Name] = std::make_shared<Route>(routeDto.Name, routeDto.Handle, MessageOriginFilter::Host, routeDto.Metadata);
 		}
 
-		_connectionStateObservable.get_observable().subscribe([this](ConnectionState state) {
+		_connectionStateObservable.get_observable().subscribe([=](ConnectionState state) {
+			// On next
 			_connectionState = state;
+		}, [](std::exception_ptr exptr) {
+			// On error
+			try
+			{
+				std::rethrow_exception(exptr);
+			}
+			catch (const std::exception& ex)
+			{
+				ILogger::instance()->log(LogLevel::Error, "Scene", "Connection state change failed", ex.what());
+			}
 		});
 	}
 
@@ -30,7 +42,7 @@ namespace Stormancer
 		_logger->log(LogLevel::Trace, "Scene", "deleting scene...", _id);
 #endif
 		auto& logger = _logger;
-		disconnect(true).then([logger](pplx::task<void> t) {
+		disconnect(true).then([=](pplx::task<void> t) {
 			try
 			{
 				t.get();
@@ -110,22 +122,22 @@ namespace Stormancer
 
 	void Scene::addRoute(const std::string& routeName, std::function<void(Packetisp_ptr)> handler, MessageOriginFilter filter, const std::map<std::string, std::string>& metadata)
 	{
-		auto subscription = onMessage(routeName, filter, metadata)
-			.subscribe(
-				handler,
-				// On error
-				[this, routeName](std::exception_ptr eptr)
-				{
-					try
-					{
-						std::rethrow_exception(eptr);
-					}
-					catch (std::exception& e)
-					{
-						_logger->log(LogLevel::Error, "Scene", "Error reading message on route " + routeName, e.what());
-					}
-				}
-		);
+		auto observable = onMessage(routeName, filter, metadata);
+		auto subscription = observable.subscribe(
+			// On next
+			handler,
+			[=](std::exception_ptr exptr)
+		{
+			// On error
+			try
+			{
+				std::rethrow_exception(exptr);
+			}
+			catch (const std::exception& ex)
+			{
+				_logger->log(LogLevel::Error, "Scene", "Error reading message on route '" + routeName + "'", ex.what());
+			}
+		});
 		_subscriptions.push_back(subscription);
 	}
 
@@ -154,15 +166,15 @@ namespace Stormancer
 			throw std::runtime_error("A route already exists for this route name.");
 		}
 
-		auto route = std::make_shared<Route>(routeName, 0, filter, metadata);
+		auto route = std::make_shared<Route>(routeName, (uint16)0, filter, metadata);
 		_localRoutesMap[routeName] = route;
 		return onMessage(route);
 	}
 
 	rxcpp::observable<Packetisp_ptr> Scene::onMessage(Route_ptr route)
 	{
-		auto observable = rxcpp::observable<>::create<Packetisp_ptr>([this, route](rxcpp::subscriber<Packetisp_ptr> subscriber) {
-			auto handler = std::function<void(Packet_ptr)>([this, subscriber, route](Packet_ptr p) {
+		auto observable = rxcpp::observable<>::create<Packetisp_ptr>([=](rxcpp::subscriber<Packetisp_ptr> subscriber) {
+			auto handler = std::function<void(Packet_ptr)>([=](Packet_ptr p) {
 				std::shared_ptr<IScenePeer> origin = nullptr;
 				bool isOriginHost = false;
 				if (p->connection->id() == host()->id())
@@ -187,7 +199,7 @@ namespace Stormancer
 			route->handlers.push_back(handler);
 			auto it = route->handlers.end();
 			it--;
-			subscriber.add([route, it]() {
+			subscriber.add([=]() {
 				route->handlers.erase(it);
 			});
 		});
@@ -195,7 +207,7 @@ namespace Stormancer
 		return observable.as_dynamic();
 	}
 
-	void Scene::send(const PeerFilter&, const std::string& routeName, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability)
+	void Scene::send(const PeerFilter&, const std::string& routeName, const Writer& writer, PacketPriority priority, PacketReliability reliability, const std::string& channelIdentifier)
 	{
 		auto client = _client.lock();
 		if (!client)
@@ -219,17 +231,34 @@ namespace Stormancer
 		}
 
 		Route_ptr route = _remoteRoutesMap[routeName];
-		_peer->sendToScene(_handle, route->handle(), writer, priority, reliability);
+		int channelUid = 1;
+		if (channelIdentifier.empty())
+		{
+			std::stringstream ss;
+			ss << "Scene_" << _id << "_" << routeName;
+			channelUid = _peer->getChannelUidStore().getChannelUid(ss.str());
+		}
+		else
+		{
+			channelUid = _peer->getChannelUidStore().getChannelUid(channelIdentifier);
+		}
+		auto writer2 = [=, &writer](obytestream* stream) {
+			(*stream) << _handle;
+			(*stream) << route->handle();
+			writer(stream);
+		};
+		TransformMetadata transformMetadata{ _metadata };
+		_peer->send(writer2, channelUid, priority, reliability, transformMetadata);
 	}
 
-	void Scene::send(const std::string& routeName, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability)
+	void Scene::send(const std::string& routeName, const Writer& writer, PacketPriority priority, PacketReliability reliability, const std::string& channelIdentifier)
 	{
-		send(MatchSceneHost(), routeName, writer, priority, reliability);
+		send(MatchSceneHost(), routeName, writer, priority, reliability, channelIdentifier);
 	}
 
-	void Scene::sendPacket(const std::string& routeName, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability)
+	void Scene::sendPacket(const std::string& routeName, const Writer& writer, PacketPriority priority, PacketReliability reliability, const std::string& channelIdentifier)
 	{
-		send(MatchSceneHost(), routeName, writer, priority, reliability);
+		send(MatchSceneHost(), routeName, writer, priority, reliability, channelIdentifier);
 	}
 
 	pplx::task<void> Scene::connect()
@@ -269,7 +298,7 @@ namespace Stormancer
 			auto client = _client.lock();
 			if (client)
 			{
-				_disconnectTask = client->disconnect(this);
+				_disconnectTask = client->disconnect(shared_from_this());
 			}
 			else
 			{
@@ -293,7 +322,7 @@ namespace Stormancer
 		if (immediate)
 		{
 			// if immediate, we don't propage the exception
-			return _disconnectTask.then([this](pplx::task<void> t) {
+			return _disconnectTask.then([=](pplx::task<void> t) {
 				try
 				{
 					t.wait();
@@ -375,13 +404,13 @@ namespace Stormancer
 	std::shared_ptr<P2PTunnel> Scene::registerP2PServer(const std::string & p2pServerId)
 	{
 		auto p2p = dependencyResolver()->resolve<P2PService>();
-		return p2p->registerP2PServer(this->id()+"."+p2pServerId);
+		return p2p->registerP2PServer(this->id() + "." + p2pServerId);
 
 	}
 	pplx::task<std::shared_ptr<P2PScenePeer>> Scene::openP2PConnection(const std::string & token)
 	{
 		auto p2p = dependencyResolver()->resolve<P2PService>();
-		return p2p->openP2PConnection(token).then([this, p2p](pplx::task < std::shared_ptr<IConnection>> t) {
+		return p2p->openP2PConnection(token).then([=](pplx::task < std::shared_ptr<IConnection>> t) {
 
 			return std::make_shared<P2PScenePeer>(this, t.get(), p2p);
 		});

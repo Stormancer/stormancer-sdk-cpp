@@ -1,4 +1,4 @@
-#include <stdafx.h>
+#include "stdafx.h"
 #include "MatchmakingService.h"
 
 namespace Stormancer
@@ -21,7 +21,7 @@ namespace Stormancer
 		: _scene(scene)
 		, _rpcService(scene->dependencyResolver()->resolve<RpcService>())
 	{
-		_scene->addRoute("match.update", [this](Packetisp_ptr packet) {
+		_scene->addRoute("match.update", [=](Packetisp_ptr packet) {
 			byte matchStateByte;
 			packet->stream->read((char*)&matchStateByte, 1);
 			int32 matchState = matchStateByte;
@@ -30,48 +30,36 @@ namespace Stormancer
 
 			auto ms = std::to_string(matchState);
 
-			_onMatchUpdate(_matchState);
+			if (_onMatchUpdate)
+			{
+				_onMatchUpdate(_matchState);
+			}
 
 			if (_matchState == MatchState::Success)
 			{
-				msgpack::unpacked result;
+				Serializer serializer;
+				MatchmakingResponse mmres = serializer.deserializeOne<MatchmakingResponse>(packet->stream);
 
-				std::string buffer;
-				*packet->stream >> buffer;
-
-				//std::string bufferLisible = StringifyBytesArray(buffer, true);
-				//UE_LOG(LogTemp, Error, TEXT("buffer value -----------------> :  %s"), *(FString(bufferLisible.c_str())));
-
-				msgpack::unpack(result, buffer.data(), buffer.size());
-				MatchmakingResponse mmres;
-				result.get().convert(&mmres);
-
-				_onMatchFound(mmres);
+				if (_onMatchFound)
+				{
+					_onMatchFound(mmres);
+				}
 			}
 		});
 
-		_scene->addRoute("match.parameters.update", [this](Packetisp_ptr packet) {
-			std::string buffer;
-			*packet->stream >> buffer;
-
-			msgpack::unpacked result;
-			msgpack::unpack(result, buffer.data(), buffer.size());
-			std::string provider;
-			result.get().convert(&provider);
+		_scene->addRoute("match.parameters.update", [=](Packetisp_ptr packet) {
+			Serializer serializer;
+			std::string provider = serializer.deserializeOne<std::string>(packet->stream);
 
 			//_onMatchParametersUpdate();
 		});
 
-		_scene->addRoute("match.ready.update", [this](Packetisp_ptr packet) {
-			std::string buffer;
-			*packet->stream >> buffer;
-			msgpack::unpacked result;
-			msgpack::unpack(result, buffer.data(), buffer.size());
-			Internal::ReadyVerificationRequest readyUpdateTmp;
-			result.get().convert(&readyUpdateTmp);
-
+		_scene->addRoute("match.ready.update", [=](Packetisp_ptr packet) {
+			Serializer serializer;
+			Internal::ReadyVerificationRequest readyUpdateTmp = serializer.deserializeOne<Internal::ReadyVerificationRequest>(packet->stream);
 			ReadyVerificationRequest readyUpdate = readyUpdateTmp;
 			readyUpdate.membersCountReady = 0;
+
 			for (auto it : readyUpdateTmp.members)
 			{
 				Readiness ready = (Readiness)it.second;
@@ -123,11 +111,12 @@ namespace Stormancer
 
 		_isMatching = true;
 
-		rxcpp::observable<Packetisp_ptr> observable = _rpcService->rpc_observable("match.find", [provider](bytestream* stream) {
-			msgpack::pack(stream, provider);
+		rxcpp::observable<Packetisp_ptr> observable = _rpcService->rpc_observable("match.find", [=](obytestream* stream) {
+			_serializer.serialize(stream, provider);
 		}, PacketPriority::MEDIUM_PRIORITY);
 
-		auto onNext = [this, tce](Packetisp_ptr packet) {
+		_matchmakingSubscription = observable.subscribe([=](Packetisp_ptr packet) {
+			// On next
 			_isMatching = false;
 			if (_hasSubscription)
 			{
@@ -135,9 +124,8 @@ namespace Stormancer
 				_hasSubscription = false;
 			}
 			tce.set();
-		};
-
-		auto onError = [this, tce](std::exception_ptr eptr) {
+		}, [=](std::exception_ptr exptr) {
+			// On error
 			_isMatching = false;
 			if (_hasSubscription)
 			{
@@ -146,22 +134,20 @@ namespace Stormancer
 			}
 			try
 			{
-				if (eptr)
+				if (exptr)
 				{
-					std::rethrow_exception(eptr);
+					std::rethrow_exception(exptr);
 				}
 				else
 				{
 					throw std::runtime_error("Unknown error during mathmaking.");
 				}
 			}
-			catch(std::exception& ex)
+			catch (const std::exception& ex)
 			{
 				tce.set_exception(ex);
 			}
-		};
-
-		_matchmakingSubscription = observable.subscribe(onNext, onError);
+		});
 		_hasSubscription = true;
 
 		return pplx::create_task(tce);
@@ -169,9 +155,9 @@ namespace Stormancer
 
 	void MatchmakingService::resolve(bool acceptMatch)
 	{
-		_scene->sendPacket("match.ready.resolve", [acceptMatch](bytestream* stream) {
+		_scene->sendPacket("match.ready.resolve", [=](obytestream* stream) {
 			*stream << acceptMatch;
-		}, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE);
+		}, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE_ORDERED);
 	}
 
 	void MatchmakingService::cancel()
@@ -186,7 +172,7 @@ namespace Stormancer
 			}
 			else
 			{
-				_scene->sendPacket("match.cancel", [](bytestream*) {}, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE);
+				_scene->sendPacket("match.cancel", Writer(), PacketPriority::IMMEDIATE_PRIORITY, PacketReliability::RELIABLE_ORDERED);
 			}
 		}
 	}

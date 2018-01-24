@@ -15,23 +15,6 @@ namespace Stormancer
 	{
 	}
 
-	void TcpConnection::sendSystem(byte msgId, std::function<void(bytestream*)> writer, PacketPriority priority)
-	{
-		sendRaw([msgId, &writer](bytestream* stream) {
-			*stream << msgId;
-			writer(stream);
-		}, priority, PacketReliability::RELIABLE_ORDERED);
-	}
-
-	void TcpConnection::sendToScene(byte sceneIndex, uint16 route, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability)
-	{
-		sendRaw([sceneIndex, route, &writer](bytestream* stream) {
-			*stream << sceneIndex;
-			*stream << route;
-			writer(stream);
-		}, priority, reliability);
-	}
-
 	void TcpConnection::setApplication(std::string account, std::string application)
 	{
 		if (account.length() > 0)
@@ -136,27 +119,19 @@ namespace Stormancer
 		return _closeAction;
 	}
 
-	void TcpConnection::sendRaw(std::function<void(bytestream*)> writer, PacketPriority, PacketReliability)
+	void TcpConnection::sendRaw(const Writer& writer, PacketPriority, PacketReliability)
 	{
 		if (!_socketId.expired())
 		{
-			SOCKET socketId = *(_socketId.lock());
-			bytestream stream;
+			//SOCKET socketId = *(_socketId.lock());
+			obytestream stream;
 			writer(&stream);
 			stream.flush();
-			auto bytes = stream.str();
+			auto bytes = stream.bytes();
 
-			unsigned int length = (unsigned int)bytes.length();
-			send__(socketId, (char*)&length, sizeof(length), 0);
-			send__(socketId, bytes.data(), length, 0);
+			//unsigned int length = (unsigned int)bytes.length();
+			//send__(socketId, (char*)&length, sizeof(length), 0);
+			//send__(socketId, bytes.data(), length, 0);
 		}
-	}
-	
-	void TcpConnection::sendRaw(byte msgId, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability)
-	{
-		sendRaw([msgId, writer](bytestream* s) {
-			*s << msgId;
-			writer(s);
-		}, priority, reliability);
 	}
 }

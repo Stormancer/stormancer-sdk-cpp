@@ -22,7 +22,7 @@ namespace Stormancer
 			throw std::runtime_error("The scene ptr is invalid");
 		}
 
-		auto observable = rxcpp::observable<>::create<Packetisp_ptr>([this, writer, route, priority](rxcpp::subscriber<Packetisp_ptr> subscriber) {
+		auto observable = rxcpp::observable<>::create<Packetisp_ptr>([=](rxcpp::subscriber<Packetisp_ptr> subscriber) {
 			if (!_scene)
 			{
 				throw std::runtime_error("The scene ptr is invalid");
@@ -49,10 +49,18 @@ namespace Stormancer
 			}
 
 			auto metadata = relevantRoute->metadata();
+
+			if (!mapContains(metadata, RpcPlugin::pluginName))
+			{
+				auto errorMsg = std::string() + "The target remote route '" + route + "' is not an RPC route.";
+				ILogger::instance()->log(LogLevel::Error, "RpcService", errorMsg, route);
+				throw std::runtime_error(errorMsg);
+			}
+			
 			if (metadata[RpcPlugin::pluginName] != RpcPlugin::version)
 			{
-				auto errorMsg = std::string("The target remote route does not support the plugin RPC version ") + RpcPlugin::version;
-				ILogger::instance()->log(LogLevel::Error, "RpcService", errorMsg.c_str());
+				auto errorMsg = std::string() + "The target remote route '" + route + "' does not support the plugin RPC version " + RpcPlugin::version;
+				ILogger::instance()->log(LogLevel::Error, "RpcService", errorMsg.c_str(), route);
 				throw std::runtime_error(errorMsg);
 			}
 
@@ -67,10 +75,10 @@ namespace Stormancer
 
 			try
 			{
-				_scene->sendPacket(route, [id, writer](bytestream* bs) {
+				_scene->sendPacket(route, [=](obytestream* bs) {
 					*bs << id;
 					writer(bs);
-				}, priority, PacketReliability::RELIABLE_ORDERED);
+				}, priority, PacketReliability::RELIABLE_ORDERED, _rpcServerChannelIdentifier);
 			}
 			catch (std::exception& ex)
 			{
@@ -79,7 +87,7 @@ namespace Stormancer
 				return;
 			}
 
-			subscriber.add([this, request]() {
+			subscriber.add([=]() {
 				if (!request->hasCompleted)
 				{
 #ifdef STORMANCER_LOG_RPC
@@ -90,10 +98,10 @@ namespace Stormancer
 					{
 						try
 						{
-							_scene->sendPacket(RpcPlugin::cancellationRouteName, [this, request](bytestream* bs)
+							_scene->sendPacket(RpcPlugin::cancellationRouteName, [=](obytestream* bs)
 							{
 								*bs << request->id;
-							});
+							}, PacketPriority::IMMEDIATE_PRIORITY, PacketReliability::RELIABLE_ORDERED, _rpcServerChannelIdentifier);
 						}
 						catch (std::exception& e)
 						{
@@ -131,7 +139,7 @@ namespace Stormancer
 		{
 			std::map<std::string, std::string> rpcMetadatas{ { RpcPlugin::pluginName, RpcPlugin::version } };
 
-			_scene->addRoute(route, [this, handler, ordered](Packetisp_ptr p) {
+			_scene->addRoute(route, [=](Packetisp_ptr p) {
 				uint16 id = 0;
 				*p->stream >> id;
 				pplx::cancellation_token_source cts;
@@ -142,13 +150,13 @@ namespace Stormancer
 					if (!mapContains(_runningRequests, id))
 					{
 						_runningRequests[id] = cts;
-						ctx = RpcRequestContext_ptr(new RpcRequestContext<IScenePeer>(p->connection.get(), _scene, id, ordered, p->stream, cts.get_token()));
+						ctx = std::make_shared<RpcRequestContext<IScenePeer>>(p->connection.get(), _scene, id, ordered, p->stream, cts.get_token());
 					}
 				}
 
 				if (ctx)
 				{
-					invokeWrapping(handler, ctx).then([this, id, ctx](pplx::task<void> t) {
+					invokeWrapping(handler, ctx).then([=](pplx::task<void> t) {
 						try
 						{
 							t.wait();
@@ -275,13 +283,8 @@ namespace Stormancer
 
 			eraseRequest(request->id);
 
-			std::string buf;
-			*packet->stream >> buf;
-			msgpack::unpacked result;
-			msgpack::unpack(result, buf.data(), buf.size());
-			msgpack::object deserialized = result.get();
-			std::string msg;
-			deserialized.convert(&msg);
+			std::string msg = _serializer.deserializeOne<std::string>(packet->stream);
+			
 			request->observer.on_error(std::make_exception_ptr(std::runtime_error(msg)));
 		}
 	}
@@ -310,7 +313,7 @@ namespace Stormancer
 				}
 			}
 
-			request->task.then([this, request](pplx::task<void> t) {
+			request->task.then([=](pplx::task<void> t) {
 				eraseRequest(request->id);
 				request->observer.on_completed();
 			});
@@ -380,25 +383,23 @@ namespace Stormancer
 
 		auto observable = rpc_observable(procedure, writer, PacketPriority::MEDIUM_PRIORITY);
 
-		auto onNext = [](Packetisp_ptr packet) {};
-
-		auto onError = [tce, procedure](const std::exception_ptr error) {
-			ILogger::instance()->log(LogLevel::Trace, "RpcHelpers", "An exception occurred during the rpc " + procedure);
+		observable.subscribe([](Packetisp_ptr packet) {
+			// On next
+		}, [=](std::exception_ptr exptr) {
+			// On error
 			try
 			{
-				std::rethrow_exception(error);
+				std::rethrow_exception(exptr);
 			}
-			catch (std::exception& e)
+			catch (const std::exception& ex)
 			{
-				tce.set_exception(e);
+				ILogger::instance()->log(LogLevel::Warn, "RpcHelpers", "An exception occurred during the rpc '" + procedure + "'", ex.what());
+				tce.set_exception(ex);
 			}
-		};
-
-		std::function<void()> onComplete = [tce]() {
+		}, [=]() {
+			// On complete
 			tce.set();
-		};
-
-		observable.subscribe(onNext, onError, onComplete);
+		});
 
 		return pplx::create_task(tce, pplx::task_options(getDispatcher()));
 	}

@@ -35,10 +35,8 @@ namespace Stormancer
 
 #pragma region public_methods
 
-		P2PTunnels(std::shared_ptr<RequestProcessor> sysCall, std::shared_ptr<IConnectionManager> connections, std::shared_ptr<Serializer> serializer
-			, std::shared_ptr<Configuration> configuration
-			, std::shared_ptr<ILogger> logger);
-		void receiveFrom(uint64 id, bytestream* stream);
+		P2PTunnels(std::shared_ptr<RequestProcessor> sysCall, std::shared_ptr<IConnectionManager> connections, std::shared_ptr<Serializer> serializer, std::shared_ptr<Configuration> configuration, std::shared_ptr<ILogger> logger);
+		void receiveFrom(uint64 id, ibytestream* stream);
 		std::shared_ptr<P2PTunnel> createServer(std::string serverId, std::shared_ptr<P2PTunnels> tunnels);
 		pplx::task<std::shared_ptr<P2PTunnel>> openTunnel(uint64 connectionId, std::string serverId);
 		byte addClient(std::string serverId, uint64 clientPeerId);

@@ -17,7 +17,7 @@ namespace Stormancer
 
 		ScenePeer(IConnection* connection, byte sceneHandle, std::map<std::string, Route_ptr>& routeMapping, Scene* scene);
 		~ScenePeer();
-		void send(std::string& routeName, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability) override;
+		void send(const std::string& routeName, const Writer& writer, PacketPriority priority, PacketReliability reliability) override;
 		void disconnect() override;
 		uint64 id() override;
 

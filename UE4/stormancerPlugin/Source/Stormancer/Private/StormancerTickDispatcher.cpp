@@ -8,11 +8,14 @@ FStormancerTickDispatcher::FStormancerTickDispatcher() :
 {
 }
 
-void FStormancerTickDispatcher::stop()
+pplx::task<void> FStormancerTickDispatcher::stop()
 {
-	MainThreadActionDispatcher::stop();
-	// MainThreadActionDispatcher needs a last call tu update() before stopping
-	MainThreadActionDispatcher::update(std::chrono::milliseconds(1));
+
+	return MainThreadActionDispatcher::stop().then([this] {
+
+		// MainThreadActionDispatcher needs a last call tu update() before stopping
+		MainThreadActionDispatcher::update(std::chrono::milliseconds(1));
+	});
 }
 
 void FStormancerTickDispatcher::Tick(float DeltaTime)

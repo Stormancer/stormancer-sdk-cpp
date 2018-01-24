@@ -25,7 +25,7 @@ namespace Stormancer
 		return _p2p->openTunnel((uint64)_connection->id(), _scene->id() + "." + serverId);
 	}
 
-	void P2PScenePeer::send(std::string &, std::function<void(bytestream*)>, PacketPriority, PacketReliability)
+	void P2PScenePeer::send(const std::string&, const Writer&, PacketPriority, PacketReliability)
 	{
 		throw std::runtime_error("Not implemented");
 	}

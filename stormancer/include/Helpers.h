@@ -1,7 +1,7 @@
 #pragma once
 
 #include "headers.h"
-#include "bytestream.h"
+#include "Streams/bytestream.h"
 
 namespace Stormancer
 {
@@ -142,13 +142,11 @@ namespace Stormancer
 	void streamCopy(T* fromStream, U* toStream)
 	{
 		uint32 n = static_cast<uint32>(fromStream->rdbuf()->in_avail());
-		char* c = new char[n];
+		byte* c = new byte[n];
 		fromStream->readsome(c, n);
 		toStream->write(c, n);
 		delete[] c;
 	}
-
-	STORMANCER_DLL_API char* readToEnd(bytestream* stream, std::streamsize* length);
 
 	std::time_t nowTime_t();
 	std::string time_tToStr(std::time_t time, bool local = false);
@@ -161,7 +159,7 @@ namespace Stormancer
 
 	bool ensureSuccessStatusCode(int statusCode);
 
-	STORMANCER_DLL_API std::string stringifyBytesArray(std::string bytes, bool hex = false);
+	STORMANCER_DLL_API std::string stringifyBytesArray(const std::vector<byte>& bytes, bool hex = true);
 
 	/// Compares the value of var with expected. If those are equal, replaces var with desired and returns true. Otherwise returns false.
 	/// \param var Reference to the value to compare with expected.
@@ -271,7 +269,7 @@ namespace Stormancer
 
 		// Create a continuation task that cancels the overall task 
 		// if the timeout task finishes first.
-		return (failure_task || success_task).then([t, cts](bool success)
+		return (failure_task || success_task).then([=](bool success)
 		{
 			if (!success)
 			{

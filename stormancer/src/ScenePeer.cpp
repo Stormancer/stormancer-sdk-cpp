@@ -15,14 +15,21 @@ namespace Stormancer
 	{
 	}
 
-	void ScenePeer::send(std::string& routeName, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability)
+	void ScenePeer::send(const std::string& routeName, const Writer& writer, PacketPriority priority, PacketReliability reliability)
 	{
 		if (!mapContains(_routeMapping, routeName))
 		{
 			throw std::invalid_argument(std::string("The routeName '") + routeName + "' is not declared on the server.");
 		}
 		Route_ptr r = _routeMapping[routeName];
-		_connection->sendToScene(_sceneHandle, r->handle(), writer, priority, reliability);
+		std::stringstream ss;
+		ss << "ScenePeer_" << id() << "_" << routeName;
+		int channelUid = _connection->getChannelUidStore().getChannelUid(ss.str());
+		_connection->send([=, &writer](obytestream* stream) {
+			(*stream) << _sceneHandle;
+			(*stream) << r->handle();
+			writer(stream);
+		}, channelUid, priority, reliability);
 	}
 
 	void ScenePeer::disconnect()

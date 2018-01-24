@@ -1,10 +1,10 @@
-#include <stdafx.h>
+#include "stdafx.h"
 #include "Friends.h"
 
 Stormancer::FriendsService::FriendsService(std::shared_ptr<Scene> scene, std::shared_ptr<ILogger> logger) :
 	_scene(scene),
 	_logger(logger),
-	friendListChanged([](std::shared_ptr<Friend> f, FriendListUpdateOperation op) {})
+	friendListChanged([](std::shared_ptr<Friend> f, FriendListUpdateOperation /*op*/) {})
 {
 	scene->addRoute("friends.notification", [this](Packetisp_ptr packet) {
 		auto update = packet->readObject<FriendListUpdateDto>();
@@ -19,18 +19,17 @@ pplx::task<void> Stormancer::FriendsService::inviteFriend(std::string userId)
 
 pplx::task<void> Stormancer::FriendsService::answerFriendInvitation(std::string originId, bool accept)
 {
-	return _scene->dependencyResolver()->resolve<RpcService>()->rpc<void, std::string, bool>("friends.invitefriend", originId, accept);
+	return _scene->dependencyResolver()->resolve<RpcService>()->rpc<void, std::string, bool>("friends.acceptfriendinvitation", originId, accept);
 }
 
 pplx::task<void> Stormancer::FriendsService::removeFriend(std::string userId)
 {
 	return _scene->dependencyResolver()->resolve<RpcService>()->rpc<void, std::string>("friends.removefriend", userId);
-
 }
 
 pplx::task<void> Stormancer::FriendsService::setStatus(FriendListStatusConfig status, std::string details)
 {
-	return _scene->dependencyResolver()->resolve<RpcService>()->rpc<void, FriendListStatusConfig , std::string > ("friends.invitefriend", status, details);
+	return _scene->dependencyResolver()->resolve<RpcService>()->rpc<void, FriendListStatusConfig , std::string > ("friends.setstatus", status, details);
 }
 
 void Stormancer::FriendsService::onFriendNotification(const FriendListUpdateDto &update)

@@ -20,7 +20,7 @@ namespace Stormancer
 	{
 		std::string userId;
 		std::string details;
-		long lastConnected;
+		uint64 lastConnected;
 		FriendStatus status;
 
 		MSGPACK_DEFINE(userId, details, lastConnected, status)

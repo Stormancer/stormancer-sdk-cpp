@@ -16,6 +16,8 @@ namespace Stormancer
 		/// System request
 		ID_SYSTEM_REQUEST = DefaultMessageIDTypes::ID_USER_PACKET_ENUM,
 
+		ID_ENCRYPTED = 135,
+
 		/// Reponse to a system request
 		ID_REQUEST_RESPONSE_MSG = 137,
 

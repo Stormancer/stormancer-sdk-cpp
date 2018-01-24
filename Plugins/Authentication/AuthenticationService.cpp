@@ -1,6 +1,8 @@
-#include <stdafx.h>
+#include "stdafx.h"
 #include <RPC/RpcService.h>
 #include "AuthenticationService.h"
+#include <unordered_map>
+
 
 namespace Stormancer
 {
@@ -9,6 +11,7 @@ namespace Stormancer
 	{
 		_connectionSubscription = client->getConnectionStateChangedObservable().subscribe([this](ConnectionState state)
 		{
+			// On next
 			switch (state)
 			{
 			case ConnectionState::Connecting:
@@ -18,6 +21,16 @@ namespace Stormancer
 			break;
 			default:
 			break;
+			}
+		}, [](std::exception_ptr exptr) {
+			// On error
+			try
+			{
+				std::rethrow_exception(exptr);
+			}
+			catch (const std::exception& ex)
+			{
+				ILogger::instance()->log(LogLevel::Error, "AuthenticationService", "Client connection state change failed", ex.what());
 			}
 		});
 	}
@@ -191,6 +204,26 @@ namespace Stormancer
 	std::string AuthenticationService::userId()
 	{
 		return _userId;
+	}
+
+	pplx::task<std::string> AuthenticationService::getBearerToken()
+	{
+		return getAuthenticationScene().then([this](Scene_ptr authScene)
+		{
+			auto rpcService = authScene->dependencyResolver()->resolve<RpcService>();
+
+			return rpcService->rpc<std::string>("sceneauthorization.getbearertoken");
+		});
+	}
+
+	pplx::task<std::string> AuthenticationService::getUserFromBearerToken(std::string token)
+	{
+		return getAuthenticationScene().then([this, token](Scene_ptr authScene)
+		{
+			auto rpcService = authScene->dependencyResolver()->resolve<RpcService>();
+
+			return rpcService->rpc<std::string,std::string>("sceneauthorization.getuserfrombearertoken",token);
+		});
 	}
 
 	std::string AuthenticationService::getUsername()

@@ -19,8 +19,6 @@ namespace Stormancer
 		return pplx::create_task(tce);
 	}
 
-	
-
 	void ConnectionsRepository::newConnection(std::shared_ptr<IConnection> connection)
 	{
 		ILogger::instance()->log(LogLevel::Info, "P2P", "Adding connection " + connection->ipAddress(), std::to_string(connection->id()));
@@ -41,7 +39,7 @@ namespace Stormancer
 				_connections[id] = connection;
 				
 				std::weak_ptr<ConnectionsRepository> weakThis(shared_from_this());
-				connection->onClose([weakThis,id](std::string reason) {
+				connection->onClose([=](std::string reason) {
 					if (auto thiz = weakThis.lock())
 					{
 						thiz->_connections.erase(id);
@@ -86,5 +84,4 @@ namespace Stormancer
 	{
 		return (int)_connections.size();
 	}
-
 };

@@ -15,10 +15,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\Action.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\AES\AES.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\AES\AESDecryptStream.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\AES\AESEncryptStream.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\AES\AESPacketTransform.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\AES\IAES.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\ApiClient.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\basic_bytebuf.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\basic_bytestream.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\bytestream.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\ChannelUidStore.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\Client.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\ClientFactory.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\Compatibility\IStormancerTask.h" />
@@ -34,7 +37,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\DefaultScheduler.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\DependencyResolver.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\DisconnectFromSceneDto.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\EmptyDto.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\headers.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\Helpers.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\IActionDispatcher.h" />
@@ -43,6 +45,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\IConnectionManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\IPacketDispatcher.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\IPacketProcessor.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\IPacketTransform.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\IPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\IRequestModule.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\IScenePeer.h" />
@@ -99,6 +102,11 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\SingleServicePlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stdafx.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancerTypes.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\Streams\bytestream.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\Streams\bytestreambuf.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\Streams\ibytestream.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\Streams\obytestream.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\SyncClock.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\SystemRequest.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\SystemRequestIDTypes.h" />
@@ -109,22 +117,22 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\Watch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\AES\AESDecryptStream.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\AES\AESEncryptStream.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\AES\AESPacketTransform.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\ApiClient.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\ChannelUidStore.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Client.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\ClientFactory.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Configuration.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\ConnectionData.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\ConnectionResult.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\ConnectToSceneMsg.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\ContainerConfigurator.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\DefaultPacketDispatcher.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\DefaultScheduler.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\DependencyResolver.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\DisconnectFromSceneDto.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\dllmain.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\EmptyDto.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Helpers.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\IActionDispatcher.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\IPacketTransform.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\IPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\IService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Logger\ConsoleLogger.cpp" />
@@ -151,19 +159,20 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\RequestModuleBuilder.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\RequestProcessor.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Route.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\RouteDto.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\RPC\RpcPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\RPC\RpcRequest.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\RPC\RpcService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Scene.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\SceneDispatcher.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\SceneEndpoint.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\SceneInfosDto.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\SceneInfosRequestDto.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\ScenePeer.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Serializer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Streams\bytestreambuf.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Streams\ibytestream.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Streams\obytestream.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\SyncClock.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\SystemRequest.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\TCP\TcpConnection.cpp" />

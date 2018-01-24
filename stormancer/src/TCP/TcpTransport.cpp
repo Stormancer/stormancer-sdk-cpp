@@ -47,7 +47,7 @@ namespace Stormancer
 		_handler = handler;
 		initialize();
 
-		_scheduler->schedulePeriodic(15, [this]() {
+		_scheduler->schedulePeriodic(15, [=]() {
 			// action queue
 			{
 				std::lock_guard<std::mutex> lock(_actionQueueMutex);
@@ -67,7 +67,7 @@ namespace Stormancer
 			}
 		}, ct);
 
-		ct.register_callback([this]()
+		ct.register_callback([=]()
 		{
 			stop();
 		});
@@ -241,7 +241,7 @@ namespace Stormancer
 			if (readbytes < sizeof(msgLength))
 			{
 				std::lock_guard<std::mutex> lg(_actionQueueMutex);
-				_actionQueue.push([this, endpoint, readbytes]()
+				_actionQueue.push([=]()
 				{
 					onDisconnection(endpoint, readbytes == 0 ? "remote server disconnected." : "an error occurred");
 				});
@@ -257,7 +257,7 @@ namespace Stormancer
 			if (readbytes < msgLength)
 			{
 				std::lock_guard<std::mutex> lg(_actionQueueMutex);
-				_actionQueue.push([this, endpoint, readbytes]()
+				_actionQueue.push([=]()
 				{
 					onDisconnection(endpoint, readbytes == 0 ? "remote server disconnected." : "an error occurred");
 				});
@@ -274,10 +274,10 @@ namespace Stormancer
 				continue;
 			}
 
-			auto stream = new bytestream;
-			stream->rdbuf()->pubsetbuf((char*)buffer, msgLength);
+			auto stream = new ibytestream;
+			stream->rdbuf()->pubsetbuf(buffer, msgLength);
 			Packet_ptr packet(new Packet<>(_connection, stream), deleter<Packet<>>());
-			packet->cleanup += std::function<void(void)>([stream, buffer]() {
+			packet->cleanup += std::function<void(void)>([=]() {
 				if (stream)
 				{
 					stream->rdbuf()->pubsetbuf(nullptr, 0);
@@ -303,7 +303,7 @@ namespace Stormancer
 		_logger->log(LogLevel::Trace, "TcpTransport", "Connected", endpoint.c_str());
 		uint64 cid = 0;
 		std::shared_ptr<TcpConnection> connection = std::make_shared<TcpConnection>(_socketId, cid, _host);
-		connection->onClose([this, endpoint](std::string reason) {
+		connection->onClose([=](std::string reason) {
 			_logger->log(LogLevel::Trace, "tcpTransport", "Closed ", endpoint.c_str());
 			onRequestClose();
 		});

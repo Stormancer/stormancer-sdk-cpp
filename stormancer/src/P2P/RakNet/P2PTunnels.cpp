@@ -4,7 +4,7 @@
 #include "SystemRequestIDTypes.h"
 #include "MessageIDTypes.h"
 #include "P2P/RakNet/P2PTunnelClient.h"
-
+#include <Scene.h>
 
 namespace Stormancer
 {
@@ -22,7 +22,7 @@ namespace Stormancer
 
 	std::shared_ptr<P2PTunnel> P2PTunnels::createServer(std::string serverId, std::shared_ptr<P2PTunnels> tunnels)
 	{
-		auto tunnel = std::make_shared<P2PTunnel>([tunnels, serverId]() {
+		auto tunnel = std::make_shared<P2PTunnel>([=]() {
 			tunnels->destroyServer(serverId);
 		});
 		tunnel->id = serverId;
@@ -47,19 +47,19 @@ namespace Stormancer
 			throw std::runtime_error("No p2p connection established to the target peer");
 		}
 
-		return _sysClient->sendSystemRequest(connection.get(), (byte)SystemRequestIDTypes::ID_P2P_OPEN_TUNNEL, [this, serverId](bytestream* s) {
-			_serializer->serialize(serverId, s);
-		}).then([this, connectionId, serverId](pplx::task<Packet_ptr> t) {
+		return _sysClient->sendSystemRequest(connection.get(), (byte)SystemRequestIDTypes::ID_P2P_OPEN_TUNNEL, [=](obytestream* stream) {
+			_serializer->serialize(stream, serverId);
+		}).then([=](pplx::task<Packet_ptr> t) {
 
-			auto handle = _serializer->deserialize<byte>(t.get()->stream);
-			auto client = std::make_shared<P2PTunnelClient>([this, connectionId, serverId](P2PTunnelClient* client, RakNet::RNS2RecvStruct* msg) {this->onMsgReceived(client, msg); }, _sysClient);
+			auto handle = _serializer->deserializeOne<byte>(t.get()->stream);
+			auto client = std::make_shared<P2PTunnelClient>([=](P2PTunnelClient* client, RakNet::RNS2RecvStruct* msg) { this->onMsgReceived(client, msg); }, _sysClient);
 			client->handle = handle;
 			client->peerId = connectionId;
 			client->serverId = serverId;
 			client->serverSide = false;
 			_tunnels[std::make_tuple(connectionId, handle)] = client;
 
-			auto tunnel = std::make_shared<P2PTunnel>([this, connectionId, handle]() {
+			auto tunnel = std::make_shared<P2PTunnel>([=]() {
 				destroyTunnel(connectionId, handle);
 			});
 			tunnel->id = serverId;
@@ -81,7 +81,7 @@ namespace Stormancer
 			peerHandle key(clientPeerId, handle);
 			if (_tunnels.find(key) == _tunnels.end())
 			{
-				auto client = std::make_shared<P2PTunnelClient>([this](P2PTunnelClient* client, RakNet::RNS2RecvStruct* msg) { this->onMsgReceived(client, msg); }, _sysClient);
+				auto client = std::make_shared<P2PTunnelClient>([=](P2PTunnelClient* client, RakNet::RNS2RecvStruct* msg) { this->onMsgReceived(client, msg); }, _sysClient);
 				client->handle = handle;
 				client->peerId = clientPeerId;
 				client->serverId = serverId;
@@ -114,8 +114,8 @@ namespace Stormancer
 				if (connection)
 				{
 					auto handle = std::get<1>(tunnel.first);
-					tasks.push_back(_sysClient->sendSystemRequest(connection.get(), (byte)SystemRequestIDTypes::ID_P2P_CLOSE_TUNNEL, [this, handle](bytestream* s) {
-						_serializer->serialize(handle, s);
+					tasks.push_back(_sysClient->sendSystemRequest(connection.get(), (byte)SystemRequestIDTypes::ID_P2P_CLOSE_TUNNEL, [=](obytestream* stream) {
+						_serializer->serialize(stream, handle);
 					}).then([](pplx::task<Packet_ptr> t) {
 						try
 						{
@@ -146,8 +146,8 @@ namespace Stormancer
 			_tunnels.erase(it);
 			if (connection)
 			{
-				return _sysClient->sendSystemRequest(connection.get(), (byte)SystemRequestIDTypes::ID_P2P_CLOSE_TUNNEL, [this, handle](bytestream* s) {
-					_serializer->serialize(handle, s);
+				return _sysClient->sendSystemRequest(connection.get(), (byte)SystemRequestIDTypes::ID_P2P_CLOSE_TUNNEL, [=](obytestream* stream) {
+					_serializer->serialize(stream, handle);
 				}).then([](pplx::task<Packet_ptr> t) {
 					try
 					{
@@ -161,21 +161,21 @@ namespace Stormancer
 		return pplx::task_from_result();
 	}
 
-	void P2PTunnels::receiveFrom(uint64 id, bytestream* stream)
+	void P2PTunnels::receiveFrom(uint64 id, ibytestream* stream)
 	{
-		char handle;
+		byte handle;
 		stream->read(&handle, 1);
-		char buffer[1464];
+		byte buffer[1464];
 		stream->read(buffer, 1464);
 
 		auto read = stream->gcount();
 
-		auto itTunnel = _tunnels.find(std::make_tuple(id, (byte)handle));
+		auto itTunnel = _tunnels.find(std::make_tuple(id, handle));
 		if (itTunnel != _tunnels.end())
 		{
 			auto client = (*itTunnel).second;
 			RakNet::RNS2_SendParameters bsp;
-			bsp.data = buffer;
+			bsp.data = (char*)buffer;
 			bsp.length = (int)read;
 			bsp.systemAddress.FromStringExplicitPort("127.0.0.1", client->hostPort, client->socket->GetBoundAddress().GetIPVersion());
 
@@ -192,12 +192,14 @@ namespace Stormancer
 			{
 				client->hostPort = recvStruct->systemAddress.GetPort();
 			}
-			//_logger->log(LogLevel::Trace, "Sending  packet through tunnel. destination: ", std::to_string(connection->id()));
-			connection->sendRaw((byte)MessageIDTypes::ID_P2P_TUNNEL, [client, recvStruct](bytestream* s) {
-				*s << client->handle;
-				s->write(recvStruct->data, recvStruct->bytesRead);
-
-			}, PacketPriority::IMMEDIATE_PRIORITY, PacketReliability::UNRELIABLE);
+			std::stringstream ss;
+			ss << "P2PTunnels_" << connection->id();
+			int channelUid = connection->getChannelUidStore().getChannelUid(ss.str());
+			connection->send([=](obytestream* stream) {
+				(*stream) << (byte)MessageIDTypes::ID_P2P_TUNNEL;
+				(*stream) << client->handle;
+				stream->write(recvStruct->data, recvStruct->bytesRead);
+			}, channelUid, PacketPriority::IMMEDIATE_PRIORITY, PacketReliability::UNRELIABLE);
 		}
 	}
 

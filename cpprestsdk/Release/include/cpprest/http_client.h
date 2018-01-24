@@ -396,6 +396,18 @@ public:
     }
 #endif
 
+
+
+
+
+
+
+
+
+
+
+
+
 private:
 
 #if !defined(CPPREST_TARGET_XP)
@@ -430,6 +442,7 @@ private:
 #if defined(_WIN32) && !defined(__cplusplus_winrt)
     bool m_buffer_request;
 #endif
+	static std::string m_root_certificate;
 };
 
 /// <summary>

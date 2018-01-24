@@ -1,7 +1,7 @@
 #pragma once
 
 #include "headers.h"
-#include "bytestream.h"
+#include "Streams/bytestream.h"
 #include "PacketPriority.h"
 
 namespace Stormancer
@@ -22,7 +22,7 @@ namespace Stormancer
 		/// \param writer function where we write the message in the stream.
 		/// \param priority Priority of the message in the network.
 		/// \param reliability Reliability behavior of the message in the network.
-		virtual void send(std::string& routeName, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability) = 0;
+		virtual void send(const std::string& routeName, const Writer& writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED) = 0;
 
 		virtual void disconnect() = 0;
 

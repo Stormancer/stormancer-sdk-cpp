@@ -89,7 +89,7 @@ namespace Stormancer
 		request.headers().add("x-version", "1.0.0");
 #endif
 
-		return client.request(request).then([this, endpoints, errors, baseUri, accountId, applicationName, sceneId](pplx::task<web::http::http_response> task) {
+		return client.request(request).then([=](pplx::task<web::http::http_response> task) {
 			web::http::http_response response;
 			try
 			{
@@ -109,7 +109,7 @@ namespace Stormancer
 				auto msgStr = "HTTP request on '" + baseUri + "' returned status code " + std::to_string(statusCode);
 				ILogger::instance()->log(LogLevel::Trace, "ApiClient", msgStr);
 				concurrency::streams::stringstreambuf ss;
-				return response.body().read_to_end(ss).then([this, endpoints, ss,statusCode,errors,msgStr,accountId,applicationName,sceneId](size_t) {
+				return response.body().read_to_end(ss).then([=](size_t) {
 					std::string responseText = ss.collection();
 					ILogger::instance()->log(LogLevel::Trace, "ApiClient", "Response", responseText);
 
@@ -122,10 +122,7 @@ namespace Stormancer
 						(*errors).push_back("[" + msgStr + ":" + std::to_string(statusCode) + "]");
 						return getSceneEndpointImpl(endpoints, errors, accountId, applicationName, sceneId);
 					}
-					
 				});
-
-				
 			}
 			catch (const std::exception& ex)
 			{
@@ -144,7 +141,7 @@ namespace Stormancer
 
 	pplx::task<ServerEndpoints> ApiClient::GetServerEndpints()
 	{
-		return requestWithRetries([this](std::string) {
+		return requestWithRetries([=](std::string) {
 			web::http::http_request request(web::http::methods::POST);
 
 			std::string relativeUri = std::string("/") + _config->account + "/" + _config->application + "/_endpoints";
@@ -193,7 +190,7 @@ namespace Stormancer
 		web::http::client::http_client client(baseUri, config);
 #endif
 
-		return client.request(rq).then([baseUri, this, errors, requestFactory, endpoints](pplx::task<web::http::http_response> t) {
+		return client.request(rq).then([=](pplx::task<web::http::http_response> t) {
 
 			bool success = false;
 			web::http::http_response response;

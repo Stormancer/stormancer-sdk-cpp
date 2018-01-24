@@ -99,6 +99,12 @@ namespace Stormancer
 		pplx::task<void> logout();
 
 		std::string userId();
+
+		//get user id from bearer token
+		pplx::task<std::string> getUserFromBearerToken(std::string token);
+
+		//Creates a token authenticating the bearer as the userId
+		pplx::task<std::string> getBearerToken();
 		std::string getUsername();
 
 		pplx::task<std::string> getUserIdByPseudo(std::string pseudo);

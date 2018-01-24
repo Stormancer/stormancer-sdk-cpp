@@ -1,4 +1,4 @@
-#include <stdafx.h>
+#include "stdafx.h"
 #include <RPC/RpcService.h>
 #include "GameSessionService.h"
 
@@ -62,11 +62,11 @@ namespace Stormancer
 	pplx::task<void> GameSessionService::reset()
 	{
 		auto rpc = _scene->dependencyResolver()->resolve<RpcService>();
-		return rpc->rpcWriter("gamesession.reset", [](bytestream*) {});
+		return rpc->rpcWriter("gamesession.reset", Writer());
 	}
 
 	void GameSessionService::ready()
 	{
-		_scene->sendPacket("player.ready", [](bytestream*) {});
+		_scene->sendPacket("player.ready", Writer());
 	}
 }

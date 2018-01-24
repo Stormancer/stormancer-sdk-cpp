@@ -14,7 +14,7 @@ public:
 	bool IsTickableInEditor() const override;
 
 	// Inherited via MainThreadActionDispatcher
-	virtual void stop() override;
+	virtual pplx::task<void> stop() override;
 
 private:
 	// TODO fill up?

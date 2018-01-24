@@ -56,20 +56,20 @@ void FStormancerPlugin::DestroyClient()
 	if (_Client)
 	{
 		// Keep the client alive until it's been properly disconnected, but remove it from the plugin.
-		auto client = std::move(_Client);
-
-		client->disconnect(false).then([client](pplx::task<void> t)
+		std::shared_ptr<Stormancer::Client> client = std::move(_Client);
+		try
 		{
-			try
+			client->disconnect().then([]()
 			{
-				t.get();
-			}
-			catch (std::exception& e)
-			{
-				UE_LOG(StormancerLog, Error, TEXT("Error disconnecting the client: %s"), UTF8_TO_TCHAR(e.what()));
-			}
-			// The client is going to be released here
-		});
+				return;
+			});
+		}
+		catch (std::exception& e)
+		{
+			UE_LOG(StormancerLog, Error, TEXT("Error disconnecting the client: %s"), UTF8_TO_TCHAR(e.what()));
+		}
+		// The client is going to be released here
+		
 	}
 }
 

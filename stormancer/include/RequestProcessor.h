@@ -6,6 +6,7 @@
 #include "IRequestModule.h"
 #include "SystemRequest.h"
 #include "PacketPriority.h"
+#include "Serializer.h"
 
 namespace Stormancer
 {
@@ -32,7 +33,7 @@ namespace Stormancer
 		/// \param msgId The message id.
 		/// \param writer A procedure writing the request parameters.
 		/// \return An observable returning the request responses.
-		pplx::task<Packet_ptr> sendSystemRequest(IConnection* peer, byte msgId, std::function<void(bytestream*)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY);
+		pplx::task<Packet_ptr> sendSystemRequest(IConnection* peer, byte msgId, const Writer& writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY);
 
 		/// Register a new system request handlers for the specified message Id.
 		/// \param msgId The system message id.
@@ -42,17 +43,10 @@ namespace Stormancer
 		template<typename T1, typename T2>
 		pplx::task<T2> sendSystemRequest(IConnection* peer, byte id, const T1& parameter)
 		{
-			return sendSystemRequest(peer, id, [this, &parameter](bytestream* stream) {
-				msgpack::pack(stream, parameter);
-			}).then([this](Packet_ptr packet) {
-				// deserialize result dto
-				std::string buffer;
-				*packet->stream >> buffer;
-				msgpack::unpacked result;
-				msgpack::unpack(&result, buffer.data(), buffer.size());
-				T2 t2;
-				result.get().convert(&t2);
-				return t2;
+			return sendSystemRequest(peer, id, [=, &parameter](obytestream* stream) {
+				_serializer.serialize(stream, parameter);
+			}).then([=](Packet_ptr packet) {
+				return _serializer.deserializeOne<T2>(packet->stream);
 			});
 		}
 
@@ -63,6 +57,7 @@ namespace Stormancer
 		std::shared_ptr<ILogger> _logger;
 		bool _isRegistered = false;
 		std::map<byte, std::function<pplx::task<void>(RequestContext*)>> _handlers;
+		Serializer _serializer;
 
 	private:
 

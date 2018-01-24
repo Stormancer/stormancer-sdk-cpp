@@ -34,10 +34,7 @@ namespace Stormancer
 		void setMetadata(const std::string& key, const std::string& value) override;
 		DependencyResolver* dependencyResolver() override;
 		void close(std::string reason = "") override;
-		void sendSystem(byte msgId, std::function<void(bytestream*)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY) override;
-		void sendRaw(std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability, char channel);
-		virtual void sendRaw(byte msgId, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability) override;
-		void sendToScene(byte sceneIndex, uint16 route, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability) override;
+		virtual void send(const Writer& writer, int channelUid, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const TransformMetadata& transformMetadata = TransformMetadata()) override;
 		int ping() const override;
 		void setApplication(std::string account, std::string application) override;
 		Action<std::string>::TIterator onClose(std::function<void(std::string)> callback);
@@ -94,7 +91,7 @@ namespace Stormancer
 		ConnectionState _connectionState = ConnectionState::Disconnected;
 		rxcpp::subjects::subject<ConnectionState> _connectionStateObservable;
 		Action<std::string> _closeAction;
-
+		
 #pragma endregion
 	};
 };

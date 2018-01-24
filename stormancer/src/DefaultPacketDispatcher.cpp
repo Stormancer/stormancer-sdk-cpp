@@ -28,7 +28,7 @@ namespace Stormancer
 	{
 		if (_asyncDispatch)
 		{
-			pplx::create_task([this, packet]() {
+			pplx::create_task([=]() {
 				dispatchImpl(packet);
 			}).then([](pplx::task<void> t) {
 				try

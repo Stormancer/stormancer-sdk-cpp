@@ -1,7 +1,7 @@
 #pragma once
 
 #include "headers.h"
-#include "bytestream.h"
+#include "Streams/bytestream.h"
 
 namespace Stormancer
 {
@@ -21,7 +21,7 @@ namespace Stormancer
 		PeerFilter(PeerFilterType type, const int64 id);
 		PeerFilter(PeerFilterType type, const std::vector<int64> ids);
 		virtual ~PeerFilter();
-		static PeerFilter readFilter(bytestream* stream);
+		static PeerFilter readFilter(ibytestream* stream);
 
 		const PeerFilterType type = PeerFilterType::MatchSceneHost;
 		const std::vector<int64> ids;

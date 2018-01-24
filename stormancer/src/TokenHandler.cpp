@@ -2,6 +2,7 @@
 #include "TokenHandler.h"
 #include "Helpers.h"
 #include "Logger/ILogger.h"
+#include "Serializer.h"
 
 namespace Stormancer
 {
@@ -24,14 +25,8 @@ namespace Stormancer
 		auto data = stringSplit(token, "-")[0];
 		utility::string_t data2(data.begin(), data.end());
 		auto vectorData = utility::conversions::from_base64(data2);
-		std::string buffer(vectorData.begin(), vectorData.end());
 
-		msgpack::unpacked result;
-		msgpack::unpack(result, buffer.data(), buffer.size());
-		msgpack::object obj = result.get();
-
-		ConnectionData cData;
-		obj.convert(&cData);
+		ConnectionData cData = _serializer.deserializeOne<ConnectionData>(vectorData.data(), vectorData.size());
 
 		std::stringstream ss;
 		ss << cData.AccountId

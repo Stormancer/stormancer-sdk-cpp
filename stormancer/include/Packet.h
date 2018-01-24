@@ -5,6 +5,7 @@
 #include "Helpers.h"
 #include "Action.h"
 #include "IScenePeer.h"
+#include "Serializer.h"
 
 namespace Stormancer
 {
@@ -19,7 +20,7 @@ namespace Stormancer
 		/// Constructor
 		/// \param source Generic source of the packets.
 		/// \param stream Data stream attached to the packet.
-		Packet(std::shared_ptr<T> source, bytestream* stream)
+		Packet(std::shared_ptr<T> source, ibytestream* stream)
 			: connection(source)
 			, stream(stream)
 		{
@@ -29,7 +30,7 @@ namespace Stormancer
 		/// \param source Generic source of the packets.
 		/// \param stream Data stream attached to the packet.
 		/// \param metadata Metadata attached to this packet.
-		Packet(std::shared_ptr<T> source, bytestream* stream, const std::map<std::string, std::string>& metadata)
+		Packet(std::shared_ptr<T> source, ibytestream* stream, const std::map<std::string, std::string>& metadata)
 			: connection(source)
 			, stream(stream)
 			, metadata(metadata)
@@ -48,20 +49,20 @@ namespace Stormancer
 			cleanup.clear();
 		}
 
-		/// Read a msgpack object
+		/// Read a serialized object
 		template<typename TOut>
 		TOut readObject()
 		{
-			auto g = stream->tellg();
-			std::string buffer;
-			*stream >> buffer;
-			msgpack::unpacked unp;
-			auto readOffset = msgpack::unpack(unp, buffer.data(), buffer.size());
-			g += readOffset;
-			stream->seekg(g);
-			TOut result;
-			unp.get().convert(&result);
-			return result;
+			Serializer serializer;
+			return serializer.deserializeOne<TOut>(stream);
+		}
+
+		/// Read many serialized objects
+		template<typename... Args>
+		void readObjects(Args&... args)
+		{
+			Serializer serializer;
+			serializer.deserialize(stream, args...);
 		}
 
 #pragma endregion
@@ -72,7 +73,7 @@ namespace Stormancer
 		std::shared_ptr<T> connection = nullptr;
 
 		/// Data stream
-		bytestream* stream = nullptr;
+		ibytestream* stream = nullptr;
 
 		/// Clean-up operations
 		Action<> cleanup;

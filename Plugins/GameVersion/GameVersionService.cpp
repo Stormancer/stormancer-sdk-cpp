@@ -1,4 +1,4 @@
-#include <stdafx.h>
+#include "stdafx.h"
 #include "GameVersionService.h"
 
 namespace Stormancer
@@ -11,31 +11,19 @@ namespace Stormancer
 		}
 
 		scene->addRoute("gameVersion.update", [this](Packetisp_ptr packet) {
-			msgpack::unpacked result;
-			std::string buffer;
-			*packet->stream >> buffer;
-
-			msgpack::unpack(result, buffer.data(), buffer.size());
-			std::string version;
-			result.get().convert(&version);
-
-			_gameVersion = version;
+			Serializer serializer;
+			_gameVersion = serializer.deserializeOne<std::string>(packet->stream);
 
 			if (_onGameVersionUpdate)
 			{
-				_onGameVersionUpdate(version);
+				_onGameVersionUpdate(_gameVersion);
 			}
 		});
 
 		scene->addRoute("serverVersion.update", [this](Packetisp_ptr packet) {
-			msgpack::unpacked result;
-			std::string buffer;
-			*packet->stream >> buffer;
+			Serializer serializer;
+			std::string version = serializer.deserializeOne<std::string>(packet->stream);
 
-			msgpack::unpack(result, buffer.data(), buffer.size());
-			std::string version;
-			result.get().convert(&version);
-			
 			if (_onServerVersionUpdate)
 			{
 				_onServerVersionUpdate(version);

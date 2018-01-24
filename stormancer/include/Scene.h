@@ -1,7 +1,7 @@
 #pragma once
 
 #include "headers.h"
-#include "bytestream.h"
+#include "Streams/bytestream.h"
 #include "PacketPriority.h"
 #include "ConnectionResult.h"
 #include "SceneInfosDto.h"
@@ -64,17 +64,17 @@ namespace Stormancer
 		/// \param writer Function where we write the data in the byte stream.
 		/// \param priority Message priority on the network.
 		/// \param reliability Message reliability behavior.
-		STORMANCER_DLL_API void send(const PeerFilter& peerFilter, const std::string& routeName, std::function<void(bytestream*)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE);
+		STORMANCER_DLL_API void send(const PeerFilter& peerFilter, const std::string& routeName, const Writer& writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const std::string& channelIdentifier = "");
 
 		/// Send a packet to a route.
 		/// \param routeName Route name.
 		/// \param writer Function where we write the data in the byte stream.
 		/// \param priority Message priority on the network.
 		/// \param reliability Message reliability behavior.
-		STORMANCER_DLL_API void send(const std::string& routeName, std::function<void(bytestream*)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE);
+		STORMANCER_DLL_API void send(const std::string& routeName, const Writer& writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const std::string& channelIdentifier = "");
 
 		/// Ddeprecated (look at Scene::send).
-		STORMANCER_DLL_API void sendPacket(const std::string& routeName, std::function<void(bytestream*)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE);
+		STORMANCER_DLL_API void sendPacket(const std::string& routeName, const Writer& writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const std::string& channelIdentifier = "");
 
 		/// Returns the connection state to the the scene.
 		STORMANCER_DLL_API ConnectionState getCurrentConnectionState() const;
@@ -129,7 +129,7 @@ namespace Stormancer
 		std::shared_ptr<P2PTunnel> registerP2PServer(const std::string& p2pServerId);
 
 		pplx::task<std::shared_ptr<P2PScenePeer>> openP2PConnection(const std::string& token);
-		
+
 #pragma endregion
 
 	private:
@@ -228,6 +228,7 @@ namespace Stormancer
 		std::shared_ptr<P2PService> _p2p;
 
 		ILogger_ptr _logger;
+
 #pragma endregion
 	};
 

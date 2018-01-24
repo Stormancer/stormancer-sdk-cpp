@@ -21,7 +21,7 @@ void Stormancer::ConfigureContainer(DependencyResolver* dr, Configuration_ptr co
 		return std::make_shared<TokenHandler>();
 	});
 
-	dr->registerDependency<ApiClient>([config](DependencyResolver* resolver) {
+	dr->registerDependency<ApiClient>([=](DependencyResolver* resolver) {
 		auto tokenHandler = resolver->resolve<ITokenHandler>();
 		return std::make_shared<ApiClient>(resolver->resolve<ILogger>(), config, tokenHandler);
 	}, true);
@@ -44,7 +44,7 @@ void Stormancer::ConfigureContainer(DependencyResolver* dr, Configuration_ptr co
 		return std::make_shared<SceneDispatcher>(resolver->resolve<IActionDispatcher>());
 	}, true);
 
-	dr->registerDependency<SyncClock>([config](DependencyResolver* resolver) {
+	dr->registerDependency<SyncClock>([=](DependencyResolver* resolver) {
 		return std::make_shared<SyncClock>(resolver, config->synchronisedClockInterval);
 	}, true);
 
@@ -52,7 +52,7 @@ void Stormancer::ConfigureContainer(DependencyResolver* dr, Configuration_ptr co
 		return std::make_shared<RequestProcessor>(resolver->resolve<ILogger>());
 	}, true);
 
-	dr->registerDependency<IPacketDispatcher>([config](DependencyResolver* dependencyResolver) {
+	dr->registerDependency<IPacketDispatcher>([=](DependencyResolver* dependencyResolver) {
 		auto dispatcher = config->dispatcher(dependencyResolver);
 		dispatcher->addProcessor(dependencyResolver->resolve<RequestProcessor>());
 		dispatcher->addProcessor(dependencyResolver->resolve<SceneDispatcher>());

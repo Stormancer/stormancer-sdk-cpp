@@ -102,6 +102,8 @@ namespace Stormancer
 
 		ILogger_ptr logger = std::make_shared<NullLogger>();
 
+		std::string endpointRootCertificate;
+
 #pragma endregion
 
 	private:

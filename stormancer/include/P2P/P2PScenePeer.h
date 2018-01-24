@@ -19,7 +19,7 @@ namespace Stormancer
 
 		std::string getSceneId() const;
 
-		virtual void send(std::string& route, std::function<void(bytestream*)> writer, PacketPriority packetPriority = PacketPriority::MEDIUM_PRIORITY, PacketReliability packetReliability = PacketReliability::RELIABLE_ORDERED) override;
+		virtual void send(const std::string& route, const Writer& writer, PacketPriority packetPriority = PacketPriority::MEDIUM_PRIORITY, PacketReliability packetReliability = PacketReliability::RELIABLE_ORDERED) override;
 
 		virtual uint64 id() override;
 		virtual void disconnect() override;

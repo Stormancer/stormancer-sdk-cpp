@@ -5,14 +5,12 @@
 
 namespace Stormancer
 {
-	class RelayConnection :public IConnection
+	class RelayConnection : public IConnection
 	{
 	public:
 
 		RelayConnection(std::shared_ptr<IConnection> serverConnection, std::string address, uint64 id);
-		void sendSystem(byte msgId, std::function<void(bytestream*)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY) override;
-		void sendToScene(byte sceneIndex, uint16 route, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability) override;
-		void sendRaw(byte msgId, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability) override;
+		virtual void send(const Writer& writer, int channelUid, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const TransformMetadata& transformMetadata = TransformMetadata()) override;
 		void setApplication(std::string account, std::string application) override;
 		void close(std::string reason = "") override;
 		std::string ipAddress() const override;

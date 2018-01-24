@@ -21,7 +21,7 @@ namespace Stormancer
 
 			if (rpcParams == version)
 			{
-				scene->dependencyResolver()->registerDependency<RpcService>([scene](DependencyResolver* resolver) {
+				scene->dependencyResolver()->registerDependency<RpcService>([=](DependencyResolver* resolver) {
 					return std::make_shared<RpcService>(scene, resolver->resolve<IActionDispatcher>());
 				}, true);
 			}
@@ -38,22 +38,22 @@ namespace Stormancer
 			{
 				auto rpc = scene->dependencyResolver()->resolve<RpcService>();
 
-				scene->addRoute(nextRouteName, [scene](Packetisp_ptr p) {
+				scene->addRoute(nextRouteName, [=](Packetisp_ptr p) {
 					auto rpcService = scene->dependencyResolver()->resolve<RpcService>().get();
 					rpcService->next(p);
 				});
 
-				scene->addRoute(cancellationRouteName, [scene](Packetisp_ptr p) {
+				scene->addRoute(cancellationRouteName, [=](Packetisp_ptr p) {
 					auto rpcService = scene->dependencyResolver()->resolve<RpcService>().get();
 					rpcService->cancel(p);
 				});
 
-				scene->addRoute(errorRouteName, [scene](Packetisp_ptr p) {
+				scene->addRoute(errorRouteName, [=](Packetisp_ptr p) {
 					auto rpcService = scene->dependencyResolver()->resolve<RpcService>().get();
 					rpcService->error(p);
 				});
 
-				scene->addRoute(completeRouteName, [scene](Packetisp_ptr p) {
+				scene->addRoute(completeRouteName, [=](Packetisp_ptr p) {
 					auto rpcService = scene->dependencyResolver()->resolve<RpcService>().get();
 					rpcService->complete(p);
 				});

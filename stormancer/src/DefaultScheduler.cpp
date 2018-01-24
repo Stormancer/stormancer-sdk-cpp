@@ -20,7 +20,7 @@ namespace Stormancer
 		
 		std::weak_ptr<TimerThread> weakTimer(_timer);
 		auto delayMs = std::chrono::milliseconds(delay);
-		_timer->schedule([work, ct, weakTimer, delayMs]()
+		_timer->schedule([=]()
 		{
 			periodicFunc(work, ct, weakTimer, delayMs);
 		}, clock_type::now());
@@ -40,7 +40,7 @@ namespace Stormancer
 			auto timer = weakTimer.lock();
 			if (timer)
 			{
-				timer->schedule([work, ct, weakTimer, delay]()
+				timer->schedule([=]()
 				{
 					periodicFunc(work, ct, weakTimer, delay);
 				}, clock_type::now() + delay);

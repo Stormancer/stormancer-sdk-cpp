@@ -10,8 +10,7 @@ namespace Stormancer
 		, _isComplete(false)
 	{
 		(*packet->stream) >> _requestId;
-
-		streamCopy(packet->stream, _stream);
+		_stream->rdbuf()->pubsetbuf(packet->stream->ptr(), packet->stream->size());
 		_stream->seekg(0, std::ios_base::beg);
 	}
 
@@ -24,7 +23,7 @@ namespace Stormancer
 		return _packet;
 	}
 
-	bytestream* RequestContext::inputStream()
+	ibytestream* RequestContext::inputStream()
 	{
 		return _stream;
 	}
@@ -34,35 +33,37 @@ namespace Stormancer
 		return _isComplete;
 	}
 
-	void RequestContext::send(std::function<void(bytestream*)> writer)
+	void RequestContext::send(const Writer& writer)
 	{
 		if (_isComplete)
 		{
 			throw std::runtime_error("The request is already completed.");
 		}
 		_didSendValues = true;
-		_packet->connection->sendSystem((byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG, [this, &writer](bytestream* stream) {
-			auto rqIdPtr = &_requestId;
-			stream->write((char*)rqIdPtr, 2);
+		_packet->connection->send([=, &writer](obytestream* stream) {
+			(*stream) << (byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG;
+			(*stream) << _requestId;
 			writer(stream);
-		});
+		}, 0);
 	}
 
 	void RequestContext::complete()
 	{
 		_isComplete = true;
-		_packet->connection->sendSystem((byte)MessageIDTypes::ID_REQUEST_RESPONSE_COMPLETE, [this](bytestream* stream) {
-			stream->write((char*)&_requestId, 2);
-			char c = (_didSendValues ? 1 : 0);
+		_packet->connection->send([=](obytestream* stream) {
+			(*stream) << (byte)MessageIDTypes::ID_REQUEST_RESPONSE_COMPLETE;
+			(*stream) << _requestId;
+			byte c = (_didSendValues ? 1 : 0);
 			stream->write(&c, 1);
-		});
+		}, 0);
 	}
 
-	void RequestContext::error(std::function<void(bytestream*)> writer)
+	void RequestContext::error(const Writer& writer)
 	{
-		_packet->connection->sendSystem((byte)MessageIDTypes::ID_REQUEST_RESPONSE_ERROR, [this, &writer](bytestream* stream) {
-			stream->write((char*)&_requestId, 2);
+		_packet->connection->send([=, &writer](obytestream* stream) {
+			(*stream) << (byte)MessageIDTypes::ID_REQUEST_RESPONSE_ERROR;
+			(*stream) << _requestId;
 			writer(stream);
-		});
+		}, 0);
 	}
 };

@@ -9,17 +9,6 @@ namespace Stormancer
 	struct SceneInfosDto
 	{
 	public:
-	
-		/// Constructor.
-		SceneInfosDto();
-
-		/// Destructor.
-		virtual ~SceneInfosDto();
-
-		/// deserialize by using MessagePack.
-		void msgpack_unpack(const msgpack::object& o);
-
-	public:
 		
 		/// The scene id.
 		std::string SceneId;
@@ -32,5 +21,7 @@ namespace Stormancer
 		
 		/// The serializer the client should use when communicating with the scene.
 		std::string SelectedSerializer;
+
+		MSGPACK_DEFINE_MAP(SceneId, Metadata, Routes, SelectedSerializer);
 	};
 };

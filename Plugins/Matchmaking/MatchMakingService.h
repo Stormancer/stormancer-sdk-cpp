@@ -102,6 +102,7 @@ namespace Stormancer
 		std::function<void(ReadyVerificationRequest)> _onMatchReadyUpdate;
 		std::function<void(MatchmakingResponse)> _onMatchFound;
 		MatchState _matchState = MatchState::Unknown;
+		Serializer _serializer;
 
 #pragma endregion
 	};

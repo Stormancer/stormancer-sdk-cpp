@@ -24,10 +24,10 @@ namespace Stormancer
 	{
 	}
 	
-	PeerFilter PeerFilter::readFilter(bytestream* stream)
+	PeerFilter PeerFilter::readFilter(ibytestream* stream)
 	{
 		byte peerType;
-		*stream >> peerType;
+		(*stream) >> peerType;
 		switch (peerType)
 		{
 			case 0:

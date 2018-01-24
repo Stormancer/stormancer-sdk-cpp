@@ -2,6 +2,7 @@
 
 #include "headers.h"
 #include "ITokenHandler.h"
+#include "Serializer.h"
 
 namespace Stormancer
 {
@@ -15,6 +16,12 @@ namespace Stormancer
 		TokenHandler();
 		virtual ~TokenHandler();
 		SceneEndpoint decodeToken(const std::string& token);
+
+#pragma endregion
+
+#pragma region private_members
+
+		Serializer _serializer;
 
 #pragma endregion
 	};

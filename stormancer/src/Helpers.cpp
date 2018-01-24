@@ -49,7 +49,7 @@ namespace Stormancer
 	std::string stringTrim(const std::string& str2, char ch)
 	{
 		auto str = str2;
-		std::function<int(int)> ischar = [ch](int c) -> int {
+		std::function<int(int)> ischar = [=](int c) -> int {
 			if (c == ch)
 			{
 				return 1;
@@ -78,7 +78,7 @@ namespace Stormancer
 	std::wstring wstringTrim(const std::wstring& str2, wchar_t ch)
 	{
 		auto str = str2;
-		std::function<int(int)> ischar = [ch](int c) -> int {
+		std::function<int(int)> ischar = [=](int c) -> int {
 			if (c == ch)
 			{
 				return 1;
@@ -105,14 +105,14 @@ namespace Stormancer
 
 	pplx::task<void> taskDelay(std::chrono::milliseconds milliseconds, pplx::cancellation_token token)
 	{
-		pplx::task<void> sleepTask = pplx::task<void>([milliseconds]() {
+		pplx::task<void> sleepTask = pplx::task<void>([=]() {
 			std::this_thread::sleep_for(milliseconds);
 		}, pplx::task_options(token));
 
 		if (token.is_cancelable())
 		{
 			pplx::task_completion_event<void> tce;
-			token.register_callback([tce]() { tce.set(); });
+			token.register_callback([=]() { tce.set(); });
 			pplx::task<void> t(tce);
 
 			std::vector<pplx::task<void>> v{ t, sleepTask };
@@ -123,14 +123,6 @@ namespace Stormancer
 		{
 			return sleepTask;
 		}
-	}
-
-	char* readToEnd(bytestream* stream, std::streamsize* length)
-	{
-		*length = stream->rdbuf()->in_avail();
-		char* data = new char[(uint32)*length];
-		stream->read(data, *length);
-		return data;
 	}
 
 	std::time_t nowTime_t()
@@ -207,20 +199,20 @@ namespace Stormancer
 		return time_tToStr(now, "%H:%M:%S");
 	}
 
-	std::string stringifyBytesArray(std::string bytes, bool hex)
+	std::string stringifyBytesArray(const std::vector<byte>& bytes, bool hex)
 	{
 		std::stringstream ss;
 		if (hex)
 		{
 			ss << std::setfill('0') << std::setw(2) << std::hex << std::uppercase;
 		}
-		for (std::size_t i = 0; i < bytes.length(); ++i)
+		for (std::size_t i = 0; i < bytes.size(); ++i)
 		{
 			if (i)
 			{
 				ss << ' ';
 			}
-			ss << std::setw(2) << (int)(byte)bytes[i];
+			ss << std::setw(2) << (int)bytes.at(i);
 		}
 		return ss.str();
 	}

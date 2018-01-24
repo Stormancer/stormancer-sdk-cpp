@@ -9,20 +9,8 @@ namespace Stormancer
 	{
 	public:
 
-		/// Constructor.
-		DisconnectFromSceneDto(byte sceneHandle = 0);
-
-		/// Destructor.
-		virtual ~DisconnectFromSceneDto();
-
-		/// MessagePack serialization.
-		template<typename Packer>
-		void msgpack_pack(Packer& pk) const
-		{
-			pk.pack_map(SceneHandle); // serialize byte
-		}
-
-	public:
 		byte SceneHandle;
+
+		MSGPACK_DEFINE_MAP(SceneHandle);
 	};
 };

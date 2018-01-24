@@ -122,7 +122,7 @@ namespace Stormancer
 
 	void MainThreadActionDispatcher::schedule(pplx::TaskProc_t task, void* param)
 	{
-		post([task, param]() {
+		post([=]() {
 			task(param);
 		});
 	}

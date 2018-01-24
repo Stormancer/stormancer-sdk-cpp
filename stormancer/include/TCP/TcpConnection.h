@@ -18,9 +18,7 @@ namespace Stormancer
 
 		TcpConnection(std::shared_ptr<SOCKET> socketId, uint64 connectionId, std::string ip);
 		~TcpConnection();
-		void sendSystem(byte msgId, std::function<void(bytestream*)> writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY) override;
-		void sendToScene(byte sceneIndex, uint16 route, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability) override;
-		virtual void sendRaw(byte msgId, std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability) override;
+		virtual void send(const Writer& writer, int channelUid, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const TransformMetadata& transformMetadata = TransformMetadata()) override;
 		void setApplication(std::string account, std::string application) override;
 		void close(std::string reason = "") override;
 		std::string ipAddress() const override;
@@ -53,7 +51,7 @@ namespace Stormancer
 
 #pragma region private_methods
 
-		void sendRaw(std::function<void(bytestream*)> writer, PacketPriority priority, PacketReliability reliability);
+		void sendRaw(const Writer& writer, PacketPriority priority, PacketReliability reliability);
 
 #pragma endregion
 

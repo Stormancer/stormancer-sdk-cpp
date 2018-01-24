@@ -16,7 +16,7 @@ namespace Stormancer
 		SingleInstance = 16
 	};
 
-	using TServiceContextFlags = std::underlying_type_t<ServiceContextFlags>;
+	using TServiceContextFlags = std::underlying_type<ServiceContextFlags>::type;
 
 	inline ServiceContextFlags operator|(ServiceContextFlags lhs, ServiceContextFlags rhs)
 	{
@@ -46,17 +46,12 @@ namespace Stormancer
 		std::string metadataKey;
 	};
 
-	template<class T>
+	template<class T, const ServiceOptions& options>
 	class SingleServicePlugin : public IPlugin
 	{
 	public:
 
 #pragma region public_method
-
-		SingleServicePlugin(ServiceOptions options)
-			: _options(options)
-		{
-		}
 
 		void clientCreated(Client* client) override
 		{
@@ -65,13 +60,13 @@ namespace Stormancer
 				throw std::runtime_error("The client has been deleted.");
 			}
 
-			bool enabledOnContext = (_options.contextFlags & ServiceContextFlags::Client) != ServiceContextFlags::None;
+			bool enabledOnContext = (options.contextFlags & ServiceContextFlags::Client) != ServiceContextFlags::None;
 			if (enabledOnContext)
 			{
-				bool singleInstance = (_options.contextFlags & ServiceContextFlags::SingleInstance) != ServiceContextFlags::None;
+				bool singleInstance = (options.contextFlags & ServiceContextFlags::SingleInstance) != ServiceContextFlags::None;
 				client->dependencyResolver()->registerDependency<T>([](DependencyResolver*) { return std::make_shared<T>(); }, singleInstance);
 			}
-			bool createWithClient = (_options.contextFlags & ServiceContextFlags::CreateWithClient) != ServiceContextFlags::None;
+			bool createWithClient = (options.contextFlags & ServiceContextFlags::CreateWithClient) != ServiceContextFlags::None;
 			if (createWithClient)
 			{
 				auto service = client->dependencyResolver()->resolve<T>();
@@ -86,11 +81,11 @@ namespace Stormancer
 				throw std::runtime_error("The scene has been deleted.");
 			}
 
-			bool enabledOnContext = (_options.contextFlags & ServiceContextFlags::Scene) != ServiceContextFlags::None;
-			bool enabledOnScene = SingleServicePlugin::isEnabled(scene, _options.metadataKey);
+			bool enabledOnContext = (options.contextFlags & ServiceContextFlags::Scene) != ServiceContextFlags::None;
+			bool enabledOnScene = SingleServicePlugin::isEnabled(scene, options.metadataKey);
 			if (enabledOnContext && enabledOnScene)
 			{
-				bool singleInstance = (_options.contextFlags & ServiceContextFlags::SingleInstance) != ServiceContextFlags::None;
+				bool singleInstance = (options.contextFlags & ServiceContextFlags::SingleInstance) != ServiceContextFlags::None;
 				scene->dependencyResolver()->registerDependency<T>([](DependencyResolver*) { return std::make_shared<T>(); }, singleInstance);
 			}
 		}
@@ -102,8 +97,8 @@ namespace Stormancer
 				throw std::runtime_error("The scene has been deleted.");
 			}
 
-			bool createWithScene = (_options.contextFlags & ServiceContextFlags::CreateWithScene) != ServiceContextFlags::None;
-			bool enabledOnScene = SingleServicePlugin::isEnabled(scene, _options.metadataKey);
+			bool createWithScene = (options.contextFlags & ServiceContextFlags::CreateWithScene) != ServiceContextFlags::None;
+			bool enabledOnScene = SingleServicePlugin::isEnabled(scene, options.metadataKey);
 			if (createWithScene && enabledOnScene)
 			{
 				auto service = scene->dependencyResolver()->resolve<T>();
@@ -125,14 +120,6 @@ namespace Stormancer
 			auto name = scene->getHostMetadata(metadataKey);
 			return (!name.empty());
 		}
-
-#pragma endregion
-
-	private:
-
-#pragma region private_members
-
-		ServiceOptions _options;
 
 #pragma endregion
 	};

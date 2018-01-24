@@ -11,7 +11,7 @@ Installation
 - Inside your project's build configuration file (`MyProject/Source/MyProject/MyProject.Build.cs`), add a dependency to the `StormancerPlugin` module.
 Also, as Stormancer needs exceptions and RTTI, you need to add these two lines to the build file's constructor:
 ```
-UEBuildConfiguration.bForceEnableExceptions = true;
+UEBuildConfiguration.bForceEnableExceptions = true; (bForceEnableExceptions = true; for UE4.16 and higher version)
 bUseRTTI = true;
 ```
 

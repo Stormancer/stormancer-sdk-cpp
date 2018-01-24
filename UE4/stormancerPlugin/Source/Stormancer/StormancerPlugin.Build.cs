@@ -1,15 +1,52 @@
 using System;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.Diagnostics;
+
 namespace UnrealBuildTool.Rules
 {
-	public class StormancerPlugin : ModuleRules
+    struct SetupInfo
+    {
+        public string _DownloadPath;
+        public string _Version;
+        public string _FileName;
+        public string _InstallPath;
+        public string _TempPath;
+
+        public SetupInfo(string DownloadPath, string Version, string FileName, string InstallPath, string tempPath)
+        {
+            _DownloadPath = DownloadPath;
+            _Version = Version;
+            _FileName = FileName;
+            _InstallPath = InstallPath;
+            _TempPath = tempPath;
+        }
+    }
+
+    public class StormancerPlugin : ModuleRules
 	{
-		private string VS_TOOLSET = "140";
-		public StormancerPlugin(TargetInfo target)
+        Dictionary<string, SetupInfo> SetupInfoMap = new Dictionary<string, SetupInfo>();
+
+        private string VS_TOOLSET = "140";
+        private string TEMP_PATH = "D:\\Temp";
+
+        private string SDK_LIB_PATH = "";
+        private string SDK_HEADER_PATH = "";
+        private string SDK_DOWNLOAD_PATH = "https://github.com/Stormancer/stormancer-sdk-cpp/releases/download";
+        private string SDK_VERSION = "v1.2";
+        private string SDK_FILENAME = "Stormancer-cpp-1.2.zip";
+        private string SDK_INSTALL_PATH = "";
+
+        public StormancerPlugin(ReadOnlyTargetRules target)
 		{
+            SDK_LIB_PATH = ModuleDirectory + "/../../3rdparty/stormancer/libs/";
+            SDK_HEADER_PATH = ModuleDirectory + "/../../3rdparty/stormancer/include/";
+            SDK_INSTALL_PATH = ModuleDirectory + "/../../3rdparty/stormancer";
+            SetupInfoMap.Add("stormancer", new SetupInfo(SDK_DOWNLOAD_PATH, SDK_VERSION, SDK_FILENAME, SDK_INSTALL_PATH, TEMP_PATH));
+
             // Stormancer needs RTTI and exceptions
-            UEBuildConfiguration.bForceEnableExceptions = true;
+            bEnableExceptions = true;
             bUseRTTI = true;
 
             /** Setup an external C++ module */
@@ -21,7 +58,7 @@ namespace UnrealBuildTool.Rules
 
 
 		/** Perform all the normal module setup for plugin local c++ files. */
-		private void SetupLocal(TargetInfo target) {
+		private void SetupLocal(ReadOnlyTargetRules target) {
             //var process = System.Diagnostics.Process.Start(System.IO.Path.Combine(PluginPath, "install.ps1"), "");
             //process.WaitForExit();
             PublicIncludePaths.AddRange(new string[] {"source/Stormancer/Public" });
@@ -41,20 +78,32 @@ namespace UnrealBuildTool.Rules
 		 * @param build_path Relative build path, eg. 3rdparty/mylib/build
 		 * @param library_name Short library name, eg. mylib. Automatically expands to libmylib.a, mylib.lib, etc.
 		 */
-		private void LoadLibrary(TargetInfo target, string include_path, string build_path, string library_name) {
+		private void LoadLibrary(ReadOnlyTargetRules target, string include_path, string build_path, string library_name) {
 
 			// Add the include path
 			var full_include_path = Path.Combine(PluginPath, include_path);
-			if (!Directory.Exists(full_include_path)) {
-				Fail("Invalid include path: " + full_include_path);
-			}
-			else {
-				PublicIncludePaths.Add(full_include_path);
-				Trace("Added include path: {0}", full_include_path);
-			}
+            if (!Directory.Exists(full_include_path))
+            {
+                //Fail("Invalid include path: " + full_include_path);
+                Trace("Missing include files at : {0}", full_include_path);
+                DownloadResources(SetupInfoMap[library_name]);
 
-			// Get the build path
-			var full_build_path = Path.Combine(PluginPath, build_path);
+            }
+            else
+            {
+                SetupInfo info = SetupInfoMap[library_name];
+                string versionFile = info._InstallPath + "\\" + info._FileName.Substring(0, info._FileName.Length - 4);
+                if (!File.Exists(versionFile))
+                {
+                    //File exists but it's not up-to-date
+                    DownloadResources(SetupInfoMap[library_name]);
+                }
+                PublicIncludePaths.Add(full_include_path);
+                Trace("Added include path: {0}", full_include_path);
+            }
+
+            // Get the build path
+            var full_build_path = Path.Combine(PluginPath, build_path);
 			if (!Directory.Exists(full_build_path)) {
 				Fail("Invalid build path: " + full_build_path + " (Did you build the 3rdparty module already?)");
 			}
@@ -161,6 +210,30 @@ namespace UnrealBuildTool.Rules
 			get {
 				return new DirectoryInfo(PluginPath).Name;
 			}
-		}
-	}
+        }
+
+        void DownloadResources(SetupInfo info)
+        {
+            ProcessStartInfo startInfo = new ProcessStartInfo(); // Maybe wrong I Think this is not launching a right powershell exe as I an launch it correctly with the arguments
+            startInfo.FileName = "Powershell.exe";
+            string scriptPath = ModuleDirectory + "/../../SetupResources.ps1";
+            startInfo.Arguments = "Unblock-File -Path " + scriptPath + "; " + scriptPath + " -DownloadPath " + info._DownloadPath + " -Version " + info._Version + " -FileName " + info._FileName + " -InstallPath " + info._InstallPath + " -TempPath " + info._TempPath;
+            Trace(startInfo.Arguments);
+
+            startInfo.RedirectStandardOutput = true;
+            startInfo.RedirectStandardError = true;
+            startInfo.UseShellExecute = false;
+            startInfo.CreateNoWindow = true;
+            Process process = new Process();
+            process.StartInfo = startInfo;
+
+            process.OutputDataReceived += (s, e) => Trace(e.Data);
+            process.ErrorDataReceived += (s, e) => Trace(e.Data);
+            process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+
+            process.WaitForExit();
+        }
+    }
 }

@@ -137,40 +137,18 @@
 #undef check
 #endif
 
+#include <stormancerTypes.h>
+
 // msgpack
 #include <msgpack.hpp>
 
-// custom types
-namespace Stormancer
-{
-#if defined(_STDINT)
-	using int8 = int8_t;
-	using int16 = int16_t;
-	using int32 = int32_t;
-	using int64 = int64_t;
-
-	using uint8 = uint8_t;
-	using uint16 = uint16_t;
-	using uint32 = uint32_t;
-	using uint64 = uint64_t;
-#else
-	using int8 = signed char;
-	using int16 = signed short int;
-	using int32 = signed long int;
-	using int64 = signed long long int;
-
-	using uint8 = unsigned char;
-	using uint16 = unsigned short int;
-	using uint32 = unsigned long int;
-	using uint64 = unsigned long long int;
-#endif
-
-	using byte = uint8;
-};
-
 #if (defined(UE_EDITOR) || defined(UE_GAME))
+#if UE_BUILD_SHIPPING
+#define check(expr)                    { CA_ASSUME(expr); }
+#else
 //Copy paste from UnrealEngine\Engine\Source\Runtime\Core\Public\Misc\AssertionMacros.h
-#define check(expr)				{ if(UNLIKELY(!(expr))) { FDebug::LogAssertFailedMessage( #expr, __FILE__, __LINE__ ); _DebugBreakAndPromptForRemote(); FDebug::AssertFailed( #expr, __FILE__, __LINE__ ); CA_ASSUME(false); } }
+#define check(expr)                { if(UNLIKELY(!(expr))) { FDebug::LogAssertFailedMessage( #expr, __FILE__, __LINE__ ); _DebugBreakAndPromptForRemote(); FDebug::AssertFailed( #expr, __FILE__, __LINE__ ); CA_ASSUME(false); } }
+#endif // UE_BUILD_SHIPPING
 #ifdef _WIN32
 #include "HideWindowsPlatformTypes.h"
 #endif // _WIN32

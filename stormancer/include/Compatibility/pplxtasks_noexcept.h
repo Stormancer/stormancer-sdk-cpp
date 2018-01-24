@@ -34,6 +34,12 @@ public:
 			{
 				res.SetError(e.what());
 			}
+#ifdef __cplusplus_winrt
+			catch (Platform::Exception^ e)
+			{
+				res.SetError(Stormancer::wstring_to_utf8(L"HRESULT: " + std::to_wstring(e->HResult) + L", Message: " + e->Message->Data()).c_str());
+			}
+#endif
 
 			return pplx::task_from_result(res);
 		});
@@ -46,7 +52,7 @@ public:
 		if (!_resultWasHandled)
 		{
 			std::shared_ptr<ILogger> logger = _logger;
-			_task.then([logger](pplx::task<StormancerResult<TRes> > taskRes)
+			_task.then([=](pplx::task<StormancerResult<TRes> > taskRes)
 			{
 				StormancerResult<TRes> res;
 				try
@@ -76,7 +82,7 @@ public:
 		// Schedule on the specified dispatcher, if any
 		pplx::task_options opts = (_dispatcher) ? pplx::task_options(_dispatcher) : pplx::task_options();
 
-		_task.then([continuation](pplx::task<StormancerResult<TRes> > taskRes)
+		_task.then([=](pplx::task<StormancerResult<TRes> > taskRes)
 		{
 			StormancerResult<TRes> res;
 			try
