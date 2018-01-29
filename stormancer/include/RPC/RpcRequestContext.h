@@ -16,12 +16,12 @@ namespace Stormancer
 #pragma region public_methods
 
 		RpcRequestContext(T* peer, Scene* scene, uint16 id, bool ordered, ibytestream* inputStream, pplx::cancellation_token token)
-			: _scene(scene),
-			_id(id),
-			_ordered(ordered),
-			_peer(peer),
-			_inputStream(inputStream),
-			_cancellationToken(token)
+			: _peer(peer)
+			, _scene(scene)
+			, _inputStream(inputStream)
+			, _id(id)
+			, _ordered(ordered)
+			, _cancellationToken(token)
 		{
 		}
 
@@ -51,9 +51,12 @@ namespace Stormancer
 				throw std::runtime_error("The scene ptr is invalid");
 			}
 
-			_scene->sendPacket(RpcPlugin::nextRouteName, [=](obytestream* stream) {
+			_scene->send(RpcPlugin::nextRouteName, [=](obytestream* stream) {
 				writeRequestId(stream);
-				writer(stream);
+				if (writer)
+				{
+					writer(stream);
+				}
 			}, priority, (_ordered ? PacketReliability::RELIABLE_ORDERED : PacketReliability::RELIABLE), _rpcClientChannelIdentifier);
 			_msgSent = 1;
 		}
@@ -65,7 +68,7 @@ namespace Stormancer
 				throw std::runtime_error("The scene ptr is invalid");
 			}
 
-			_scene->sendPacket(RpcPlugin::errorRouteName, [=](obytestream* stream) {
+			_scene->send(RpcPlugin::errorRouteName, [=](obytestream* stream) {
 				writeRequestId(stream);
 				_serializer.serialize(stream, errorMsg);
 			}, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE_ORDERED, _rpcClientChannelIdentifier);
@@ -78,7 +81,7 @@ namespace Stormancer
 				throw std::runtime_error("The scene ptr is invalid");
 			}
 
-			_scene->sendPacket(RpcPlugin::completeRouteName, [=](obytestream* stream) {
+			_scene->send(RpcPlugin::completeRouteName, [=](obytestream* stream) {
 				(*stream) << _msgSent;
 				writeRequestId(stream);
 			}, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE_ORDERED, _rpcClientChannelIdentifier);

@@ -67,6 +67,6 @@ namespace Stormancer
 
 	void GameSessionService::ready()
 	{
-		_scene->sendPacket("player.ready", Writer());
+		_scene->send("gamesession.playerready", Writer());
 	}
 }

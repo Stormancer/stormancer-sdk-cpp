@@ -28,9 +28,9 @@ namespace Stormancer
 		const std::string& account() const override;
 		const std::string& application() const override;
 		const std::map<std::string, std::string>& metadata() const override;
-		std::string metadata(const std::string& key) const;
+		std::string metadata(const std::string& key) const override;
 		void setMetadata(const std::map<std::string, std::string>& metadata) override;
-		void setMetadata(const std::string& key, const std::string& value);
+		void setMetadata(const std::string& key, const std::string& value) override;
 		DependencyResolver* dependencyResolver() override;
 		ConnectionState getConnectionState() const override;
 		rxcpp::observable<ConnectionState> getConnectionStateChangedObservable() const override;

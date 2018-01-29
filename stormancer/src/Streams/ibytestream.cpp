@@ -101,27 +101,47 @@ namespace Stormancer
 		{
 			int sz = (int)size();
 			bytes.resize(sz);
-			std::memcpy(bytes.data(), ptr(), sz);
+			std::memcpy(bytes.data(), startPtr(), sz);
 		}
 		return bytes;
 	}
 
-	byte* ibytestream::ptr()
+	byte* ibytestream::startPtr()
 	{
 		auto bsb = dynamic_cast<bytestreambuf*>(rdbuf());
 		if (bsb)
 		{
-			return bsb->ptr();
+			return bsb->startReadPtr();
 		}
 		return nullptr;
 	}
 
-	int ibytestream::size()
+	byte* ibytestream::currentPtr()
 	{
 		auto bsb = dynamic_cast<bytestreambuf*>(rdbuf());
 		if (bsb)
 		{
-			return bsb->gcount();
+			return bsb->currentReadPtr();
+		}
+		return nullptr;
+	}
+
+	std::streamsize ibytestream::size()
+	{
+		auto bsb = dynamic_cast<bytestreambuf*>(rdbuf());
+		if (bsb)
+		{
+			return bsb->size();
+		}
+		return 0;
+	}
+
+	std::streamsize ibytestream::readBytesCount()
+	{
+		auto bsb = dynamic_cast<bytestreambuf*>(rdbuf());
+		if (bsb)
+		{
+			return bsb->readBytesCount();
 		}
 		return 0;
 	}

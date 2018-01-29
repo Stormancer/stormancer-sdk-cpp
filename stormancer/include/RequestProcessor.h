@@ -63,6 +63,5 @@ namespace Stormancer
 
 		SystemRequest_ptr reserveRequestSlot(byte msgId,pplx::task_completion_event<Packet_ptr> tce);
 		SystemRequest_ptr freeRequestSlot(uint16 requestId);
-		PacketProcessorConfig* _requestProcessorConfig;
 	};
 };

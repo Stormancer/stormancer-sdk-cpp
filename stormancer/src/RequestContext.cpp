@@ -6,16 +6,16 @@ namespace Stormancer
 {
 	RequestContext::RequestContext(Packet_ptr packet)
 		: _packet(packet)
-		, _stream(packet->stream)
+		, _stream(new ibytestream())
 		, _isComplete(false)
 	{
 		(*packet->stream) >> _requestId;
-		_stream->rdbuf()->pubsetbuf(packet->stream->ptr(), packet->stream->size());
-		_stream->seekg(0, std::ios_base::beg);
+		_stream->rdbuf()->pubsetbuf(packet->stream->currentPtr(), packet->stream->rdbuf()->in_avail());
 	}
 
 	RequestContext::~RequestContext()
 	{
+		delete _stream;
 	}
 
 	Packet_ptr RequestContext::packet()
@@ -43,7 +43,10 @@ namespace Stormancer
 		_packet->connection->send([=, &writer](obytestream* stream) {
 			(*stream) << (byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG;
 			(*stream) << _requestId;
-			writer(stream);
+			if (writer)
+			{
+				writer(stream);
+			}
 		}, 0);
 	}
 
@@ -63,7 +66,10 @@ namespace Stormancer
 		_packet->connection->send([=, &writer](obytestream* stream) {
 			(*stream) << (byte)MessageIDTypes::ID_REQUEST_RESPONSE_ERROR;
 			(*stream) << _requestId;
-			writer(stream);
+			if (writer)
+			{
+				writer(stream);
+			}
 		}, 0);
 	}
 };

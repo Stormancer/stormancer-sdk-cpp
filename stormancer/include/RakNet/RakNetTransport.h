@@ -76,7 +76,6 @@ namespace Stormancer
 		std::string _type;
 		std::map<uint64, std::shared_ptr<RakNetConnection>> _connections;
 		std::mutex _pendingConnection_mtx;
-		const int _connectionTimeout = 5000;
 		std::queue<ConnectionRequest> _pendingConnections;
 		std::shared_ptr<IScheduler> _scheduler;
 		std::shared_ptr<RakNet::SocketDescriptor> _socketDescriptor;

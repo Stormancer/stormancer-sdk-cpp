@@ -25,11 +25,19 @@ namespace Stormancer
 
 		~bytestreambuf();
 
-		byte* ptr();
+		byte* startReadPtr();
 
-		int gcount();
+		byte* currentReadPtr();
 
-		int pcount();
+		byte* startWritePtr();
+
+		byte* currentWritePtr();
+
+		std::streamsize size();
+
+		std::streamsize readBytesCount();
+
+		std::streamsize writtenBytesCount();
 
 		void dynamic(bool dyn);
 

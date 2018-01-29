@@ -18,7 +18,10 @@ namespace Stormancer
 			(*s) << id();
 			(*s) << priority;
 			(*s) << reliability;
-			writer(s);
+			if (writer)
+			{
+				writer(s);
+			}
 		}, channelUid, priority, reliability);
 	}
 

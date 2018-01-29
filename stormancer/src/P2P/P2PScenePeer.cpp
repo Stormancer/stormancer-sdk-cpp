@@ -5,8 +5,8 @@
 namespace Stormancer
 {
 	P2PScenePeer::P2PScenePeer(Scene* scene, std::shared_ptr<IConnection> connection, std::shared_ptr<P2PService> p2p)
-		: _connection(connection)
-		, _scene(scene)
+		: _scene(scene)
+		, _connection(connection)
 		, _p2p(p2p)
 	{
 		if (!_connection)

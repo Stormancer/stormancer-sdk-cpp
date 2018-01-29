@@ -28,7 +28,10 @@ namespace Stormancer
 		_connection->send([=, &writer](obytestream* stream) {
 			(*stream) << _sceneHandle;
 			(*stream) << r->handle();
-			writer(stream);
+			if (writer)
+			{
+				writer(stream);
+			}
 		}, channelUid, priority, reliability);
 	}
 

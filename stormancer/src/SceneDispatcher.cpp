@@ -7,8 +7,8 @@
 namespace Stormancer
 {
 	SceneDispatcher::SceneDispatcher(std::shared_ptr<IActionDispatcher> evDispatcher)
-		: _scenes((uint32)0xff - (uint32)MessageIDTypes::ID_SCENES + 1)
-		, _eventDispatcher(evDispatcher)
+		: _eventDispatcher(evDispatcher)
+		, _scenes((uint32)0xff - (uint32)MessageIDTypes::ID_SCENES + 1)
 	{
 		handler = new processorFunction([=](uint8 sceneHandle, Packet_ptr packet) {
 			return handler_impl(sceneHandle, packet);

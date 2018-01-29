@@ -155,7 +155,7 @@ namespace Stormancer
 
 	void MatchmakingService::resolve(bool acceptMatch)
 	{
-		_scene->sendPacket("match.ready.resolve", [=](obytestream* stream) {
+		_scene->send("match.ready.resolve", [=](obytestream* stream) {
 			*stream << acceptMatch;
 		}, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE_ORDERED);
 	}
@@ -172,7 +172,7 @@ namespace Stormancer
 			}
 			else
 			{
-				_scene->sendPacket("match.cancel", Writer(), PacketPriority::IMMEDIATE_PRIORITY, PacketReliability::RELIABLE_ORDERED);
+				_scene->send("match.cancel", Writer(), PacketPriority::IMMEDIATE_PRIORITY, PacketReliability::RELIABLE_ORDERED);
 			}
 		}
 	}

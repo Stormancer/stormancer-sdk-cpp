@@ -45,9 +45,13 @@ namespace Stormancer
 
 		std::vector<byte> bytes();
 
-		byte* ptr();
+		byte* startPtr();
 
-		int size();
+		byte* currentPtr();
+
+		std::streamsize size();
+
+		std::streamsize readBytesCount();
 
 		ibytestream& read(byte* ptr, std::streamsize size);
 

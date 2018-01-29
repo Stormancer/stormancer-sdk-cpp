@@ -172,7 +172,10 @@ namespace Stormancer
 					(*stream) << (byte)MessageIDTypes::ID_SYSTEM_REQUEST;
 					(*stream) << msgId;
 					(*stream) << request->id;
-					writer(stream);
+					if (writer)
+					{
+						writer(stream);
+					}
 				}, 0, priority);
 			}
 			catch (const std::exception& ex)

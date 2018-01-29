@@ -73,9 +73,6 @@ namespace Stormancer
 		/// \param reliability Message reliability behavior.
 		STORMANCER_DLL_API void send(const std::string& routeName, const Writer& writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const std::string& channelIdentifier = "");
 
-		/// Ddeprecated (look at Scene::send).
-		STORMANCER_DLL_API void sendPacket(const std::string& routeName, const Writer& writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const std::string& channelIdentifier = "");
-
 		/// Returns the connection state to the the scene.
 		STORMANCER_DLL_API ConnectionState getCurrentConnectionState() const;
 

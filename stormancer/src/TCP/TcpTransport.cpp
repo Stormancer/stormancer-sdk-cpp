@@ -261,7 +261,7 @@ namespace Stormancer
 				{
 					onDisconnection(endpoint, readbytes == 0 ? "remote server disconnected." : "an error occurred");
 				});
-				delete buffer;
+				delete[] buffer;
 				break;
 			}
 
@@ -270,7 +270,7 @@ namespace Stormancer
 				int64 sid = *(int64*)(buffer + 1);
 				_logger->log(LogLevel::Trace, "TcpTransport", "Connection ID received.", std::to_string(sid).c_str());
 				onConnectionIdReceived(sid);
-				delete buffer;
+				delete[] buffer;
 				continue;
 			}
 

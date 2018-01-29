@@ -9,10 +9,10 @@ namespace Stormancer
 	}
 
 	Route::Route(const std::string& routeName, uint16 handle, MessageOriginFilter filter, std::map<std::string, std::string> metadata)
-		: _name(routeName),
-		_metadata(metadata),
-		_handle(handle),
-		_filter(filter)
+		: _handle(handle)
+		, _filter(filter)
+		, _name(routeName)
+		, _metadata(metadata)
 	{
 	}
 

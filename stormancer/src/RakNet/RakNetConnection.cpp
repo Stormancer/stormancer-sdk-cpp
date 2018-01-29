@@ -6,10 +6,10 @@
 namespace Stormancer
 {
 	RakNetConnection::RakNetConnection(RakNet::RakNetGUID guid, int64 id, std::weak_ptr<RakNet::RakPeerInterface> peer)
-		: _lastActivityDate(nowTime_t())
-		, _guid(guid)
+		: _id(id)
 		, _peer(peer)
-		, _id(id)
+		, _guid(guid)
+		, _lastActivityDate(nowTime_t())
 	{
 		_connectionStateObservable.get_observable().subscribe([=](ConnectionState state) {
 			// On next
@@ -127,13 +127,16 @@ namespace Stormancer
 		{
 			packetTransform->onSend(writer2, transformMetadata);
 		}
-		writer2(&stream);
+		if (writer2)
+		{
+			writer2(&stream);
+		}
 		stream.flush();
-		byte* dataPtr = stream.ptr();
-		std::streamsize dataSize = stream.pcount();
+		byte* dataPtr = stream.startPtr();
+		std::streamsize dataSize = stream.writtenBytesCount();
 
 #if defined(STORMANCER_LOG_PACKETS) || defined(STORMANCER_LOG_RAKNET_PACKETS)
-		auto bytes2 = stringifyBytesArray(bytes, true);
+		auto bytes2 = stringifyBytesArray(stream.bytes(), true);
 		ILogger::instance()->log(LogLevel::Trace, "RakNetConnection", "Send packet to scene", bytes2.c_str());
 #endif
 

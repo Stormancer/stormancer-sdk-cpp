@@ -18,7 +18,7 @@ namespace Stormancer
 
 		~AESWindows();
 
-		std::vector<byte> key() const;
+		std::vector<byte> key() const override;
 
 		void encrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream* outputStream) override;
 

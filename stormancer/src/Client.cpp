@@ -44,15 +44,15 @@ namespace Stormancer
 	// Client
 
 	Client::Client(Configuration_ptr config)
-		: _initialized(false)
+		: _dependencyResolver(std::make_shared<DependencyResolver>())
+		, _initialized(false)
 		, _accountId(config->account)
-		, _config(config)
 		, _applicationName(config->application)
-		, _metadata(config->_metadata)
 		, _maxPeers(config->maxPeers)
-		, _dependencyResolver(std::make_shared<DependencyResolver>())
-		, _plugins(config->plugins())
+		, _metadata(config->_metadata)
 		, _synchronisedClock(config->synchronisedClock)
+		, _plugins(config->plugins())
+		, _config(config)
 	{
 		ILogger::setInstance(config->logger);
 
@@ -705,7 +705,7 @@ namespace Stormancer
 			scene->setConnectionState(ConnectionState::Disconnected);
 		};
 
-		auto disconnectTask = sendSystemRequest<DisconnectFromSceneDto, void>((byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, DisconnectFromSceneDto { sceneHandle = sceneHandle }).then([](pplx::task<void> t) {
+		auto disconnectTask = sendSystemRequest<DisconnectFromSceneDto, void>((byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, DisconnectFromSceneDto { sceneHandle }).then([](pplx::task<void> t) {
 			try
 			{
 				t.get();

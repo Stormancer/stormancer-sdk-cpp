@@ -510,13 +510,14 @@ namespace Stormancer
 	void RakNetTransport::onMessageReceived(RakNet::Packet* rakNetPacket)
 	{
 #if defined(STORMANCER_LOG_PACKETS) && !defined(STORMANCER_LOG_RAKNET_PACKETS)
-		std::string receivedData((char*)rakNetPacket->data, rakNetPacket->length);
-		auto bytes = stringifyBytesArray(receivedData, true);
+		std::vector<byte> tempBytes(rakNetPacket->data, rakNetPacket->data + rakNetPacket->length);
+		auto bytes = stringifyBytesArray(tempBytes, true);
 		_logger->log(LogLevel::Trace, "RakNetTransport", "Packet received", bytes.c_str());
 #endif
 
 		auto connection = getConnection(rakNetPacket->guid);
 		auto stream = new ibytestream(rakNetPacket->data, rakNetPacket->length);
+
 		Packet_ptr packet(new Packet<>(connection, stream), deleter<Packet<>>());
 		auto peer = _peer;
 		packet->cleanup += [=]() {

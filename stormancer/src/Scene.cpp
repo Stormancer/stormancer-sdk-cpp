@@ -7,12 +7,12 @@
 namespace Stormancer
 {
 	Scene::Scene(IConnection* connection, std::weak_ptr<Client> client, const std::string& id, const std::string& token, const SceneInfosDto& dto, std::weak_ptr<DependencyResolver> parentDependencyResolver)
-		: _id(id)
+		: _dependencyResolver(std::make_shared<DependencyResolver>(parentDependencyResolver))
 		, _peer(connection)
 		, _token(token)
-		, _client(client)
 		, _metadata(dto.Metadata)
-		, _dependencyResolver(std::make_shared<DependencyResolver>(parentDependencyResolver))
+		, _id(id)
+		, _client(client)
 		, _logger(_dependencyResolver->resolve<ILogger>())
 	{
 		for (auto routeDto : dto.Routes)
@@ -189,7 +189,7 @@ namespace Stormancer
 				if (origin)
 				{
 					if ((isOriginHost && ((int)route->filter() & (int)MessageOriginFilter::Host)) ||
-						(!isOriginHost) && ((int)route->filter() & (int)MessageOriginFilter::Peer)) //Filter packet
+						((!isOriginHost) && ((int)route->filter() & (int)MessageOriginFilter::Peer))) //Filter packet
 					{
 						Packetisp_ptr packet(new Packet<IScenePeer>(origin, p->stream, p->metadata));
 						subscriber.on_next(packet);
@@ -245,18 +245,16 @@ namespace Stormancer
 		auto writer2 = [=, &writer](obytestream* stream) {
 			(*stream) << _handle;
 			(*stream) << route->handle();
-			writer(stream);
+			if (writer)
+			{
+				writer(stream);
+			}
 		};
 		TransformMetadata transformMetadata{ _metadata };
 		_peer->send(writer2, channelUid, priority, reliability, transformMetadata);
 	}
 
 	void Scene::send(const std::string& routeName, const Writer& writer, PacketPriority priority, PacketReliability reliability, const std::string& channelIdentifier)
-	{
-		send(MatchSceneHost(), routeName, writer, priority, reliability, channelIdentifier);
-	}
-
-	void Scene::sendPacket(const std::string& routeName, const Writer& writer, PacketPriority priority, PacketReliability reliability, const std::string& channelIdentifier)
 	{
 		send(MatchSceneHost(), routeName, writer, priority, reliability, channelIdentifier);
 	}

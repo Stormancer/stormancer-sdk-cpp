@@ -28,7 +28,7 @@ namespace Stormancer
 	{
 		if (_aes)
 		{
-			byte* dataPtr = ptr();
+			byte* dataPtr = startPtr();
 			std::streamsize dataSize = rdbuf()->in_avail();
 			if (dataPtr != nullptr && dataSize > 0)
 			{

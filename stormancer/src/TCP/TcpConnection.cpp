@@ -125,7 +125,10 @@ namespace Stormancer
 		{
 			//SOCKET socketId = *(_socketId.lock());
 			obytestream stream;
-			writer(&stream);
+			if (writer)
+			{
+				writer(&stream);
+			}
 			stream.flush();
 			auto bytes = stream.bytes();
 

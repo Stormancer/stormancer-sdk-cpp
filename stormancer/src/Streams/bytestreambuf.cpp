@@ -28,29 +28,67 @@ namespace Stormancer
 		tidy();
 	}
 
-	byte* bytestreambuf::ptr()
+	byte* bytestreambuf::startReadPtr()
+	{
+		return eback();
+	}
+
+	byte* bytestreambuf::currentReadPtr()
+	{
+		return gptr();
+	}
+
+	byte* bytestreambuf::startWritePtr()
 	{
 		return pbase();
 	}
 
-	int bytestreambuf::gcount()
+	byte* bytestreambuf::currentWritePtr()
 	{
-		byte* first = eback();
-		byte* last = gptr();
-		if (first && last)
+		return pptr();
+	}
+
+	std::streamsize bytestreambuf::size()
+	{
+		if (_mode & Write)
 		{
-			return (int)(last - first);
+			byte* first = eback();
+			byte* last = egptr();
+			if (first && last)
+			{
+				return (last - first);
+			}
+		}
+		else if (_mode & Read)
+		{
+			byte* first = pbase();
+			byte* last = epptr();
+			if (first && last)
+			{
+				return (last - first);
+			}
 		}
 		return 0;
 	}
 
-	int bytestreambuf::pcount()
+	std::streamsize bytestreambuf::readBytesCount()
+	{
+		byte* first = eback();
+		byte* next = gptr();
+		if (first && next)
+		{
+			return (next - first);
+		}
+		return 0;
+	}
+
+	std::streamsize bytestreambuf::writtenBytesCount()
 	{
 		byte* first = pbase();
 		byte* next = pptr();
 		if (first && next)
 		{
-			return (int)(next - first);
+			return (next - first);
 		}
 		return 0;
 	}
@@ -85,7 +123,7 @@ namespace Stormancer
 		if ((_mode & Read) && (which & std::ios_base::in))
 		{
 			byte* first = eback();
-			byte* next = 0;
+			byte* next = gptr();
 			byte* last = egptr();
 
 			if (way == std::ios_base::beg)
@@ -110,7 +148,7 @@ namespace Stormancer
 		if ((_mode & Write) && (which & std::ios_base::out))
 		{
 			byte* first = pbase();
-			byte* next = 0;
+			byte* next = pptr();
 			byte* last = epptr();
 
 			if (way == std::ios_base::beg)

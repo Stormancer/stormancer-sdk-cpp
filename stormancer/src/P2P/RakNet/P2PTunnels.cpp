@@ -76,7 +76,7 @@ namespace Stormancer
 		{
 			throw std::runtime_error("The server does not exist");
 		}
-		for (byte handle = 0; handle < 256; handle++)
+		for (byte handle = 0; handle < 255; handle++)
 		{
 			peerHandle key(clientPeerId, handle);
 			if (_tunnels.find(key) == _tunnels.end())
@@ -168,7 +168,7 @@ namespace Stormancer
 		byte buffer[1464];
 		stream->read(buffer, 1464);
 
-		auto read = stream->gcount();
+		auto read = stream->readBytesCount();
 
 		auto itTunnel = _tunnels.find(std::make_tuple(id, handle));
 		if (itTunnel != _tunnels.end())

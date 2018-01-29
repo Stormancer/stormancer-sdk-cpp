@@ -30,7 +30,10 @@ namespace Stormancer
 					};
 
 					AESEncryptStream aesStream(key, true);
-					writer(&aesStream);
+					if (writer)
+					{
+						writer(&aesStream);
+					}
 					aesStream.encrypt(stream);
 				};
 			}
@@ -54,15 +57,15 @@ namespace Stormancer
 					0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F
 				};
 
-				byte* dataPtr = stream->ptr() + 1;
+				byte* dataPtr = stream->startPtr() + 1;
 				std::streamsize dataSize = stream->rdbuf()->in_avail();
 
 				AESDecryptStream aesStream(key, dataPtr, dataSize);
 				obytestream os;
 				aesStream.decrypt(&os);
 
-				byte* decryptedPtr = os.ptr();
-				std::streamsize decryptedSize = os.pcount();
+				byte* decryptedPtr = os.startPtr();
+				std::streamsize decryptedSize = os.writtenBytesCount();
 
 				std::memcpy(dataPtr, decryptedPtr, (std::size_t)decryptedSize);
 				stream->rdbuf()->pubsetbuf(dataPtr, decryptedSize);

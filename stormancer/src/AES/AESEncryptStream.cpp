@@ -28,8 +28,8 @@ namespace Stormancer
 	{
 		if (_aes)
 		{
-			byte* dataPtr = ptr();
-			std::streamsize dataSize = pcount();
+			byte* dataPtr = startPtr();
+			std::streamsize dataSize = writtenBytesCount();
 			if (dataPtr && dataSize > 0)
 			{
 				std::streamsize ivSize = (_useIV ? _aes->getBlockSize() : 0);

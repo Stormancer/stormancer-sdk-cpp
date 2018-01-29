@@ -75,9 +75,12 @@ namespace Stormancer
 
 			try
 			{
-				_scene->sendPacket(route, [=](obytestream* bs) {
+				_scene->send(route, [=](obytestream* bs) {
 					*bs << id;
-					writer(bs);
+					if (writer)
+					{
+						writer(bs);
+					}
 				}, priority, PacketReliability::RELIABLE_ORDERED, _rpcServerChannelIdentifier);
 			}
 			catch (std::exception& ex)
@@ -98,7 +101,7 @@ namespace Stormancer
 					{
 						try
 						{
-							_scene->sendPacket(RpcPlugin::cancellationRouteName, [=](obytestream* bs)
+							_scene->send(RpcPlugin::cancellationRouteName, [=](obytestream* bs)
 							{
 								*bs << request->id;
 							}, PacketPriority::IMMEDIATE_PRIORITY, PacketReliability::RELIABLE_ORDERED, _rpcServerChannelIdentifier);

@@ -45,9 +45,13 @@ namespace Stormancer
 
 		virtual std::vector<byte> bytes();
 
-		byte* ptr();
+		byte* startPtr();
 
-		int pcount();
+		byte* currentPtr();
+
+		std::streamsize size();
+
+		std::streamsize writtenBytesCount();
 
 		void dynamic(bool dyn);
 

@@ -425,7 +425,7 @@ namespace
 		{
 			if (sceneMain)
 			{
-				sceneMain->sendPacket("message", [](obytestream* stream) {
+				sceneMain->send("message", [](obytestream* stream) {
 					Serializer serializer;
 					serializer.serialize(stream, "rpc");
 				});
@@ -445,7 +445,7 @@ namespace
 		{
 			if (sceneMain)
 			{
-				sceneMain->sendPacket("message", [](obytestream* stream) {
+				sceneMain->send("message", [](obytestream* stream) {
 					Serializer serializer;
 					serializer.serialize(stream, "rpcCancel");
 				});
@@ -465,7 +465,7 @@ namespace
 		{
 			if (sceneMain)
 			{
-				sceneMain->sendPacket("message", [](obytestream* stream) {
+				sceneMain->send("message", [](obytestream* stream) {
 					Serializer serializer;
 					serializer.serialize(stream, "rpcException");
 				});

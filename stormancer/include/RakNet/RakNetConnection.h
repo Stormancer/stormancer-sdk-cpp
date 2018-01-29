@@ -37,8 +37,8 @@ namespace Stormancer
 		virtual void send(const Writer& writer, int channelUid, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const TransformMetadata& transformMetadata = TransformMetadata()) override;
 		int ping() const override;
 		void setApplication(std::string account, std::string application) override;
-		Action<std::string>::TIterator onClose(std::function<void(std::string)> callback);
-		Action<std::string>& onCloseAction();
+		Action<std::string>::TIterator onClose(std::function<void(std::string)> callback) override;
+		Action<std::string>& onCloseAction() override;
 		rxcpp::observable<ConnectionState> getConnectionStateChangedObservable() const override;
 
 		template<typename T>
