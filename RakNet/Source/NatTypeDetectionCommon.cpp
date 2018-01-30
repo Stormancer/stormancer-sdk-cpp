@@ -155,55 +155,7 @@ RakNetSocket2* RakNet::CreateNonblockingBoundSocket(const char *bindAddr
 #endif
 
 	return r2;
-
-	/*
-	#ifdef __native_client__
-	RakNetSocket2 *s = SocketLayer::CreateBoundSocket( 0, 0, false, bindAddr, true, 0, AF_INET, chromeInstance );
-	#else
-	RakNetSocket2 *s = SocketLayer::CreateBoundSocket( 0, 0, false, bindAddr, true, 0, AF_INET, 0 );
-	#endif
-
-	#ifdef _WIN32
-		unsigned long nonblocking = 1;
-		s->IOCTLSocket( FIONBIO, &nonblocking );
-	#elif defined(_PS3) || defined(__PS3__) || defined(SN_TARGET_PS3) || defined(_PS4) || defined(SN_TARGET_PSP2)
-		int sock_opt=1;
-		s->SetSockOpt(SOL_SOCKET, SO_NBIO, ( char * ) & sock_opt, sizeof ( sock_opt ) );
-	#elif defined(__native_client__)
-		// Nop
-	#else
-		s->Fcntl( F_SETFL, O_NONBLOCK );
-	#endif
-	return s;
-	*/
 }
 
-/*
-int RakNet::NatTypeRecvFrom(char *data, RakNetSocket2* socket, SystemAddress &sender, RNS2EventHandler *eventHandler)
-{
-#if defined(__native_client__)
-	RakAssert("TODO" && 0);
-#elif defined(WINDOWS_STORE_RT)
-	RakAssert("TODO" && 0);
-#else
-	if (socket->IsBerkleySocket())
-	{
-		RNS2RecvStruct *recvFromStruct;
-		recvFromStruct=AllocRNS2RecvStruct(_FILE_AND_LINE_);
-		if (recvFromStruct != NULL)
-		{
-			recvFromStruct->socket=this;
-			socket->RecvFromBlocking(recvFromStruct);
-		}
-		if (recvFromStruct->bytesRead>0)
-		{
-			sender = recvFromStruct->systemAddress;
-		}
-		return recvFromStruct->bytesRead;
-	}
-	return 0;
-#endif
-}
-*/
 
 #endif // #if _RAKNET_SUPPORT_NatTypeDetectionServer==1 || _RAKNET_SUPPORT_NatTypeDetectionClient==1
