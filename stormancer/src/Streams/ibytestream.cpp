@@ -136,7 +136,7 @@ namespace Stormancer
 		return 0;
 	}
 
-	std::streamsize ibytestream::readBytesCount()
+	std::streamsize ibytestream::totalReadBytesCount()
 	{
 		auto bsb = dynamic_cast<bytestreambuf*>(rdbuf());
 		if (bsb)

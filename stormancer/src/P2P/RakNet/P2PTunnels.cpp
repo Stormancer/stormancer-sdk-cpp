@@ -166,9 +166,7 @@ namespace Stormancer
 		byte handle;
 		stream->read(&handle, 1);
 		byte buffer[1464];
-		stream->read(buffer, 1464);
-
-		auto read = stream->readBytesCount();
+		auto read = stream->readsome(buffer, 1464);
 
 		auto itTunnel = _tunnels.find(std::make_tuple(id, handle));
 		if (itTunnel != _tunnels.end())

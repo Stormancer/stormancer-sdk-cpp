@@ -51,7 +51,7 @@ namespace Stormancer
 
 		std::streamsize size();
 
-		std::streamsize readBytesCount();
+		std::streamsize totalReadBytesCount();
 
 		ibytestream& read(byte* ptr, std::streamsize size);
 
