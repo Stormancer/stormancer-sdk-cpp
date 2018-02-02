@@ -164,13 +164,13 @@ namespace Stormancer
 		const bool _isHost = false;
 
 		/// Scene peer connection.
-		IConnection* _peer;
+		IConnection* _peer = nullptr;
 
 		/// Application token.
 		std::string _token;
 
 		/// Scene handle.
-		byte _handle;
+		byte _handle = 0;
 
 		/// Scene metadatas.
 		std::map<std::string, std::string> _metadata;

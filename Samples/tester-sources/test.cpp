@@ -140,11 +140,6 @@ namespace
 		throw std::runtime_error("An excepion occured!");
 	}
 
-	void test_rpc_server_canceled(Packetisp_ptr p)
-	{
-		logger->log(LogLevel::Debug, "test_rpc_server_cancelled", "RPC on server cancel OK");
-	}
-
 	void test_connect()
 	{
 		logger->log(LogLevel::Info, "test_connect", "CONNECT");
@@ -355,6 +350,10 @@ namespace
 			}, []() {
 				// On complete
 				logger->log(LogLevel::Error, "test_rpc_server_cancel", "rpc complete received, but this RPC should be cancelled.");
+			});
+
+			subscription.add([=]() {
+				logger->log(LogLevel::Debug, "test_rpc_server_cancel", "RPC subscription unsubscribed");
 			});
 
 			taskDelay(30ms).then([subscription]() {

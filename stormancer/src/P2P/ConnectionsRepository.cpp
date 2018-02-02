@@ -21,7 +21,7 @@ namespace Stormancer
 
 	void ConnectionsRepository::newConnection(std::shared_ptr<IConnection> connection)
 	{
-		ILogger::instance()->log(LogLevel::Info, "P2P", "Adding connection " + connection->ipAddress(), std::to_string(connection->id()));
+		ILogger::instance()->log(LogLevel::Trace, "P2P", "Adding connection " + connection->ipAddress(), std::to_string(connection->id()));
 		if (connection == nullptr)
 		{
 			throw std::runtime_error("connection is null");

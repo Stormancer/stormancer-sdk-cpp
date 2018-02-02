@@ -638,19 +638,15 @@ namespace Stormancer
 			// Stops the synchronised clock, disconnect the scenes, closes the server connection then stops the underlying transports.
 
 			auto connection = _serverConnection;
-			auto clientDisconnected = [=]() {
-				auto serverConnection = connection.lock();
-				if (serverConnection)
-				{
-					serverConnection->close();
-				}
-			};
-
 			disconnectAllScenes().then([=](pplx::task<void> t) {
 				try
 				{
 					t.get();
-					clientDisconnected();
+					auto serverConnection = connection.lock();
+					if (serverConnection)
+					{
+						serverConnection->close();
+					}
 					_disconnectionTce.set();
 				}
 				catch (const std::exception& ex)
@@ -692,33 +688,32 @@ namespace Stormancer
 
 		_dependencyResolver->resolve<SceneDispatcher>()->removeScene(sceneHandle);
 
-		auto sceneDisconnected = [=]() {
-			for (auto plugin : _plugins)
-			{
-				plugin->sceneDisconnected(scene.get());
-			}
-
-			//#ifdef STORMANCER_LOG_CLIENT			
-			//			logger()->log(LogLevel::Debug, "client", "Scene disconnected", sceneId);
-			//#endif
-
-			scene->setConnectionState(ConnectionState::Disconnected);
-		};
-
-		auto disconnectTask = sendSystemRequest<DisconnectFromSceneDto, void>((byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, DisconnectFromSceneDto { sceneHandle }).then([](pplx::task<void> t) {
+		return sendSystemRequest<DisconnectFromSceneDto, void>((byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, DisconnectFromSceneDto { sceneHandle }).then([=](pplx::task<void> t) {
 			try
 			{
 				t.get();
+				for (auto plugin : _plugins)
+				{
+					plugin->sceneDisconnected(scene.get());
+				}
+
+#ifdef STORMANCER_LOG_CLIENT			
+				logger()->log(LogLevel::Debug, "client", "Scene disconnected", sceneId);
+#endif
+
+				scene->setConnectionState(ConnectionState::Disconnected);
 			}
-			catch (...) {}
+			catch (const std::exception& ex)
+			{
+				// capture the exception and don't rethrow it
+				logger()->log(LogLevel::Warn, "client", "Scene disconnexion failed", ex.what());
+			}
+			catch (...)
+			{
+				// capture the exception and don't rethrow it
+				logger()->log(LogLevel::Warn, "client", "Scene disconnexion failed");
+			}
 		});
-
-		disconnectTask = disconnectTask.then([=]() {
-			sceneDisconnected();
-		});
-
-
-		return disconnectTask;
 	}
 
 	pplx::task<void> Client::disconnectAllScenes()

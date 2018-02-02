@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "Friends.h"
 
-Stormancer::FriendsService::FriendsService(std::shared_ptr<Scene> scene, std::shared_ptr<ILogger> logger) :
-	_scene(scene),
-	_logger(logger),
-	friendListChanged([](std::shared_ptr<Friend> f, FriendListUpdateOperation /*op*/) {})
+Stormancer::FriendsService::FriendsService(std::shared_ptr<Scene> scene, std::shared_ptr<ILogger> logger)
+	: friendListChanged([](std::shared_ptr<Friend> f, FriendListUpdateOperation /*op*/) {})
+	, _scene(scene)
+	, _logger(logger)
 {
 	scene->addRoute("friends.notification", [this](Packetisp_ptr packet) {
 		auto update = packet->readObject<FriendListUpdateDto>();
@@ -29,7 +29,7 @@ pplx::task<void> Stormancer::FriendsService::removeFriend(std::string userId)
 
 pplx::task<void> Stormancer::FriendsService::setStatus(FriendListStatusConfig status, std::string details)
 {
-	return _scene->dependencyResolver()->resolve<RpcService>()->rpc<void, FriendListStatusConfig , std::string > ("friends.setstatus", status, details);
+	return _scene->dependencyResolver()->resolve<RpcService>()->rpc<void, FriendListStatusConfig, std::string >("friends.setstatus", status, details);
 }
 
 void Stormancer::FriendsService::onFriendNotification(const FriendListUpdateDto &update)

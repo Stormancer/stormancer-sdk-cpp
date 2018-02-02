@@ -81,11 +81,7 @@ namespace Stormancer
 			logger->StartLog("packetLogs");
 #endif
 
-			_peer = std::shared_ptr<RakNet::RakPeerInterface>(RakNet::RakPeerInterface::GetInstance(), [
-#ifdef STORMANCER_PACKETFILELOGGER
-				logger
-#endif
-			](RakNet::RakPeerInterface* peer) {
+			_peer = std::shared_ptr<RakNet::RakPeerInterface>(RakNet::RakPeerInterface::GetInstance(), [=](RakNet::RakPeerInterface* peer) {
 				ILogger::instance()->log(LogLevel::Trace, "RakNetTransport", "Deleting RakPeerInterface...");
 				RakNet::RakPeerInterface::DestroyInstance(peer);
 #ifdef STORMANCER_PACKETFILELOGGER

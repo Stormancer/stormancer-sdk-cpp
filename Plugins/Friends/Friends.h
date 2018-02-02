@@ -69,8 +69,6 @@ namespace Stormancer
 		std::shared_ptr<Scene> _scene;
 		std::shared_ptr<ILogger> _logger;
 	};
-	
-		
 }
 
 MSGPACK_ADD_ENUM(Stormancer::FriendStatus);
