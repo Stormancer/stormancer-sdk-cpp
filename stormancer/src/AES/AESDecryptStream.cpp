@@ -3,8 +3,14 @@
 
 namespace Stormancer
 {
-	AESDecryptStream::AESDecryptStream(const std::vector<byte>& key, byte* dataPtr, std::streamsize dataSize)
-		: obytestream(dataPtr, dataSize)
+	AESDecryptStream::AESDecryptStream(const std::vector<byte>& key)
+		: _aes(IAES::createAES(key))
+	{
+		obytestream::dynamic(true);
+	}
+
+	AESDecryptStream::AESDecryptStream(const std::vector<byte>& key, byte* encryptedDataPtr, std::streamsize encryptedDataSize)
+		: obytestream(encryptedDataPtr, encryptedDataSize)
 		, _aes(IAES::createAES(key))
 	{
 	}
@@ -33,7 +39,7 @@ namespace Stormancer
 			if (dataPtr != nullptr && dataSize > 0)
 			{
 				ibytestream ibs(dataPtr, dataSize);
-				uint8 ivSize;
+				uint16 ivSize;
 				ibs >> ivSize;
 
 				byte* ivPtr = nullptr;

@@ -24,6 +24,7 @@ namespace Stormancer
 #pragma region private_members
 
 		std::unique_ptr<IAES> _aes;
+
 		bool _useIV = true;
 
 #pragma endregion

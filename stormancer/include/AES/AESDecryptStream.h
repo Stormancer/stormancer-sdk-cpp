@@ -12,7 +12,9 @@ namespace Stormancer
 
 #pragma region public_methods
 
-		AESDecryptStream(const std::vector<byte>& key, byte* dataPtr = nullptr, std::streamsize dataSize = 0);
+		AESDecryptStream(const std::vector<byte>& key);
+
+		AESDecryptStream(const std::vector<byte>& key, byte* encryptedDataPtr, std::streamsize encryptedDataSize);
 
 		~AESDecryptStream();
 

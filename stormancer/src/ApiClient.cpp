@@ -8,6 +8,7 @@ namespace Stormancer
 		, _config(config)
 		, _tokenHandler(tokenHandler)
 	{
+		std::srand((uint32)std::time(0));
 	}
 
 	ApiClient::~ApiClient()
@@ -25,7 +26,6 @@ namespace Stormancer
 
 		std::vector<std::string> baseUris = _config->getApiEndpoint();
 		auto errors = std::make_shared<std::vector<std::string>>();
-		std::srand((uint32)std::time(0));
 
 		if (baseUris.size() == 0)
 		{

@@ -33,7 +33,7 @@ namespace Stormancer
 			if (dataPtr && dataSize > 0)
 			{
 				std::streamsize ivSize = (_useIV ? _aes->getBlockSize() : 0);
-				(*stream) << (uint8)ivSize;
+				(*stream) << (uint16)ivSize;
 
 				byte* ivPtr = nullptr;
 				if (ivSize > 0)

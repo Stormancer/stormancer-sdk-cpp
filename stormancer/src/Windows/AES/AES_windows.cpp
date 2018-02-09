@@ -1,9 +1,81 @@
 #include "stdafx.h"
 #include "Windows/AES/AES_Windows.h"
 
+#ifndef STATUS_UNSUCCESSFUL
 #define STATUS_UNSUCCESSFUL         ((NTSTATUS)0xC0000001L)
+#endif
+
+#ifndef STATUS_SUCCESS
+#define STATUS_SUCCESS                   ((NTSTATUS)0x00000000L)    // ntsubauth
+#endif
+
+#ifndef STATUS_AUTH_TAG_MISMATCH
+#define STATUS_AUTH_TAG_MISMATCH         ((NTSTATUS)0xC000A002L)
+#endif
+
+#ifndef STATUS_BUFFER_TOO_SMALL
+#define STATUS_BUFFER_TOO_SMALL          ((NTSTATUS)0xC0000023L)
+#endif
+
+#ifndef STATUS_INVALID_BUFFER_SIZE
+#define STATUS_INVALID_BUFFER_SIZE       ((NTSTATUS)0xC0000206L)
+#endif
+
+#ifndef STATUS_INVALID_HANDLE
+#define STATUS_INVALID_HANDLE            ((NTSTATUS)0xC0000008L)    // winnt
+#endif
+
+#ifndef STATUS_INVALID_PARAMETER
+#define STATUS_INVALID_PARAMETER         ((NTSTATUS)0xC000000DL)    // winnt
+#endif
+
+#ifndef STATUS_NOT_SUPPORTED
+#define STATUS_NOT_SUPPORTED             ((NTSTATUS)0xC00000BBL)
+#endif
+
+#ifndef STATUS_DATA_ERROR
+#define STATUS_DATA_ERROR                ((NTSTATUS)0xC000003E)
+#endif
 
 #define NT_SUCCESS(Status)          (((NTSTATUS)(Status)) >= 0)
+
+std::string getErrorString(NTSTATUS err)
+{
+	std::stringstream ss;
+	switch (err)
+	{
+	case STATUS_SUCCESS:
+		ss << "STATUS_SUCCESS";
+		break;
+	case STATUS_AUTH_TAG_MISMATCH:
+		ss << "STATUS_AUTH_TAG_MISMATCH";
+		break;
+	case STATUS_BUFFER_TOO_SMALL:
+		ss << "STATUS_BUFFER_TOO_SMALL";
+		break;
+	case STATUS_INVALID_BUFFER_SIZE:
+		ss << "STATUS_INVALID_BUFFER_SIZE";
+		break;
+	case STATUS_INVALID_HANDLE:
+		ss << "STATUS_INVALID_HANDLE";
+		break;
+	case STATUS_INVALID_PARAMETER:
+		ss << "STATUS_INVALID_PARAMETER";
+		break;
+	case STATUS_NOT_SUPPORTED:
+		ss << "STATUS_NOT_SUPPORTED";
+		break;
+	case STATUS_DATA_ERROR:
+		ss << "STATUS_DATA_ERROR";
+		break;
+	default:
+		ss << "0x" << std::hex << err;
+		return ss.str();
+		break;
+	}
+	ss << " (0x" << std::hex << err << ")";
+	return ss.str();
+}
 
 namespace Stormancer
 {
@@ -41,7 +113,7 @@ namespace Stormancer
 			0)))
 		{
 			std::stringstream ss;
-			ss << "Error 0x" << std::hex << status << " returned by BCryptOpenAlgorithmProvider";
+			ss << "Error " << getErrorString(status) << " returned by BCryptOpenAlgorithmProvider";
 			throw std::runtime_error(ss.str());
 		}
 
@@ -58,7 +130,7 @@ namespace Stormancer
 			0)))
 		{
 			std::stringstream ss;
-			ss << "Error 0x" << std::hex << status << " returned by BCryptGetProperty";
+			ss << "Error " << getErrorString(status) << " returned by BCryptGetProperty";
 			throw std::runtime_error(ss.str());
 		}
 
@@ -79,7 +151,7 @@ namespace Stormancer
 			0)))
 		{
 			std::stringstream ss;
-			ss << "Error 0x" << std::hex << status << " returned by BCryptGetProperty";
+			ss << "Error " << getErrorString(status) << " returned by BCryptGetProperty";
 			throw std::runtime_error(ss.str());
 		}
 
@@ -91,7 +163,7 @@ namespace Stormancer
 			0)))
 		{
 			std::stringstream ss;
-			ss << "Error 0x" << std::hex << status << " returned by BCryptSetProperty";
+			ss << "Error " << getErrorString(status) << " returned by BCryptSetProperty";
 			throw std::runtime_error(ss.str());
 		}
 
@@ -106,7 +178,7 @@ namespace Stormancer
 			0)))
 		{
 			std::stringstream ss;
-			ss << "Error 0x" << std::hex << status << " returned by BCryptGenerateSymmetricKey";
+			ss << "Error " << getErrorString(status) << " returned by BCryptGenerateSymmetricKey";
 			throw std::runtime_error(ss.str());
 		}
 	}
@@ -139,7 +211,7 @@ namespace Stormancer
 			BCRYPT_BLOCK_PADDING)))
 		{
 			std::stringstream ss;
-			ss << "Error 0x" << std::hex << status << " returned by BCryptEncrypt";
+			ss << "Error " << getErrorString(status) << " returned by BCryptEncrypt";
 			throw std::runtime_error(ss.str());
 		}
 
@@ -166,7 +238,7 @@ namespace Stormancer
 			BCRYPT_BLOCK_PADDING)))
 		{
 			std::stringstream ss;
-			ss << "Error 0x" << std::hex << status << " returned by BCryptEncrypt";
+			ss << "Error " << getErrorString(status) << " returned by BCryptEncrypt";
 			throw std::runtime_error(ss.str());
 		}
 
@@ -211,7 +283,7 @@ namespace Stormancer
 			BCRYPT_BLOCK_PADDING)))
 		{
 			std::stringstream ss;
-			ss << "Error 0x" << std::hex << status << " returned by BCryptDecrypt";
+			ss << "Error " << getErrorString(status) << " returned by BCryptDecrypt";
 			throw std::runtime_error(ss.str());
 		}
 
@@ -235,7 +307,7 @@ namespace Stormancer
 			BCRYPT_BLOCK_PADDING)))
 		{
 			std::stringstream ss;
-			ss << "Error 0x" << std::hex << status << " returned by BCryptDecrypt";
+			ss << "Error " << getErrorString(status) << " returned by BCryptDecrypt";
 			throw std::runtime_error(ss.str());
 		}
 
@@ -252,11 +324,10 @@ namespace Stormancer
 
 	void AESWindows::generateRandomIV(byte* ivPtr, std::streamsize ivSize)
 	{
-		std::srand((uint32)std::time(0));
 		for (int32 i = 0; i < ivSize; i++)
 		{
 			int32 r = std::rand();
-			ivPtr[i] = (byte)(r % 0xFF);
+			ivPtr[i] = (byte)r;
 		}
 	}
 

@@ -331,7 +331,12 @@ namespace Stormancer
 				{
 					if (_mode & Dynamic)
 					{
-						grow((next - first) + n);
+						std::streamsize targetSize = n;
+						if (next && first)
+						{
+							targetSize += (next - first);
+						}
+						grow(targetSize);
 						first = pbase();
 						next = pptr();
 						last = epptr();
