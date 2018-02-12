@@ -15,9 +15,9 @@ namespace
 	auto logger = make_shared<ConsoleLogger>();
 
 	bool stop = false;
-	const string endpoint = "http://api.stormancer.com:8081/";
+	const string endpoint = "http://api2.stormancer.com:8080/";
 	//const string endpoint = "http://127.0.0.1:8081/";
-	const string accountId = "test";
+	const string accountId = "tester";
 	const string applicationName = "tester";
 	const string sceneName = "main";
 	Configuration_ptr config;
