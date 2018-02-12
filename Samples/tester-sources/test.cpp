@@ -548,9 +548,6 @@ void run_all_tests()
 	stop = true;
 }
 
-#include "../../stormancer/include/AES/AESEncryptStream.h"
-#include "../../stormancer/include/AES/AESDecryptStream.h"
-
 void run_all_tests_nonblocking()
 {
 	testsDone = false;
