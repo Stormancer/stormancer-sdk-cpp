@@ -101,6 +101,159 @@ namespace Stormancer
 		return _key;
 	}
 
+	void AESWindows::encrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream* outputStream)
+	{
+		NTSTATUS status = STATUS_UNSUCCESSFUL;
+
+		if (ivPtr == nullptr || ivSize == 0 || ivSize != _cbBlockLen)
+		{
+			ivSize = 0;
+			ivPtr = nullptr;
+		}
+
+		DWORD cbCipherText = 0;
+
+		// Get the output buffer size.
+		if (!NT_SUCCESS(status = BCryptEncrypt(
+			_hKey,
+			dataPtr,
+			(ULONG)dataSize,
+			NULL,
+			ivPtr,
+			(ULONG)ivSize,
+			NULL,
+			0,
+			&cbCipherText,
+			BCRYPT_BLOCK_PADDING)))
+		{
+			std::stringstream ss;
+			ss << "Error " << getErrorString(status) << " returned by BCryptEncrypt";
+			throw std::runtime_error(ss.str());
+		}
+
+		PBYTE pbCipherText = (PBYTE)HeapAlloc(GetProcessHeap(), 0, cbCipherText);
+		if (NULL == pbCipherText)
+		{
+			throw std::runtime_error("memory allocation failed");
+		}
+
+		DWORD cbData = 0;
+
+		// Use the key to encrypt the plaintext buffer.
+		// For block sized messages, block padding will add an extra block.
+		if (!NT_SUCCESS(status = BCryptEncrypt(
+			_hKey,
+			dataPtr,
+			(ULONG)dataSize,
+			NULL,
+			ivPtr,
+			(ULONG)ivSize,
+			pbCipherText,
+			cbCipherText,
+			&cbData,
+			BCRYPT_BLOCK_PADDING)))
+		{
+			std::stringstream ss;
+			ss << "Error " << getErrorString(status) << " returned by BCryptEncrypt";
+			throw std::runtime_error(ss.str());
+		}
+
+		// Write the encrypted data in the output stream
+		if (outputStream)
+		{
+			uint32 encryptedSize = cbCipherText;
+			(*outputStream) << encryptedSize;
+
+			outputStream->write(pbCipherText, cbCipherText);
+		}
+
+		if (pbCipherText)
+		{
+			HeapFree(GetProcessHeap(), 0, pbCipherText);
+		}
+	}
+
+	void AESWindows::decrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream* outputStream)
+	{
+		if (ivSize != _cbBlockLen)
+		{
+			throw std::runtime_error("Id size does not match with the block size");
+		}
+
+		NTSTATUS status = STATUS_UNSUCCESSFUL;
+
+		DWORD cbDecryptedData = 0;
+
+		// Get the output buffer size.
+		if (!NT_SUCCESS(status = BCryptDecrypt(
+			_hKey,
+			dataPtr,
+			(ULONG)dataSize,
+			NULL,
+			ivPtr,
+			(ULONG)ivSize,
+			NULL,
+			0,
+			&cbDecryptedData,
+			BCRYPT_BLOCK_PADDING)))
+		{
+			std::stringstream ss;
+			ss << "Error " << getErrorString(status) << " returned by BCryptDecrypt";
+			throw std::runtime_error(ss.str());
+		}
+
+		PBYTE pbDecryptedData = (PBYTE)HeapAlloc(GetProcessHeap(), 0, cbDecryptedData);
+
+		if (NULL == pbDecryptedData)
+		{
+			throw std::runtime_error("memory allocation failed");
+		}
+
+		// Decrypt the data
+		if (!NT_SUCCESS(status = BCryptDecrypt(
+			_hKey,
+			dataPtr,
+			(ULONG)dataSize,
+			NULL,
+			ivPtr,
+			(ULONG)ivSize,
+			pbDecryptedData,
+			cbDecryptedData,
+			&cbDecryptedData,
+			BCRYPT_BLOCK_PADDING)))
+		{
+			std::stringstream ss;
+			ss << "Error " << getErrorString(status) << " returned by BCryptDecrypt";
+			throw std::runtime_error(ss.str());
+		}
+
+		// Write the decrypted data in the output stream
+		if (outputStream)
+		{
+			outputStream->write(pbDecryptedData, cbDecryptedData);
+		}
+
+		if (pbDecryptedData)
+		{
+			HeapFree(GetProcessHeap(), 0, pbDecryptedData);
+		}
+	}
+
+	void AESWindows::generateRandomIV(byte* ivPtr, std::streamsize ivSize)
+	{
+		for (int32 i = 0; i < ivSize; i++)
+		{
+			//int32 r = std::rand();
+			//ivPtr[i] = (byte)r;
+			ivPtr[i] = (byte)i;
+		}
+	}
+
+	std::streamsize AESWindows::getBlockSize()
+	{
+		return _cbBlockLen;
+	}
+
 	void AESWindows::initAES()
 	{
 		NTSTATUS status = STATUS_UNSUCCESSFUL;
@@ -181,159 +334,6 @@ namespace Stormancer
 			ss << "Error " << getErrorString(status) << " returned by BCryptGenerateSymmetricKey";
 			throw std::runtime_error(ss.str());
 		}
-	}
-
-	void AESWindows::encrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream* outputStream)
-	{
-		NTSTATUS status = STATUS_UNSUCCESSFUL;
-
-		if (ivPtr == nullptr || ivSize == 0 || ivSize != _cbBlockLen)
-		{
-			ivSize = 0;
-			ivPtr = nullptr;
-		}
-
-		DWORD cbCipherText = 0;
-
-		//
-		// Get the output buffer size.
-		//
-		if (!NT_SUCCESS(status = BCryptEncrypt(
-			_hKey,
-			dataPtr,
-			(ULONG)dataSize,
-			NULL,
-			ivPtr,
-			(ULONG)ivSize,
-			NULL,
-			0,
-			&cbCipherText,
-			BCRYPT_BLOCK_PADDING)))
-		{
-			std::stringstream ss;
-			ss << "Error " << getErrorString(status) << " returned by BCryptEncrypt";
-			throw std::runtime_error(ss.str());
-		}
-
-		PBYTE pbCipherText = (PBYTE)HeapAlloc(GetProcessHeap(), 0, cbCipherText);
-		if (NULL == pbCipherText)
-		{
-			throw std::runtime_error("memory allocation failed");
-		}
-
-		DWORD cbData = 0;
-
-		// Use the key to encrypt the plaintext buffer.
-		// For block sized messages, block padding will add an extra block.
-		if (!NT_SUCCESS(status = BCryptEncrypt(
-			_hKey,
-			dataPtr,
-			(ULONG)dataSize,
-			NULL,
-			ivPtr,
-			(ULONG)ivSize,
-			pbCipherText,
-			cbCipherText,
-			&cbData,
-			BCRYPT_BLOCK_PADDING)))
-		{
-			std::stringstream ss;
-			ss << "Error " << getErrorString(status) << " returned by BCryptEncrypt";
-			throw std::runtime_error(ss.str());
-		}
-
-		if (outputStream)
-		{
-			uint32 encryptedSize = cbCipherText;
-			(*outputStream) << encryptedSize;
-
-			outputStream->write(pbCipherText, cbCipherText);
-		}
-
-		if (pbCipherText)
-		{
-			HeapFree(GetProcessHeap(), 0, pbCipherText);
-		}
-	}
-
-	void AESWindows::decrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream* outputStream)
-	{
-		if (ivSize != _cbBlockLen)
-		{
-			throw std::runtime_error("Id size does not match with the block size");
-		}
-
-		NTSTATUS status = STATUS_UNSUCCESSFUL;
-
-		DWORD cbDecryptedData = 0;
-
-		//
-		// Get the output buffer size.
-		//
-		if (!NT_SUCCESS(status = BCryptDecrypt(
-			_hKey,
-			dataPtr,
-			(ULONG)dataSize,
-			NULL,
-			ivPtr,
-			(ULONG)ivSize,
-			NULL,
-			0,
-			&cbDecryptedData,
-			BCRYPT_BLOCK_PADDING)))
-		{
-			std::stringstream ss;
-			ss << "Error " << getErrorString(status) << " returned by BCryptDecrypt";
-			throw std::runtime_error(ss.str());
-		}
-
-		PBYTE pbDecryptedData = (PBYTE)HeapAlloc(GetProcessHeap(), 0, cbDecryptedData);
-
-		if (NULL == pbDecryptedData)
-		{
-			throw std::runtime_error("memory allocation failed");
-		}
-
-		if (!NT_SUCCESS(status = BCryptDecrypt(
-			_hKey,
-			dataPtr,
-			(ULONG)dataSize,
-			NULL,
-			ivPtr,
-			(ULONG)ivSize,
-			pbDecryptedData,
-			cbDecryptedData,
-			&cbDecryptedData,
-			BCRYPT_BLOCK_PADDING)))
-		{
-			std::stringstream ss;
-			ss << "Error " << getErrorString(status) << " returned by BCryptDecrypt";
-			throw std::runtime_error(ss.str());
-		}
-
-		if (outputStream)
-		{
-			outputStream->write(pbDecryptedData, cbDecryptedData);
-		}
-
-		if (pbDecryptedData)
-		{
-			HeapFree(GetProcessHeap(), 0, pbDecryptedData);
-		}
-	}
-
-	void AESWindows::generateRandomIV(byte* ivPtr, std::streamsize ivSize)
-	{
-		for (int32 i = 0; i < ivSize; i++)
-		{
-			int32 r = std::rand();
-			ivPtr[i] = (byte)r;
-		}
-	}
-
-	std::streamsize AESWindows::getBlockSize()
-	{
-		return _cbBlockLen;
 	}
 
 	void AESWindows::cleanAES()
