@@ -4,6 +4,7 @@
 #include "IPacketProcessor.h"
 #include "IConnectionManager.h"
 #include "Logger/ILogger.h"
+
 namespace Stormancer
 {
 	class P2PTunnels;

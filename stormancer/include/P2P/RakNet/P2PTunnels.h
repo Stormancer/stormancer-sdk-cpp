@@ -8,6 +8,7 @@
 #include "P2P/ServerDescriptor.h"
 #include "Configuration.h"
 #include "Logger/ILogger.h"
+
 namespace RakNet
 {
 	struct RNS2RecvStruct;

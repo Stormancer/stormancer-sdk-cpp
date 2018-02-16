@@ -140,7 +140,10 @@ namespace Stormancer
 				{
 					t.get();
 				}
-				catch (const std::exception&) {}
+				catch (const std::exception& ex)
+				{
+					ILogger::instance()->log(LogLevel::Warn, "Client", "Client destroy failed", ex.what());
+				}
 				delete client;
 			});
 		});

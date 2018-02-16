@@ -1,7 +1,5 @@
 #pragma once
 
-#include "headers.h"
-
 namespace Stormancer
 {
 	/// State of a network connection.

@@ -119,7 +119,7 @@ namespace Stormancer
 		return _closeAction;
 	}
 
-	void TcpConnection::sendRaw(const Writer& writer, PacketPriority, PacketReliability)
+	void TcpConnection::send(const Writer& writer, int /*channelUid*/, PacketPriority /*priority*/, PacketReliability /*reliability*/, const TransformMetadata& /*transformMetadata*/)
 	{
 		if (!_socketId.expired())
 		{

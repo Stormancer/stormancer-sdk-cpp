@@ -18,7 +18,7 @@ namespace Stormancer
 
 		TcpConnection(std::shared_ptr<SOCKET> socketId, uint64 connectionId, std::string ip);
 		~TcpConnection();
-		virtual void send(const Writer& writer, int channelUid, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const TransformMetadata& transformMetadata = TransformMetadata()) override;
+		void send(const Writer& writer, int channelUid, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const TransformMetadata& transformMetadata = TransformMetadata()) override;
 		void setApplication(std::string account, std::string application) override;
 		void close(std::string reason = "") override;
 		std::string ipAddress() const override;
