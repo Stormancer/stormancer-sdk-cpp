@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "ScenePeer.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/ScenePeer.h"
 
 namespace Stormancer
 {

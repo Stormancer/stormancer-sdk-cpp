@@ -1,7 +1,7 @@
-#include "stdafx.h"
-#include "RequestProcessor.h"
-#include "MessageIDTypes.h"
-#include "Serializer.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/RequestProcessor.h"
+#include "stormancer/MessageIDTypes.h"
+#include "stormancer/Serializer.h"
 
 namespace Stormancer
 {

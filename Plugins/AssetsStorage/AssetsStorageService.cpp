@@ -1,7 +1,6 @@
-#include "stdafx.h"
-#include <stormancer.h>
+#include "stormancer/headers.h"
+#include "stormancer/stormancer.h"
 #include "AssetsStorageService.h"
-
 
 namespace Stormancer
 {

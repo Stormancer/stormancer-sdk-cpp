@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "stormancer/headers.h"
 #include "BugReportPlugin.h"
 #include "BugReportService.h"
 
@@ -16,4 +16,4 @@ namespace Stormancer
 			}
 		}
 	}
-};
+}

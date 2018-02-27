@@ -1,8 +1,9 @@
 #pragma once
-#include <headers.h>
-#include <Scene.h>
-#include <RPC/RpcService.h>
-#include <Serializer.h>
+
+#include "stormancer/headers.h"
+#include "stormancer/Scene.h"
+#include "stormancer/RPC/RpcService.h"
+#include "stormancer/Serializer.h"
 
 namespace Stormancer
 {

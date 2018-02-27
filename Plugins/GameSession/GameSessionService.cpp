@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include <RPC/RpcService.h>
+#include "stormancer/headers.h"
+#include "stormancer/RPC/RpcService.h"
 #include "GameSessionService.h"
 
 namespace Stormancer

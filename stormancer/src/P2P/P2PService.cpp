@@ -1,8 +1,8 @@
-#include "stdafx.h"
-#include "P2P/P2PService.h"
-#include "P2P/P2PSession.h"
-#include "SystemRequestIDTypes.h"
-#include "P2P/RakNet/P2PTunnels.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/P2P/P2PService.h"
+#include "stormancer/P2P/P2PSession.h"
+#include "stormancer/SystemRequestIDTypes.h"
+#include "stormancer/P2P/RakNet/P2PTunnels.h"
 
 namespace Stormancer
 {

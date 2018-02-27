@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "Serializer.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/Serializer.h"
 
 namespace Stormancer
 {

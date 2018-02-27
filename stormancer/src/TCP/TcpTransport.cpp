@@ -1,6 +1,6 @@
-#include "stdafx.h"
-#include "TCP/TcpTransport.h"
-#include "MessageIDTypes.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/TCP/TcpTransport.h"
+#include "stormancer/MessageIDTypes.h"
 
 namespace Stormancer
 {

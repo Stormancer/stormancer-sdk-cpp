@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "TestRunner.h"
 #include "TestPlayerDataPlugin.h"
 

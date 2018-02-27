@@ -1,6 +1,6 @@
-#include "stdafx.h"
-#include "RequestContext.h"
-#include "MessageIDTypes.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/RequestContext.h"
+#include "stormancer/MessageIDTypes.h"
 
 namespace Stormancer
 {

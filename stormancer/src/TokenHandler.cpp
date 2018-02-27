@@ -1,8 +1,8 @@
-#include "stdafx.h"
-#include "TokenHandler.h"
-#include "Helpers.h"
-#include "Logger/ILogger.h"
-#include "Serializer.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/TokenHandler.h"
+#include "stormancer/Helpers.h"
+#include "stormancer/Logger/ILogger.h"
+#include "stormancer/Serializer.h"
 
 namespace Stormancer
 {

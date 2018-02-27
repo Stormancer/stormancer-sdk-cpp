@@ -1,7 +1,7 @@
-#include "stdafx.h"
-#include "Configuration.h"
-#include "RakNet/RakNetTransport.h"
-#include "RPC/RpcPlugin.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/Configuration.h"
+#include "stormancer/RakNet/RakNetTransport.h"
+#include "stormancer/RPC/RpcPlugin.h"
 
 namespace Stormancer
 {

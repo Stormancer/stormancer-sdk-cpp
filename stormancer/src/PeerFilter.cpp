@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "PeerFilter.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/PeerFilter.h"
 
 namespace Stormancer
 {

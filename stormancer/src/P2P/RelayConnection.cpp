@@ -1,6 +1,6 @@
-#include "stdafx.h"
-#include "P2P/RelayConnection.h"
-#include "MessageIDTypes.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/P2P/RelayConnection.h"
+#include "stormancer/MessageIDTypes.h"
 
 namespace Stormancer
 {

@@ -1,7 +1,8 @@
 #pragma once
-#include <headers.h>
-#include <IPlugin.h>
-#include <Scene.h>
+
+#include "stormancer/headers.h"
+#include "stormancer/IPlugin.h"
+#include "stormancer/Scene.h"
 
 namespace Stormancer
 {

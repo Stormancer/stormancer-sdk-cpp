@@ -1,14 +1,9 @@
-#include "stdafx.h"
-#include "Helpers.h"
-
-
+#include "stormancer/stdafx.h"
+#include "stormancer/Helpers.h"
 
 
 // Needed for string/wstring conversion, not present on Vita.
 #include <codecvt>
-
-
-#include <string>
 
 
 namespace Stormancer

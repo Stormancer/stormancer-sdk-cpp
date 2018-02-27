@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "Logger/NullLogger.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/Logger/NullLogger.h"
 
 namespace Stormancer
 {

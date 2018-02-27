@@ -1,9 +1,9 @@
-#include "stdafx.h"
-#include "Helpers.h"
-#include "MessageIDTypes.h"
-#include "AES/AESPacketTransform.h"
-#include "AES/AESEncryptStream.h"
-#include "AES/AESDecryptStream.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/Helpers.h"
+#include "stormancer/MessageIDTypes.h"
+#include "stormancer/AES/AESPacketTransform.h"
+#include "stormancer/AES/AESEncryptStream.h"
+#include "stormancer/AES/AESDecryptStream.h"
 
 namespace Stormancer
 {

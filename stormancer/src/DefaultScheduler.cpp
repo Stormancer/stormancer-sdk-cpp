@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "DefaultScheduler.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/DefaultScheduler.h"
 
 namespace Stormancer
 {

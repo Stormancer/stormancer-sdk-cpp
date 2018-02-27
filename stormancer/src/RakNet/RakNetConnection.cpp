@@ -1,7 +1,7 @@
-#include "stdafx.h"
-#include "RakNet/RakNetConnection.h"
-#include "Logger/ILogger.h"
-#include "AES/AESPacketTransform.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/RakNet/RakNetConnection.h"
+#include "stormancer/Logger/ILogger.h"
+#include "stormancer/AES/AESPacketTransform.h"
 
 namespace Stormancer
 {

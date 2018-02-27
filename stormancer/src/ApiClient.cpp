@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "ApiClient.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/ApiClient.h"
 
 namespace Stormancer
 {

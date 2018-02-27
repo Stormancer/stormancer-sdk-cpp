@@ -1,9 +1,7 @@
 #pragma once
+
 #include "TestCase.h"
-#include "stormancer.h"
-#include <memory>
-#include <vector>
-#include <unordered_map>
+#include "stormancer/stormancer.h"
 
 class TestRunner
 {

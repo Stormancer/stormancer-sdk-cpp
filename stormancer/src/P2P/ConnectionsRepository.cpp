@@ -1,6 +1,6 @@
-#include "stdafx.h"
-#include "P2P/ConnectionsRepository.h"
-#include "Logger/ILogger.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/P2P/ConnectionsRepository.h"
+#include "stormancer/Logger/ILogger.h"
 
 namespace Stormancer
 {

@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "SceneEndpoint.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/SceneEndpoint.h"
 
 namespace Stormancer
 {

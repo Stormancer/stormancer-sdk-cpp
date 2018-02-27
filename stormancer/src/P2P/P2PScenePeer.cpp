@@ -1,6 +1,6 @@
-#include "stdafx.h"
-#include "Scene.h"
-#include "P2P/P2PScenePeer.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/Scene.h"
+#include "stormancer/P2P/P2PScenePeer.h"
 
 namespace Stormancer
 {

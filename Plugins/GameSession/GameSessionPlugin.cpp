@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "stormancer/headers.h"
 #include "GameSessionPlugin.h"
 #include "GameSessionService.h"
 

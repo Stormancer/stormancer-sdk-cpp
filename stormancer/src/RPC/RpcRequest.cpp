@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "RPC/RpcRequest.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/RPC/RpcRequest.h"
 
 namespace Stormancer
 {

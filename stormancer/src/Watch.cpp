@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "Watch.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/Watch.h"
 
 namespace Stormancer
 {

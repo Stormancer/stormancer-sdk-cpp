@@ -1,6 +1,5 @@
-#include "stdafx.h"
-#include "TCP/TcpConnection.h"
-#include "..\..\include\TCP\TcpConnection.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/TCP/TcpConnection.h"
 
 namespace Stormancer
 {

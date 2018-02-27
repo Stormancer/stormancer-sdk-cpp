@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "stormancer.h"
+#include "stormancer/headers.h"
+#include "stormancer/Scene.h"
 #include "InvitationsPlugin.h"
 #include "Invitations.h"
 

@@ -1,7 +1,7 @@
-#include "stdafx.h"
-#include "RPC/RpcPlugin.h"
-#include "RPC/RpcService.h"
-#include "IActionDispatcher.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/RPC/RpcPlugin.h"
+#include "stormancer/RPC/RpcService.h"
+#include "stormancer/IActionDispatcher.h"
 
 namespace Stormancer
 {

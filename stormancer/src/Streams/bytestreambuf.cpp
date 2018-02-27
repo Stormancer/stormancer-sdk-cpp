@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "Streams/bytestreambuf.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/Streams/bytestreambuf.h"
 
 namespace Stormancer
 {

@@ -1,9 +1,9 @@
 #include "StormancerWrapper.h"
-#include <PlayerProfile/PlayerProfileService.h>
-#include <PlayerProfile/PlayerProfile.h>
-#include <Leaderboard/LeaderboardService.h>
-#include <Logger/ConsoleLogger.h>
-#include <Helpers.h>
+#include "PlayerProfile/PlayerProfileService.h"
+#include "PlayerProfile/PlayerProfile.h"
+#include "Leaderboard/LeaderboardService.h"
+#include "stormancer/Logger/ConsoleLogger.h"
+#include "stormancer/Helpers.h"
 
 bool stop = false;
 

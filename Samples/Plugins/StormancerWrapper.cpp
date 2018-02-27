@@ -1,6 +1,6 @@
-#include <Logger/ConsoleLogger.h>
+#include "stormancer/Logger/ConsoleLogger.h"
+#include "stormancer/SingleServicePlugin.h"
 #include "StormancerWrapper.h"
-#include "SingleServicePlugin.h"
 #include "Authentication/AuthenticationPlugin.h"
 #include "BugReport/BugReportPlugin.h"
 #include "GameSession/GameSessionPlugin.h"

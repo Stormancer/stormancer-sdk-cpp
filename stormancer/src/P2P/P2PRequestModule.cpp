@@ -1,10 +1,10 @@
-#include "stdafx.h"
-#include "P2P/P2PRequestModule.h"
-#include "P2P/ConnectivityCandidate.h"
-#include "P2P/OpenRelayParameters.h"
-#include "P2P/RelayConnection.h"
-#include "SystemRequestIDTypes.h"
-#include "P2P/RakNet/P2PTunnels.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/P2P/P2PRequestModule.h"
+#include "stormancer/P2P/ConnectivityCandidate.h"
+#include "stormancer/P2P/OpenRelayParameters.h"
+#include "stormancer/P2P/RelayConnection.h"
+#include "stormancer/SystemRequestIDTypes.h"
+#include "stormancer/P2P/RakNet/P2PTunnels.h"
 
 namespace Stormancer
 {

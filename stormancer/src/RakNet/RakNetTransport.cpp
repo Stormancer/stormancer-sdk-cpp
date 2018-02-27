@@ -1,17 +1,16 @@
-#include "stdafx.h"
-#include "RakNet/RakNetTransport.h"
-#include "IScheduler.h"
-#include "MessageIDTypes.h"
-#include <GetTime.h>
+#include "stormancer/stdafx.h"
+#include "GetTime.h"
 #include "BitStream.h"
+#include "stormancer/RakNet/RakNetTransport.h"
+#include "stormancer/IScheduler.h"
+#include "stormancer/MessageIDTypes.h"
 
 #ifdef STORMANCER_PACKETFILELOGGER
-#include <PacketFileLogger.h>
+#include "PacketFileLogger.h"
 #endif
 
 #if defined(_WIN32)
 //
-
 #else
 #include <unistd.h>
 #endif

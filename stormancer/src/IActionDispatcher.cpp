@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "IActionDispatcher.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/IActionDispatcher.h"
 
 namespace Stormancer
 {

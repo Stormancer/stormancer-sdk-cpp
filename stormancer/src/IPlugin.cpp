@@ -1,6 +1,6 @@
-#include "stdafx.h"
-#include "IPlugin.h"
-#include "Packet.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/IPlugin.h"
+#include "stormancer/Packet.h"
 
 namespace Stormancer
 {

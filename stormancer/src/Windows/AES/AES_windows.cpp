@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "Windows/AES/AES_Windows.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/Windows/AES/AES_Windows.h"
 
 #ifndef STATUS_UNSUCCESSFUL
 #define STATUS_UNSUCCESSFUL         ((NTSTATUS)0xC0000001L)

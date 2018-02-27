@@ -384,15 +384,15 @@
     <Message Condition=" ('$(Configuration)' == 'DebugUE4') and ('$(Platform)' == 'ARM64') " Text="The project &quot;RaknetDll&quot; is not selected for building in solution configuration &quot;DebugUE4|ARM64&quot;." />
     <Message Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'ARM') " Text="The project &quot;RaknetDll&quot; is not selected for building in solution configuration &quot;Release|ARM&quot;." />
     <Message Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'ARM64') " Text="The project &quot;RaknetDll&quot; is not selected for building in solution configuration &quot;Release|ARM64&quot;." />
-    <Message Condition=" ('$(Configuration)' == 'Debug') and ('$(Platform)' == 'ARM') " Text="The project &quot;SmokeTest&quot; is not selected for building in solution configuration &quot;Debug|ARM&quot;." />
-    <Message Condition=" ('$(Configuration)' == 'Debug') and ('$(Platform)' == 'ARM64') " Text="The project &quot;SmokeTest&quot; is not selected for building in solution configuration &quot;Debug|ARM64&quot;." />
-    <Message Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'ARM') " Text="The project &quot;SmokeTest&quot; is not selected for building in solution configuration &quot;Release|ARM&quot;." />
-    <Message Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'ARM64') " Text="The project &quot;SmokeTest&quot; is not selected for building in solution configuration &quot;Release|ARM64&quot;." />
-    <Message Condition=" ('$(Configuration)' == 'Debug') and ('$(Platform)' == 'ARM') " Text="The project &quot;RakNetIpv6&quot; is not selected for building in solution configuration &quot;Debug|ARM&quot;." />
-    <Message Condition=" ('$(Configuration)' == 'Debug') and ('$(Platform)' == 'ARM64') " Text="The project &quot;RakNetIpv6&quot; is not selected for building in solution configuration &quot;Debug|ARM64&quot;." />
-    <Message Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'ARM') " Text="The project &quot;RakNetIpv6&quot; is not selected for building in solution configuration &quot;Release|ARM&quot;." />
-    <Message Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'ARM64') " Text="The project &quot;RakNetIpv6&quot; is not selected for building in solution configuration &quot;Release|ARM64&quot;." />
-    <Message Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'x86') " Text="The project &quot;RakNetIpv6&quot; is not selected for building in solution configuration &quot;Release|x86&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Debug') and ('$(Platform)' == 'ARM') " Text="The project &quot;SmokeTest-vc140&quot; is not selected for building in solution configuration &quot;Debug|ARM&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Debug') and ('$(Platform)' == 'ARM64') " Text="The project &quot;SmokeTest-vc140&quot; is not selected for building in solution configuration &quot;Debug|ARM64&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'ARM') " Text="The project &quot;SmokeTest-vc140&quot; is not selected for building in solution configuration &quot;Release|ARM&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'ARM64') " Text="The project &quot;SmokeTest-vc140&quot; is not selected for building in solution configuration &quot;Release|ARM64&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Debug') and ('$(Platform)' == 'ARM') " Text="The project &quot;RakNetIpv6-vc140&quot; is not selected for building in solution configuration &quot;Debug|ARM&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Debug') and ('$(Platform)' == 'ARM64') " Text="The project &quot;RakNetIpv6-vc140&quot; is not selected for building in solution configuration &quot;Debug|ARM64&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'ARM') " Text="The project &quot;RakNetIpv6-vc140&quot; is not selected for building in solution configuration &quot;Release|ARM&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'ARM64') " Text="The project &quot;RakNetIpv6-vc140&quot; is not selected for building in solution configuration &quot;Release|ARM64&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'x86') " Text="The project &quot;RakNetIpv6-vc140&quot; is not selected for building in solution configuration &quot;Release|x86&quot;." />
   </Target>
   <Target Name="GetSolutionConfigurationContents" Outputs="$(SolutionConfigurationContents)" />
   <Target Name="Build" Outputs="@(CollectedBuildOutput)">
@@ -411,20 +411,20 @@
   <Target Name="Publish">
     <MSBuild Projects="@(ProjectReference)" Targets="Publish" BuildInParallel="True" Properties="BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" SkipNonexistentProjects="%(ProjectReference.SkipNonexistentProjects)" />
   </Target>
-  <Target Name="libs\cpprestsdk" Outputs="@(libs_cpprestsdkBuildOutput)">
+  <Target Name="libs\cpprestsdk\cpprestsdk" Outputs="@(libs_cpprestsdk_cpprestsdkBuildOutput)">
     <MSBuild Condition="'%(ProjectReference.Identity)' == 'C:\TeamCity\buildAgent\work\e505dd3a3a335743\cpprestsdk\Release\src\build\vs14\casablanca140.vcxproj'" Projects="@(ProjectReference)" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=ARM;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
-      <Output TaskParameter="TargetOutputs" ItemName="libs_cpprestsdkBuildOutput" />
+      <Output TaskParameter="TargetOutputs" ItemName="libs_cpprestsdk_cpprestsdkBuildOutput" />
     </MSBuild>
   </Target>
-  <Target Name="libs\cpprestsdk:Clean">
+  <Target Name="libs\cpprestsdk\cpprestsdk:Clean">
     <MSBuild Condition="'%(ProjectReference.Identity)' == 'C:\TeamCity\buildAgent\work\e505dd3a3a335743\cpprestsdk\Release\src\build\vs14\casablanca140.vcxproj'" Projects="@(ProjectReference)" Targets="Clean" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=ARM;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
   </Target>
-  <Target Name="libs\cpprestsdk:Rebuild" Outputs="@(libs_cpprestsdkBuildOutput)">
+  <Target Name="libs\cpprestsdk\cpprestsdk:Rebuild" Outputs="@(libs_cpprestsdk_cpprestsdkBuildOutput)">
     <MSBuild Condition="'%(ProjectReference.Identity)' == 'C:\TeamCity\buildAgent\work\e505dd3a3a335743\cpprestsdk\Release\src\build\vs14\casablanca140.vcxproj'" Projects="@(ProjectReference)" Targets="Rebuild" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=ARM;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
-      <Output TaskParameter="TargetOutputs" ItemName="libs_cpprestsdkBuildOutput" />
+      <Output TaskParameter="TargetOutputs" ItemName="libs_cpprestsdk_cpprestsdkBuildOutput" />
     </MSBuild>
   </Target>
-  <Target Name="libs\cpprestsdk:Publish">
+  <Target Name="libs\cpprestsdk\cpprestsdk:Publish">
     <MSBuild Condition="'%(ProjectReference.Identity)' == 'C:\TeamCity\buildAgent\work\e505dd3a3a335743\cpprestsdk\Release\src\build\vs14\casablanca140.vcxproj'" Projects="@(ProjectReference)" Targets="Publish" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=ARM;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
   </Target>
   <Target Name="RaknetAndroid" Outputs="@(RaknetAndroidBuildOutput)">

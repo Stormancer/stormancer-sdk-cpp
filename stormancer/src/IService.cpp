@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "IService.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/IService.h"
 
 namespace Stormancer
 {

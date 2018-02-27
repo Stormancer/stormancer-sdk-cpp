@@ -1,8 +1,9 @@
 #pragma once
-#include <headers.h>
-#include <cpprest\json.h>
-#include <IPlugin.h>
-#include <Scene.h>
+
+#include <cpprest/json.h>
+#include "stormancer/headers.h"
+#include "stormancer/IPlugin.h"
+#include "stormancer/Scene.h"
 
 namespace Stormancer
 {

@@ -1,10 +1,10 @@
-#include "stdafx.h"
-#include "P2P/RakNet/P2PTunnels.h"
-#include "IConnectionManager.h"
-#include "SystemRequestIDTypes.h"
-#include "MessageIDTypes.h"
-#include "P2P/RakNet/P2PTunnelClient.h"
-#include <Scene.h>
+#include "stormancer/stdafx.h"
+#include "stormancer/P2P/RakNet/P2PTunnels.h"
+#include "stormancer/IConnectionManager.h"
+#include "stormancer/SystemRequestIDTypes.h"
+#include "stormancer/MessageIDTypes.h"
+#include "stormancer/P2P/RakNet/P2PTunnelClient.h"
+#include "stormancer/Scene.h"
 
 namespace Stormancer
 {

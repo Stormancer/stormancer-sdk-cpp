@@ -1,5 +1,6 @@
 #pragma once
-#include <stormancer.h>
+
+#include "stormancer/stormancer.h"
 
 #ifdef __cplusplus
 extern "C" {

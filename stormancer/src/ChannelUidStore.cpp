@@ -1,6 +1,6 @@
-#include "stdafx.h"
-#include "Helpers.h"
-#include "ChannelUidStore.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/Helpers.h"
+#include "stormancer/ChannelUidStore.h"
 
 namespace Stormancer
 {

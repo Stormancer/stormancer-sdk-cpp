@@ -1,9 +1,10 @@
 #pragma once
-#include "headers.h"
-#include "IService.h"
-#include "Scene.h"
-#include "RPC/RpcService.h"
-#include "SingleServicePlugin.h"
+
+#include "stormancer/headers.h"
+#include "stormancer/IService.h"
+#include "stormancer/Scene.h"
+#include "stormancer/RPC/RpcService.h"
+#include "stormancer/SingleServicePlugin.h"
 
 namespace Stormancer
 {

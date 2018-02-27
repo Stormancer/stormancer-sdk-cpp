@@ -1,6 +1,6 @@
-#include "stdafx.h"
-#include "TimerThread.h"
 #include <cassert>
+#include "stormancer/stdafx.h"
+#include "stormancer/TimerThread.h"
 
 namespace Stormancer
 {

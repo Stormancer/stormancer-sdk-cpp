@@ -1,8 +1,8 @@
-#include "stdafx.h"
-#include "SyncClock.h"
-#include "IScheduler.h"
-#include "RequestProcessor.h"
-#include "SystemRequestIDTypes.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/SyncClock.h"
+#include "stormancer/IScheduler.h"
+#include "stormancer/RequestProcessor.h"
+#include "stormancer/SystemRequestIDTypes.h"
 
 namespace Stormancer
 {

@@ -1,6 +1,6 @@
-#include "stdafx.h"
-#include "DefaultPacketDispatcher.h"
-#include "Logger/ILogger.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/DefaultPacketDispatcher.h"
+#include "stormancer/Logger/ILogger.h"
 
 namespace Stormancer
 {

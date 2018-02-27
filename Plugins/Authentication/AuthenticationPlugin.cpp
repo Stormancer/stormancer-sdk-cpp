@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "stormancer/headers.h"
 #include "AuthenticationPlugin.h"
 #include "AuthenticationService.h"
 

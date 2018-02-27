@@ -1,6 +1,6 @@
-#include "stdafx.h"
-#include "P2P/P2PSessions.h"
-#include "IConnectionManager.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/P2P/P2PSessions.h"
+#include "stormancer/IConnectionManager.h"
 
 namespace Stormancer
 {

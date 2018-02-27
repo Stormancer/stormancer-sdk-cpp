@@ -4,9 +4,9 @@
 
 #if !defined(RXCPP_RX_SCHEDULER_NEW_THREAD_HPP)
 #define RXCPP_RX_SCHEDULER_NEW_THREAD_HPP
-#include "../rx-includes.hpp"
-#include "TimerThread.h"
 #include <mutex>
+#include "rx-includes.hpp"
+#include "stormancer/TimerThread.h"
 
 namespace rxcpp {
 

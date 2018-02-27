@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "AES/AESEncryptStream.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/AES/AESEncryptStream.h"
 
 namespace Stormancer
 {

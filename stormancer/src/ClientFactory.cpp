@@ -1,6 +1,6 @@
-#include "stdafx.h"
-#include "ClientFactory.h"
-#include "IClientFactory.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/ClientFactory.h"
+#include "stormancer/IClientFactory.h"
 
 namespace Stormancer
 {

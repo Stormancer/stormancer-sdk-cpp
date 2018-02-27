@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "stormancer/headers.h"
 #include "Friends.h"
 
 Stormancer::FriendsService::FriendsService(std::shared_ptr<Scene> scene, std::shared_ptr<ILogger> logger)

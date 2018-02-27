@@ -1,7 +1,8 @@
 #pragma once
-#include <headers.h>
-#include <Configuration.h>
-#include <Client.h>
+
+#include "stormancer/headers.h"
+#include "stormancer/Configuration.h"
+#include "stormancer/Client.h"
 #include "MatchMaking/MatchMakingService.h"
 #include "Authentication/AuthenticationService.h"
 

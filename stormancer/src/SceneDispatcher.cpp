@@ -1,8 +1,8 @@
-#include "stdafx.h"
-#include "SceneDispatcher.h"
-#include "IActionDispatcher.h"
-#include "Scene.h"
-#include "MessageIDTypes.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/SceneDispatcher.h"
+#include "stormancer/IActionDispatcher.h"
+#include "stormancer/Scene.h"
+#include "stormancer/MessageIDTypes.h"
 
 namespace Stormancer
 {

@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "DependencyResolver.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/DependencyResolver.h"
 
 namespace Stormancer
 {

@@ -2,9 +2,9 @@
 //
 
 #include "stdafx.h"
-#include <stormancer.h>
 #include <io.h>
 #include <exception>
+#include "stormancer/stormancer.h"
 
 int main()
 {

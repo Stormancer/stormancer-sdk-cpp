@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "SystemRequest.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/SystemRequest.h"
 
 namespace Stormancer
 {

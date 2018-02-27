@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "P2P/P2PTunnel.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/P2P/P2PTunnel.h"
 
 namespace Stormancer
 {

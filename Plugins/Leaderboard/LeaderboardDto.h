@@ -1,7 +1,8 @@
 #pragma once
+
 #include <string>
 #include <vector>
-#include <msgpack_define.h>
+#include "stormancer/msgpack_define.h"
 
 namespace Stormancer
 {

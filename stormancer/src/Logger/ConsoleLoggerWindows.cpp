@@ -1,9 +1,7 @@
-#include "stdafx.h"
-#include "Logger/ConsoleLoggerWindows.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/Logger/ConsoleLoggerWindows.h"
 
 #if defined(_WIN32)
-
-#include <iostream>
 
 namespace Stormancer
 {

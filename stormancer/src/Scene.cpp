@@ -1,8 +1,8 @@
-#include "stdafx.h"
-#include "Scene.h"
-#include "ScenePeer.h"
-#include "Client.h"
-#include "TransformMetadata.h"
+#include "stormancer/stdafx.h"
+#include "stormancer/Scene.h"
+#include "stormancer/ScenePeer.h"
+#include "stormancer/Client.h"
+#include "stormancer/TransformMetadata.h"
 
 namespace Stormancer
 {
