@@ -72,6 +72,7 @@ void cpprest_init(JavaVM*);
 #include <algorithm>
 
 #if defined(_MSC_VER)
+#include <intrin.h>
 #if defined(__cplusplus_winrt)
 #include <windows.h>
 #include <ctxtcall.h>
