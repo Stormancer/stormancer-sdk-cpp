@@ -3,27 +3,26 @@
 
 
 
-using namespace std;
-using namespace Stormancer;
+using namespace std::literals;
 
-namespace
+namespace Stormancer
 {
 
 
 
-	auto logger = make_shared<ConsoleLogger>();
+	auto logger = std::make_shared<ConsoleLogger>();
 
 	bool stop = false;
-	const string endpoint = "http://api2.stormancer.com:8080/";
+	const std::string endpoint = "http://api2.stormancer.com:8080/";
 	//const string endpoint = "http://127.0.0.1:8081/";
-	const string accountId = "tester";
-	const string applicationName = "tester";
-	const string sceneName = "main";
+	const std::string accountId = "tester";
+	const std::string applicationName = "tester";
+	const std::string sceneName = "main";
 	Configuration_ptr config;
 	Client_ptr client;
 	Scene_ptr sceneMain;
 
-	deque<function<void()>> tests;
+	std::deque<std::function<void()>> tests;
 	bool testsDone = false;
 	bool testsPassed = false;
 
@@ -42,9 +41,9 @@ namespace
 		}
 	}
 
-	string connectionStateToString(ConnectionState connectionState)
+	std::string connectionStateToString(ConnectionState connectionState)
 	{
-		string stateStr = to_string((int)connectionState) + " ";
+		std::string stateStr = to_string((int)connectionState) + " ";
 		switch (connectionState)
 		{
 		case ConnectionState::Disconnected:
@@ -66,7 +65,7 @@ namespace
 	void onMessage(Packetisp_ptr packet)
 	{
 		Serializer serializer;
-		string message = serializer.deserializeOne<std::string>(packet->stream);
+		std::string message = serializer.deserializeOne<std::string>(packet->stream);
 
 		logger->log(LogLevel::Debug, "onMessage", "Message received", message);
 
@@ -90,7 +89,7 @@ namespace
 	pplx::task<void> test_rpc_client_received(RpcRequestContext_ptr rc)
 	{
 		Serializer serializer;
-		string message = serializer.deserializeOne<string>(rc->inputStream());
+		std::string message = serializer.deserializeOne<std::string>(rc->inputStream());
 
 		logger->log(LogLevel::Debug, "test_rpc_client", "RPC request received", message);
 
@@ -107,7 +106,7 @@ namespace
 		else
 		{
 			logger->log(LogLevel::Error, "test_rpc_client", "RPC server failed", "Bad message");
-			throw runtime_error("RPC server failed (bad message)");
+			throw std::runtime_error("RPC server failed (bad message)");
 		}
 	}
 
@@ -119,7 +118,7 @@ namespace
 		});
 
 		Serializer serializer;
-		string message = serializer.deserializeOne<std::string>(rc->inputStream());
+		std::string message = serializer.deserializeOne<std::string>(rc->inputStream());
 
 		logger->log(LogLevel::Debug, "test_rpc_client", "RPC request received", message);
 
@@ -128,7 +127,7 @@ namespace
 		if (!rc->cancellationToken().is_canceled())
 		{
 			logger->log(LogLevel::Error, "test_rpc_client", "RPC server should be cancelled");
-			throw runtime_error("RPC server should be cancelled");
+			throw std::runtime_error("RPC server should be cancelled");
 		}
 
 		return pplx::task_from_result();
@@ -159,7 +158,7 @@ namespace
 						config.reset();
 					}
 				}
-				catch (const exception& ex)
+				catch (const std::exception& ex)
 				{
 					logger->log(ex);
 				}
@@ -219,13 +218,13 @@ namespace
 					}
 					execNextTest();
 				}
-				catch (const exception& ex)
+				catch (const std::exception& ex)
 				{
 					logger->log(LogLevel::Error, "test_connect", "Failed to get and connect the scene.", ex.what());
 				}
 			});
 		}
-		catch (const exception& ex)
+		catch (const std::exception& ex)
 		{
 			logger->log(ex);
 		}
@@ -246,7 +245,7 @@ namespace
 				});
 			}
 		}
-		catch (exception& ex)
+		catch (std::exception& ex)
 		{
 			logger->log(LogLevel::Error, "test_echo", "Can't send data to the scene.", ex.what());
 		}
@@ -284,10 +283,10 @@ namespace
 			//});
 
 			// We do an RPC on the server (by sending the string "stormancer") and get back a string response (that should be "stormancer" too)
-			rpcService->rpc<string>("rpc", "stormancer").then([](pplx::task<string> t) {
+			rpcService->rpc<std::string>("rpc", "stormancer").then([](pplx::task<std::string> t) {
 				try
 				{
-					string response = t.get();
+					std::string response = t.get();
 
 					logger->log(LogLevel::Debug, "test_rpc_server", "rpc response received", response.c_str());
 
@@ -301,7 +300,7 @@ namespace
 					}
 					execNextTest();
 				}
-				catch (const exception& ex)
+				catch (const std::exception& ex)
 				{
 					logger->log(LogLevel::Error, "test_rpc_server", "RPC SERVER failed", ex.what());
 				}
@@ -429,7 +428,7 @@ namespace
 				});
 			}
 		}
-		catch (exception& ex)
+		catch (const std::exception& ex)
 		{
 			logger->log(LogLevel::Error, "test_rpc_client", "Can't send data to the scene.", ex.what());
 		}
@@ -449,7 +448,7 @@ namespace
 				});
 			}
 		}
-		catch (exception& ex)
+		catch (const std::exception& ex)
 		{
 			logger->log(LogLevel::Error, "test_rpc_client_cancel", "Can't send data to the scene.", ex.what());
 		}
@@ -469,7 +468,7 @@ namespace
 				});
 			}
 		}
-		catch (exception& ex)
+		catch (const std::exception& ex)
 		{
 			logger->log(LogLevel::Error, "test_rpc_client_exception", "Can't send data to the scene.", ex.what());
 		}
@@ -509,7 +508,7 @@ namespace
 				logger->log(LogLevel::Debug, "test_disconnect", "Disconnect client OK");
 				execNextTest();
 			}
-			catch (exception& ex)
+			catch (const std::exception& ex)
 			{
 				logger->log(LogLevel::Error, "test_disconnect", "Failed to disconnect client", ex.what());
 			}
@@ -543,42 +542,42 @@ void run_all_tests()
 {
 	run_all_tests_nonblocking();
 
-	cin.ignore();
-	stop = true;
+	std::cin.ignore();
+	Stormancer::stop = true;
 }
 
 void run_all_tests_nonblocking()
 {
-	testsDone = false;
-	testsPassed = false;
+	Stormancer::testsDone = false;
+	Stormancer::testsPassed = false;
 
 	// Some platforms require a Client to be created before using pplx::task
-	config = Configuration::create(endpoint, accountId, applicationName);
-	config->logger = logger;
-	client = Client::create(config);
+	Stormancer::config = Stormancer::Configuration::create(Stormancer::endpoint, Stormancer::accountId, Stormancer::applicationName);
+	Stormancer::config->logger = Stormancer::logger;
+	Stormancer::client = Stormancer::Client::create(Stormancer::config);
 
-	tests.push_back(test_connect);
-	tests.push_back(test_echo);
-	tests.push_back(test_rpc_server);
-	tests.push_back(test_rpc_server_cancel);
-	tests.push_back(test_rpc_server_exception);
-	tests.push_back(test_rpc_server_clientException);
-	tests.push_back(test_rpc_client);
-	tests.push_back(test_rpc_client_cancel);
-	tests.push_back(test_rpc_client_exception);
-	tests.push_back(test_syncclock);
-	tests.push_back(test_disconnect);
-	tests.push_back(test_clean);
+	Stormancer::tests.push_back(Stormancer::test_connect);
+	Stormancer::tests.push_back(Stormancer::test_echo);
+	Stormancer::tests.push_back(Stormancer::test_rpc_server);
+	Stormancer::tests.push_back(Stormancer::test_rpc_server_cancel);
+	Stormancer::tests.push_back(Stormancer::test_rpc_server_exception);
+	Stormancer::tests.push_back(Stormancer::test_rpc_server_clientException);
+	Stormancer::tests.push_back(Stormancer::test_rpc_client);
+	Stormancer::tests.push_back(Stormancer::test_rpc_client_cancel);
+	Stormancer::tests.push_back(Stormancer::test_rpc_client_exception);
+	Stormancer::tests.push_back(Stormancer::test_syncclock);
+	Stormancer::tests.push_back(Stormancer::test_disconnect);
+	Stormancer::tests.push_back(Stormancer::test_clean);
 
-	execNextTest();
+	Stormancer::execNextTest();
 }
 
 bool tests_done()
 {
-	return testsDone;
+	return Stormancer::testsDone;
 }
 
 bool tests_passed()
 {
-	return testsPassed;
+	return Stormancer::testsPassed;
 }
