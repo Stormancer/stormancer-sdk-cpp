@@ -145,11 +145,16 @@
 #include "msgpack.hpp"
 
 #if (defined(UE_EDITOR) || defined(UE_GAME))
+#include "Runtime/Launch/Resources/Version.h"
 #if UE_BUILD_SHIPPING
 #define check(expr)                    { CA_ASSUME(expr); }
 #else
 //Copy paste from UnrealEngine\Engine\Source\Runtime\Core\Public\Misc\AssertionMacros.h
+#if ENGINE_MINOR_VERSION < 18
 #define check(expr)                { if(UNLIKELY(!(expr))) { FDebug::LogAssertFailedMessage( #expr, __FILE__, __LINE__ ); _DebugBreakAndPromptForRemote(); FDebug::AssertFailed( #expr, __FILE__, __LINE__ ); CA_ASSUME(false); } }
+#else
+#define check(expr)				{ if(UNLIKELY(!(expr))) { FDebug::LogAssertFailedMessage( #expr, __FILE__, __LINE__, TEXT("") ); _DebugBreakAndPromptForRemote(); FDebug::AssertFailed( #expr, __FILE__, __LINE__ ); CA_ASSUME(false); } }
+#endif
 #endif // UE_BUILD_SHIPPING
 #ifdef _WIN32
 #include "HideWindowsPlatformTypes.h"
