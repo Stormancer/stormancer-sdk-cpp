@@ -458,7 +458,7 @@ namespace Stormancer
 			tce.set_exception(std::runtime_error("Transport not started. Make sure you started it."));
 		}
 
-		auto result = _peer->Connect(hostStr.c_str(), _port, 0, 0);
+		auto result = _peer->Connect(hostStr.c_str(), _port, nullptr, 0, nullptr, 0, 12, 500, 30000);
 		if (result != RakNet::ConnectionAttemptResult::CONNECTION_ATTEMPT_STARTED)
 		{
 			tce.set_exception(std::runtime_error(std::string("Bad RakNet connection attempt result (") + std::to_string(result) + ')'));
