@@ -14,13 +14,13 @@
 namespace Stormancer
 {
 
-namespace
-{
-ServiceOptions playerProfileServiceOptions{
-	ServiceContextFlags::Scene | ServiceContextFlags::CreateWithScene | ServiceContextFlags::SingleInstance,
-	"profiles"
-};
-}
+	namespace
+	{
+		ServiceOptions playerProfileServiceOptions{
+			ServiceContextFlags::Scene | ServiceContextFlags::CreateWithScene | ServiceContextFlags::SingleInstance,
+			"profiles"
+		};
+	}
 
 	std::shared_ptr<StormancerWrapper> StormancerWrapper::_instance;
 
@@ -68,8 +68,6 @@ ServiceOptions playerProfileServiceOptions{
 		if (_client && _client->getConnectionState() == ConnectionState::Connected)
 		{
 			_client->disconnect().wait();
-			_authService.reset();
-			_scenes.clear();
 			_actionDispatcher.reset();
 			_client.reset();
 			_config.reset();
@@ -78,17 +76,21 @@ ServiceOptions playerProfileServiceOptions{
 
 	pplx::task<void> StormancerWrapper::Authenticate(const std::string& provider, const std::string& authenticationToken)
 	{
-		if (!_authService)
-		{
-			_authService = _client->dependencyResolver()->resolve<AuthenticationService>();
-		}
+		auto authService = _client->dependencyResolver()->resolve<AuthenticationService>();
 
 		const std::map<std::string, std::string> authenticationContext{
 			{ "provider", provider },
 			{ "ticket", authenticationToken }
 		};
 
-		return _authService->login(authenticationContext);
+		return authService->login(authenticationContext);
+	}
+
+	std::string StormancerWrapper::userId()
+	{
+		auto authService = _client->dependencyResolver()->resolve<AuthenticationService>();
+
+		return authService->userId();
 	}
 
 	std::shared_ptr<IActionDispatcher> StormancerWrapper::getDispatcher()
@@ -106,49 +108,24 @@ ServiceOptions playerProfileServiceOptions{
 		return _logger;
 	}
 
-	pplx::task<void> StormancerWrapper::lauchMatchmaking(MatchType type)
+	pplx::task<void> StormancerWrapper::lauchMatchmaking(MatchType type, const MatchmakingRequest& mmRequest)
 	{
-		std::string matchmakingScene;
+		std::string matchmakingScene = getMatchMakingSceneName(type);
 
-		switch (type)
+		return getService<MatchmakingService>(matchmakingScene).then([=](std::shared_ptr<MatchmakingService> matchmakingService)
 		{
-			case Fast:
-				matchmakingScene = "fast-match";
-				break;
-			case Ranked:
-				matchmakingScene = "ranked";
-				break;
-			default:
-				throw std::runtime_error("invalid match type");
-				break;
-		}
-
-		return getService<MatchmakingService>(matchmakingScene).then([this](std::shared_ptr<MatchmakingService> matchmakingService)
-		{
-			matchmakingService->onMatchFound(_onMatchFound);
-			matchmakingService->onMatchUpdate(_onMatchUpdate);
-			return matchmakingService->findMatch("game");
+			matchmakingService->onMatchFound(_onMatchFoundCallback);
+			matchmakingService->onMatchUpdate(_onMatchUpdateCallback);
+			matchmakingService->onMatchReadyUpdate(_onMatchReadyUpdateCallback);
+			return matchmakingService->findMatch("game", mmRequest);
 		});
 	}
 
 	pplx::task<void> StormancerWrapper::cancelMatchmaking(MatchType type)
 	{
-		std::string matchmakingScene;
+		std::string matchmakingScene = getMatchMakingSceneName(type);
 
-		switch (type)
-		{
-			case Fast:
-				matchmakingScene = "fast-match";
-				break;
-			case Ranked:
-				matchmakingScene = "ranked";
-				break;
-			default:
-				//throw std::runtime_error("invalid match type"); /* RLE: avoiding crash. */
-				break;
-		}
-
-		return getService<MatchmakingService>(matchmakingScene).then([this](std::shared_ptr<MatchmakingService> matchmakingService)
+		return getService<MatchmakingService>(matchmakingScene).then([=](std::shared_ptr<MatchmakingService> matchmakingService)
 		{
 			if (matchmakingService)
 			{
@@ -157,14 +134,52 @@ ServiceOptions playerProfileServiceOptions{
 		});
 	}
 
+	pplx::task<void> StormancerWrapper::resolveMatchmaking(MatchType type, bool acceptMatch)
+	{
+		std::string matchmakingScene = getMatchMakingSceneName(type);
+
+		return getService<MatchmakingService>(matchmakingScene).then([=](std::shared_ptr<MatchmakingService> matchmakingService)
+		{
+			if (matchmakingService)
+			{
+				matchmakingService->resolve(acceptMatch);
+			}
+		});
+	}
+
 	void StormancerWrapper::onMatchFound(const std::function<void(MatchmakingResponse)>& matchFoundCallback)
 	{
-		_onMatchFound = matchFoundCallback;
+		_onMatchFoundCallback = matchFoundCallback;
 	}
 
 	void StormancerWrapper::onMatchUpdate(const std::function<void(MatchState)>& matchUpdateCallback)
 	{
-		_onMatchUpdate = matchUpdateCallback;
+		_onMatchUpdateCallback = matchUpdateCallback;
+	}
+
+	void StormancerWrapper::onMatchReadyUpdate(const std::function<void(ReadyVerificationRequest)>& matchReadyUpdateCallback)
+	{
+		_onMatchReadyUpdateCallback = matchReadyUpdateCallback;
+	}
+
+	std::string StormancerWrapper::getMatchMakingSceneName(MatchType type)
+	{
+		std::string matchmakingScene;
+
+		switch (type)
+		{
+		case Fast:
+			matchmakingScene = "matchmaker-fast";
+			break;
+		case Ranked:
+			matchmakingScene = "matchmaker-ranked";
+			break;
+		default:
+			throw std::runtime_error("invalid match type");
+			break;
+		}
+
+		return matchmakingScene;
 	}
 
 	std::shared_ptr<StormancerWrapper> StormancerWrapper::instance()

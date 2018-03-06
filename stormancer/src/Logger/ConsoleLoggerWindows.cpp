@@ -3,6 +3,8 @@
 
 #if defined(_WIN32)
 
+#include <iostream>
+
 namespace Stormancer
 {
 	ConsoleLogger::ConsoleLogger(LogLevel maximalLogLevel)
@@ -51,13 +53,13 @@ namespace Stormancer
 				setConsoleColorDarkRed();
 				break;
 			default:
-				setConsoleColorWhite();
+				resetColor();
 				break;
 		}
 
 		std::clog << message2 << std::endl;
 
-		setConsoleColorWhite();
+		resetColor();
 	}
 
 	void ConsoleLogger::log(const std::exception& e)
@@ -68,7 +70,7 @@ namespace Stormancer
 
 		std::clog << formatException(e) << std::endl;
 
-		setConsoleColorWhite();
+		resetColor();
 	}
 
 	void ConsoleLogger::setConsoleColor(WORD color)
@@ -76,39 +78,44 @@ namespace Stormancer
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
 	}
 
-	void ConsoleLogger::setConsoleColorWhite()
+	void ConsoleLogger::resetColor()
 	{
 		setConsoleColor(15);
 	}
 
+	void ConsoleLogger::setConsoleColorWhite()
+	{
+		setConsoleColor(31);
+	}
+
 	void ConsoleLogger::setConsoleColorGrey()
 	{
-		setConsoleColor(8);
+		setConsoleColor(24);
 	}
 
 	void ConsoleLogger::setConsoleColorGreen()
 	{
-		setConsoleColor(2);
+		setConsoleColor(26);
 	}
 
 	void ConsoleLogger::setConsoleColorRed()
 	{
-		setConsoleColor(12);
+		setConsoleColor(28);
 	}
 
 	void ConsoleLogger::setConsoleColorBlue()
 	{
-		setConsoleColor(11);
+		setConsoleColor(27);
 	}
 
 	void ConsoleLogger::setConsoleColorDarkRed()
 	{
-		setConsoleColor(4);
+		setConsoleColor(192);
 	}
 
 	void ConsoleLogger::setConsoleColorYellow()
 	{
-		setConsoleColor(14);
+		setConsoleColor(30);
 	}
 }
 

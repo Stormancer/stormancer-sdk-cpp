@@ -3,20 +3,6 @@
 
 namespace Stormancer
 {
-	Internal::ReadyVerificationRequest::operator Stormancer::ReadyVerificationRequest()
-	{
-		Stormancer::ReadyVerificationRequest readyUpdate;
-		readyUpdate.matchId = matchId;
-		readyUpdate.timeout = timeout;
-		readyUpdate.membersCountTotal = (int32)members.size();
-		readyUpdate.membersCountReady = 0;
-		for (auto it : members)
-		{
-			readyUpdate.members[it.first] = (Readiness)it.second;
-		}
-		return readyUpdate;
-	}
-
 	MatchmakingService::MatchmakingService(Scene_ptr scene)
 		: _scene(scene)
 		, _rpcService(scene->dependencyResolver()->resolve<RpcService>())
@@ -48,22 +34,19 @@ namespace Stormancer
 		});
 
 		_scene->addRoute("match.parameters.update", [=](Packetisp_ptr packet) {
-			Serializer serializer;
+			Serializer serializer;	
 			std::string provider = serializer.deserializeOne<std::string>(packet->stream);
-
 			//_onMatchParametersUpdate();
 		});
 
 		_scene->addRoute("match.ready.update", [=](Packetisp_ptr packet) {
 			Serializer serializer;
-			Internal::ReadyVerificationRequest readyUpdateTmp = serializer.deserializeOne<Internal::ReadyVerificationRequest>(packet->stream);
-			ReadyVerificationRequest readyUpdate = readyUpdateTmp;
+			ReadyVerificationRequest readyUpdate = serializer.deserializeOne<ReadyVerificationRequest>(packet->stream);
 			readyUpdate.membersCountReady = 0;
 
-			for (auto it : readyUpdateTmp.members)
+			for (auto it : readyUpdate.members)
 			{
-				Readiness ready = (Readiness)it.second;
-				if (ready == Readiness::Ready)
+				if (it.second == Readiness::Ready)
 				{
 					readyUpdate.membersCountReady++;
 				}
@@ -77,12 +60,8 @@ namespace Stormancer
 	}
 
 	MatchmakingService::~MatchmakingService()
-	{		
-		if (_hasSubscription)
-		{
-			_matchmakingSubscription.unsubscribe();
-			_hasSubscription = false;
-		}
+	{
+		this->cancel();
 	}
 
 	void MatchmakingService::onMatchUpdate(std::function<void(MatchState)> callback)
@@ -105,58 +84,34 @@ namespace Stormancer
 		return _matchState;
 	}
 
-	pplx::task<void> MatchmakingService::findMatch(std::string provider)
+	pplx::task<void> MatchmakingService::findMatch(const std::string &provider, const MatchmakingRequest &mmRequest)
 	{
-		pplx::task_completion_event<void> tce;
+		if (_isMatching)
+		{
+			return pplx::task_from_exception<void>(std::runtime_error("Already matching !"));
+		}
 
 		_isMatching = true;
+		_matchmakingCTS = pplx::cancellation_token_source();
+		auto matchmakingToken = _matchmakingCTS.get_token();
 
-		rxcpp::observable<Packetisp_ptr> observable = _rpcService->rpc_observable("match.find", [=](obytestream* stream) {
-			_serializer.serialize(stream, provider);
-		}, PacketPriority::MEDIUM_PRIORITY);
-
-		_matchmakingSubscription = observable.subscribe([=](Packetisp_ptr packet) {
-			// On next
-			_isMatching = false;
-			if (_hasSubscription)
-			{
-				_matchmakingSubscription.unsubscribe();
-				_hasSubscription = false;
+		return _rpcService->rpc<void>("match.find", provider, mmRequest).then([=](pplx::task<void> res) {
+			if (matchmakingToken.is_canceled())
+			{					
+				return pplx::task_from_exception<void>(std::runtime_error("Matchmaking canceled"));
 			}
-			tce.set();
-		}, [=](std::exception_ptr exptr) {
-			// On error
-			_isMatching = false;
-			if (_hasSubscription)
+			else 
 			{
-				_matchmakingSubscription.unsubscribe();
-				_hasSubscription = false;
-			}
-			try
-			{
-				if (exptr)
-				{
-					std::rethrow_exception(exptr);
-				}
-				else
-				{
-					throw std::runtime_error("Unknown error during mathmaking.");
-				}
-			}
-			catch (const std::exception& ex)
-			{
-				tce.set_exception(ex);
+				_isMatching = false;
+				return res;
 			}
 		});
-		_hasSubscription = true;
-
-		return pplx::create_task(tce);
 	}
 
 	void MatchmakingService::resolve(bool acceptMatch)
 	{
 		_scene->send("match.ready.resolve", [=](obytestream* stream) {
-			*stream << acceptMatch;
+			(*stream) << acceptMatch;
 		}, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE_ORDERED);
 	}
 
@@ -164,16 +119,9 @@ namespace Stormancer
 	{
 		if (_isMatching)
 		{
+			_matchmakingCTS.cancel();
+			_scene->send("match.cancel", [](obytestream*) {}, PacketPriority::IMMEDIATE_PRIORITY, PacketReliability::RELIABLE_ORDERED);
 			_isMatching = false;
-			if (_hasSubscription)
-			{
-				_matchmakingSubscription.unsubscribe();
-				_hasSubscription = false;
-			}
-			else
-			{
-				_scene->send("match.cancel", Writer(), PacketPriority::IMMEDIATE_PRIORITY, PacketReliability::RELIABLE_ORDERED);
-			}
 		}
 	}
 };

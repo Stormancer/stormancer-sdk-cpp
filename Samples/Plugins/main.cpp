@@ -6,6 +6,9 @@
 #include "stormancer/Helpers.h"
 
 bool stop = false;
+const std::string endpoint = "http://127.0.0.1:8081";
+const std::string accountId = "account-id";
+const std::string applicationName = "application-name";
 
 int main()
 {
@@ -15,7 +18,7 @@ int main()
 
 	stormancerWrapper.setLogger(logger);
 
-	stormancerWrapper.init("http://api.stormancer.com/", "AccountId", "AppId");
+	stormancerWrapper.init(endpoint, accountId, applicationName);
 	
 	stormancerWrapper.Authenticate("steam", "plop").then([logger, &stormancerWrapper](pplx::task<void> t) {
 		try

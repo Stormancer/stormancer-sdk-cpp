@@ -20,6 +20,7 @@ namespace Stormancer
 		void log(const std::exception& ex) override;
 
 		static void setConsoleColor(WORD color);
+		static void resetColor();
 		static void setConsoleColorWhite();
 		static void setConsoleColorGrey();
 		static void setConsoleColorGreen();

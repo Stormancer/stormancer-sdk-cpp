@@ -24,25 +24,32 @@ namespace Stormancer
 		NotReady = 2
 	};
 
+	struct MatchmakingRequest
+	{
+		std::vector<std::string> userIds;
+		int32 teamSize;
+		std::string region;
+		std::string version;
+
+		MSGPACK_DEFINE_ARRAY(userIds, teamSize, region, version);
+	};
+
 	struct Player
 	{
 		std::string playerId;
-		std::string pseudo;
-		int64 rank;
-		std::string division;
 
-		MSGPACK_DEFINE(playerId, pseudo, rank, division);
+		MSGPACK_DEFINE_ARRAY(playerId);
 	};
 
 	struct MatchmakingResponse
 	{
 		std::string gameId;
-		Player player1;
-		Player player2;
-		std::string hostId;
+		std::vector<Player> team1;
+		std::vector<Player> team2;
+		std::string gameHost;
 		std::vector<std::string> optionalParameters;
 
-		MSGPACK_DEFINE(gameId, player1, player2, hostId, optionalParameters);
+		MSGPACK_DEFINE_ARRAY(gameHost, gameId, team1, team2, optionalParameters);
 	};
 
 	struct ReadyVerificationRequest
@@ -51,23 +58,9 @@ namespace Stormancer
 		std::string matchId;
 		int32 timeout;
 		int32 membersCountReady;
-		int32 membersCountTotal;
+
+		MSGPACK_DEFINE_ARRAY(members, matchId, timeout);
 	};
-
-	// Msgpack doesn't support using C++11 enum class so we use int32 instead in this temporary internal functions
-	namespace Internal
-	{
-		struct ReadyVerificationRequest
-		{
-			std::map<std::string, int32> members;
-			std::string matchId;
-			int32 timeout;
-
-			MSGPACK_DEFINE(members, matchId, timeout);
-
-			operator Stormancer::ReadyVerificationRequest();
-		};
-	}
 
 	class MatchmakingService
 	{
@@ -77,11 +70,13 @@ namespace Stormancer
 
 		MatchmakingService(Scene_ptr scene);
 		~MatchmakingService();
+
 		MatchmakingService(const MatchmakingService& other) = delete;
 		MatchmakingService(const MatchmakingService&& other) = delete;
 		MatchmakingService& operator=(const MatchmakingService&& other) = delete;
+
 		MatchState matchState() const;
-		pplx::task<void> findMatch(std::string provider);
+		pplx::task<void> findMatch(const std::string& provider, const MatchmakingRequest& mmRequest);
 		void resolve(bool acceptMatch);
 		void cancel();
 		void onMatchUpdate(std::function<void(MatchState)> callback);
@@ -97,14 +92,17 @@ namespace Stormancer
 		Scene_ptr _scene;
 		std::shared_ptr<RpcService> _rpcService;
 		bool _isMatching = false;
-		bool _hasSubscription = false;
-		rxcpp::subscription _matchmakingSubscription;
+		pplx::cancellation_token_source _matchmakingCTS;
 		std::function<void(MatchState)> _onMatchUpdate;
 		std::function<void(ReadyVerificationRequest)> _onMatchReadyUpdate;
 		std::function<void(MatchmakingResponse)> _onMatchFound;
 		MatchState _matchState = MatchState::Unknown;
 		Serializer _serializer;
+		std::shared_ptr<Stormancer::ILogger> _logger;			
+		std::string _logCategory = "Matchmaking";
 
 #pragma endregion
 	};
-};
+}
+
+MSGPACK_ADD_ENUM(Stormancer::Readiness);
