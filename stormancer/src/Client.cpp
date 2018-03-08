@@ -22,6 +22,7 @@
 
 
 
+
 namespace
 {
 
@@ -232,6 +233,27 @@ namespace Stormancer
 				return scene;
 			});
 		});
+	}
+
+	STORMANCER_DLL_API pplx::task<Scene_ptr> Client::getConnectedScene(const std::string& sceneId)
+	{
+#ifdef STORMANCER_LOG_CLIENT
+		logger()->log(LogLevel::Trace, "Client", "Get connected scene.", sceneId);
+#endif
+
+		if (sceneId.empty())
+		{
+			logger()->log(LogLevel::Error, "Client", "SceneId is empty");
+			return pplx::task_from_exception<Scene_ptr>(std::runtime_error("SceneId is empty"));
+		}
+
+		std::lock_guard<std::mutex> lg(_scenesMutex);
+		if (mapContains(_scenes, sceneId))
+		{
+			return _scenes[sceneId].task;
+		}
+
+		return pplx::task_from_exception<Scene_ptr>(std::runtime_error("Client isn't connected to scene id" + sceneId));
 	}
 
 	std::vector<std::string> Client::getSceneIds()

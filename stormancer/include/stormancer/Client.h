@@ -41,6 +41,8 @@ namespace Stormancer
 
 		STORMANCER_DLL_API pplx::task<Scene_ptr> connectToPrivateScene(const std::string& sceneToken, const SceneInitializer& initializer = SceneInitializer());
 
+		STORMANCER_DLL_API pplx::task<Scene_ptr> getConnectedScene(const std::string& sceneId);
+
 		STORMANCER_DLL_API std::vector<std::string> getSceneIds();
 
 		/// Returns the name of the application.
