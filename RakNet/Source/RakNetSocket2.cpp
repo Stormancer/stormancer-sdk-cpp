@@ -33,6 +33,7 @@ using namespace RakNet;
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
+
 #endif
 
 #ifdef TEST_NATIVE_CLIENT_ON_WINDOWS
@@ -48,6 +49,7 @@ using namespace RakNet;
 #include "RakNetSocket2_Berkley.cpp"
 #include "RakNetSocket2_Berkley_NativeClient.cpp"
 #include "RakNetSocket2_WindowsStore8.cpp"
+#include "RakNetSocket2_NX.cpp"
 #undef RAKNET_SOCKET_2_INLINE_FUNCTIONS
 
 #endif
@@ -94,6 +96,9 @@ RakNetSocket2* RakNetSocket2Allocator::AllocRNS2(void)
 #elif defined(_WIN32)
 	s2 = RakNet::OP_NEW<RNS2_Windows>(_FILE_AND_LINE_);
 	s2->SetSocketType(RNS2T_WINDOWS);
+
+
+
 #else
 	s2 = RakNet::OP_NEW<RNS2_Linux>(_FILE_AND_LINE_);
 	s2->SetSocketType(RNS2T_LINUX);
@@ -118,6 +123,8 @@ void RakNetSocket2::GetMyIP(SystemAddress addresses[MAXIMUM_NUMBER_OF_INTERNAL_I
 	RNS2_720::GetMyIP(addresses);
 #elif defined(_WIN32)
 	RNS2_Windows::GetMyIP(addresses);
+
+
 #else
 	RNS2_Linux::GetMyIP(addresses);
 #endif
@@ -540,6 +547,8 @@ RNS2SendResult RNS2_Windows::Send( RNS2_SendParameters *sendParameters, const ch
 void RNS2_Windows::GetMyIP( SystemAddress addresses[MAXIMUM_NUMBER_OF_INTERNAL_IDS] ) {return GetMyIP_Windows_Linux(addresses);}
 void RNS2_Windows::SetSocketLayerOverride(SocketLayerOverride *_slo) {slo = _slo;}
 SocketLayerOverride* RNS2_Windows::GetSocketLayerOverride(void) {return slo;}
+
+
 #else
 RNS2BindResult RNS2_Linux::Bind( RNS2_BerkleyBindParameters *bindParameters, const char *file, unsigned int line ) {return BindShared(bindParameters, file, line);}
 RNS2SendResult RNS2_Linux::Send( RNS2_SendParameters *sendParameters, const char *file, unsigned int line ) {return Send_Windows_Linux_360NoVDP(rns2Socket,sendParameters, file, line);}

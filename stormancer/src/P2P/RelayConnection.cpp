@@ -16,8 +16,8 @@ namespace Stormancer
 		_serverConnection->send([=](obytestream* s) {
 			(*s) << (byte)MessageIDTypes::ID_P2P_RELAY;
 			(*s) << id();
-			(*s) << priority;
-			(*s) << reliability;
+			(*s) << (uint8)priority;
+			(*s) << (uint8)reliability;
 			if (writer)
 			{
 				writer(s);

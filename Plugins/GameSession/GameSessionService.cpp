@@ -40,13 +40,14 @@ namespace Stormancer
 			auto p2pToken = packet->readObject<std::string>();
 			if (p2pToken.empty()) //host
 			{
-				_tunnel = _scene->registerP2PServer(GAMESESSION_P2P_SERVER_ID);
-
 				this->_onRoleReceived("HOST");
+				_tunnel = _scene->registerP2PServer(GAMESESSION_P2P_SERVER_ID);
 			}
 			else //client
 			{
 				_scene->openP2PConnection(p2pToken).then([this](std::shared_ptr<Stormancer::P2PScenePeer> p2pPeer) {
+					this->_onRoleReceived("CLIENT");
+
 					if (_onConnectionOpened)
 					{
 						_onConnectionOpened(p2pPeer);
@@ -59,8 +60,6 @@ namespace Stormancer
 							{
 								_onTunnelOpened(guestTunnel);
 							}
-
-							this->_onRoleReceived("CLIENT");
 						});
 					}
 					else
@@ -74,6 +73,7 @@ namespace Stormancer
 					}
 					catch (const std::exception& ex)
 					{
+						_onConnectionFailure(ex.what());
 						_logger->log(ex);
 					}
 				});
@@ -130,6 +130,11 @@ namespace Stormancer
 	void GameSessionService::OnShutdownReceived(std::function<void(void)> callback)
 	{
 		_onShutdownReceived = callback;
+	}
+
+	void GameSessionService::OnConnectionFailure(std::function<void(std::string)> callback)
+	{
+		_onConnectionFailure += callback;
 	}
 
 	pplx::task<void> GameSessionService::connect()

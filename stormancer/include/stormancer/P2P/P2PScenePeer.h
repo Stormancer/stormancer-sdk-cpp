@@ -35,6 +35,11 @@ namespace Stormancer
 		std::shared_ptr<IConnection> _connection;
 		std::shared_ptr<P2PService> _p2p;
 
+		/// Scene handle.
+		byte _handle = 0;
+		std::map<std::string, std::string> _metadata;
+		/// The remote routes.
+		std::map<std::string, Route_ptr> _remoteRoutesMap;
 #pragma endregion
 	};
 }

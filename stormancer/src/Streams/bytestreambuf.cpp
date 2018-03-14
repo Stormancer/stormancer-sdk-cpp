@@ -111,7 +111,11 @@ namespace Stormancer
 	{
 		tidy();
 		setg(s, s, s + size);
+
+
+
 		setp(s, s, s + size);
+
 		_mode = (Read | Write);
 		return (this);
 	}
@@ -348,7 +352,12 @@ namespace Stormancer
 				{
 					std::memcpy(next, s, (std::size_t)sz);
 					next += sz;
+
+
+
+
 					setp(first, next, last);
+
 					updateReadAfterWrite();
 					wc += sz;
 				}
@@ -396,7 +405,11 @@ namespace Stormancer
 	void bytestreambuf::reset()
 	{
 		setg(nullptr, nullptr, nullptr);
+
+
+
 		setp(nullptr, nullptr, nullptr);
+
 		_mode = 0;
 	}
 
@@ -415,7 +428,11 @@ namespace Stormancer
 			ptrWriteLast = nullptr;
 		}
 		setg(ptr, ptr, ptr);
+
+
+
 		setp(ptr, ptr, ptrWriteLast);
+
 		_mode = (Read | Write | Dynamic | Allocated);
 	}
 
@@ -459,7 +476,10 @@ namespace Stormancer
 
 				writeNext = writeFirst + (oldWriteNext - oldWriteFirst);
 
+
+
 				setp(writeFirst, writeNext, writeLast);
+
 
 				byte* readFirst = (oldReadFirst ? writeFirst : nullptr);
 				byte* readNext = (oldReadNext ? writeFirst + (oldReadNext - oldReadFirst) : nullptr);
@@ -489,7 +509,11 @@ namespace Stormancer
 	{
 		if ((next >= first) && (next <= last))
 		{
+
+
+
 			setp(first, next, last);
+
 			return true;
 		}
 		return false;

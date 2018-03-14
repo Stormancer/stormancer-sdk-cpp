@@ -25,9 +25,22 @@ namespace Stormancer
 		return _p2p->openTunnel((uint64)_connection->id(), _scene->id() + "." + serverId);
 	}
 
-	void P2PScenePeer::send(const std::string&, const Writer&, PacketPriority, PacketReliability)
+	void P2PScenePeer::send(const std::string& routeName, const Writer& writer, PacketPriority packetPriority, PacketReliability packetReliability)
 	{
-		throw std::runtime_error("Not implemented");
+		if (!mapContains(_remoteRoutesMap, routeName))
+		{
+			throw std::invalid_argument(std::string() + "The route '" + routeName + "' doesn't exist on the scene");
+		}
+
+		auto route = _remoteRoutesMap[routeName];
+		std::stringstream ss;
+		ss << "P2PScenePeer_" << _scene->id() << "_" << routeName;
+		int channelUid = _connection->getChannelUidStore().getChannelUid(ss.str());
+		_connection->send([=, &writer](obytestream* stream) {
+			(*stream) << _handle;
+			// TODO: (*stream) << routeHandle;
+			writer(stream);
+		}, channelUid, packetPriority, packetReliability);
 	}
 
 	uint64 P2PScenePeer::id()

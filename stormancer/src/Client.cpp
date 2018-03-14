@@ -23,6 +23,8 @@
 
 
 
+
+
 namespace
 {
 
@@ -67,6 +69,8 @@ namespace Stormancer
 		std::vector<std::shared_ptr<IRequestModule>> modules{ std::dynamic_pointer_cast<IRequestModule>(dependencyResolver()->resolve<P2PRequestModule>()) };
 
 		RequestProcessor::Initialize(this->dependencyResolver()->resolve<RequestProcessor>(), modules);
+
+
 
 
 
@@ -836,6 +840,45 @@ namespace Stormancer
 			}
 		}
 	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

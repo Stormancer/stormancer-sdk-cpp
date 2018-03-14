@@ -62,13 +62,13 @@ namespace Stormancer
 		resetColor();
 	}
 
-	void ConsoleLogger::log(const std::exception& e)
+	void ConsoleLogger::log(const std::exception& ex)
 	{
 		std::lock_guard<std::mutex> lg(_mutex);
 
 		setConsoleColorRed();
 
-		std::clog << formatException(e) << std::endl;
+		std::clog << formatException(ex) << std::endl;
 
 		resetColor();
 	}
@@ -110,7 +110,7 @@ namespace Stormancer
 
 	void ConsoleLogger::setConsoleColorDarkRed()
 	{
-		setConsoleColor(192);
+		setConsoleColor(79);
 	}
 
 	void ConsoleLogger::setConsoleColorYellow()

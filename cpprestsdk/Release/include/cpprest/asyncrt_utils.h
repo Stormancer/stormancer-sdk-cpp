@@ -34,6 +34,8 @@
 #include <locale.h>
 
 
+
+
 #include "cpprest/details/basic_types.h"
 
 #if !defined(_WIN32) || (_MSC_VER >= 1700)

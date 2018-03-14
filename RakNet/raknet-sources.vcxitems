@@ -90,6 +90,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\NatTypeDetectionServer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\NetworkIDManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\NetworkIDObject.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Source\NXIncludes.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\PacketConsoleLogger.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\PacketFileLogger.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\PacketizedTCP.h" />
@@ -194,6 +195,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)Source\MessageFilter.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Source\NetworkIDManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Source\NetworkIDObject.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Source\NXIncludes.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Source\PacketFileLogger.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Source\PacketizedTCP.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Source\PacketLogger.cpp" />
@@ -209,6 +211,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)Source\RakNetSocket2_Berkley.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Source\RakNetSocket2_Berkley_NativeClient.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Source\RakNetSocket2_NativeClient.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Source\RakNetSocket2_NX.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Source\RakNetSocket2_PS3_PS4.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Source\RakNetSocket2_PS4.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Source\RakNetSocket2_Vita.cpp" />

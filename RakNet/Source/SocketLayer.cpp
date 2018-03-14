@@ -72,6 +72,10 @@ using namespace pp;
 
 
 
+
+
+
+
 #if defined(_XBOX) || defined(_XBOX_720_COMPILE_AS_WINDOWS) || defined(X360)
 #include "WSAStartupSingleton.h"
 #elif   defined(_WIN32)
@@ -148,6 +152,8 @@ void SocketLayer::SetSocketOptions( __UDPSOCKET__ listenSocket, bool blockingSoc
 
 
 
+
+
 #else
 		fcntl( listenSocket, F_SETFL, O_NONBLOCK );
 #endif
@@ -221,6 +227,8 @@ RakNet::RakString SocketLayer::GetSubNetForSocketAndIp(__UDPSOCKET__ inSock, Rak
 		}
 	}
 	return "";
+
+
 #else
 
 	int fd,fd2;

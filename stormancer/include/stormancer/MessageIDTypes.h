@@ -1,7 +1,7 @@
 #pragma once
 
 #include "stormancer/headers.h"
-#include "MessageIdentifiers.h"
+
 
 namespace Stormancer
 {
@@ -11,10 +11,10 @@ namespace Stormancer
 		/// Re-use RakNet NAT messages id types
 		ID_P2P_RELAY = 58,
 		ID_P2P_TUNNEL = 59,
-		ID_ADVERTISE_PEERID = 48,//Borrow id from autopatcher
+		ID_ADVERTISE_PEERID = 48, // Borrow id from autopatcher
 		
 		/// System request
-		ID_SYSTEM_REQUEST = DefaultMessageIDTypes::ID_USER_PACKET_ENUM,
+		ID_SYSTEM_REQUEST = 134, // = DefaultMessageIDTypes::ID_USER_PACKET_ENUM
 
 		ID_ENCRYPTED = 135,
 

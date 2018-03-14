@@ -28,6 +28,10 @@ typedef SOCKET __TCPSOCKET__;
 
 
 
+
+
+
+
 #elif defined(WINDOWS_STORE_RT)
 	#include <windows.h>
 	#include "WinRTSockAddr.h"

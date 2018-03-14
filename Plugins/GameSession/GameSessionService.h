@@ -125,6 +125,8 @@ namespace Stormancer
 
 		void OnShutdownReceived(std::function<void(void)> callback);
 
+		void OnConnectionFailure(std::function<void(std::string)> callback);
+
 		template<typename TOut, typename TIn>
 		pplx::task<TOut> sendGameResults(TIn results)
 		{
@@ -151,6 +153,7 @@ namespace Stormancer
 		std::shared_ptr<P2PTunnel> _tunnel;
 		Action<SessionPlayerUpdateArg> _onConnectedPlayersChanged;
 		Action<std::string> _onRoleReceived;
+		Action<std::string> _onConnectionFailure;
 		std::function<void(void)> _onShutdownReceived;
 		std::function<void(std::shared_ptr<Stormancer::P2PTunnel>)> _onTunnelOpened;
 		std::function<void(std::shared_ptr<Stormancer::P2PScenePeer>)> _onConnectionOpened;

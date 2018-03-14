@@ -54,6 +54,8 @@
 
 
 
+
+
 #pragma comment(lib, "ws2_32.lib")
 
 #pragma comment(lib, "iphlpapi.lib") // Needed by libupnp
@@ -94,6 +96,7 @@
 #include <algorithm>
 #include <chrono>
 #include <functional>
+#include <locale>
 #include <iostream>
 #include <map>
 #include <memory>

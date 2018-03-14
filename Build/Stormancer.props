@@ -2,21 +2,17 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
-    <StormancerRoot>$(MSBuildThisFileDirectory)..</StormancerRoot>
+    <RootSDK>$(MSBuildThisFileDirectory)..\</RootSDK>
+	<OutDir>$(RootSDK)output\libs\</OutDir>
+    <TargetName>Stormancer_$(Configuration)_$(Platform)</TargetName>
+    <LibraryPath>$(RootSDK)binaries\$(Configuration)\$(Platform)\</LibraryPath>
+    <IntDir>$(RootSDK)Intermediate\stormancer\$(Platform)_$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup />
-  <ItemDefinitionGroup>
-    <ClCompile>
-      <PreprocessorDefinitions>_STORMANCER_LIB_NAME="Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform).lib";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(StormancerRoot)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ClCompile>
-	<Link>
-		<AdditionalLibraryDirectories>$(StormancerRoot)\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-	</Link>
-  </ItemDefinitionGroup>
+
   <ItemGroup>
-    <BuildMacro Include="StormancerRoot">
-      <Value>$(StormancerRoot)</Value>
+    <BuildMacro Include="RootSDK">
+      <Value>$(RootSDK)</Value>
     </BuildMacro>
   </ItemGroup>
 </Project>

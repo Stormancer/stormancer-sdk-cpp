@@ -109,7 +109,7 @@ namespace Stormancer
 			uint16 id;
 			*(p->stream) >> id;
 
-			char hasValues;
+			byte hasValues;
 			*(p->stream) >> hasValues;
 
 			if (hasValues == 0)

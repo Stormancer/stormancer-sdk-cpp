@@ -1,6 +1,6 @@
 #pragma once
 #include "ModuleManager.h"
-#include "stormancer.h"
+#include "stormancer/stormancer.h"
 
 /**
  * The public interface to this module.  In most cases, this interface is only public to sibling modules 

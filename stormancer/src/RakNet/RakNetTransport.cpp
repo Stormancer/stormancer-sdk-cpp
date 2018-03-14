@@ -4,6 +4,7 @@
 #include "stormancer/RakNet/RakNetTransport.h"
 #include "stormancer/IScheduler.h"
 #include "stormancer/MessageIDTypes.h"
+#include "MessageIdentifiers.h"
 
 #ifdef STORMANCER_PACKETFILELOGGER
 #include "PacketFileLogger.h"
@@ -511,7 +512,7 @@ namespace Stormancer
 #endif
 
 		auto connection = getConnection(rakNetPacket->guid);
-		auto stream = new ibytestream(rakNetPacket->data, rakNetPacket->length);
+		auto stream = new ibytestream((byte*)rakNetPacket->data, (std::streamsize)rakNetPacket->length);
 
 		Packet_ptr packet(new Packet<>(connection, stream), deleter<Packet<>>());
 		auto peer = _peer;

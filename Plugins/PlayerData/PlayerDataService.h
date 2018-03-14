@@ -8,71 +8,94 @@
 
 namespace Stormancer
 {
+	template<typename T>
+	struct PlayerData
+	{
+		int64 peerId;
+		std::string userId;
+		T data;
 
-class PlayerDataService;
-
-ServiceOptions opts{
-	ServiceContextFlags::Scene | ServiceContextFlags::CreateWithScene | ServiceContextFlags::SingleInstance,
-	"stormancer.playerdata"
-};
-
-using PlayerDataPlugin = SingleServicePlugin<PlayerDataService, opts>;
-
-class PlayerDataService : public IService, public std::enable_shared_from_this<PlayerDataService>
-{
-public:
+		MSGPACK_DEFINE(peerId, userId, data);
+	};
 
 	template<typename T>
-	pplx::task<T> GetPlayerData(const std::string& stormancerId)
+	class PlayerDataService : public IService, public std::enable_shared_from_this<PlayerDataService<T>>
 	{
-		auto rpc = _scene->dependencyResolver()->resolve<RpcService>();
+	public:
 
-		return rpc->rpc<T>(GET_PLAYERDATA_RPC, stormancerId);
-	}
-
-	template<typename T>
-	pplx::task<void> SetPlayerData(const T& data)
-	{
-		auto rpc = _scene->dependencyResolver()->resolve<RpcService>();
-
-		return rpc->rpc<void>(SET_PLAYERDATA_RPC, data);
-	}
-
-	void OnPlayerDataUpdated(std::function<void(const std::string&, Packetisp_ptr)> callback)
-	{
-		_onDataUpdated = callback;
-	}
-
-	virtual void setScene(Scene* scene) override
-	{
-		_scene = scene;
-
-		std::weak_ptr<PlayerDataService> weakThis = shared_from_this();
-		_scene->addRoute(PLAYERDATA_UPDATED_ROUTE, [weakThis](Packetisp_ptr packet)
+		pplx::task<PlayerData<T>> GetPlayerData(const std::string& userId)
 		{
-			auto thiz = weakThis.lock();
-			if (thiz && thiz->_onDataUpdated)
+			for (auto it : _playersData)
 			{
-				const auto stormancerId = packet->readObject<std::string>();
-				thiz->_onDataUpdated(stormancerId, packet);
+				if (it.second.userId == userId)
+				{
+					return pplx::task_from_result(it.second);
+				}
 			}
-		});
-	}
+			return pplx::task_from_exception<PlayerData<T>>(std::runtime_error("Player data not found."));
+		}
 
-	Scene* GetScene()
-	{
-		return _scene;
-	}
+		pplx::task<PlayerData<T>> GetPlayerData(int64 peerId)
+		{
+			if (mapContains(_playersData, peerId))
+			{
+				return pplx::task_from_result(_playersData.at(peerId));
+			}
+			return pplx::task_from_exception<PlayerData<T>>(std::runtime_error("Player data not found."));
+		}
 
-private:
+		pplx::task<void> SetPlayerData(const PlayerData<T>& data)
+		{
+			auto rpc = _scene->dependencyResolver()->resolve<RpcService>();
 
-	static constexpr const char* PLAYERDATA_UPDATED_ROUTE = "playerdata.updated";
-	static constexpr const char* GET_PLAYERDATA_RPC = "playerdata.getplayerdata";
-	static constexpr const char* SET_PLAYERDATA_RPC = "playerdata.setplayerdata";
+			return rpc->rpc<void>(SET_PLAYERDATA_RPC, data);
+		}
 
-	Scene* _scene;
+		void OnPlayerDataUpdated(std::function<void(const std::string&, Packetisp_ptr)> callback)
+		{
+			_onDataUpdated = callback;
+		}
 
-	std::function<void(const std::string&, Packetisp_ptr)> _onDataUpdated;
-};
+		virtual void setScene(Scene* scene) override
+		{
+			_scene = scene;
 
+			std::weak_ptr<PlayerDataService<T>> weakThis = shared_from_this();
+			_scene->addRoute(PLAYERDATA_UPDATED_ROUTE, [weakThis](Packetisp_ptr packet)
+			{
+				auto thiz = weakThis.lock();
+				if (thiz && thiz->_onDataUpdated)
+				{
+					auto playerData = packet->readObject<PlayerData<T>>();
+					playerData.peerId = packet->connection->id();
+					thiz->_onDataUpdated(playerData);
+				}
+			});
+		}
+
+		Scene* GetScene()
+		{
+			return _scene;
+		}
+
+	private:
+
+		static constexpr const char* PLAYERDATA_UPDATED_ROUTE = "playerdata.updated";
+		static constexpr const char* GET_PLAYERDATA_RPC = "playerdata.getplayerdata";
+		static constexpr const char* SET_PLAYERDATA_RPC = "playerdata.setplayerdata";
+
+		Scene* _scene;
+
+		std::function<void(PlayerData<T>)> _onDataUpdated;
+
+		std::map<int64, PlayerData<T>> _playersData;
+	};
+
+	ServiceOptions opts{
+		ServiceContextFlags::Scene | ServiceContextFlags::CreateWithScene | ServiceContextFlags::SingleInstance,
+		"stormancer.playerdata"
+	};
+
+	template<typename T>
+	using PlayerDataPlugin = SingleServicePlugin<PlayerDataService<T>, opts>;
 }

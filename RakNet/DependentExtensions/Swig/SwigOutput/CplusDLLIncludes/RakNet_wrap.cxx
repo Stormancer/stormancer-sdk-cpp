@@ -109,7 +109,7 @@ template <typename T> T SwigValueInit() {
 #endif
 
 #ifndef SWIGEXPORT
-# if defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN__) || defined(_PS4)
+# if defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN__)
 #   if defined(STATIC_LINKED)
 #     define SWIGEXPORT
 #   else

@@ -62,7 +62,8 @@ enum RNS2Type
 	RNS2T_XBOX_360,
 	RNS2T_XBOX_720,
 	RNS2T_WINDOWS,
-	RNS2T_LINUX
+	RNS2T_LINUX,
+	RNS2T_NX
 };
 
 struct RNS2_SendParameters
@@ -350,7 +351,7 @@ public:
 };
 #endif
 
-#if (defined(_WIN32) || defined(_XBOX_720_COMPILE_AS_WINDOWS) || defined(_XBOX_720_WITH_XBOX_LIVE) || defined(__GNUC__) || defined(__GCCXML__) || defined(__S3E__) || defined(_XBOX) || defined(X360))
+#if (defined(_WIN32) || defined(_XBOX_720_COMPILE_AS_WINDOWS) || defined(_XBOX_720_WITH_XBOX_LIVE) || defined(__GNUC__) || defined(__GCCXML__) || defined(__S3E__) || defined(_XBOX) || defined(X360) )
 class RNS2_Windows_Linux_360
 {
 public:
@@ -435,6 +436,16 @@ protected:
 	static void GetMyIPIPV4And6( SystemAddress addresses[MAXIMUM_NUMBER_OF_INTERNAL_IDS] );
 	SocketLayerOverride *slo;
 };
+
+
+
+
+
+
+
+
+
+
 
 #else
 class RNS2_Linux : public RNS2_Berkley, public RNS2_Windows_Linux_360

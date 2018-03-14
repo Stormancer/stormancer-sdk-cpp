@@ -542,7 +542,7 @@ void run_all_tests()
 {
 	run_all_tests_nonblocking();
 
-	std::cin.ignore();
+
 	Stormancer::stop = true;
 }
 
