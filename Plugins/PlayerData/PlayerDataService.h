@@ -60,7 +60,7 @@ namespace Stormancer
 		{
 			_scene = scene;
 
-			std::weak_ptr<PlayerDataService<T>> weakThis = shared_from_this();
+			std::weak_ptr<PlayerDataService<T>> weakThis = this->shared_from_this();
 			_scene->addRoute(PLAYERDATA_UPDATED_ROUTE, [weakThis](Packetisp_ptr packet)
 			{
 				auto thiz = weakThis.lock();
