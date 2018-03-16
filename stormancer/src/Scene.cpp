@@ -23,7 +23,7 @@ namespace Stormancer
 		_connectionStateObservable.get_observable().subscribe([=](ConnectionState state) {
 			// On next
 			_connectionState = state;
-		}, [](std::exception_ptr exptr) {
+		}, [=](std::exception_ptr exptr) {
 			// On error
 			try
 			{
@@ -31,7 +31,7 @@ namespace Stormancer
 			}
 			catch (const std::exception& ex)
 			{
-				ILogger::instance()->log(LogLevel::Error, "Scene", "Connection state change failed", ex.what());
+				_logger->log(LogLevel::Error, "Scene", "Connection state change failed", ex.what());
 			}
 		});
 	}

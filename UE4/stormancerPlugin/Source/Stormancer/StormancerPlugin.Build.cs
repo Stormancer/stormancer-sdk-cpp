@@ -41,7 +41,7 @@ namespace UnrealBuildTool.Rules
 #if WITH_FORWARDED_MODULE_RULES_CTOR
 		public StormancerPlugin(ReadOnlyTargetRules target) : base(target)
 #else
-		public StormancerPlugin(TargetInfo target)
+		public StormancerPlugin(TargetInfo target) : base(target)
 #endif
 		{
             SDK_LIB_PATH = ModuleDirectory + "/../../3rdparty/stormancer/libs/";
@@ -74,7 +74,7 @@ namespace UnrealBuildTool.Rules
 			PrivateIncludePaths.AddRange(new string[] {"Source/Stormancer/Private" });
 			PublicDependencyModuleNames.AddRange(new string[] { "Core" });
 			PrivateDependencyModuleNames.AddRange(new string[] { "Engine", "CoreUObject" });
-            if (UEBuildConfiguration.bBuildEditor == true)
+            if (target.Type == TargetType.Editor)
             {
                 PrivateDependencyModuleNames.AddRange(new string[] { "UnrealEd" });
             }
@@ -145,13 +145,13 @@ namespace UnrealBuildTool.Rules
                     platform = "Durango";
                     break;
                 default:
-                    Definitions.Add("STORMANCER_SUPPORTED=0");
+                    PublicDefinitions.Add("STORMANCER_SUPPORTED=0");
                     Trace("Warning: unsupported platform");
                     return;
-				default:
-				    break;
 			}
-
+			
+			PublicDefinitions.Add("STORMANCER_SUPPORTED=1");
+			
 			// Look at all the files in the build path; we need to smartly locate
 			// the static library based on the current platform. For dynamic libraries
 			// this is more difficult, but for static libraries, it's just .lib or .a
@@ -198,12 +198,8 @@ namespace UnrealBuildTool.Rules
 			Trace("Added static library: {0}", full_library_path);
 		}
 
-		/**
-		 * Print out a build message
-		 * Why error? Well, the UE masks all other errors. *shrug*
-		 */
 		private void Trace(string msg) {
-			Log.TraceError(Plugin + ": " + msg);
+			Log.TraceInformation(Plugin + ": " + msg);
 		}
 
 		/** Trace helper */

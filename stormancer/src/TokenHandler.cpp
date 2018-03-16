@@ -6,7 +6,8 @@
 
 namespace Stormancer
 {
-	TokenHandler::TokenHandler()
+	TokenHandler::TokenHandler(ILogger_ptr logger)
+		: _logger(logger)
 	{
 	}
 
@@ -40,7 +41,7 @@ namespace Stormancer
 			<< " " << cData.SceneId
 			<< " " << cData.UserData
 			<< " " << cData.Version;
-		ILogger::instance()->log(LogLevel::Trace, "TokenHandler", "Decoded token : " + ss.str());
+		_logger->log(LogLevel::Trace, "TokenHandler", "Decoded token : " + ss.str());
 
 		return SceneEndpoint(token, cData);
 	}

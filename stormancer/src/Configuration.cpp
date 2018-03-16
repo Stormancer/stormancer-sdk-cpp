@@ -11,7 +11,7 @@ namespace Stormancer
 	{
 		scheduler = std::make_shared<DefaultScheduler>();
 		transportFactory = _defaultTransportFactory;
-		dispatcher = [](DependencyResolver*) { return std::make_shared<DefaultPacketDispatcher>(); };
+		dispatcher = [](DependencyResolver* dr) { return std::make_shared<DefaultPacketDispatcher>(dr->resolve<ILogger>()); };
 		addServerEndpoint(endpoint);
 		_plugins.push_back(new RpcPlugin());
 	}

@@ -12,7 +12,9 @@ namespace Stormancer
 
 #pragma region public_methods
 		
-		P2PTunnelClient(std::function<void(P2PTunnelClient*, RakNet::RNS2RecvStruct*)> onMsgRecv,  std::shared_ptr<RequestProcessor> sysCall);
+		P2PTunnelClient(std::function<void(P2PTunnelClient*, RakNet::RNS2RecvStruct*)> onMsgRecv,
+			std::shared_ptr<RequestProcessor> sysCall,
+			ILogger_ptr logger);
 		~P2PTunnelClient();
 
 #pragma endregion
@@ -45,6 +47,7 @@ namespace Stormancer
 
 		std::function<void(P2PTunnelClient*, RakNet::RNS2RecvStruct*)> _onMsgRecv;
 		std::shared_ptr<RequestProcessor> _sysCall;
+		ILogger_ptr _logger;
 
 #pragma endregion
 	};

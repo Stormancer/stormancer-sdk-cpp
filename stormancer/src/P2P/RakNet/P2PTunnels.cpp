@@ -52,7 +52,7 @@ namespace Stormancer
 		}).then([=](pplx::task<Packet_ptr> t) {
 
 			auto handle = _serializer->deserializeOne<byte>(t.get()->stream);
-			auto client = std::make_shared<P2PTunnelClient>([=](P2PTunnelClient* client, RakNet::RNS2RecvStruct* msg) { this->onMsgReceived(client, msg); }, _sysClient);
+			auto client = std::make_shared<P2PTunnelClient>([=](P2PTunnelClient* client, RakNet::RNS2RecvStruct* msg) { this->onMsgReceived(client, msg); }, _sysClient, _logger);
 			client->handle = handle;
 			client->peerId = connectionId;
 			client->serverId = serverId;
@@ -81,7 +81,7 @@ namespace Stormancer
 			peerHandle key(clientPeerId, handle);
 			if (_tunnels.find(key) == _tunnels.end())
 			{
-				auto client = std::make_shared<P2PTunnelClient>([=](P2PTunnelClient* client, RakNet::RNS2RecvStruct* msg) { this->onMsgReceived(client, msg); }, _sysClient);
+				auto client = std::make_shared<P2PTunnelClient>([=](P2PTunnelClient* client, RakNet::RNS2RecvStruct* msg) { this->onMsgReceived(client, msg); }, _sysClient, _logger);
 				client->handle = handle;
 				client->peerId = clientPeerId;
 				client->serverId = serverId;

@@ -25,37 +25,37 @@ int main()
 		{
 			t.wait();
 			logger->log("connect OK");
-			stormancerWrapper.getService<Stormancer::LeaderboardService>("services", true, true).then([](pplx::task<std::shared_ptr<Stormancer::LeaderboardService>> t) {
+			stormancerWrapper.getService<Stormancer::LeaderboardService>("services", true, true).then([=](pplx::task<std::shared_ptr<Stormancer::LeaderboardService>> t) {
 				try
 				{
 					auto service = t.get();
 					Stormancer::LeaderboardQuery query;
 					query.leaderboardName = "test";
 					query.size = 10;
-					service->query(query).then([](pplx::task<Stormancer::LeaderboardResult> t2) {
+					service->query(query).then([=](pplx::task<Stormancer::LeaderboardResult> t2) {
 						try
 						{
 							auto result = t2.get();
 							auto resultsCount = result.results.size();
-							Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Debug, "main", "Results count = " + std::to_string(resultsCount));
+							logger->log(Stormancer::LogLevel::Debug, "main", "Results count = " + std::to_string(resultsCount));
 							if (resultsCount > 0)
 							{
-								Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Debug, "main", "My rank = " + std::to_string(result.results[0].ranking));
-								Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Debug, "main", "My score = " + std::to_string(result.results[0].scoreRecord.score));
+								logger->log(Stormancer::LogLevel::Debug, "main", "My rank = " + std::to_string(result.results[0].ranking));
+								logger->log(Stormancer::LogLevel::Debug, "main", "My score = " + std::to_string(result.results[0].scoreRecord.score));
 								std::time_t a = result.results[0].scoreRecord.createdOn / 1000;
 								auto dateStr = Stormancer::time_tToStr(a, true);
-								Stormancer::ILogger::instance()->log(Stormancer::LogLevel::Debug, "main", "My date = " + dateStr);
+								logger->log(Stormancer::LogLevel::Debug, "main", "My date = " + dateStr);
 							}
 						}
 						catch (const std::exception& ex)
 						{
-							Stormancer::ILogger::instance()->log(ex);
+							logger->log(ex);
 						}
 					});
 				}
 				catch (const std::exception& ex)
 				{
-					Stormancer::ILogger::instance()->log(ex);
+					logger->log(ex);
 				}
 			});
 		}

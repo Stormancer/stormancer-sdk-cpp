@@ -8,14 +8,12 @@ namespace UnrealBuildTool.Rules
 {
     public class StormancerPlugin : ModuleRules
 	{
-        Dictionary<string, SetupInfo> SetupInfoMap = new Dictionary<string, SetupInfo>();
-
         private string VS_TOOLSET = "140";
 
 #if WITH_FORWARDED_MODULE_RULES_CTOR
 		public StormancerPlugin(ReadOnlyTargetRules target) : base(target)
 #else
-		public StormancerPlugin(TargetInfo target)
+		public StormancerPlugin(TargetInfo target) : base(target)
 #endif
 		{
             // Stormancer needs RTTI and exceptions
@@ -43,7 +41,7 @@ namespace UnrealBuildTool.Rules
 			PrivateIncludePaths.AddRange(new string[] {"Source/Stormancer/Private" });
 			PublicDependencyModuleNames.AddRange(new string[] { "Core" });
 			PrivateDependencyModuleNames.AddRange(new string[] { "Engine", "CoreUObject" });
-            if (UEBuildConfiguration.bBuildEditor == true)
+            if (target.Type == TargetType.Editor)
             {
                 PrivateDependencyModuleNames.AddRange(new string[] { "UnrealEd" });
             }
@@ -101,14 +99,12 @@ namespace UnrealBuildTool.Rules
                     platform = "Durango";
                     break;
                 default:
-                    Definitions.Add("STORMANCER_SUPPORTED=0");
+                    PublicDefinitions.Add("STORMANCER_SUPPORTED=0");
                     Trace("Warning: unsupported platform");
                     return;
-				default:
-				    break;
 			}
 			
-			Definitions.Add("STORMANCER_SUPPORTED=1");
+			PublicDefinitions.Add("STORMANCER_SUPPORTED=1");
 			
 			// Look at all the files in the build path; we need to smartly locate
 			// the static library based on the current platform. For dynamic libraries
@@ -156,12 +152,8 @@ namespace UnrealBuildTool.Rules
 			Trace("Added static library: {0}", full_library_path);
 		}
 
-		/**
-		 * Print out a build message
-		 * Why error? Well, the UE masks all other errors. *shrug*
-		 */
 		private void Trace(string msg) {
-			Log.TraceError(Plugin + ": " + msg);
+			Log.TraceInformation(Plugin + ": " + msg);
 		}
 
 		/** Trace helper */

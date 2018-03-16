@@ -27,14 +27,14 @@ namespace Stormancer
 
 	RakNetTransport::~RakNetTransport()
 	{
-		ILogger::instance()->log(LogLevel::Trace, "RakNetTransport", "Deleting RakNet transport...");
+		_logger->log(LogLevel::Trace, "RakNetTransport", "Deleting RakNet transport...");
 
 		if (_isRunning)
 		{
 			stop();
 		}
 
-		ILogger::instance()->log(LogLevel::Trace, "RakNetTransport", "RakNet transport deleted");
+		_logger->log(LogLevel::Trace, "RakNetTransport", "RakNet transport deleted");
 	}
 
 	void RakNetTransport::start(std::string type, std::shared_ptr<IConnectionManager> handler, pplx::cancellation_token ct, uint16 serverPort, uint16 maxConnections)
@@ -82,7 +82,7 @@ namespace Stormancer
 #endif
 
 			_peer = std::shared_ptr<RakNet::RakPeerInterface>(RakNet::RakPeerInterface::GetInstance(), [=](RakNet::RakPeerInterface* peer) {
-				ILogger::instance()->log(LogLevel::Trace, "RakNetTransport", "Deleting RakPeerInterface...");
+				_logger->log(LogLevel::Trace, "RakNetTransport", "Deleting RakPeerInterface...");
 				RakNet::RakPeerInterface::DestroyInstance(peer);
 #ifdef STORMANCER_PACKETFILELOGGER
 				delete logger;
@@ -542,7 +542,7 @@ namespace Stormancer
 		if (rakPeerInterface)
 		{
 			int64 cid = peerId;
-			auto connection = std::make_shared<RakNetConnection>(raknetGuid, cid, peer);
+			auto connection = std::make_shared<RakNetConnection>(raknetGuid, cid, peer, _logger);
 			RakNet::RakNetGUID guid(connection->guid());
 			connection->onClose([=](std::string reason) {
 				_logger->log(LogLevel::Trace, "RakNetTransport", "On close", guid.ToString());

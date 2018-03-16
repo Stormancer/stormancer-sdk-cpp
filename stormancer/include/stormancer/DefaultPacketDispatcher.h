@@ -3,6 +3,7 @@
 #include "stormancer/headers.h"
 #include "stormancer/IPacketDispatcher.h"
 #include "stormancer/IPacketProcessor.h"
+#include "stormancer/Logger/ILogger.h"
 
 namespace Stormancer
 {
@@ -10,7 +11,7 @@ namespace Stormancer
 	class DefaultPacketDispatcher : public IPacketDispatcher
 	{
 	public:
-		DefaultPacketDispatcher(bool asyncDispatch = true);
+		DefaultPacketDispatcher(ILogger_ptr logger, bool asyncDispatch = true);
 		virtual ~DefaultPacketDispatcher();
 
 		void dispatchPacket(Packet_ptr packet);
@@ -23,5 +24,6 @@ namespace Stormancer
 		std::map<byte, handlerFunction*> _handlers;
 		std::vector<processorFunction*> _defaultProcessors;
 		bool _asyncDispatch = true;
+		ILogger_ptr _logger;
 	};
 };

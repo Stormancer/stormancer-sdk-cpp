@@ -5,3 +5,4 @@
 #include "IStormancerPlugin.h"
 #include "StormancerTickDispatcher.h"
 #include "stormancer/IActionDispatcher.h"
+#include "StormancerLogger.h"

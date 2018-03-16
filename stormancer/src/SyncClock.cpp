@@ -9,6 +9,7 @@ namespace Stormancer
 	SyncClock::SyncClock(DependencyResolver* dependencyResolver, int interval)
 		: _dependencyResolver(dependencyResolver)
 		, _interval(interval)
+		, _logger(dependencyResolver->resolve<ILogger>())
 	{
 		_watch.reset();
 	}
@@ -103,7 +104,7 @@ namespace Stormancer
 
 	void SyncClock::stop()
 	{
-		auto logger = ILogger::instance();
+		auto logger = _logger;
 		logger->log(LogLevel::Trace, "synchronizedClock", "Stopping SyncClock...");
 
 		if (!compareExchange(_mutex, _isRunning, true, false))

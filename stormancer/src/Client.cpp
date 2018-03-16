@@ -57,8 +57,6 @@ namespace Stormancer
 		, _plugins(config->plugins())
 		, _config(config)
 	{
-		ILogger::setInstance(config->logger);
-
 		ConfigureContainer(this->dependencyResolver(), config);
 
 #ifdef STORMANCER_LOG_CLIENT
@@ -134,12 +132,12 @@ namespace Stormancer
 	{
 		if (!config)
 		{
-			ILogger::instance()->log(LogLevel::Error, "Client", "Provided configuration is null");
 			return nullptr;
 		}
 
 		auto client = std::shared_ptr<Client>(new Client(config), [](Client* client)
 		{
+			auto logger = client->logger();
 			client->destroy().then([=](pplx::task<void> t) {
 				try
 				{
@@ -147,7 +145,7 @@ namespace Stormancer
 				}
 				catch (const std::exception& ex)
 				{
-					ILogger::instance()->log(LogLevel::Warn, "Client", "Client destroy failed", ex.what());
+					logger->log(LogLevel::Warn, "Client", "Client destroy failed", ex.what());
 				}
 				delete client;
 			});
@@ -199,7 +197,7 @@ namespace Stormancer
 		}
 		else
 		{
-			return NullLogger::instance();
+			return nullptr;
 		}
 	}
 
@@ -439,7 +437,7 @@ namespace Stormancer
 							}
 
 							setConnectionState(state);
-						}, [](std::exception_ptr exptr) {
+						}, [=](std::exception_ptr exptr) {
 							// On error
 							try
 							{
@@ -447,7 +445,7 @@ namespace Stormancer
 							}
 							catch (const std::exception& ex)
 							{
-								ILogger::instance()->log(LogLevel::Error, "Client", "Connection state change failed", ex.what());
+								logger()->log(LogLevel::Error, "Client", "Connection state change failed", ex.what());
 							}
 						});
 
@@ -680,7 +678,7 @@ namespace Stormancer
 				}
 				catch (const std::exception& ex)
 				{
-					ILogger::instance()->log(LogLevel::Warn, "Client", "Exception thrown in client disconnection", ex.what());
+					logger()->log(LogLevel::Warn, "Client", "Exception thrown in client disconnection", ex.what());
 				}
 			});
 		}

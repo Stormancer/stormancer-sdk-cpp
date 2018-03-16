@@ -1,6 +1,7 @@
 #pragma once
 #include "stormancer/headers.h"
 #include "stormancer/Client.h"
+#include "stormancer/Logger/ILogger.h"
 
 namespace Stormancer
 {
@@ -145,6 +146,7 @@ namespace Stormancer
 		Action<GameConnectionState> _onConnectionStateChanged;
 		GameConnectionState _connectionState;
 		rxcpp::composite_subscription _connectionSubscription;
+		ILogger_ptr _logger;
 
 #pragma endregion
 	};

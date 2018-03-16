@@ -145,7 +145,7 @@ namespace Stormancer
 	pplx::task<void> GameSessionService::reset()
 	{
 		auto rpc = _scene->dependencyResolver()->resolve<RpcService>();
-		return rpc->rpcWriter("gamesession.reset", [](obytestream* _) {});
+		return rpc->rpcWriter("gamesession.reset", [](obytestream*) {});
 	}
 
 	pplx::task<void> GameSessionService::disconnect()
@@ -172,11 +172,10 @@ namespace Stormancer
 
 	}
 
-	void GameSessionManager::setToken(std::string token)
+	void GameSessionManager::setToken(std::string newToken)
 	{
 		this->currentGameSessionId = "";
-		this->token = token;
-
+		this->token = newToken;
 	}
 
 	pplx::task<Stormancer::Scene_ptr> GameSessionManager::getCurrentGameSession()

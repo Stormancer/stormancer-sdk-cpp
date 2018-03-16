@@ -57,12 +57,12 @@ namespace Stormancer
 				}
 				catch (const std::exception& ex)
 				{
-					ILogger::instance()->log(LogLevel::Trace, "RpcHelpers", "An exception occurred during the rpc response deserialization " + procedure);
+					_logger->log(LogLevel::Trace, "RpcHelpers", "An exception occurred during the rpc response deserialization " + procedure);
 					tce.set_exception(ex);
 				}
 			}, [=](std::exception_ptr error) {
 				// On error
-				ILogger::instance()->log(LogLevel::Trace, "RpcHelpers", "An exception occurred during the rpc " + procedure);
+				_logger->log(LogLevel::Trace, "RpcHelpers", "An exception occurred during the rpc " + procedure);
 				tce.set_exception(error);
 			}, [=]() {
 				// On complete
@@ -134,6 +134,7 @@ namespace Stormancer
 		Scene* _scene;
 		Serializer _serializer;
 		const std::string _rpcServerChannelIdentifier = "RPC_server";
+		ILogger_ptr _logger;
 
 #pragma endregion
 	};

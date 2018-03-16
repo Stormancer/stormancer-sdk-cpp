@@ -2,6 +2,7 @@
 
 #include "stormancer/headers.h"
 #include "stormancer/IConnectionManager.h"
+#include "stormancer/Logger/ILogger.h"
 
 namespace Stormancer
 {
@@ -9,7 +10,7 @@ namespace Stormancer
 	{
 	public:
 
-		ConnectionsRepository();
+		ConnectionsRepository(ILogger_ptr logger);
 		pplx::task<std::shared_ptr<IConnection>> addPendingConnection(uint64 id) override;
 		void newConnection(std::shared_ptr<IConnection> connection) override;
 		std::shared_ptr<IConnection> getConnection(uint64 id) override;
@@ -27,5 +28,6 @@ namespace Stormancer
 
 		std::unordered_map<uint64, std::shared_ptr<IConnection>> _connections;
 		std::unordered_map<uint64, PendingConnection> _pendingP2PConnections;
+		ILogger_ptr _logger;
 	};
 }

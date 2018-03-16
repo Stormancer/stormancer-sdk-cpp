@@ -4,6 +4,7 @@
 #include "stormancer/headers.h"
 #include "stormancer/IConnection.h"
 #include "stormancer/PacketPriority.h"
+#include "stormancer/Logger/ILogger.h"
 
 namespace Stormancer
 {
@@ -16,7 +17,7 @@ namespace Stormancer
 
 #pragma region public_methods
 
-		RakNetConnection(RakNet::RakNetGUID guid, int64 id, std::weak_ptr<RakNet::RakPeerInterface> peer);
+		RakNetConnection(RakNet::RakNetGUID guid, int64 id, std::weak_ptr<RakNet::RakPeerInterface> peer, ILogger_ptr logger);
 		~RakNetConnection();
 		uint64 id() const override;
 		time_t connectionDate() const override;
@@ -91,6 +92,7 @@ namespace Stormancer
 		ConnectionState _connectionState = ConnectionState::Disconnected;
 		rxcpp::subjects::subject<ConnectionState> _connectionStateObservable;
 		Action<std::string> _closeAction;
+		ILogger_ptr _logger;
 		
 #pragma endregion
 	};

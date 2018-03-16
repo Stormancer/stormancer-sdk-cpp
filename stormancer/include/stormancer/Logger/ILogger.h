@@ -30,11 +30,6 @@ namespace Stormancer
 
 	public:
 
-		/// Get or set the singleton logger instance.
-		/// \param logger The instance to set (optionnal).
-		/// \return Current singleton instance.
-		STORMANCER_DLL_API static std::shared_ptr<ILogger> instance();
-
 		/// Logs a simple message
 		virtual void log(const std::string& message) = 0;
 
@@ -63,12 +58,6 @@ namespace Stormancer
 		STORMANCER_DLL_API ILogger();
 
 		STORMANCER_DLL_API virtual ~ILogger();
-
-	private:
-
-		STORMANCER_DLL_API static void setInstance(std::shared_ptr<ILogger> logger = nullptr);
-
-		static std::shared_ptr<ILogger> sLogger;
 	};
 
 	using ILogger_ptr = std::shared_ptr<ILogger>;

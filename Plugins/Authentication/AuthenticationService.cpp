@@ -6,6 +6,7 @@ namespace Stormancer
 {
 	AuthenticationService::AuthenticationService(Client* client)
 		: _client(client)
+		, _logger(client->logger())
 	{
 		_connectionSubscription = client->getConnectionStateChangedObservable().subscribe([=](ConnectionState state)
 		{
@@ -20,7 +21,7 @@ namespace Stormancer
 			default:
 				break;
 			}
-		}, [](std::exception_ptr exptr) {
+		}, [=](std::exception_ptr exptr) {
 			// On error
 			try
 			{
@@ -28,7 +29,7 @@ namespace Stormancer
 			}
 			catch (const std::exception& ex)
 			{
-				ILogger::instance()->log(LogLevel::Error, "AuthenticationService", "Client connection state change failed", ex.what());
+				_logger->log(LogLevel::Error, "AuthenticationService", "Client connection state change failed", ex.what());
 			}
 		});
 	}
@@ -109,11 +110,11 @@ namespace Stormancer
 			auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
 			return rpcService->rpc<LoginResult, CreateUserParameters>(_createUserRoute, rq);
 		})
-			.then([](LoginResult loginResult)
+			.then([=](LoginResult loginResult)
 		{
 			if (!loginResult.success)
 			{
-				ILogger::instance()->log(LogLevel::Error, "AuthenticationService", "An error occured while creating an account.", loginResult.errorMsg);
+				_logger->log(LogLevel::Error, "AuthenticationService", "An error occured while creating an account.", loginResult.errorMsg);
 				throw std::runtime_error(loginResult.errorMsg);
 			}
 		});

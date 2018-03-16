@@ -6,8 +6,9 @@
 namespace Stormancer
 {
 	RpcService::RpcService(Scene* scene, std::shared_ptr<IActionDispatcher> dispatcher)
-		: _dispatcher(dispatcher),
-		_scene(scene)
+		: _dispatcher(dispatcher)
+		, _scene(scene)
+		, _logger(scene->dependencyResolver()->resolve<ILogger>())
 	{
 	}
 
@@ -44,7 +45,7 @@ namespace Stormancer
 
 			if (!relevantRoute)
 			{
-				ILogger::instance()->log(LogLevel::Error, "RpcService", "The target route does not exist on the remote host.");
+				_logger->log(LogLevel::Error, "RpcService", "The target route does not exist on the remote host.");
 				throw std::runtime_error("The target route does not exist on the remote host.");
 			}
 
@@ -53,14 +54,14 @@ namespace Stormancer
 			if (!mapContains(metadata, RpcPlugin::pluginName))
 			{
 				auto errorMsg = std::string() + "The target remote route '" + route + "' is not an RPC route.";
-				ILogger::instance()->log(LogLevel::Error, "RpcService", errorMsg, route);
+				_logger->log(LogLevel::Error, "RpcService", errorMsg, route);
 				throw std::runtime_error(errorMsg);
 			}
 			
 			if (metadata[RpcPlugin::pluginName] != RpcPlugin::version)
 			{
 				auto errorMsg = std::string() + "The target remote route '" + route + "' does not support the plugin RPC version " + RpcPlugin::version;
-				ILogger::instance()->log(LogLevel::Error, "RpcService", errorMsg.c_str(), route);
+				_logger->log(LogLevel::Error, "RpcService", errorMsg.c_str(), route);
 				throw std::runtime_error(errorMsg);
 			}
 
@@ -86,7 +87,7 @@ namespace Stormancer
 			catch (std::exception& ex)
 			{
 				subscriber.on_error(std::make_exception_ptr(ex));
-				ILogger::instance()->log(LogLevel::Error, "RpcService", ("Failed to send rpc packet on route " + route).c_str(), ex.what());
+				_logger->log(LogLevel::Error, "RpcService", ("Failed to send rpc packet on route " + route).c_str(), ex.what());
 				return;
 			}
 
@@ -95,7 +96,7 @@ namespace Stormancer
 				{
 #ifdef STORMANCER_LOG_RPC
 					auto idStr = std::to_string(request->id);
-					ILogger::instance()->log(LogLevel::Trace, "RpcService", "Cancel RPC", idStr.c_str());
+					_logger->log(LogLevel::Trace, "RpcService", "Cancel RPC", idStr.c_str());
 #endif
 					if (_scene && _scene->getCurrentConnectionState() == ConnectionState::Connected)
 					{
@@ -108,7 +109,7 @@ namespace Stormancer
 						}
 						catch (std::exception& e)
 						{
-							ILogger::instance()->log(LogLevel::Error, "RpcService", "Failed to send rpc cancellation packet", e.what());
+							_logger->log(LogLevel::Error, "RpcService", "Failed to send rpc cancellation packet", e.what());
 						}
 					}
 					eraseRequest(request->id);
@@ -191,7 +192,7 @@ namespace Stormancer
 		catch (const std::exception& ex)
 		{
 			std::runtime_error e2(ex.what() + std::string("\nFailed to add procedure on the scene."));
-			ILogger::instance()->log(e2);
+			_logger->log(e2);
 			throw e2;
 		}
 	}
@@ -213,7 +214,7 @@ namespace Stormancer
 			{
 #ifdef STORMANCER_LOG_RPC
 				auto idStr = std::to_string(id);
-				ILogger::instance()->log(LogLevel::Trace, "RpcService", "Create RPC", idStr.c_str());
+				_logger->log(LogLevel::Trace, "RpcService", "Create RPC", idStr.c_str());
 #endif
 				return id;
 				break;
@@ -241,7 +242,7 @@ namespace Stormancer
 		if (!request)
 		{
 			auto idstr = std::to_string(id);
-			ILogger::instance()->log(LogLevel::Warn, "RpcService", "Pending RPC request not found", idstr.c_str());
+			_logger->log(LogLevel::Warn, "RpcService", "Pending RPC request not found", idstr.c_str());
 		}
 
 		return request;
@@ -251,7 +252,7 @@ namespace Stormancer
 	{
 		std::lock_guard<std::mutex> lock(_pendingRequestsMutex);
 #ifdef STORMANCER_LOG_RPC
-		ILogger::instance()->log(LogLevel::Trace, "RpcService", "Erase RPC", std::to_string(requestId));
+		_logger->log(LogLevel::Trace, "RpcService", "Erase RPC", std::to_string(requestId));
 #endif
 		_pendingRequests.erase(requestId);
 	}
@@ -263,7 +264,7 @@ namespace Stormancer
 		{
 #ifdef STORMANCER_LOG_RPC
 			auto idstr = std::to_string(request->id);
-			ILogger::instance()->log(LogLevel::Trace, "RpcService", "RPC next", idstr.c_str());
+			_logger->log(LogLevel::Trace, "RpcService", "RPC next", idstr.c_str());
 #endif
 			request->observer.on_next(packet);
 			if (!request->task.is_done())
@@ -280,7 +281,7 @@ namespace Stormancer
 		{
 #ifdef STORMANCER_LOG_RPC
 			auto idstr = std::to_string(request->id);
-			ILogger::instance()->log(LogLevel::Trace, "RpcService", "RPC error", idstr.c_str());
+			_logger->log(LogLevel::Trace, "RpcService", "RPC error", idstr.c_str());
 #endif
 			request->hasCompleted = true;
 
@@ -303,9 +304,9 @@ namespace Stormancer
 		{
 #ifdef STORMANCER_LOG_RPC
 			auto idstr = std::to_string(request->id);
-			ILogger::instance()->log(LogLevel::Trace, "RpcService", "RPC complete", idstr.c_str());
+			_logger->log(LogLevel::Trace, "RpcService", "RPC complete", idstr.c_str());
 			std::string messageSentStr = std::string() + "messageSent == " + (messageSent ? "true" : "false");
-			ILogger::instance()->log(LogLevel::Trace, "RpcService", messageSentStr.c_str(), idstr.c_str());
+			_logger->log(LogLevel::Trace, "RpcService", messageSentStr.c_str(), idstr.c_str());
 #endif
 			request->hasCompleted = true;
 			if (!messageSent)
@@ -330,7 +331,7 @@ namespace Stormancer
 
 #ifdef STORMANCER_LOG_RPC
 		auto idstr = std::to_string(id);
-		ILogger::instance()->log(LogLevel::Trace, "RpcService", "cancel RPC", idstr.c_str());
+		_logger->log(LogLevel::Trace, "RpcService", "cancel RPC", idstr.c_str());
 #endif
 		{
 			std::lock_guard<std::mutex> lock(_pendingRequestsMutex);
@@ -396,7 +397,7 @@ namespace Stormancer
 			}
 			catch (const std::exception& ex)
 			{
-				ILogger::instance()->log(LogLevel::Warn, "RpcHelpers", "An exception occurred during the rpc '" + procedure + "'", ex.what());
+				_logger->log(LogLevel::Warn, "RpcHelpers", "An exception occurred during the rpc '" + procedure + "'", ex.what());
 				tce.set_exception(ex);
 			}
 		}, [=]() {

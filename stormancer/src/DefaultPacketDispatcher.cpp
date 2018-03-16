@@ -4,8 +4,9 @@
 
 namespace Stormancer
 {
-	DefaultPacketDispatcher::DefaultPacketDispatcher(bool asyncDispatch)
+	DefaultPacketDispatcher::DefaultPacketDispatcher(ILogger_ptr logger, bool asyncDispatch)
 		: _asyncDispatch(asyncDispatch)
+		, _logger(logger)
 	{
 	}
 
@@ -30,14 +31,14 @@ namespace Stormancer
 		{
 			pplx::create_task([=]() {
 				dispatchImpl(packet);
-			}).then([](pplx::task<void> t) {
+			}).then([=](pplx::task<void> t) {
 				try
 				{
 					t.wait();
 				}
 				catch (const std::exception& ex)
 				{
-					ILogger::instance()->log(LogLevel::Error, "client.dispatchPacket", "Exception unhandled in dispatchPacketImpl :" + std::string(ex.what()));
+					_logger->log(LogLevel::Error, "client.dispatchPacket", "Exception unhandled in dispatchPacketImpl :" + std::string(ex.what()));
 					throw ex;
 				}
 			});

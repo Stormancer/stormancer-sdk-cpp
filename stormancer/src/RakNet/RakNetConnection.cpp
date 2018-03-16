@@ -5,16 +5,17 @@
 
 namespace Stormancer
 {
-	RakNetConnection::RakNetConnection(RakNet::RakNetGUID guid, int64 id, std::weak_ptr<RakNet::RakPeerInterface> peer)
+	RakNetConnection::RakNetConnection(RakNet::RakNetGUID guid, int64 id, std::weak_ptr<RakNet::RakPeerInterface> peer, ILogger_ptr logger)
 		: _id(id)
 		, _peer(peer)
 		, _guid(guid)
 		, _lastActivityDate(nowTime_t())
+		, _logger(logger)
 	{
 		_connectionStateObservable.get_observable().subscribe([=](ConnectionState state) {
 			// On next
 			_connectionState = state;
-		}, [](std::exception_ptr exptr) {
+		}, [=](std::exception_ptr exptr) {
 			// On error
 			try
 			{
@@ -22,7 +23,7 @@ namespace Stormancer
 			}
 			catch (const std::exception& ex)
 			{
-				ILogger::instance()->log(LogLevel::Error, "RakNetConnection", "Connection state change failed", ex.what());
+				_logger->log(LogLevel::Error, "RakNetConnection", "Connection state change failed", ex.what());
 			}
 		});
 	}
@@ -137,7 +138,7 @@ namespace Stormancer
 
 #if defined(STORMANCER_LOG_PACKETS) || defined(STORMANCER_LOG_RAKNET_PACKETS)
 		auto bytes2 = stringifyBytesArray(stream.bytes(), true);
-		ILogger::instance()->log(LogLevel::Trace, "RakNetConnection", "Send packet to scene", bytes2.c_str());
+		_logger->log(LogLevel::Trace, "RakNetConnection", "Send packet to scene", bytes2.c_str());
 #endif
 
 		auto peer = _peer.lock();

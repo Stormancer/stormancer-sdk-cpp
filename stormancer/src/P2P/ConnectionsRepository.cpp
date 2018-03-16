@@ -4,7 +4,8 @@
 
 namespace Stormancer
 {
-	ConnectionsRepository::ConnectionsRepository()
+	ConnectionsRepository::ConnectionsRepository(ILogger_ptr logger)
+		: _logger(logger)
 	{
 	}
 
@@ -15,13 +16,13 @@ namespace Stormancer
 		pc.id = id;
 		pc.tce = tce;
 		_pendingP2PConnections[id] = pc;
-		ILogger::instance()->log(LogLevel::Info, "P2P", "Added pending connection from id ", std::to_string(id));
+		_logger->log(LogLevel::Info, "P2P", "Added pending connection from id ", std::to_string(id));
 		return pplx::create_task(tce);
 	}
 
 	void ConnectionsRepository::newConnection(std::shared_ptr<IConnection> connection)
 	{
-		ILogger::instance()->log(LogLevel::Trace, "P2P", "Adding connection " + connection->ipAddress(), std::to_string(connection->id()));
+		_logger->log(LogLevel::Trace, "P2P", "Adding connection " + connection->ipAddress(), std::to_string(connection->id()));
 		if (connection == nullptr)
 		{
 			throw std::runtime_error("connection is null");
@@ -46,13 +47,13 @@ namespace Stormancer
 					}
 				});
 
-				ILogger::instance()->log(LogLevel::Info, "P2P", "Transitioning connection from pending", std::to_string(connection->id()));
+				_logger->log(LogLevel::Info, "P2P", "Transitioning connection from pending", std::to_string(connection->id()));
 				pc.tce.set(connection);
 			}
 			else
 			{
 				_connections[connection->id()] = connection;
-				ILogger::instance()->log(LogLevel::Info, "P2P", "Added connection without pending, id", std::to_string(connection->id()));
+				_logger->log(LogLevel::Info, "P2P", "Added connection without pending, id", std::to_string(connection->id()));
 			}
 		}
 		else
@@ -66,7 +67,7 @@ namespace Stormancer
 		auto it = _connections.find(id);
 		if (it == _connections.end())
 		{
-			ILogger::instance()->log(LogLevel::Error, "P2P", "Connection not found, id", std::to_string(id));
+			_logger->log(LogLevel::Error, "P2P", "Connection not found, id", std::to_string(id));
 			return std::shared_ptr<IConnection>();
 		}
 		else

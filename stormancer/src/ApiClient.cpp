@@ -98,7 +98,7 @@ namespace Stormancer
 			catch (const std::exception& ex)
 			{
 				auto msgStr = "Can't reach the server endpoint. " + baseUri;
-				ILogger::instance()->log(LogLevel::Warn, "ApiClient", msgStr, ex.what());
+				_logger->log(LogLevel::Warn, "ApiClient", msgStr, ex.what());
 				(*errors).push_back("[" + msgStr + ":" + ex.what() + "]");
 				return getSceneEndpointImpl(endpoints, errors, accountId, applicationName, sceneId);
 			}
@@ -107,11 +107,11 @@ namespace Stormancer
 			{
 				uint16 statusCode = response.status_code();
 				auto msgStr = "HTTP request on '" + baseUri + "' returned status code " + std::to_string(statusCode);
-				ILogger::instance()->log(LogLevel::Trace, "ApiClient", msgStr);
+				_logger->log(LogLevel::Trace, "ApiClient", msgStr);
 				concurrency::streams::stringstreambuf ss;
 				return response.body().read_to_end(ss).then([=](size_t) {
 					std::string responseText = ss.collection();
-					ILogger::instance()->log(LogLevel::Trace, "ApiClient", "Response", responseText);
+					_logger->log(LogLevel::Trace, "ApiClient", "Response", responseText);
 
 					if (ensureSuccessStatusCode(statusCode))
 					{

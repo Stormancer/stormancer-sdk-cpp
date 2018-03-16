@@ -3,6 +3,7 @@
 #include "stormancer/headers.h"
 #include "stormancer/ITokenHandler.h"
 #include "stormancer/Serializer.h"
+#include "stormancer/Logger/ILogger.h"
 
 namespace Stormancer
 {
@@ -13,7 +14,7 @@ namespace Stormancer
 
 #pragma region public_methods
 
-		TokenHandler();
+		TokenHandler(ILogger_ptr logger);
 		virtual ~TokenHandler();
 		SceneEndpoint decodeToken(const std::string& token);
 
@@ -22,6 +23,7 @@ namespace Stormancer
 #pragma region private_members
 
 		Serializer _serializer;
+		ILogger_ptr _logger;
 
 #pragma endregion
 	};

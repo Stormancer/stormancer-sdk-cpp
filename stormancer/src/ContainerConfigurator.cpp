@@ -17,8 +17,8 @@ void Stormancer::ConfigureContainer(DependencyResolver* dr, Configuration_ptr co
 	dr->registerDependency<Configuration>(config);
 	dr->registerDependency<ILogger>(config->logger);
 
-	dr->registerDependency<ITokenHandler>([](DependencyResolver*) {
-		return std::make_shared<TokenHandler>();
+	dr->registerDependency<ITokenHandler>([](DependencyResolver* dr) {
+		return std::make_shared<TokenHandler>(dr->resolve<ILogger>());
 	});
 
 	dr->registerDependency<ApiClient>([=](DependencyResolver* resolver) {
@@ -60,8 +60,8 @@ void Stormancer::ConfigureContainer(DependencyResolver* dr, Configuration_ptr co
 		return dispatcher;
 	}, true);
 
-	dr->registerDependency<IConnectionManager>([](DependencyResolver*) {
-		return std::make_shared<ConnectionsRepository>();
+	dr->registerDependency<IConnectionManager>([](DependencyResolver* dr) {
+		return std::make_shared<ConnectionsRepository>(dr->resolve<ILogger>());
 	}, true);
 
 	dr->registerDependency<P2PSessions>([](DependencyResolver* dr) {

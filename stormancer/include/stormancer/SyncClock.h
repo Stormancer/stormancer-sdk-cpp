@@ -4,6 +4,7 @@
 #include "stormancer/DependencyResolver.h"
 #include "stormancer/IConnection.h"
 #include "stormancer/Watch.h"
+#include "stormancer/Logger/ILogger.h"
 
 namespace Stormancer
 {
@@ -44,5 +45,6 @@ namespace Stormancer
 		double _medianLatency = 0;
 		double _standardDeviationLatency = 0;
 		double _offset = 0;
+		ILogger_ptr _logger;
 	};
 };

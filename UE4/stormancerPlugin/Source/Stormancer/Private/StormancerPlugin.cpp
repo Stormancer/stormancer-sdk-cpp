@@ -83,6 +83,7 @@ std::shared_ptr<Stormancer::Client> FStormancerPlugin::CreateClient(std::string 
 	{
 		auto config = Stormancer::Configuration::create(endpoint, account, application);
 		config->actionDispatcher = std::make_shared<FStormancerTickDispatcher>();
+		config->logger = std::make_shared<Stormancer::FStormancerLogger>();
 
 		_Client = Stormancer::Client::create(config);
 	}

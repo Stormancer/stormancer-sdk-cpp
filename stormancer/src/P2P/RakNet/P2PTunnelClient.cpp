@@ -6,8 +6,11 @@ namespace Stormancer
 	// Use this intermediate variable to avoid "string literal to char* conversion" warning
 	static char address[] = "127.0.0.1";
 
-	P2PTunnelClient::P2PTunnelClient(std::function<void(P2PTunnelClient*, RakNet::RNS2RecvStruct*)> onMsgRecv, std::shared_ptr<RequestProcessor> sysCall)
+	P2PTunnelClient::P2PTunnelClient(std::function<void(P2PTunnelClient*, RakNet::RNS2RecvStruct*)> onMsgRecv,
+		std::shared_ptr<RequestProcessor> sysCall,
+		ILogger_ptr logger)
 		: _sysCall(sysCall)
+		, _logger(logger)
 	{
 		_onMsgRecv = onMsgRecv;
 		hostPort = 0;
@@ -41,7 +44,7 @@ namespace Stormancer
 			RakNet::RakNetSocket2Allocator::DeallocRNS2(socket);
 			throw std::runtime_error("Failed to send test message");
 		}
-		((RakNet::RNS2_Berkley*)socket)->CreateRecvPollingThread(0).then([](pplx::task<void> task)
+		((RakNet::RNS2_Berkley*)socket)->CreateRecvPollingThread(0).then([this](pplx::task<void> task)
 		{
 			try
 			{
@@ -49,7 +52,7 @@ namespace Stormancer
 			}
 			catch (const std::exception& ex)
 			{
-				ILogger::instance()->log(LogLevel::Error, "P2PTunnelClient", "An exception occured in raknet polling thread", ex.what());
+				_logger->log(LogLevel::Error, "P2PTunnelClient", "An exception occured in raknet polling thread", ex.what());
 			}
 		});
 		isRunning = true;

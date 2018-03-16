@@ -1,6 +1,6 @@
 #pragma once
 #include "Tickable.h"
-#include "IActionDispatcher.h"
+#include "stormancer/IActionDispatcher.h"
 
 class FStormancerTickDispatcher : public FTickableGameObject, public Stormancer::MainThreadActionDispatcher
 {

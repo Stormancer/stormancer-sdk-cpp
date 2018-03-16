@@ -99,7 +99,7 @@ namespace Stormancer
 			else
 			{
 				std::string idstr = std::to_string(id);
-				ILogger::instance()->log(LogLevel::Warn, "RequestProcessor/next", "Unknow request id. " + idstr);
+				_logger->log(LogLevel::Warn, "RequestProcessor/next", "Unknow request id. " + idstr);
 			}
 
 			return true;
@@ -127,7 +127,7 @@ namespace Stormancer
 				}
 				else
 				{
-					ILogger::instance()->log(LogLevel::Warn, "RequestProcessor/complete", "Unknow request id " + to_string(id));
+					_logger->log(LogLevel::Warn, "RequestProcessor/complete", "Unknow request id " + to_string(id));
 				}
 			}
 
@@ -152,7 +152,7 @@ namespace Stormancer
 			}
 			else
 			{
-				ILogger::instance()->log(LogLevel::Warn, "RequestProcessor/error", "Unknown request id :" + to_string(id));
+				_logger->log(LogLevel::Warn, "RequestProcessor/error", "Unknown request id :" + to_string(id));
 			}
 
 			return true;

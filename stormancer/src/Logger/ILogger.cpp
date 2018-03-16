@@ -4,17 +4,6 @@
 
 namespace Stormancer
 {
-	std::shared_ptr<ILogger> ILogger::sLogger;
-
-	std::shared_ptr<ILogger> ILogger::instance()
-	{
-		return sLogger;
-	}
-
-	void ILogger::setInstance(std::shared_ptr<ILogger> logger)
-	{
-		sLogger = logger;
-	}
 
 	ILogger::ILogger()
 	{

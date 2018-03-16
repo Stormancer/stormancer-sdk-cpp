@@ -24,10 +24,15 @@ You can either use a pre-built Stormancer release, or build Stormancer yourself 
 ### Steps common to both methods
 
 - Inside your project's build configuration file (`MyProject/Source/MyProject/MyProject.Build.cs`), add a dependency to the `StormancerPlugin` module.
-Also, as Stormancer needs exceptions and RTTI, you need to add these two lines to the build file's constructor:
+Also, as Stormancer needs exceptions and RTTI, you need to add these two lines to your Build.cs file's constructor:
 ```
-bEnableExceptions = true;
-bUseRTTI = true;
+public MyProject(TargetInfo target)
+{
+	// ...
+	bEnableExceptions = true;
+	bUseRTTI = true;
+	// ...
+}
 ```
 
 - The plugin will be built and added to your project next time you load the project in the Unreal Editor, or the next time you build your game.

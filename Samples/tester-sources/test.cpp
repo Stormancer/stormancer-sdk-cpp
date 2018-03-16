@@ -170,7 +170,7 @@ namespace Stormancer
 				}
 				catch (const std::exception& ex)
 				{
-					ILogger::instance()->log(LogLevel::Error, "Test", "Client connection state change failed", ex.what());
+					logger->log(LogLevel::Error, "Test", "Client connection state change failed", ex.what());
 				}
 			});
 
@@ -190,7 +190,7 @@ namespace Stormancer
 					}
 					catch (const std::exception& ex)
 					{
-						ILogger::instance()->log(LogLevel::Error, "Test", "Scene connection state change failed", ex.what());
+						logger->log(LogLevel::Error, "Test", "Scene connection state change failed", ex.what());
 					}
 				});
 
