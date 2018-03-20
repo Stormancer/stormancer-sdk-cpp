@@ -9,6 +9,7 @@ namespace Stormancer
 {
 	ConsoleLogger::ConsoleLogger(LogLevel maximalLogLevel)
 		: _maximalLogLevel(maximalLogLevel)
+		, _useBlueBackgroundColor(false)
 	{
 	}
 
@@ -18,7 +19,7 @@ namespace Stormancer
 
 	void ConsoleLogger::log(const std::string& message)
 	{
-		log(Stormancer::LogLevel::Debug, "None", message);
+		log(Stormancer::LogLevel::Debug, "", message);
 	}
 
 	void ConsoleLogger::log(LogLevel level, const std::string& category, const std::string& message, const std::string& data)
@@ -85,37 +86,37 @@ namespace Stormancer
 
 	void ConsoleLogger::setConsoleColorWhite()
 	{
-		setConsoleColor(31);
+		setConsoleColor(_useBlueBackgroundColor ? 31 : 15);
 	}
 
 	void ConsoleLogger::setConsoleColorGrey()
 	{
-		setConsoleColor(24);
+		setConsoleColor(_useBlueBackgroundColor ? 24 : 8);
 	}
 
 	void ConsoleLogger::setConsoleColorGreen()
 	{
-		setConsoleColor(26);
+		setConsoleColor(_useBlueBackgroundColor ? 26 : 10);
 	}
 
 	void ConsoleLogger::setConsoleColorRed()
 	{
-		setConsoleColor(28);
+		setConsoleColor(_useBlueBackgroundColor ? 28 : 12);
 	}
 
 	void ConsoleLogger::setConsoleColorBlue()
 	{
-		setConsoleColor(27);
+		setConsoleColor(_useBlueBackgroundColor ? 27 : 11);
+	}
+
+	void ConsoleLogger::setConsoleColorYellow()
+	{
+		setConsoleColor(_useBlueBackgroundColor ? 30 : 14);
 	}
 
 	void ConsoleLogger::setConsoleColorDarkRed()
 	{
 		setConsoleColor(79);
-	}
-
-	void ConsoleLogger::setConsoleColorYellow()
-	{
-		setConsoleColor(30);
 	}
 }
 

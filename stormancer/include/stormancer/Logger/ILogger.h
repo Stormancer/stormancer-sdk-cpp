@@ -24,7 +24,7 @@ namespace Stormancer
 	class Client;
 
 	/// Interface for the loggers.
-	class ILogger
+	class STORMANCER_DLL_API ILogger
 	{
 		friend class Client;
 
@@ -46,18 +46,18 @@ namespace Stormancer
 		/// \param message The message of the log.
 		/// \param data Some additional data.
 		/// \return The formatted message.
-		STORMANCER_DLL_API static std::string format(LogLevel level, const std::string& category, const std::string& message, const std::string& data = "");
+		static std::string format(LogLevel level, const std::string& category, const std::string& message, const std::string& data = "");
 
 		/// A basic format of an exception.
 		/// \param e The exception.
 		/// \return The formatted message.
-		STORMANCER_DLL_API static std::string formatException(const std::exception& ex);
+		static std::string formatException(const std::exception& ex);
 
 	protected:
 
-		STORMANCER_DLL_API ILogger();
+		ILogger();
 
-		STORMANCER_DLL_API virtual ~ILogger();
+		virtual ~ILogger();
 	};
 
 	using ILogger_ptr = std::shared_ptr<ILogger>;

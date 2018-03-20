@@ -19,15 +19,15 @@ namespace Stormancer
 		void log(LogLevel level, const std::string& category, const std::string& message, const std::string& data = "") override;
 		void log(const std::exception& ex) override;
 
-		static void setConsoleColor(WORD color);
-		static void resetColor();
-		static void setConsoleColorWhite();
-		static void setConsoleColorGrey();
-		static void setConsoleColorGreen();
-		static void setConsoleColorRed();
-		static void setConsoleColorBlue();
-		static void setConsoleColorDarkRed();
-		static void setConsoleColorYellow();
+		void setConsoleColor(WORD color);
+		void resetColor();
+		void setConsoleColorWhite();
+		void setConsoleColorGrey();
+		void setConsoleColorGreen();
+		void setConsoleColorRed();
+		void setConsoleColorBlue();
+		void setConsoleColorYellow();
+		void setConsoleColorDarkRed();
 
 #pragma endregion
 
@@ -37,6 +37,7 @@ namespace Stormancer
 
 		std::mutex _mutex;
 		LogLevel _maximalLogLevel = LogLevel::Trace;
+		bool _useBlueBackgroundColor = false;
 
 #pragma endregion
 	};
