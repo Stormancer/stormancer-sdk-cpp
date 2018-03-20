@@ -9,7 +9,6 @@
 #include "stormancer/SceneInfosRequestDto.h"
 #include "stormancer/SystemRequestIDTypes.h"
 #include "stormancer/ConnectToSceneMsg.h"
-#include "stormancer/DisconnectFromSceneDto.h"
 #include "stormancer/P2P/P2PRequestModule.h"
 
 

@@ -27,18 +27,16 @@ namespace Stormancer
 		return ss.str();
 	}
 
-	std::vector<std::string> stringSplit(const std::string& str, const std::string& separator)
+	std::vector<std::string> stringSplit(const std::string& str, char separator)
 	{
-		std::vector<std::string> splitted;
-		size_t cursor = 0, lastCursor = 0;
-		while ((cursor = str.find(separator, cursor)) != std::string::npos)
+		std::vector<std::string> tokens;
+		std::string token;
+		std::istringstream tokenStream(str);
+		while (std::getline(tokenStream, token, separator))
 		{
-			splitted << str.substr(lastCursor, cursor - lastCursor);
-			lastCursor = cursor;
-			cursor++;
+			tokens.push_back(token);
 		}
-		splitted << str.substr(lastCursor + 1, str.length() - lastCursor);
-		return splitted;
+		return tokens;
 	}
 
 	std::string stringTrim(const std::string& str2, char ch)

@@ -107,7 +107,7 @@ namespace Stormancer
 	/// \param glue A glue string. Default is an empty string.
 	std::string vectorJoin(const std::vector<std::string>& vector, const std::string& glue = "");
 
-	std::vector<std::string> stringSplit(const std::string& str, const std::string& separator);
+	std::vector<std::string> stringSplit(const std::string& str, char separator);
 
 	std::string stringTrim(const std::string& str, char ch = ' ');
 

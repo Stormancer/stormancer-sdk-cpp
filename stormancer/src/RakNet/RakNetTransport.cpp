@@ -433,7 +433,7 @@ namespace Stormancer
 
 		auto rq = _pendingConnections.front();
 		auto endpoint = rq.endpoint;
-		auto split = stringSplit(endpoint, ":");
+		auto split = stringSplit(endpoint, ':');
 		auto tce = rq.tce;
 		if (split.size() < 2)
 		{
@@ -611,7 +611,7 @@ namespace Stormancer
 	bool RakNetTransport::sendPingImpl(const std::string& address)
 	{
 
-		auto els = stringSplit(address, ":");
+		auto els = stringSplit(address, ':');
 
 
 
@@ -685,7 +685,7 @@ namespace Stormancer
 
 	void RakNetTransport::openNat(const std::string& address)
 	{
-		auto els = stringSplit(address, ":");
+		auto els = stringSplit(address, ':');
 		this->_peer->SendTTL(els[0].c_str(), (uint16)std::stoi(els[1]), 3);
 	}
 

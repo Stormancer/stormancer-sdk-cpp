@@ -23,7 +23,7 @@ namespace Stormancer
 		}
 
 		auto token = stringTrim(token2, '"');
-		auto data = stringSplit(token, "-")[0];
+		auto data = stringSplit(token, '-')[0];
 		utility::string_t data2(data.begin(), data.end());
 		auto vectorData = utility::conversions::from_base64(data2);
 

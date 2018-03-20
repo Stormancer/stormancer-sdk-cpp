@@ -36,7 +36,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\DefaultPacketDispatcher.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\DefaultScheduler.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\DependencyResolver.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\DisconnectFromSceneDto.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\headers.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\Helpers.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\IActionDispatcher.h" />
