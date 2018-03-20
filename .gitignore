@@ -212,3 +212,5 @@ xcuserdata/
 /ARM/Release
 Release
 *.self
+
+*.a
