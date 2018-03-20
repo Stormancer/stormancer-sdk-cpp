@@ -255,7 +255,7 @@ namespace Stormancer
 			return _scenes[sceneId].task;
 		}
 
-		return pplx::task_from_exception<Scene_ptr>(std::runtime_error("Client isn't connected to scene id" + sceneId));
+		return pplx::task_from_result<Scene_ptr>(nullptr);
 	}
 
 	std::vector<std::string> Client::getSceneIds()
@@ -715,7 +715,7 @@ namespace Stormancer
 
 		_dependencyResolver->resolve<SceneDispatcher>()->removeScene(sceneHandle);
 
-		return sendSystemRequest<DisconnectFromSceneDto, void>((byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, DisconnectFromSceneDto { sceneHandle }).then([=](pplx::task<void> t) {
+		return sendSystemRequest<byte, void>((byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, sceneHandle).then([=](pplx::task<void> t) {
 			try
 			{
 				t.get();
