@@ -43,10 +43,10 @@ namespace Stormancer
 
 	struct MatchmakingResponse
 	{
+		std::string gameHost;
 		std::string gameId;
 		std::vector<Player> team1;
 		std::vector<Player> team2;
-		std::string gameHost;
 		std::vector<std::string> optionalParameters;
 
 		MSGPACK_DEFINE_ARRAY(gameHost, gameId, team1, team2, optionalParameters);

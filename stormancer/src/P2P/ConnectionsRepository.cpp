@@ -67,7 +67,6 @@ namespace Stormancer
 		auto it = _connections.find(id);
 		if (it == _connections.end())
 		{
-			_logger->log(LogLevel::Error, "P2P", "Connection not found, id", std::to_string(id));
 			return std::shared_ptr<IConnection>();
 		}
 		else

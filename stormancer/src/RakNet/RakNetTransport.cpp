@@ -604,19 +604,28 @@ namespace Stormancer
 		auto boundAddress = _peer->GetMyBoundAddress(0);
 		return boundAddress.GetPort();
 	}
+
 	pplx::task<int> RakNetTransport::sendPing(const std::string& address)
 	{
 		return this->sendPing(address, 4);
 	}
+
 	bool RakNetTransport::sendPingImpl(const std::string& address)
 	{
-
 		auto els = stringSplit(address, ':');
-
-
+		assert(els.size() >= 2);
 
 		auto port = (uint16)std::atoi(els[1].c_str());
-		return _peer->Ping(els[0].c_str(), port, false);
+
+		if (_peer)
+		{
+			return _peer->Ping(els[0].c_str(), port, false);
+		}
+		else
+		{
+			// ping fails: no peer to perform the ping!
+			return false;
+		}
 
 		/*auto p2 = RakNet::RakPeerInterface::GetInstance();
 		p2->Startup(10, new RakNet::SocketDescriptor(), 1);
@@ -675,12 +684,7 @@ namespace Stormancer
 				this->_logger->log(LogLevel::Debug, "RakNetTransport", "Ping to " + address + " failed", ex.what());
 				return -1;
 			}
-
 		});
-
-
-
-
 	}
 
 	void RakNetTransport::openNat(const std::string& address)

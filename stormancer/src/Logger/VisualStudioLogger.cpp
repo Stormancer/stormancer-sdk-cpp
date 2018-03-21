@@ -2,11 +2,6 @@
 #include "stormancer/Logger/VisualStudioLogger.h"
 #include <locale>
 
-namespace
-{
-	std::wstring_convert<std::codecvt<wchar_t, char, std::mbstate_t> > wcharConverter;
-}
-
 namespace Stormancer
 {
 	VisualStudioLogger::VisualStudioLogger(Stormancer::LogLevel maximalLogLevel)
@@ -20,7 +15,7 @@ namespace Stormancer
 
 	void VisualStudioLogger::log(const std::string& message)
 	{
-		log(Stormancer::LogLevel::Info, "None", message, "");
+		log(Stormancer::LogLevel::Info, "", message, "");
 	}
 
 	void VisualStudioLogger::log(Stormancer::LogLevel level, const std::string& category, const std::string& message, const std::string& data)
@@ -31,21 +26,21 @@ namespace Stormancer
 		}
 		std::string message2 = format(level, category, message, data) + "\n";
 
-		_mutex.lock();
+		{
+			std::lock_guard<std::mutex> lg(_mutex);
 
-		OutputDebugString(wcharConverter.from_bytes(message2).c_str());
-
-		_mutex.unlock();
+			OutputDebugStringA(message2.c_str());
+		}
 	}
 
-	void VisualStudioLogger::log(const std::exception& e)
+	void VisualStudioLogger::log(const std::exception& ex)
 	{
-		_mutex.lock();
+		std::string msg = formatException(ex) + "\n";
 
-		std::string msg(formatException(e));
-		msg += "\n";
+		{
+			std::lock_guard<std::mutex> lg(_mutex);
 
-		OutputDebugString(wcharConverter.from_bytes(msg).c_str());
-		_mutex.unlock();
+			OutputDebugStringA(msg.c_str());
+		}
 	}
 }

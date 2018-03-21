@@ -4,8 +4,6 @@
 
 namespace Stormancer
 {
-
-
 	GameSessionService::GameSessionService(Scene_ptr scene) :
 		_onShutdownReceived([]() {})
 	{
@@ -36,6 +34,10 @@ namespace Stormancer
 			this->_onConnectedPlayersChanged(SessionPlayerUpdateArg(player, update.Data));
 		});
 
+		_scene->addRoute("players.allReady", [=](Packetisp_ptr packet) {
+			_onAllPlayerReady();
+		});
+
 		_scene->addRoute("player.p2ptoken", [this](Packetisp_ptr packet) {
 			auto p2pToken = packet->readObject<std::string>();
 			if (p2pToken.empty()) //host
@@ -56,6 +58,7 @@ namespace Stormancer
 					{
 						return p2pPeer->openP2PTunnel(GAMESESSION_P2P_SERVER_ID).then([this](std::shared_ptr<Stormancer::P2PTunnel> guestTunnel)
 						{
+							_tunnel = guestTunnel;
 							if (_onTunnelOpened)
 							{
 								_onTunnelOpened(guestTunnel);
@@ -137,6 +140,11 @@ namespace Stormancer
 		_onConnectionFailure += callback;
 	}
 
+	void GameSessionService::OnAllPlayerReady(std::function<void(void)> callback)
+	{
+		_onAllPlayerReady += callback;
+	}
+
 	pplx::task<void> GameSessionService::connect()
 	{
 		return _scene->connect();
@@ -167,26 +175,26 @@ namespace Stormancer
 		});
 	}
 
-	GameSessionManager::GameSessionManager(Client* client) :client(client)
+	GameSessionManager::GameSessionManager(Client* client)
+		: _client(client)
 	{
-
 	}
 
-	void GameSessionManager::setToken(std::string newToken)
+	void GameSessionManager::setToken(std::string token)
 	{
 		this->currentGameSessionId = "";
-		this->token = newToken;
+		this->_token = token;
 	}
 
 	pplx::task<Stormancer::Scene_ptr> GameSessionManager::getCurrentGameSession()
 	{
 		if (this->currentGameSessionId.empty())
 		{
-			return this->client->getConnectedScene(this->currentGameSessionId);
+			return this->_client->getConnectedScene(this->currentGameSessionId);
 		}
 		else
 		{
-			return this->client->getPrivateScene(this->token).then([this](pplx::task<Scene_ptr> t) {
+			return this->_client->getPrivateScene(this->_token).then([this](pplx::task<Scene_ptr> t) {
 				auto scene = t.get();
 				this->currentGameSessionId = scene->id();
 				return scene;

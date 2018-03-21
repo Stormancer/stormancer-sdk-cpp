@@ -92,8 +92,8 @@ namespace Stormancer
 		pplx::task<Scene_ptr> getCurrentGameSession();
 
 	private:
-		std::string token;
-		Client* client;
+		std::string _token;
+		Client* _client;
 	};
 
 	class GameSessionService
@@ -127,6 +127,8 @@ namespace Stormancer
 
 		void OnConnectionFailure(std::function<void(std::string)> callback);
 
+		void OnAllPlayerReady(std::function<void(void)> callback);
+
 		template<typename TOut, typename TIn>
 		pplx::task<TOut> sendGameResults(TIn results)
 		{
@@ -154,6 +156,7 @@ namespace Stormancer
 		Action<SessionPlayerUpdateArg> _onConnectedPlayersChanged;
 		Action<std::string> _onRoleReceived;
 		Action<std::string> _onConnectionFailure;
+		Action<void> _onAllPlayerReady;
 		std::function<void(void)> _onShutdownReceived;
 		std::function<void(std::shared_ptr<Stormancer::P2PTunnel>)> _onTunnelOpened;
 		std::function<void(std::shared_ptr<Stormancer::P2PScenePeer>)> _onConnectionOpened;
@@ -161,6 +164,5 @@ namespace Stormancer
 		std::vector<SessionPlayer> _users;
 		pplx::task_completion_event<std::string> _waitServerTce;
 		std::shared_ptr<Stormancer::ILogger> _logger;
-
 	};
 }
