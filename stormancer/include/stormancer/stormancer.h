@@ -10,7 +10,6 @@
 #include "stormancer/ConnectionData.h"
 #include "stormancer/ConnectToSceneMsg.h"
 #include "stormancer/ConnectionResult.h"
-#include "stormancer/DisconnectFromSceneDto.h"
 #include "stormancer/RouteDto.h"
 #include "stormancer/SceneInfosDto.h"
 #include "stormancer/SceneInfosRequestDto.h"

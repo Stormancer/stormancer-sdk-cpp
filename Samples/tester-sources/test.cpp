@@ -13,8 +13,8 @@ namespace Stormancer
 	auto logger = std::make_shared<ConsoleLogger>();
 
 	bool stop = false;
-	const std::string endpoint = "http://api2.stormancer.com:8080/";
-	//const string endpoint = "http://127.0.0.1:8081/";
+	const std::string endpoint = "https://api2.stormancer.com:443";
+	//const string endpoint = "http://127.0.0.1:8081";
 	const std::string accountId = "tester";
 	const std::string applicationName = "tester";
 	const std::string sceneName = "main";
@@ -559,11 +559,11 @@ void run_all_tests_nonblocking()
 	Stormancer::tests.push_back(Stormancer::test_connect);
 	Stormancer::tests.push_back(Stormancer::test_echo);
 	Stormancer::tests.push_back(Stormancer::test_rpc_server);
-	Stormancer::tests.push_back(Stormancer::test_rpc_server_cancel);
+	//Stormancer::tests.push_back(Stormancer::test_rpc_server_cancel);
 	Stormancer::tests.push_back(Stormancer::test_rpc_server_exception);
 	Stormancer::tests.push_back(Stormancer::test_rpc_server_clientException);
 	Stormancer::tests.push_back(Stormancer::test_rpc_client);
-	Stormancer::tests.push_back(Stormancer::test_rpc_client_cancel);
+	//Stormancer::tests.push_back(Stormancer::test_rpc_client_cancel);
 	Stormancer::tests.push_back(Stormancer::test_rpc_client_exception);
 	Stormancer::tests.push_back(Stormancer::test_syncclock);
 	Stormancer::tests.push_back(Stormancer::test_disconnect);
