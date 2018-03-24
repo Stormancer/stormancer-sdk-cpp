@@ -55,7 +55,9 @@ namespace Stormancer
 
 		ibytestream& read(byte* ptr, std::streamsize size);
 
+
 		ibytestream& read(char* ptr, std::streamsize size);
+
 
 #pragma endregion
 

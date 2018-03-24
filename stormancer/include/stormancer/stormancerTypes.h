@@ -33,5 +33,8 @@ namespace Stormancer
 	using float64 = double;
 #endif
 
+
+
 	using byte = uint8;
+
 };

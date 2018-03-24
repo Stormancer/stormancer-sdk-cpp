@@ -160,4 +160,5 @@ namespace Stormancer
 		std::basic_ostream<byte>::write((byte*)ptr, size);
 		return (*this);
 	}
+
 }

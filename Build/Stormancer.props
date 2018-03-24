@@ -6,7 +6,7 @@
 	<OutDir>$(RootSDK)output\libs\</OutDir>
     <TargetName>Stormancer_$(Configuration)_$(Platform)</TargetName>
     <LibraryPath>$(RootSDK)binaries\$(Configuration)\$(Platform)\</LibraryPath>
-    <IntDir>$(RootSDK)Intermediate\stormancer\$(Platform)_$(Configuration)\</IntDir>
+    <IntDir>$(RootSDK)Intermediate\$(ProjectName)\$(Platform)_$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup />
 

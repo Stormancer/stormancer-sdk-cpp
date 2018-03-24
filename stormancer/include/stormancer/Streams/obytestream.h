@@ -59,6 +59,7 @@ namespace Stormancer
 
 		obytestream& write(const char* ptr, std::streamsize size);
 
+
 #pragma endregion
 
 	private:

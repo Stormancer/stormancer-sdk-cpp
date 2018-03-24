@@ -360,9 +360,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\AES\IAES.h">
       <Filter>Header Files\AES</Filter>
     </ClInclude>
-    <ClInclude Include="D:\stormancer-sdks\stormancer-sdk-cpp-ps4\stormancer\include\stormancer\P2P\P2PConnectToSceneMessage.h">
-      <Filter>Header Files\P2P</Filter>
-    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\P2P\P2PConnectToSceneMessage.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Configuration.cpp">
