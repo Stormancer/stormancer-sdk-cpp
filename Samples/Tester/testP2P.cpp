@@ -69,7 +69,7 @@ public:
 	{
 		if (recvStruct->systemAddress.GetPort() != socket->GetBoundAddress().GetPort())
 		{
-			_logger->log("received a message: "+std::string(recvStruct->data));
+			_logger->log("P2P sample: received a message: "+std::string(recvStruct->data));
 			if (_server)
 			{
 				Send(recvStruct->systemAddress.GetPort());

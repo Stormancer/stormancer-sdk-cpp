@@ -1,13 +1,17 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/Scene.h"
 #include "stormancer/P2P/P2PScenePeer.h"
+#include "stormancer/P2P/P2PConnectToSceneMessage.h"
 
 namespace Stormancer
 {
-	P2PScenePeer::P2PScenePeer(Scene* scene, std::shared_ptr<IConnection> connection, std::shared_ptr<P2PService> p2p)
+	P2PScenePeer::P2PScenePeer(Scene* scene, std::shared_ptr<IConnection> connection, std::shared_ptr<P2PService> p2p, P2PConnectToSceneMessage message)
 		: _scene(scene)
 		, _connection(connection)
 		, _p2p(p2p)
+		, _handle(message.sceneHandle)
+		,_metadata(message.metadata)
+		
 	{
 		if (!_connection)
 		{

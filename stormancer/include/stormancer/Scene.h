@@ -119,8 +119,6 @@ namespace Stormancer
 
 		STORMANCER_DLL_API std::unordered_map<uint64, std::shared_ptr<IScenePeer>> connectedPeers() const;
 
-		STORMANCER_DLL_API pplx::task<std::shared_ptr<IScenePeer>> connectToPeer(const std::string& token);
-
 		STORMANCER_DLL_API rxcpp::observable<P2PConnectionStateChangedArgs> p2pConnectionStateChanged() const;
 
 		std::shared_ptr<P2PTunnel> registerP2PServer(const std::string& p2pServerId);
@@ -153,6 +151,16 @@ namespace Stormancer
 		void handleMessage(Packet_ptr packet);
 
 		void setConnectionState(ConnectionState connectionState);
+
+		pplx::task<std::shared_ptr<P2PScenePeer>> createScenePeerFromP2PConnection(std::shared_ptr<IConnection > c);
+
+		template<typename T1, typename T2>
+		pplx::task<T1> sendSystemRequest(std::shared_ptr<IConnection> connection, byte id, const T2& parameter)
+		{
+			
+			auto requestProcessor = _dependencyResolver->resolve<RequestProcessor>();
+			return requestProcessor->sendSystemRequest<T2, T1>(connection.get(), id, parameter);
+		}
 
 #pragma endregion
 

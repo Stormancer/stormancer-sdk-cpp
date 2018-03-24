@@ -368,7 +368,7 @@ namespace Stormancer
 #ifdef STORMANCER_LOG_CLIENT
 					logger()->log(LogLevel::Trace, "Client", "Connecting transport to server", endpointUrl);
 #endif
-					_connectionTask = transport->connect(endpointUrl)
+					_connectionTask = ensureNetworkAvailable().then([transport, endpointUrl]() { return transport->connect(endpointUrl); })
 						.then([=](std::weak_ptr<IConnection> weakptr)
 					{
 						auto connection = weakptr.lock();
@@ -887,6 +887,8 @@ namespace Stormancer
 
 
 
+	pplx::task<void> Client::ensureNetworkAvailable()
+	{
 
 
 
@@ -922,6 +924,8 @@ namespace Stormancer
 
 
 
+		return pplx::task_from_result();
 
+	}
 
 };

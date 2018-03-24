@@ -3,6 +3,8 @@
 #include "stormancer/ScenePeer.h"
 #include "stormancer/Client.h"
 #include "stormancer/TransformMetadata.h"
+#include "stormancer/SystemRequestIDTypes.h"
+#include "stormancer/P2P/P2PConnectToSceneMessage.h"
 
 namespace Stormancer
 {
@@ -357,14 +359,34 @@ namespace Stormancer
 	{
 		_onPacketReceived(packet);
 
-		uint16 routeId;
-		*packet->stream >> routeId;
+		uint16 routeHandle;
+		*packet->stream >> routeHandle;
+		
 
-		packet->metadata["routeId"] = std::to_string(routeId);
-
-		if (mapContains(_handlers, routeId))
+		if (mapContains(_handlers, routeHandle))
 		{
-			auto observers = _handlers[routeId];
+			Route_ptr route;
+			for (auto it = _localRoutesMap.begin(); it != _localRoutesMap.end(); ++it)
+			{
+				if (it->second->handle() == routeHandle)
+				{
+					route = it->second;
+					break;
+				}
+
+			}
+			if (packet->connection->id() == _host->id() && !((int)route->filter() & (int)Stormancer::MessageOriginFilter::Host))
+			{
+				return;//the route doesn't accept messages from the scene host.
+			}
+
+			if (packet->connection->id() != _host->id() && !((int)route->filter() & (int)Stormancer::MessageOriginFilter::Peer))
+			{
+				return;//the route doesn't accept messages from the scene host.
+			}
+
+			packet->metadata["routeId"] = route->name();
+			auto observers = _handlers[routeHandle];
 			for (auto f : observers)
 			{
 				f(packet);
@@ -409,8 +431,17 @@ namespace Stormancer
 	{
 		auto p2p = dependencyResolver()->resolve<P2PService>();
 		return p2p->openP2PConnection(token).then([=](pplx::task < std::shared_ptr<IConnection>> t) {
-
-			return std::make_shared<P2PScenePeer>(this, t.get(), p2p);
+			auto c = t.get();
+			P2PConnectToSceneMessage message;
+			return this->sendSystemRequest<P2PConnectToSceneMessage, P2PConnectToSceneMessage>(c,(byte)SystemRequestIDTypes::ID_CONNECT_TO_SCENE, message).then([c](P2PConnectToSceneMessage m) {
+				return std::make_tuple(c, m);
+			
+			});
+			
+		}).then([=](pplx::task<std::tuple<std::shared_ptr<IConnection>,P2PConnectToSceneMessage>> t) {
+		
+			auto tuple = t.get();
+			return std::make_shared<P2PScenePeer>(this,std::get<0>(tuple),p2p,std::get<1>(tuple));
 		});
 	}
 
@@ -439,4 +470,5 @@ namespace Stormancer
 			}
 		}
 	}
+	
 };

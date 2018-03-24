@@ -5,17 +5,18 @@
 #include "stormancer/P2P/P2PService.h"
 #include "stormancer/P2P/P2PTunnel.h"
 
+
 namespace Stormancer
 {
 	class Scene;
-
+	struct P2PConnectToSceneMessage;
 	class P2PScenePeer : public IScenePeer
 	{
 	public:
 
 #pragma region public_methods
 
-		P2PScenePeer(Scene* scene, std::shared_ptr<IConnection> connection, std::shared_ptr<P2PService> P2P);
+		P2PScenePeer(Scene* scene, std::shared_ptr<IConnection> connection, std::shared_ptr<P2PService> P2P, P2PConnectToSceneMessage);
 
 		std::string getSceneId() const;
 
