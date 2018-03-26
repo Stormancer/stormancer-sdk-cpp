@@ -84,19 +84,19 @@ namespace Concurrency { namespace streams {
             /// <summary>
             /// <c>can_seek<c/> is used to determine whether a stream buffer supports seeking.
             /// </summary>
-            virtual bool can_seek() const { return false; }
+            virtual bool can_seek() const override { return false; }
 
             /// <summary>
             /// <c>has_size<c/> is used to determine whether a stream buffer supports size().
             /// </summary>
-            virtual bool has_size() const { return false; }
+            virtual bool has_size() const override { return false; }
 
             /// <summary>
             /// Get the stream buffer size, if one has been set.
             /// </summary>
             /// <param name="direction">The direction of buffering (in or out)</param>
             /// <remarks>An implementation that does not support buffering will always return '0'.</remarks>
-            virtual size_t buffer_size(std::ios_base::openmode = std::ios_base::in) const
+            virtual size_t buffer_size(std::ios_base::openmode = std::ios_base::in) const override
             {
                 return 0;
             }
@@ -107,7 +107,7 @@ namespace Concurrency { namespace streams {
             /// <param name="size">The size to use for internal buffering, 0 if no buffering should be done.</param>
             /// <param name="direction">The direction of buffering (in or out)</param>
             /// <remarks>An implementation that does not support buffering will silently ignore calls to this function and it will not have any effect on what is returned by subsequent calls to <see cref="::buffer_size method" />.</remarks>
-            virtual void set_buffer_size(size_t , std::ios_base::openmode = std::ios_base::in)
+            virtual void set_buffer_size(size_t , std::ios_base::openmode = std::ios_base::in) override
             {
                 return;
             }
@@ -117,7 +117,7 @@ namespace Concurrency { namespace streams {
             /// to be consumed without blocking. May be used in conjunction with <cref="::sbumpc method"/> to read data without
             /// incurring the overhead of using tasks.
             /// </summary>
-            virtual size_t in_avail() const { return m_total; }
+            virtual size_t in_avail() const override { return m_total; }
 
 
             /// <summary>
@@ -127,7 +127,7 @@ namespace Concurrency { namespace streams {
             /// <returns>The current position. EOF if the operation fails.</returns>
             /// <remarks>Some streams may have separate write and read cursors.
             ///          For such streams, the direction parameter defines whether to move the read or the write cursor.</remarks>
-            virtual pos_type getpos(std::ios_base::openmode mode) const
+            virtual pos_type getpos(std::ios_base::openmode mode) const override
             {
                 if ( ((mode & std::ios_base::in) && !this->can_read()) ||
                      ((mode & std::ios_base::out) && !this->can_write()))
@@ -142,15 +142,15 @@ namespace Concurrency { namespace streams {
             }
 
             // Seeking is not supported
-            virtual pos_type seekpos(pos_type, std::ios_base::openmode) { return (pos_type)traits::eof(); }
-            virtual pos_type seekoff(off_type , std::ios_base::seekdir , std::ios_base::openmode ) { return (pos_type)traits::eof(); }
+            virtual pos_type seekpos(pos_type, std::ios_base::openmode) override { return (pos_type)traits::eof(); }
+            virtual pos_type seekoff(off_type , std::ios_base::seekdir , std::ios_base::openmode ) override { return (pos_type)traits::eof(); }
 
             /// <summary>
             /// Allocates a contiguous memory block and returns it.
             /// </summary>
             /// <param name="count">The number of characters to allocate.</param>
             /// <returns>A pointer to a block to write to, null if the stream buffer implementation does not support alloc/commit.</returns>
-            virtual _CharType* _alloc(size_t count)
+            virtual _CharType* _alloc(size_t count) override
             {
                 if (!this->can_write())
                 {
@@ -170,7 +170,7 @@ namespace Concurrency { namespace streams {
             /// Submits a block already allocated by the stream buffer.
             /// </summary>
             /// <param name="count">The number of characters to be committed.</param>
-            virtual void _commit(size_t count)
+            virtual void _commit(size_t count) override
             {
                 pplx::extensibility::scoped_critical_section_t l(m_lock);
 
@@ -199,7 +199,7 @@ namespace Concurrency { namespace streams {
             /// If the end of the stream is reached, the function will return <c>true</c>, a null pointer, and a count of zero;
             /// a subsequent read will not succeed.
             /// </remarks>
-            virtual bool acquire(_Out_ _CharType*& ptr, _Out_ size_t& count)
+            virtual bool acquire(_Out_ _CharType*& ptr, _Out_ size_t& count) override
             {
                 count = 0;
                 ptr = nullptr;
@@ -232,7 +232,7 @@ namespace Concurrency { namespace streams {
             /// </summary>
             /// <param name="ptr">A pointer to the block of data to be released.</param>
             /// <param name="count">The number of characters that were read.</param>
-            virtual void release(_Out_writes_opt_ (count) _CharType *ptr, _In_ size_t count)
+            virtual void release(_Out_writes_opt_ (count) _CharType *ptr, _In_ size_t count) override
             {
                 if (ptr == nullptr) return;
 
@@ -247,7 +247,7 @@ namespace Concurrency { namespace streams {
 
         protected:
 
-            virtual pplx::task<bool> _sync()
+            virtual pplx::task<bool> _sync() override
             {
                 pplx::extensibility::scoped_critical_section_t l(m_lock);
 
@@ -258,7 +258,7 @@ namespace Concurrency { namespace streams {
                 return pplx::task_from_result(true);
             }
 
-            virtual pplx::task<int_type> _putc(_CharType ch)
+            virtual pplx::task<int_type> _putc(_CharType ch) override
             {
                 return pplx::task_from_result((this->write(&ch, 1) == 1) ? static_cast<int_type>(ch) : traits::eof());
             }
@@ -269,7 +269,7 @@ namespace Concurrency { namespace streams {
             }
 
 
-            virtual pplx::task<size_t> _getn(_Out_writes_ (count) _CharType *ptr, _In_ size_t count)
+            virtual pplx::task<size_t> _getn(_Out_writes_ (count) _CharType *ptr, _In_ size_t count) override
             {
                 pplx::task_completion_event<size_t> tce;
                 enqueue_request(_request(count, [this, ptr, count, tce]()
@@ -287,13 +287,13 @@ namespace Concurrency { namespace streams {
                 return can_satisfy(count) ? this->read(ptr, count) : (size_t)traits::requires_async();
             }
 
-            virtual size_t _scopy(_Out_writes_ (count) _CharType *ptr, _In_ size_t count)
+            virtual size_t _scopy(_Out_writes_ (count) _CharType *ptr, _In_ size_t count) override
             {
                 pplx::extensibility::scoped_critical_section_t l(m_lock);
                 return can_satisfy(count) ? this->read(ptr, count, false) : (size_t)traits::requires_async();
             }
 
-            virtual pplx::task<int_type> _bumpc()
+            virtual pplx::task<int_type> _bumpc() override
             {
                 pplx::task_completion_event<int_type> tce;
                 enqueue_request(_request(1, [this, tce]()
@@ -303,13 +303,13 @@ namespace Concurrency { namespace streams {
                 return pplx::create_task(tce);
             }
 
-            virtual int_type _sbumpc()
+            virtual int_type _sbumpc() override
             {
                 pplx::extensibility::scoped_critical_section_t l(m_lock);
                 return can_satisfy(1) ? this->read_byte(true) : traits::requires_async();
             }
 
-            virtual pplx::task<int_type> _getc()
+            virtual pplx::task<int_type> _getc() override
             {
                 pplx::task_completion_event<int_type> tce;
                 enqueue_request(_request(1, [this, tce]()
@@ -319,13 +319,13 @@ namespace Concurrency { namespace streams {
                 return pplx::create_task(tce);
             }
 
-            int_type _sgetc()
+            int_type _sgetc() override
             {
                 pplx::extensibility::scoped_critical_section_t l(m_lock);
                 return can_satisfy(1) ? this->read_byte(false) : traits::requires_async();
             }
 
-            virtual pplx::task<int_type> _nextc()
+            virtual pplx::task<int_type> _nextc() override
             {
                 pplx::task_completion_event<int_type> tce;
                 enqueue_request(_request(1, [this, tce]()
@@ -336,7 +336,7 @@ namespace Concurrency { namespace streams {
                 return pplx::create_task(tce);
             }
 
-            virtual pplx::task<int_type> _ungetc()
+            virtual pplx::task<int_type> _ungetc() override
             {
                 return pplx::task_from_result<int_type>(traits::eof());
             }
@@ -346,7 +346,7 @@ namespace Concurrency { namespace streams {
             /// <summary>
             /// Close the stream buffer for writing
             /// </summary>
-            pplx::task<void> _close_write()
+            pplx::task<void> _close_write() override
             {
                 // First indicate that there could be no more writes.
                 // Fulfill outstanding relies on that to flush all the

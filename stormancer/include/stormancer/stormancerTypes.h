@@ -5,7 +5,7 @@
 // custom types
 namespace Stormancer
 {
-#if defined(_STDINT)
+#if defined(_STDINT) || defined(__CLANG_STDINT_H)
 	using int8 = int8_t;
 	using int16 = int16_t;
 	using int32 = int32_t;
