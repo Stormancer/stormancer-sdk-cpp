@@ -511,6 +511,9 @@ bool SystemAddress::SetBinaryAddress(const char *str, char portDelineator)
 
 
 
+
+
+
 			address.addr4.sin_addr.s_addr = inet_addr__("127.0.0.1");
 
 			if (str[9])
@@ -526,6 +529,9 @@ bool SystemAddress::SetBinaryAddress(const char *str, char portDelineator)
 		RakNetSocket2::DomainNameToIP(str, ip);
 		if (ip[0])
 		{
+
+
+
 
 
 
@@ -591,6 +597,9 @@ bool SystemAddress::SetBinaryAddress(const char *str, char portDelineator)
 #else
 		if (IPPart[0])
 		{
+
+
+
 
 
 

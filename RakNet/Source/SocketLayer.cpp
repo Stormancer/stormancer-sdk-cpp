@@ -154,6 +154,10 @@ void SocketLayer::SetSocketOptions( __UDPSOCKET__ listenSocket, bool blockingSoc
 
 
 
+
+
+
+
 #else
 		fcntl( listenSocket, F_SETFL, O_NONBLOCK );
 #endif

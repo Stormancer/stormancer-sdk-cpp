@@ -59,6 +59,11 @@ void RNS2_Berkley::SetNonBlockingSocket(unsigned long nonblocking)
 
 
 
+
+
+
+
+
 #else
 	if (nonblocking)
 		fcntl( rns2Socket, F_SETFL, O_NONBLOCK );
@@ -97,6 +102,10 @@ void RNS2_Berkley::GetSystemAddressIPV4 ( RNS2Socket rns2Socket, SystemAddress *
 
 	if (systemAddressOut->address.addr4.sin_addr.s_addr == INADDR_ANY)
 	{
+
+
+
+
 
 
 
@@ -194,6 +203,10 @@ RNS2BindResult RNS2_Berkley::BindSharedIPV4( RNS2_BerkleyBindParameters *bindPar
 
 	if (bindParameters->hostAddress && bindParameters->hostAddress[0])
 	{
+
+
+
+
 
 
 
