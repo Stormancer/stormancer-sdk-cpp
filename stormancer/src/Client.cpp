@@ -176,7 +176,11 @@ namespace Stormancer
 			_metadata["serializers"] = "msgpack/array";
 			_metadata["transport"] = transport->name();
 			_metadata["version"] = "1.2.0";
+
+
+
 			_metadata["platform"] = __PLATFORM__;
+
 			_metadata["protocol"] = "2";
 
 			for (auto plugin : _plugins)
@@ -578,7 +582,11 @@ namespace Stormancer
 		auto requestProcessor = _dependencyResolver->resolve<RequestProcessor>();
 		return requestProcessor->sendSystemRequest(serverConnection.get(), (byte)SystemRequestIDTypes::ID_SET_METADATA, [=](obytestream* stream) {
 			_serializer.serialize(stream, serverConnection->metadata());
-		}).then([](Packet_ptr) {});
+		}).then([this](Packet_ptr) {
+#ifdef STORMANCER_LOG_CLIENT
+			logger()->log(LogLevel::Trace, "Client", "Updated server metadata");
+#endif
+		});
 	}
 
 	pplx::task<void> Client::connectToScene(const std::string& sceneId, const std::string& sceneToken, const std::vector<Route_ptr>& localRoutes)

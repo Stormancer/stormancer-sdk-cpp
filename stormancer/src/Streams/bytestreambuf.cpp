@@ -110,12 +110,8 @@ namespace Stormancer
 	std::basic_streambuf<byte>* bytestreambuf::setbuf(byte* s, std::streamsize size)
 	{
 		tidy();
-		setg(s, s, s + size);
-
-
-
-		setp(s, s, s + size);
-
+		setg(s, s, (s + size));
+		setp(s, (s + size));
 		_mode = (Read | Write);
 		return (this);
 	}
@@ -319,8 +315,10 @@ namespace Stormancer
 	{
 		std::streamsize wc = 0;
 
-		if (s)
+		// Check data to write
+		if (s && n > 0)
 		{
+			// Check write mode
 			if (_mode & Write)
 			{
 				byte* first = pbase();
@@ -331,6 +329,7 @@ namespace Stormancer
 				{
 					avail = last - next;
 				}
+				// Reserve more memory if necessary
 				if (avail < n)
 				{
 					if (_mode & Dynamic)
@@ -347,17 +346,14 @@ namespace Stormancer
 						avail = last - next;
 					}
 				}
+				// Write data if the is enough available memory
 				std::streamsize sz = std::min(avail, n);
 				if (sz > 0)
 				{
 					std::memcpy(next, s, (std::size_t)sz);
 					next += sz;
-
-
-
-
-					setp(first, next, last);
-
+					setp(first, last);
+					pbump((int)(next - first));
 					updateReadAfterWrite();
 					wc += sz;
 				}
@@ -405,11 +401,7 @@ namespace Stormancer
 	void bytestreambuf::reset()
 	{
 		setg(nullptr, nullptr, nullptr);
-
-
-
-		setp(nullptr, nullptr, nullptr);
-
+		setp(nullptr, nullptr);
 		_mode = 0;
 	}
 
@@ -428,11 +420,7 @@ namespace Stormancer
 			ptrWriteLast = nullptr;
 		}
 		setg(ptr, ptr, ptr);
-
-
-
-		setp(ptr, ptr, ptrWriteLast);
-
+		setp(ptr, ptrWriteLast);
 		_mode = (Read | Write | Dynamic | Allocated);
 	}
 
@@ -476,10 +464,8 @@ namespace Stormancer
 
 				writeNext = writeFirst + (oldWriteNext - oldWriteFirst);
 
-
-
-				setp(writeFirst, writeNext, writeLast);
-
+				setp(writeFirst, writeLast);
+				pbump((int)(oldWriteNext - oldWriteFirst));
 
 				byte* readFirst = (oldReadFirst ? writeFirst : nullptr);
 				byte* readNext = (oldReadNext ? writeFirst + (oldReadNext - oldReadFirst) : nullptr);
@@ -509,11 +495,8 @@ namespace Stormancer
 	{
 		if ((next >= first) && (next <= last))
 		{
-
-
-
-			setp(first, next, last);
-
+			setp(first, last);
+			pbump((int)(next - first));
 			return true;
 		}
 		return false;
