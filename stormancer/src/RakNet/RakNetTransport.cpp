@@ -368,26 +368,27 @@ namespace Stormancer
 			throw std::runtime_error("RakNet transport is not started");
 		}
 
-		if (_peer)
+		auto peer = _peer;
+		_peer.reset();
+		if (peer)
 		{
-			if (_peer->IsActive())
+			if (peer->IsActive())
 			{
-				_peer->Shutdown(1000);
-				_peer.reset();
+				peer->Shutdown(1000);
 			}
-		}
 
-		if (_socketDescriptor)
-		{
-			_socketDescriptor.reset();
-		}
+			if (_socketDescriptor)
+			{
+				_socketDescriptor.reset();
+			}
 
-		if (_handler)
-		{
-			_handler.reset();
-		}
+			if (_handler)
+			{
+				_handler.reset();
+			}
 
-		_logger->log(LogLevel::Trace, "RakNetTransport", "RakNet transport stopped");
+			_logger->log(LogLevel::Trace, "RakNetTransport", "RakNet transport stopped");
+		}
 	}
 
 	std::vector<std::string> RakNetTransport::externalAddresses() const
@@ -545,7 +546,7 @@ namespace Stormancer
 			auto connection = std::make_shared<RakNetConnection>(raknetGuid, cid, peer, _logger);
 			RakNet::RakNetGUID guid(connection->guid());
 			connection->onClose([=](std::string reason) {
-				_logger->log(LogLevel::Trace, "RakNetTransport", "On close", guid.ToString());
+				//_logger->log(LogLevel::Trace, "RakNetTransport", "On close", guid.ToString());
 				onRequestClose(guid);
 			});
 			_connections[raknetGuid.g] = connection;
@@ -563,11 +564,13 @@ namespace Stormancer
 
 	void RakNetTransport::onRequestClose(RakNet::RakNetGUID guid)
 	{
-		if (_peer)
+		auto peer = _peer;
+		if (peer)
 		{
-			_peer->CloseConnection(guid, true);
+			peer->CloseConnection(guid, true);
 		}
 	}
+
 
 	bool RakNetTransport::isRunning() const
 	{
@@ -617,9 +620,10 @@ namespace Stormancer
 
 		auto port = (uint16)std::atoi(els[1].c_str());
 
-		if (_peer)
+		auto peer = _peer;
+		if (peer)
 		{
-			return _peer->Ping(els[0].c_str(), port, false);
+			return peer->Ping(els[0].c_str(), port, false);
 		}
 		else
 		{

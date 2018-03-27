@@ -354,10 +354,11 @@ RAK_THREAD_DECLARATION(RNS2_Berkley::RecvFromLoop)
 unsigned RNS2_Berkley::RecvFromLoopInt(void)
 {
 	isRecvFromLoopThreadActive.Increment();
-
+	bool wasLastRcvEmpty = false;
 	while (endThreads == false)
 	{
 		RNS2RecvStruct *recvFromStruct;
+
 		recvFromStruct = binding.eventHandler->AllocRNS2RecvStruct(_FILE_AND_LINE_);
 		if (recvFromStruct != NULL)
 		{
@@ -366,13 +367,22 @@ unsigned RNS2_Berkley::RecvFromLoopInt(void)
 
 			if (recvFromStruct->bytesRead>0)
 			{
+				wasLastRcvEmpty = false;
 				RakAssert(recvFromStruct->systemAddress.GetPort());
 				//RAKNET_DEBUG_PRINTF("Received %i bytes.\n", recvFromStruct->bytesRead);
 				binding.eventHandler->OnRNS2Recv(recvFromStruct);
 			}
 			else
 			{
-				RakSleep(0);
+				if (wasLastRcvEmpty)
+				{
+					RakSleep(1);
+				}
+				else
+				{
+					wasLastRcvEmpty = true;
+					RakSleep(0);
+				}
 				binding.eventHandler->DeallocRNS2RecvStruct(recvFromStruct, _FILE_AND_LINE_);
 			}
 		}
