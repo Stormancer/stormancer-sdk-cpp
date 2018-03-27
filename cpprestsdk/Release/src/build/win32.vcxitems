@@ -17,6 +17,8 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\http\client\http_client_winhttp.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\http\client\x509_cert_utilities_win32.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\http\listener\http_server_httpsys.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\http\oauth\oauth1.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\http\oauth\oauth2.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\pplx\pplxwin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\streams\fileio_win32.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\websockets\client\ws_client_wspp.cpp" />
@@ -26,6 +28,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\cpprest\details\http_server_httpsys.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\cpprest\oauth1.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\cpprest\oauth2.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\pplx\pplxwin.h" />
   </ItemGroup>
 </Project>

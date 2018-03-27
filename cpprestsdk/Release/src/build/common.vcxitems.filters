@@ -25,9 +25,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\http\common\http_msg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\http\listener\http_server_api.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\json\json.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -35,12 +32,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\json\json_serialization.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\http\oauth\oauth1.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\http\oauth\oauth2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\pch\stdafx.cpp">
@@ -117,12 +108,6 @@
       <Filter>Header Files\cpprest</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\cpprest\json.h">
-      <Filter>Header Files\cpprest</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\cpprest\oauth1.h">
-      <Filter>Header Files\cpprest</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\cpprest\oauth2.h">
       <Filter>Header Files\cpprest</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\cpprest\producerconsumerstream.h">

@@ -24,6 +24,7 @@
 
 
 
+
 namespace
 {
 
@@ -66,6 +67,16 @@ namespace Stormancer
 		std::vector<std::shared_ptr<IRequestModule>> modules{ std::dynamic_pointer_cast<IRequestModule>(dependencyResolver()->resolve<P2PRequestModule>()) };
 
 		RequestProcessor::Initialize(this->dependencyResolver()->resolve<RequestProcessor>(), modules);
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -299,9 +310,13 @@ namespace Stormancer
 		{
 			ClientScene cScene;
 			cScene.isPublic = true;
-			auto apiClient = _dependencyResolver->resolve<ApiClient>();
-			auto task = apiClient->getSceneEndpoint(_accountId, _applicationName, sceneId).then([=](SceneEndpoint sep) {
+			
+			auto task = ensureNetworkAvailable()
+				.then([=]() {
+				
+				return _dependencyResolver->resolve<ApiClient>()->getSceneEndpoint(_accountId, _applicationName, sceneId).then([=](SceneEndpoint sep) {
 				return getSceneInternal(sceneId, sep);
+				});
 			});
 			cScene.task = task;
 			_scenes[sceneId] = cScene;
@@ -368,7 +383,7 @@ namespace Stormancer
 #ifdef STORMANCER_LOG_CLIENT
 					logger()->log(LogLevel::Trace, "Client", "Connecting transport to server", endpointUrl);
 #endif
-					_connectionTask = ensureNetworkAvailable().then([transport, endpointUrl]() { return transport->connect(endpointUrl); })
+					_connectionTask =  transport->connect(endpointUrl)
 						.then([=](std::weak_ptr<IConnection> weakptr)
 					{
 						auto connection = weakptr.lock();
