@@ -294,8 +294,8 @@
     <ClInclude Include="..\..\threadutil\inc\TimerThread.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\pthreads\pthreads-140.vcxproj">
-      <Project>{74ca3a12-8f4d-480b-bd0e-beb5630132ea}</Project>
+    <ProjectReference Include="pthreads\pthreads.vcxproj">
+      <Project>{1420b42f-6115-4ec8-a6a3-3e25cdf157a1}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -71,15 +71,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\uuid.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\VirtualDir.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\webserver.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\win32\httpreadwrite.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\win32\miniserver.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\win32\ssdplib.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\win32\unixutil.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\win32\upnpapi.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\win32\uri.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\ssdp\ssdp_ResultData.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\inc\win32\autoconfig.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\inc\win32\upnpconfig.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\ixml\src\attr.c" />
@@ -108,20 +101,14 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\api\upnpdebug.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\api\UpnpString.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\api\upnptools.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\api\win32\upnpapi.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\gena\gena_callback2.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\gena\gena_device.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\gena\win32\gena_ctrlpt.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\client_table\ClientSubscription.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\client_table\client_table.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\miniserver\win32\miniserver.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\net\http\httpparser.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\net\http\parsetools.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\net\http\statcodes.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\net\http\win32\httpreadwrite.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\net\http\win32\webserver.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\net\sock.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\net\uri\win32\uri.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\service_table\service_table.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\util\membuffer.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\util\strintmap.c" />
@@ -131,12 +118,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\soap\soap_ctrlpt.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\soap\soap_device.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\ssdp\ssdp_ResultData.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\ssdp\win32\ssdp_ctrlpt.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\ssdp\win32\ssdp_device.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\ssdp\win32\ssdp_server.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\urlconfig\win32\urlconfig.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\uuid\md5.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\uuid\uuid.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\uuid\win32\sysdep.c" />
   </ItemGroup>
 </Project>

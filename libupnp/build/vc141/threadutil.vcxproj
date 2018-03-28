@@ -293,11 +293,6 @@
     <ClInclude Include="..\..\threadutil\inc\threadpool.h" />
     <ClInclude Include="..\..\threadutil\inc\TimerThread.h" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\pthreads\pthreads-141.vcxproj">
-      <Project>{74ca3a12-8f4d-480b-bd0e-beb5630132ea}</Project>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

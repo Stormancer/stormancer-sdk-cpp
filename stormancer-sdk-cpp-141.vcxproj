@@ -335,6 +335,9 @@
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
+    <ProjectReference Include="libupnp\build\vc141\libupnp.vcxproj">
+      <Project>{6227f51a-1498-4c4a-b213-f6fded605125}</Project>
+    </ProjectReference>
     <ProjectReference Include="RakNet\Lib\DLL\DLL_vc141.vcxproj">
       <Project>{bc75cd23-cb75-4233-a305-b7328825a9a5}</Project>
     </ProjectReference>

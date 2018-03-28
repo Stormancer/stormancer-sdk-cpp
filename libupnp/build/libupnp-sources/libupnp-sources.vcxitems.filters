@@ -72,16 +72,10 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\httpparser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\win32\httpreadwrite.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\md5.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\membuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\win32\miniserver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\netall.h">
@@ -103,9 +97,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\ssdp\ssdp_ResultData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\win32\ssdplib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\statcodes.h">
@@ -138,16 +129,10 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\inc\TemplateUndef.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\win32\unixutil.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\inc\upnp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\upnp_timeout.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\win32\upnpapi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\inc\upnpdebug.h">
@@ -177,9 +162,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\upnputil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\win32\uri.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\urlconfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -204,7 +186,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\ixml\src\inc\ixmlparser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\inc\win32\upnpconfig.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\threadutil\src\FreeList.c">
@@ -246,25 +227,16 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\gena\gena_callback2.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\gena\win32\gena_ctrlpt.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\gena\gena_device.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\net\http\httpparser.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\net\http\win32\httpreadwrite.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\uuid\md5.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\util\membuffer.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\miniserver\win32\miniserver.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\net\http\parsetools.c">
@@ -285,16 +257,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\net\sock.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\ssdp\win32\ssdp_ctrlpt.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\ssdp\win32\ssdp_device.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\ssdp\ssdp_ResultData.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\ssdp\win32\ssdp_server.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\net\http\statcodes.c">
@@ -312,13 +275,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\api\SubscriptionRequest.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\uuid\win32\sysdep.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\util\upnp_timeout.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\api\win32\upnpapi.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\api\upnpdebug.c">
@@ -330,19 +287,10 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\api\upnptools.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\net\uri\win32\uri.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\urlconfig\win32\urlconfig.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\util\util.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\uuid\uuid.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\net\http\win32\webserver.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\ixml\src\attr.c">

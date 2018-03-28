@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{1696F6BA-63DD-406D-8226-09201676F202}</ItemsProjectGuid>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\config.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\context.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\implement.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\need_errno.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\pthread.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\sched.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\semaphore.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\_ptw32.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\pthread.c">
+      <PreprocessorDefinitions>HAVE_CONFIG_H;WIN32;NDEBUG;RELEASE;_WINDOWS;PTW32_STATIC_LIB;UPNP_STATIC_LIB;UPNP_USE_MSVCPP;_CRT_NONSTDC_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL;_SCL_SECURE_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_WARNINGS;_AFX_SECURE_NO_DEPRECATE;_SECURE_ATL;_ATL_NO_COM_SUPPORT;_ATL_SECURE_NO_WARNINGS;_ATL_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions);_WINSOCK_DEPRECATED_NO_WARNINGS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>%(DefiningProjectDirectory)..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemGroup>
+</Project>
