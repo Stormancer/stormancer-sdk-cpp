@@ -13,7 +13,7 @@ namespace Stormancer
 	auto logger = std::make_shared<ConsoleLogger>();
 
 	bool stop = false;
-	const std::string endpoint = "http://api2.stormancer.com";
+	const std::string endpoint = "https://api2.stormancer.com";
 	//const string endpoint = "http://127.0.0.1:8081";
 	const std::string accountId = "tester";
 	const std::string applicationName = "tester";
