@@ -13,9 +13,11 @@ namespace Stormancer
 
 	enum class P2PSessionState
 	{
+		
 		Connecting,
 		Connected,
 		Closing,
+		Unknown,
 	};
 
 	enum class EndpointCandidateType

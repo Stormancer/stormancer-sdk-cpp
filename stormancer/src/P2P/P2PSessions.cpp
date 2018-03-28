@@ -40,7 +40,7 @@ namespace Stormancer
 			throw std::runtime_error("Session not found");
 		}
 
-		auto& session = (*it).second;
+		const auto& session = (*it).second;
 		auto connection = _connections->getConnection(session.remotePeer);
 		_sessions.erase(it);
 		if (connection)
