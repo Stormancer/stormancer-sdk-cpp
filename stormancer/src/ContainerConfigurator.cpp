@@ -98,6 +98,7 @@ void Stormancer::ConfigureContainer(DependencyResolver* dr, Configuration_ptr co
 			dr->resolve<P2PSessions>(),
 			dr->resolve<Serializer>(),
 			dr->resolve<P2PTunnels>(),
-			dr->resolve<ILogger>());
+			dr->resolve<ILogger>(),
+			dr->resolve<Configuration>());
 	}, true);
 }

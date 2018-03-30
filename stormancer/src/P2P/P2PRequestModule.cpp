@@ -8,7 +8,15 @@
 
 namespace Stormancer
 {
-	P2PRequestModule::P2PRequestModule(std::shared_ptr<ITransport> transport, std::shared_ptr<IConnectionManager> connections, std::shared_ptr<P2PSessions> sessions, std::shared_ptr<Serializer> serializer, std::shared_ptr<P2PTunnels> tunnels, std::shared_ptr<ILogger> logger)
+	P2PRequestModule::P2PRequestModule(
+		std::shared_ptr<ITransport> transport, 
+		std::shared_ptr<IConnectionManager> connections, 
+		std::shared_ptr<P2PSessions> sessions, 
+		std::shared_ptr<Serializer> serializer, 
+		std::shared_ptr<P2PTunnels> tunnels, 
+		std::shared_ptr<ILogger> logger,
+		std::shared_ptr<Configuration> config
+	)
 	{
 		_transport = transport;
 		_connections = connections;
@@ -16,12 +24,25 @@ namespace Stormancer
 		_serializer = serializer;
 		_tunnels = tunnels;
 		_logger = logger;
+		_config = config;
 	}
 
 	void P2PRequestModule::registerModule(RequestModuleBuilder* builder)
 	{
 		builder->service((byte)SystemRequestIDTypes::ID_P2P_GATHER_IP, [=](RequestContext* ctx) {
-			auto endpoints = _transport->getAvailableEndpoints();
+			std::vector<std::string> endpoints;
+			if (_config->publicIp != "")
+			{
+				endpoints.push_back(_config->publicIp);
+			}
+			else if (_config->p2pRemotePeerHasPublicIp)
+			{
+				endpoints.clear();
+			}
+			else
+			{
+				endpoints = _transport->getAvailableEndpoints();
+			}
 			ctx->send([=](obytestream* stream) {
 				_serializer->serialize(stream, endpoints);
 			});
@@ -66,16 +87,40 @@ namespace Stormancer
 				});
 				return pplx::task_from_result();
 			}*/
-
-			return _transport->sendPing(candidate.listeningEndpointCandidate.address).then([=](pplx::task<int> t) {
-				auto latency = (int)t.get();
-				_logger->log(LogLevel::Debug, "p2p", "Connectivity test complete : " + candidate.clientEndpointCandidate.address + " => " + candidate.listeningEndpointCandidate.address + " ping : " + std::to_string(latency));
+			if (_config->p2pRemotePeerHasPublicIp)
+			{
+				if (candidate.listeningEndpointCandidate.address.substr(0, 9) == "127.0.0.1")
+				{
+					ctx->send([=](obytestream* stream) {
+						_serializer->serialize(stream, -1);
+					});
+					return pplx::task_from_result();
+				}
+				else
+				{
+					ctx->send([=](obytestream* stream) {
+						_serializer->serialize(stream, 1);
+					});
+					return pplx::task_from_result();
+				}
+			}
+			else if (_config->publicIp != "")
+			{
 				ctx->send([=](obytestream* stream) {
-					_serializer->serialize(stream, latency);
+					_serializer->serialize(stream, -1);
 				});
-			});
-
-
+				return pplx::task_from_result();
+			}
+			else
+			{
+				return _transport->sendPing(candidate.listeningEndpointCandidate.address).then([=](pplx::task<int> t) {
+					auto latency = (int)t.get();
+					_logger->log(LogLevel::Debug, "p2p", "Connectivity test complete : " + candidate.clientEndpointCandidate.address + " => " + candidate.listeningEndpointCandidate.address + " ping : " + std::to_string(latency));
+					ctx->send([=](obytestream* stream) {
+						_serializer->serialize(stream, latency);
+					});
+				});
+			}
 		});
 
 		builder->service((byte)SystemRequestIDTypes::ID_P2P_TEST_CONNECTIVITY_HOST, [=](RequestContext* ctx) {
@@ -88,8 +133,10 @@ namespace Stormancer
 				});
 				return pplx::task_from_result();
 			}*/
-
-			_transport->openNat(candidate.clientEndpointCandidate.address);
+			if (_config->publicIp == "" && !_config->p2pRemotePeerHasPublicIp)
+			{
+				_transport->openNat(candidate.clientEndpointCandidate.address);
+			}
 			ctx->send(Writer());
 			return pplx::task_from_result();
 		});

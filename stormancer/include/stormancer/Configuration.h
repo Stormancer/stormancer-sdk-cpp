@@ -83,6 +83,12 @@ namespace Stormancer
 		///Gets or sets the default p2p host port. 0 For automatic attribution.
 		unsigned short p2pServerPort = 7777;
 
+		///Gets or sets the default public
+		std::string publicIp;
+
+		///Gets or sets 
+		bool p2pRemotePeerHasPublicIp;
+
 		/// <summary>
 		/// Dispatches events
 		/// </summary>
