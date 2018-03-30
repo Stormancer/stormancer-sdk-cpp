@@ -135,7 +135,7 @@ namespace Stormancer
 				byte ID = rakNetPacket->data[0];
 				//_logger->log(LogLevel::Trace, "RakNetTransport", "RakNet packet received ", std::to_string(ID));
 #ifdef STORMANCER_LOG_RAKNET_PACKETS
-				std::string receivedData((char*)rakNetPacket->data, rakNetPacket->length);
+				std::vector<byte> receivedData(rakNetPacket->data, rakNetPacket->data + rakNetPacket->length);
 				auto bytes = stringifyBytesArray(receivedData, true);
 				_logger->log(LogLevel::Trace, "RakNetTransport", "RakNet packet received", bytes.c_str());
 #endif
@@ -368,13 +368,11 @@ namespace Stormancer
 			throw std::runtime_error("RakNet transport is not started");
 		}
 
-		auto peer = _peer;
-		_peer.reset();
-		if (peer)
+		if (_peer)
 		{
-			if (peer->IsActive())
+			if (_peer->IsActive())
 			{
-				peer->Shutdown(1000);
+				_peer->Shutdown(1000);
 			}
 
 			if (_socketDescriptor)
@@ -389,6 +387,7 @@ namespace Stormancer
 
 			_logger->log(LogLevel::Trace, "RakNetTransport", "RakNet transport stopped");
 		}
+		_peer.reset();
 	}
 
 	std::vector<std::string> RakNetTransport::externalAddresses() const
@@ -473,10 +472,9 @@ namespace Stormancer
 		auto msg = std::string() + systemAddress.ToString(true, ':') + " connected";
 		_logger->log(LogLevel::Trace, "RakNetTransport", msg.c_str());
 
-		auto connection = createNewConnection(guid, _peer, peerId);
+		auto connection = createNewConnection(guid, peerId);
 
 		_handler->newConnection(connection);
-
 
 		pplx::task<void>([=]() {
 			// Start this asynchronously because we locked the mutex in run and the user can do something that tries to lock again this mutex
@@ -537,17 +535,22 @@ namespace Stormancer
 		return _connections[guid.g];
 	}
 
-	std::shared_ptr<RakNetConnection> RakNetTransport::createNewConnection(RakNet::RakNetGUID raknetGuid, std::weak_ptr<RakNet::RakPeerInterface> peer, uint64 peerId)
+	std::shared_ptr<RakNetConnection> RakNetTransport::createNewConnection(RakNet::RakNetGUID raknetGuid, uint64 peerId)
 	{
-		auto rakPeerInterface = peer.lock();
-		if (rakPeerInterface)
+		if (_peer)
 		{
 			int64 cid = peerId;
-			auto connection = std::make_shared<RakNetConnection>(raknetGuid, cid, peer, _logger);
+			auto connection = std::make_shared<RakNetConnection>(raknetGuid, cid, _peer, _logger);
 			RakNet::RakNetGUID guid(connection->guid());
+			auto logger = _logger;
+			std::weak_ptr<RakNet::RakPeerInterface> weakPeer = _peer;
 			connection->onClose([=](std::string reason) {
-				//_logger->log(LogLevel::Trace, "RakNetTransport", "On close", guid.ToString());
-				onRequestClose(guid);
+				auto peer = weakPeer.lock();
+				if (peer)
+				{
+					logger->log(LogLevel::Trace, "RakNetTransport", "On close", guid.ToString());
+					peer->CloseConnection(guid, true);
+				}
 			});
 			_connections[raknetGuid.g] = connection;
 			return connection;
@@ -561,16 +564,6 @@ namespace Stormancer
 		_connections.erase(guid.g);
 		return connection;
 	}
-
-	void RakNetTransport::onRequestClose(RakNet::RakNetGUID guid)
-	{
-		auto peer = _peer;
-		if (peer)
-		{
-			peer->CloseConnection(guid, true);
-		}
-	}
-
 
 	bool RakNetTransport::isRunning() const
 	{

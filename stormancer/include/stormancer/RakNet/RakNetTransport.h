@@ -55,9 +55,8 @@ namespace Stormancer
 		void onDisconnection(RakNet::Packet* packet, std::string reason);
 		void onMessageReceived(RakNet::Packet* packet);
 		std::shared_ptr<RakNetConnection> getConnection(RakNet::RakNetGUID guid);
-		std::shared_ptr<RakNetConnection> createNewConnection(RakNet::RakNetGUID raknetGuid, std::weak_ptr<RakNet::RakPeerInterface> peer, uint64 peerId);
+		std::shared_ptr<RakNetConnection> createNewConnection(RakNet::RakNetGUID raknetGuid, uint64 peerId);
 		std::shared_ptr<RakNetConnection> removeConnection(RakNet::RakNetGUID guid);
-		void onRequestClose(RakNet::RakNetGUID guid);
 		pplx::task<int> sendPing(const std::string& address) override;
 		bool sendPingImpl(const std::string& address);
 		pplx::task<int> sendPing(const std::string& address, const int nb) override;

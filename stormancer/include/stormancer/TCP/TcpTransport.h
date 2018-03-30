@@ -46,7 +46,6 @@ namespace Stormancer
 		void listen(std::string endpoint);
 		std::shared_ptr<TcpConnection> createNewConnection(std::string endpoint);
 		void onDisconnection(std::string endpoint, std::string reason);
-		void onRequestClose();
 
 #pragma endregion
 

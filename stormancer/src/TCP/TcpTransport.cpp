@@ -305,7 +305,6 @@ namespace Stormancer
 		std::shared_ptr<TcpConnection> connection = std::make_shared<TcpConnection>(_socketId, cid, _host);
 		connection->onClose([=](std::string reason) {
 			_logger->log(LogLevel::Trace, "tcpTransport", "Closed ", endpoint.c_str());
-			onRequestClose();
 		});
 		_connection = connection;
 
@@ -327,11 +326,6 @@ namespace Stormancer
 			_connection->setConnectionState(ConnectionState::Disconnected);
 			_connection = nullptr;
 		}
-	}
-
-	void TcpTransport::onRequestClose()
-	{
-		_socketId = nullptr;
 	}
 
 	void TcpTransport::stop()
