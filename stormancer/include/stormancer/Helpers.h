@@ -123,7 +123,7 @@ namespace Stormancer
 
 	pplx::task<void> taskIf(bool condition, std::function<pplx::task<void>()> action);
 
-	pplx::task<void> taskDelay(std::chrono::milliseconds timeOffset, pplx::cancellation_token token = pplx::cancellation_token::none());
+	pplx::task<void> taskDelay(std::chrono::milliseconds timeOffset, const pplx::cancellation_token& ct = pplx::cancellation_token::none());
 
 	template<typename T, typename... U>
 	pplx::task<T> invokeWrapping(std::function<pplx::task<T>(U...)> func, U&... argument)
@@ -248,6 +248,9 @@ namespace Stormancer
 	/// \return true if the exchange function was called, false otherwise.
 	bool compareExchange(std::mutex& mutex, std::function<bool()> const compare, std::function<void()> exchange);
 
+
+
+	pplx::cancellation_token_source create_linked_source(pplx::cancellation_token token1, pplx::cancellation_token token2);
 
 
 

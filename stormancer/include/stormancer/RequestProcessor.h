@@ -14,6 +14,9 @@ namespace Stormancer
 	class RequestProcessor : public IPacketProcessor
 	{
 	public:
+
+#pragma region public_methods
+
 		static void Initialize(std::shared_ptr<RequestProcessor> processor, std::vector<std::shared_ptr<IRequestModule>> modules);
 
 		/// Constructor.
@@ -33,7 +36,7 @@ namespace Stormancer
 		/// \param msgId The message id.
 		/// \param writer A procedure writing the request parameters.
 		/// \return An observable returning the request responses.
-		pplx::task<Packet_ptr> sendSystemRequest(IConnection* peer, byte msgId, const Writer& writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY);
+		pplx::task<Packet_ptr> sendSystemRequest(IConnection* peer, byte msgId, const Writer& writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, const pplx::cancellation_token& ct = pplx::cancellation_token::none());
 
 		/// Register a new system request handlers for the specified message Id.
 		/// \param msgId The system message id.
@@ -41,16 +44,28 @@ namespace Stormancer
 		std::function<void(byte, std::function<pplx::task<void>(RequestContext*)>)> addSystemRequestHandler;
 
 		template<typename T1, typename T2>
-		pplx::task<T2> sendSystemRequest(IConnection* peer, byte id, const T1& parameter)
+		pplx::task<T1> sendSystemRequest(IConnection* peer, byte id, const T2& parameter, const pplx::cancellation_token& ct = pplx::cancellation_token::none())
 		{
 			return sendSystemRequest(peer, id, [=, &parameter](obytestream* stream) {
 				_serializer.serialize(stream, parameter);
-			}).then([=](Packet_ptr packet) {
-				return _serializer.deserializeOne<T2>(packet->stream);
-			});
+			}, PacketPriority::MEDIUM_PRIORITY, ct).then([=](Packet_ptr packet) {
+				return _serializer.deserializeOne<T1>(packet->stream);
+			}, ct);
 		}
 
-	protected:
+#pragma endregion
+
+	private:
+
+#pragma region private_methods
+
+		SystemRequest_ptr reserveRequestSlot(byte msgId, pplx::task_completion_event<Packet_ptr> tce, const pplx::cancellation_token& ct = pplx::cancellation_token::none());
+
+		SystemRequest_ptr freeRequestSlot(uint16 requestId);
+
+#pragma endregion
+
+#pragma region private_members
 
 		std::map<uint16, SystemRequest_ptr> _pendingRequests;
 		std::mutex _mutexPendingRequests;
@@ -59,9 +74,6 @@ namespace Stormancer
 		std::map<byte, std::function<pplx::task<void>(RequestContext*)>> _handlers;
 		Serializer _serializer;
 
-	private:
-
-		SystemRequest_ptr reserveRequestSlot(byte msgId,pplx::task_completion_event<Packet_ptr> tce);
-		SystemRequest_ptr freeRequestSlot(uint16 requestId);
+#pragma endregion
 	};
 };

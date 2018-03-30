@@ -261,7 +261,7 @@ namespace Stormancer
 		send(MatchSceneHost(), routeName, writer, priority, reliability, channelIdentifier);
 	}
 
-	pplx::task<void> Scene::connect()
+	pplx::task<void> Scene::connect(const pplx::cancellation_token& ct)
 	{
 		std::lock_guard<std::mutex> lg(_connectMutex);
 
@@ -270,7 +270,7 @@ namespace Stormancer
 			auto client = _client.lock();
 			if (client)
 			{
-				_connectTask = client->connectToScene(_id, _token, mapValues(_localRoutesMap));
+				_connectTask = client->connectToScene(_id, _token, mapValues(_localRoutesMap), ct);
 			}
 			else
 			{
@@ -427,12 +427,12 @@ namespace Stormancer
 		return p2p->registerP2PServer(this->id() + "." + p2pServerId);
 	}
 
-	pplx::task<std::shared_ptr<P2PScenePeer>> Scene::openP2PConnection(const std::string & token)
+	pplx::task<std::shared_ptr<P2PScenePeer>> Scene::openP2PConnection(const std::string & p2pToken, const pplx::cancellation_token& ct)
 	{
 		auto p2p = dependencyResolver()->resolve<P2PService>();
-		return p2p->openP2PConnection(token).then([=](pplx::task < std::shared_ptr<IConnection>> t) {
+		return p2p->openP2PConnection(p2pToken, ct).then([=](pplx::task < std::shared_ptr<IConnection>> t) {
 			return std::make_shared<P2PScenePeer>(this, t.get(), p2p, P2PConnectToSceneMessage());
-		});
+		}, ct);
 		//	auto c = t.get();
 		//	P2PConnectToSceneMessage message;
 		//	return this->sendSystemRequest<P2PConnectToSceneMessage, P2PConnectToSceneMessage>(c,(byte)SystemRequestIDTypes::ID_CONNECT_TO_SCENE, message).then([c](P2PConnectToSceneMessage m) {
@@ -469,5 +469,10 @@ namespace Stormancer
 				subscriber.on_completed();
 			}
 		}
+	}
+
+	pplx::task<std::shared_ptr<P2PScenePeer>> Scene::createScenePeerFromP2PConnection(std::shared_ptr<IConnection> /*connection*/, const pplx::cancellation_token& /*ct*/)
+	{
+		throw std::runtime_error("Not implemented");
 	}
 };

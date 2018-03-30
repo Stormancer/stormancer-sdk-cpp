@@ -37,7 +37,7 @@ namespace Stormancer
 		_logger->log(LogLevel::Trace, "RakNetTransport", "RakNet transport deleted");
 	}
 
-	void RakNetTransport::start(std::string type, std::shared_ptr<IConnectionManager> handler, pplx::cancellation_token ct, uint16 serverPort, uint16 maxConnections)
+	void RakNetTransport::start(std::string type, std::shared_ptr<IConnectionManager> handler, const pplx::cancellation_token& ct, uint16 serverPort, uint16 maxConnections)
 	{
 		_logger->log(LogLevel::Trace, "RakNetTransport", "Starting RakNet transport...");
 
@@ -140,15 +140,6 @@ namespace Stormancer
 				_logger->log(LogLevel::Trace, "RakNetTransport", "RakNet packet received", bytes.c_str());
 #endif
 
-				{
-					/*std::string packetSystemAddressStr = rakNetPacket->systemAddress.ToString(true, ':');
-					if (_serverConnected && !mapContains(_pendingConnections, packetSystemAddressStr))
-					{
-						_peer->DeallocatePacket(rakNetPacket);
-						continue;
-					}*/
-				}
-
 				try
 				{
 					switch (ID)
@@ -158,31 +149,37 @@ namespace Stormancer
 					{
 						std::lock_guard<std::mutex> lg(_pendingConnection_mtx);
 
-
 						std::string packetSystemAddressStr = rakNetPacket->systemAddress.ToString(true, ':');
 						if (!_pendingConnections.empty())
 						{
 							auto rq = _pendingConnections.front();
-							_logger->log(LogLevel::Trace, "RakNetTransport", "Connection request accepted", packetSystemAddressStr.c_str());
 							if (!_serverConnected)
 							{
-								_serverConnected = true;
-								_serverRakNetGUID = rakNetPacket->guid;
-								auto c = onConnection(rakNetPacket->systemAddress, rakNetPacket->guid, 0);
-								rq.tce.set(c);
 								_pendingConnections.pop();
+								if (rq.cancellationToken.is_canceled())
+								{
+									_peer->CloseConnection(rakNetPacket->guid, false);
+									rq.tce.set_exception(std::runtime_error("Operation canceled"));
+								}
+								else
+								{
+									_logger->log(LogLevel::Trace, "RakNetTransport", "Connection request accepted", packetSystemAddressStr.c_str());
+									_serverConnected = true;
+									_serverRakNetGUID = rakNetPacket->guid;
+									auto connection = onConnection(rakNetPacket->systemAddress, rakNetPacket->guid, 0);
+									rq.tce.set(connection);
+								}
 								startNextPendingConnections();
 							}
 							else
 							{
+								// TODO: if (rq.token.is_canceled())
 								RakNet::BitStream data;
-								data.Write((char)MessageIDTypes::ID_ADVERTISE_PEERID);
+								data.Write((byte)MessageIDTypes::ID_ADVERTISE_PEERID);
 								data.Write(_id);
 								data.Write(false);
 								_peer->Send(&data, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE, 0, rakNetPacket->guid, false);
 							}
-
-
 						}
 						else
 						{
@@ -194,23 +191,29 @@ namespace Stormancer
 					case DefaultMessageIDTypes::ID_NO_FREE_INCOMING_CONNECTIONS:
 					case DefaultMessageIDTypes::ID_CONNECTION_ATTEMPT_FAILED:
 					{
-						std::lock_guard<std::mutex> lg(_pendingConnection_mtx);
 						std::string packetSystemAddressStr = rakNetPacket->systemAddress.ToString(true, ':');
+
+						std::lock_guard<std::mutex> lg(_pendingConnection_mtx);
 
 						if (!_pendingConnections.empty())
 						{
 							auto rq = _pendingConnections.front();
-							_logger->log(LogLevel::Trace, "RakNetTransport", "Connection request failed", packetSystemAddressStr.c_str());
-							rq.tce.set_exception(std::runtime_error("Connection attempt failed"));
 							_pendingConnections.pop();
+							if (rq.cancellationToken.is_canceled())
+							{
+								rq.tce.set_exception(std::runtime_error("Operation canceled"));
+							}
+							else
+							{
+								_logger->log(LogLevel::Trace, "RakNetTransport", "Connection request failed", packetSystemAddressStr.c_str());
+								rq.tce.set_exception(std::runtime_error("Connection attempt failed"));
+							}
 							startNextPendingConnections();
 						}
 						else
 						{
 							_logger->log(LogLevel::Error, "RakNetTransport", "Can't get the pending connection TCE", packetSystemAddressStr.c_str());
 						}
-
-
 						break;
 					}
 					case DefaultMessageIDTypes::ID_ALREADY_CONNECTED:
@@ -305,15 +308,20 @@ namespace Stormancer
 
 						if (waitingConnection)
 						{
-
 							auto rq = _pendingConnections.front();
-							_logger->log(LogLevel::Trace, "RakNetTransport", "Connection request accepted", packetSystemAddressStr.c_str());
-
-							auto c = onConnection(rakNetPacket->systemAddress, rakNetPacket->guid, (uint64)remotePeerId);
-							rq.tce.set(c);
 							_pendingConnections.pop();
+							if (rq.cancellationToken.is_canceled())
+							{
+								_peer->CloseConnection(rakNetPacket->systemAddress, false);
+								rq.tce.set_exception(std::runtime_error("Operation canceled"));
+							}
+							else
+							{
+								_logger->log(LogLevel::Trace, "RakNetTransport", "Connection request accepted", packetSystemAddressStr.c_str());
+								auto connection = onConnection(rakNetPacket->systemAddress, rakNetPacket->guid, (uint64)remotePeerId);
+								rq.tce.set(connection);
+							}
 							startNextPendingConnections();
-
 						}
 						else
 						{
@@ -408,13 +416,14 @@ namespace Stormancer
 		_id = p;
 	}
 
-	pplx::task<std::shared_ptr<IConnection>> RakNetTransport::connect(std::string endpoint)
+	pplx::task<std::shared_ptr<IConnection>> RakNetTransport::connect(std::string endpoint, const pplx::cancellation_token& ct)
 	{
 		std::lock_guard<std::mutex> lock(_pendingConnection_mtx);
 
 		auto shouldStart = _pendingConnections.empty();
 		ConnectionRequest rq;
 		rq.endpoint = endpoint;
+		rq.cancellationToken = ct;
 		_pendingConnections.push(rq);
 		if (shouldStart)
 		{
@@ -432,6 +441,13 @@ namespace Stormancer
 		}
 
 		auto rq = _pendingConnections.front();
+
+		if (rq.cancellationToken.is_canceled())
+		{
+			_pendingConnections.pop();
+			startNextPendingConnections();
+		}
+
 		auto endpoint = rq.endpoint;
 		auto split = stringSplit(endpoint, ':');
 		auto tce = rq.tce;
@@ -464,7 +480,6 @@ namespace Stormancer
 		{
 			tce.set_exception(std::runtime_error(std::string("Bad RakNet connection attempt result (") + std::to_string(result) + ')'));
 		}
-
 	}
 
 	std::shared_ptr<RakNetConnection> RakNetTransport::onConnection(RakNet::SystemAddress systemAddress, RakNet::RakNetGUID guid, uint64 peerId)

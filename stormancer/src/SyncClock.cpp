@@ -22,7 +22,7 @@ namespace Stormancer
 		}
 	}
 
-	void SyncClock::start(std::weak_ptr<IConnection> connectionPtr, pplx::cancellation_token ct)
+	void SyncClock::start(std::weak_ptr<IConnection> connectionPtr, const pplx::cancellation_token& ct)
 	{
 		auto logger = _dependencyResolver->resolve<ILogger>();
 		logger->log(LogLevel::Trace, "synchronizedClock", "Starting SyncClock...");
@@ -45,10 +45,11 @@ namespace Stormancer
 		{
 			_cancellationToken = ct;
 
-			auto cts = pplx::cancellation_token_source::create_linked_source(ct);
+			auto cts = pplx::cancellation_token_source::create_linked_source(_cancellationToken);
 			scheduler->schedulePeriodic(_interval, [weakThis, cts]
 			{
-				if (auto thiz = weakThis.lock())
+				auto thiz = weakThis.lock();
+				if (thiz)
 				{
 					std::lock_guard<std::mutex> lg(thiz->_mutex);
 					thiz->syncClockImplAsync();
@@ -57,7 +58,7 @@ namespace Stormancer
 				{
 					cts.cancel();
 				}
-			}, ct);
+			}, _cancellationToken);
 
 			// Do multiple pings at start
 			scheduler->schedulePeriodic(_intervalAtStart, [weakThis, cts]
@@ -150,11 +151,11 @@ namespace Stormancer
 
 			// Keep an active reference to the logger, in case the task is cancelled we cannot rely on this being valid
 			auto logger = _dependencyResolver->resolve<ILogger>();
-			auto ct = _cancellationToken;
+			auto cancellationToken = _cancellationToken;
 
 			requestProcessor->sendSystemRequest(remoteConnection.get(), (byte)SystemRequestIDTypes::ID_PING, [=](obytestream* bs) {
 				*bs << timeStart;
-			}, PacketPriority::IMMEDIATE_PRIORITY).then([=](pplx::task<Packet_ptr> t) {
+			}, PacketPriority::IMMEDIATE_PRIORITY, _cancellationToken).then([=](pplx::task<Packet_ptr> t) {
 				Packet_ptr packet;
 				try
 				{
@@ -162,12 +163,10 @@ namespace Stormancer
 				}
 				catch (const std::exception& ex)
 				{
-					logger->log(LogLevel::Warn, "syncClock", "Failed to ping the server", ex.what());
-					return;
-				}
-
-				if (ct.is_canceled())
-				{
+					if (!cancellationToken.is_canceled())
+					{
+						logger->log(LogLevel::Warn, "syncClock", "Failed to ping the server", ex.what());
+					}
 					return;
 				}
 

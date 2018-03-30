@@ -36,7 +36,7 @@ namespace Stormancer
 	{
 		_isRegistered = true;
 
-		config.addProcessor((byte)MessageIDTypes::ID_SYSTEM_REQUEST, new handlerFunction([=](Packet_ptr  p) {
+		config.addProcessor((byte)MessageIDTypes::ID_SYSTEM_REQUEST, new handlerFunction([=](Packet_ptr p) {
 			byte sysRequestId;
 			*(p->stream) >> sysRequestId;
 			std::shared_ptr<RequestContext> context = std::make_shared<RequestContext>(p);
@@ -88,12 +88,19 @@ namespace Stormancer
 
 			if (request)
 			{
-				p->metadata["request"] = std::to_string(request->id);
-				time(&request->lastRefresh);
-				if (!request->complete)
+				if (request->cancellationToken.is_canceled())
 				{
-					request->complete = true;
-					request->tce.set(p);
+					request->tce.set_exception(std::runtime_error("Operation canceled"));
+				}
+				else
+				{
+					p->metadata["request"] = std::to_string(request->id);
+					time(&request->lastRefresh);
+					if (!request->complete)
+					{
+						request->complete = true;
+						request->tce.set(p);
+					}
 				}
 			}
 			else
@@ -118,11 +125,18 @@ namespace Stormancer
 
 				if (request)
 				{
-					p->metadata["request"] = std::to_string(request->id);
-					if (!request->complete)
+					if (request->cancellationToken.is_canceled())
 					{
-						request->complete = true;
-						request->tce.set(nullptr);
+						request->tce.set_exception(std::runtime_error("Operation canceled"));
+					}
+					else
+					{
+						p->metadata["request"] = std::to_string(request->id);
+						if (!request->complete)
+						{
+							request->complete = true;
+							request->tce.set(Packet_ptr());
+						}
 					}
 				}
 				else
@@ -142,12 +156,19 @@ namespace Stormancer
 
 			if (request)
 			{
-				p->metadata["request"] = std::to_string(request->id);
-				std::string msg = _serializer.deserializeOne<std::string>(p->stream);
-				if (!request->complete)
+				if (request->cancellationToken.is_canceled())
 				{
-					request->complete = true;
-					request->tce.set_exception(std::runtime_error(msg+"(msgId:"+std::to_string(request->operation())+ ")"));
+					request->tce.set_exception(std::runtime_error("Operation canceled"));
+				}
+				else
+				{
+					p->metadata["request"] = std::to_string(request->id);
+					std::string msg = _serializer.deserializeOne<std::string>(p->stream);
+					if (!request->complete)
+					{
+						request->complete = true;
+						request->tce.set_exception(std::runtime_error(msg + "(msgId:" + std::to_string(request->operation()) + ")"));
+					}
 				}
 			}
 			else
@@ -159,12 +180,12 @@ namespace Stormancer
 		}));
 	}
 
-	pplx::task<Packet_ptr> RequestProcessor::sendSystemRequest(IConnection* peer, byte msgId, const Writer& writer, PacketPriority priority)
+	pplx::task<Packet_ptr> RequestProcessor::sendSystemRequest(IConnection* peer, byte msgId, const Writer& writer, PacketPriority priority, const pplx::cancellation_token& ct)
 	{
-		auto tce = pplx::task_completion_event<Packet_ptr>();
 		if (peer)
 		{
-			auto request = reserveRequestSlot(msgId,tce);
+			pplx::task_completion_event<Packet_ptr> tce;
+			auto request = reserveRequestSlot(msgId, tce, ct);
 			
 			try
 			{
@@ -182,15 +203,16 @@ namespace Stormancer
 			{
 				tce.set_exception(ex);
 			}
+
+			return pplx::create_task(tce);
 		}
 		else
 		{
-			tce.set_exception(std::invalid_argument("peer should not be nullptr"));
+			return pplx::task_from_exception<Packet_ptr>(std::invalid_argument("peer should not be nullptr"));
 		}
-		return pplx::create_task(tce);
 	}
 
-	SystemRequest_ptr RequestProcessor::reserveRequestSlot(byte msgId, pplx::task_completion_event<Packet_ptr> tce)
+	SystemRequest_ptr RequestProcessor::reserveRequestSlot(byte msgId, pplx::task_completion_event<Packet_ptr> tce, const pplx::cancellation_token& ct)
 	{
 		SystemRequest_ptr request;
 
@@ -207,8 +229,9 @@ namespace Stormancer
 
 				if (!mapContains(_pendingRequests, id))
 				{
-					request = std::make_shared<SystemRequest>(msgId,tce);
+					request = std::make_shared<SystemRequest>(msgId, tce);
 					request->id = id;
+					request->cancellationToken = ct;
 					_pendingRequests[id] = request;
 					break;
 				}

@@ -18,7 +18,7 @@ namespace Stormancer
 	using Client_ptr = std::shared_ptr<Client>;
 
 	/// Manage the connection to the scenes of an application.
-	class Client : public std::enable_shared_from_this<Client>
+	class STORMANCER_DLL_API Client : public std::enable_shared_from_this<Client>
 	{
 	public:
 
@@ -31,48 +31,49 @@ namespace Stormancer
 
 		/// Factory.
 		/// \param config A pointer to a Configuration.
-		STORMANCER_DLL_API static Client_ptr create(Configuration_ptr config);
+		static Client_ptr create(Configuration_ptr config);
 
-		STORMANCER_DLL_API pplx::task<Scene_ptr> getPublicScene(const std::string& sceneId);
+		pplx::task<Scene_ptr> getPublicScene(const std::string& sceneId, const pplx::cancellation_token& ct = pplx::cancellation_token::none());
 
-		STORMANCER_DLL_API pplx::task<Scene_ptr> getPrivateScene(const std::string& sceneToken);
+		pplx::task<Scene_ptr> getPrivateScene(const std::string& sceneToken, const pplx::cancellation_token& ct = pplx::cancellation_token::none());
 
-		STORMANCER_DLL_API pplx::task<Scene_ptr> connectToPublicScene(const std::string& sceneId, const SceneInitializer& initializer = SceneInitializer());
+		pplx::task<Scene_ptr> connectToPublicScene(const std::string& sceneId, const SceneInitializer& initializer = SceneInitializer(), const pplx::cancellation_token& ct = pplx::cancellation_token::none());
 
-		STORMANCER_DLL_API pplx::task<Scene_ptr> connectToPrivateScene(const std::string& sceneToken, const SceneInitializer& initializer = SceneInitializer());
+		pplx::task<Scene_ptr> connectToPrivateScene(const std::string& sceneToken, const SceneInitializer& initializer = SceneInitializer(), const pplx::cancellation_token& ct = pplx::cancellation_token::none());
 
-		STORMANCER_DLL_API pplx::task<Scene_ptr> getConnectedScene(const std::string& sceneId);
+		pplx::task<Scene_ptr> getConnectedScene(const std::string& sceneId, const pplx::cancellation_token& ct = pplx::cancellation_token::none());
 
-		STORMANCER_DLL_API std::vector<std::string> getSceneIds();
+		std::vector<std::string> getSceneIds();
 
 		/// Returns the name of the application.
-		STORMANCER_DLL_API const std::string& applicationName() const;
+		const std::string& applicationName() const;
 
 		/// Returns the used logger.
-		STORMANCER_DLL_API ILogger_ptr logger() const;
+		ILogger_ptr logger() const;
 
 		/// Disconnect and close all connections.
 		/// this method returns nothing. So it's useful for application close.
-		STORMANCER_DLL_API pplx::task<void> disconnect();
+		pplx::task<void> disconnect();
 
 		/// Get sync clock value
-		STORMANCER_DLL_API int64 clock() const;
+		int64 clock() const;
 
 		/// Get last ping from sync clock
-		STORMANCER_DLL_API int64 lastPing() const;
+		int64 lastPing() const;
 
 		/// Get dependency resolver
-		STORMANCER_DLL_API DependencyResolver* dependencyResolver();
+		DependencyResolver* dependencyResolver();
 
 		/// Get connection state observable
-		STORMANCER_DLL_API rxcpp::observable<ConnectionState> getConnectionStateChangedObservable() const;
+		rxcpp::observable<ConnectionState> getConnectionStateChangedObservable() const;
 
 		/// Get current connection state
-		STORMANCER_DLL_API ConnectionState getConnectionState() const;
+		ConnectionState getConnectionState() const;
 
 		/// Set a metadata
-		STORMANCER_DLL_API void setMedatata(const std::string& key, const std::string& value);
+		void setMedatata(const std::string& key, const std::string& value);
 
+		pplx::cancellation_token getToken();
 
 #pragma endregion
 
@@ -96,31 +97,33 @@ namespace Stormancer
 		Client& operator=(const Client& other) = delete;
 		~Client();
 		void initialize();
-		pplx::task<void> connectToScene(const std::string& sceneId, const std::string& sceneToken, const std::vector<Route_ptr>& localRoutes);
+		pplx::task<void> connectToScene(const std::string& sceneId, const std::string& sceneToken, const std::vector<Route_ptr>& localRoutes, pplx::cancellation_token ct = pplx::cancellation_token::none());
 		pplx::task<void> disconnect(Scene_ptr scene);
 		pplx::task<void> disconnectAllScenes();
 		pplx::task<void> destroy();
-		pplx::task<Scene_ptr> getSceneInternal(const std::string& sceneId, const SceneEndpoint& sceneEndpoint);
+		pplx::task<Scene_ptr> getSceneInternal(const std::string& sceneId, const SceneEndpoint& sceneEndpoint, pplx::cancellation_token ct = pplx::cancellation_token::none());
 		void transport_packetReceived(Packet_ptr packet);
-		pplx::task<void> updateServerMetadata();
-		pplx::task<void> ensureConnectedToServer(const SceneEndpoint& sceneEndpoint);
+		pplx::task<void> updateServerMetadata(pplx::cancellation_token ct = pplx::cancellation_token::none());
+		pplx::task<void> ensureConnectedToServer(const SceneEndpoint& sceneEndpoint, pplx::cancellation_token ct = pplx::cancellation_token::none());
 		void dispatchEvent(const std::function<void(void)>& ev);
 		void setConnectionState(ConnectionState state);
+		pplx::cancellation_token getBetterCancellationToken(const pplx::cancellation_token& ct);
 
 
 
 
-		pplx::task<void> ensureNetworkAvailable();
+		pplx::task<void> ensureNetworkAvailable(const pplx::cancellation_token& ct = pplx::cancellation_token::none());
+
 		template<typename T1, typename T2>
-		pplx::task<T2> sendSystemRequest(byte id, const T1& parameter)
+		pplx::task<T1> sendSystemRequest(byte id, const T2& parameter, const pplx::cancellation_token& ct = pplx::cancellation_token::none())
 		{
 			auto peer = _serverConnection.lock();
 			if (!peer)
 			{
-				return pplx::task_from_exception<T2>(std::runtime_error("Peer disconnected"));
+				return pplx::task_from_exception<T1>(std::runtime_error("Peer disconnected"));
 			}
 			auto requestProcessor = _dependencyResolver->resolve<RequestProcessor>();
-			return requestProcessor->sendSystemRequest<T1, T2>(peer.get(), id, parameter);
+			return requestProcessor->sendSystemRequest<T1, T2>(peer.get(), id, parameter, ct);
 		}
 
 #pragma endregion

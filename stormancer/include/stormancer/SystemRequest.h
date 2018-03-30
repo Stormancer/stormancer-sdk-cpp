@@ -18,6 +18,7 @@ namespace Stormancer
 		time_t lastRefresh = time(NULL);
 		pplx::task_completion_event<Packet_ptr> tce;
 		bool complete = false;
+		pplx::cancellation_token cancellationToken = pplx::cancellation_token::none();
 
 		byte operation();
 #pragma endregion

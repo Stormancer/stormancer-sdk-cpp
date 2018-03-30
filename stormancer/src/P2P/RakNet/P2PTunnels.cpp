@@ -38,7 +38,7 @@ namespace Stormancer
 		return tunnel;
 	}
 
-	pplx::task<std::shared_ptr<P2PTunnel>> P2PTunnels::openTunnel(uint64 connectionId, std::string serverId)
+	pplx::task<std::shared_ptr<P2PTunnel>> P2PTunnels::openTunnel(uint64 connectionId, std::string serverId, const pplx::cancellation_token& ct)
 	{
 		auto connection = _connections->getConnection(connectionId);
 
@@ -49,8 +49,7 @@ namespace Stormancer
 
 		return _sysClient->sendSystemRequest(connection.get(), (byte)SystemRequestIDTypes::ID_P2P_OPEN_TUNNEL, [=](obytestream* stream) {
 			_serializer->serialize(stream, serverId);
-		}).then([=](pplx::task<Packet_ptr> t) {
-
+		}, PacketPriority::MEDIUM_PRIORITY, ct).then([=](pplx::task<Packet_ptr> t) {
 			auto handle = _serializer->deserializeOne<byte>(t.get()->stream);
 			auto client = std::make_shared<P2PTunnelClient>([=](P2PTunnelClient* client, RakNet::RNS2RecvStruct* msg) { this->onMsgReceived(client, msg); }, _sysClient, _logger);
 			client->handle = handle;
@@ -66,7 +65,7 @@ namespace Stormancer
 			tunnel->ip = "127.0.0.1";
 			tunnel->port = client->socket->GetBoundAddress().GetPort();
 			return tunnel;
-		});
+		}, ct);
 	}
 
 	byte P2PTunnels::addClient(std::string serverId, uint64 clientPeerId)
@@ -114,9 +113,7 @@ namespace Stormancer
 				if (connection)
 				{
 					auto handle = std::get<1>(tunnel.first);
-					tasks.push_back(_sysClient->sendSystemRequest(connection.get(), (byte)SystemRequestIDTypes::ID_P2P_CLOSE_TUNNEL, [=](obytestream* stream) {
-						_serializer->serialize(stream, handle);
-					}).then([](pplx::task<Packet_ptr> t) {
+					tasks.push_back(_sysClient->sendSystemRequest<void>(connection.get(), (byte)SystemRequestIDTypes::ID_P2P_CLOSE_TUNNEL, handle).then([](pplx::task<void> t) {
 						try
 						{
 							t.get();
@@ -146,14 +143,15 @@ namespace Stormancer
 			_tunnels.erase(it);
 			if (connection)
 			{
-				return _sysClient->sendSystemRequest(connection.get(), (byte)SystemRequestIDTypes::ID_P2P_CLOSE_TUNNEL, [=](obytestream* stream) {
-					_serializer->serialize(stream, handle);
-				}).then([](pplx::task<Packet_ptr> t) {
+				return _sysClient->sendSystemRequest<void>(connection.get(), (byte)SystemRequestIDTypes::ID_P2P_CLOSE_TUNNEL, handle)
+				.then([](pplx::task<void> t) {
 					try
 					{
 						t.get();
 					}
-					catch (...) {}
+					catch (...)
+					{
+					}
 				});
 			}
 		}

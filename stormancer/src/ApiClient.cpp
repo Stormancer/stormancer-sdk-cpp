@@ -15,7 +15,7 @@ namespace Stormancer
 	{
 	}
 
-	pplx::task<SceneEndpoint> ApiClient::getSceneEndpoint(std::string accountId, std::string applicationName, std::string sceneId)
+	pplx::task<SceneEndpoint> ApiClient::getSceneEndpoint(std::string accountId, std::string applicationName, std::string sceneId, const pplx::cancellation_token& ct)
 	{
 #ifdef STORMANCER_LOG_CLIENT
 		std::stringstream ss1;
@@ -34,7 +34,7 @@ namespace Stormancer
 
 		if (_config->endpointSelectionMode == EndpointSelectionMode::FALLBACK)
 		{
-			return getSceneEndpointImpl(baseUris, errors, accountId, applicationName, sceneId);
+			return getSceneEndpointImpl(baseUris, errors, accountId, applicationName, sceneId, ct);
 		}
 		else if (_config->endpointSelectionMode == EndpointSelectionMode::RANDOM)
 		{
@@ -46,13 +46,13 @@ namespace Stormancer
 				baseUris2.push_back(*it);
 				baseUris.erase(it);
 			}
-			return getSceneEndpointImpl(baseUris2, errors, accountId, applicationName, sceneId);
+			return getSceneEndpointImpl(baseUris2, errors, accountId, applicationName, sceneId, ct);
 		}
 
 		return pplx::task_from_exception<SceneEndpoint>(std::runtime_error("Error selecting server endpoint."));
 	}
 
-	pplx::task<SceneEndpoint> ApiClient::getSceneEndpointImpl(std::vector<std::string> endpoints, std::shared_ptr<std::vector<std::string>> errors, std::string accountId, std::string applicationName, std::string sceneId)
+	pplx::task<SceneEndpoint> ApiClient::getSceneEndpointImpl(std::vector<std::string> endpoints, std::shared_ptr<std::vector<std::string>> errors, std::string accountId, std::string applicationName, std::string sceneId, const pplx::cancellation_token& ct)
 	{
 		if (endpoints.size() == 0)
 		{
@@ -89,7 +89,7 @@ namespace Stormancer
 		request.headers().add("x-version", "1.0.0");
 #endif
 
-		return client.request(request).then([=](pplx::task<web::http::http_response> task) {
+		return client.request(request, ct).then([=](pplx::task<web::http::http_response> task) {
 			web::http::http_response response;
 			try
 			{
@@ -100,7 +100,7 @@ namespace Stormancer
 				auto msgStr = "Can't reach the server endpoint. " + baseUri;
 				_logger->log(LogLevel::Warn, "ApiClient", msgStr, ex.what());
 				(*errors).push_back("[" + msgStr + ":" + ex.what() + "]");
-				return getSceneEndpointImpl(endpoints, errors, accountId, applicationName, sceneId);
+				return getSceneEndpointImpl(endpoints, errors, accountId, applicationName, sceneId, ct);
 			}
 
 			try
@@ -120,26 +120,26 @@ namespace Stormancer
 					else
 					{
 						(*errors).push_back("[" + msgStr + ":" + std::to_string(statusCode) + "]");
-						return getSceneEndpointImpl(endpoints, errors, accountId, applicationName, sceneId);
+						return getSceneEndpointImpl(endpoints, errors, accountId, applicationName, sceneId, ct);
 					}
-				});
+				}, ct);
 			}
 			catch (const std::exception& ex)
 			{
-				throw std::runtime_error(std::string(ex.what()) + "\nCan't get the scene endpoint response.");
+				throw std::runtime_error(std::string() + "Can't get the scene endpoint response: " + ex.what());
 			}
-		});
+		}, ct);
 	}
 
-	pplx::task<web::http::http_response> ApiClient::requestWithRetries(std::function<web::http::http_request(std::string)> requestFactory)
+	pplx::task<web::http::http_response> ApiClient::requestWithRetries(std::function<web::http::http_request(std::string)> requestFactory, const pplx::cancellation_token& ct)
 	{
 		auto errors = std::make_shared<std::vector<std::string>>();
 		std::vector<std::string> baseUris = _config->getApiEndpoint();
 
-		return requestWithRetriesImpl(requestFactory, baseUris, errors);
+		return requestWithRetriesImpl(requestFactory, baseUris, errors, ct);
 	}
 
-	pplx::task<ServerEndpoints> ApiClient::GetServerEndpints()
+	pplx::task<ServerEndpoints> ApiClient::GetServerEndpoints()
 	{
 		return requestWithRetries([=](std::string) {
 			web::http::http_request request(web::http::methods::POST);
@@ -167,7 +167,7 @@ namespace Stormancer
 		});
 	}
 
-	pplx::task<web::http::http_response> ApiClient::requestWithRetriesImpl(std::function<web::http::http_request(std::string)> requestFactory, std::vector<std::string> endpoints, std::shared_ptr<std::vector<std::string>> errors)
+	pplx::task<web::http::http_response> ApiClient::requestWithRetriesImpl(std::function<web::http::http_request(std::string)> requestFactory, std::vector<std::string> endpoints, std::shared_ptr<std::vector<std::string>> errors, const pplx::cancellation_token& ct)
 	{
 
 		auto it = endpoints.begin();
@@ -190,7 +190,7 @@ namespace Stormancer
 		web::http::client::http_client client(baseUri, config);
 #endif
 
-		return client.request(rq).then([=](pplx::task<web::http::http_response> t) {
+		return client.request(rq, ct).then([=](pplx::task<web::http::http_response> t) {
 
 			bool success = false;
 			web::http::http_response response;
@@ -216,7 +216,7 @@ namespace Stormancer
 			{
 				if (endpoints.size() > 0)
 				{
-					return requestWithRetriesImpl(requestFactory, endpoints, errors);
+					return requestWithRetriesImpl(requestFactory, endpoints, errors, ct);
 				}
 				else
 				{
@@ -232,6 +232,6 @@ namespace Stormancer
 			{
 				return pplx::task_from_result(response);
 			}
-		});
+		}, ct);
 	}
 };

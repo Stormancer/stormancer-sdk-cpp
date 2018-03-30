@@ -96,16 +96,16 @@ namespace Stormancer
 		}
 	}
 
-	pplx::task<void> taskDelay(std::chrono::milliseconds milliseconds, pplx::cancellation_token token)
+	pplx::task<void> taskDelay(std::chrono::milliseconds milliseconds, const pplx::cancellation_token& ct)
 	{
 		pplx::task<void> sleepTask = pplx::task<void>([=]() {
 			std::this_thread::sleep_for(milliseconds);
-		}, pplx::task_options(token));
+		}, pplx::task_options(ct));
 
-		if (token.is_cancelable())
+		if (ct.is_cancelable())
 		{
 			pplx::task_completion_event<void> tce;
-			token.register_callback([=]() { tce.set(); });
+			ct.register_callback([=]() { tce.set(); });
 			pplx::task<void> t(tce);
 
 			std::vector<pplx::task<void>> v{ t, sleepTask };
@@ -232,6 +232,12 @@ namespace Stormancer
 			}
 		}
 		return false;
+	}
+
+	pplx::cancellation_token_source create_linked_source(pplx::cancellation_token token1, pplx::cancellation_token token2)
+	{
+		std::vector<pplx::cancellation_token> tokens{ token1, token2 };
+		return pplx::cancellation_token_source::create_linked_source(tokens.begin(), tokens.end());
 	}
 
 

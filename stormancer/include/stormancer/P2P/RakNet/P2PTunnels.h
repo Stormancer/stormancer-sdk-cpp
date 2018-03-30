@@ -39,7 +39,7 @@ namespace Stormancer
 		P2PTunnels(std::shared_ptr<RequestProcessor> sysCall, std::shared_ptr<IConnectionManager> connections, std::shared_ptr<Serializer> serializer, std::shared_ptr<Configuration> configuration, std::shared_ptr<ILogger> logger);
 		void receiveFrom(uint64 id, ibytestream* stream);
 		std::shared_ptr<P2PTunnel> createServer(std::string serverId, std::shared_ptr<P2PTunnels> tunnels);
-		pplx::task<std::shared_ptr<P2PTunnel>> openTunnel(uint64 connectionId, std::string serverId);
+		pplx::task<std::shared_ptr<P2PTunnel>> openTunnel(uint64 connectionId, std::string serverId, const pplx::cancellation_token& ct = pplx::cancellation_token::none());
 		byte addClient(std::string serverId, uint64 clientPeerId);
 		void closeTunnel(byte handle, uint64 peerId);
 		pplx::task<void> destroyServer(std::string serverId);

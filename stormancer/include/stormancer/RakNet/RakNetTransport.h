@@ -17,6 +17,7 @@ namespace Stormancer
 	public:
 		pplx::task_completion_event<std::shared_ptr<IConnection>> tce;
 		std::string endpoint;
+		pplx::cancellation_token cancellationToken = pplx::cancellation_token::none();
 	};
 
 	class RakNetTransport : public ITransport
@@ -27,8 +28,8 @@ namespace Stormancer
 
 		RakNetTransport(DependencyResolver* resolver);
 		~RakNetTransport();
-		void start(std::string type, std::shared_ptr<IConnectionManager> handler, pplx::cancellation_token token = pplx::cancellation_token::none(), uint16 maxConnections = 10, uint16 serverPort = 0) override;
-		pplx::task<std::shared_ptr<IConnection>> connect(std::string endpoint) override;
+		void start(std::string type, std::shared_ptr<IConnectionManager> handler, const pplx::cancellation_token& ct = pplx::cancellation_token::none(), uint16 maxConnections = 10, uint16 serverPort = 0) override;
+		pplx::task<std::shared_ptr<IConnection>> connect(std::string endpoint, const pplx::cancellation_token& ct = pplx::cancellation_token::none()) override;
 		bool isRunning() const override;
 		std::string name() const override;
 		uint64 id() const override;
@@ -63,6 +64,7 @@ namespace Stormancer
 		void openNat(const std::string& address) override;
 		std::vector<std::string> getAvailableEndpoints() const override;
 		void startNextPendingConnections();
+
 #pragma endregion
 
 #pragma region private_members

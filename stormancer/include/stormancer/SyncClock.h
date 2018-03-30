@@ -14,7 +14,7 @@ namespace Stormancer
 
 		SyncClock(DependencyResolver* resolver, int interval = 1000);
 		~SyncClock();
-		void start(std::weak_ptr<IConnection> connection, pplx::cancellation_token ct);
+		void start(std::weak_ptr<IConnection> connection, const pplx::cancellation_token& ct);
 		int lastPing();
 		bool isRunning();
 		int64 clock();

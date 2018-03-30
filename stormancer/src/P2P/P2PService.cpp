@@ -20,12 +20,12 @@ namespace Stormancer
 		return _tunnels->createServer(p2pServerId, _tunnels);
 	}
 
-	pplx::task<std::shared_ptr<P2PTunnel>> P2PService::openTunnel(uint64 connectionId, const std::string& id)
+	pplx::task<std::shared_ptr<P2PTunnel>> P2PService::openTunnel(uint64 connectionId, const std::string& id, const pplx::cancellation_token& ct)
 	{
-		return _tunnels->openTunnel(connectionId, id);
+		return _tunnels->openTunnel(connectionId, id, ct);
 	}
 
-	pplx::task<std::shared_ptr<IConnection>> P2PService::openP2PConnection(const std::string& token)
+	pplx::task<std::shared_ptr<IConnection>> P2PService::openP2PConnection(const std::string& p2pToken, const pplx::cancellation_token& ct)
 	{
 		auto server = _connections->getConnection(0);
 		if (!server)
@@ -33,13 +33,9 @@ namespace Stormancer
 			return pplx::task_from_exception<std::shared_ptr<IConnection>>(std::runtime_error("Cannot establish P2P connection. The client must be connected to the server"));
 		}
 
-		return _sysCall->sendSystemRequest(server.get(), (byte)SystemRequestIDTypes::ID_P2P_CREATE_SESSION, [=](obytestream* stream) {
-			_serializer->serialize(stream, token);
-		})
-			.then([=](pplx::task<Packet_ptr> t) {
-			auto packet = t.get();
-			auto session = _serializer->deserializeOne<P2PSession>(packet->stream);
-			return _connections->getConnection(session.remotePeer);
-		});
+		return _sysCall->sendSystemRequest<P2PSession>(server.get(), (byte)SystemRequestIDTypes::ID_P2P_CREATE_SESSION, p2pToken, ct)
+			.then([=](P2PSession session) {
+				return _connections->getConnection(session.remotePeer);
+		}, ct);
 	}
 };
