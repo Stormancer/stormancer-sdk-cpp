@@ -385,7 +385,7 @@ namespace Stormancer
 #ifdef STORMANCER_LOG_CLIENT
 					logger()->log(LogLevel::Trace, "Client", "Connecting transport to server", endpointUrl);
 #endif
-					_connectionTask =  transport->connect(endpointUrl, ct)
+					_connectionTask = transport->connect(endpointUrl, ct)
 						.then([=](std::weak_ptr<IConnection> weakptr)
 					{
 						auto connection = weakptr.lock();
@@ -743,30 +743,42 @@ namespace Stormancer
 
 		_dependencyResolver->resolve<SceneDispatcher>()->removeScene(sceneHandle);
 
-		return sendSystemRequest<void>((byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, sceneHandle).then([=](pplx::task<void> t) {
+		std::weak_ptr<Client> weak = shared_from_this();
+		return sendSystemRequest<void>((byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, sceneHandle).then([scene, sceneId, weak](pplx::task<void> t) {			
+			auto self = weak.lock();
+			
 			try
 			{
 				t.get();
-				for (auto plugin : _plugins)
+				if (self)
 				{
-					plugin->sceneDisconnected(scene.get());
-				}
+					for (auto plugin : self->_plugins)
+					{
+						plugin->sceneDisconnected(scene.get());
+					}
 
 #ifdef STORMANCER_LOG_CLIENT			
-				logger()->log(LogLevel::Debug, "client", "Scene disconnected", sceneId);
+					self->logger()->log(LogLevel::Debug, "client", "Scene disconnected", sceneId);
 #endif
 
-				scene->setConnectionState(ConnectionState::Disconnected);
+					scene->setConnectionState(ConnectionState::Disconnected);
+				}
 			}
 			catch (const std::exception& ex)
 			{
-				// capture the exception and don't rethrow it
-				logger()->log(LogLevel::Warn, "client", "Scene disconnexion failed", ex.what());
+				if (self)
+				{
+					// capture the exception and don't rethrow it
+					self->logger()->log(LogLevel::Warn, "client", "Scene disconnexion failed", ex.what());
+				}
 			}
 			catch (...)
 			{
-				// capture the exception and don't rethrow it
-				logger()->log(LogLevel::Warn, "client", "Scene disconnexion failed");
+				if (self)
+				{
+					// capture the exception and don't rethrow it
+					self->logger()->log(LogLevel::Warn, "client", "Scene disconnexion failed");
+				}
 			}
 		});
 	}
