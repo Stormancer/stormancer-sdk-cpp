@@ -37,7 +37,7 @@ namespace Stormancer
 		_logger->log(LogLevel::Trace, "RakNetTransport", "RakNet transport deleted");
 	}
 
-	void RakNetTransport::start(std::string type, std::shared_ptr<IConnectionManager> handler, const pplx::cancellation_token& ct, uint16 serverPort, uint16 maxConnections)
+	void RakNetTransport::start(std::string type, std::shared_ptr<IConnectionManager> handler, pplx::cancellation_token ct, uint16 serverPort, uint16 maxConnections)
 	{
 		_logger->log(LogLevel::Trace, "RakNetTransport", "Starting RakNet transport...");
 
@@ -159,7 +159,6 @@ namespace Stormancer
 								if (rq.cancellationToken.is_canceled())
 								{
 									_peer->CloseConnection(rakNetPacket->guid, false);
-									rq.tce.set_exception(std::runtime_error("Operation canceled"));
 								}
 								else
 								{
@@ -173,12 +172,18 @@ namespace Stormancer
 							}
 							else
 							{
-								// TODO: if (rq.token.is_canceled())
-								RakNet::BitStream data;
-								data.Write((byte)MessageIDTypes::ID_ADVERTISE_PEERID);
-								data.Write(_id);
-								data.Write(false);
-								_peer->Send(&data, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE, 0, rakNetPacket->guid, false);
+								if (rq.cancellationToken.is_canceled())
+								{
+									_peer->CloseConnection(rakNetPacket->guid, false);
+								}
+								else
+								{
+									RakNet::BitStream data;
+									data.Write((byte)MessageIDTypes::ID_ADVERTISE_PEERID);
+									data.Write(_id);
+									data.Write(false);
+									_peer->Send(&data, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE, 0, rakNetPacket->guid, false);
+								}
 							}
 						}
 						else
@@ -193,17 +198,15 @@ namespace Stormancer
 					{
 						std::string packetSystemAddressStr = rakNetPacket->systemAddress.ToString(true, ':');
 
+						_peer->CloseConnection(rakNetPacket->guid, false);
+
 						std::lock_guard<std::mutex> lg(_pendingConnection_mtx);
 
 						if (!_pendingConnections.empty())
 						{
 							auto rq = _pendingConnections.front();
 							_pendingConnections.pop();
-							if (rq.cancellationToken.is_canceled())
-							{
-								rq.tce.set_exception(std::runtime_error("Operation canceled"));
-							}
-							else
+							if (!rq.cancellationToken.is_canceled())
 							{
 								_logger->log(LogLevel::Trace, "RakNetTransport", "Connection request failed", packetSystemAddressStr.c_str());
 								rq.tce.set_exception(std::runtime_error("Connection attempt failed"));
@@ -312,8 +315,7 @@ namespace Stormancer
 							_pendingConnections.pop();
 							if (rq.cancellationToken.is_canceled())
 							{
-								_peer->CloseConnection(rakNetPacket->systemAddress, false);
-								rq.tce.set_exception(std::runtime_error("Operation canceled"));
+								_peer->CloseConnection(rakNetPacket->guid, false);
 							}
 							else
 							{
@@ -325,7 +327,7 @@ namespace Stormancer
 						}
 						else
 						{
-							auto c = onConnection(rakNetPacket->systemAddress, rakNetPacket->guid, (uint64)remotePeerId);
+							onConnection(rakNetPacket->systemAddress, rakNetPacket->guid, (uint64)remotePeerId);
 						}
 						break;
 					}
@@ -416,7 +418,7 @@ namespace Stormancer
 		_id = p;
 	}
 
-	pplx::task<std::shared_ptr<IConnection>> RakNetTransport::connect(std::string endpoint, const pplx::cancellation_token& ct)
+	pplx::task<std::shared_ptr<IConnection>> RakNetTransport::connect(std::string endpoint, pplx::cancellation_token ct)
 	{
 		std::lock_guard<std::mutex> lock(_pendingConnection_mtx);
 
@@ -430,7 +432,7 @@ namespace Stormancer
 			startNextPendingConnections();
 		}
 
-		return pplx::task<std::shared_ptr<IConnection>>(rq.tce);
+		return pplx::task<std::shared_ptr<IConnection>>(rq.tce, ct);
 	}
 
 	void RakNetTransport::startNextPendingConnections()
@@ -616,9 +618,9 @@ namespace Stormancer
 		return boundAddress.GetPort();
 	}
 
-	pplx::task<int> RakNetTransport::sendPing(const std::string& address)
+	pplx::task<int> RakNetTransport::sendPing(const std::string& address, pplx::cancellation_token ct)
 	{
-		return this->sendPing(address, 4);
+		return this->sendPing(address, 4, ct);
 	}
 
 	bool RakNetTransport::sendPingImpl(const std::string& address)
@@ -646,7 +648,7 @@ namespace Stormancer
 		//_peer->Connect("127.0.0.1", port, nullptr, 0);
 	}
 
-	pplx::task<int> RakNetTransport::sendPing(const std::string& address, const int nb)
+	pplx::task<int> RakNetTransport::sendPing(const std::string& address, const int nb, pplx::cancellation_token ct)
 	{
 		pplx::task_completion_event<int> tce;
 
@@ -655,17 +657,17 @@ namespace Stormancer
 			_pendingPings[address] = tce;
 		}
 
-		pplx::task<int> eventSetTask(tce);
-		auto tcs = pplx::cancellation_token_source();
-		auto tasks = std::vector<pplx::task<bool>>();
+		pplx::task<int> eventSetTask(tce, ct);
+		auto cts = pplx::cancellation_token_source::create_linked_source(ct);
+		std::vector<pplx::task<bool>> tasks;
 		for (int i = 0; i < nb; i++)
 		{
-			tasks.push_back(taskDelay(std::chrono::milliseconds(300 * i), tcs.get_token()).then([this, address]() {
-				return this->sendPingImpl(address);
-			}));
+			tasks.push_back(taskDelay(std::chrono::milliseconds(300 * i), cts.get_token()).then([this, address]() {
+				return sendPingImpl(address);
+			}, cts.get_token()));
 		}
 
-		pplx::when_all(tasks.begin(), tasks.end()).then([tce, address, this](std::vector<bool> results) {
+		pplx::when_all(tasks.begin(), tasks.end()).then([=](std::vector<bool> results) {
 			bool sent = false;
 
 			for (bool result : results)
@@ -679,24 +681,25 @@ namespace Stormancer
 
 			if (!sent)
 			{
-				this->_logger->log(LogLevel::Debug, "RakNetTransport", "Pings to " + address + " failed: unreachable address.");
+				_logger->log(LogLevel::Debug, "RakNetTransport", "Pings to " + address + " failed: unreachable address.");
 				tce.set(-1);
 			}
+		}, cts.get_token());
 
-		});
-		pplx::cancellation_token_source cts;
-		return cancel_after_timeout(eventSetTask, cts, 1500).then([this, address](pplx::task<int> t) {
+		auto cts2 = pplx::cancellation_token_source::create_linked_source(ct);
+		return cancel_after_timeout(eventSetTask, cts2, 1500).then([=](pplx::task<int> t) {
 			std::lock_guard<std::mutex> lg(_pendingPingsMutex);
-			_pendingPings.erase(address);//destroys the tce and cancels the task
+			_pendingPings.erase(address); // destroys the tce and cancels the task
 			try
 			{
 				return t.get();
 			}
-			catch (std::exception& ex) {
-				this->_logger->log(LogLevel::Debug, "RakNetTransport", "Ping to " + address + " failed", ex.what());
+			catch (std::exception& ex)
+			{
+				_logger->log(LogLevel::Debug, "RakNetTransport", "Ping to " + address + " failed", ex.what());
 				return -1;
 			}
-		});
+		}, cts2.get_token());
 	}
 
 	void RakNetTransport::openNat(const std::string& address)

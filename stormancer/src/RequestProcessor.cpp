@@ -180,7 +180,7 @@ namespace Stormancer
 		}));
 	}
 
-	pplx::task<Packet_ptr> RequestProcessor::sendSystemRequest(IConnection* peer, byte msgId, const Writer& writer, PacketPriority priority, const pplx::cancellation_token& ct)
+	pplx::task<Packet_ptr> RequestProcessor::sendSystemRequest(IConnection* peer, byte msgId, const Writer& writer, PacketPriority priority, pplx::cancellation_token ct)
 	{
 		if (peer)
 		{
@@ -212,7 +212,7 @@ namespace Stormancer
 		}
 	}
 
-	SystemRequest_ptr RequestProcessor::reserveRequestSlot(byte msgId, pplx::task_completion_event<Packet_ptr> tce, const pplx::cancellation_token& ct)
+	SystemRequest_ptr RequestProcessor::reserveRequestSlot(byte msgId, pplx::task_completion_event<Packet_ptr> tce, pplx::cancellation_token ct)
 	{
 		SystemRequest_ptr request;
 

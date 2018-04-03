@@ -20,12 +20,12 @@ namespace Stormancer
 		return _tunnels->createServer(p2pServerId, _tunnels);
 	}
 
-	pplx::task<std::shared_ptr<P2PTunnel>> P2PService::openTunnel(uint64 connectionId, const std::string& id, const pplx::cancellation_token& ct)
+	pplx::task<std::shared_ptr<P2PTunnel>> P2PService::openTunnel(uint64 connectionId, const std::string& id, pplx::cancellation_token ct)
 	{
 		return _tunnels->openTunnel(connectionId, id, ct);
 	}
 
-	pplx::task<std::shared_ptr<IConnection>> P2PService::openP2PConnection(const std::string& p2pToken, const pplx::cancellation_token& ct)
+	pplx::task<std::shared_ptr<IConnection>> P2PService::openP2PConnection(const std::string& p2pToken, pplx::cancellation_token ct)
 	{
 		auto server = _connections->getConnection(0);
 		if (!server)

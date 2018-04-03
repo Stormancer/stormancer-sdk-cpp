@@ -46,7 +46,7 @@ namespace Stormancer
 		void initialize();
 
 		/// Connect to the scene.
-		pplx::task<void> connect(const pplx::cancellation_token& ct = pplx::cancellation_token::none());
+		pplx::task<void> connect(pplx::cancellation_token ct = pplx::cancellation_token::none());
 
 		/// Disconnect from the scene.
 		pplx::task<void> disconnect(bool immediate = false);
@@ -123,7 +123,7 @@ namespace Stormancer
 
 		std::shared_ptr<P2PTunnel> registerP2PServer(const std::string& p2pServerId);
 
-		pplx::task<std::shared_ptr<P2PScenePeer>> openP2PConnection(const std::string& p2pToken, const pplx::cancellation_token& ct = pplx::cancellation_token::none());
+		pplx::task<std::shared_ptr<P2PScenePeer>> openP2PConnection(const std::string& p2pToken, pplx::cancellation_token ct = pplx::cancellation_token::none());
 
 #pragma endregion
 
@@ -152,13 +152,13 @@ namespace Stormancer
 
 		void setConnectionState(ConnectionState connectionState);
 
-		pplx::task<std::shared_ptr<P2PScenePeer>> createScenePeerFromP2PConnection(std::shared_ptr<IConnection> connection, const pplx::cancellation_token& ct = pplx::cancellation_token::none());
+		pplx::task<std::shared_ptr<P2PScenePeer>> createScenePeerFromP2PConnection(std::shared_ptr<IConnection> connection, pplx::cancellation_token ct = pplx::cancellation_token::none());
 
 		template<typename T1, typename T2>
-		pplx::task<T1> sendSystemRequest(std::shared_ptr<IConnection> connection, byte id, const T2& parameter, const pplx::cancellation_token& ct = pplx::cancellation_token::none())
+		pplx::task<T1> sendSystemRequest(std::shared_ptr<IConnection> connection, byte id, const T2& parameter, pplx::cancellation_token ct = pplx::cancellation_token::none())
 		{
 			auto requestProcessor = _dependencyResolver->resolve<RequestProcessor>();
-			return requestProcessor->sendSystemRequest<T1, T2>(connection.get(), id, parameter, token);
+			return requestProcessor->sendSystemRequest<T1, T2>(connection.get(), id, parameter, ct);
 		}
 
 #pragma endregion

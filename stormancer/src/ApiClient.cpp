@@ -15,7 +15,7 @@ namespace Stormancer
 	{
 	}
 
-	pplx::task<SceneEndpoint> ApiClient::getSceneEndpoint(std::string accountId, std::string applicationName, std::string sceneId, const pplx::cancellation_token& ct)
+	pplx::task<SceneEndpoint> ApiClient::getSceneEndpoint(std::string accountId, std::string applicationName, std::string sceneId, pplx::cancellation_token ct)
 	{
 #ifdef STORMANCER_LOG_CLIENT
 		std::stringstream ss1;
@@ -52,7 +52,7 @@ namespace Stormancer
 		return pplx::task_from_exception<SceneEndpoint>(std::runtime_error("Error selecting server endpoint."));
 	}
 
-	pplx::task<SceneEndpoint> ApiClient::getSceneEndpointImpl(std::vector<std::string> endpoints, std::shared_ptr<std::vector<std::string>> errors, std::string accountId, std::string applicationName, std::string sceneId, const pplx::cancellation_token& ct)
+	pplx::task<SceneEndpoint> ApiClient::getSceneEndpointImpl(std::vector<std::string> endpoints, std::shared_ptr<std::vector<std::string>> errors, std::string accountId, std::string applicationName, std::string sceneId, pplx::cancellation_token ct)
 	{
 		if (endpoints.size() == 0)
 		{
@@ -131,7 +131,7 @@ namespace Stormancer
 		}, ct);
 	}
 
-	pplx::task<web::http::http_response> ApiClient::requestWithRetries(std::function<web::http::http_request(std::string)> requestFactory, const pplx::cancellation_token& ct)
+	pplx::task<web::http::http_response> ApiClient::requestWithRetries(std::function<web::http::http_request(std::string)> requestFactory, pplx::cancellation_token ct)
 	{
 		auto errors = std::make_shared<std::vector<std::string>>();
 		std::vector<std::string> baseUris = _config->getApiEndpoint();
@@ -167,7 +167,7 @@ namespace Stormancer
 		});
 	}
 
-	pplx::task<web::http::http_response> ApiClient::requestWithRetriesImpl(std::function<web::http::http_request(std::string)> requestFactory, std::vector<std::string> endpoints, std::shared_ptr<std::vector<std::string>> errors, const pplx::cancellation_token& ct)
+	pplx::task<web::http::http_response> ApiClient::requestWithRetriesImpl(std::function<web::http::http_request(std::string)> requestFactory, std::vector<std::string> endpoints, std::shared_ptr<std::vector<std::string>> errors, pplx::cancellation_token ct)
 	{
 
 		auto it = endpoints.begin();

@@ -22,7 +22,7 @@ namespace Stormancer
 		}
 	}
 
-	void SyncClock::start(std::weak_ptr<IConnection> connectionPtr, const pplx::cancellation_token& ct)
+	void SyncClock::start(std::weak_ptr<IConnection> connectionPtr, pplx::cancellation_token ct)
 	{
 		auto logger = _dependencyResolver->resolve<ILogger>();
 		logger->log(LogLevel::Trace, "synchronizedClock", "Starting SyncClock...");
@@ -85,22 +85,22 @@ namespace Stormancer
 				{
 					thiz->syncClockImplAsync();
 				}
-			}, ct);
+			}, _cancellationToken);
+
+			_cancellationToken.register_callback([weakThis]
+			{
+				if (auto thiz = weakThis.lock())
+				{
+					thiz->stop();
+				}
+			});
+
+			logger->log(LogLevel::Trace, "synchronizedClock", "SyncClock started");
 		}
 		else
 		{
 			logger->log(LogLevel::Warn, "synchronizedClock", "Missing scheduler");
 		}
-
-		ct.register_callback([weakThis]
-		{
-			if (auto thiz = weakThis.lock())
-			{
-				thiz->stop();
-			}
-		});
-
-		logger->log(LogLevel::Trace, "synchronizedClock", "SyncClock started");
 	}
 
 	void SyncClock::stop()
@@ -155,21 +155,7 @@ namespace Stormancer
 
 			requestProcessor->sendSystemRequest(remoteConnection.get(), (byte)SystemRequestIDTypes::ID_PING, [=](obytestream* bs) {
 				*bs << timeStart;
-			}, PacketPriority::IMMEDIATE_PRIORITY, _cancellationToken).then([=](pplx::task<Packet_ptr> t) {
-				Packet_ptr packet;
-				try
-				{
-					packet = t.get();
-				}
-				catch (const std::exception& ex)
-				{
-					if (!cancellationToken.is_canceled())
-					{
-						logger->log(LogLevel::Warn, "syncClock", "Failed to ping the server", ex.what());
-					}
-					return;
-				}
-
+			}, PacketPriority::IMMEDIATE_PRIORITY, _cancellationToken).then([=](Packet_ptr packet) {
 				uint64 timeEnd = (uint64)_watch.getElapsedTime();
 
 				std::lock_guard<std::mutex> lock(_mutex);
@@ -221,6 +207,19 @@ namespace Stormancer
 					}
 				}
 				_offset = offsetsAvg / lenOffsets;
+			}, _cancellationToken).then([=](pplx::task<void> t) {
+				try
+				{
+					t.get();
+				}
+				catch (const std::exception& ex)
+				{
+					if (!cancellationToken.is_canceled())
+					{
+						logger->log(LogLevel::Warn, "syncClock", "Failed to ping the server", ex.what());
+					}
+					return;
+				}
 			});
 		}
 		catch (const std::exception& ex)

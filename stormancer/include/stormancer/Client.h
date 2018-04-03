@@ -33,15 +33,15 @@ namespace Stormancer
 		/// \param config A pointer to a Configuration.
 		static Client_ptr create(Configuration_ptr config);
 
-		pplx::task<Scene_ptr> getPublicScene(const std::string& sceneId, const pplx::cancellation_token& ct = pplx::cancellation_token::none());
+		pplx::task<Scene_ptr> getPublicScene(const std::string& sceneId, pplx::cancellation_token ct = pplx::cancellation_token::none());
 
-		pplx::task<Scene_ptr> getPrivateScene(const std::string& sceneToken, const pplx::cancellation_token& ct = pplx::cancellation_token::none());
+		pplx::task<Scene_ptr> getPrivateScene(const std::string& sceneToken, pplx::cancellation_token ct = pplx::cancellation_token::none());
 
-		pplx::task<Scene_ptr> connectToPublicScene(const std::string& sceneId, const SceneInitializer& initializer = SceneInitializer(), const pplx::cancellation_token& ct = pplx::cancellation_token::none());
+		pplx::task<Scene_ptr> connectToPublicScene(const std::string& sceneId, const SceneInitializer& initializer = SceneInitializer(), pplx::cancellation_token ct = pplx::cancellation_token::none());
 
-		pplx::task<Scene_ptr> connectToPrivateScene(const std::string& sceneToken, const SceneInitializer& initializer = SceneInitializer(), const pplx::cancellation_token& ct = pplx::cancellation_token::none());
+		pplx::task<Scene_ptr> connectToPrivateScene(const std::string& sceneToken, const SceneInitializer& initializer = SceneInitializer(), pplx::cancellation_token ct = pplx::cancellation_token::none());
 
-		pplx::task<Scene_ptr> getConnectedScene(const std::string& sceneId, const pplx::cancellation_token& ct = pplx::cancellation_token::none());
+		pplx::task<Scene_ptr> getConnectedScene(const std::string& sceneId, pplx::cancellation_token ct = pplx::cancellation_token::none());
 
 		std::vector<std::string> getSceneIds();
 
@@ -107,15 +107,15 @@ namespace Stormancer
 		pplx::task<void> ensureConnectedToServer(const SceneEndpoint& sceneEndpoint, pplx::cancellation_token ct = pplx::cancellation_token::none());
 		void dispatchEvent(const std::function<void(void)>& ev);
 		void setConnectionState(ConnectionState state);
-		pplx::cancellation_token getBetterCancellationToken(const pplx::cancellation_token& ct);
+		pplx::cancellation_token getBetterCancellationToken(pplx::cancellation_token ct);
 
 
 
 
-		pplx::task<void> ensureNetworkAvailable(const pplx::cancellation_token& ct = pplx::cancellation_token::none());
+		pplx::task<void> ensureNetworkAvailable(pplx::cancellation_token ct = pplx::cancellation_token::none());
 
 		template<typename T1, typename T2>
-		pplx::task<T1> sendSystemRequest(byte id, const T2& parameter, const pplx::cancellation_token& ct = pplx::cancellation_token::none())
+		pplx::task<T1> sendSystemRequest(byte id, const T2& parameter, pplx::cancellation_token ct = pplx::cancellation_token::none())
 		{
 			auto peer = _serverConnection.lock();
 			if (!peer)

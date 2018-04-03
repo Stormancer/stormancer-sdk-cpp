@@ -15,7 +15,7 @@ namespace Stormancer
 
 #pragma region public_methods
 
-		RpcRequestContext(T* peer, Scene* scene, uint16 id, bool ordered, ibytestream* inputStream, const pplx::cancellation_token& ct)
+		RpcRequestContext(T* peer, Scene* scene, uint16 id, bool ordered, ibytestream* inputStream, pplx::cancellation_token ct)
 			: _peer(peer)
 			, _scene(scene)
 			, _inputStream(inputStream)

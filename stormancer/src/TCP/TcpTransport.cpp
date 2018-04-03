@@ -29,7 +29,7 @@ namespace Stormancer
 		_logger->log(LogLevel::Trace, "TcpTransport", "TCP transport deleted");
 	}
 
-	void TcpTransport::start(std::string type, std::shared_ptr<IConnectionManager> handler, const pplx::cancellation_token& ct, uint16 port, uint16)
+	void TcpTransport::start(std::string type, std::shared_ptr<IConnectionManager> handler, pplx::cancellation_token ct, uint16 port, uint16)
 	{
 		_logger->log(LogLevel::Trace, "TcpTransport", "Starting TCP transport...");
 
@@ -75,7 +75,7 @@ namespace Stormancer
 		_logger->log(LogLevel::Trace, "TcpTransport", "TCP transport started");
 	}
 
-	pplx::task<std::shared_ptr<IConnection>> TcpTransport::connect(std::string endpoint, const pplx::cancellation_token& ct)
+	pplx::task<std::shared_ptr<IConnection>> TcpTransport::connect(std::string endpoint, pplx::cancellation_token ct)
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
 
@@ -355,7 +355,7 @@ namespace Stormancer
 		_logger->log(LogLevel::Trace, "TcpTransport", "TCP transport stopped");
 	}
 
-	pplx::task<int> TcpTransport::sendPing(const std::string& /*address*/)
+	pplx::task<int> TcpTransport::sendPing(const std::string& /*address*/, pplx::cancellation_token /*ct*/)
 	{
 		throw std::runtime_error("not implemented");
 	}

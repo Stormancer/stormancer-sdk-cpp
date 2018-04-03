@@ -11,7 +11,7 @@ namespace Stormancer
 	{
 	}
 
-	void DefaultScheduler::schedulePeriodic(int delay, std::function<void()> work, const pplx::cancellation_token& ct)
+	void DefaultScheduler::schedulePeriodic(int delay, std::function<void()> work, pplx::cancellation_token ct)
 	{
 		if (delay <= 0)
 		{
@@ -31,7 +31,7 @@ namespace Stormancer
 		_timer->schedule(work, when);
 	}
 
-	void DefaultScheduler::periodicFunc(std::function<void()> work, const pplx::cancellation_token& ct, std::weak_ptr<TimerThread> weakTimer, std::chrono::milliseconds delay)
+	void DefaultScheduler::periodicFunc(std::function<void()> work, pplx::cancellation_token ct, std::weak_ptr<TimerThread> weakTimer, std::chrono::milliseconds delay)
 	{
 		if (!ct.is_canceled())
 		{

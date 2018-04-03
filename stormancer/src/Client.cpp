@@ -215,7 +215,7 @@ namespace Stormancer
 		}
 	}
 
-	pplx::task<Scene_ptr> Client::connectToPublicScene(const std::string& sceneId, const SceneInitializer& initializer, const pplx::cancellation_token& ct)
+	pplx::task<Scene_ptr> Client::connectToPublicScene(const std::string& sceneId, const SceneInitializer& initializer, pplx::cancellation_token ct)
 	{
 		return getPublicScene(sceneId, ct).then([=](Scene_ptr scene) {
 			if (scene->getCurrentConnectionState() == ConnectionState::Disconnected)
@@ -231,7 +231,7 @@ namespace Stormancer
 		}, ct);
 	}
 
-	pplx::task<Scene_ptr> Client::connectToPrivateScene(const std::string& sceneToken, const SceneInitializer& initializer, const pplx::cancellation_token& ct)
+	pplx::task<Scene_ptr> Client::connectToPrivateScene(const std::string& sceneToken, const SceneInitializer& initializer, pplx::cancellation_token ct)
 	{
 		return getPrivateScene(sceneToken, ct).then([=](Scene_ptr scene) {
 			if (scene->getCurrentConnectionState() == ConnectionState::Disconnected)
@@ -247,7 +247,7 @@ namespace Stormancer
 		}, ct);
 	}
 
-	pplx::task<Scene_ptr> Client::getConnectedScene(const std::string& sceneId, const pplx::cancellation_token& /*ct*/)
+	pplx::task<Scene_ptr> Client::getConnectedScene(const std::string& sceneId, pplx::cancellation_token /*ct*/)
 	{
 #ifdef STORMANCER_LOG_CLIENT
 		logger()->log(LogLevel::Trace, "Client", "Get connected scene.", sceneId);
@@ -281,7 +281,7 @@ namespace Stormancer
 		return sceneIds;
 	}
 
-	pplx::task<Scene_ptr> Client::getPublicScene(const std::string& sceneId, const pplx::cancellation_token& ct)
+	pplx::task<Scene_ptr> Client::getPublicScene(const std::string& sceneId, pplx::cancellation_token ct)
 	{
 #ifdef STORMANCER_LOG_CLIENT
 		logger()->log(LogLevel::Trace, "Client", "Get public scene.", sceneId);
@@ -324,7 +324,7 @@ namespace Stormancer
 		}
 	}
 
-	pplx::task<Scene_ptr> Client::getPrivateScene(const std::string& sceneToken, const pplx::cancellation_token& ct)
+	pplx::task<Scene_ptr> Client::getPrivateScene(const std::string& sceneToken, pplx::cancellation_token ct)
 	{
 #ifdef STORMANCER_LOG_CLIENT
 		logger()->log(LogLevel::Trace, "Client", "Get private scene.", sceneToken);
@@ -867,7 +867,7 @@ namespace Stormancer
 		}
 	}
 
-	pplx::cancellation_token Client::getBetterCancellationToken(const pplx::cancellation_token& ct)
+	pplx::cancellation_token Client::getBetterCancellationToken(pplx::cancellation_token ct)
 	{
 		if (ct.is_cancelable())
 		{
@@ -928,7 +928,7 @@ namespace Stormancer
 
 
 
-	pplx::task<void> Client::ensureNetworkAvailable(const pplx::cancellation_token& ct)
+	pplx::task<void> Client::ensureNetworkAvailable(pplx::cancellation_token ct)
 	{
 
 

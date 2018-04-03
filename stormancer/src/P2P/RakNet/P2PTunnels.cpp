@@ -38,7 +38,7 @@ namespace Stormancer
 		return tunnel;
 	}
 
-	pplx::task<std::shared_ptr<P2PTunnel>> P2PTunnels::openTunnel(uint64 connectionId, std::string serverId, const pplx::cancellation_token& ct)
+	pplx::task<std::shared_ptr<P2PTunnel>> P2PTunnels::openTunnel(uint64 connectionId, std::string serverId, pplx::cancellation_token ct)
 	{
 		auto connection = _connections->getConnection(connectionId);
 

@@ -36,7 +36,7 @@ namespace Stormancer
 		/// \param msgId The message id.
 		/// \param writer A procedure writing the request parameters.
 		/// \return An observable returning the request responses.
-		pplx::task<Packet_ptr> sendSystemRequest(IConnection* peer, byte msgId, const Writer& writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, const pplx::cancellation_token& ct = pplx::cancellation_token::none());
+		pplx::task<Packet_ptr> sendSystemRequest(IConnection* peer, byte msgId, const Writer& writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, pplx::cancellation_token ct = pplx::cancellation_token::none());
 
 		/// Register a new system request handlers for the specified message Id.
 		/// \param msgId The system message id.
@@ -44,7 +44,7 @@ namespace Stormancer
 		std::function<void(byte, std::function<pplx::task<void>(RequestContext*)>)> addSystemRequestHandler;
 
 		template<typename T1, typename T2>
-		pplx::task<T1> sendSystemRequest(IConnection* peer, byte id, const T2& parameter, const pplx::cancellation_token& ct = pplx::cancellation_token::none())
+		pplx::task<T1> sendSystemRequest(IConnection* peer, byte id, const T2& parameter, pplx::cancellation_token ct = pplx::cancellation_token::none())
 		{
 			return sendSystemRequest(peer, id, [=, &parameter](obytestream* stream) {
 				_serializer.serialize(stream, parameter);
@@ -59,7 +59,7 @@ namespace Stormancer
 
 #pragma region private_methods
 
-		SystemRequest_ptr reserveRequestSlot(byte msgId, pplx::task_completion_event<Packet_ptr> tce, const pplx::cancellation_token& ct = pplx::cancellation_token::none());
+		SystemRequest_ptr reserveRequestSlot(byte msgId, pplx::task_completion_event<Packet_ptr> tce, pplx::cancellation_token ct = pplx::cancellation_token::none());
 
 		SystemRequest_ptr freeRequestSlot(uint16 requestId);
 
