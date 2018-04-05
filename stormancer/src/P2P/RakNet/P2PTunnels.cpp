@@ -8,8 +8,8 @@
 
 namespace Stormancer
 {
-	P2PTunnels::P2PTunnels(std::shared_ptr<RequestProcessor> sysCall, std::shared_ptr<IConnectionManager> connections, 
-		std::shared_ptr<Serializer> serializer, 
+	P2PTunnels::P2PTunnels(std::shared_ptr<RequestProcessor> sysCall, std::shared_ptr<IConnectionManager> connections,
+		std::shared_ptr<Serializer> serializer,
 		std::shared_ptr<Configuration> configuration,
 		std::shared_ptr<ILogger> logger)
 	{
@@ -22,7 +22,7 @@ namespace Stormancer
 
 	std::shared_ptr<P2PTunnel> P2PTunnels::createServer(std::string serverId, std::shared_ptr<P2PTunnels> tunnels)
 	{
-		auto tunnel = std::make_shared<P2PTunnel>([=]() {
+		auto tunnel = std::make_shared<P2PTunnel>([tunnels, serverId]() {
 			tunnels->destroyServer(serverId);
 		});
 		tunnel->id = serverId;
@@ -47,19 +47,34 @@ namespace Stormancer
 			throw std::runtime_error("No p2p connection established to the target peer");
 		}
 
-		return _sysClient->sendSystemRequest(connection.get(), (byte)SystemRequestIDTypes::ID_P2P_OPEN_TUNNEL, [=](obytestream* stream) {
-			_serializer->serialize(stream, serverId);
-		}, PacketPriority::MEDIUM_PRIORITY, ct).then([=](pplx::task<Packet_ptr> t) {
-			auto handle = _serializer->deserializeOne<byte>(t.get()->stream);
-			auto client = std::make_shared<P2PTunnelClient>([=](P2PTunnelClient* client, RakNet::RNS2RecvStruct* msg) { this->onMsgReceived(client, msg); }, _sysClient, _logger);
+		std::weak_ptr<P2PTunnels> weakSelf = shared_from_this();
+		return _sysClient->sendSystemRequest<byte>(connection.get(), (byte)SystemRequestIDTypes::ID_P2P_OPEN_TUNNEL, serverId, ct)
+			.then([weakSelf, connectionId, serverId](byte handle) {
+			auto self = weakSelf.lock();
+			if (!self)
+			{
+				throw std::runtime_error("P2PTunnels has been destroyed.");
+			}
+			auto client = std::make_shared<P2PTunnelClient>([weakSelf](P2PTunnelClient* client, RakNet::RNS2RecvStruct* msg)
+			{
+				auto self = weakSelf.lock();
+				if (self)
+				{
+					self->onMsgReceived(client, msg);
+				}
+			}, self->_sysClient, self->_logger);
 			client->handle = handle;
 			client->peerId = connectionId;
 			client->serverId = serverId;
 			client->serverSide = false;
-			_tunnels[std::make_tuple(connectionId, handle)] = client;
+			self->_tunnels[std::make_tuple(connectionId, handle)] = client;
 
-			auto tunnel = std::make_shared<P2PTunnel>([=]() {
-				destroyTunnel(connectionId, handle);
+			auto tunnel = std::make_shared<P2PTunnel>([weakSelf, connectionId, handle]() {
+				auto self = weakSelf.lock();
+				if (self)
+				{
+					self->destroyTunnel(connectionId, handle);
+				}
 			});
 			tunnel->id = serverId;
 			tunnel->ip = "127.0.0.1";
@@ -144,7 +159,7 @@ namespace Stormancer
 			if (connection)
 			{
 				return _sysClient->sendSystemRequest<void>(connection.get(), (byte)SystemRequestIDTypes::ID_P2P_CLOSE_TUNNEL, handle)
-				.then([](pplx::task<void> t) {
+					.then([](pplx::task<void> t) {
 					try
 					{
 						t.get();

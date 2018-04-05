@@ -107,12 +107,12 @@ namespace Stormancer
 		pplx::task<void> ensureConnectedToServer(const SceneEndpoint& sceneEndpoint, pplx::cancellation_token ct = pplx::cancellation_token::none());
 		void dispatchEvent(const std::function<void(void)>& ev);
 		void setConnectionState(ConnectionState state);
-		pplx::cancellation_token getBetterCancellationToken(pplx::cancellation_token ct);
+		pplx::cancellation_token getLinkedCancellationToken(pplx::cancellation_token ct);
 
 
 
 
-		pplx::task<void> ensureNetworkAvailable(pplx::cancellation_token ct = pplx::cancellation_token::none());
+		pplx::task<void> ensureNetworkAvailable();
 
 		template<typename T1, typename T2>
 		pplx::task<T1> sendSystemRequest(byte id, const T2& parameter, pplx::cancellation_token ct = pplx::cancellation_token::none())

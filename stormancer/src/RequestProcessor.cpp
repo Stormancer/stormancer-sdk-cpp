@@ -88,20 +88,15 @@ namespace Stormancer
 
 			if (request)
 			{
-				if (request->cancellationToken.is_canceled())
+
+				p->metadata["request"] = std::to_string(request->id);
+				time(&request->lastRefresh);
+				if (!request->complete)
 				{
-					request->tce.set_exception(std::runtime_error("Operation canceled"));
+					request->complete = true;
+					request->tce.set(p);
 				}
-				else
-				{
-					p->metadata["request"] = std::to_string(request->id);
-					time(&request->lastRefresh);
-					if (!request->complete)
-					{
-						request->complete = true;
-						request->tce.set(p);
-					}
-				}
+
 			}
 			else
 			{
@@ -125,18 +120,11 @@ namespace Stormancer
 
 				if (request)
 				{
-					if (request->cancellationToken.is_canceled())
+					p->metadata["request"] = std::to_string(request->id);
+					if (!request->complete)
 					{
-						request->tce.set_exception(std::runtime_error("Operation canceled"));
-					}
-					else
-					{
-						p->metadata["request"] = std::to_string(request->id);
-						if (!request->complete)
-						{
-							request->complete = true;
-							request->tce.set(Packet_ptr());
-						}
+						request->complete = true;
+						request->tce.set(Packet_ptr());
 					}
 				}
 				else
@@ -156,19 +144,12 @@ namespace Stormancer
 
 			if (request)
 			{
-				if (request->cancellationToken.is_canceled())
+				p->metadata["request"] = std::to_string(request->id);
+				std::string msg = _serializer.deserializeOne<std::string>(p->stream);
+				if (!request->complete)
 				{
-					request->tce.set_exception(std::runtime_error("Operation canceled"));
-				}
-				else
-				{
-					p->metadata["request"] = std::to_string(request->id);
-					std::string msg = _serializer.deserializeOne<std::string>(p->stream);
-					if (!request->complete)
-					{
-						request->complete = true;
-						request->tce.set_exception(std::runtime_error(msg + "(msgId:" + std::to_string(request->operation()) + ")"));
-					}
+					request->complete = true;
+					request->tce.set_exception(std::runtime_error(msg + "(msgId:" + std::to_string(request->operation()) + ")"));
 				}
 			}
 			else
@@ -185,8 +166,8 @@ namespace Stormancer
 		if (peer)
 		{
 			pplx::task_completion_event<Packet_ptr> tce;
-			auto request = reserveRequestSlot(msgId, tce, ct);
-			
+			auto request = reserveRequestSlot(msgId, tce);
+
 			try
 			{
 				peer->send([=, &writer](obytestream* stream) {
@@ -204,7 +185,7 @@ namespace Stormancer
 				tce.set_exception(ex);
 			}
 
-			return pplx::create_task(tce);
+			return pplx::create_task(tce, ct);
 		}
 		else
 		{
@@ -212,7 +193,7 @@ namespace Stormancer
 		}
 	}
 
-	SystemRequest_ptr RequestProcessor::reserveRequestSlot(byte msgId, pplx::task_completion_event<Packet_ptr> tce, pplx::cancellation_token ct)
+	SystemRequest_ptr RequestProcessor::reserveRequestSlot(byte msgId, pplx::task_completion_event<Packet_ptr> tce)
 	{
 		SystemRequest_ptr request;
 
@@ -231,7 +212,6 @@ namespace Stormancer
 				{
 					request = std::make_shared<SystemRequest>(msgId, tce);
 					request->id = id;
-					request->cancellationToken = ct;
 					_pendingRequests[id] = request;
 					break;
 				}

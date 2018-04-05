@@ -235,8 +235,16 @@ namespace Stormancer
 	}
 
 	pplx::cancellation_token_source create_linked_source(pplx::cancellation_token token1, pplx::cancellation_token token2)
-	{
-		std::vector<pplx::cancellation_token> tokens{ token1, token2 };
+	{	
+		std::vector<pplx::cancellation_token> tokens;
+		if (token1.is_cancelable())
+		{
+			tokens.push_back(token1);
+		}
+		if (token2.is_cancelable())
+		{
+			tokens.push_back(token2);
+		}
 		return pplx::cancellation_token_source::create_linked_source(tokens.begin(), tokens.end());
 	}
 

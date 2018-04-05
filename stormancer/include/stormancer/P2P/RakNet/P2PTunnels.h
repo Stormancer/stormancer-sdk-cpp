@@ -30,7 +30,7 @@ namespace Stormancer
 		bool operator()(const peerHandle& v0, const peerHandle& v1) const;
 	};
 
-	class P2PTunnels
+	class P2PTunnels : public std::enable_shared_from_this<P2PTunnels>
 	{
 	public:
 
