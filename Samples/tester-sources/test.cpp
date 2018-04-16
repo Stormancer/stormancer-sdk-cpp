@@ -334,24 +334,21 @@ namespace Stormancer
 				serializer.serialize(stream, "stormancer2");
 			});
 
-			auto onNext = [](Packetisp_ptr packet) {
+			auto subscription = observable.subscribe([](Packetisp_ptr packet) {
+				// On next
 				logger->log(LogLevel::Error, "test_rpc_server_cancel", "rpc response received, but this RPC should be cancelled.");
-			};
-
-			auto onError = [](std::exception_ptr exptr) {
+			}, [](std::exception_ptr exptr) {
+				// On error
 				try {
 					std::rethrow_exception(exptr);
 				}
 				catch (const std::exception& ex) {
 					logger->log(LogLevel::Debug, "test_rpc_server_cancel", "Rpc failed as expected", ex.what());
 				}
-			};
-
-			auto onComplete = []() {
+			}, []() {
+				// On complete
 				logger->log(LogLevel::Error, "test_rpc_server_cancel", "rpc complete received, but this RPC should be cancelled.");
-			};
-
-			auto subscription = observable.subscribe(onNext, onError, onComplete);
+			});
 
 			subscription.add([=]() {
 				logger->log(LogLevel::Debug, "test_rpc_server_cancel", "RPC subscription unsubscribed");

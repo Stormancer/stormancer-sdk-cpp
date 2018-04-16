@@ -363,12 +363,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\P2P\P2PConnectToSceneMessage.h">
       <Filter>Header Files\P2P</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\SafeCapture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\CustomExceptions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Configuration.cpp">

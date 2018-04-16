@@ -1,7 +1,6 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/P2P/ConnectionsRepository.h"
 #include "stormancer/Logger/ILogger.h"
-#include "stormancer/SafeCapture.h"
 
 namespace Stormancer
 {
@@ -10,7 +9,7 @@ namespace Stormancer
 	{
 	}
 
-	pplx::task<std::shared_ptr<IConnection>> Stormancer::ConnectionsRepository::addPendingConnection(uint64 id)
+	pplx::task<std::shared_ptr<IConnection>> Stormancer::ConnectionsRepository::addPendingConnection( uint64 id)
 	{
 		auto tce = pplx::task_completion_event<std::shared_ptr<IConnection>>();
 		PendingConnection pc;
@@ -39,11 +38,14 @@ namespace Stormancer
 
 				auto id = connection->id();
 				_connections[id] = connection;
-
+				
 				std::weak_ptr<ConnectionsRepository> weakThis(shared_from_this());
-				connection->onClose(STRM_SAFE_CAPTURE([=](std::string reason) {
-					_connections.erase(id);
-				}));
+				connection->onClose([=](std::string reason) {
+					if (auto thiz = weakThis.lock())
+					{
+						thiz->_connections.erase(id);
+					}
+				});
 
 				_logger->log(LogLevel::Info, "P2P", "Transitioning connection from pending", std::to_string(connection->id()));
 				pc.tce.set(connection);

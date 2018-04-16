@@ -14,17 +14,13 @@ namespace Stormancer
 
 		SystemRequest(byte msgId,pplx::task_completion_event<Packet_ptr> tce);
 		virtual ~SystemRequest();
-		byte operation();
-
-#pragma endregion
-
-#pragma region public_members
-
 		uint16 id = 0;
 		time_t lastRefresh = time(NULL);
 		pplx::task_completion_event<Packet_ptr> tce;
 		bool complete = false;
+		//pplx::cancellation_token cancellationToken = pplx::cancellation_token::none();
 
+		byte operation();
 #pragma endregion
 
 	private:

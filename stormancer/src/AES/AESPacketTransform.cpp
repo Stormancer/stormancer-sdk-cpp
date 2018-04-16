@@ -19,7 +19,6 @@ namespace Stormancer
 			auto& cryptedRoutes = transformMetadata.sceneMetadata.at(str);
 			if (cryptedRoutes.find(";ALL;") != std::string::npos || cryptedRoutes.find(";+" + transformMetadata.routeName + ";") != std::string::npos)
 			{
-				auto writerCopy = writer;
 				writer = [=](obytestream* stream) {
 					(*stream) << (byte)MessageIDTypes::ID_ENCRYPTED;
 
@@ -31,9 +30,9 @@ namespace Stormancer
 					};
 
 					AESEncryptStream aesStream(key, true);
-					if (writerCopy)
+					if (writer)
 					{
-						writerCopy(&aesStream);
+						writer(&aesStream);
 					}
 					aesStream.encrypt(stream);
 				};

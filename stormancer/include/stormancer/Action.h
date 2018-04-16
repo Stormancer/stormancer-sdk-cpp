@@ -1,20 +1,19 @@
 #pragma once
 
 #include "stormancer/headers.h"
-#include "stormancer/SafeCapture.h"
 
 namespace Stormancer
 {
 	/// Aggregates procedures to be run simultaneously.
-	template<typename... TParams>
+	template<typename TParam = void>
 	class Action
 	{
 	public:
 
-		using TFunction = std::function<void(TParams...)>;
+		using TFunction = std::function<void(TParam)>;
 		using TContainer = std::list<TFunction>;
 		using TIterator = typename TContainer::iterator;
-		using TAction = Action<TParams...>;
+		using TAction = Action<TParam>;
 
 #pragma region public_methods
 
@@ -60,13 +59,19 @@ namespace Stormancer
 			return *this;
 		}
 
-		const TAction& operator()(TParams... data) const
+		const TAction& operator()(TParam data, bool async = false) const
 		{
-			auto functionsCopy = _functions; // copy _functions because f can erase itself from the _functions
-			for (auto f : functionsCopy)
+			if (async)
 			{
-				f(data...);
+				pplx::task<void>([=]() {
+					exec(data);
+				});
 			}
+			else
+			{
+				exec(data);
+			}
+
 			return *this;
 		}
 
@@ -93,6 +98,19 @@ namespace Stormancer
 #pragma endregion
 
 	private:
+
+#pragma region private_methods
+
+		inline void exec(const TParam& data) const
+		{
+			auto functionsCopy = _functions; // copy _functions because f can erase itself from the _functions
+			for (auto f : functionsCopy)
+			{
+				f(data);
+			}
+		}
+
+#pragma endregion
 
 #pragma region private_members
 
@@ -107,10 +125,10 @@ namespace Stormancer
 	{
 	public:
 
-		using TFunction = std::function<void()>;
+		using TFunction = std::function<void(void)>;
 		using TContainer = std::list<TFunction>;
 		using TIterator = TContainer::iterator;
-		using TAction = Action<void>;
+		using TAction = Action<>;
 
 #pragma region public_methods
 
@@ -156,13 +174,19 @@ namespace Stormancer
 			return *this;
 		}
 
-		const TAction& operator()() const
+		const TAction& operator()(bool async = false) const
 		{
-			auto functionsCopy = _functions; // copy _functions because f can erase itself from the _functions
-			for (auto f : functionsCopy)
+			if (async)
 			{
-				f();
+				pplx::task<void>([=]() {
+					exec();
+				});
 			}
+			else
+			{
+				exec();
+			}
+
 			return *this;
 		}
 
@@ -189,6 +213,19 @@ namespace Stormancer
 #pragma endregion
 
 	private:
+
+#pragma region private_methods
+
+		inline void exec() const
+		{
+			auto functionsCopy = _functions; // copy _functions because f can erase itself from the _functions
+			for (auto f : functionsCopy)
+			{
+				f();
+			}
+		}
+
+#pragma endregion
 
 #pragma region private_members
 

@@ -5,7 +5,6 @@
 #include "stormancer/TransformMetadata.h"
 #include "stormancer/SystemRequestIDTypes.h"
 #include "stormancer/P2P/P2PConnectToSceneMessage.h"
-#include "stormancer/SafeCapture.h"
 
 namespace Stormancer
 {
@@ -322,18 +321,15 @@ namespace Stormancer
 
 		if (immediate)
 		{
-			auto logger = _logger;
 			// if immediate, we don't propage the exception
-			return _disconnectTask
-				.then([=](pplx::task<void> t)
-			{
+			return _disconnectTask.then([=](pplx::task<void> t) {
 				try
 				{
-					t.get();
+					t.wait();
 				}
 				catch (const std::exception& ex)
 				{
-					logger->log(LogLevel::Warn, "Scene", "Scene disconnection failed.", ex.what());
+					_logger->log(LogLevel::Warn, "Scene", "Scene disconnection failed.", ex.what());
 				}
 			});
 		}
@@ -381,12 +377,12 @@ namespace Stormancer
 			}
 			if (packet->connection->id() == _host->id() && !((int)route->filter() & (int)Stormancer::MessageOriginFilter::Host))
 			{
-				return; // The route doesn't accept messages from the scene host.
+				return;//the route doesn't accept messages from the scene host.
 			}
 
 			if (packet->connection->id() != _host->id() && !((int)route->filter() & (int)Stormancer::MessageOriginFilter::Peer))
 			{
-				return; // The route doesn't accept messages from the scene host.
+				return;//the route doesn't accept messages from the scene host.
 			}
 
 			packet->metadata["routeId"] = route->name();
@@ -433,16 +429,17 @@ namespace Stormancer
 
 	pplx::task<std::shared_ptr<P2PScenePeer>> Scene::openP2PConnection(const std::string & p2pToken, pplx::cancellation_token ct)
 	{
-		auto p2pService = dependencyResolver()->resolve<P2PService>();
-		return p2pService->openP2PConnection(p2pToken, ct).then(STRM_SAFE_CAPTURE([=](pplx::task < std::shared_ptr<IConnection>> t) {
-			return std::make_shared<P2PScenePeer>(this, t.get(), p2pService, P2PConnectToSceneMessage());
-		}), ct);
+		auto p2p = dependencyResolver()->resolve<P2PService>();
+		return p2p->openP2PConnection(p2pToken, ct).then([=](pplx::task < std::shared_ptr<IConnection>> t) {
+			return std::make_shared<P2PScenePeer>(this, t.get(), p2p, P2PConnectToSceneMessage());
+		}, ct);
 		//	auto c = t.get();
 		//	P2PConnectToSceneMessage message;
 		//	return this->sendSystemRequest<P2PConnectToSceneMessage, P2PConnectToSceneMessage>(c,(byte)SystemRequestIDTypes::ID_CONNECT_TO_SCENE, message).then([c](P2PConnectToSceneMessage m) {
 		//		return std::make_tuple(c, m);
 		//	});
 		//}).then([=](pplx::task<std::tuple<std::shared_ptr<IConnection>,P2PConnectToSceneMessage>> t) {
+		//
 		//	auto tuple = t.get();
 		//	return std::make_shared<P2PScenePeer>(this,std::get<0>(tuple),p2p,std::get<1>(tuple));
 		//});

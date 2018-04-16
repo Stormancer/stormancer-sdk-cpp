@@ -5,7 +5,6 @@
 #include "stormancer/MessageIDTypes.h"
 #include "stormancer/P2P/RakNet/P2PTunnelClient.h"
 #include "stormancer/Scene.h"
-#include "stormancer/SafeCapture.h"
 
 namespace Stormancer
 {
@@ -48,26 +47,40 @@ namespace Stormancer
 			throw std::runtime_error("No p2p connection established to the target peer");
 		}
 
+		std::weak_ptr<P2PTunnels> weakSelf = shared_from_this();
 		return _sysClient->sendSystemRequest<byte>(connection.get(), (byte)SystemRequestIDTypes::ID_P2P_OPEN_TUNNEL, serverId, ct)
-			.then(STRM_SAFE_CAPTURE([this, connectionId, serverId](byte handle)
-		{
-			auto client = std::make_shared<P2PTunnelClient>(STRM_SAFE_CAPTURE([this](P2PTunnelClient* client, RakNet::RNS2RecvStruct* msg) {
-				onMsgReceived(client, msg);
-			}), _sysClient, _logger);
+			.then([weakSelf, connectionId, serverId](byte handle) {
+			auto self = weakSelf.lock();
+			if (!self)
+			{
+				throw std::runtime_error("P2PTunnels has been destroyed.");
+			}
+			auto client = std::make_shared<P2PTunnelClient>([weakSelf](P2PTunnelClient* client, RakNet::RNS2RecvStruct* msg)
+			{
+				auto self = weakSelf.lock();
+				if (self)
+				{
+					self->onMsgReceived(client, msg);
+				}
+			}, self->_sysClient, self->_logger);
 			client->handle = handle;
 			client->peerId = connectionId;
 			client->serverId = serverId;
 			client->serverSide = false;
-			_tunnels[std::make_tuple(connectionId, handle)] = client;
+			self->_tunnels[std::make_tuple(connectionId, handle)] = client;
 
-			auto tunnel = std::make_shared<P2PTunnel>(STRM_SAFE_CAPTURE([this, connectionId, handle]() {
-				destroyTunnel(connectionId, handle);
-			}));
+			auto tunnel = std::make_shared<P2PTunnel>([weakSelf, connectionId, handle]() {
+				auto self = weakSelf.lock();
+				if (self)
+				{
+					self->destroyTunnel(connectionId, handle);
+				}
+			});
 			tunnel->id = serverId;
 			tunnel->ip = "127.0.0.1";
 			tunnel->port = client->socket->GetBoundAddress().GetPort();
 			return tunnel;
-		}), ct);
+		}, ct);
 	}
 
 	byte P2PTunnels::addClient(std::string serverId, uint64 clientPeerId)

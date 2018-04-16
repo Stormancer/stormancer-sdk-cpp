@@ -1,5 +1,4 @@
 #pragma once
-
 #include "stormancer/headers.h"
 #include "stormancer/stormancer.h"
 
@@ -8,11 +7,20 @@ namespace Stormancer
 	class MetafileDto
 	{
 	public:
-		MSGPACK_DEFINE(FileName, URL, Path, MD5Hash)
+		MSGPACK_DEFINE(FileName, URL, Path, MD5Hash, MD5HashContent)
 		std::string FileName;
 		std::string URL;
 		std::string Path;
 		std::string MD5Hash;
+		std::string MD5HashContent;
+	};
+
+	class DocumentTest
+	{
+	public:
+		MSGPACK_DEFINE(Type, Content)
+		std::string Type;
+		std::string Content;
 	};
 
 	class AssetsStorageService

@@ -49,7 +49,8 @@ namespace Stormancer
 
 			auto observable = rpc_observable(procedure, writer, PacketPriority::MEDIUM_PRIORITY);
 
-			auto onNext = [=](Packetisp_ptr packet) {
+			observable.subscribe([=](Packetisp_ptr packet) {
+				// On next
 				try
 				{
 					RpcService::internalOnNext<TOutput>(tce, packet, unwriter); // this is used for managing TOutput = void
@@ -59,18 +60,14 @@ namespace Stormancer
 					_logger->log(LogLevel::Trace, "RpcHelpers", "An exception occurred during the rpc response deserialization " + procedure);
 					tce.set_exception(ex);
 				}
-			};
-
-			auto onError = [=](std::exception_ptr error) {
+			}, [=](std::exception_ptr error) {
+				// On error
 				_logger->log(LogLevel::Trace, "RpcHelpers", "An exception occurred during the rpc " + procedure);
 				tce.set_exception(error);
-			};
-
-			auto onComplete = [=]() {
+			}, [=]() {
+				// On complete
 				RpcService::internalOnComplete(tce); // this is used for managing TOutput = void
-			};
-
-			observable.subscribe(onNext, onError, onComplete);
+			});
 
 			return pplx::create_task(tce, pplx::task_options(getDispatcher()));
 		}

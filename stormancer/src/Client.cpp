@@ -10,7 +10,6 @@
 #include "stormancer/SystemRequestIDTypes.h"
 #include "stormancer/ConnectToSceneMsg.h"
 #include "stormancer/P2P/P2PRequestModule.h"
-#include "stormancer/SafeCapture.h"
 
 
 
@@ -191,9 +190,7 @@ namespace Stormancer
 
 			_initialized = true;
 			_dependencyResolver->resolve<IActionDispatcher>()->start();
-			transport->onPacketReceived(STRM_SAFE_CAPTURE([=](Packet_ptr packet) {
-				transport_packetReceived(packet);
-			}));
+			transport->onPacketReceived([=](Packet_ptr packet) { transport_packetReceived(packet); });
 #ifdef STORMANCER_LOG_CLIENT
 			logger()->log(LogLevel::Trace, "Client", "Client initialized");
 #endif
@@ -220,15 +217,7 @@ namespace Stormancer
 
 	pplx::task<Scene_ptr> Client::connectToPublicScene(const std::string& sceneId, const SceneInitializer& initializer, pplx::cancellation_token ct)
 	{
-		if (sceneId.empty())
-		{
-			logger()->log(LogLevel::Error, "Client", "SceneId is empty");
-			return pplx::task_from_exception<Scene_ptr>(std::runtime_error("SceneId is empty"));
-		}
-
-		return getPublicScene(sceneId, ct)
-			.then(STRM_SAFE_CAPTURE([=](Scene_ptr scene)
-		{
+		return getPublicScene(sceneId, ct).then([=](Scene_ptr scene) {
 			if (scene->getCurrentConnectionState() == ConnectionState::Disconnected)
 			{
 				if (initializer)
@@ -236,25 +225,15 @@ namespace Stormancer
 					initializer(scene);
 				}
 			}
-			return scene->connect(ct)
-				.then([=]()
-			{
+			return scene->connect(ct).then([=]() {
 				return scene;
 			}, ct);
-		}), ct);
+		}, ct);
 	}
 
 	pplx::task<Scene_ptr> Client::connectToPrivateScene(const std::string& sceneToken, const SceneInitializer& initializer, pplx::cancellation_token ct)
 	{
-		if (sceneToken.empty())
-		{
-			logger()->log(LogLevel::Error, "Client", "sceneToken is empty");
-			return pplx::task_from_exception<Scene_ptr>(std::runtime_error("sceneToken is empty"));
-		}
-
-		return getPrivateScene(sceneToken, ct)
-			.then(STRM_SAFE_CAPTURE([initializer, ct](Scene_ptr scene)
-		{
+		return getPrivateScene(sceneToken, ct).then([=](Scene_ptr scene) {
 			if (scene->getCurrentConnectionState() == ConnectionState::Disconnected)
 			{
 				if (initializer)
@@ -262,12 +241,10 @@ namespace Stormancer
 					initializer(scene);
 				}
 			}
-			return scene->connect(ct)
-				.then([=]()
-			{
+			return scene->connect(ct).then([=]() {
 				return scene;
 			}, ct);
-		}), ct);
+		}, ct);
 	}
 
 	pplx::task<Scene_ptr> Client::getConnectedScene(const std::string& sceneId, pplx::cancellation_token ct)
@@ -285,7 +262,7 @@ namespace Stormancer
 		std::lock_guard<std::mutex> lg(_scenesMutex);
 		if (mapContains(_scenes, sceneId))
 		{
-			return _scenes[sceneId].task;
+			return _scenes[sceneId].task.then([](pplx::task<Scene_ptr> t) {return t; }, ct);
 		}
 
 		return pplx::task_from_result<Scene_ptr>(nullptr);
@@ -334,16 +311,27 @@ namespace Stormancer
 			ClientScene cScene;
 			cScene.isPublic = true;
 
+			std::weak_ptr<Client> weakSelf = shared_from_this();
 			auto task = ensureNetworkAvailable()
-				.then(STRM_SAFE_CAPTURE([this, sceneId, ct]()
-			{
-				auto apiClient = _dependencyResolver->resolve<ApiClient>();
-				return apiClient->getSceneEndpoint(_accountId, _applicationName, sceneId, ct);
-			}), ct)
-				.then(STRM_SAFE_CAPTURE([this, sceneId, ct](SceneEndpoint sep)
-			{
-				return getSceneInternal(sceneId, sep, ct);
-			}), ct);
+				.then([weakSelf, sceneId, ct]() {
+				auto self = weakSelf.lock();
+				if (!self)
+				{
+					throw std::runtime_error("client destroyed!");
+				}
+
+				auto apiClient = self->_dependencyResolver->resolve<ApiClient>();
+				return apiClient->getSceneEndpoint(self->_accountId, self->_applicationName, sceneId, ct);
+			}, ct)
+				.then([weakSelf, sceneId, ct](SceneEndpoint sep) {
+				auto self = weakSelf.lock();
+				if (!self)
+				{
+					throw std::runtime_error("client destroyed!");
+				}
+				return self->getSceneInternal(sceneId, sep, ct);
+
+			}, ct);
 
 			cScene.task = task;
 			_scenes[sceneId] = cScene;
@@ -413,32 +401,30 @@ namespace Stormancer
 					logger()->log(LogLevel::Trace, "Client", "Connecting transport to server", endpointUrl);
 #endif
 					_connectionTask = transport->connect(endpointUrl, ct)
-						.then(STRM_SAFE_CAPTURE([=](std::weak_ptr<IConnection> weakptr)
+						.then([=](std::weak_ptr<IConnection> weakptr)
 					{
 						auto connection = weakptr.lock();
 						if (!connection)
 						{
-							throw std::runtime_error("Connection not available");
+							return;
 						}
 
-						auto onConnectionStateChangedNext = STRM_SAFE_CAPTURE([=](ConnectionState state) {
+						auto onConnectionStateChangedNext = [=](ConnectionState state) {
+							// On next
 							if (state == ConnectionState::Disconnecting)
 							{
 								std::lock_guard<std::mutex> lg(_scenesMutex);
 								for (auto sceneIt : _scenes)
 								{
-									sceneIt.second.task
-										.then(STRM_SAFE_CAPTURE([=](Scene_ptr scene)
-									{
-										dispatchEvent([scene]() {
+									sceneIt.second.task.then([=](Scene_ptr scene) {
+										dispatchEvent([=]() {
 											scene->setConnectionState(ConnectionState::Disconnecting);
 										});
 										for (auto plugin : _plugins)
 										{
 											plugin->sceneDisconnecting(scene.get());
 										}
-									}))
-										.then([](pplx::task<void> t)
+									}).then([](pplx::task<void> t)
 									{
 										try
 										{
@@ -456,19 +442,15 @@ namespace Stormancer
 								std::lock_guard<std::mutex> lg(_scenesMutex);
 								for (auto sceneIt : _scenes)
 								{
-									sceneIt.second.task
-										.then(STRM_SAFE_CAPTURE([=](Scene_ptr scene)
-									{
-										dispatchEvent([scene]() {
+									sceneIt.second.task.then([=](Scene_ptr scene) {
+										dispatchEvent([=]() {
 											scene->setConnectionState(ConnectionState::Disconnected);
 										});
 										for (auto plugin : _plugins)
 										{
 											plugin->sceneDisconnected(scene.get());
 										}
-									}))
-										.then([](pplx::task<void> t)
-									{
+									}).then([](pplx::task<void> t) {
 										try
 										{
 											t.wait();
@@ -484,9 +466,10 @@ namespace Stormancer
 							}
 
 							setConnectionState(state);
-						});
+						};
 
-						auto onConnectionStateChangedError = STRM_SAFE_CAPTURE([=](std::exception_ptr exptr) {
+						auto onConnectionStateChangedError = [=](std::exception_ptr exptr) {
+							// On error
 							try
 							{
 								std::rethrow_exception(exptr);
@@ -495,7 +478,7 @@ namespace Stormancer
 							{
 								logger()->log(LogLevel::Error, "Client", "Connection state change failed", ex.what());
 							}
-						});
+						};
 
 						_connectionSubscription = connection->getConnectionStateChangedObservable().subscribe(onConnectionStateChangedNext, onConnectionStateChangedError);
 
@@ -514,18 +497,18 @@ namespace Stormancer
 						connection->setMetadata(_metadata);
 						_serverConnection = weakptr;
 						return;
-					}), ct)
-						.then(STRM_SAFE_CAPTURE([=]()
+					}, ct)
+						.then([=]()
 					{
 						return updateServerMetadata(ct);
-					}), ct)
-						.then(STRM_SAFE_CAPTURE([=]()
+					}, ct)
+						.then([=]()
 					{
 						if (_synchronisedClock && endpoint.tokenData.Version > 0)
 						{
 							_dependencyResolver->resolve<SyncClock>()->start(_serverConnection, _cts.get_token());
 						}
-					}), ct);
+					}, ct);
 				}
 				catch (std::exception& ex)
 				{
@@ -545,11 +528,15 @@ namespace Stormancer
 		logger()->log(LogLevel::Trace, "Client", "Get scene " + sceneId, sep.token);
 #endif
 
-		return ensureConnectedToServer(sep, ct)
-			.then(STRM_SAFE_CAPTURE([this, sep, ct]()
-		{
+		std::weak_ptr<Client> weakSelf = shared_from_this();
+		return ensureConnectedToServer(sep, ct).then([weakSelf, sep, ct]() {
+			auto self = weakSelf.lock();
+			if (!self)
+			{
+				throw std::runtime_error("client destroyed");
+			}
 			SceneInfosRequestDto parameter;
-			auto serverConnection = _serverConnection.lock();
+			auto serverConnection = self->_serverConnection.lock();
 			if (!serverConnection)
 			{
 				throw std::runtime_error("The server connection ptr is invalid");
@@ -557,12 +544,16 @@ namespace Stormancer
 			parameter.Metadata = serverConnection->metadata();
 			parameter.Token = sep.token;
 
-			logger()->log(LogLevel::Trace, "Client", "Send SceneInfosRequestDto");
-
-			return sendSystemRequest<SceneInfosDto>((byte)SystemRequestIDTypes::ID_GET_SCENE_INFOS, parameter, ct);
-		}), ct)
-			.then(STRM_SAFE_CAPTURE([this, ct](SceneInfosDto sceneInfos)
-		{
+#ifdef STORMANCER_LOG_CLIENT
+			self->logger()->log(LogLevel::Trace, "Client", "Send SceneInfosRequestDto");
+#endif
+			return self->sendSystemRequest<SceneInfosDto>((byte)SystemRequestIDTypes::ID_GET_SCENE_INFOS, parameter, ct);
+		}, ct).then([weakSelf, ct](SceneInfosDto sceneInfos) {
+			auto self = weakSelf.lock();
+			if (!self)
+			{
+				throw std::runtime_error("client destroyed");
+			}
 			std::stringstream ss;
 			ss << sceneInfos.SceneId << " " << sceneInfos.SelectedSerializer << " Routes:[";
 			for (uint32 i = 0; i < sceneInfos.Routes.size(); i++)
@@ -576,36 +567,37 @@ namespace Stormancer
 			}
 			ss << "]";
 
-			logger()->log(LogLevel::Trace, "Client", "SceneInfosDto received", ss.str());
+			self->logger()->log(LogLevel::Trace, "Client", "SceneInfosDto received", ss.str());
 
-			auto serverConnection = _serverConnection.lock();
+			auto serverConnection = self->_serverConnection.lock();
 			if (!serverConnection)
 			{
-				throw std::runtime_error("Connection not available");
+				throw std::runtime_error("The server connection ptr is invalid");
 			}
 			serverConnection->setMetadata("serializer", sceneInfos.SelectedSerializer);
 
-			return updateServerMetadata(ct)
-				.then([sceneInfos]()
-			{
+			return self->updateServerMetadata(ct).then([sceneInfos]() {
 				return sceneInfos;
 			}, ct);
-		}), ct)
-			.then(STRM_SAFE_CAPTURE([this, sceneId, sep](SceneInfosDto sceneInfos)
-		{
-			logger()->log(LogLevel::Trace, "Client", "Return the scene", sceneId);
-			auto scene = std::make_shared<Scene>(_serverConnection.lock().get(), shared_from_this(), sceneId, sep.token, sceneInfos, _dependencyResolver);
+		}, ct).then([weakSelf, sceneId, sep](SceneInfosDto sceneInfos) {
+			auto self = weakSelf.lock();
+			if (!self)
+			{
+				throw std::runtime_error("client destroyed");
+			}
+			self->logger()->log(LogLevel::Trace, "Client", "Return the scene", sceneId);
+			auto scene = std::make_shared<Scene>(self->_serverConnection.lock().get(), self, sceneId, sep.token, sceneInfos, self->_dependencyResolver);
 			scene->initialize();
-			for (auto plugin : _plugins)
+			for (auto plugin : self->_plugins)
 			{
 				plugin->registerSceneDependencies(scene.get());
 			}
-			for (auto plugin : _plugins)
+			for (auto plugin : self->_plugins)
 			{
 				plugin->sceneCreated(scene.get());
 			}
 			return scene;
-		}), ct);
+		}, ct);
 	}
 
 	pplx::task<void> Client::updateServerMetadata(pplx::cancellation_token ct)
@@ -620,14 +612,14 @@ namespace Stormancer
 		auto serverConnection = _serverConnection.lock();
 		if (!serverConnection)
 		{
-			throw std::runtime_error("Connection not available");
+			throw std::runtime_error("The server connection ptr is invalid");
 		}
 
 		auto requestProcessor = _dependencyResolver->resolve<RequestProcessor>();
 
-		return requestProcessor->sendSystemRequest(serverConnection.get(), (byte)SystemRequestIDTypes::ID_SET_METADATA, STRM_SAFE_CAPTURE([this, serverConnection](obytestream* stream) {
+		return requestProcessor->sendSystemRequest(serverConnection.get(), (byte)SystemRequestIDTypes::ID_SET_METADATA, [=](obytestream* stream) {
 			_serializer.serialize(stream, serverConnection->metadata());
-		}), PacketPriority::MEDIUM_PRIORITY, ct)
+		}, PacketPriority::MEDIUM_PRIORITY, ct)
 			.then([loggerPtr](Packet_ptr) {
 #ifdef STORMANCER_LOG_CLIENT
 			loggerPtr->log(LogLevel::Trace, "Client", "Updated server metadata");
@@ -656,7 +648,13 @@ namespace Stormancer
 		cScene.connecting = true;
 		auto& task = cScene.task;
 
-		task = task.then(STRM_SAFE_CAPTURE([this, sceneToken, localRoutes, ct](Scene_ptr scene) {
+		std::weak_ptr<Client> weakSelf = shared_from_this();
+		task = task.then([weakSelf, sceneToken, localRoutes, ct](Scene_ptr scene) {
+			auto self = weakSelf.lock();
+			if (!self)
+			{
+				throw std::runtime_error("client destroyed");
+			}
 			if (scene->getCurrentConnectionState() != ConnectionState::Disconnected)
 			{
 				throw std::runtime_error("The scene is not in disconnected state.");
@@ -664,7 +662,7 @@ namespace Stormancer
 
 			scene->setConnectionState(ConnectionState::Connecting);
 
-			for (auto plugin : _plugins)
+			for (auto plugin : self->_plugins)
 			{
 				plugin->sceneConnecting(scene.get());
 			}
@@ -680,28 +678,34 @@ namespace Stormancer
 				parameter.Routes << routeDto;
 			}
 
-			auto serverConnection = _serverConnection.lock();
+			auto serverConnection = self->_serverConnection.lock();
 			if (!serverConnection)
 			{
-				throw std::runtime_error("Connection not available");
+				throw std::runtime_error("The server connection pointer is invalid.");
 			}
 			parameter.ConnectionMetadata = serverConnection->metadata();
 
-			return sendSystemRequest<ConnectionResult>((byte)SystemRequestIDTypes::ID_CONNECT_TO_SCENE, parameter, ct)
-				.then(STRM_SAFE_CAPTURE([this, scene](ConnectionResult result)
-			{
+			auto systemRequestTask = self->sendSystemRequest<ConnectionResult>((byte)SystemRequestIDTypes::ID_CONNECT_TO_SCENE, parameter, ct);
+			return systemRequestTask.then([weakSelf, scene](ConnectionResult result) {
+				auto self = weakSelf.lock();
+				if (!self)
+				{
+					throw std::runtime_error("client destroyed");
+				}
 				scene->completeConnectionInitialization(result);
-				auto sceneDispatcher = _dependencyResolver->resolve<SceneDispatcher>();
+				auto sceneDispatcher = self->_dependencyResolver->resolve<SceneDispatcher>();
 				sceneDispatcher->addScene(scene);
 				scene->setConnectionState(ConnectionState::Connected);
-				for (auto plugin : _plugins)
+				for (auto plugin : self->_plugins)
 				{
 					plugin->sceneConnected(scene.get());
 				}
-				logger()->log(LogLevel::Debug, "client", "Scene connected.", scene->id());
+#ifdef STORMANCER_LOG_CLIENT
+				self->logger()->log(LogLevel::Debug, "client", "Scene connected.", scene->id());
+#endif
 				return scene;
-			}), ct);
-		}), ct);
+			}, ct);
+		}, ct);
 
 		return task.then([](Scene_ptr) {}, ct);
 	}
@@ -731,27 +735,27 @@ namespace Stormancer
 		{
 			// Stops the synchronised clock, disconnect the scenes, closes the server connection then stops the underlying transports.
 
-			auto myLogger = logger();
-
-			disconnectAllScenes()
-				.then(STRM_SAFE_CAPTURE([this]()
-			{
-				auto serverConnection = _serverConnection.lock();
-				if (serverConnection)
+			std::weak_ptr<Client> weakSelf = shared_from_this();
+			disconnectAllScenes().then([weakSelf](pplx::task<void> t) {
+				auto self = weakSelf.lock();
+				if (!self)
 				{
-					serverConnection->close();
+					// client already destroyed, do nothing.
+					return;
 				}
-				_disconnectionTce.set();
-			}))
-				.then([myLogger](pplx::task<void> t)
-			{
 				try
 				{
 					t.get();
+					auto serverConnection = self->_serverConnection.lock();
+					if (serverConnection)
+					{
+						serverConnection->close();
+					}
+					self->_disconnectionTce.set();
 				}
 				catch (const std::exception& ex)
 				{
-					myLogger->log(LogLevel::Warn, "Client", "Exception thrown in client disconnection", ex.what());
+					self->logger()->log(LogLevel::Warn, "Client", "Exception thrown in client disconnection", ex.what());
 				}
 			});
 		}
@@ -788,35 +792,43 @@ namespace Stormancer
 
 		_dependencyResolver->resolve<SceneDispatcher>()->removeScene(sceneHandle);
 
-		auto myLogger = logger();
-
+		std::weak_ptr<Client> weakSelf = shared_from_this();
 		return sendSystemRequest<void>((byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, sceneHandle)
-			.then(STRM_SAFE_CAPTURE([this, scene, sceneId]()
-		{
-			for (auto plugin : _plugins)
-			{
-				plugin->sceneDisconnected(scene.get());
-			}
+			.then([scene, sceneId, weakSelf](pplx::task<void> t) {
+			auto self = weakSelf.lock();
 
-			logger()->log(LogLevel::Debug, "client", "Scene disconnected", sceneId);
-
-			scene->setConnectionState(ConnectionState::Disconnected);
-		}))
-			.then([myLogger](pplx::task<void> t)
-		{
 			try
 			{
 				t.get();
+				if (self)
+				{
+					for (auto plugin : self->_plugins)
+					{
+						plugin->sceneDisconnected(scene.get());
+					}
+
+#ifdef STORMANCER_LOG_CLIENT			
+					self->logger()->log(LogLevel::Debug, "client", "Scene disconnected", sceneId);
+#endif
+
+					scene->setConnectionState(ConnectionState::Disconnected);
+				}
 			}
 			catch (const std::exception& ex)
 			{
-				// capture the exception and don't rethrow it
-				myLogger->log(LogLevel::Warn, "client", "Scene disconnexion failed", ex.what());
+				if (self)
+				{
+					// capture the exception and don't rethrow it
+					self->logger()->log(LogLevel::Warn, "client", "Scene disconnexion failed", ex.what());
+				}
 			}
 			catch (...)
 			{
-				// capture the exception and don't rethrow it
-				myLogger->log(LogLevel::Warn, "client", "Scene disconnexion failed");
+				if (self)
+				{
+					// capture the exception and don't rethrow it
+					self->logger()->log(LogLevel::Warn, "client", "Scene disconnexion failed");
+				}
 			}
 		});
 	}
@@ -829,9 +841,9 @@ namespace Stormancer
 		auto scenesToDisconnect = _scenes;
 		for (auto it : scenesToDisconnect)
 		{
-			tasks.push_back(it.second.task.then(STRM_SAFE_CAPTURE([=](Scene_ptr scene) {
+			tasks.push_back(it.second.task.then([=](Scene_ptr scene) {
 				return disconnect(scene);
-			})));
+			}));
 		}
 
 		return 	pplx::when_all(tasks.begin(), tasks.end());
@@ -922,11 +934,6 @@ namespace Stormancer
 		return create_linked_source(ct, _cts.get_token()).get_token();
 	}
 
-	pplx::cancellation_token Client::getToken()
-	{
-		return _cts.get_token();
-	}
-
 
 
 
@@ -1013,9 +1020,13 @@ namespace Stormancer
 
 
 
-
 		return pplx::task_from_result();
 
 
+	}
+
+	pplx::cancellation_token Client::getToken()
+	{
+		return _cts.get_token();
 	}
 };

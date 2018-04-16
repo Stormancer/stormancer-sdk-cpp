@@ -20,7 +20,7 @@ namespace Stormancer
 		pplx::cancellation_token cancellationToken = pplx::cancellation_token::none();
 	};
 
-	class RakNetTransport : public ITransport, public std::enable_shared_from_this<RakNetTransport>
+	class RakNetTransport : public ITransport, std::enable_shared_from_this<RakNetTransport>
 	{
 	public:
 

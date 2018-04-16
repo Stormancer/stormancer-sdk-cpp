@@ -3,7 +3,6 @@
 #include "stormancer/IScheduler.h"
 #include "stormancer/RequestProcessor.h"
 #include "stormancer/SystemRequestIDTypes.h"
-#include "stormancer/SafeCapture.h"
 
 namespace Stormancer
 {
@@ -27,7 +26,7 @@ namespace Stormancer
 	{
 		auto logger = _dependencyResolver->resolve<ILogger>();
 		logger->log(LogLevel::Trace, "synchronizedClock", "Starting SyncClock...");
-
+		
 		if (!compareExchange(_mutex, _isRunning, false, true))
 		{
 			throw std::runtime_error("SyncClock already started");
@@ -40,25 +39,40 @@ namespace Stormancer
 		}
 		_remoteConnection = connection;
 
+		std::weak_ptr<SyncClock> weakThis(shared_from_this());
 		auto  scheduler = _dependencyResolver->resolve<IScheduler>();
 		if (scheduler)
 		{
 			_cancellationToken = ct;
 
 			auto cts = pplx::cancellation_token_source::create_linked_source(_cancellationToken);
-			scheduler->schedulePeriodic(_interval, STRM_SAFE_CAPTURE([this, cts]()
+			scheduler->schedulePeriodic(_interval, [weakThis, cts]
 			{
-				std::lock_guard<std::mutex> lg(_mutex);
-				syncClockImplAsync();
-			}), _cancellationToken);
+				auto thiz = weakThis.lock();
+				if (thiz)
+				{
+					std::lock_guard<std::mutex> lg(thiz->_mutex);
+					thiz->syncClockImplAsync();
+				}
+				else
+				{
+					cts.cancel();
+				}
+			}, _cancellationToken);
 
 			// Do multiple pings at start
-			scheduler->schedulePeriodic(_intervalAtStart, STRM_SAFE_CAPTURE([this, cts]
+			scheduler->schedulePeriodic(_intervalAtStart, [weakThis, cts]
 			{
+				auto thiz = weakThis.lock();
+				if (!thiz)
+				{
+					cts.cancel();
+					return;
+				}
 				bool shouldCallSyncClockImpl = false;
 				{
-					std::lock_guard<std::mutex> lg(_mutex);
-					if (_clockValues.size() >= _maxValues)
+					std::lock_guard<std::mutex> lg(thiz->_mutex);
+					if (thiz->_clockValues.size() >= thiz->_maxValues)
 					{
 						cts.cancel();
 					}
@@ -67,16 +81,19 @@ namespace Stormancer
 						shouldCallSyncClockImpl = true;
 					}
 				}
-				if (shouldCallSyncClockImpl)
+				if(shouldCallSyncClockImpl)
 				{
-					syncClockImplAsync();
+					thiz->syncClockImplAsync();
 				}
-			}), _cancellationToken);
+			}, _cancellationToken);
 
-			_cancellationToken.register_callback(STRM_SAFE_CAPTURE([this]
+			_cancellationToken.register_callback([weakThis]
 			{
-				stop();
-			}));
+				if (auto thiz = weakThis.lock())
+				{
+					thiz->stop();
+				}
+			});
 
 			logger->log(LogLevel::Trace, "synchronizedClock", "SyncClock started");
 		}
@@ -135,11 +152,10 @@ namespace Stormancer
 			// Keep an active reference to the logger, in case the task is cancelled we cannot rely on this being valid
 			auto logger = _dependencyResolver->resolve<ILogger>();
 			auto cancellationToken = _cancellationToken;
-			requestProcessor->sendSystemRequest(remoteConnection.get(), (byte)SystemRequestIDTypes::ID_PING, [&timeStart](obytestream* bs) {
-				(*bs) << timeStart;
-			}, PacketPriority::IMMEDIATE_PRIORITY, _cancellationToken)
-				.then(STRM_SAFE_CAPTURE([=](Packet_ptr packet)
-			{
+
+			requestProcessor->sendSystemRequest(remoteConnection.get(), (byte)SystemRequestIDTypes::ID_PING, [=](obytestream* bs) {
+				*bs << timeStart;
+			}, PacketPriority::IMMEDIATE_PRIORITY, _cancellationToken).then([=](Packet_ptr packet) {
 				uint64 timeEnd = (uint64)_watch.getElapsedTime();
 
 				std::lock_guard<std::mutex> lock(_mutex);
@@ -191,9 +207,7 @@ namespace Stormancer
 					}
 				}
 				_offset = offsetsAvg / lenOffsets;
-			}), _cancellationToken)
-				.then([=](pplx::task<void> t)
-			{
+			}, _cancellationToken).then([=](pplx::task<void> t) {
 				try
 				{
 					t.get();
@@ -204,6 +218,7 @@ namespace Stormancer
 					{
 						logger->log(LogLevel::Warn, "syncClock", "Failed to ping the server", ex.what());
 					}
+					return;
 				}
 			});
 		}
