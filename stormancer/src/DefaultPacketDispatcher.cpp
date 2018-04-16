@@ -31,7 +31,9 @@ namespace Stormancer
 		{
 			pplx::create_task([=]() {
 				dispatchImpl(packet);
-			}).then([=](pplx::task<void> t) {
+			})
+				.then([this](pplx::task<void> t)
+			{
 				try
 				{
 					t.wait();
