@@ -11,7 +11,7 @@ namespace Stormancer
 {
 	class P2PTunnels;
 
-	class P2PService : std::enable_shared_from_this<P2PService>
+	class P2PService : public std::enable_shared_from_this<P2PService>
 	{
 	public:
 
