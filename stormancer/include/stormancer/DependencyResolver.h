@@ -41,7 +41,7 @@ namespace Stormancer
 			}
 			else
 			{
-				return std::shared_ptr<T>();
+				return nullptr;
 			}
 		}
 		

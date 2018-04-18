@@ -105,7 +105,9 @@ namespace Stormancer
 		if (ct.is_cancelable())
 		{
 			pplx::task_completion_event<void> tce;
-			ct.register_callback([=]() { tce.set(); });
+			ct.register_callback([=]() {
+				tce.set();
+			});
 			pplx::task<void> t(tce);
 
 			std::vector<pplx::task<void>> v{ t, sleepTask };

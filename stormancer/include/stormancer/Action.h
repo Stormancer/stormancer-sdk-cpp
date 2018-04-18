@@ -5,15 +5,15 @@
 namespace Stormancer
 {
 	/// Aggregates procedures to be run simultaneously.
-	template<typename TParam = void>
+	template<typename... TParams>
 	class Action
 	{
 	public:
 
-		using TFunction = std::function<void(TParam)>;
+		using TFunction = std::function<void(TParams...)>;
 		using TContainer = std::list<TFunction>;
 		using TIterator = typename TContainer::iterator;
-		using TAction = Action<TParam>;
+		using TAction = Action<TParams...>;
 
 #pragma region public_methods
 
@@ -59,19 +59,13 @@ namespace Stormancer
 			return *this;
 		}
 
-		const TAction& operator()(TParam data, bool async = false) const
+		const TAction& operator()(TParams... data) const
 		{
-			if (async)
+			auto functionsCopy = _functions; // copy _functions because f can erase itself from the _functions
+			for (auto f : functionsCopy)
 			{
-				pplx::task<void>([=]() {
-					exec(data);
-				});
+				f(data...);
 			}
-			else
-			{
-				exec(data);
-			}
-
 			return *this;
 		}
 
@@ -98,19 +92,6 @@ namespace Stormancer
 #pragma endregion
 
 	private:
-
-#pragma region private_methods
-
-		inline void exec(const TParam& data) const
-		{
-			auto functionsCopy = _functions; // copy _functions because f can erase itself from the _functions
-			for (auto f : functionsCopy)
-			{
-				f(data);
-			}
-		}
-
-#pragma endregion
 
 #pragma region private_members
 
@@ -125,10 +106,10 @@ namespace Stormancer
 	{
 	public:
 
-		using TFunction = std::function<void(void)>;
+		using TFunction = std::function<void()>;
 		using TContainer = std::list<TFunction>;
 		using TIterator = TContainer::iterator;
-		using TAction = Action<>;
+		using TAction = Action<void>;
 
 #pragma region public_methods
 
@@ -174,19 +155,13 @@ namespace Stormancer
 			return *this;
 		}
 
-		const TAction& operator()(bool async = false) const
+		const TAction& operator()() const
 		{
-			if (async)
+			auto functionsCopy = _functions; // copy _functions because f can erase itself from the _functions
+			for (auto f : functionsCopy)
 			{
-				pplx::task<void>([=]() {
-					exec();
-				});
+				f();
 			}
-			else
-			{
-				exec();
-			}
-
 			return *this;
 		}
 
@@ -213,19 +188,6 @@ namespace Stormancer
 #pragma endregion
 
 	private:
-
-#pragma region private_methods
-
-		inline void exec() const
-		{
-			auto functionsCopy = _functions; // copy _functions because f can erase itself from the _functions
-			for (auto f : functionsCopy)
-			{
-				f();
-			}
-		}
-
-#pragma endregion
 
 #pragma region private_members
 
