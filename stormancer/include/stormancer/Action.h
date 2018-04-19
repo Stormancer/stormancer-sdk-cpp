@@ -23,7 +23,7 @@ namespace Stormancer
 
 		Action(TFunction f)
 		{
-			_functions.push_back(f);
+			_functions->push_back(f);
 		}
 
 		virtual ~Action()
@@ -48,20 +48,20 @@ namespace Stormancer
 
 		TAction& operator=(TFunction f)
 		{
-			_functions.clear();
-			_functions.push_back(f);
+			_functions->clear();
+			_functions->push_back(f);
 			return *this;
 		}
 
 		TAction& operator+=(TFunction f)
 		{
-			_functions.push_back(f);
+			_functions->push_back(f);
 			return *this;
 		}
 
 		const TAction& operator()(TParams... data) const
 		{
-			auto functionsCopy = _functions; // copy _functions because f can erase itself from the _functions
+			TContainer functionsCopy = *_functions; // copy _functions because f can erase itself from the _functions
 			for (auto f : functionsCopy)
 			{
 				f(data...);
@@ -71,22 +71,22 @@ namespace Stormancer
 
 		TIterator push_front(TFunction f)
 		{
-			return _functions.insert(_functions.begin(), f);
+			return _functions->insert(_functions->begin(), f);
 		}
 
 		TIterator push_back(TFunction f)
 		{
-			return _functions.insert(_functions.end(), f);
+			return _functions->insert(_functions->end(), f);
 		}
 
 		void erase(TIterator it)
 		{
-			_functions.erase(it);
+			_functions->erase(it);
 		}
 
 		void clear()
 		{
-			_functions.clear();
+			_functions->clear();
 		}
 
 #pragma endregion
@@ -95,7 +95,7 @@ namespace Stormancer
 
 #pragma region private_members
 
-		TContainer _functions;
+		std::shared_ptr<TContainer> _functions = std::make_shared<TContainer>();
 
 #pragma endregion
 	};
@@ -119,7 +119,7 @@ namespace Stormancer
 
 		Action(TFunction f)
 		{
-			_functions.push_back(f);
+			_functions->push_back(f);
 		}
 
 		virtual ~Action()
@@ -144,20 +144,20 @@ namespace Stormancer
 
 		TAction& operator=(TFunction f)
 		{
-			_functions.clear();
-			_functions.push_back(f);
+			_functions->clear();
+			_functions->push_back(f);
 			return *this;
 		}
 
 		TAction& operator+=(TFunction f)
 		{
-			_functions.push_back(f);
+			_functions->push_back(f);
 			return *this;
 		}
 
 		const TAction& operator()() const
 		{
-			auto functionsCopy = _functions; // copy _functions because f can erase itself from the _functions
+			TContainer functionsCopy = *_functions; // copy _functions because f can erase itself from the _functions
 			for (auto f : functionsCopy)
 			{
 				f();
@@ -167,22 +167,22 @@ namespace Stormancer
 
 		TIterator push_front(TFunction f)
 		{
-			return _functions.insert(_functions.begin(), f);
+			return _functions->insert(_functions->begin(), f);
 		}
 
 		TIterator push_back(TFunction f)
 		{
-			return _functions.insert(_functions.end(), f);
+			return _functions->insert(_functions->end(), f);
 		}
 
 		void erase(TIterator it)
 		{
-			_functions.erase(it);
+			_functions->erase(it);
 		}
 
 		void clear()
 		{
-			_functions.clear();
+			_functions->clear();
 		}
 
 #pragma endregion
@@ -191,7 +191,7 @@ namespace Stormancer
 
 #pragma region private_members
 
-		TContainer _functions;
+		std::shared_ptr<TContainer> _functions = std::make_shared<TContainer>();
 
 #pragma endregion
 	};
