@@ -1,5 +1,0 @@
-# boost's include directories can look like build directories
-!x86
-!x64
-!ARM
-!debug
