@@ -5,6 +5,7 @@
 #include "stormancer/Scene.h"
 #include "stormancer/RPC/RpcService.h"
 #include "stormancer/SingleServicePlugin.h"
+#include "stormancer/SafeCapture.h"
 
 namespace Stormancer
 {
@@ -60,17 +61,14 @@ namespace Stormancer
 		{
 			_scene = scene;
 
-			std::weak_ptr<PlayerDataService<T>> weakThis = this->shared_from_this();
-			_scene->addRoute(PLAYERDATA_UPDATED_ROUTE, [weakThis](Packetisp_ptr packet)
-			{
-				auto thiz = weakThis.lock();
-				if (thiz && thiz->_onDataUpdated)
+			_scene->addRoute(PLAYERDATA_UPDATED_ROUTE, STRM_SAFE_CAPTURE([this](Packetisp_ptr packet) {
+				if (_onDataUpdated)
 				{
 					auto playerData = packet->readObject<PlayerData<T>>();
 					playerData.peerId = packet->connection->id();
-					thiz->_onDataUpdated(playerData);
+					_onDataUpdated(playerData);
 				}
-			});
+			}));
 		}
 
 		Scene* GetScene()

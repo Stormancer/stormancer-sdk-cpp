@@ -1,5 +1,6 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/ApiClient.h"
+#include "stormancer/SafeCapture.h"
 
 namespace Stormancer
 {
@@ -18,10 +19,9 @@ namespace Stormancer
 	pplx::task<SceneEndpoint> ApiClient::getSceneEndpoint(std::string accountId, std::string applicationName, std::string sceneId, pplx::cancellation_token ct)
 	{
 #ifdef STORMANCER_LOG_CLIENT
-		std::stringstream ss1;
-		ss1 << accountId << ';' << applicationName << ';' << sceneId;
-		auto str = ss1.str();
-		_logger->log(LogLevel::Trace, "ApiClient", "Scene endpoint data", str.c_str());
+		std::stringstream ss;
+		ss << accountId << ';' << applicationName << ';' << sceneId;
+		_logger->log(LogLevel::Trace, "ApiClient", "Scene endpoint data", ss.str());
 #endif
 
 		std::vector<std::string> baseUris = _config->getApiEndpoint();
@@ -89,7 +89,9 @@ namespace Stormancer
 		request.headers().add("x-version", "1.0.0");
 #endif
 
-		return client.request(request, ct).then([=](pplx::task<web::http::http_response> task) {
+		return client.request(request, ct)
+			.then(STRM_SAFE_CAPTURE([=](pplx::task<web::http::http_response> task)
+		{
 			web::http::http_response response;
 			try
 			{
@@ -109,7 +111,9 @@ namespace Stormancer
 				auto msgStr = "HTTP request on '" + baseUri + "' returned status code " + std::to_string(statusCode);
 				_logger->log(LogLevel::Trace, "ApiClient", msgStr);
 				concurrency::streams::stringstreambuf ss;
-				return response.body().read_to_end(ss).then([=](size_t) {
+				return response.body().read_to_end(ss)
+					.then(STRM_SAFE_CAPTURE([=](size_t)
+				{
 					std::string responseText = ss.collection();
 					_logger->log(LogLevel::Trace, "ApiClient", "Response", responseText);
 
@@ -122,29 +126,31 @@ namespace Stormancer
 						(*errors).push_back("[" + msgStr + ":" + std::to_string(statusCode) + "]");
 						return getSceneEndpointImpl(endpoints, errors, accountId, applicationName, sceneId, ct);
 					}
-				}, ct);
+				}), ct);
 			}
 			catch (const std::exception& ex)
 			{
 				throw std::runtime_error(std::string() + "Can't get the scene endpoint response: " + ex.what());
 			}
-		}, ct);
+		}), ct);
 	}
 
 	pplx::task<web::http::http_response> ApiClient::requestWithRetries(std::function<web::http::http_request(std::string)> requestFactory, pplx::cancellation_token ct)
 	{
 		auto errors = std::make_shared<std::vector<std::string>>();
 		std::vector<std::string> baseUris = _config->getApiEndpoint();
-
 		return requestWithRetriesImpl(requestFactory, baseUris, errors, ct);
 	}
 
 	pplx::task<ServerEndpoints> ApiClient::GetServerEndpoints()
 	{
+		auto account = _config->account;
+		auto application = _config->application;
+
 		return requestWithRetries([=](std::string) {
 			web::http::http_request request(web::http::methods::POST);
 
-			std::string relativeUri = std::string("/") + _config->account + "/" + _config->application + "/_endpoints";
+			std::string relativeUri = std::string("/") + account + "/" + application + "/_endpoints";
 #if defined(_WIN32)
 			request.set_request_uri(std::wstring(relativeUri.begin(), relativeUri.end()));
 			request.headers().add(L"Accept", L"application/json");
@@ -157,19 +163,20 @@ namespace Stormancer
 			request.set_body(std::string());
 #endif
 			return request;
-		}).then([](pplx::task<web::http::http_response> t) {
-			return t.get().extract_json();
-		}).then([](pplx::task < web::json::value> t) {
-
+		})
+			.then([](web::http::http_response response)
+		{
+			return response.extract_json();
+		})
+			.then([](web::json::value /*value*/)
+		{
 			ServerEndpoints result;
-
 			return result;
 		});
 	}
 
 	pplx::task<web::http::http_response> ApiClient::requestWithRetriesImpl(std::function<web::http::http_request(std::string)> requestFactory, std::vector<std::string> endpoints, std::shared_ptr<std::vector<std::string>> errors, pplx::cancellation_token ct)
 	{
-
 		auto it = endpoints.begin();
 		if (_config->endpointSelectionMode == Stormancer::EndpointSelectionMode::RANDOM)
 		{
@@ -190,8 +197,9 @@ namespace Stormancer
 		web::http::client::http_client client(baseUri, config);
 #endif
 
-		return client.request(rq, ct).then([=](pplx::task<web::http::http_response> t) {
-
+		return client.request(rq, ct)
+			.then(STRM_SAFE_CAPTURE([=](pplx::task<web::http::http_response> t)
+		{
 			bool success = false;
 			web::http::http_response response;
 			try
@@ -206,7 +214,6 @@ namespace Stormancer
 					auto error = response.extract_string(true).get();
 					errors->push_back("An error occured while performing an http request to" + baseUri + " status code : '" + std::to_string(response.status_code()) + "', message : '" + std::string(error.begin(), error.end()));
 				}
-
 			}
 			catch (std::exception &ex)
 			{
@@ -232,6 +239,6 @@ namespace Stormancer
 			{
 				return pplx::task_from_result(response);
 			}
-		}, ct);
+		}), ct);
 	}
 };

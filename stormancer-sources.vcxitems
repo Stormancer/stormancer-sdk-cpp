@@ -92,6 +92,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\RPC\RpcRequest.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\RPC\RpcRequestContext.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\RPC\RpcService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\SafeCapture.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\Scene.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\SceneDispatcher.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\SceneEndpoint.h" />
@@ -102,6 +103,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\SingleServicePlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\stdafx.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\stormancer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\CustomExceptions.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\stormancerTypes.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\Streams\bytestream.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\Streams\bytestreambuf.h" />
