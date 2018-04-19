@@ -1,0 +1,39 @@
+#pragma once
+#include "stormancer/headers.h"
+#include "stormancer/stormancer.h"
+
+namespace Stormancer
+{
+	class MetafileDto
+	{
+	public:
+		MSGPACK_DEFINE(FileName, URL, Path, MD5Hash, MD5HashContent)
+		std::string FileName;
+		std::string URL;
+		std::string Path;
+		std::string MD5Hash;
+		std::string MD5HashContent;
+	};
+
+	class DocumentTest
+	{
+	public:
+		MSGPACK_DEFINE(Type, Content)
+		std::string Type;
+		std::string Content;
+	};
+
+	class AssetsStorageService
+	{
+	public:
+		AssetsStorageService(Stormancer::Scene_ptr scene);
+		Scene_ptr GetScene() {
+			return this->_scene;
+		}
+
+		pplx::task<MetafileDto> GetFile(std::string branchName, std::string path);
+	private:
+		Scene_ptr _scene;
+		std::shared_ptr<Stormancer::ILogger> _logger;		
+	};
+}

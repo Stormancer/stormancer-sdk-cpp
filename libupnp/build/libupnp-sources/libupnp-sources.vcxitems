@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{5EEBA6DB-45F0-4437-9B6E-1ECCDF3D8753}</ItemsProjectGuid>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\ixml\inc\ixml.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\ixml\inc\ixmldebug.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\ixml\src\inc\ixmlmembuf.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\ixml\src\inc\ixmlparser.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\threadutil\inc\FreeList.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\threadutil\inc\ithread.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\threadutil\inc\LinkedList.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\threadutil\inc\threadpool.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\threadutil\inc\TimerThread.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\inc\ActionComplete.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\inc\ActionRequest.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\inc\Callback.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\inc\Discovery.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\inc\Event.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\inc\EventSubscribe.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\inc\FileInfo.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\inc\StateVarComplete.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\inc\StateVarRequest.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\inc\SubscriptionRequest.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\inc\TemplateInclude.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\inc\TemplateSource.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\inc\TemplateUndef.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\inc\upnp.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\inc\upnpdebug.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\inc\UpnpGlobal.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\inc\UpnpIntTypes.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\inc\UpnpStdInt.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\inc\UpnpString.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\inc\upnptools.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\inc\UpnpUniStd.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\inc\win32\UpnpInet.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\client_table.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\config.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\gena.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\gena_ctrlpt.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\gena_device.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\global.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\gmtdate.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\httpparser.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\md5.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\membuffer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\netall.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\parsetools.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\server.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\service_table.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\soaplib.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\sock.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\statcodes.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\statuscodes.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\strintmap.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\sysdep.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\upnputil.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\upnp_timeout.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\urlconfig.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\uuid.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\VirtualDir.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\inc\webserver.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\upnp\src\ssdp\ssdp_ResultData.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\inc\win32\autoconfig.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\ixml\src\attr.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\ixml\src\document.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\ixml\src\element.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\ixml\src\ixml.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\ixml\src\ixmldebug.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\ixml\src\ixmlmembuf.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\ixml\src\ixmlparser.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\ixml\src\namedNodeMap.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\ixml\src\node.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\ixml\src\nodeList.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\threadutil\src\FreeList.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\threadutil\src\LinkedList.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\threadutil\src\TimerThread.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\threadutil\src\win32\ThreadPool.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\api\ActionComplete.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\api\ActionRequest.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\api\Discovery.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\api\Event.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\api\EventSubscribe.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\api\FileInfo.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\api\StateVarComplete.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\api\StateVarRequest.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\api\SubscriptionRequest.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\api\upnpdebug.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\api\UpnpString.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\api\upnptools.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\gena\gena_callback2.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\gena\gena_device.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\client_table\ClientSubscription.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\client_table\client_table.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\net\http\httpparser.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\net\http\parsetools.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\net\http\statcodes.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\net\sock.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\service_table\service_table.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\util\membuffer.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\util\strintmap.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\util\upnp_timeout.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\genlib\util\util.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\soap\soap_common.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\soap\soap_ctrlpt.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\soap\soap_device.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\ssdp\ssdp_ResultData.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\uuid\md5.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\upnp\src\uuid\uuid.c" />
+  </ItemGroup>
+</Project>

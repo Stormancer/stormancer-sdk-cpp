@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{e7c14f8f-a186-40c5-98d6-0b6e0af478d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{e30751c2-c87c-4ee9-85a2-7bc0230ad291}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stormancer\src\Windows\AES\AES_windows.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stormancer\include\stormancer\Windows\AES\AES_windows.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
