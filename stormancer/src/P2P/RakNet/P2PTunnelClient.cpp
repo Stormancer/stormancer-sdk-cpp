@@ -1,5 +1,6 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/P2P/RakNet/P2PTunnelClient.h"
+#include "..\..\..\include\stormancer\P2P\RakNet\P2PTunnelClient.h"
 
 namespace Stormancer
 {
@@ -27,7 +28,10 @@ namespace Stormancer
 		bbp.setIPHdrIncl = false;
 		bbp.doNotFragment = false;
 		bbp.pollingThreadPriority = 0;
-		bbp.eventHandler = this;
+
+		_handler = new P2PTunnelRNS2EventHandler();
+		_handler->innerClient = this;
+		bbp.eventHandler = _handler;
 		bbp.remotePortRakNetWasStartedOn_PS3_PS4_PSP2 = 0;
 	
 		RakNet::RNS2BindResult br = ((RakNet::RNS2_Berkley*)socket)->Bind(&bbp, _FILE_AND_LINE_);
@@ -59,12 +63,21 @@ namespace Stormancer
 	}
 
 	P2PTunnelClient::~P2PTunnelClient()
-	{
+	{		
 		if (socket != nullptr)
-		{
-			((RakNet::RNS2_Berkley*)socket)->BlockOnStopRecvPollingThread();
-			RakNet::RakNetSocket2Allocator::DeallocRNS2(socket);
+		{	
+			auto socketCopy = socket;
 			socket = nullptr;
+			_handler->innerClient = nullptr;
+			auto handler = _handler;
+			
+			pplx::create_task([socketCopy, handler]()
+			{				
+				((RakNet::RNS2_Berkley*)socketCopy)->BlockOnStopRecvPollingThread();
+				RakNet::RakNetSocket2Allocator::DeallocRNS2(socketCopy);
+
+				delete handler;
+			});
 		}
 	}
 
@@ -75,13 +88,22 @@ namespace Stormancer
 			_onMsgRecv(this, recvStruct);
 		}
 	}
+	
 
-	void P2PTunnelClient::DeallocRNS2RecvStruct(RakNet::RNS2RecvStruct* s, const char * file, unsigned int line)
+	void P2PTunnelRNS2EventHandler::OnRNS2Recv(RakNet::RNS2RecvStruct * recvStruct)
+	{
+		if (innerClient)
+		{
+			innerClient->OnRNS2Recv(recvStruct);
+		}
+	}
+
+	void P2PTunnelRNS2EventHandler::DeallocRNS2RecvStruct(RakNet::RNS2RecvStruct * s, const char * file, unsigned int line)
 	{
 		RakNet::OP_DELETE(s, file, line);
 	}
 
-	RakNet::RNS2RecvStruct* P2PTunnelClient::AllocRNS2RecvStruct(const char * file, unsigned int line)
+	RakNet::RNS2RecvStruct * P2PTunnelRNS2EventHandler::AllocRNS2RecvStruct(const char * file, unsigned int line)
 	{
 		return RakNet::OP_NEW<RakNet::RNS2RecvStruct>(file, line);
 	}

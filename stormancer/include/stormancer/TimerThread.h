@@ -11,65 +11,67 @@
 namespace Stormancer
 {
 
-class TimerThread
-{
-public:
+	class TimerThread
+	{
+	public:
 
-	using clock_type = std::chrono::steady_clock;
+		using clock_type = std::chrono::steady_clock;
 
 #pragma region public_methods
 
-	static TimerThread& getInstance();
+		static TimerThread& getInstance();
 
-	TimerThread();
+		TimerThread();
 
-	~TimerThread();
+		~TimerThread();
 
-	TimerThread(const TimerThread&) = delete;
+		TimerThread(const TimerThread&) = delete;
 
-	void schedule(std::function<void()> func, clock_type::time_point when);
+		void schedule(std::function<void()> func, clock_type::time_point when);
 
 #pragma endregion
 
-private:
+	private:
 
-	struct QueueEntry
-	{
-		clock_type::time_point scheduledTime;
-		std::function<void()> function;
-
-		QueueEntry(clock_type::time_point t, std::function<void()> f) :
-			scheduledTime(t),
-			function(f)
-		{}
-
-		friend bool operator>(const QueueEntry& lhs, const QueueEntry& rhs)
+		struct QueueEntry
 		{
-			return lhs.scheduledTime > rhs.scheduledTime;
-		}
-	};
+			clock_type::time_point scheduledTime;
+			std::function<void()> function;
 
-	using func_queue_type = std::priority_queue<QueueEntry, std::vector<QueueEntry>, std::greater<QueueEntry>>;
+			QueueEntry(clock_type::time_point t, std::function<void()> f) :
+				scheduledTime(t),
+				function(f)
+			{}
+
+			friend bool operator>(const QueueEntry& lhs, const QueueEntry& rhs)
+			{
+				return lhs.scheduledTime > rhs.scheduledTime;
+			}
+		};
+
+		using func_queue_type = std::priority_queue<QueueEntry, std::vector<QueueEntry>, std::greater<QueueEntry>>;
 
 #pragma region private_methods
 
-	void _threadLoop();
+		void _threadLoop();
 
-	void _stop(bool immediate = false);
+		void _stop(bool immediate = false);
 
 #pragma endregion
 
 #pragma region private_members
 
-	static std::unique_ptr<TimerThread> _sInstance;
+		static std::unique_ptr<TimerThread> _sInstance;
 
-	std::mutex _mutex;
-	std::condition_variable _cond;
-	func_queue_type _taskQueue;
-	bool _stopRequested = false;
-	std::thread _thread;
+		std::mutex _mutex;
+		std::condition_variable _cond;
+		func_queue_type _taskQueue;
+		bool _stopRequested = false;
+		std::thread _thread;
 
 #pragma endregion
-};
+	};
+
+
 
 }

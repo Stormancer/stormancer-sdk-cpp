@@ -320,6 +320,7 @@ namespace Stormancer
 			_disconnectTask = pplx::task_from_result();
 		}
 
+		std::weak_ptr<Scene> weakSelf = shared_from_this();
 		if (immediate)
 		{
 			auto logger = _logger;
@@ -333,15 +334,24 @@ namespace Stormancer
 				}
 				catch (const std::exception& ex)
 				{
-					logger->log(LogLevel::Warn, "Scene", "Scene disconnection failed.", ex.what());
+					logger->log(LogLevel::Warn, "Scene", "Scene disconnection failed.", ex.what());					
 				}
 			});
 		}
-		else
+		_disconnectTask = _disconnectTask.then([weakSelf](pplx::task<void> t)
 		{
-			return _disconnectTask;
-		}
+			auto self = weakSelf.lock();
+			if (self)
+			{
+				self->_registeredComponents.clear();
+				self->_dependencyResolver = nullptr;
+			}
+			return t;
+		});
+
+		return _disconnectTask;
 	}
+
 
 	DependencyResolver* Scene::dependencyResolver() const
 	{
@@ -365,7 +375,7 @@ namespace Stormancer
 
 		uint16 routeHandle;
 		*packet->stream >> routeHandle;
-		
+
 
 		if (mapContains(_handlers, routeHandle))
 		{

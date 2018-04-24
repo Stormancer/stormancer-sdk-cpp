@@ -623,7 +623,7 @@ namespace Stormancer
 
 	pplx::task<int> RakNetTransport::sendPing(const std::string& address, pplx::cancellation_token ct)
 	{
-		return this->sendPing(address, 4, ct);
+		return this->sendPing(address, 2, ct);
 	}
 
 	bool RakNetTransport::sendPingImpl(const std::string& address)
@@ -661,7 +661,7 @@ namespace Stormancer
 		}
 
 		pplx::task<int> eventSetTask(tce, ct);
-		auto cts = pplx::cancellation_token_source::create_linked_source(ct);
+		pplx::cancellation_token_source cts = ct.is_cancelable() ? pplx::cancellation_token_source::create_linked_source(ct) : pplx::cancellation_token_source();
 		std::vector<pplx::task<bool>> tasks;
 		for (int i = 0; i < nb; i++)
 		{

@@ -72,7 +72,7 @@ namespace Stormancer
 		bool asynchronousDispatch = true;
 
 		///Size of the threadpool. Defaults to 5. Less than 3 can provoke deadlocks.
-		int threadpoolSize = 5;
+		int threadpoolSize = 10;
 
 		/// The scheduler used by the client to run the transport and other repeated tasks.
 		std::shared_ptr<IScheduler> scheduler;
@@ -109,6 +109,8 @@ namespace Stormancer
 		ILogger_ptr logger = std::make_shared<NullLogger>();
 
 		std::string endpointRootCertificate;
+
+		bool shoudInitializeNetworkLibraries = true;
 
 #pragma endregion
 

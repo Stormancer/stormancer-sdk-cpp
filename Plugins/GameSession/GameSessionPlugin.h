@@ -9,5 +9,6 @@ namespace Stormancer
 	{
 	public:
 		void sceneCreated(Scene* scene) override;
+		void sceneDisconnecting(Scene* scene) override;
 	};
 };

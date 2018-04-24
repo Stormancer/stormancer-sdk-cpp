@@ -72,6 +72,9 @@ namespace Stormancer
 
 		auto config = web::http::client::http_client_config();
 		config.set_timeout(std::chrono::seconds(3));
+
+		config.set_initHttpLib(_config->shoudInitializeNetworkLibraries);
+
 		web::http::client::http_client client(baseUri2, config);
 		web::http::http_request request(web::http::methods::POST);
 		std::string relativeUri = "/" + accountId + "/" + applicationName + "/scenes/" + sceneId + "/token";

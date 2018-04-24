@@ -115,10 +115,8 @@ public:
 #if !defined(_WIN32) && !defined(__cplusplus_winrt)
         , m_ssl_context_callback([](boost::asio::ssl::context&)->void{})
         , m_tlsext_sni_enabled(true)
-#endif
-
-
-
+#endif	
+		, m_initHttpLib(true)
 
 #if defined(_WIN32) && !defined(__cplusplus_winrt)
         , m_buffer_request(false)
@@ -292,22 +290,21 @@ public:
         m_validate_certificates = validate_certs;
     }
 #endif
+	bool initHttpLib() const
+	{
+		return m_initHttpLib;
+	}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	/// <summary>
+	/// Set the initSceHttpLib property.
+	/// If true, the sdk will try to initialize the HttpLib.
+	/// </summary>
+	/// <param name="initSceHttpLib">True to initialize the http lib, false otherwise.</param>
+	/// <remarks>Http lib can only be initialized once.</remarks>
+	void set_initHttpLib(bool initHttpLib)
+	{
+		m_initHttpLib = initHttpLib;
+	}
 
 #ifdef _WIN32
 #if !defined(__cplusplus_winrt)
@@ -438,8 +435,7 @@ private:
     std::function<void(boost::asio::ssl::context&)> m_ssl_context_callback;
     bool m_tlsext_sni_enabled;
 #endif
-
-
+	bool m_initHttpLib = true;
 
 #if defined(_WIN32) && !defined(__cplusplus_winrt)
     bool m_buffer_request;

@@ -11,13 +11,13 @@ namespace Stormancer
 
 		_logger = scene->dependencyResolver()->resolve<ILogger>();
 
-		_scene->addRoute("gameSession.shutdown", [this](Packetisp_ptr packet) {
+		scene->addRoute("gameSession.shutdown", [this](Packetisp_ptr packet) {
 			if (this->_onShutdownReceived)
 			{
 				this->_onShutdownReceived();
 			}
 		});
-		_scene->addRoute("player.update", [this](Packetisp_ptr packet) {
+		scene->addRoute("player.update", [this](Packetisp_ptr packet) {
 			auto update = packet->readObject<Stormancer::PlayerUpdate>();
 			SessionPlayer player(update.UserId, (PlayerStatus)update.Status);
 
@@ -34,20 +34,31 @@ namespace Stormancer
 			this->_onConnectedPlayersChanged(SessionPlayerUpdateArg(player, update.Data));
 		});
 
-		_scene->addRoute("players.allReady", [=](Packetisp_ptr packet) {
+		scene->addRoute("players.allReady", [=](Packetisp_ptr packet) {
 			_onAllPlayerReady();
 		});
 
-		_scene->addRoute("player.p2ptoken", [this](Packetisp_ptr packet) {
+		scene->addRoute("player.p2ptoken", [this](Packetisp_ptr packet) {
+			auto scene = GetScene();
+			_logger->log(LogLevel::Trace, "gamession.p2ptoken", "recieved p2p token");
+			if (_receivedP2PToken)
+			{
+				return;
+			}
+
+			_receivedP2PToken = true;
 			auto p2pToken = packet->readObject<std::string>();
 			if (p2pToken.empty()) //host
 			{
+				_logger->log(LogLevel::Trace, "gamession.p2ptoken", "received empty p2p token: I'm the host.");
 				this->_onRoleReceived("HOST");
-				_tunnel = _scene->registerP2PServer(GAMESESSION_P2P_SERVER_ID);
+				_tunnel = GetScene()->registerP2PServer(GAMESESSION_P2P_SERVER_ID);
 			}
 			else //client
 			{
-				_scene->openP2PConnection(p2pToken).then([this](std::shared_ptr<Stormancer::P2PScenePeer> p2pPeer) {
+				_logger->log(LogLevel::Trace, "gamession.p2ptoken", "received valid p2p token: I'm a client.");
+
+				scene->openP2PConnection(p2pToken).then([this](std::shared_ptr<Stormancer::P2PScenePeer> p2pPeer) {
 					this->_onRoleReceived("CLIENT");
 
 					if (_onConnectionOpened)
@@ -81,7 +92,12 @@ namespace Stormancer
 					}
 				});
 			}
-		});
+		});			
+	}
+
+	GameSessionService::~GameSessionService()
+	{
+		std::clog << "GameSessionService destroyed" << std::endl;
 	}
 
 	pplx::task<std::string> GameSessionService::waitServerReady(pplx::cancellation_token token)
@@ -147,20 +163,39 @@ namespace Stormancer
 
 	pplx::task<void> GameSessionService::connect()
 	{
-		return _scene->connect();
+		auto scene = GetScene();
+		if (scene)
+		{
+			return scene->connect();
+		}
+		else
+		{
+			return pplx::task_from_exception<void>(std::runtime_error("Scene deleted?"));
+		}
+
 	}
 
 	pplx::task<void> GameSessionService::reset()
 	{
-		auto rpc = _scene->dependencyResolver()->resolve<RpcService>();
-		return rpc->rpcWriter("gamesession.reset", [](obytestream*) {});
+		auto scene = GetScene();
+		if (scene)
+		{
+			auto rpc = scene->dependencyResolver()->resolve<RpcService>();
+			return rpc->rpcWriter("gamesession.reset", [](obytestream*) {});
+		}
+		else
+		{
+			return pplx::task_from_exception<void>(std::runtime_error("Scene deleted?"));
+		}
+
 	}
 
 	pplx::task<void> GameSessionService::disconnect()
 	{
-		if (_scene)
+		auto scene = GetScene();
+		if (scene)
 		{
-			return _scene->disconnect();
+			return scene->disconnect();
 		}
 		else
 		{
@@ -168,11 +203,22 @@ namespace Stormancer
 		}
 	}
 
+	void GameSessionService::__disconnecting()
+	{
+		_tunnel = nullptr;
+		_users.clear();
+		_logger = nullptr;
+	}
+
 	void GameSessionService::ready(std::string data)
 	{
-		_scene->send("player.ready", [data](obytestream* stream) {
-			msgpack::pack(stream, data);
-		});
+		auto scene = GetScene();
+		if (scene)
+		{
+			scene->send("player.ready", [data](obytestream* stream) {
+				msgpack::pack(stream, data);
+			});
+		}
 	}
 
 	GameSessionManager::GameSessionManager(Client* client)

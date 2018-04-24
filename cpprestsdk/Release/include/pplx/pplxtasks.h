@@ -960,12 +960,21 @@ namespace pplx
 
 			~_ExceptionHolder()
 			{
-				if (_M_exceptionObserved == 0 && !(pplx::unobservedExceptionHandler && pplx::unobservedExceptionHandler(_M_stdException)))
+				if (_M_exceptionObserved == 0)
 				{
-					// If you are trapped here, it means an exception thrown in task chain didn't get handled.
-					// Please add task-based continuation to handle all exceptions coming from tasks.
-					// this->_M_stackTrace keeps the creation callstack of the task generates this exception.
-					_REPORT_PPLTASK_UNOBSERVED_EXCEPTION();
+					bool handled = false;
+					if (pplx::unobservedExceptionHandler)
+					{
+						handled = pplx::unobservedExceptionHandler(_M_stdException);
+					}
+
+					if (!handled)
+					{
+						// If you are trapped here, it means an exception thrown in task chain didn't get handled.
+											// Please add task-based continuation to handle all exceptions coming from tasks.
+											// this->_M_stackTrace keeps the creation callstack of the task generates this exception.
+						_REPORT_PPLTASK_UNOBSERVED_EXCEPTION();
+					}
 				}
 			}
 
@@ -983,7 +992,7 @@ namespace pplx
 				}
 #endif  /* defined (__cplusplus_winrt) */
 				std::rethrow_exception(_M_stdException);
-			}
+				}
 
 			// A variable that remembers if this exception was every rethrown into user code (and hence handled by the user). Exceptions that
 			// are unobserved when the exception holder is destructed will terminate the process.
@@ -1211,7 +1220,7 @@ namespace pplx
 			task_continuation_context _Current(true);
 			_Current._Resolve(true);
 			return _Current;
-		}
+	}
 #endif  /* defined (__cplusplus_winrt) */
 
 	private:
@@ -1219,7 +1228,7 @@ namespace pplx
 		task_continuation_context(bool _DeferCapture = false) : details::_ContextCallback(_DeferCapture)
 		{
 		}
-	};
+};
 
 	class task_options;
 	namespace details
@@ -1759,8 +1768,8 @@ namespace pplx
 						// synchronous callback, which causes a deadlock. To avoid this, we test the state ancestor's event , and we will NOT wait on
 						// if it has finished execution (which means now we are on the inline synchronous callback).
 						_DoWait = false;
-					}
-				}
+		}
+	}
 #endif  /* defined (__cplusplus_winrt) */
 				if (_DoWait)
 				{
@@ -2112,14 +2121,14 @@ namespace pplx
 							{
 								_TaskImplPtr->_CancelWithException(std::current_exception());
 							}
+								}
+							}, _PTaskHandle->_M_inliningMode);
 						}
-					}, _PTaskHandle->_M_inliningMode);
-				}
 				else
 				{
 					_ScheduleTask(_PTaskHandle, _PTaskHandle->_M_inliningMode);
 				}
-			}
+					}
 
 			/// <summary>
 			///     Schedule the actual continuation. This will either schedule the function on the continuation task's implementation
@@ -2496,10 +2505,10 @@ namespace pplx
 							{
 								// We will only try to cancel async operation but not unwrapped tasks, since unwrapped tasks cannot be canceled without its token.
 								_M_unwrapped_async_op->Cancel();
-							}
+					}
 #endif  /* defined (__cplusplus_winrt) */
 							_M_TaskCollection._Cancel();
-						}
+				}
 
 						// The _M_TaskState variable transitions to _Canceled when cancellation is completed (the task is not executing user code anymore).
 						// In the case of a synchronous cancel, this can happen immediately, whereas with an asynchronous cancel, the task has to move from
@@ -2507,10 +2516,10 @@ namespace pplx
 						_M_TaskState = _PendingCancel;
 
 						_M_taskEventLogger._LogCancelTask();
-					}
+			}
 
 
-				}
+		}
 
 				// Only execute continuations and mark the task as completed if we were able to move the task to the _Canceled state.
 				if (_RunContinuations)
@@ -2581,7 +2590,7 @@ namespace pplx
 				else
 				{
 					_M_unwrapped_async_op = _AsyncOp;
-				}
+			}
 			}
 #endif  /* defined (__cplusplus_winrt) */
 
@@ -2600,7 +2609,7 @@ namespace pplx
 #if defined (__cplusplus_winrt)
 			_AsyncOperationType^                        _M_unwrapped_async_op;
 #endif  /* defined (__cplusplus_winrt) */
-		};
+			};
 
 		template<typename _ResultType>
 		struct _Task_completion_event_impl
@@ -4164,7 +4173,7 @@ namespace pplx
 
 		// The underlying implementation for this task
 		typename details::_Task_ptr<_ReturnType>::_Type _M_Impl;
-	};
+		};
 
 	/// <summary>
 	///     The Parallel Patterns Library (PPL) <c>task</c> class. A <c>task</c> object represents work that can be executed asynchronously,
@@ -4620,7 +4629,7 @@ namespace pplx
 
 		// The void task contains a task of a dummy type so common code can be used for tasks with void and non-void results.
 		task<details::_Unit_type> _M_unitTask;
-	};
+		};
 
 	namespace details
 	{
@@ -7343,7 +7352,7 @@ namespace pplx
 
 	} // namespace details
 
-} // namespace Concurrency
+	} // namespace Concurrency
 
 #pragma pop_macro("new")
 

@@ -6,8 +6,24 @@
 
 namespace Stormancer
 {
-	class P2PTunnelClient : RakNet::RNS2EventHandler
+	class P2PTunnelClient;
+
+	class P2PTunnelRNS2EventHandler : public RakNet::RNS2EventHandler
 	{
+	public:
+		// Inherited via RNS2EventHandler
+		virtual void OnRNS2Recv(RakNet::RNS2RecvStruct * recvStruct) override;
+		virtual void DeallocRNS2RecvStruct(RakNet::RNS2RecvStruct * s, const char * file, unsigned int line) override;
+		virtual RakNet::RNS2RecvStruct * AllocRNS2RecvStruct(const char * file, unsigned int line) override;
+
+	public:
+		P2PTunnelClient * innerClient = nullptr;
+	};
+
+	class P2PTunnelClient
+	{
+		friend P2PTunnelRNS2EventHandler;
+
 	public:
 
 #pragma region public_methods
@@ -35,11 +51,7 @@ namespace Stormancer
 
 #pragma region private_methods
 
-		virtual void OnRNS2Recv(RakNet::RNS2RecvStruct* recvStruct) override;
-
-		virtual void DeallocRNS2RecvStruct(RakNet::RNS2RecvStruct* s, const char* file, unsigned int line) override;
-
-		virtual RakNet::RNS2RecvStruct* AllocRNS2RecvStruct(const char* file, unsigned int line) override;
+		void OnRNS2Recv(RakNet::RNS2RecvStruct* recvStruct);
 
 #pragma endregion
 
@@ -48,6 +60,7 @@ namespace Stormancer
 		std::function<void(P2PTunnelClient*, RakNet::RNS2RecvStruct*)> _onMsgRecv;
 		std::shared_ptr<RequestProcessor> _sysCall;
 		ILogger_ptr _logger;
+		P2PTunnelRNS2EventHandler* _handler;
 
 #pragma endregion
 	};

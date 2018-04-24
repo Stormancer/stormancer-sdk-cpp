@@ -85,6 +85,7 @@ namespace Stormancer
 	{
 	public:
 		GameSessionManager(Client* client);
+		
 		std::string currentGameSessionId;
 
 		void setToken(std::string token);
@@ -112,6 +113,7 @@ namespace Stormancer
 
 	public:
 		GameSessionService(Stormancer::Scene_ptr scene);
+		~GameSessionService();
 
 		pplx::task<std::string> waitServerReady(pplx::cancellation_token);
 
@@ -132,8 +134,16 @@ namespace Stormancer
 		template<typename TOut, typename TIn>
 		pplx::task<TOut> sendGameResults(TIn results)
 		{
-			auto rpc = _scene->dependencyResolver()->resolve<RpcService>();
-			return rpc->rpc<TOut, TIn>("gamesession.postresults", results);
+			auto scene = GetScene();
+			if (scene)
+			{
+				auto rpc = scene->dependencyResolver()->resolve<RpcService>();
+				return rpc->rpc<TOut, TIn>("gamesession.postresults", results);
+			}
+			else
+			{
+				return pplx::task_from_exception<TOut>(std::runtime_error("Scene deleted?"));
+			}
 		}
 
 		pplx::task<void> connect();
@@ -143,8 +153,10 @@ namespace Stormancer
 		bool shouldEstablishTunnel = true;
 
 		Scene_ptr GetScene() {
-			return this->_scene;
+			return _scene.lock();
 		}
+
+		void __disconnecting();
 
 		void ready(std::string data);
 	private:
@@ -160,9 +172,10 @@ namespace Stormancer
 		std::function<void(void)> _onShutdownReceived;
 		std::function<void(std::shared_ptr<Stormancer::P2PTunnel>)> _onTunnelOpened;
 		std::function<void(std::shared_ptr<Stormancer::P2PScenePeer>)> _onConnectionOpened;
-		Scene_ptr _scene;
+		std::weak_ptr<Scene> _scene;
 		std::vector<SessionPlayer> _users;
 		pplx::task_completion_event<std::string> _waitServerTce;
 		std::shared_ptr<Stormancer::ILogger> _logger;
+		bool _receivedP2PToken = false;
 	};
 }

@@ -263,4 +263,9 @@ namespace Stormancer
 		return myconv.to_bytes(str);
 	}
 
+
+	void setUnobservedExceptionHandler(std::function<bool(std::exception_ptr)> handler)
+	{
+		pplx::unobservedExceptionHandler = handler;
+	}
 };

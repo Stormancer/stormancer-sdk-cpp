@@ -172,12 +172,19 @@ namespace Stormancer
 		if (itTunnel != _tunnels.end())
 		{
 			auto client = (*itTunnel).second;
-			RakNet::RNS2_SendParameters bsp;
-			bsp.data = (char*)buffer;
-			bsp.length = (int)read;
-			bsp.systemAddress.FromStringExplicitPort("127.0.0.1", client->hostPort, client->socket->GetBoundAddress().GetIPVersion());
+			if (client)
+			{
+				RakNet::RNS2_SendParameters bsp;
+				bsp.data = (char*)buffer;
+				bsp.length = (int)read;
+				bsp.systemAddress.FromStringExplicitPort("127.0.0.1", client->hostPort, client->socket->GetBoundAddress().GetIPVersion());
 
-			(*itTunnel).second->socket->Send(&bsp, _FILE_AND_LINE_);
+				(*itTunnel).second->socket->Send(&bsp, _FILE_AND_LINE_);
+			}
+			else
+			{
+				_tunnels.erase(itTunnel);
+			}
 		}
 	}
 

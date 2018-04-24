@@ -354,9 +354,23 @@ namespace Stormancer
 		//    return true;
 	}
 
+	template< class Rep, class Period >
+	pplx::cancellation_token timeout(std::chrono::duration<Rep, Period> duration)
+	{
+		pplx::cancellation_token_source cts;
+
+		TimerThread::getInstance().schedule([cts]() {
+			cts.cancel();
+		}, TimerThread::clock_type::now() + duration);
+
+		return cts.get_token();
+	}
+
 
 	// The PS Vita doesn't have the codecvt header, which is used by these functions.
 	std::wstring utf8_to_wstring(const std::string& str);
 	std::string wstring_to_utf8(const std::wstring& str);
 
+
+	STORMANCER_DLL_API void setUnobservedExceptionHandler(std::function<bool(std::exception_ptr)> handler);
 };

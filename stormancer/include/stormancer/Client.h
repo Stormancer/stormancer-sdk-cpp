@@ -18,7 +18,7 @@ namespace Stormancer
 	using Client_ptr = std::shared_ptr<Client>;
 
 	/// Manage the connection to the scenes of an application.
-	class STORMANCER_DLL_API Client : public std::enable_shared_from_this<Client>
+	class STORMANCER_DLL_API Client
 	{
 	public:
 
@@ -108,6 +108,9 @@ namespace Stormancer
 		void dispatchEvent(const std::function<void(void)>& ev);
 		void setConnectionState(ConnectionState state);
 		pplx::cancellation_token getLinkedCancellationToken(pplx::cancellation_token ct);
+		std::weak_ptr<Client> weak_from_this();
+		void clean();
+
 
 
 
@@ -156,6 +159,7 @@ namespace Stormancer
 		std::shared_ptr<Configuration> _config;
 		rxcpp::composite_subscription _connectionSubscription;
 		Serializer _serializer;
+		std::weak_ptr<Client> _weak;
 
 #pragma endregion
 	};
