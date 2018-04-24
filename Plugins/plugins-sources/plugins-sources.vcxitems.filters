@@ -161,5 +161,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\PlayerProfile\PlayerProfileService.h">
       <Filter>PlayerProfile</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\AssetsStorage\AssetsStorageDto.h">
+      <Filter>AssetsStorage</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

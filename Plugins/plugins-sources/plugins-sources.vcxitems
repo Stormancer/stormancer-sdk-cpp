@@ -34,6 +34,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\Matchmaking\MatchmakingService.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\AssetsStorage\AssetsStorageDto.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\AssetsStorage\AssetsStoragePlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\AssetsStorage\AssetsStorageService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Authentication\AuthenticationPlugin.h" />
