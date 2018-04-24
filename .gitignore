@@ -7,18 +7,15 @@
 *.sln.docstates
 
 # Build results
-[Dd]ebug/
-[Dd]ebugPublic/
-[Rr]eleases/
-x64/
-x86/
-build/
-bld/
-[Bb]in/
-[Oo]bj/
-[Oo]utput/
-[Bb]inaries/
-[Ii]ntermediate/
+/[Dd]ebug/
+/[Dd]ebugPublic/
+/[Rr]eleases/
+/build/
+/[Bb]in/
+/[Oo]bj/
+/[Oo]utput/
+/[Bb]inaries/
+/[Ii]ntermediate/
 
 UE4/stormancerPlugin/3rdParty/
 # Roslyn cache directories
@@ -194,7 +191,6 @@ FakesAssemblies/
 
 *Thumbs.db
 
-include/*
 *.elf
 /StormancerClient.Native.*-propertiesui-cc9f67ef-747b-4dcf-879e-8fb099bd223b.xml
 
