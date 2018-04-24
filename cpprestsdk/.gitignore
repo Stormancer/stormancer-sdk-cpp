@@ -63,6 +63,7 @@ Intermediate/
 **/packages/*
 # except build/, which is used as an MSBuild target.
 !**/packages/build/
+!Build
 # In pplx, Release actually contains source files...
 !Release/
 !Release/src/build
