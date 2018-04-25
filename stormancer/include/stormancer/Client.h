@@ -73,8 +73,6 @@ namespace Stormancer
 		/// Set a metadata
 		void setMedatata(const std::string& key, const std::string& value);
 
-		pplx::cancellation_token getToken();
-
 #pragma endregion
 
 	private:

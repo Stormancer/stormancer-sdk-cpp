@@ -144,8 +144,7 @@ namespace Stormancer
 
 		try
 		{
-			client->getConnectionStateChangedObservable().subscribe([](ConnectionState state) {
-				// On next
+			auto onNext = [](ConnectionState state) {
 				try
 				{
 					auto stateStr = connectionStateToString(state);
@@ -162,8 +161,9 @@ namespace Stormancer
 				{
 					logger->log(ex);
 				}
-			}, [](std::exception_ptr exptr) {
-				// On error
+			};
+
+			auto onError = [](std::exception_ptr exptr) {
 				try
 				{
 					std::rethrow_exception(exptr);
@@ -172,17 +172,21 @@ namespace Stormancer
 				{
 					logger->log(LogLevel::Error, "Test", "Client connection state change failed", ex.what());
 				}
-			});
+			};
+
+			client->getConnectionStateChangedObservable().subscribe(onNext, onError);
 
 			logger->log(LogLevel::Debug, "test_connect", "Get scene");
 
 			client->connectToPublicScene(sceneName, [](Scene_ptr scene) {
 				logger->log(LogLevel::Debug, "test_connect", "Get scene OK");
 
-				scene->getConnectionStateChangedObservable().subscribe([scene](ConnectionState state) {
+				auto onNext = [scene](ConnectionState state) {
 					auto stateStr = connectionStateToString(state);
 					logger->log(LogLevel::Debug, "test_connect", "Scene connection state changed", stateStr.c_str());
-				}, [](std::exception_ptr exptr) {
+				};
+
+				auto onError = [](std::exception_ptr exptr) {
 					// On error
 					try
 					{
@@ -192,7 +196,9 @@ namespace Stormancer
 					{
 						logger->log(LogLevel::Error, "Test", "Scene connection state change failed", ex.what());
 					}
-				});
+				};
+
+				scene->getConnectionStateChangedObservable().subscribe(onNext, onError);
 
 				logger->log(LogLevel::Debug, "test_connect", "Add route");
 				scene->addRoute("message", onMessage);
@@ -477,7 +483,7 @@ namespace Stormancer
 		}
 	}
 
-	void test_syncclock()
+	void test_syncClock()
 	{
 		logger->log(LogLevel::Info, "test_syncclock", "SYNC CLOCK");
 
@@ -562,13 +568,13 @@ void run_all_tests_nonblocking()
 	Stormancer::tests.push_back(Stormancer::test_connect);
 	Stormancer::tests.push_back(Stormancer::test_echo);
 	Stormancer::tests.push_back(Stormancer::test_rpc_server);
-	//Stormancer::tests.push_back(Stormancer::test_rpc_server_cancel);
+	Stormancer::tests.push_back(Stormancer::test_rpc_server_cancel);
 	Stormancer::tests.push_back(Stormancer::test_rpc_server_exception);
 	Stormancer::tests.push_back(Stormancer::test_rpc_server_clientException);
 	Stormancer::tests.push_back(Stormancer::test_rpc_client);
-	//Stormancer::tests.push_back(Stormancer::test_rpc_client_cancel);
+	Stormancer::tests.push_back(Stormancer::test_rpc_client_cancel);
 	Stormancer::tests.push_back(Stormancer::test_rpc_client_exception);
-	Stormancer::tests.push_back(Stormancer::test_syncclock);
+	Stormancer::tests.push_back(Stormancer::test_syncClock);
 	Stormancer::tests.push_back(Stormancer::test_disconnect);
 	Stormancer::tests.push_back(Stormancer::test_clean);
 

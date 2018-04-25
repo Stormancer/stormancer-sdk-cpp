@@ -89,6 +89,16 @@ namespace Stormancer
 			_functions->clear();
 		}
 
+		std::size_t size() const
+		{
+			return _functions->size();
+		}
+
+		operator bool() const
+		{
+			return (_functions->size() > 0);
+		}
+
 #pragma endregion
 
 	private:
@@ -183,6 +193,16 @@ namespace Stormancer
 		void clear()
 		{
 			_functions->clear();
+		}
+
+		std::size_t size() const
+		{
+			return _functions->size();
+		}
+
+		operator bool() const
+		{
+			return (_functions->size() > 0);
 		}
 
 #pragma endregion

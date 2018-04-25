@@ -3,10 +3,31 @@
 #include "headers.h"
 #include "stormancer/CustomExceptions.h"
 
-#define STRM_SAFE_CAPTURE(...) Stormancer::createSafeCapture(this->shared_from_this(), __VA_ARGS__)
+#if __cplusplus >= 201703L
+#define STRM_WEAK_FROM_THIS() this->weak_from_this()
+#else
+#define STRM_WEAK_FROM_THIS() Stormancer::GetWeakFromThis(this)
+#endif
+
+#define STRM_SAFE_CAPTURE(...) Stormancer::createSafeCapture(STRM_WEAK_FROM_THIS(), __VA_ARGS__)
+
+#define STRM_SAFE_CAPTURE_NOTHROW(...) Stormancer::createSafeCaptureNoThrow(STRM_WEAK_FROM_THIS(), __VA_ARGS__)
 
 namespace Stormancer
 {
+	template<typename T>
+	std::weak_ptr<T> GetWeakFromThis(T* t)
+	{
+		try
+		{
+			return t->shared_from_this();
+		}
+		catch (const std::bad_weak_ptr&)
+		{
+			return std::weak_ptr<T>();
+		}
+	}
+
 	template<typename TClass, typename TCallable>
 	class SafeCapture
 	{
@@ -27,11 +48,45 @@ namespace Stormancer
 		auto operator()(Args&&...args) const -> decltype(_callable(std::forward<Args>(args)...))
 		{
 			auto sharedPtr = _weakPtr.lock();
-			if (!sharedPtr)
+			if (sharedPtr)
+			{
+				return _callable(std::forward<Args>(args)...);
+			}
+			else
 			{
 				throw PointerDeletedException();
 			}
-			return _callable(std::forward<Args>(args)...);
+		}
+	};
+
+	template<typename TClass, typename TCallable>
+	class SafeCaptureNoThrow
+	{
+	private:
+
+		std::weak_ptr<TClass> _weakPtr;
+		TCallable _callable;
+
+	public:
+
+		SafeCaptureNoThrow(std::weak_ptr<TClass> weakPtr, TCallable callable)
+			: _weakPtr(weakPtr)
+			, _callable(callable)
+		{
+		}
+
+		template<class... Args>
+		auto operator()(Args&&...args) const -> decltype(_callable(std::forward<Args>(args)...))
+		{
+			auto sharedPtr = _weakPtr.lock();
+			if (sharedPtr)
+			{
+				return _callable(std::forward<Args>(args)...);
+			}
+			else
+			{
+				return; // Can avoid to throw only if the callable returns void
+			}
 		}
 	};
 
@@ -42,8 +97,8 @@ namespace Stormancer
 	}
 
 	template<typename TClass, typename TCallable>
-	auto createSafeCapture(std::shared_ptr<TClass> sharedPtr, TCallable callable) -> SafeCapture<TClass, TCallable>
+	auto createSafeCaptureNoThrow(std::weak_ptr<TClass> weakPtr, TCallable callable) -> SafeCaptureNoThrow<TClass, TCallable>
 	{
-		return SafeCapture<TClass, TCallable>(std::weak_ptr<TClass>(sharedPtr), callable);
+		return SafeCaptureNoThrow<TClass, TCallable>(weakPtr, callable);
 	}
 }

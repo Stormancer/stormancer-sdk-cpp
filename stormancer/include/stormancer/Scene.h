@@ -49,7 +49,7 @@ namespace Stormancer
 		pplx::task<void> connect(pplx::cancellation_token ct = pplx::cancellation_token::none());
 
 		/// Disconnect from the scene.
-		pplx::task<void> disconnect(bool immediate = false);
+		pplx::task<void> disconnect();
 
 		/// Add a route to the scene.
 		/// \param routeName Route name.
@@ -215,9 +215,6 @@ namespace Stormancer
 		pplx::task<void> _disconnectTask;
 
 		std::mutex _disconnectMutex;
-
-		/// Registered components
-		std::map<std::string, std::function<void*()>> _registeredComponents;
 
 		Action<Packet_ptr> _onPacketReceived;
 

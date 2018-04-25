@@ -12,11 +12,11 @@ namespace Stormancer
 		, _lastActivityDate(nowTime_t())
 		, _logger(logger)
 	{
-		_connectionStateObservable.get_observable().subscribe([=](ConnectionState state) {
-			// On next
+		auto onNext = [=](ConnectionState state) {
 			_connectionState = state;
-		}, [=](std::exception_ptr exptr) {
-			// On error
+		};
+
+		auto onError = [=](std::exception_ptr exptr) {
 			try
 			{
 				std::rethrow_exception(exptr);
@@ -25,7 +25,9 @@ namespace Stormancer
 			{
 				_logger->log(LogLevel::Error, "RakNetConnection", "Connection state change failed", ex.what());
 			}
-		});
+		};
+
+		_connectionStateObservable.get_observable().subscribe(onNext, onError);
 	}
 
 	RakNetConnection::~RakNetConnection()

@@ -23,10 +23,11 @@ namespace Stormancer
 			_remoteRoutesMap[routeDto.Name] = std::make_shared<Route>(routeDto.Name, routeDto.Handle, MessageOriginFilter::Host, routeDto.Metadata);
 		}
 
-		_connectionStateObservable.get_observable().subscribe([=](ConnectionState state) {
-			// On next
+		auto onNext = [=](ConnectionState state) {
 			_connectionState = state;
-		}, [=](std::exception_ptr exptr) {
+		};
+
+		auto onError = [=](std::exception_ptr exptr) {
 			// On error
 			try
 			{
@@ -36,25 +37,26 @@ namespace Stormancer
 			{
 				_logger->log(LogLevel::Error, "Scene", "Connection state change failed", ex.what());
 			}
-		});
+		};
+
+		_connectionStateObservable.get_observable().subscribe(onNext, onError);
 	}
 
 	Scene::~Scene()
 	{
-#ifdef STORMANCER_LOG_CLIENT
 		_logger->log(LogLevel::Trace, "Scene", "deleting scene...", _id);
-#endif
-		auto& logger = _logger;
-		disconnect(true).then([=](pplx::task<void> t) {
+
+		auto logger = _logger;
+		disconnect().then([logger](pplx::task<void> t) {
 			try
 			{
-				t.get();
+				t.wait();
 			}
 			catch (const std::exception& ex)
 			{
-				logger->log(LogLevel::Trace, "Scene", "Scene disconnection failed.", ex.what());
+				logger->log(LogLevel::Trace, "Client", "Ignore scene disconnection failure", ex.what());
 			}
-		}).wait();
+		});
 
 		for (auto weakSub : _subscriptions)
 		{
@@ -69,9 +71,7 @@ namespace Stormancer
 		_localRoutesMap.clear();
 		_remoteRoutesMap.clear();
 
-#ifdef STORMANCER_LOG_CLIENT
 		_logger->log(LogLevel::Trace, "Scene", "Scene deleted.", _id);
-#endif
 	}
 
 	void Scene::initialize()
@@ -286,20 +286,23 @@ namespace Stormancer
 		return _connectTask;
 	}
 
-	pplx::task<void> Scene::disconnect(bool immediate)
+	pplx::task<void> Scene::disconnect()
 	{
-#ifdef STORMANCER_LOG_CLIENT
-		_logger->log(LogLevel::Trace, "Scene", std::string() + "Scene disconnecting, immediate=" + (immediate ? "true" : "false"));
-#endif
+		_logger->log(LogLevel::Trace, "Scene", "Scene disconnecting");
 
 		std::lock_guard<std::mutex> lg(_disconnectMutex);
 
 		if (_connectionState == ConnectionState::Connected)
 		{
+			auto logger = _logger;
 			auto client = _client.lock();
 			if (client)
 			{
-				_disconnectTask = client->disconnect(shared_from_this());
+				_disconnectTask = client->disconnect(shared_from_this())
+					.then(STRM_SAFE_CAPTURE_NOTHROW([this]()
+				{
+					_dependencyResolver = nullptr;
+				}));
 			}
 			else
 			{
@@ -319,35 +322,6 @@ namespace Stormancer
 		{
 			_disconnectTask = pplx::task_from_result();
 		}
-
-		std::weak_ptr<Scene> weakSelf = shared_from_this();
-		if (immediate)
-		{
-			auto logger = _logger;
-			// if immediate, we don't propage the exception
-			return _disconnectTask
-				.then([=](pplx::task<void> t)
-			{
-				try
-				{
-					t.get();
-				}
-				catch (const std::exception& ex)
-				{
-					logger->log(LogLevel::Warn, "Scene", "Scene disconnection failed.", ex.what());					
-				}
-			});
-		}
-		_disconnectTask = _disconnectTask.then([weakSelf](pplx::task<void> t)
-		{
-			auto self = weakSelf.lock();
-			if (self)
-			{
-				self->_registeredComponents.clear();
-				self->_dependencyResolver = nullptr;
-			}
-			return t;
-		});
 
 		return _disconnectTask;
 	}

@@ -18,11 +18,9 @@ namespace Stormancer
 
 	pplx::task<SceneEndpoint> ApiClient::getSceneEndpoint(std::string accountId, std::string applicationName, std::string sceneId, pplx::cancellation_token ct)
 	{
-#ifdef STORMANCER_LOG_CLIENT
 		std::stringstream ss;
 		ss << accountId << ';' << applicationName << ';' << sceneId;
 		_logger->log(LogLevel::Trace, "ApiClient", "Scene endpoint data", ss.str());
-#endif
 
 		std::vector<std::string> baseUris = _config->getApiEndpoint();
 		auto errors = std::make_shared<std::vector<std::string>>();

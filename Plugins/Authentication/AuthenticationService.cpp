@@ -8,9 +8,7 @@ namespace Stormancer
 		: _client(client)
 		, _logger(client->logger())
 	{
-		_connectionSubscription = client->getConnectionStateChangedObservable().subscribe([=](ConnectionState state)
-		{
-			// On next
+		auto onNext = [=](ConnectionState state) {
 			switch (state)
 			{
 			case ConnectionState::Connecting:
@@ -21,8 +19,9 @@ namespace Stormancer
 			default:
 				break;
 			}
-		}, [=](std::exception_ptr exptr) {
-			// On error
+		};
+
+		auto onError = [=](std::exception_ptr exptr) {
 			try
 			{
 				std::rethrow_exception(exptr);
@@ -31,7 +30,9 @@ namespace Stormancer
 			{
 				_logger->log(LogLevel::Error, "AuthenticationService", "Client connection state change failed", ex.what());
 			}
-		});
+		};
+
+		_connectionSubscription = client->getConnectionStateChangedObservable().subscribe(onNext, onError);
 	}
 
 	AuthenticationService::~AuthenticationService()
