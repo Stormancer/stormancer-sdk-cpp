@@ -33,7 +33,7 @@ namespace Stormancer
 	{
 	public:
 
-		InvitationsService(std::shared_ptr<Scene> scene, std::shared_ptr<ILogger> logger);
+		InvitationsService(Scene_ptr scene, std::shared_ptr<ILogger> logger);
 		pplx::task<InvitationData> invite(std::string userId, std::string userData);
 
 		std::function<void(InvitationData)> onInvitationSucceded;
@@ -42,8 +42,8 @@ namespace Stormancer
 
 	private:
 		
-		std::shared_ptr<Scene> _scene;
-		std::shared_ptr<ILogger> _logger;
+		std::weak_ptr<Scene> _scene;
+		ILogger_ptr _logger;
 		Serializer _serializer;
 	};
 }

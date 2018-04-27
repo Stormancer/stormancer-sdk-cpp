@@ -89,7 +89,7 @@ private:
 		{
 			return auth_service->getPrivateScene("test-player-data-plugin");
 		})
-			.then([=](Stormancer::Scene_ptr scene)
+			.then([](Stormancer::Scene_ptr scene)
 		{
 			return scene->dependencyResolver()->resolve<Stormancer::PlayerDataService<std::string>>();
 		});

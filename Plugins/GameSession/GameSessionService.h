@@ -152,9 +152,7 @@ namespace Stormancer
 
 		bool shouldEstablishTunnel = true;
 
-		Scene_ptr GetScene() {
-			return _scene.lock();
-		}
+		std::weak_ptr<Scene> GetScene();
 
 		void __disconnecting();
 

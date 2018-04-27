@@ -7,7 +7,7 @@ namespace Stormancer
 		: _scene(scene)
 		, _rpcService(scene->dependencyResolver()->resolve<RpcService>())
 	{
-		_scene->addRoute("match.update", [=](Packetisp_ptr packet) {
+		scene->addRoute("match.update", [this](Packetisp_ptr packet) {
 			byte matchStateByte;
 			packet->stream->read((char*)&matchStateByte, 1);
 			int32 matchState = matchStateByte;
@@ -33,13 +33,13 @@ namespace Stormancer
 			}
 		});
 
-		_scene->addRoute("match.parameters.update", [=](Packetisp_ptr packet) {
+		scene->addRoute("match.parameters.update", [](Packetisp_ptr packet) {
 			Serializer serializer;	
 			std::string provider = serializer.deserializeOne<std::string>(packet->stream);
 			//_onMatchParametersUpdate();
 		});
 
-		_scene->addRoute("match.ready.update", [=](Packetisp_ptr packet) {
+		scene->addRoute("match.ready.update", [this](Packetisp_ptr packet) {
 			Serializer serializer;
 			ReadyVerificationRequest readyUpdate = serializer.deserializeOne<ReadyVerificationRequest>(packet->stream);
 			readyUpdate.membersCountReady = 0;
@@ -95,7 +95,9 @@ namespace Stormancer
 		_matchmakingCTS = pplx::cancellation_token_source();
 		auto matchmakingToken = _matchmakingCTS.get_token();
 
-		return _rpcService->rpc<void>("match.find", provider, mmRequest).then([=](pplx::task<void> res) {
+		return _rpcService->rpc<void>("match.find", provider, mmRequest)
+			.then([this, matchmakingToken](pplx::task<void> res)
+		{
 			if (matchmakingToken.is_canceled())
 			{					
 				return pplx::task_from_exception<void>(std::runtime_error("Matchmaking canceled"));
@@ -110,7 +112,14 @@ namespace Stormancer
 
 	void MatchmakingService::resolve(bool acceptMatch)
 	{
-		_scene->send("match.ready.resolve", [=](obytestream* stream) {
+		auto scene = _scene.lock();
+		if (!scene)
+		{
+			_logger->log(LogLevel::Error, "MatchmakingService", "scene deleted");
+			return;
+		}
+
+		scene->send("match.ready.resolve", [acceptMatch](obytestream* stream) {
 			(*stream) << acceptMatch;
 		}, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE_ORDERED);
 	}
@@ -119,8 +128,15 @@ namespace Stormancer
 	{
 		if (_isMatching)
 		{
+			auto scene = _scene.lock();
+			if (!scene)
+			{
+				_logger->log(LogLevel::Error, "MatchmakingService", "scene deleted");
+				return;
+			}
+
 			_matchmakingCTS.cancel();
-			_scene->send("match.cancel", [](obytestream*) {}, PacketPriority::IMMEDIATE_PRIORITY, PacketReliability::RELIABLE_ORDERED);
+			scene->send("match.cancel", [](obytestream*) {}, PacketPriority::IMMEDIATE_PRIORITY, PacketReliability::RELIABLE_ORDERED);
 			_isMatching = false;
 		}
 	}

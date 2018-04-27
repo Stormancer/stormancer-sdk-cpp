@@ -50,7 +50,7 @@ namespace Stormancer
 
 #pragma region private_members
 
-		Scene_ptr _scene;
+		std::weak_ptr<Scene> _scene;
 		std::shared_ptr<RpcService> _rpc;
 		Serializer _serializer;
 

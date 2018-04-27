@@ -142,7 +142,6 @@ namespace Stormancer
 		std::string _userId;
 		std::string _username;
 		Client* _client;
-		pplx::task<Scene_ptr> _authenticationScene;
 		Action<GameConnectionState> _onConnectionStateChanged;
 		GameConnectionState _connectionState;
 		rxcpp::composite_subscription _connectionSubscription;

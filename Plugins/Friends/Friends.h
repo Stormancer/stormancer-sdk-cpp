@@ -46,7 +46,7 @@ namespace Stormancer
 	class FriendsService
 	{
 	public:
-		FriendsService(std::shared_ptr<Scene> scene, std::shared_ptr<ILogger> logger);
+		FriendsService(Scene_ptr scene, std::shared_ptr<ILogger> logger);
 
 		std::function<void(std::shared_ptr<Friend>, FriendListUpdateOperation)> friendListChanged;
 
@@ -67,8 +67,8 @@ namespace Stormancer
 		void onFriendUpdateStatus(const FriendListUpdateDto &update);
 		void onFriendRemove(const FriendListUpdateDto &update);
 
-		std::shared_ptr<Scene> _scene;
-		std::shared_ptr<ILogger> _logger;
+		std::weak_ptr<Scene> _scene;
+		ILogger_ptr _logger;
 	};
 }
 

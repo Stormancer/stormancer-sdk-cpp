@@ -6,6 +6,7 @@
 class UdpSocket : RakNet::RNS2EventHandler
 {
 public:
+
 	UdpSocket(std::shared_ptr<Stormancer::ILogger> logger,unsigned short port,bool server):
 		_logger(logger),
 		_server(server)
@@ -56,7 +57,6 @@ public:
 	}
 	void Send(unsigned short port)
 	{
-		
 		RakNet::RNS2_SendParameters sp;
 		sp.data = "blah";
 		sp.length = 5;
@@ -99,14 +99,9 @@ void testP2P()
 	hostConfiguration->logger = logger;
 
 	auto hostClient = Stormancer::Client::create(hostConfiguration);
-	auto hostScene = hostClient->getPublicScene("test-scene").then([=](Stormancer::Scene_ptr scene)
+	auto hostScene = hostClient->connectToPublicScene("test-scene")
+		.then([logger](pplx::task<Stormancer::Scene_ptr> sceneTask)
 	{
-		return scene->connect().then([=]()
-		{
-			logger->log("host scene connected.");
-			return scene;
-		});
-	}).then([=](pplx::task<Stormancer::Scene_ptr> sceneTask) {
 		try
 		{
 			return sceneTask.get();
@@ -121,14 +116,9 @@ void testP2P()
 	auto guestConfiguration = Stormancer::Configuration::create(endpoint, account, application);
 	guestConfiguration->logger = logger;
 	auto guestClient = Stormancer::Client::create(guestConfiguration);
-	auto guestScene = guestClient->getPublicScene("test-scene").then([=](Stormancer::Scene_ptr scene)
+	auto guestScene = guestClient->connectToPublicScene("test-scene")
+		.then([=](pplx::task<Stormancer::Scene_ptr> sceneTask)
 	{
-		return scene->connect().then([=]()
-		{
-			logger->log("guest scene connected.");
-			return scene;
-		});
-	}).then([=](pplx::task<Stormancer::Scene_ptr> sceneTask) {
 		try
 		{
 			return sceneTask.get();
@@ -157,14 +147,12 @@ void testP2P()
 
 	logger->log(std::string("Retrieved guest tunnel: ") + guestTunnel->ip + ":" + std::to_string(guestTunnel->port));
 
-
 	std::string t;
 	std::cin >> t;
 }
+
 void p2pClient()
 {
-	
-
 	auto logger = std::make_shared<Stormancer::ConsoleLogger>();
 	//auto rakPeer = RakNet::RakPeerInterface::GetInstance();
 	//UdpSocket testSocket(logger, 0);
@@ -172,14 +160,9 @@ void p2pClient()
 	config->logger = logger;
 
 	auto client = Stormancer::Client::create(config);
-	auto scene = client->getPublicScene("test-scene").then([=](Stormancer::Scene_ptr scene)
+	auto scene = client->connectToPublicScene("test-scene")
+		.then([logger](pplx::task<Stormancer::Scene_ptr> sceneTask)
 	{
-		return scene->connect().then([=]()
-		{
-			logger->log("host scene connected.");
-			return scene;
-		});
-	}).then([=](pplx::task<Stormancer::Scene_ptr> sceneTask) {
 		try
 		{
 			return sceneTask.get();
@@ -217,7 +200,4 @@ void p2pClient()
 
 		std::cin.get();
 	}
-
-	
-
 }

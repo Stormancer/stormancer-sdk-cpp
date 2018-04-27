@@ -1,7 +1,7 @@
 #include "stormancer/headers.h"
 #include "Friends.h"
 
-Stormancer::FriendsService::FriendsService(std::shared_ptr<Scene> scene, std::shared_ptr<ILogger> logger)
+Stormancer::FriendsService::FriendsService(Scene_ptr scene, std::shared_ptr<ILogger> logger)
 	: friendListChanged([](std::shared_ptr<Friend> f, FriendListUpdateOperation /*op*/) {})
 	, _scene(scene)
 	, _logger(logger)
@@ -14,22 +14,46 @@ Stormancer::FriendsService::FriendsService(std::shared_ptr<Scene> scene, std::sh
 
 pplx::task<void> Stormancer::FriendsService::inviteFriend(std::string userId)
 {
-	return _scene->dependencyResolver()->resolve<RpcService>()->rpc<void, std::string>("friends.invitefriend", userId);
+	auto scene = _scene.lock();
+	if (!scene)
+	{
+		return pplx::task_from_exception<void>(std::runtime_error("scene deleted"));
+	}
+
+	return scene->dependencyResolver()->resolve<RpcService>()->rpc<void, std::string>("friends.invitefriend", userId);
 }
 
 pplx::task<void> Stormancer::FriendsService::answerFriendInvitation(std::string originId, bool accept)
 {
-	return _scene->dependencyResolver()->resolve<RpcService>()->rpc<void, std::string, bool>("friends.acceptfriendinvitation", originId, accept);
+	auto scene = _scene.lock();
+	if (!scene)
+	{
+		return pplx::task_from_exception<void>(std::runtime_error("scene deleted"));
+	}
+
+	return scene->dependencyResolver()->resolve<RpcService>()->rpc<void, std::string, bool>("friends.acceptfriendinvitation", originId, accept);
 }
 
 pplx::task<void> Stormancer::FriendsService::removeFriend(std::string userId)
 {
-	return _scene->dependencyResolver()->resolve<RpcService>()->rpc<void, std::string>("friends.removefriend", userId);
+	auto scene = _scene.lock();
+	if (!scene)
+	{
+		return pplx::task_from_exception<void>(std::runtime_error("scene deleted"));
+	}
+
+	return scene->dependencyResolver()->resolve<RpcService>()->rpc<void, std::string>("friends.removefriend", userId);
 }
 
 pplx::task<void> Stormancer::FriendsService::setStatus(FriendListStatusConfig status, std::string details)
 {
-	return _scene->dependencyResolver()->resolve<RpcService>()->rpc<void, FriendListStatusConfig, std::string >("friends.setstatus", status, details);
+	auto scene = _scene.lock();
+	if (!scene)
+	{
+		return pplx::task_from_exception<void>(std::runtime_error("scene deleted"));
+	}
+
+	return scene->dependencyResolver()->resolve<RpcService>()->rpc<void, FriendListStatusConfig, std::string >("friends.setstatus", status, details);
 }
 
 void Stormancer::FriendsService::onFriendNotification(const FriendListUpdateDto &update)
@@ -76,7 +100,6 @@ void Stormancer::FriendsService::onFriendUpdate(const FriendListUpdateDto & upda
 		fr->userId = update.data.userId;
 
 		friendListChanged(fr, FriendListUpdateOperation::Update);
-
 	}
 }
 

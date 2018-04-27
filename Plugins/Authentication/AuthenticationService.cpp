@@ -8,7 +8,7 @@ namespace Stormancer
 		: _client(client)
 		, _logger(client->logger())
 	{
-		auto onNext = [=](ConnectionState state) {
+		auto onNext = [this](ConnectionState state) {
 			switch (state)
 			{
 			case ConnectionState::Connecting:
@@ -21,7 +21,7 @@ namespace Stormancer
 			}
 		};
 
-		auto onError = [=](std::exception_ptr exptr) {
+		auto onError = [this](std::exception_ptr exptr) {
 			try
 			{
 				std::rethrow_exception(exptr);
@@ -106,12 +106,12 @@ namespace Stormancer
 		rq.password = password;
 		rq.userData = "{\"key\":\"" + key + "\",\"pseudo\":\"" + pseudo + "\"}";
 		return getAuthenticationScene()
-			.then([=](Scene_ptr scene)
+			.then([this, rq](Scene_ptr scene)
 		{
 			auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
 			return rpcService->rpc<LoginResult, CreateUserParameters>(_createUserRoute, rq);
 		})
-			.then([=](LoginResult loginResult)
+			.then([this](LoginResult loginResult)
 		{
 			if (!loginResult.success)
 			{
@@ -128,7 +128,8 @@ namespace Stormancer
 			return pplx::task_from_exception<void>(std::runtime_error("Authentication service already authenticated."));
 		}
 
-		return getAuthenticationScene().then([=](Scene_ptr scene)
+		return getAuthenticationScene()
+			.then([this, authenticationContext](Scene_ptr scene)
 		{
 			setConnectionState(GameConnectionState::Authenticating);
 			auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
@@ -136,7 +137,7 @@ namespace Stormancer
 			pplx::task_completion_event<void> tce;
 
 			rpcService->rpc<LoginResult, std::map<std::string, std::string>>(_loginRoute, authenticationContext)
-				.then([=](pplx::task<LoginResult> task)
+				.then([this, tce](pplx::task<LoginResult> task)
 			{
 				try
 				{
@@ -168,7 +169,9 @@ namespace Stormancer
 	{
 		if (_client)
 		{
-			_authenticationScene = _client->connectToPublicScene(_authenticationSceneName).then([](Scene_ptr scene) {
+			return _client->connectToPublicScene(_authenticationSceneName)
+				.then([](Scene_ptr scene)
+			{
 				if (scene->getCurrentConnectionState() != ConnectionState::Connected)
 				{
 					throw std::runtime_error("Scene is not connected.");
@@ -178,9 +181,8 @@ namespace Stormancer
 		}
 		else
 		{
-			throw std::runtime_error("Client is invalid.");
+			return pplx::task_from_exception<Scene_ptr>(std::runtime_error("Client is invalid."));
 		}
-		return _authenticationScene;
 	}
 
 	pplx::task<void> AuthenticationService::logout()
@@ -188,7 +190,8 @@ namespace Stormancer
 		if (_authenticated)
 		{
 			_authenticated = false;
-			return getAuthenticationScene().then([](Scene_ptr scene)
+			return getAuthenticationScene()
+				.then([](Scene_ptr scene)
 			{
 				return scene->disconnect();
 			});
@@ -206,20 +209,20 @@ namespace Stormancer
 
 	pplx::task<std::string> AuthenticationService::getBearerToken()
 	{
-		return getAuthenticationScene().then([=](Scene_ptr authScene)
+		return getAuthenticationScene()
+			.then([](Scene_ptr authScene)
 		{
 			auto rpcService = authScene->dependencyResolver()->resolve<RpcService>();
-
 			return rpcService->rpc<std::string>("sceneauthorization.getbearertoken");
 		});
 	}
 
 	pplx::task<std::string> AuthenticationService::getUserFromBearerToken(std::string token)
 	{
-		return getAuthenticationScene().then([=](Scene_ptr authScene)
+		return getAuthenticationScene()
+			.then([token](Scene_ptr authScene)
 		{
 			auto rpcService = authScene->dependencyResolver()->resolve<RpcService>();
-
 			return rpcService->rpc<std::string, std::string>("sceneauthorization.getuserfrombearertoken", token);
 		});
 	}
@@ -231,23 +234,23 @@ namespace Stormancer
 
 	pplx::task<std::string> AuthenticationService::getUserIdByPseudo(std::string pseudo)
 	{
-		return getAuthenticationScene().then([=](Scene_ptr authScene)
+		return getAuthenticationScene()
+			.then([pseudo](Scene_ptr authScene)
 		{
 			auto rpcService = authScene->dependencyResolver()->resolve<RpcService>();
-
 			return rpcService->rpc<std::string, std::string>("users.getuseridbypseudo", pseudo);
 		});
 	}
 
 	pplx::task<Scene_ptr> AuthenticationService::getPrivateScene(const std::string& sceneId)
 	{
-		return getAuthenticationScene().then([=](Scene_ptr authScene)
+		return getAuthenticationScene()
+			.then([sceneId](Scene_ptr authScene)
 		{
 			auto rpcService = authScene->dependencyResolver()->resolve<RpcService>();
-
 			return rpcService->rpc<std::string, std::string>("sceneauthorization.gettoken", sceneId);
 		})
-			.then([=](std::string token)
+			.then([this](std::string token)
 		{
 			if (_client)
 			{
@@ -272,7 +275,8 @@ namespace Stormancer
 
 	pplx::task<std::unordered_map<std::string, std::string>> AuthenticationService::getPseudos(std::vector<std::string> userIds)
 	{
-		return getAuthenticationScene().then([=](Scene_ptr authScene)
+		return getAuthenticationScene()
+			.then([userIds](Scene_ptr authScene)
 		{
 			auto rpcService = authScene->dependencyResolver()->resolve<RpcService>();
 			return rpcService->rpc<std::unordered_map<std::string, std::string>, std::vector<std::string>>("users.getpseudos", userIds);
@@ -293,10 +297,10 @@ namespace Stormancer
 		}
 	}
 
-
 	pplx::task<void> AuthenticationService::requestPasswordChange(const std::string& email)
 	{
-		return getAuthenticationScene().then([=](Scene_ptr authScene)
+		return getAuthenticationScene()
+			.then([email](Scene_ptr authScene)
 		{
 			auto rpcService = authScene->dependencyResolver()->resolve<RpcService>();
 			return rpcService->rpc<void, std::string>("provider.loginpassword.requestPasswordRecovery", email);
@@ -310,7 +314,8 @@ namespace Stormancer
 		parameter.code = code;
 		parameter.newPassword = newPassword;
 
-		return getAuthenticationScene().then([=](Scene_ptr authScene)
+		return getAuthenticationScene()
+			.then([parameter](Scene_ptr authScene)
 		{
 			auto rpcService = authScene->dependencyResolver()->resolve<RpcService>();
 			return rpcService->rpc<void, ChangePasswordParameters>("provider.loginpassword.resetPassword", parameter);

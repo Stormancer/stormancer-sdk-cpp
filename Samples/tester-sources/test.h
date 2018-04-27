@@ -67,7 +67,7 @@ namespace Stormancer
 		const std::string _sceneName = "main";
 		Configuration_ptr _config;
 		Client_ptr _client;
-		Scene_ptr _sceneMain;
+		std::weak_ptr<Scene> _sceneMain;
 
 		std::deque<std::function<void()>> _tests;
 		bool _testsDone = false;

@@ -89,7 +89,7 @@ namespace Stormancer
 
 #pragma region private_members
 
-		Scene_ptr _scene;
+		std::weak_ptr<Scene> _scene;
 		std::shared_ptr<RpcService> _rpcService;
 		bool _isMatching = false;
 		pplx::cancellation_token_source _matchmakingCTS;

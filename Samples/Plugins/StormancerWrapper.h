@@ -69,15 +69,25 @@ namespace Stormancer
 				sceneTask = _client->getPublicScene(sceneId);
 			}
 
-			sceneTask.then([=](pplx::task<Scene_ptr> task) {
+			sceneTask.then([this, connect, tce](pplx::task<Scene_ptr> task) {
 				try
 				{
 					auto scene = task.get();
-					(connect ? scene->connect() : pplx::task_from_result()).then([this, scene, tce](pplx::task<void> connectTask) {
+					pplx::task<void> connectTask;
+					if (connect)
+					{
+						connectTask = scene->connect();
+					}
+					else
+					{
+						connectTask = pplx::task_from_result();
+					}
+					connectTask
+						.then([this, scene, tce](pplx::task<void> connectTask)
+					{
 						try
 						{
 							connectTask.get();
-
 							auto service = scene->dependencyResolver()->resolve<T>();
 							assert(service);
 							tce.set(service);
