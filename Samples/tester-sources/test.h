@@ -1,6 +1,7 @@
 #pragma once
 
 #include "stormancer/stormancer.h"
+#include "stormancer/Logger/VisualStudioLogger.h"
 
 namespace Stormancer
 {
