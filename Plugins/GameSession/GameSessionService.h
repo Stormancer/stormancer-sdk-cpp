@@ -85,7 +85,7 @@ namespace Stormancer
 	{
 	public:
 		GameSessionManager(Client* client);
-		
+
 		std::string currentGameSessionId;
 
 		void setToken(std::string token);
@@ -134,16 +134,14 @@ namespace Stormancer
 		template<typename TOut, typename TIn>
 		pplx::task<TOut> sendGameResults(TIn results)
 		{
-			auto scene = GetScene();
-			if (scene)
+			auto scene = _scene.lock();
+			if (!scene)
 			{
-				auto rpc = scene->dependencyResolver()->resolve<RpcService>();
-				return rpc->rpc<TOut, TIn>("gamesession.postresults", results);
+				return pplx::task_from_exception<TOut>(std::runtime_error("Scene deleted"));
 			}
-			else
-			{
-				return pplx::task_from_exception<TOut>(std::runtime_error("Scene deleted?"));
-			}
+
+			auto rpc = scene->dependencyResolver()->resolve<RpcService>();
+			return rpc->rpc<TOut, TIn>("gamesession.postresults", results);
 		}
 
 		pplx::task<void> connect();
