@@ -28,7 +28,6 @@ namespace Stormancer
 		};
 
 		auto onError = [=](std::exception_ptr exptr) {
-			// On error
 			try
 			{
 				std::rethrow_exception(exptr);

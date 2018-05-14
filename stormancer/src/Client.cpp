@@ -776,7 +776,7 @@ namespace Stormancer
 
 		pplx::cancellation_token_source cts;
 
-		auto timeOutToken = timeout(std::chrono::milliseconds(30));
+		auto timeOutToken = timeout(std::chrono::milliseconds(5000));
 
 		auto loggerPtr = logger();
 
