@@ -97,18 +97,10 @@ enum pathType {
 	OPAQUE_PART
 };
 
-#ifdef WIN32
-	/* there is a conflict in windows with other symbols. */
-	enum uriType  {
-		absolute,
-		relative
-	};
-#else
-	enum uriType  {
-		ABSOLUTE,
-		RELATIVE
-	};
-#endif
+enum uriType  {
+	UPNP_URI_ABSOLUTE,
+	UPNP_URI_RELATIVE
+};
 
 /*! 
  * \brief Buffer used in parsinghttp messages, urls, etc. generally this simply

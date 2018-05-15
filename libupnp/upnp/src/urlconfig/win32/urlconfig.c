@@ -289,7 +289,7 @@ static int config_description_doc(
 			goto error_handler;
 		}
 		len = parse_uri(domStr, strlen(domStr), &uri);
-		if (len < 0 || uri.type != ABSOLUTE) {
+		if (len < 0 || uri.type != UPNP_URI_ABSOLUTE) {
 			err_code = UPNP_E_INVALID_URL;
 			goto error_handler;
 		}

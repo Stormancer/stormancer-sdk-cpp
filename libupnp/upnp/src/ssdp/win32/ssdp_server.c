@@ -597,7 +597,7 @@ static UPNP_INLINE int valid_ssdp_msg(
 	}
 	if (hmsg->request_method != (http_method_t)HTTPMETHOD_MSEARCH) {
 		/* check PATH == "*" */
-		if (hmsg->uri.type != (enum uriType)RELATIVE ||
+		if (hmsg->uri.type != (enum uriType)UPNP_URI_RELATIVE ||
 		    strncmp("*", hmsg->uri.pathquery.buff,
 			    hmsg->uri.pathquery.size) != 0) {
 			return FALSE;

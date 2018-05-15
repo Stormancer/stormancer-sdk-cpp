@@ -605,12 +605,12 @@ char *resolve_rel_url(char *base_url, char *rel_url)
     size_t len_rel = strlen(rel_url);
     if (parse_uri(rel_url, len_rel, &rel) != HTTP_SUCCESS)
         return NULL;
-    if (rel.type == (enum uriType)ABSOLUTE)
+    if (rel.type == (enum uriType)UPNP_URI_ABSOLUTE)
         return strdup(rel_url);
 
     size_t len_base = strlen(base_url);
     if ((parse_uri(base_url, len_base, &base) != HTTP_SUCCESS)
-            || (base.type != (enum uriType)ABSOLUTE))
+            || (base.type != (enum uriType)UPNP_URI_ABSOLUTE))
         return NULL;
     if (len_rel == (size_t)0)
         return strdup(base_url);
@@ -713,11 +713,11 @@ int parse_uri(const char *in, size_t max, uri_type *out)
 
 	begin_hostport = parse_scheme(in, max, &out->scheme);
 	if (begin_hostport) {
-		out->type = ABSOLUTE;
+		out->type = UPNP_URI_ABSOLUTE;
 		out->path_type = OPAQUE_PART;
 		begin_hostport++;
 	} else {
-		out->type = RELATIVE;
+		out->type = UPNP_URI_RELATIVE;
 		out->path_type = REL_PATH;
 	}
 	if (begin_hostport + (size_t)1 < max &&
