@@ -328,7 +328,15 @@ namespace Stormancer
 
 	DependencyResolver* Scene::dependencyResolver() const
 	{
-		return _dependencyResolver.get();
+		auto dependencyResolver = _dependencyResolver;
+		if (dependencyResolver)
+		{
+			return _dependencyResolver.get();
+		}
+		else
+		{
+			return nullptr;
+		}
 	}
 
 	void Scene::completeConnectionInitialization(ConnectionResult& cr)

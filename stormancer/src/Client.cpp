@@ -851,7 +851,15 @@ namespace Stormancer
 
 	DependencyResolver* Client::dependencyResolver()
 	{
-		return _dependencyResolver.get();
+		auto dependencyResolver = _dependencyResolver;
+		if (dependencyResolver)
+		{
+			return dependencyResolver.get();
+		}
+		else
+		{
+			return nullptr;
+		}
 	}
 
 	rxcpp::observable<ConnectionState> Client::getConnectionStateChangedObservable() const
