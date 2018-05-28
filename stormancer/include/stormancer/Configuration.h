@@ -87,7 +87,7 @@ namespace Stormancer
 		std::string publicIp;
 
 		///Gets or sets 
-		bool p2pRemotePeerHasPublicIp;
+		bool enableNatPunchthrough = true;
 
 		/// <summary>
 		/// Dispatches events

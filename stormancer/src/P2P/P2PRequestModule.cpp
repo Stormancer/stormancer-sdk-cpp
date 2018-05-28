@@ -35,7 +35,7 @@ namespace Stormancer
 			{
 				endpoints.push_back(_config->publicIp);
 			}
-			else if (_config->p2pRemotePeerHasPublicIp)
+			else if (_config->enableNatPunchthrough == false)
 			{
 				endpoints.clear();
 			}
@@ -87,7 +87,7 @@ namespace Stormancer
 				});
 				return pplx::task_from_result();
 			}*/
-			if (_config->p2pRemotePeerHasPublicIp)
+			if (_config->enableNatPunchthrough == false)
 			{
 				if (candidate.listeningEndpointCandidate.address.substr(0, 9) == "127.0.0.1")
 				{
@@ -133,7 +133,7 @@ namespace Stormancer
 				});
 				return pplx::task_from_result();
 			}*/
-			if (_config->publicIp == "" && !_config->p2pRemotePeerHasPublicIp)
+			if (_config->publicIp == "" && _config->enableNatPunchthrough)
 			{
 				_transport->openNat(candidate.clientEndpointCandidate.address);
 			}

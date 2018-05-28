@@ -23,7 +23,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup />
   <ItemGroup>
-    <ProjectReference Include="C:\TeamCity\buildAgent\work\e505dd3a3a335743\cpprestsdk\Release\src\build\vs14\casablanca140.vcxproj">
+    <ProjectReference Include="C:\TeamCity\buildAgent\work\3f4f59100bc37114\cpprestsdk\Release\src\build\vs14\casablanca140.vcxproj">
       <ToolsVersion>
       </ToolsVersion>
       <SkipNonexistentProjects>False</SkipNonexistentProjects>
@@ -31,7 +31,7 @@
       <Configuration>Release</Configuration>
       <Platform>x64</Platform>
     </ProjectReference>
-    <ProjectReference Include="C:\TeamCity\buildAgent\work\e505dd3a3a335743\RakNet\Lib\DLL\DLL_vc12.vcxproj">
+    <ProjectReference Include="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RakNet\Lib\DLL\DLL_vc12.vcxproj">
       <ToolsVersion>
       </ToolsVersion>
       <SkipNonexistentProjects>False</SkipNonexistentProjects>
@@ -42,22 +42,22 @@
   </ItemGroup>
   <Target Name="Clean">
     <MSBuild Projects="@(ProjectReference-&gt;Reverse())" Targets="Clean" BuildInParallel="True" Properties="BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" SkipNonexistentProjects="%(ProjectReference.SkipNonexistentProjects)" />
-    <MSBuild Projects="C:\TeamCity\buildAgent\work\e505dd3a3a335743\Samples\RakNetIpv6\RakNetIpv6-vc140.vcxproj" Targets="Clean" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
+    <MSBuild Projects="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\RakNetIpv6\RakNetIpv6-vc140.vcxproj" Targets="Clean" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
   </Target>
   <Target Name="Build" Outputs="@(RakNetIpv6-vc140BuildOutput)">
     <MSBuild Projects="@(ProjectReference)" BuildInParallel="True" Properties="BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" SkipNonexistentProjects="%(ProjectReference.SkipNonexistentProjects)" />
-    <MSBuild Projects="C:\TeamCity\buildAgent\work\e505dd3a3a335743\Samples\RakNetIpv6\RakNetIpv6-vc140.vcxproj" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
+    <MSBuild Projects="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\RakNetIpv6\RakNetIpv6-vc140.vcxproj" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
       <Output TaskParameter="TargetOutputs" ItemName="RakNetIpv6-vc140BuildOutput" />
     </MSBuild>
   </Target>
   <Target Name="Rebuild" Outputs="@(RakNetIpv6-vc140BuildOutput)">
     <MSBuild Projects="@(ProjectReference)" Targets="Rebuild" BuildInParallel="True" Properties="BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" SkipNonexistentProjects="%(ProjectReference.SkipNonexistentProjects)" />
-    <MSBuild Projects="C:\TeamCity\buildAgent\work\e505dd3a3a335743\Samples\RakNetIpv6\RakNetIpv6-vc140.vcxproj" Targets="Rebuild" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
+    <MSBuild Projects="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\RakNetIpv6\RakNetIpv6-vc140.vcxproj" Targets="Rebuild" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
       <Output TaskParameter="TargetOutputs" ItemName="RakNetIpv6-vc140BuildOutput" />
     </MSBuild>
   </Target>
   <Target Name="Publish">
     <MSBuild Projects="@(ProjectReference)" Targets="Publish" BuildInParallel="True" Properties="BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" SkipNonexistentProjects="%(ProjectReference.SkipNonexistentProjects)" />
-    <MSBuild Projects="C:\TeamCity\buildAgent\work\e505dd3a3a335743\Samples\RakNetIpv6\RakNetIpv6-vc140.vcxproj" Targets="Publish" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
+    <MSBuild Projects="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\RakNetIpv6\RakNetIpv6-vc140.vcxproj" Targets="Publish" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
   </Target>
 </Project>
