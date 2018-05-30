@@ -5,6 +5,7 @@
 #include "stormancer/P2P/RelayConnection.h"
 #include "stormancer/SystemRequestIDTypes.h"
 #include "stormancer/P2P/RakNet/P2PTunnels.h"
+#include "stormancer/P2P/OpenTunnelResult.h"
 
 namespace Stormancer
 {
@@ -26,14 +27,14 @@ namespace Stormancer
 		_logger = logger;
 		_config = config;
 	}
-
+	
 	void P2PRequestModule::registerModule(RequestModuleBuilder* builder)
 	{
 		builder->service((byte)SystemRequestIDTypes::ID_P2P_GATHER_IP, [=](RequestContext* ctx) {
 			std::vector<std::string> endpoints;
-			if (_config->publicIp != "")
+			if (_config->dedicatedServerEndpoint != "")
 			{
-				endpoints.push_back(_config->publicIp);
+				endpoints.push_back(_config->dedicatedServerEndpoint + ":" + std::to_string(_config->clientSDKPort));
 			}
 			else if (_config->enableNatPunchthrough == false)
 			{
@@ -104,7 +105,7 @@ namespace Stormancer
 					return pplx::task_from_result();
 				}
 			}
-			else if (_config->publicIp != "")
+			else if (_config->dedicatedServerEndpoint != "")
 			{
 				ctx->send([=](obytestream* stream) {
 					_serializer->serialize(stream, -1);
@@ -133,7 +134,7 @@ namespace Stormancer
 				});
 				return pplx::task_from_result();
 			}*/
-			if (_config->publicIp == "" && _config->enableNatPunchthrough)
+			if (_config->dedicatedServerEndpoint == "" && _config->enableNatPunchthrough)
 			{
 				_transport->openNat(candidate.clientEndpointCandidate.address);
 			}
@@ -197,11 +198,28 @@ namespace Stormancer
 		builder->service((byte)SystemRequestIDTypes::ID_P2P_OPEN_TUNNEL, [=](RequestContext* ctx) {
 			auto serverId = _serializer->deserializeOne<std::string>(ctx->inputStream());
 			auto peerId = ctx->packet()->connection->id();
-			auto handle = _tunnels->addClient(serverId, peerId);
+			if (!_config->hasPublicIp())
+			{
+				auto handle = _tunnels->addClient(serverId, peerId);
 
-			ctx->send([=](obytestream* stream) {
-				_serializer->serialize(stream, handle);
-			});
+				ctx->send([=](obytestream* stream) {
+					OpenTunnelResult result;
+					result.useTunnel = true;
+					result.handle = handle;
+					_serializer->serialize(stream, result);
+					
+				});
+			}
+			else
+			{
+				std::string endpoint = _config->getIp_Port();//Dedicated server IP:port
+				ctx->send([endpoint,this](obytestream* stream) {
+					OpenTunnelResult result;
+					result.useTunnel = false;
+					result.endpoint = endpoint;
+					_serializer->serialize(stream, result);
+				});
+			}
 			return pplx::task_from_result();
 
 		});

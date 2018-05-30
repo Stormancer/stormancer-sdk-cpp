@@ -22,7 +22,7 @@ namespace Stormancer
 
 	/// Used by a Client for initialization.
 	/// For instance to target a custom Stormancer cluster change the ServerEndoint property to the http API endpoint of your custom cluster.
-	class Configuration
+	class STORMANCER_DLL_API Configuration
 	{
 	public:
 
@@ -33,22 +33,29 @@ namespace Stormancer
 		~Configuration();
 
 		/// Create an account with an account and an application name and returns a Configuration smart ptr.
-		STORMANCER_DLL_API static Configuration_ptr create(const std::string& endpoint, const std::string& account, const std::string& application);
+		static Configuration_ptr create(const std::string& endpoint, const std::string& account, const std::string& application);
 
 		/// Add a server endpoint in the internal list
-		STORMANCER_DLL_API void addServerEndpoint(const std::string& serverEndpoint);
+		void addServerEndpoint(const std::string& serverEndpoint);
 
 		/// Get the Api endpoint.
-		STORMANCER_DLL_API std::vector<std::string> getApiEndpoint();
+		std::vector<std::string> getApiEndpoint();
 
 		/// Add a plugin to the client.
 		/// Plugins enable developpers to plug custom code in the stormancer client's extensibility points. Possible uses include: custom high level protocols, logger or analyzers.
 		/// \param plugin The plugin instance to add.
-		STORMANCER_DLL_API void addPlugin(IPlugin* plugin);
+		void addPlugin(IPlugin* plugin);
 
 		/// Get a reference to the plugins list
-		STORMANCER_DLL_API const std::vector<IPlugin*> plugins();
+		const std::vector<IPlugin*> plugins();
 
+		/// Return if the configuration have a public ip setup
+		/// This configuration used for dedicated server without P2P tunnel.
+		const bool hasPublicIp();
+
+		/// Return the couple of IP Port setup in configuration
+		/// 
+		const std::string getIp_Port();
 #pragma endregion
 
 #pragma region public_members
@@ -66,7 +73,7 @@ namespace Stormancer
 		uint16 maxPeers = 10;
 
 		/// Optional server port
-		uint16 serverPort = 0;
+		uint16 clientSDKPort = 0;
 
 		/// Enable or disable the asynchrounous dispatch of received messages. Enabled by default.
 		bool asynchronousDispatch = true;
@@ -81,13 +88,16 @@ namespace Stormancer
 		std::function<std::shared_ptr<ITransport>(DependencyResolver*)> transportFactory;
 
 		///Gets or sets the default p2p host port. 0 For automatic attribution.
-		unsigned short p2pServerPort = 7777;
+		unsigned short serverGamePort = 7777;
 
-		///Gets or sets the default public
-		std::string publicIp;
+		/// Ip of the sever where game dedicated serveur is launch
+		std::string dedicatedServerEndpoint;
 
-		///Gets or sets 
+		/// Disable or enable nat punch through on client side
 		bool enableNatPunchthrough = true;
+
+		/// Force a specific endpoint. Configuration used to connect client directly by localhost address.
+		std::string forceTransportEndpoint = "";
 
 		/// <summary>
 		/// Dispatches events

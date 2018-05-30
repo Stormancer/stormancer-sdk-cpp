@@ -63,6 +63,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\P2P\ConnectivityCandidate.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\P2P\EndpointCandidate.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\P2P\OpenRelayParameters.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\P2P\OpenTunnelResult.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\P2P\P2PConnectionStateChangedArgs.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\P2P\P2PEnums.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\P2P\P2PPacketDispatcher.h" />

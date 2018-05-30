@@ -459,31 +459,36 @@ namespace Stormancer
 		if (split.size() < 2)
 		{
 			tce.set_exception(std::invalid_argument("Bad server endpoint, no port (" + endpoint + ')'));
+			return;
 		}
 
-		std::string portString = *(split.end() - 1);
+		std::string portString = split[1];
 		if (endpoint.size() - 1 <= portString.size())
 		{
 			tce.set_exception(std::invalid_argument("Bad server endpoint, no host (" + endpoint + ')'));
+			return;
 		}
 
 		_port = (uint16)std::atoi(portString.c_str());
 		if (_port == 0)
 		{
 			tce.set_exception(std::runtime_error("Server endpoint port should not be 0 (" + endpoint + ')'));
+			return;
 		}
 
-		auto hostStr = std::string(endpoint.c_str(), endpoint.size() - portString.size() - 1);
+		auto hostStr = split[0];
 
 		if (_peer == nullptr || !_peer->IsActive())
 		{
 			tce.set_exception(std::runtime_error("Transport not started. Make sure you started it."));
+			return;
 		}
 
 		auto result = _peer->Connect(hostStr.c_str(), _port, nullptr, 0, nullptr, 0, 12, 500, 30000);
 		if (result != RakNet::ConnectionAttemptResult::CONNECTION_ATTEMPT_STARTED)
 		{
 			tce.set_exception(std::runtime_error(std::string("Bad RakNet connection attempt result (") + std::to_string(result) + ')'));
+			return;
 		}
 	}
 

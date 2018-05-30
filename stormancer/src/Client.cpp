@@ -393,9 +393,9 @@ namespace Stormancer
 				try
 				{
 					//Start transport and execute plugin event
-					logger()->log(LogLevel::Trace, "Client", "Starting transport", "port:" + std::to_string(_config->serverPort) + "; maxPeers:" + std::to_string((uint16)_maxPeers + 1));
+					logger()->log(LogLevel::Trace, "Client", "Starting transport", "port:" + std::to_string(_config->clientSDKPort) + "; maxPeers:" + std::to_string((uint16)_maxPeers + 1));
 					auto transport = _dependencyResolver->resolve<ITransport>();
-					transport->start("client", _dependencyResolver->resolve<IConnectionManager>(), _cts.get_token(), _config->serverPort, (uint16)_maxPeers + 1);
+					transport->start("client", _dependencyResolver->resolve<IConnectionManager>(), _cts.get_token(), _config->clientSDKPort, (uint16)_maxPeers + 1);
 					for (auto plugin : _plugins)
 					{
 						plugin->transportStarted(transport.get());
@@ -403,6 +403,10 @@ namespace Stormancer
 
 					//Connect to server
 					std::string endpointUrl = endpoint.tokenData.Endpoints.at(transport->name());
+					if (this->_config->forceTransportEndpoint != "")
+					{
+						endpointUrl = this->_config->forceTransportEndpoint;
+					}
 					logger()->log(LogLevel::Trace, "Client", "Connecting transport to server", endpointUrl);
 					_connectionTask = transport->connect(endpointUrl, ct)
 						.then(createSafeCapture(weak_from_this(), [this](std::weak_ptr<IConnection> connectionWeak)

@@ -6,6 +6,7 @@
 #include "stormancer/P2P/RakNet/P2PTunnelClient.h"
 #include "stormancer/Scene.h"
 #include "stormancer/SafeCapture.h"
+#include "stormancer/P2P/OpenTunnelResult.h"
 
 namespace Stormancer
 {
@@ -28,7 +29,7 @@ namespace Stormancer
 		});
 		tunnel->id = serverId;
 		tunnel->ip = "127.0.0.1";
-		tunnel->port = _config->p2pServerPort;
+		tunnel->port = _config->serverGamePort;
 		tunnel->side = P2PTunnelSide::Host;
 		ServerDescriptor descriptor;
 		descriptor.id = tunnel->id;
@@ -48,25 +49,39 @@ namespace Stormancer
 			throw std::runtime_error("No p2p connection established to the target peer");
 		}
 
-		return _sysClient->sendSystemRequest<byte>(connection.get(), (byte)SystemRequestIDTypes::ID_P2P_OPEN_TUNNEL, serverId, ct)
-			.then(STRM_SAFE_CAPTURE([this, connectionId, serverId](byte handle)
+		return _sysClient->sendSystemRequest<OpenTunnelResult>(connection.get(), (byte)SystemRequestIDTypes::ID_P2P_OPEN_TUNNEL, serverId, ct)
+			.then(STRM_SAFE_CAPTURE([this, connectionId, serverId](OpenTunnelResult result)
 		{
-			auto client = std::make_shared<P2PTunnelClient>(STRM_SAFE_CAPTURE([this](P2PTunnelClient* client, RakNet::RNS2RecvStruct* msg) {
-				onMsgReceived(client, msg);
-			}), _sysClient, _logger);
-			client->handle = handle;
-			client->peerId = connectionId;
-			client->serverId = serverId;
-			client->serverSide = false;
-			_tunnels[std::make_tuple(connectionId, handle)] = client;
+			if (result.useTunnel)
+			{
+				auto client = std::make_shared<P2PTunnelClient>(STRM_SAFE_CAPTURE([this](P2PTunnelClient* client, RakNet::RNS2RecvStruct* msg) {
+					onMsgReceived(client, msg);
+				}), _sysClient, _logger);
+				client->handle = result.handle;
+				client->peerId = connectionId;
+				client->serverId = serverId;
+				client->serverSide = false;
+				_tunnels[std::make_tuple(connectionId, result.handle)] = client;
 
-			auto tunnel = std::make_shared<P2PTunnel>(STRM_SAFE_CAPTURE([this, connectionId, handle]() {
-				destroyTunnel(connectionId, handle);
-			}));
-			tunnel->id = serverId;
-			tunnel->ip = "127.0.0.1";
-			tunnel->port = client->socket->GetBoundAddress().GetPort();
-			return tunnel;
+				auto tunnel = std::make_shared<P2PTunnel>(STRM_SAFE_CAPTURE([this, connectionId, result]() {
+					destroyTunnel(connectionId, result.handle);
+				}));
+				tunnel->id = serverId;
+				tunnel->ip = "127.0.0.1";
+				tunnel->port = (uint16) client->socket->GetBoundAddress().GetPort();
+				return tunnel;
+			}
+			else
+			{
+				auto tunnel = std::make_shared<P2PTunnel>(STRM_SAFE_CAPTURE([this, connectionId, result]() {
+
+				}));
+				auto el = stringSplit(result.endpoint, ':');
+				tunnel->id = serverId;
+				tunnel->ip = el[0];
+				tunnel->port = (uint16) std::stoi(el[1]);
+				return tunnel;
+			}
 		}), ct);
 	}
 

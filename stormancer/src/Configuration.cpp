@@ -62,4 +62,14 @@ namespace Stormancer
 	{
 		return std::make_shared<RakNetTransport>(resolver);
 	};
+
+	const bool Configuration::hasPublicIp()
+	{
+		return dedicatedServerEndpoint != "";
+	}
+
+	const std::string Configuration::getIp_Port()
+	{
+		return dedicatedServerEndpoint + ":" + std::to_string(serverGamePort); 
+	}
 };
