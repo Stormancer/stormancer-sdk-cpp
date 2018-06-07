@@ -46,10 +46,23 @@ namespace Stormancer
 		template<typename T1, typename T2>
 		pplx::task<T1> sendSystemRequest(IConnection* peer, byte id, const T2& parameter, pplx::cancellation_token ct = pplx::cancellation_token::none())
 		{
+			std::string T1name = typeid(T1).name();
+			auto logger = _logger;
+			auto serializer = _serializer;
+
 			return sendSystemRequest(peer, id, [=, &parameter](obytestream* stream) {
 				_serializer.serialize(stream, parameter);
-			}, PacketPriority::MEDIUM_PRIORITY, ct).then([=](Packet_ptr packet) {
-				return _serializer.deserializeOne<T1>(packet->stream);
+			}, PacketPriority::MEDIUM_PRIORITY, ct).then([T1name, logger, serializer, id](Packet_ptr packet) {
+				if (!packet)
+				{
+					auto msg = "Tried to return " + T1name + " from a system request of type " + std::to_string(id) + " that returned void.";
+					logger->log(Stormancer::LogLevel::Error, "systemrequests", msg);
+					throw std::runtime_error(msg);
+				}
+				else
+				{
+					return serializer.deserializeOne<T1>(packet->stream);
+				}
 			}, ct);
 		}
 
