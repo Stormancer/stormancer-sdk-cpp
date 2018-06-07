@@ -3,6 +3,7 @@
 #include "stormancer/Helpers.h"
 #include "stormancer/Logger/ILogger.h"
 #include "stormancer/Serializer.h"
+#include "cpprest/json.h"
 
 namespace Stormancer
 {
@@ -45,4 +46,45 @@ namespace Stormancer
 
 		return SceneEndpoint(token, cData);
 	}
+
+	SceneEndpoint TokenHandler::getSceneEndpointInfo(const std::string& token)
+	{
+		auto json = utility::string_t(token.begin(), token.end());
+		auto getTokenResponse = web::json::value::parse(json);
+		
+		SceneEndpoint endpoint;
+		endpoint.version = 2;
+		endpoint.token = wstring_to_utf8(getTokenResponse[U("token")].as_string());
+
+		endpoint.getTokenResponse.token = wstring_to_utf8(getTokenResponse[U("token")].as_string());
+
+		endpoint.getTokenResponse.encryption.algorithm = wstring_to_utf8(getTokenResponse[U("encryption")][U("algorithm")].as_string());
+		endpoint.getTokenResponse.encryption.key = wstring_to_utf8(getTokenResponse[U("encryption")][U("key")].as_string());
+		endpoint.getTokenResponse.encryption.mode = wstring_to_utf8(getTokenResponse[U("encryption")][U("mode")].as_string());
+		endpoint.getTokenResponse.encryption.token = wstring_to_utf8(getTokenResponse[U("encryption")][U("token")].as_string());
+
+		for (auto transport : getTokenResponse[U("endpoints")].as_object())
+		{
+			for (auto e : transport.second.as_array())
+			{
+				endpoint.getTokenResponse.endpoints[wstring_to_utf8(transport.first)].push_back(wstring_to_utf8(e.as_string()));
+			}
+		}
+		return endpoint;
+	}
+
+	/*
+	public class GetConnectionTokenResponse
+    {
+        public string token { get; set; }
+        public Dictionary<string, List<string>> endpoints { get; set; } = new Dictionary<string, List<string>>();
+        public EncryptionConfiguration encryption { get; set; }
+    }
+    public class EncryptionConfiguration
+    {
+        public string algorithm { get; set; } = "aes256";
+        public string mode { get; set; } = "GCM";
+        public string key { get; set; }
+        public string token { get; set; }
+    }*/
 };

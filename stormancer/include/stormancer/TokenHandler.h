@@ -16,7 +16,8 @@ namespace Stormancer
 
 		TokenHandler(ILogger_ptr logger);
 		virtual ~TokenHandler();
-		SceneEndpoint decodeToken(const std::string& token);
+		SceneEndpoint decodeToken(const std::string& token) override;
+		SceneEndpoint getSceneEndpointInfo(const std::string& token) override;
 
 #pragma endregion
 
