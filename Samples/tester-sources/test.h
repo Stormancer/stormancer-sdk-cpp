@@ -11,6 +11,14 @@ namespace Stormancer
 
 #pragma region public_methods
 
+		Tester(std::string endpoint, std::string account, std::string application)
+			: _endpoint(endpoint)
+			, _accountId(account)
+			, _applicationName(application)
+		{}
+
+		Tester() = default;
+
 		/// Run the test suite, and block indefinitely on stdin.
 		void run_all_tests();
 
@@ -61,7 +69,6 @@ namespace Stormancer
 
 		bool _stop = false;
 		const std::string _endpoint = "https://api2.stormancer.com";
-		//const string _endpoint = "http://127.0.0.1:8081";
 		const std::string _accountId = "tester";
 		const std::string _applicationName = "tester";
 		const std::string _sceneName = "main";

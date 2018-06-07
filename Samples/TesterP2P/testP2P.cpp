@@ -3,6 +3,17 @@
 #include "RakNetSocket2.h"
 #include "RakPeer.h"
 
+static std::string endpoint = "http://api.stormancer.com:8081/";
+static std::string account = "samples";
+static std::string application = "p2p";
+
+void setTestParameters(std::string param_endpoint, std::string param_account, std::string param_application)
+{
+	endpoint = param_endpoint;
+	account = param_account;
+	application = param_application;
+}
+
 class UdpSocket : RakNet::RNS2EventHandler
 {
 public:
