@@ -8,8 +8,8 @@ namespace Stormancer
 	}
 
 	SceneEndpoint::SceneEndpoint(const std::string& token, const ConnectionData& tokenData)
-		: tokenData(tokenData)
-		, token(token)
+		: token(token)
+		, tokenData(tokenData)
 	{
 	}
 

@@ -123,8 +123,8 @@ namespace Stormancer
 	void RakNetConnection::send(const Writer& writer, int channelUid, PacketPriority priority, PacketReliability reliability, const TransformMetadata& transformMetadata)
 	{
 		obytestream stream;
-		std::vector<std::unique_ptr<IPacketTransform>> packetTransforms;
-		packetTransforms.emplace_back(new AESPacketTransform());
+		std::vector<std::shared_ptr<IPacketTransform>> packetTransforms;
+		packetTransforms.emplace_back(std::make_shared<AESPacketTransform>());
 		Writer writer2 = writer;
 		for (auto& packetTransform : packetTransforms)
 		{

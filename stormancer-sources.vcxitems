@@ -52,6 +52,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\IService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\ITokenHandler.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\ITransport.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\KeyStore.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\Logger\ConsoleLogger.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\Logger\ConsoleLoggerWindows.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\Logger\FileLogger.h" />

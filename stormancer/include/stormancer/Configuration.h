@@ -121,7 +121,7 @@ namespace Stormancer
 		std::string endpointRootCertificate;
 
 		bool shoudInitializeNetworkLibraries = true;
-
+		bool encryptionEnabled = false;
 #pragma endregion
 
 	private:

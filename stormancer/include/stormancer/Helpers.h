@@ -371,6 +371,10 @@ namespace Stormancer
 	std::wstring utf8_to_wstring(const std::string& str);
 	std::string wstring_to_utf8(const std::wstring& str);
 
+	// Convert a platform string to an std::string
+	inline std::string to_string(const std::string& str) { return str; }
+	inline std::string to_string(const std::wstring& str) { return wstring_to_utf8(str); }
+
 
 	STORMANCER_DLL_API void setUnobservedExceptionHandler(std::function<bool(std::exception_ptr)> handler);
 };

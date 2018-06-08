@@ -11,9 +11,13 @@
 #include "stormancer/P2P/P2PSessions.h"
 #include "stormancer/P2P/P2PRequestModule.h"
 #include "stormancer/P2P/RakNet/P2PTunnels.h"
+#include "stormancer/KeyStore.h"
 
 void Stormancer::ConfigureContainer(DependencyResolver* dr, Configuration_ptr config)
 {
+	dr->registerDependency<KeyStore>([](DependencyResolver*) {
+		return std::make_shared<KeyStore>();
+	}, true);
 	dr->registerDependency<Configuration>(config);
 	dr->registerDependency<ILogger>(config->logger);
 
@@ -73,7 +77,7 @@ void Stormancer::ConfigureContainer(DependencyResolver* dr, Configuration_ptr co
 		return std::make_shared<P2PTunnels>(
 			dr->resolve<RequestProcessor>(),
 			dr->resolve<IConnectionManager>(),
-			dr->resolve<Serializer>(), 
+			dr->resolve<Serializer>(),
 			dr->resolve<Configuration>(),
 			dr->resolve<ILogger>());
 	}, true);

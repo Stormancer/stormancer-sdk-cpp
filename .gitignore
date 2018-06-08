@@ -16,6 +16,8 @@
 /[Oo]utput/
 /[Bb]inaries/
 /[Ii]ntermediate/
+/x64/
+/x86/
 
 UE4/stormancerPlugin/3rdParty/
 # Roslyn cache directories

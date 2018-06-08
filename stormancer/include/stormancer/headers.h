@@ -130,6 +130,10 @@
 #ifdef _STORMANCERSDKCPP
 #include "cpprest/http_client.h"
 #include "cpprest/filestream.h"
+	// U is for universal string (char/wchar).
+	#ifndef U
+	#define U _XPLATSTR
+	#endif
 #endif
 #include "pplx/pplxtasks.h"
 

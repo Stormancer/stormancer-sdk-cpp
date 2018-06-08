@@ -11,6 +11,7 @@
 #include "stormancer/ConnectToSceneMsg.h"
 #include "stormancer/P2P/P2PRequestModule.h"
 #include "stormancer/SafeCapture.h"
+#include "stormancer/KeyStore.h"
 
 
 
@@ -402,7 +403,28 @@ namespace Stormancer
 					}
 
 					//Connect to server
-					std::string endpointUrl = endpoint.tokenData.Endpoints.at(transport->name());
+					std::string endpointUrl;
+					if (endpoint.version == 1)
+					{
+						endpointUrl = endpoint.tokenData.Endpoints.at(transport->name());
+					}
+					else
+					{
+						auto& endpoints = endpoint.getTokenResponse.endpoints.at(transport->name());
+						endpointUrl = endpoints.at(std::rand() % endpoints.size());
+						if (_config->encryptionEnabled)
+						{
+							_metadata["encryption"] = endpoint.getTokenResponse.encryption.token;
+							auto keyStore = _dependencyResolver->resolve<KeyStore>();
+							auto key = utility::conversions::from_base64(utility::string_t(endpoint.getTokenResponse.encryption.key.begin(), endpoint.getTokenResponse.encryption.key.end()));
+							if (key.size() != 256 / 8)
+							{
+								throw std::runtime_error("Unexpected key size. received " + std::to_string(key.size() * 8) + " bits expected 256 bits ");
+							}
+							std::copy(key.begin(), key.end(), keyStore->key);
+						}
+					}
+
 					if (this->_config->forceTransportEndpoint != "")
 					{
 						endpointUrl = this->_config->forceTransportEndpoint;
