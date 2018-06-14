@@ -124,6 +124,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\AES\AESDecryptStream.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\AES\AESEncryptStream.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\AES\AESPacketTransform.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\AES\IAES.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\ApiClient.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\ChannelUidStore.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Client.cpp" />

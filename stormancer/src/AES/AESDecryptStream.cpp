@@ -3,15 +3,12 @@
 
 namespace Stormancer
 {
-	AESDecryptStream::AESDecryptStream(const std::vector<byte>& key)
-		: _aes(IAES::createAES(key))
-	{
-		obytestream::dynamic(true);
-	}
+	
 
-	AESDecryptStream::AESDecryptStream(const std::vector<byte>& key, byte* encryptedDataPtr, std::streamsize encryptedDataSize)
+	AESDecryptStream::AESDecryptStream(std::shared_ptr<IAES> aes, byte* encryptedDataPtr, std::streamsize encryptedDataSize, uint64 keyId)
 		: obytestream(encryptedDataPtr, encryptedDataSize)
-		, _aes(IAES::createAES(key))
+		, _aes(aes)
+		, _keyId(keyId)
 	{
 	}
 
@@ -39,8 +36,8 @@ namespace Stormancer
 			if (dataPtr != nullptr && dataSize > 0)
 			{
 				ibytestream ibs(dataPtr, dataSize);
-				uint16 ivSize;
-				ibs >> ivSize;
+
+				auto ivSize = _aes->ivSize();
 
 				byte* ivPtr = nullptr;
 				if (ivSize > 0)
@@ -49,18 +46,12 @@ namespace Stormancer
 					ibs.read(ivPtr, ivSize);
 				}
 
-				uint32 encryptedSize;
-				ibs >> encryptedSize;
-				std::streamsize dataLeft = ibs.rdbuf()->in_avail();
-				if (dataLeft >= encryptedSize)
-				{
-					byte* encryptedPtr = dataPtr + sizeof(ivSize) + ivSize + sizeof(encryptedSize);
 
-					if (ivSize == _aes->getBlockSize())
-					{
-						_aes->decrypt(encryptedPtr, encryptedSize, ivPtr, ivSize, stream);
-					}
-				}
+				std::streamsize dataLeft = ibs.rdbuf()->in_avail();
+				byte* encryptedPtr = dataPtr + ivSize;
+
+				_aes->decrypt(encryptedPtr, dataLeft, ivPtr, ivSize, stream,_keyId);
+
 
 				if (ivPtr)
 				{

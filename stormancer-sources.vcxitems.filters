@@ -560,5 +560,8 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\AES\AESDecryptStream.cpp">
       <Filter>Source Files\AES</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\AES\IAES.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

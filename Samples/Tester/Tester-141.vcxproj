@@ -276,10 +276,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="testP2P.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="testP2P.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\stormancer-sdk-cpp-141.vcxproj">

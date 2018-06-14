@@ -69,7 +69,7 @@ namespace Stormancer
 		endpoints.erase(it);
 
 		auto config = web::http::client::http_client_config();
-		config.set_timeout(std::chrono::seconds(3));
+		config.set_timeout(std::chrono::seconds(30));
 
 
 		config.set_initHttpLib(_config->shoudInitializeNetworkLibraries);

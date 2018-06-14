@@ -13,7 +13,7 @@ namespace Stormancer
 		{
 			auto test = _tests[0];
 			_tests.pop_front();
-			pplx::create_task(test);
+			pplx::create_task(test).wait();
 		}
 		else
 		{

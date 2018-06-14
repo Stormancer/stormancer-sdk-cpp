@@ -12,9 +12,8 @@ namespace Stormancer
 
 #pragma region public_methods
 
-		AESDecryptStream(const std::vector<byte>& key);
-
-		AESDecryptStream(const std::vector<byte>& key, byte* encryptedDataPtr, std::streamsize encryptedDataSize);
+		
+		AESDecryptStream(std::shared_ptr<IAES> aes, byte* encryptedDataPtr, std::streamsize encryptedDataSize, uint64 keyId);
 
 		~AESDecryptStream();
 
@@ -26,8 +25,8 @@ namespace Stormancer
 
 #pragma region private_members
 
-		std::unique_ptr<IAES> _aes;
-
+		std::shared_ptr<IAES> _aes;
+		uint64 _keyId;
 #pragma endregion
 	};
 }

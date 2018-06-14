@@ -7,23 +7,24 @@
 
 namespace Stormancer
 {
+	class KeyStore;
 	class AESWindows : public IAES
 	{
 	public:
 
 #pragma region public_methods
 
-		AESWindows(const std::vector<byte>& key);
+		AESWindows(std::shared_ptr<KeyStore> keyStore);
 
 		~AESWindows();
 
-		std::vector<byte> key() const override;
+		
 
-		void encrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream* outputStream) override;
+		void encrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream* outputStream, uint64 keyId) override;
 
-		void decrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream* outputStream) override;
+		void decrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream* outputStream, uint64 keyId) override;
 
-		void generateRandomIV(byte* ivPtr, std::streamsize ivSize) override;
+		void generateRandomIV(byte* ivPtr) override;
 
 		virtual std::streamsize getBlockSize() override;
 
@@ -39,11 +40,13 @@ namespace Stormancer
 
 #pragma region private_members
 
-		std::vector<byte> _key;
+		std::shared_ptr<KeyStore>  _key;
 
 		BCRYPT_ALG_HANDLE _hAesAlg = NULL;
-		BCRYPT_KEY_HANDLE _hKey = NULL;
-		PBYTE _pbKeyObject = NULL;
+
+		std::unordered_map<uint64, BCRYPT_KEY_HANDLE> _keyHandles;
+		std::unordered_map<uint64, PBYTE> _keyPointers;
+		
 		DWORD _cbBlockLen = 0;
 
 #pragma endregion

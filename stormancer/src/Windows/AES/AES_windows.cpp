@@ -1,5 +1,6 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/Windows/AES/AES_Windows.h"
+#include "stormancer/KeyStore.h"
 
 #ifndef STATUS_UNSUCCESSFUL
 #define STATUS_UNSUCCESSFUL         ((NTSTATUS)0xC0000001L)
@@ -79,14 +80,10 @@ std::string getErrorString(NTSTATUS err)
 
 namespace Stormancer
 {
-	// paltform specific factory implementation
-	std::unique_ptr<IAES> IAES::createAES(const std::vector<byte>& key)
-	{
-		return std::make_unique<AESWindows>(key);
-	}
 
-	AESWindows::AESWindows(const std::vector<byte>& key)
-		: _key(key)
+
+	AESWindows::AESWindows(std::shared_ptr<KeyStore> keyStore)
+		: _key(keyStore)
 	{
 		initAES();
 	}
@@ -96,12 +93,9 @@ namespace Stormancer
 		cleanAES();
 	}
 
-	std::vector<byte> AESWindows::key() const
-	{
-		return _key;
-	}
+	
 
-	void AESWindows::encrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream* outputStream)
+	void AESWindows::encrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream* outputStream, uint64 keyId)
 	{
 		NTSTATUS status = STATUS_UNSUCCESSFUL;
 
@@ -115,7 +109,7 @@ namespace Stormancer
 
 		// Get the output buffer size.
 		if (!NT_SUCCESS(status = BCryptEncrypt(
-			_hKey,
+			_keyHandles[keyId],
 			dataPtr,
 			(ULONG)dataSize,
 			NULL,
@@ -142,7 +136,7 @@ namespace Stormancer
 		// Use the key to encrypt the plaintext buffer.
 		// For block sized messages, block padding will add an extra block.
 		if (!NT_SUCCESS(status = BCryptEncrypt(
-			_hKey,
+			_keyHandles[keyId],
 			dataPtr,
 			(ULONG)dataSize,
 			NULL,
@@ -173,7 +167,7 @@ namespace Stormancer
 		}
 	}
 
-	void AESWindows::decrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream* outputStream)
+	void AESWindows::decrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream* outputStream, uint64 keyId)
 	{
 		if (ivSize != _cbBlockLen)
 		{
@@ -186,7 +180,7 @@ namespace Stormancer
 
 		// Get the output buffer size.
 		if (!NT_SUCCESS(status = BCryptDecrypt(
-			_hKey,
+			_keyHandles[keyId],
 			dataPtr,
 			(ULONG)dataSize,
 			NULL,
@@ -211,7 +205,7 @@ namespace Stormancer
 
 		// Decrypt the data
 		if (!NT_SUCCESS(status = BCryptDecrypt(
-			_hKey,
+			_keyHandles[keyId],
 			dataPtr,
 			(ULONG)dataSize,
 			NULL,
@@ -239,9 +233,9 @@ namespace Stormancer
 		}
 	}
 
-	void AESWindows::generateRandomIV(byte* ivPtr, std::streamsize ivSize)
+	void AESWindows::generateRandomIV(byte* ivPtr)
 	{
-		for (int32 i = 0; i < ivSize; i++)
+		for (int32 i = 0; i < 256/8; i++)
 		{
 			//int32 r = std::rand();
 			//ivPtr[i] = (byte)r;
@@ -288,8 +282,8 @@ namespace Stormancer
 		}
 
 		// Allocate the key object on the heap.
-		_pbKeyObject = (PBYTE)HeapAlloc(GetProcessHeap(), 0, cbKeyObject);
-		if (NULL == _pbKeyObject)
+		_keyPointers[0] = (PBYTE)HeapAlloc(GetProcessHeap(), 0, cbKeyObject);
+		if (NULL == _keyPointers[0])
 		{
 			throw std::runtime_error("memory allocation failed");
 		}
@@ -323,11 +317,11 @@ namespace Stormancer
 		// Generate the key from supplied input key bytes.
 		if (!NT_SUCCESS(status = BCryptGenerateSymmetricKey(
 			_hAesAlg,
-			&_hKey,
-			_pbKeyObject,
+			&_keyHandles[0],
+			_keyPointers[0],
 			cbKeyObject,
-			(PBYTE)_key.data(),
-			(ULONG)_key.size(),
+			(PBYTE)_key->key,
+			(ULONG)32,
 			0)))
 		{
 			std::stringstream ss;
@@ -342,15 +336,16 @@ namespace Stormancer
 		{
 			BCryptCloseAlgorithmProvider(_hAesAlg, 0);
 		}
-
-		if (_hKey)
+		for (auto key : this->_keyHandles)
 		{
-			BCryptDestroyKey(_hKey);
+			BCryptDestroyKey(key.second);
 		}
+		_keyHandles.clear();
 
-		if (_pbKeyObject)
+		for(auto key : _keyPointers)
 		{
-			HeapFree(GetProcessHeap(), 0, _pbKeyObject);
+			HeapFree(GetProcessHeap(), 0, key.second);
 		}
+		_keyPointers.clear();
 	}
 }

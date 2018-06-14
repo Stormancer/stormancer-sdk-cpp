@@ -12,6 +12,9 @@
 #include "stormancer/P2P/P2PRequestModule.h"
 #include "stormancer/P2P/RakNet/P2PTunnels.h"
 #include "stormancer/KeyStore.h"
+#include "stormancer/AES/AESPacketTransform.h"
+#include "stormancer/AES/IAES.h"
+#include "stormancer/AES/AES.h"
 
 void Stormancer::ConfigureContainer(DependencyResolver* dr, Configuration_ptr config)
 {
@@ -63,6 +66,26 @@ void Stormancer::ConfigureContainer(DependencyResolver* dr, Configuration_ptr co
 		dispatcher->addProcessor(dependencyResolver->resolve<P2PPacketDispatcher>());
 		return dispatcher;
 	}, true);
+	
+	dr->registerDependency<AESPacketTransform>([](DependencyResolver* dependencyResolver){
+		return std::make_shared<AESPacketTransform>(dependencyResolver->resolve<IAES>());
+	}, false);
+
+	dr->registerDependency<IAES>([](DependencyResolver* dependencyResolver) {
+
+
+#if defined(_WIN32)
+		return std::make_shared<AESWindows>(dependencyResolver->resolve<KeyStore>());
+
+
+
+
+
+
+#endif
+
+	}, true);
+
 
 	dr->registerDependency<IConnectionManager>([](DependencyResolver* dr) {
 		return std::make_shared<ConnectionsRepository>(dr->resolve<ILogger>());

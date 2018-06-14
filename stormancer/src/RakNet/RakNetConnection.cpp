@@ -2,15 +2,17 @@
 #include "stormancer/RakNet/RakNetConnection.h"
 #include "stormancer/Logger/ILogger.h"
 #include "stormancer/AES/AESPacketTransform.h"
+#include "stormancer/AES/IAES.h"
 
 namespace Stormancer
 {
-	RakNetConnection::RakNetConnection(RakNet::RakNetGUID guid, int64 id, std::weak_ptr<RakNet::RakPeerInterface> peer, ILogger_ptr logger)
+	RakNetConnection::RakNetConnection(RakNet::RakNetGUID guid, int64 id, std::weak_ptr<RakNet::RakPeerInterface> peer, ILogger_ptr logger, DependencyResolver* resolver)
 		: _id(id)
 		, _peer(peer)
 		, _guid(guid)
 		, _lastActivityDate(nowTime_t())
 		, _logger(logger)
+		, _dependencyResolver(resolver)
 	{
 		auto onNext = [=](ConnectionState state) {
 			_connectionState = state;
@@ -124,11 +126,11 @@ namespace Stormancer
 	{
 		obytestream stream;
 		std::vector<std::shared_ptr<IPacketTransform>> packetTransforms;
-		packetTransforms.emplace_back(std::make_shared<AESPacketTransform>());
+		packetTransforms.emplace_back(std::make_shared<AESPacketTransform>(_dependencyResolver->resolve<IAES>()));
 		Writer writer2 = writer;
 		for (auto& packetTransform : packetTransforms)
 		{
-			packetTransform->onSend(writer2, transformMetadata);
+			packetTransform->onSend(writer2, this->id(), transformMetadata);
 		}
 		if (writer2)
 		{
