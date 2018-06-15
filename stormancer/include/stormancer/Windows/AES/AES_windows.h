@@ -48,7 +48,7 @@ namespace Stormancer
 		std::unordered_map<uint64, PBYTE> _keyPointers;
 		
 		DWORD _cbBlockLen = 0;
-
+		BCRYPT_AUTH_TAG_LENGTHS_STRUCT authTagLengths;
 #pragma endregion
 	};
 }

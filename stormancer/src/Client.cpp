@@ -608,7 +608,7 @@ namespace Stormancer
 			.then(createSafeCapture(weak_from_this(), [this, sceneId, sep](SceneInfosDto sceneInfos)
 		{
 			logger()->log(LogLevel::Trace, "Client", "Return the scene", sceneId);
-			auto scene = std::make_shared<Scene>(_serverConnection.lock().get(), weak_from_this(), sceneId, sep.token, sceneInfos, _dependencyResolver);
+			auto scene = std::make_shared<Scene>(_serverConnection, weak_from_this(), sceneId, sep.token, sceneInfos, _dependencyResolver);
 			scene->initialize();
 			for (auto plugin : _plugins)
 			{

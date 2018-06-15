@@ -9,7 +9,7 @@
 
 namespace Stormancer
 {
-	Scene::Scene(IConnection* connection, std::weak_ptr<Client> client, const std::string& id, const std::string& token, const SceneInfosDto& dto, std::weak_ptr<DependencyResolver> parentDependencyResolver)
+	Scene::Scene(std::weak_ptr<IConnection> connection, std::weak_ptr<Client> client, const std::string& id, const std::string& token, const SceneInfosDto& dto, std::weak_ptr<DependencyResolver> parentDependencyResolver)
 		: _dependencyResolver(std::make_shared<DependencyResolver>(parentDependencyResolver))
 		, _peer(connection)
 		, _token(token)
@@ -107,7 +107,7 @@ namespace Stormancer
 		return _connectionStateObservable.get_observable();
 	}
 
-	IConnection* Scene::hostConnection() const
+	std::weak_ptr<IConnection> Scene::hostConnection() const
 	{
 		return _peer;
 	}
@@ -125,12 +125,9 @@ namespace Stormancer
 	void Scene::addRoute(const std::string& routeName, std::function<void(Packetisp_ptr)> handler, MessageOriginFilter filter, const std::map<std::string, std::string>& metadata)
 	{
 		auto observable = onMessage(routeName, filter, metadata);
-		auto subscription = observable.subscribe(
-			// On next
-			handler,
-			[=](std::exception_ptr exptr)
+
+		auto onError = [=](std::exception_ptr exptr)
 		{
-			// On error
 			try
 			{
 				std::rethrow_exception(exptr);
@@ -139,7 +136,9 @@ namespace Stormancer
 			{
 				_logger->log(LogLevel::Error, "Scene", "Error reading message on route '" + routeName + "'", ex.what());
 			}
-		});
+		};
+
+		auto subscription = observable.subscribe(handler, onError);
 		_subscriptions.push_back(subscription);
 	}
 
@@ -214,7 +213,13 @@ namespace Stormancer
 		auto client = _client.lock();
 		if (!client)
 		{
-			throw std::runtime_error("The client is deleted");
+			throw std::runtime_error("Client deleted");
+		}
+
+		auto peer = _peer.lock();
+		if (!peer)
+		{
+			throw std::runtime_error("Peer deleted");
 		}
 
 		if (_connectionState != ConnectionState::Connected)
@@ -238,11 +243,11 @@ namespace Stormancer
 		{
 			std::stringstream ss;
 			ss << "Scene_" << _id << "_" << routeName;
-			channelUid = _peer->getChannelUidStore().getChannelUid(ss.str());
+			channelUid = peer->getChannelUidStore().getChannelUid(ss.str());
 		}
 		else
 		{
-			channelUid = _peer->getChannelUidStore().getChannelUid(channelIdentifier);
+			channelUid = peer->getChannelUidStore().getChannelUid(channelIdentifier);
 		}
 		auto writer2 = [=, &writer](obytestream* stream) {
 			(*stream) << _handle;
@@ -253,7 +258,7 @@ namespace Stormancer
 			}
 		};
 		TransformMetadata transformMetadata{ _metadata };
-		_peer->send(writer2, channelUid, priority, reliability, transformMetadata);
+		peer->send(writer2, channelUid, priority, reliability, transformMetadata);
 	}
 
 	void Scene::send(const std::string& routeName, const Writer& writer, PacketPriority priority, PacketReliability reliability, const std::string& channelIdentifier)
@@ -331,7 +336,7 @@ namespace Stormancer
 		auto dependencyResolver = _dependencyResolver;
 		if (dependencyResolver)
 		{
-			return _dependencyResolver.get();
+			return dependencyResolver.get();
 		}
 		else
 		{

@@ -20,7 +20,7 @@ namespace Stormancer
 
 		void onSend(Writer& writer, uint64 peerId, const TransformMetadata& transformMetadata = TransformMetadata()) override;
 
-		void onReceive(ibytestream* stream, uint64 peerId, const TransformMetadata& transformMetadata = TransformMetadata()) override;
+		void onReceive(ibytestream* stream, uint64 peerId) override;
 
 #pragma endregion
 

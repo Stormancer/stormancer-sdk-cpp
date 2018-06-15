@@ -3,7 +3,7 @@
 
 namespace Stormancer
 {
-	ScenePeer::ScenePeer(IConnection* connection, byte sceneHandle, std::map<std::string, Route_ptr>& routeMapping, Scene* scene)
+	ScenePeer::ScenePeer(std::weak_ptr<IConnection> connection, byte sceneHandle, std::map<std::string, Route_ptr>& routeMapping, Scene* scene)
 		: _connection(connection),
 		_sceneHandle(sceneHandle),
 		_routeMapping(routeMapping),
@@ -17,6 +17,12 @@ namespace Stormancer
 
 	void ScenePeer::send(const std::string& routeName, const Writer& writer, PacketPriority priority, PacketReliability reliability)
 	{
+		auto connection = _connection.lock();
+		if (!connection)
+		{
+			throw std::runtime_error("Connection deleted.");
+		}
+
 		if (!mapContains(_routeMapping, routeName))
 		{
 			throw std::invalid_argument(std::string("The routeName '") + routeName + "' is not declared on the server.");
@@ -24,8 +30,8 @@ namespace Stormancer
 		Route_ptr r = _routeMapping[routeName];
 		std::stringstream ss;
 		ss << "ScenePeer_" << id() << "_" << routeName;
-		int channelUid = _connection->getChannelUidStore().getChannelUid(ss.str());
-		_connection->send([=, &writer](obytestream* stream) {
+		int channelUid = connection->getChannelUidStore().getChannelUid(ss.str());
+		connection->send([=, &writer](obytestream* stream) {
 			(*stream) << _sceneHandle;
 			(*stream) << r->handle();
 			if (writer)
@@ -45,6 +51,12 @@ namespace Stormancer
 
 	uint64 ScenePeer::id()
 	{
-		return _connection->id();
+		auto connection = _connection.lock();
+		if (!connection)
+		{
+			throw std::runtime_error("Connection deleted.");
+		}
+
+		return connection->id();
 	}
 };

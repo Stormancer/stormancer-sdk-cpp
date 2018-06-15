@@ -38,31 +38,29 @@ namespace Stormancer
 		}
 	}
 
-	void AESPacketTransform::onReceive(ibytestream* stream, uint64 peerId, const TransformMetadata& /*transformMetadata*/)
+	void AESPacketTransform::onReceive(ibytestream* stream, uint64 peerId)
 	{
 		auto bc = stream->rdbuf()->sgetc();
 		if (bc != bytestreambuf::traits_type::eof())
 		{
-			byte b = bytestreambuf::traits_type::to_char_type(bc);
-			if (b == (byte)MessageIDTypes::ID_ENCRYPTED)
-			{
-				stream->rdbuf()->sbumpc();
+
+			//stream->rdbuf()->sbumpc();
 
 
 
-				byte* dataPtr = stream->startPtr() + 1;
-				std::streamsize dataSize = stream->rdbuf()->in_avail();
+			byte* dataPtr = stream->startPtr()+1;
+			std::streamsize dataSize = stream->rdbuf()->in_avail();
 
-				AESDecryptStream aesStream(_aes, dataPtr, dataSize,peerId);
-				obytestream os;
-				aesStream.decrypt(&os);
+			AESDecryptStream aesStream(_aes, dataPtr, dataSize, peerId);
+			obytestream os;
+			aesStream.decrypt(&os);
 
-				byte* decryptedPtr = os.startPtr();
-				std::streamsize decryptedSize = os.writtenBytesCount();
+			byte* decryptedPtr = os.startPtr();
+			std::streamsize decryptedSize = os.writtenBytesCount();
 
-				std::memcpy(dataPtr, decryptedPtr, (std::size_t)decryptedSize);
-				stream->rdbuf()->pubsetbuf(dataPtr, decryptedSize);
-			}
+			std::memcpy(dataPtr, decryptedPtr, (std::size_t)decryptedSize);
+			stream->rdbuf()->pubsetbuf(dataPtr, decryptedSize);
+
 		}
 	}
 }

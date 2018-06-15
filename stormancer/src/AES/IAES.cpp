@@ -5,6 +5,6 @@ namespace Stormancer
 {
 	uint16 IAES::ivSize()
 	{
-		return 128 / 8;
+		return 96 / 8;
 	}
 }

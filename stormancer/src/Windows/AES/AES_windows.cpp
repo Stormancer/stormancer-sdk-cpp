@@ -93,7 +93,7 @@ namespace Stormancer
 		cleanAES();
 	}
 
-	
+
 
 	void AESWindows::encrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream* outputStream, uint64 keyId)
 	{
@@ -169,52 +169,37 @@ namespace Stormancer
 
 	void AESWindows::decrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream* outputStream, uint64 keyId)
 	{
-		if (ivSize != _cbBlockLen)
-		{
-			throw std::runtime_error("Id size does not match with the block size");
-		}
-
 		NTSTATUS status = STATUS_UNSUCCESSFUL;
 
-		DWORD cbDecryptedData = 0;
 
-		// Get the output buffer size.
-		if (!NT_SUCCESS(status = BCryptDecrypt(
-			_keyHandles[keyId],
-			dataPtr,
-			(ULONG)dataSize,
-			NULL,
-			ivPtr,
-			(ULONG)ivSize,
-			NULL,
-			0,
-			&cbDecryptedData,
-			BCRYPT_BLOCK_PADDING)))
-		{
-			std::stringstream ss;
-			ss << "Error " << getErrorString(status) << " returned by BCryptDecrypt";
-			throw std::runtime_error(ss.str());
-		}
+		BCRYPT_AUTHENTICATED_CIPHER_MODE_INFO authInfo;
+		BCRYPT_INIT_AUTH_MODE_INFO(authInfo);
+		std::vector<BYTE> authTag(authTagLengths.dwMinLength);
+		std::vector<BYTE> macContext(authTagLengths.dwMaxLength);
+		ULONG tagSize = 12;
+		
+		authInfo.pbNonce = ivPtr;
+		authInfo.cbNonce = (ULONG)ivSize;
+		authInfo.pbTag = dataPtr + dataSize - tagSize;
+		authInfo.cbTag = tagSize;
+		authInfo.pbMacContext = &macContext[0];
+		authInfo.cbMacContext = (ULONG)macContext.size();
 
-		PBYTE pbDecryptedData = (PBYTE)HeapAlloc(GetProcessHeap(), 0, cbDecryptedData);
+		// IV value is ignored on first call to BCryptDecrypt.
+		// This buffer will be used to keep internal IV used for chaining.
+		std::vector<BYTE> contextIV(_cbBlockLen);
+		std::vector<BYTE> decrypted(((ULONG)dataSize)-tagSize);
 
-		if (NULL == pbDecryptedData)
-		{
-			throw std::runtime_error("memory allocation failed");
-		}
-
+		DWORD bytesDone;
 		// Decrypt the data
 		if (!NT_SUCCESS(status = BCryptDecrypt(
 			_keyHandles[keyId],
-			dataPtr,
-			(ULONG)dataSize,
-			NULL,
-			ivPtr,
-			(ULONG)ivSize,
-			pbDecryptedData,
-			cbDecryptedData,
-			&cbDecryptedData,
-			BCRYPT_BLOCK_PADDING)))
+			dataPtr, (ULONG)dataSize-tagSize,
+			&authInfo,
+			&contextIV[0], (ULONG)contextIV.size(),
+			&decrypted[0], (ULONG)decrypted.size(),
+			&bytesDone,
+			0)))
 		{
 			std::stringstream ss;
 			ss << "Error " << getErrorString(status) << " returned by BCryptDecrypt";
@@ -224,18 +209,15 @@ namespace Stormancer
 		// Write the decrypted data in the output stream
 		if (outputStream)
 		{
-			outputStream->write(pbDecryptedData, cbDecryptedData);
+			outputStream->write(&decrypted[0], bytesDone);
 		}
 
-		if (pbDecryptedData)
-		{
-			HeapFree(GetProcessHeap(), 0, pbDecryptedData);
-		}
+
 	}
 
 	void AESWindows::generateRandomIV(byte* ivPtr)
 	{
-		for (int32 i = 0; i < 256/8; i++)
+		for (int32 i = 0; i < 256 / 8; i++)
 		{
 			//int32 r = std::rand();
 			//ivPtr[i] = (byte)r;
@@ -252,6 +234,7 @@ namespace Stormancer
 	{
 		NTSTATUS status = STATUS_UNSUCCESSFUL;
 
+
 		// Open an algorithm handle.
 		if (!NT_SUCCESS(status = BCryptOpenAlgorithmProvider(
 			&_hAesAlg,
@@ -261,6 +244,17 @@ namespace Stormancer
 		{
 			std::stringstream ss;
 			ss << "Error " << getErrorString(status) << " returned by BCryptOpenAlgorithmProvider";
+			throw std::runtime_error(ss.str());
+		}
+		if (!NT_SUCCESS(status = BCryptSetProperty(
+			_hAesAlg,
+			BCRYPT_CHAINING_MODE,
+			(PBYTE)BCRYPT_CHAIN_MODE_GCM,
+			sizeof(BCRYPT_CHAIN_MODE_GCM),
+			0)))
+		{
+			std::stringstream ss;
+			ss << "Error " << getErrorString(status) << " returned by BCryptSetProperty";
 			throw std::runtime_error(ss.str());
 		}
 
@@ -301,18 +295,15 @@ namespace Stormancer
 			ss << "Error " << getErrorString(status) << " returned by BCryptGetProperty";
 			throw std::runtime_error(ss.str());
 		}
+		DWORD bytesDone = 0;
 
-		if (!NT_SUCCESS(status = BCryptSetProperty(
-			_hAesAlg,
-			BCRYPT_CHAINING_MODE,
-			(PBYTE)BCRYPT_CHAIN_MODE_CBC,
-			sizeof(BCRYPT_CHAIN_MODE_CBC),
-			0)))
+		if (!NT_SUCCESS(status = BCryptGetProperty(_hAesAlg, BCRYPT_AUTH_TAG_LENGTH, (BYTE*)&authTagLengths, sizeof(authTagLengths), &bytesDone, 0)))
 		{
 			std::stringstream ss;
-			ss << "Error " << getErrorString(status) << " returned by BCryptSetProperty";
+			ss << "Error " << getErrorString(status) << " returned byBCryptGetProperty(BCRYPT_AUTH_TAG_LENGTH)";
 			throw std::runtime_error(ss.str());
 		}
+
 
 		// Generate the key from supplied input key bytes.
 		if (!NT_SUCCESS(status = BCryptGenerateSymmetricKey(
@@ -328,6 +319,8 @@ namespace Stormancer
 			ss << "Error " << getErrorString(status) << " returned by BCryptGenerateSymmetricKey";
 			throw std::runtime_error(ss.str());
 		}
+
+
 	}
 
 	void AESWindows::cleanAES()
@@ -342,7 +335,7 @@ namespace Stormancer
 		}
 		_keyHandles.clear();
 
-		for(auto key : _keyPointers)
+		for (auto key : _keyPointers)
 		{
 			HeapFree(GetProcessHeap(), 0, key.second);
 		}

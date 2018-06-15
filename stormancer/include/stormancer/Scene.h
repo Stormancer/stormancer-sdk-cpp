@@ -37,7 +37,7 @@ namespace Stormancer
 		/// \param id Scene id.
 		/// \param token Application token.
 		/// \param dto Scene informations.
-		Scene(IConnection* connection, std::weak_ptr<Client> client, const std::string& id, const std::string& token, const SceneInfosDto& dto, std::weak_ptr<DependencyResolver> parentDependencyResolver);
+		Scene(std::weak_ptr<IConnection> connection, std::weak_ptr<Client> client, const std::string& id, const std::string& token, const SceneInfosDto& dto, std::weak_ptr<DependencyResolver> parentDependencyResolver);
 
 		/// Destructor.
 		~Scene();
@@ -88,7 +88,7 @@ namespace Stormancer
 		std::string getHostMetadata(const std::string& key) const;
 
 		/// Returns the host connection.
-		IConnection* hostConnection() const;
+		std::weak_ptr<IConnection> hostConnection() const;
 
 		/// Returns a copy of the local routes.
 		std::vector<Route_ptr> localRoutes() const;
@@ -171,7 +171,7 @@ namespace Stormancer
 		const bool _isHost = false;
 
 		/// Scene peer connection.
-		IConnection* _peer = nullptr;
+		std::weak_ptr<IConnection> _peer;
 
 		/// Application token.
 		std::string _token;

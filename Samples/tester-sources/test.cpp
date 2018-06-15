@@ -201,8 +201,14 @@ namespace Stormancer
 					auto scene = task.get();
 					_sceneMain = scene;
 
+					auto connection = scene->hostConnection().lock();
+					if (!connection)
+					{
+						throw std::runtime_error("Connection deleted");
+					}
+
 					_logger->log(LogLevel::Debug, "test_connect", "Connect to scene OK");
-					_logger->log(LogLevel::Debug, "test_connect", "External addresses: " + scene->hostConnection()->metadata("externalAddrs"));
+					_logger->log(LogLevel::Debug, "test_connect", "External addresses: " + connection->metadata("externalAddrs"));
 
 					execNextTest();
 				}
