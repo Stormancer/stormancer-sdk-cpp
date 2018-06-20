@@ -195,6 +195,7 @@ namespace Stormancer
 					}
 					case DefaultMessageIDTypes::ID_INCOMPATIBLE_PROTOCOL_VERSION:
 					case DefaultMessageIDTypes::ID_NO_FREE_INCOMING_CONNECTIONS:
+						_logger->log(LogLevel::Trace, "RakNetTransport", "Connection failed because too many concurrent connections.");
 					case DefaultMessageIDTypes::ID_CONNECTION_ATTEMPT_FAILED:
 					{
 						std::string packetSystemAddressStr = rakNetPacket->systemAddress.ToString(true, ':');
@@ -237,7 +238,7 @@ namespace Stormancer
 					}
 					case DefaultMessageIDTypes::ID_DISCONNECTION_NOTIFICATION:
 					{
-						_logger->log(LogLevel::Trace, "RakNetTransport", "Peer disconnected", rakNetPacket->systemAddress.ToString(true, ':'));
+						_logger->log(LogLevel::Trace, "RakNetTransport", "Remote peer disconnected from this peer", rakNetPacket->systemAddress.ToString(true, ':'));
 						onDisconnection(rakNetPacket, "CLIENT_DISCONNECTED");
 						break;
 					}
@@ -553,7 +554,7 @@ namespace Stormancer
 		};
 
 		_onPacketReceived(packet);
-	}
+}
 
 	std::shared_ptr<RakNetConnection> RakNetTransport::getConnection(RakNet::RakNetGUID guid)
 	{
@@ -565,15 +566,15 @@ namespace Stormancer
 		if (_peer)
 		{
 			int64 cid = peerId;
-			auto connection = std::make_shared<RakNetConnection>(raknetGuid, cid, _peer, _logger,_dependencyResolver);
+			auto connection = std::make_shared<RakNetConnection>(raknetGuid, cid, _peer, _logger, _dependencyResolver);
 			RakNet::RakNetGUID guid(connection->guid());
 			auto logger = _logger;
 			std::weak_ptr<RakNet::RakPeerInterface> weakPeer = _peer;
-			connection->onClose([logger, weakPeer, guid](std::string reason) {
+			connection->onClose([logger, weakPeer, cid, guid](std::string reason) {
 				auto peer = weakPeer.lock();
 				if (peer)
 				{
-					logger->log(LogLevel::Trace, "RakNetTransport", "On close", guid.ToString());
+					logger->log(LogLevel::Trace, "RakNetTransport", "On close : " + reason, std::to_string(cid));
 					peer->CloseConnection(guid, true);
 				}
 			});
