@@ -163,7 +163,7 @@ namespace Stormancer
 								}
 								else
 								{
-									_logger->log(LogLevel::Trace, "RakNetTransport", "Connection request accepted", packetSystemAddressStr.c_str());
+									_logger->log(LogLevel::Trace, "RakNetTransport", "Successfully connected to ", packetSystemAddressStr.c_str());
 									_serverConnected = true;
 									_serverRakNetGUID = rakNetPacket->guid;
 									auto connection = onConnection(rakNetPacket->systemAddress, rakNetPacket->guid, 0);

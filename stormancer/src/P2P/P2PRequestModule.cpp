@@ -167,6 +167,8 @@ namespace Stormancer
 		builder->service((byte)SystemRequestIDTypes::ID_P2P_CONNECT_CLIENT, [=](RequestContext* ctx) {
 			auto candidate = _serializer->deserializeOne<ConnectivityCandidate>(ctx->inputStream());
 
+			_logger->log(LogLevel::Debug, "p2p", "Starting P2P client connection client peer =" + candidate.clientPeer);
+
 			auto connection = _connections->getConnection(candidate.listeningPeer);
 			if (connection && connection->getConnectionState() == ConnectionState::Connected)
 			{
@@ -186,12 +188,21 @@ namespace Stormancer
 
 			return _transport->connect(candidate.listeningEndpointCandidate.address)
 				.then([=](pplx::task<std::shared_ptr<IConnection>> t) {
-
-				auto connection = t.get();
-				ctx->send([=](obytestream* stream) {
-					bool connected = connection && connection->getConnectionState() == ConnectionState::Connected;
-					_serializer->serialize(stream, connected);
-				});
+				try
+				{
+					auto connection = t.get();
+					_logger->log(LogLevel::Trace, "p2p", "Successfully completed connection to " + std::to_string(connection->id()), "");
+					ctx->send([=](obytestream* stream) {
+						bool connected = connection && connection->getConnectionState() == ConnectionState::Connected;
+						_serializer->serialize(stream, connected);
+					});
+				}
+				catch (const std::exception& ex)
+				{
+					_logger->log(LogLevel::Error, "p2p", "Connection attempt failed: ", ex.what());
+					throw;
+				}
+				
 			});
 		});
 

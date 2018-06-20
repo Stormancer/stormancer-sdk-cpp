@@ -37,7 +37,15 @@ namespace Stormancer
 		return _sysCall->sendSystemRequest<P2PSession>(server.get(), (byte)SystemRequestIDTypes::ID_P2P_CREATE_SESSION, p2pToken, ct)
 			.then(STRM_SAFE_CAPTURE([this](P2PSession session)
 		{
-				return _connections->getConnection(session.remotePeer);
+			auto c = _connections->getConnection(session.remotePeer);
+			if (!c)
+			{
+				throw std::runtime_error("Failed to get P2P connection for peer " + std::to_string(session.remotePeer));
+			}
+			else
+			{
+				return c;
+			}
 		}), ct);
 	}
 };
