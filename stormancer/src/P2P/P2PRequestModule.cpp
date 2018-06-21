@@ -167,7 +167,7 @@ namespace Stormancer
 		builder->service((byte)SystemRequestIDTypes::ID_P2P_CONNECT_CLIENT, [=](RequestContext* ctx) {
 			auto candidate = _serializer->deserializeOne<ConnectivityCandidate>(ctx->inputStream());
 
-			_logger->log(LogLevel::Debug, "p2p", "Starting P2P client connection client peer =" + candidate.clientPeer);
+			_logger->log(LogLevel::Debug, "p2p", "Starting P2P client connection client peer =" + std::to_string(candidate.clientPeer));
 
 			auto connection = _connections->getConnection(candidate.listeningPeer);
 			if (connection && connection->getConnectionState() == ConnectionState::Connected)
