@@ -69,11 +69,12 @@ bool verify_X509_cert_chain(const std::vector<std::string> &certChain, const std
     params.RequestedUsage.dwType = USAGE_MATCH_TYPE_OR;
     LPSTR usages [] =
     {
-        szOID_PKIX_KP_SERVER_AUTH,
+		// FIXME stormancer - literal const char* to char* cast is ugly
+        (char*)szOID_PKIX_KP_SERVER_AUTH,
         
         // For older servers and to match IE.
-        szOID_SERVER_GATED_CRYPTO,
-        szOID_SGC_NETSCAPE
+        (char*)szOID_SERVER_GATED_CRYPTO,
+        (char*)szOID_SGC_NETSCAPE
     };
     params.RequestedUsage.Usage.cUsageIdentifier = std::extent<decltype(usages)>::value;
     params.RequestedUsage.Usage.rgpszUsageIdentifier = usages;
