@@ -103,6 +103,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\SceneInfosRequestDto.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\ScenePeer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\Serializer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\Shutdown.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\SingleServicePlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\stdafx.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\stormancer.h" />
@@ -174,6 +175,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\SceneEndpoint.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\ScenePeer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Serializer.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\shutdown.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>

@@ -251,6 +251,26 @@ namespace Stormancer
 	}
 
 
+	pplx::cancellation_token_source create_linked_source(pplx::cancellation_token token1, pplx::cancellation_token token2, pplx::cancellation_token token3)
+	{
+		std::vector<pplx::cancellation_token> tokens;
+		if (token1.is_cancelable())
+		{
+			tokens.push_back(token1);
+		}
+		if (token2.is_cancelable())
+		{
+			tokens.push_back(token2);
+		}
+		if (token3.is_cancelable())
+		{
+			tokens.push_back(token3);
+		}
+		return pplx::cancellation_token_source::create_linked_source(tokens.begin(), tokens.end());
+	}
+
+
+
 	std::wstring utf8_to_wstring(const std::string& str)
 	{
 		std::wstring_convert<std::codecvt_utf8<wchar_t>> myconv;

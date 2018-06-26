@@ -292,39 +292,51 @@ namespace Stormancer
 
 	pplx::task<void> Scene::disconnect()
 	{
-		_logger->log(LogLevel::Trace, "Scene", "Scene disconnecting");
-
-		std::lock_guard<std::mutex> lg(_disconnectMutex);
-
-		if (_connectionState == ConnectionState::Connected)
+		try
 		{
-			auto logger = _logger;
-			auto client = _client.lock();
-			if (client)
+			_logger->log(LogLevel::Trace, "Scene", "Scene disconnecting");
+
+			std::lock_guard<std::mutex> lg(_disconnectMutex);
+
+			if (_connectionState == ConnectionState::Connected)
 			{
-				_disconnectTask = client->disconnect(shared_from_this())
-					.then(STRM_SAFE_CAPTURE_NOTHROW([this]()
+				auto logger = _logger;
+				auto client = _client.lock();
+				if (client)
 				{
-					_dependencyResolver = nullptr;
-				}));
+					_disconnectTask = client->disconnect(shared_from_this());
+				}
+				else
+				{
+					_logger->log(LogLevel::Warn, "Scene", "Client is invalid.");
+					_disconnectTask = pplx::task_from_exception<void>(std::runtime_error("Client is invalid."));
+				}
 			}
-			else
+			else if (_connectionState == ConnectionState::Connecting)
 			{
-				_logger->log(LogLevel::Warn, "Scene", "Client is invalid.");
-				_disconnectTask = pplx::task_from_exception<void>(std::runtime_error("Client is invalid."));
+				_disconnectTask = pplx::task_from_exception<void>(std::runtime_error("Scene is connecting."));
+			}
+			else if (_connectionState == ConnectionState::Disconnecting)
+			{
+				_disconnectTask = pplx::task_from_result();
+			}
+			else if (_connectionState == ConnectionState::Disconnected)
+			{
+				_disconnectTask = pplx::task_from_result();
 			}
 		}
-		else if (_connectionState == ConnectionState::Connecting)
+		catch (std::exception& ex)
 		{
-			_disconnectTask = pplx::task_from_exception<void>(std::runtime_error("Scene is connecting."));
-		}
-		else if (_connectionState == ConnectionState::Disconnecting)
-		{
-			_disconnectTask = pplx::task_from_result();
-		}
-		else if (_connectionState == ConnectionState::Disconnected)
-		{
-			_disconnectTask = pplx::task_from_result();
+			_disconnectTask.then([](pplx::task<void> t) {
+				try
+				{
+					t.get();
+				}
+				catch (std::exception&)
+				{
+				}
+			});
+			_disconnectTask = pplx::task_from_exception<void>(ex);
 		}
 
 		return _disconnectTask;

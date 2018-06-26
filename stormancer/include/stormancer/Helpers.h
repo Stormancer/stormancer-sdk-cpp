@@ -251,6 +251,7 @@ namespace Stormancer
 
 
 	pplx::cancellation_token_source create_linked_source(pplx::cancellation_token token1, pplx::cancellation_token token2);
+	pplx::cancellation_token_source create_linked_source(pplx::cancellation_token token1, pplx::cancellation_token token2, pplx::cancellation_token token3);
 
 
 
@@ -376,5 +377,7 @@ namespace Stormancer
 	inline std::string to_string(const std::wstring& str) { return wstring_to_utf8(str); }
 
 
+
 	STORMANCER_DLL_API void setUnobservedExceptionHandler(std::function<bool(std::exception_ptr)> handler);
+
 };

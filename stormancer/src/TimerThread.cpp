@@ -6,12 +6,17 @@ namespace Stormancer
 {
 
 	std::unique_ptr<TimerThread> TimerThread::_sInstance;
+	std::mutex _instanceMutex;
 
 	TimerThread& TimerThread::getInstance()
 	{
 		if (!_sInstance)
 		{
-			_sInstance.reset(new TimerThread);
+			std::lock_guard<std::mutex> lg(_instanceMutex);
+			if (!_sInstance)
+			{
+				_sInstance.reset(new TimerThread);
+			}
 		}
 
 		return *_sInstance;

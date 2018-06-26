@@ -1,4 +1,5 @@
 #include "stormancer/stdafx.h"
+#include "stormancer/Shutdown.h"
 #include "stormancer/Client.h"
 #include "stormancer/ContainerConfigurator.h"
 #include "stormancer/DependencyResolver.h"
@@ -825,16 +826,29 @@ namespace Stormancer
 		std::vector<pplx::task<void>> tasks;
 		auto loggerPtr = logger();
 
-		std::lock_guard<std::mutex> lg(_scenesMutex);
-
 		auto scenesToDisconnect = _scenes;
+		std::lock_guard<std::mutex> lg(_scenesMutex);
+		auto weakSelf = weak_from_this();
+		auto self = weakSelf.lock();
+		if (!self)
+		{
+			return pplx::task_from_result();
+		}
 		for (auto it : scenesToDisconnect)
 		{
 			tasks.push_back(it.second.task
-				.then(createSafeCapture(weak_from_this(), [this](Scene_ptr scene)
+				.then([weakSelf](Scene_ptr scene)
 			{
-				return disconnect(scene);
-			}))
+				auto self = weakSelf.lock();
+				if (self)
+				{
+					return self->disconnect(scene);
+				}
+				else
+				{
+					return pplx::task_from_result();
+				}
+			})
 				.then([loggerPtr](pplx::task<void> t)
 			{
 				try
@@ -943,7 +957,7 @@ namespace Stormancer
 
 	pplx::cancellation_token Client::getLinkedCancellationToken(pplx::cancellation_token ct)
 	{
-		return create_linked_source(ct, _cts.get_token()).get_token();
+		return create_linked_source(ct, _cts.get_token(), Shutdown::instance().getShutdownToken()).get_token();
 	}
 
 	std::weak_ptr<Client> Client::weak_from_this()

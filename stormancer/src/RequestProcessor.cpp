@@ -166,7 +166,24 @@ namespace Stormancer
 		if (peer)
 		{
 			pplx::task_completion_event<Packet_ptr> tce;
-			auto request = reserveRequestSlot(msgId, tce);
+			auto request = reserveRequestSlot(msgId, tce, ct);
+			std::weak_ptr<RequestProcessor> wThat = this->shared_from_this();
+
+			request->ct = ct;
+			if (ct != pplx::cancellation_token::none())
+			{
+				request->ct_registration = ct.register_callback([tce, request, wThat]() {
+					if (auto that = wThat.lock())
+					{
+						if (!request->complete)
+						{
+							that->freeRequestSlot(request->id);
+							tce._Cancel();
+						}
+					}
+				});
+			}
+
 
 			try
 			{
@@ -193,7 +210,7 @@ namespace Stormancer
 		}
 	}
 
-	SystemRequest_ptr RequestProcessor::reserveRequestSlot(byte msgId, pplx::task_completion_event<Packet_ptr> tce)
+	SystemRequest_ptr RequestProcessor::reserveRequestSlot(byte msgId, pplx::task_completion_event<Packet_ptr> tce, pplx::cancellation_token ct)
 	{
 		SystemRequest_ptr request;
 
@@ -210,7 +227,7 @@ namespace Stormancer
 
 				if (!mapContains(_pendingRequests, id))
 				{
-					request = std::make_shared<SystemRequest>(msgId, tce);
+					request = std::make_shared<SystemRequest>(msgId, tce, ct);
 					request->id = id;
 					_pendingRequests[id] = request;
 					break;

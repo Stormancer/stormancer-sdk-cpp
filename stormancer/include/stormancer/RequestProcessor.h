@@ -11,7 +11,7 @@
 namespace Stormancer
 {
 	/// Processes system requests.
-	class RequestProcessor : public IPacketProcessor
+	class RequestProcessor : public IPacketProcessor, public std::enable_shared_from_this<RequestProcessor>
 	{
 	public:
 
@@ -72,7 +72,7 @@ namespace Stormancer
 
 #pragma region private_methods
 
-		SystemRequest_ptr reserveRequestSlot(byte msgId, pplx::task_completion_event<Packet_ptr> tce);
+		SystemRequest_ptr reserveRequestSlot(byte msgId, pplx::task_completion_event<Packet_ptr> tce, pplx::cancellation_token ct = pplx::cancellation_token::none());
 
 		SystemRequest_ptr freeRequestSlot(uint16 requestId);
 

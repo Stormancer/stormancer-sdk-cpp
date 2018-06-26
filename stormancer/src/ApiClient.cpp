@@ -199,7 +199,7 @@ namespace Stormancer
 		auto rq = requestFactory(baseUri);
 
 		auto config = web::http::client::http_client_config();
-		config.set_timeout(std::chrono::seconds(3));
+		config.set_timeout(std::chrono::seconds(10));
 
 #if defined(_WIN32)
 		web::http::client::http_client client(std::wstring(baseUri.begin(), baseUri.end()), config);
