@@ -5,36 +5,33 @@
 #include "stormancer/AES/AESEncryptStream.h"
 #include "stormancer/AES/AESDecryptStream.h"
 #include "stormancer/AES/IAES.h"
+#include "stormancer/Configuration.h"
 
 namespace Stormancer
 {
-	AESPacketTransform::AESPacketTransform(std::shared_ptr<IAES> aes)
-		:_aes(aes)
+	AESPacketTransform::AESPacketTransform(std::shared_ptr<IAES> aes, std::shared_ptr<Configuration> config)
+		:_aes(aes),
+		_enabled(config->encryptionEnabled)
 	{
 	}
 
-	void AESPacketTransform::onSend(Writer& writer, uint64 peerId, const TransformMetadata& transformMetadata)
+	void AESPacketTransform::onSend(Writer& writer, uint64 peerId, const TransformMetadata& metadata)
 	{
-		std::string str("crypt");
-		if (mapContains(transformMetadata.sceneMetadata, str))
+		if (_enabled && !metadata.dontEncrypt)
 		{
-			auto& cryptedRoutes = transformMetadata.sceneMetadata.at(str);
-			if (cryptedRoutes.find(";ALL;") != std::string::npos || cryptedRoutes.find(";+" + transformMetadata.routeName + ";") != std::string::npos)
-			{
-				auto writerCopy = writer;
-				writer = [=](obytestream* stream) {
-					(*stream) << (byte)MessageIDTypes::ID_ENCRYPTED;
+			auto writerCopy = writer;
+			writer = [=](obytestream* stream) {
+				(*stream) << (byte)MessageIDTypes::ID_ENCRYPTED;
 
 
 
-					AESEncryptStream aesStream(_aes, peerId);
-					if (writerCopy)
-					{
-						writerCopy(&aesStream);
-					}
-					aesStream.encrypt(stream);
-				};
-			}
+				AESEncryptStream aesStream(_aes, peerId);
+				if (writerCopy)
+				{
+					writerCopy(&aesStream);
+				}
+				aesStream.encrypt(stream);
+			};
 		}
 	}
 
@@ -48,7 +45,7 @@ namespace Stormancer
 
 
 
-			byte* dataPtr = stream->startPtr()+1;
+			byte* dataPtr = stream->startPtr() + 1;
 			std::streamsize dataSize = stream->rdbuf()->in_avail();
 
 			AESDecryptStream aesStream(_aes, dataPtr, dataSize, peerId);

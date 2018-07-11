@@ -34,19 +34,14 @@ namespace Stormancer
 			{
 				std::streamsize ivSize = _aes->ivSize();
 
-				byte* ivPtr = nullptr;
+				
 
-				ivPtr = new byte[(std::size_t)ivSize];
-				_aes->generateRandomIV(ivPtr);
-				stream->write(ivPtr, ivSize);
+				auto iv = std::vector<BYTE>(static_cast<unsigned int>(ivSize));
+				_aes->generateRandomIV(iv);
+				
+				_aes->encrypt(dataPtr, dataSize, iv.data(), ivSize, stream,_keyId);
 
-
-				_aes->encrypt(dataPtr, dataSize, ivPtr, ivSize, stream,_keyId);
-
-				if (ivPtr)
-				{
-					delete[] ivPtr;
-				}
+				
 			}
 		}
 	}

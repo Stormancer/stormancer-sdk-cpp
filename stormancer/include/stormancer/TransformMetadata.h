@@ -1,15 +1,23 @@
 #pragma once
 
-#include "headers.h"
+#include <memory>
 
 namespace Stormancer
 {
+	class Scene;
 	struct TransformMetadata
 	{
-		const std::map<std::string, std::string> sceneMetadata;
+		TransformMetadata();
+		TransformMetadata(std::weak_ptr<Scene> scene);
+
+		const std::map<std::string, std::string>& sceneMetadata();
 		std::string sceneId;
 		std::string routeName;
-		int sceneHandle;
-		int routeHandle;
+		int sceneHandle = 0;
+		int routeHandle = 0;
+		bool dontEncrypt = false;
+
+	private:
+		std::weak_ptr<Scene> _scene;
 	};
 }

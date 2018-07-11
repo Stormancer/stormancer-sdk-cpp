@@ -6,6 +6,7 @@
 #include "stormancer/SystemRequestIDTypes.h"
 #include "stormancer/P2P/P2PConnectToSceneMessage.h"
 #include "stormancer/SafeCapture.h"
+#include "..\include\stormancer\Scene.h"
 
 namespace Stormancer
 {
@@ -257,7 +258,7 @@ namespace Stormancer
 				writer(stream);
 			}
 		};
-		TransformMetadata transformMetadata{ _metadata };
+		TransformMetadata transformMetadata {shared_from_this()};
 		peer->send(writer2, channelUid, priority, reliability, transformMetadata);
 	}
 
@@ -343,19 +344,11 @@ namespace Stormancer
 	}
 
 
-	DependencyResolver* Scene::dependencyResolver() const
+	std::weak_ptr<DependencyResolver> Scene::dependencyResolver() const 
 	{
-		auto dependencyResolver = _dependencyResolver;
-		if (dependencyResolver)
-		{
-			return dependencyResolver.get();
-		}
-		else
-		{
-			return nullptr;
-		}
+			return _dependencyResolver;	
 	}
-
+	
 	void Scene::completeConnectionInitialization(ConnectionResult& cr)
 	{
 		_handle = cr.SceneHandle;
@@ -435,13 +428,13 @@ namespace Stormancer
 
 	std::shared_ptr<P2PTunnel> Scene::registerP2PServer(const std::string & p2pServerId)
 	{
-		auto p2p = dependencyResolver()->resolve<P2PService>();
+		auto p2p = dependencyResolver().lock()->resolve<P2PService>();
 		return p2p->registerP2PServer(this->id() + "." + p2pServerId);
 	}
 
 	pplx::task<std::shared_ptr<P2PScenePeer>> Scene::openP2PConnection(const std::string & p2pToken, pplx::cancellation_token ct)
 	{
-		auto p2pService = dependencyResolver()->resolve<P2PService>();
+		auto p2pService = dependencyResolver().lock()->resolve<P2PService>();
 		return p2pService->openP2PConnection(p2pToken, ct).then(STRM_SAFE_CAPTURE([=](pplx::task < std::shared_ptr<IConnection>> t) {
 			return std::make_shared<P2PScenePeer>(this, t.get(), p2pService, P2PConnectToSceneMessage());
 		}), ct);
@@ -454,6 +447,11 @@ namespace Stormancer
 		//	auto tuple = t.get();
 		//	return std::make_shared<P2PScenePeer>(this,std::get<0>(tuple),p2p,std::get<1>(tuple));
 		//});
+	}
+
+	const std::map<std::string, std::string>& Scene::getSceneMetadata()
+	{
+		return _metadata;
 	}
 
 	Action<Packet_ptr>::TIterator Scene::onPacketReceived(std::function<void(Packet_ptr)> callback)

@@ -99,53 +99,41 @@ namespace Stormancer
 	{
 		NTSTATUS status = STATUS_UNSUCCESSFUL;
 
-		if (ivPtr == nullptr || ivSize == 0 || ivSize != _cbBlockLen)
-		{
-			ivSize = 0;
-			ivPtr = nullptr;
-		}
 
-		DWORD cbCipherText = 0;
 
-		// Get the output buffer size.
-		if (!NT_SUCCESS(status = BCryptEncrypt(
-			_keyHandles[keyId],
-			dataPtr,
-			(ULONG)dataSize,
-			NULL,
-			ivPtr,
-			(ULONG)ivSize,
-			NULL,
-			0,
-			&cbCipherText,
-			BCRYPT_BLOCK_PADDING)))
-		{
-			std::stringstream ss;
-			ss << "Error " << getErrorString(status) << " returned by BCryptEncrypt";
-			throw std::runtime_error(ss.str());
-		}
 
-		PBYTE pbCipherText = (PBYTE)HeapAlloc(GetProcessHeap(), 0, cbCipherText);
-		if (NULL == pbCipherText)
-		{
-			throw std::runtime_error("memory allocation failed");
-		}
 
-		DWORD cbData = 0;
+		BCRYPT_AUTHENTICATED_CIPHER_MODE_INFO authInfo;
+		BCRYPT_INIT_AUTH_MODE_INFO(authInfo);
+		std::vector<BYTE> authTag(authTagLengths.dwMinLength);
+		std::vector<BYTE> macContext(authTagLengths.dwMaxLength);
+		ULONG tagSize = 12;
+		std::vector<BYTE> tag(tagSize);
 
+		authInfo.pbNonce = ivPtr;
+		authInfo.cbNonce = (ULONG)ivSize;
+		authInfo.pbTag = tag.data();
+		authInfo.cbTag = tagSize;
+		authInfo.pbMacContext = &macContext[0];
+		authInfo.cbMacContext = (ULONG)macContext.size();
+
+		// IV value is ignored on first call to BCryptDecrypt.
+		// This buffer will be used to keep internal IV used for chaining.
+		std::vector<BYTE> contextIV(_cbBlockLen);
+		std::vector<BYTE> encrypted(((ULONG)dataSize));
+
+		DWORD bytesProcessed;
 		// Use the key to encrypt the plaintext buffer.
 		// For block sized messages, block padding will add an extra block.
 		if (!NT_SUCCESS(status = BCryptEncrypt(
 			_keyHandles[keyId],
 			dataPtr,
 			(ULONG)dataSize,
-			NULL,
-			ivPtr,
-			(ULONG)ivSize,
-			pbCipherText,
-			cbCipherText,
-			&cbData,
-			BCRYPT_BLOCK_PADDING)))
+			&authInfo,
+			&contextIV[0], (ULONG)contextIV.size(),
+			&encrypted[0], (ULONG)encrypted.size(),
+			&bytesProcessed,
+			0)))
 		{
 			std::stringstream ss;
 			ss << "Error " << getErrorString(status) << " returned by BCryptEncrypt";
@@ -155,15 +143,12 @@ namespace Stormancer
 		// Write the encrypted data in the output stream
 		if (outputStream)
 		{
-			uint32 encryptedSize = cbCipherText;
-			(*outputStream) << encryptedSize;
 
-			outputStream->write(pbCipherText, cbCipherText);
-		}
 
-		if (pbCipherText)
-		{
-			HeapFree(GetProcessHeap(), 0, pbCipherText);
+
+			outputStream->write(ivPtr, ivSize);
+			outputStream->write(encrypted.data(), encrypted.size());
+			outputStream->write(tag.data(), tag.size());
 		}
 	}
 
@@ -177,7 +162,7 @@ namespace Stormancer
 		std::vector<BYTE> authTag(authTagLengths.dwMinLength);
 		std::vector<BYTE> macContext(authTagLengths.dwMaxLength);
 		ULONG tagSize = 12;
-		
+
 		authInfo.pbNonce = ivPtr;
 		authInfo.cbNonce = (ULONG)ivSize;
 		authInfo.pbTag = dataPtr + dataSize - tagSize;
@@ -188,13 +173,13 @@ namespace Stormancer
 		// IV value is ignored on first call to BCryptDecrypt.
 		// This buffer will be used to keep internal IV used for chaining.
 		std::vector<BYTE> contextIV(_cbBlockLen);
-		std::vector<BYTE> decrypted(((ULONG)dataSize)-tagSize);
+		std::vector<BYTE> decrypted(((ULONG)dataSize) - tagSize);
 
 		DWORD bytesDone;
 		// Decrypt the data
 		if (!NT_SUCCESS(status = BCryptDecrypt(
 			_keyHandles[keyId],
-			dataPtr, (ULONG)dataSize-tagSize,
+			dataPtr, (ULONG)dataSize - tagSize,
 			&authInfo,
 			&contextIV[0], (ULONG)contextIV.size(),
 			&decrypted[0], (ULONG)decrypted.size(),
@@ -215,13 +200,12 @@ namespace Stormancer
 
 	}
 
-	void AESWindows::generateRandomIV(byte* ivPtr)
+	void AESWindows::generateRandomIV(std::vector<BYTE> &iv)
 	{
-		for (int32 i = 0; i < 256 / 8; i++)
+		for (std::size_t i = 0; i < iv.size(); i++)
 		{
-			//int32 r = std::rand();
-			//ivPtr[i] = (byte)r;
-			ivPtr[i] = (byte)i;
+			int32 r = std::rand();
+			iv.data()[i] = (byte)r;
 		}
 	}
 

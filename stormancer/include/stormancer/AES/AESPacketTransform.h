@@ -9,6 +9,7 @@
 namespace Stormancer
 {
 	class IAES;
+	class Configuration;
 
 	class AESPacketTransform : public IPacketTransform
 	{
@@ -16,7 +17,7 @@ namespace Stormancer
 
 #pragma region public_methods
 
-		AESPacketTransform(std::shared_ptr<IAES> aes);
+		AESPacketTransform(std::shared_ptr<IAES> aes, std::shared_ptr<Configuration>);
 
 		void onSend(Writer& writer, uint64 peerId, const TransformMetadata& transformMetadata = TransformMetadata()) override;
 
@@ -26,5 +27,6 @@ namespace Stormancer
 
 	private:
 		std::shared_ptr<IAES> _aes;
+		bool _enabled;
 	};
 }

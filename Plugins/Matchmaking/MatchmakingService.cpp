@@ -5,7 +5,7 @@ namespace Stormancer
 {
 	MatchmakingService::MatchmakingService(Scene_ptr scene)
 		: _scene(scene)
-		, _rpcService(scene->dependencyResolver()->resolve<RpcService>())
+		, _rpcService(scene->dependencyResolver().lock()->resolve<RpcService>())
 	{
 		scene->addRoute("match.update", [this](Packetisp_ptr packet) {
 			byte matchStateByte;

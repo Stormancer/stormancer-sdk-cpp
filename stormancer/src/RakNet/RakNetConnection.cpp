@@ -3,6 +3,7 @@
 #include "stormancer/Logger/ILogger.h"
 #include "stormancer/AES/AESPacketTransform.h"
 #include "stormancer/AES/IAES.h"
+#include "stormancer/Configuration.h"
 
 namespace Stormancer
 {
@@ -127,7 +128,7 @@ namespace Stormancer
 	{
 		obytestream stream;
 		std::vector<std::shared_ptr<IPacketTransform>> packetTransforms;
-		packetTransforms.emplace_back(std::make_shared<AESPacketTransform>(_dependencyResolver->resolve<IAES>()));
+		packetTransforms.emplace_back(std::make_shared<AESPacketTransform>(_dependencyResolver->resolve<IAES>(), _dependencyResolver->resolve<Configuration>()));
 		Writer writer2 = writer;
 		for (auto& packetTransform : packetTransforms)
 		{

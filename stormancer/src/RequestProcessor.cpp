@@ -2,6 +2,7 @@
 #include "stormancer/RequestProcessor.h"
 #include "stormancer/MessageIDTypes.h"
 #include "stormancer/Serializer.h"
+#include "stormancer/SystemRequestIDTypes.h"
 
 namespace Stormancer
 {
@@ -187,6 +188,11 @@ namespace Stormancer
 
 			try
 			{
+				TransformMetadata metadata;
+				if (msgId == (byte)SystemRequestIDTypes::ID_SET_METADATA)
+				{
+					metadata.dontEncrypt = true;// SET metadata contains the encryption key.
+				}
 				peer->send([=, &writer](obytestream* stream) {
 					(*stream) << (byte)MessageIDTypes::ID_SYSTEM_REQUEST;
 					(*stream) << msgId;
@@ -195,7 +201,7 @@ namespace Stormancer
 					{
 						writer(stream);
 					}
-				}, 0, priority);
+				}, 0, priority,PacketReliability::RELIABLE, metadata);
 			}
 			catch (const std::exception& ex)
 			{

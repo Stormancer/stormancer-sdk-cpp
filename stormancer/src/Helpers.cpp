@@ -194,7 +194,7 @@ namespace Stormancer
 		return time_tToStr(now, "%H:%M:%S");
 	}
 
-	std::string stringifyBytesArray(const std::vector<byte>& bytes, bool hex)
+	std::string stringifyBytesArray(const std::vector<byte>& bytes, bool hex, bool withSpaces)
 	{
 		std::stringstream ss;
 		if (hex)
@@ -203,7 +203,7 @@ namespace Stormancer
 		}
 		for (std::size_t i = 0; i < bytes.size(); ++i)
 		{
-			if (i)
+			if (withSpaces && i)
 			{
 				ss << ' ';
 			}

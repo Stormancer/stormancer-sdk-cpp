@@ -47,7 +47,7 @@ namespace Stormancer
 
 		pplx::task<void> SetPlayerData(const PlayerData<T>& data)
 		{
-			auto rpc = _scene->dependencyResolver()->resolve<RpcService>();
+			auto rpc = _scene->dependencyResolver().lock()->resolve<RpcService>();
 
 			return rpc->rpc<void>(SET_PLAYERDATA_RPC, data);
 		}

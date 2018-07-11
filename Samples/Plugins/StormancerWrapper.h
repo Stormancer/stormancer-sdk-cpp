@@ -88,7 +88,7 @@ namespace Stormancer
 						try
 						{
 							connectTask.get();
-							auto service = scene->dependencyResolver()->resolve<T>();
+							auto service = scene->dependencyResolver().lock()->resolve<T>();
 							assert(service);
 							tce.set(service);
 						}

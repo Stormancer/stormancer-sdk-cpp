@@ -23,7 +23,7 @@ namespace Stormancer
 
 		virtual void decrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream* outputStream, uint64 keyId) = 0;
 
-		virtual void generateRandomIV(byte* ivPtr) = 0;
+		virtual void generateRandomIV(std::vector<BYTE> &iv) = 0;
 
 		virtual std::streamsize getBlockSize() = 0;
 

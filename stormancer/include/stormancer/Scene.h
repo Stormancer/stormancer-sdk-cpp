@@ -108,7 +108,7 @@ namespace Stormancer
 		/// Returns the peer connection to the host.
 		IScenePeer* host() const;
 
-		DependencyResolver* dependencyResolver() const;
+		std::weak_ptr<DependencyResolver> dependencyResolver() const;
 
 		/// Fire when a packet is received in the scene. 
 		Action<Packet_ptr>::TIterator onPacketReceived(std::function<void(Packet_ptr)> callback);
@@ -125,6 +125,7 @@ namespace Stormancer
 
 		pplx::task<std::shared_ptr<P2PScenePeer>> openP2PConnection(const std::string& p2pToken, pplx::cancellation_token ct = pplx::cancellation_token::none());
 
+		const std::map<std::string, std::string>& getSceneMetadata();
 #pragma endregion
 
 	private:

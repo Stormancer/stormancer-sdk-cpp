@@ -11,7 +11,7 @@ void Stormancer::InvitationsPlugin::sceneCreated(Scene * scene)
 		if (name.length() > 0)
 		{
 
-			scene->dependencyResolver()->registerDependency<InvitationsService>([scene](DependencyResolver* dr) {
+			scene->dependencyResolver().lock()->registerDependency<InvitationsService>([scene](DependencyResolver* dr) {
 				return std::make_shared<InvitationsService>(scene->shared_from_this(), dr->resolve<ILogger>());
 			}, true);
 		}

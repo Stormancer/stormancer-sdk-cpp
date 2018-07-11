@@ -12,7 +12,7 @@ namespace Stormancer
 			if (name.length() > 0)
 			{
 				
-				scene->dependencyResolver()->registerDependency<FriendsService>([scene](DependencyResolver* dr) {
+				scene->dependencyResolver().lock()->registerDependency<FriendsService>([scene](DependencyResolver* dr) {
 					return std::make_shared<FriendsService>(scene->shared_from_this(), dr->resolve<ILogger>());
 				},true);
 			}

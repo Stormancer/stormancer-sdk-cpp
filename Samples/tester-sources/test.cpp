@@ -188,7 +188,7 @@ namespace Stormancer
 				_logger->log(LogLevel::Debug, "test_connect", "Add route OK");
 
 				_logger->log(LogLevel::Debug, "test_connect", "Add procedure");
-				auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
+				auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
 				rpcService->addProcedure("rpc", [this](RpcRequestContext_ptr rc) { return test_rpc_client_received(rc); }, MessageOriginFilter::Host, true);
 				rpcService->addProcedure("rpcCancel", [this](RpcRequestContext_ptr rc) { return test_rpc_client_cancel_received(rc); }, MessageOriginFilter::Host, true);
 				rpcService->addProcedure("rpcException", [this](RpcRequestContext_ptr rc) { return test_rpc_client_exception_received(rc); }, MessageOriginFilter::Host, true);
@@ -261,7 +261,7 @@ namespace Stormancer
 		}
 
 		// get the RPC service
-		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
+		auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
 
 		//int i = 123;
 		//rpcService->rpc<void>("rpc2").then([]() { std::cout << "void 0" << std::endl; } );
@@ -336,7 +336,7 @@ namespace Stormancer
 			return;
 		}
 
-		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
+		auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
 
 		auto observable = rpcService->rpc_observable("rpcCancel", [](obytestream* stream) {
 			Serializer serializer;
@@ -390,7 +390,7 @@ namespace Stormancer
 			return;
 		}
 
-		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
+		auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
 
 		rpcService->rpc<void>("rpcException").then([this](pplx::task<void> t) {
 			try
@@ -417,7 +417,7 @@ namespace Stormancer
 			return;
 		}
 
-		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
+		auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
 
 		rpcService->rpc<void>("rpcClientException").then([this](pplx::task<void> t) {
 			try

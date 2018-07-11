@@ -91,7 +91,7 @@ private:
 		})
 			.then([](Stormancer::Scene_ptr scene)
 		{
-			return scene->dependencyResolver()->resolve<Stormancer::PlayerDataService<std::string>>();
+			return scene->dependencyResolver().lock()->resolve<Stormancer::PlayerDataService<std::string>>();
 		});
 	}
 

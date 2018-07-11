@@ -19,7 +19,7 @@ Stormancer::InvitationsService::InvitationsService(Scene_ptr scene, std::shared_
 		this->onInvitationSucceded(result);
 	});
 
-	scene->dependencyResolver()->resolve<RpcService>()->addProcedure("invitations.onInviteRequest", [=](Stormancer::RpcRequestContext_ptr ctx) {
+	scene->dependencyResolver().lock()->resolve<RpcService>()->addProcedure("invitations.onInviteRequest", [=](Stormancer::RpcRequestContext_ptr ctx) {
 		auto result = _serializer.deserializeOne<Invitation>(ctx->inputStream());
 		return this->onInvitationRequest(result).then([=](InvitationResponse response) {
 			ctx->sendValue([=, &response](Stormancer::obytestream* stream) {
@@ -37,5 +37,5 @@ pplx::task<Stormancer::InvitationData> Stormancer::InvitationsService::invite(st
 		return pplx::task_from_exception<InvitationData>(std::runtime_error(""));
 	}
 
-	return scene->dependencyResolver()->resolve<RpcService>()->rpc<Stormancer::InvitationData, std::string, std::string>("gameinvitation.invite", userId, userData);
+	return scene->dependencyResolver().lock()->resolve<RpcService>()->rpc<Stormancer::InvitationData, std::string, std::string>("gameinvitation.invite", userId, userData);
 }

@@ -16,6 +16,7 @@
 #include "stormancer/AES/IAES.h"
 #include "stormancer/AES/AES.h"
 #include "stormancer/PacketTransformProcessor.h"
+#include "stormancer/Configuration.h"
 
 void Stormancer::ConfigureContainer(DependencyResolver* dr, Configuration_ptr config)
 {
@@ -72,7 +73,7 @@ void Stormancer::ConfigureContainer(DependencyResolver* dr, Configuration_ptr co
 	}, true);
 	
 	dr->registerDependency<AESPacketTransform>([](DependencyResolver* dependencyResolver){
-		return std::make_shared<AESPacketTransform>(dependencyResolver->resolve<IAES>());
+		return std::make_shared<AESPacketTransform>(dependencyResolver->resolve<IAES>(), dependencyResolver->resolve<Configuration>());
 	}, false);
 
 	dr->registerDependency<IAES>([](DependencyResolver* dependencyResolver) {

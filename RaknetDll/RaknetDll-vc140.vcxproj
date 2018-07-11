@@ -41,7 +41,6 @@
     <ClCompile Include="..\RakNet\Source\DynDNS.cpp" />
     <ClCompile Include="..\RakNet\Source\EmailSender.cpp" />
     <ClCompile Include="..\RakNet\Source\EpochTimeToString.cpp" />
-    <ClCompile Include="..\RakNet\Source\FileList.cpp" />
     <ClCompile Include="..\RakNet\Source\FileListTransfer.cpp" />
     <ClCompile Include="..\RakNet\Source\FileOperations.cpp" />
     <ClCompile Include="..\RakNet\Source\FormatString.cpp" />

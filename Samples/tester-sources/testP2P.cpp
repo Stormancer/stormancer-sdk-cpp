@@ -136,8 +136,8 @@ void testP2P(std::string endpoint, std::string account, std::string application,
 		throw;
 	}
 
-	auto hostRpc = hostScene->dependencyResolver()->resolve<Stormancer::RpcService>();
-	auto guestRpc = guestScene->dependencyResolver()->resolve<Stormancer::RpcService>();
+	auto hostRpc = hostScene->dependencyResolver().lock()->resolve<Stormancer::RpcService>();
+	auto guestRpc = guestScene->dependencyResolver().lock()->resolve<Stormancer::RpcService>();
 	std::string p2pToken = guestRpc->rpc<std::string>("getP2PToken", true).get();
 
 	logger->log(std::string("Got P2P token ") + p2pToken);
@@ -179,7 +179,7 @@ void p2pClient(std::string endpoint, std::string account, std::string applicatio
 		}
 	}).get();
 
-	auto rpc = scene->dependencyResolver()->resolve<Stormancer::RpcService>();
+	auto rpc = scene->dependencyResolver().lock()->resolve<Stormancer::RpcService>();
 	std::string p2pToken = rpc->rpc<std::string>("getP2PToken", true).get();
 	logger->log(std::string("Obtained P2P token: ") + p2pToken);
 	if (p2pToken.empty())

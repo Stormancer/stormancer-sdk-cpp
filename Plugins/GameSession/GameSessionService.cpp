@@ -9,7 +9,7 @@ namespace Stormancer
 	{
 		_scene = scene;
 
-		_logger = scene->dependencyResolver()->resolve<ILogger>();
+		_logger = scene->dependencyResolver().lock()->resolve<ILogger>();
 
 		scene->addRoute("gameSession.shutdown", [this](Packetisp_ptr packet) {
 			if (this->_onShutdownReceived)
@@ -191,7 +191,7 @@ namespace Stormancer
 			return pplx::task_from_exception<void>(std::runtime_error("Scene deleted"));
 		}
 
-		auto rpc = scene->dependencyResolver()->resolve<RpcService>();
+		auto rpc = scene->dependencyResolver().lock()->resolve<RpcService>();
 		return rpc->rpcWriter("gamesession.reset", [](obytestream*) {});
 	}
 

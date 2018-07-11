@@ -21,7 +21,7 @@ namespace Stormancer
 
 			if (rpcParams == version)
 			{
-				scene->dependencyResolver()->registerDependency<RpcService>([=](DependencyResolver* resolver) {
+				scene->dependencyResolver().lock()->registerDependency<RpcService>([=](DependencyResolver* resolver) {
 					return std::make_shared<RpcService>(scene, resolver->resolve<IActionDispatcher>());
 				}, true);
 			}
@@ -36,25 +36,25 @@ namespace Stormancer
 
 			if (rpcParams == version)
 			{
-				auto rpc = scene->dependencyResolver()->resolve<RpcService>();
+				auto rpc = scene->dependencyResolver().lock()->resolve<RpcService>();
 
 				scene->addRoute(nextRouteName, [=](Packetisp_ptr p) {
-					auto rpcService = scene->dependencyResolver()->resolve<RpcService>().get();
+					auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>().get();
 					rpcService->next(p);
 				});
 
 				scene->addRoute(cancellationRouteName, [=](Packetisp_ptr p) {
-					auto rpcService = scene->dependencyResolver()->resolve<RpcService>().get();
+					auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>().get();
 					rpcService->cancel(p);
 				});
 
 				scene->addRoute(errorRouteName, [=](Packetisp_ptr p) {
-					auto rpcService = scene->dependencyResolver()->resolve<RpcService>().get();
+					auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>().get();
 					rpcService->error(p);
 				});
 
 				scene->addRoute(completeRouteName, [=](Packetisp_ptr p) {
-					auto rpcService = scene->dependencyResolver()->resolve<RpcService>().get();
+					auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>().get();
 					rpcService->complete(p);
 				});
 			}
@@ -65,8 +65,12 @@ namespace Stormancer
 	{
 		if (scene)
 		{
-			auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
-			rpcService->cancelAll("Scene disconnected");
+			auto dr = scene->dependencyResolver().lock();
+			if (dr)
+			{
+				auto rpcService = dr->resolve<RpcService>();
+				rpcService->cancelAll("Scene disconnected");
+			}		
 		}
 	}
 };

@@ -13,7 +13,7 @@ namespace Stormancer
 			if (!name.empty())
 			{
 				auto service = std::make_shared<LeaderboardService>(scene);
-				scene->dependencyResolver()->registerDependency<LeaderboardService>(service);
+				scene->dependencyResolver().lock()->registerDependency<LeaderboardService>(service);
 			}
 		}
 	}

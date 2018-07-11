@@ -120,6 +120,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\TCP\TcpTransport.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\TimerThread.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\TokenHandler.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\TransformMetadata.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\Watch.h" />
   </ItemGroup>
   <ItemGroup>
@@ -188,6 +189,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\TCP\TcpTransport.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\TimerThread.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\TokenHandler.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\TransformMetadata.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Watch.cpp" />
   </ItemGroup>
 </Project>

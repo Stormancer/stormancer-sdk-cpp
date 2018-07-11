@@ -16356,22 +16356,22 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_FileListNode(void * jarg1) {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_FileListProgress_GetInstance() {
-  void * jresult ;
-  RakNet::FileListProgress *result = 0 ;
-  
-  result = (RakNet::FileListProgress *)RakNet::FileListProgress::GetInstance();
-  jresult = (void *)result; 
-  return jresult;
-}
+//SWIGEXPORT void * SWIGSTDCALL CSharp_FileListProgress_GetInstance() {
+//  void * jresult ;
+//  RakNet::FileListProgress *result = 0 ;
+//  
+//  result = (RakNet::FileListProgress *)RakNet::FileListProgress::GetInstance();
+//  jresult = (void *)result; 
+//  return jresult;
+//}
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_FileListProgress_DestroyInstance(void * jarg1) {
-  RakNet::FileListProgress *arg1 = (RakNet::FileListProgress *) 0 ;
-  
-  arg1 = (RakNet::FileListProgress *)jarg1; 
-  RakNet::FileListProgress::DestroyInstance(arg1);
-}
+//SWIGEXPORT void SWIGSTDCALL CSharp_FileListProgress_DestroyInstance(void * jarg1) {
+//  RakNet::FileListProgress *arg1 = (RakNet::FileListProgress *) 0 ;
+//  
+//  arg1 = (RakNet::FileListProgress *)jarg1; 
+//  RakNet::FileListProgress::DestroyInstance(arg1);
+//}
 
 
 SWIGEXPORT void * SWIGSTDCALL CSharp_new_FileListProgress() {
@@ -16392,30 +16392,30 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_FileListProgress(void * jarg1) {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_FileListProgress_OnAddFilesFromDirectoryStarted(void * jarg1, void * jarg2, char * jarg3) {
-  RakNet::FileListProgress *arg1 = (RakNet::FileListProgress *) 0 ;
-  RakNet::FileList *arg2 = (RakNet::FileList *) 0 ;
-  char *arg3 = (char *) 0 ;
-  
-  arg1 = (RakNet::FileListProgress *)jarg1; 
-  arg2 = (RakNet::FileList *)jarg2; 
-  arg3 = (char *)jarg3; 
-  (arg1)->OnAddFilesFromDirectoryStarted(arg2,arg3);
-}
+//SWIGEXPORT void SWIGSTDCALL CSharp_FileListProgress_OnAddFilesFromDirectoryStarted(void * jarg1, void * jarg2, char * jarg3) {
+//  RakNet::FileListProgress *arg1 = (RakNet::FileListProgress *) 0 ;
+//  RakNet::FileList *arg2 = (RakNet::FileList *) 0 ;
+//  char *arg3 = (char *) 0 ;
+//  
+//  arg1 = (RakNet::FileListProgress *)jarg1; 
+//  arg2 = (RakNet::FileList *)jarg2; 
+//  arg3 = (char *)jarg3; 
+//  (arg1)->OnAddFilesFromDirectoryStarted(arg2,arg3);
+//}
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_FileListProgress_OnDirectory(void * jarg1, void * jarg2, char * jarg3, unsigned int jarg4) {
-  RakNet::FileListProgress *arg1 = (RakNet::FileListProgress *) 0 ;
-  RakNet::FileList *arg2 = (RakNet::FileList *) 0 ;
-  char *arg3 = (char *) 0 ;
-  unsigned int arg4 ;
-  
-  arg1 = (RakNet::FileListProgress *)jarg1; 
-  arg2 = (RakNet::FileList *)jarg2; 
-  arg3 = (char *)jarg3; 
-  arg4 = (unsigned int)jarg4; 
-  (arg1)->OnDirectory(arg2,arg3,arg4);
-}
+//SWIGEXPORT void SWIGSTDCALL CSharp_FileListProgress_OnDirectory(void * jarg1, void * jarg2, char * jarg3, unsigned int jarg4) {
+//  RakNet::FileListProgress *arg1 = (RakNet::FileListProgress *) 0 ;
+//  RakNet::FileList *arg2 = (RakNet::FileList *) 0 ;
+//  char *arg3 = (char *) 0 ;
+//  unsigned int arg4 ;
+//  
+//  arg1 = (RakNet::FileListProgress *)jarg1; 
+//  arg2 = (RakNet::FileList *)jarg2; 
+//  arg3 = (char *)jarg3; 
+//  arg4 = (unsigned int)jarg4; 
+//  (arg1)->OnDirectory(arg2,arg3,arg4);
+//}
 
 
 SWIGEXPORT void SWIGSTDCALL CSharp_FileListProgress_OnFile(void * jarg1, void * jarg2, char * jarg3, char * jarg4, unsigned int jarg5) {
@@ -16462,352 +16462,352 @@ SWIGEXPORT void SWIGSTDCALL CSharp_FileListProgress_OnFilePush(void * jarg1, cha
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_FileListProgress_OnFilePushesComplete(void * jarg1, void * jarg2, unsigned short jarg3) {
-  RakNet::FileListProgress *arg1 = (RakNet::FileListProgress *) 0 ;
-  RakNet::SystemAddress arg2 ;
-  unsigned short arg3 ;
-  RakNet::SystemAddress *argp2 ;
-  
-  arg1 = (RakNet::FileListProgress *)jarg1; 
-  argp2 = (RakNet::SystemAddress *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null RakNet::SystemAddress", 0);
-    return ;
-  }
-  arg2 = *argp2; 
-  arg3 = (unsigned short)jarg3; 
-  (arg1)->OnFilePushesComplete(arg2,arg3);
-}
+//SWIGEXPORT void SWIGSTDCALL CSharp_FileListProgress_OnFilePushesComplete(void * jarg1, void * jarg2, unsigned short jarg3) {
+//  RakNet::FileListProgress *arg1 = (RakNet::FileListProgress *) 0 ;
+//  RakNet::SystemAddress arg2 ;
+//  unsigned short arg3 ;
+//  RakNet::SystemAddress *argp2 ;
+//  
+//  arg1 = (RakNet::FileListProgress *)jarg1; 
+//  argp2 = (RakNet::SystemAddress *)jarg2; 
+//  if (!argp2) {
+//    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null RakNet::SystemAddress", 0);
+//    return ;
+//  }
+//  arg2 = *argp2; 
+//  arg3 = (unsigned short)jarg3; 
+//  (arg1)->OnFilePushesComplete(arg2,arg3);
+//}
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_FileListProgress_OnSendAborted(void * jarg1, void * jarg2) {
-  RakNet::FileListProgress *arg1 = (RakNet::FileListProgress *) 0 ;
-  RakNet::SystemAddress arg2 ;
-  RakNet::SystemAddress *argp2 ;
-  
-  arg1 = (RakNet::FileListProgress *)jarg1; 
-  argp2 = (RakNet::SystemAddress *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null RakNet::SystemAddress", 0);
-    return ;
-  }
-  arg2 = *argp2; 
-  (arg1)->OnSendAborted(arg2);
-}
+//SWIGEXPORT void SWIGSTDCALL CSharp_FileListProgress_OnSendAborted(void * jarg1, void * jarg2) {
+//  RakNet::FileListProgress *arg1 = (RakNet::FileListProgress *) 0 ;
+//  RakNet::SystemAddress arg2 ;
+//  RakNet::SystemAddress *argp2 ;
+//  
+//  arg1 = (RakNet::FileListProgress *)jarg1; 
+//  argp2 = (RakNet::SystemAddress *)jarg2; 
+//  if (!argp2) {
+//    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null RakNet::SystemAddress", 0);
+//    return ;
+//  }
+//  arg2 = *argp2; 
+//  (arg1)->OnSendAborted(arg2);
+//}
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_FLP_Printf_GetInstance() {
-  void * jresult ;
-  RakNet::FLP_Printf *result = 0 ;
-  
-  result = (RakNet::FLP_Printf *)RakNet::FLP_Printf::GetInstance();
-  jresult = (void *)result; 
-  return jresult;
-}
+//SWIGEXPORT void * SWIGSTDCALL CSharp_FLP_Printf_GetInstance() {
+//  void * jresult ;
+//  RakNet::FLP_Printf *result = 0 ;
+//  
+//  result = (RakNet::FLP_Printf *)RakNet::FLP_Printf::GetInstance();
+//  jresult = (void *)result; 
+//  return jresult;
+//}
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_FLP_Printf_DestroyInstance(void * jarg1) {
-  RakNet::FLP_Printf *arg1 = (RakNet::FLP_Printf *) 0 ;
-  
-  arg1 = (RakNet::FLP_Printf *)jarg1; 
-  RakNet::FLP_Printf::DestroyInstance(arg1);
-}
+//SWIGEXPORT void SWIGSTDCALL CSharp_FLP_Printf_DestroyInstance(void * jarg1) {
+//  RakNet::FLP_Printf *arg1 = (RakNet::FLP_Printf *) 0 ;
+//  
+//  arg1 = (RakNet::FLP_Printf *)jarg1; 
+//  RakNet::FLP_Printf::DestroyInstance(arg1);
+//}
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_new_FLP_Printf() {
-  void * jresult ;
-  RakNet::FLP_Printf *result = 0 ;
-  
-  result = (RakNet::FLP_Printf *)new RakNet::FLP_Printf();
-  jresult = (void *)result; 
-  return jresult;
-}
+//SWIGEXPORT void * SWIGSTDCALL CSharp_new_FLP_Printf() {
+//  void * jresult ;
+//  RakNet::FLP_Printf *result = 0 ;
+//  
+//  result = (RakNet::FLP_Printf *)new RakNet::FLP_Printf();
+//  jresult = (void *)result; 
+//  return jresult;
+//}
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_delete_FLP_Printf(void * jarg1) {
-  RakNet::FLP_Printf *arg1 = (RakNet::FLP_Printf *) 0 ;
-  
-  arg1 = (RakNet::FLP_Printf *)jarg1; 
-  delete arg1;
-}
+//SWIGEXPORT void SWIGSTDCALL CSharp_delete_FLP_Printf(void * jarg1) {
+//  RakNet::FLP_Printf *arg1 = (RakNet::FLP_Printf *) 0 ;
+//  
+//  arg1 = (RakNet::FLP_Printf *)jarg1; 
+//  delete arg1;
+//}
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_FLP_Printf_OnAddFilesFromDirectoryStarted(void * jarg1, void * jarg2, char * jarg3) {
-  RakNet::FLP_Printf *arg1 = (RakNet::FLP_Printf *) 0 ;
-  RakNet::FileList *arg2 = (RakNet::FileList *) 0 ;
-  char *arg3 = (char *) 0 ;
-  
-  arg1 = (RakNet::FLP_Printf *)jarg1; 
-  arg2 = (RakNet::FileList *)jarg2; 
-  arg3 = (char *)jarg3; 
-  (arg1)->OnAddFilesFromDirectoryStarted(arg2,arg3);
-}
+//SWIGEXPORT void SWIGSTDCALL CSharp_FLP_Printf_OnAddFilesFromDirectoryStarted(void * jarg1, void * jarg2, char * jarg3) {
+//  RakNet::FLP_Printf *arg1 = (RakNet::FLP_Printf *) 0 ;
+//  RakNet::FileList *arg2 = (RakNet::FileList *) 0 ;
+//  char *arg3 = (char *) 0 ;
+//  
+//  arg1 = (RakNet::FLP_Printf *)jarg1; 
+//  arg2 = (RakNet::FileList *)jarg2; 
+//  arg3 = (char *)jarg3; 
+//  (arg1)->OnAddFilesFromDirectoryStarted(arg2,arg3);
+//}
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_FLP_Printf_OnDirectory(void * jarg1, void * jarg2, char * jarg3, unsigned int jarg4) {
-  RakNet::FLP_Printf *arg1 = (RakNet::FLP_Printf *) 0 ;
-  RakNet::FileList *arg2 = (RakNet::FileList *) 0 ;
-  char *arg3 = (char *) 0 ;
-  unsigned int arg4 ;
-  
-  arg1 = (RakNet::FLP_Printf *)jarg1; 
-  arg2 = (RakNet::FileList *)jarg2; 
-  arg3 = (char *)jarg3; 
-  arg4 = (unsigned int)jarg4; 
-  (arg1)->OnDirectory(arg2,arg3,arg4);
-}
+//SWIGEXPORT void SWIGSTDCALL CSharp_FLP_Printf_OnDirectory(void * jarg1, void * jarg2, char * jarg3, unsigned int jarg4) {
+//  RakNet::FLP_Printf *arg1 = (RakNet::FLP_Printf *) 0 ;
+//  RakNet::FileList *arg2 = (RakNet::FileList *) 0 ;
+//  char *arg3 = (char *) 0 ;
+//  unsigned int arg4 ;
+//  
+//  arg1 = (RakNet::FLP_Printf *)jarg1; 
+//  arg2 = (RakNet::FileList *)jarg2; 
+//  arg3 = (char *)jarg3; 
+//  arg4 = (unsigned int)jarg4; 
+//  (arg1)->OnDirectory(arg2,arg3,arg4);
+//}
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_FLP_Printf_OnFilePushesComplete(void * jarg1, void * jarg2, unsigned short jarg3) {
-  RakNet::FLP_Printf *arg1 = (RakNet::FLP_Printf *) 0 ;
-  RakNet::SystemAddress arg2 ;
-  unsigned short arg3 ;
-  RakNet::SystemAddress *argp2 ;
-  
-  arg1 = (RakNet::FLP_Printf *)jarg1; 
-  argp2 = (RakNet::SystemAddress *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null RakNet::SystemAddress", 0);
-    return ;
-  }
-  arg2 = *argp2; 
-  arg3 = (unsigned short)jarg3; 
-  (arg1)->OnFilePushesComplete(arg2,arg3);
-}
+//SWIGEXPORT void SWIGSTDCALL CSharp_FLP_Printf_OnFilePushesComplete(void * jarg1, void * jarg2, unsigned short jarg3) {
+//  RakNet::FLP_Printf *arg1 = (RakNet::FLP_Printf *) 0 ;
+//  RakNet::SystemAddress arg2 ;
+//  unsigned short arg3 ;
+//  RakNet::SystemAddress *argp2 ;
+//  
+//  arg1 = (RakNet::FLP_Printf *)jarg1; 
+//  argp2 = (RakNet::SystemAddress *)jarg2; 
+//  if (!argp2) {
+//    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null RakNet::SystemAddress", 0);
+//    return ;
+//  }
+//  arg2 = *argp2; 
+//  arg3 = (unsigned short)jarg3; 
+//  (arg1)->OnFilePushesComplete(arg2,arg3);
+//}
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_FLP_Printf_OnSendAborted(void * jarg1, void * jarg2) {
-  RakNet::FLP_Printf *arg1 = (RakNet::FLP_Printf *) 0 ;
-  RakNet::SystemAddress arg2 ;
-  RakNet::SystemAddress *argp2 ;
-  
-  arg1 = (RakNet::FLP_Printf *)jarg1; 
-  argp2 = (RakNet::SystemAddress *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null RakNet::SystemAddress", 0);
-    return ;
-  }
-  arg2 = *argp2; 
-  (arg1)->OnSendAborted(arg2);
-}
+//SWIGEXPORT void SWIGSTDCALL CSharp_FLP_Printf_OnSendAborted(void * jarg1, void * jarg2) {
+//  RakNet::FLP_Printf *arg1 = (RakNet::FLP_Printf *) 0 ;
+//  RakNet::SystemAddress arg2 ;
+//  RakNet::SystemAddress *argp2 ;
+//  
+//  arg1 = (RakNet::FLP_Printf *)jarg1; 
+//  argp2 = (RakNet::SystemAddress *)jarg2; 
+//  if (!argp2) {
+//    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null RakNet::SystemAddress", 0);
+//    return ;
+//  }
+//  arg2 = *argp2; 
+//  (arg1)->OnSendAborted(arg2);
+//}
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_FileList_GetInstance() {
-  void * jresult ;
-  RakNet::FileList *result = 0 ;
-  
-  result = (RakNet::FileList *)RakNet::FileList::GetInstance();
-  jresult = (void *)result; 
-  return jresult;
-}
+//SWIGEXPORT void * SWIGSTDCALL CSharp_FileList_GetInstance() {
+//  void * jresult ;
+//  RakNet::FileList *result = 0 ;
+//  
+//  result = (RakNet::FileList *)RakNet::FileList::GetInstance();
+//  jresult = (void *)result; 
+//  return jresult;
+//}
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_FileList_DestroyInstance(void * jarg1) {
-  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
-  
-  arg1 = (RakNet::FileList *)jarg1; 
-  RakNet::FileList::DestroyInstance(arg1);
-}
+//SWIGEXPORT void SWIGSTDCALL CSharp_FileList_DestroyInstance(void * jarg1) {
+//  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
+//  
+//  arg1 = (RakNet::FileList *)jarg1; 
+//  RakNet::FileList::DestroyInstance(arg1);
+//}
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_new_FileList() {
-  void * jresult ;
-  RakNet::FileList *result = 0 ;
-  
-  result = (RakNet::FileList *)new RakNet::FileList();
-  jresult = (void *)result; 
-  return jresult;
-}
+//SWIGEXPORT void * SWIGSTDCALL CSharp_new_FileList() {
+//  void * jresult ;
+//  RakNet::FileList *result = 0 ;
+//  
+//  result = (RakNet::FileList *)new RakNet::FileList();
+//  jresult = (void *)result; 
+//  return jresult;
+//}
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_delete_FileList(void * jarg1) {
-  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
-  
-  arg1 = (RakNet::FileList *)jarg1; 
-  delete arg1;
-}
+//SWIGEXPORT void SWIGSTDCALL CSharp_delete_FileList(void * jarg1) {
+//  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
+//  
+//  arg1 = (RakNet::FileList *)jarg1; 
+//  delete arg1;
+//}
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_FileList_AddFilesFromDirectory(void * jarg1, char * jarg2, char * jarg3, unsigned int jarg4, unsigned int jarg5, unsigned int jarg6, void * jarg7) {
-  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
-  char *arg2 = (char *) 0 ;
-  char *arg3 = (char *) 0 ;
-  bool arg4 ;
-  bool arg5 ;
-  bool arg6 ;
-  FileListNodeContext arg7 ;
-  FileListNodeContext *argp7 ;
-  
-  arg1 = (RakNet::FileList *)jarg1; 
-  arg2 = (char *)jarg2; 
-  arg3 = (char *)jarg3; 
-  arg4 = jarg4 ? true : false; 
-  arg5 = jarg5 ? true : false; 
-  arg6 = jarg6 ? true : false; 
-  argp7 = (FileListNodeContext *)jarg7; 
-  if (!argp7) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null FileListNodeContext", 0);
-    return ;
-  }
-  arg7 = *argp7; 
-  (arg1)->AddFilesFromDirectory((char const *)arg2,(char const *)arg3,arg4,arg5,arg6,arg7);
-}
+//SWIGEXPORT void SWIGSTDCALL CSharp_FileList_AddFilesFromDirectory(void * jarg1, char * jarg2, char * jarg3, unsigned int jarg4, unsigned int jarg5, unsigned int jarg6, void * jarg7) {
+//  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
+//  char *arg2 = (char *) 0 ;
+//  char *arg3 = (char *) 0 ;
+//  bool arg4 ;
+//  bool arg5 ;
+//  bool arg6 ;
+//  FileListNodeContext arg7 ;
+//  FileListNodeContext *argp7 ;
+//  
+//  arg1 = (RakNet::FileList *)jarg1; 
+//  arg2 = (char *)jarg2; 
+//  arg3 = (char *)jarg3; 
+//  arg4 = jarg4 ? true : false; 
+//  arg5 = jarg5 ? true : false; 
+//  arg6 = jarg6 ? true : false; 
+//  argp7 = (FileListNodeContext *)jarg7; 
+//  if (!argp7) {
+//    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null FileListNodeContext", 0);
+//    return ;
+//  }
+//  arg7 = *argp7; 
+//  (arg1)->AddFilesFromDirectory((char const *)arg2,(char const *)arg3,arg4,arg5,arg6,arg7);
+//}
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_FileList_Clear(void * jarg1) {
-  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
-  
-  arg1 = (RakNet::FileList *)jarg1; 
-  (arg1)->Clear();
-}
+//SWIGEXPORT void SWIGSTDCALL CSharp_FileList_Clear(void * jarg1) {
+//  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
+//  
+//  arg1 = (RakNet::FileList *)jarg1; 
+//  (arg1)->Clear();
+//}
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_FileList_Serialize(void * jarg1, void * jarg2) {
-  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
-  RakNet::BitStream *arg2 = (RakNet::BitStream *) 0 ;
-  
-  arg1 = (RakNet::FileList *)jarg1; 
-  arg2 = (RakNet::BitStream *)jarg2; 
-  (arg1)->Serialize(arg2);
-}
+//SWIGEXPORT void SWIGSTDCALL CSharp_FileList_Serialize(void * jarg1, void * jarg2) {
+//  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
+//  RakNet::BitStream *arg2 = (RakNet::BitStream *) 0 ;
+//  
+//  arg1 = (RakNet::FileList *)jarg1; 
+//  arg2 = (RakNet::BitStream *)jarg2; 
+//  (arg1)->Serialize(arg2);
+//}
 
 
-SWIGEXPORT unsigned int SWIGSTDCALL CSharp_FileList_Deserialize(void * jarg1, void * jarg2) {
-  unsigned int jresult ;
-  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
-  RakNet::BitStream *arg2 = (RakNet::BitStream *) 0 ;
-  bool result;
-  
-  arg1 = (RakNet::FileList *)jarg1; 
-  arg2 = (RakNet::BitStream *)jarg2; 
-  result = (bool)(arg1)->Deserialize(arg2);
-  jresult = result; 
-  return jresult;
-}
+//SWIGEXPORT unsigned int SWIGSTDCALL CSharp_FileList_Deserialize(void * jarg1, void * jarg2) {
+//  unsigned int jresult ;
+//  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
+//  RakNet::BitStream *arg2 = (RakNet::BitStream *) 0 ;
+//  bool result;
+//  
+//  arg1 = (RakNet::FileList *)jarg1; 
+//  arg2 = (RakNet::BitStream *)jarg2; 
+//  result = (bool)(arg1)->Deserialize(arg2);
+//  jresult = result; 
+//  return jresult;
+//}
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_FileList_ListMissingOrChangedFiles(void * jarg1, char * jarg2, void * jarg3, unsigned int jarg4, unsigned int jarg5) {
-  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
-  char *arg2 = (char *) 0 ;
-  RakNet::FileList *arg3 = (RakNet::FileList *) 0 ;
-  bool arg4 ;
-  bool arg5 ;
-  
-  arg1 = (RakNet::FileList *)jarg1; 
-  arg2 = (char *)jarg2; 
-  arg3 = (RakNet::FileList *)jarg3; 
-  arg4 = jarg4 ? true : false; 
-  arg5 = jarg5 ? true : false; 
-  (arg1)->ListMissingOrChangedFiles((char const *)arg2,arg3,arg4,arg5);
-}
+//SWIGEXPORT void SWIGSTDCALL CSharp_FileList_ListMissingOrChangedFiles(void * jarg1, char * jarg2, void * jarg3, unsigned int jarg4, unsigned int jarg5) {
+//  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
+//  char *arg2 = (char *) 0 ;
+//  RakNet::FileList *arg3 = (RakNet::FileList *) 0 ;
+//  bool arg4 ;
+//  bool arg5 ;
+//  
+//  arg1 = (RakNet::FileList *)jarg1; 
+//  arg2 = (char *)jarg2; 
+//  arg3 = (RakNet::FileList *)jarg3; 
+//  arg4 = jarg4 ? true : false; 
+//  arg5 = jarg5 ? true : false; 
+//  (arg1)->ListMissingOrChangedFiles((char const *)arg2,arg3,arg4,arg5);
+//}
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_FileList_GetDeltaToCurrent(void * jarg1, void * jarg2, void * jarg3, char * jarg4, char * jarg5) {
-  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
-  RakNet::FileList *arg2 = (RakNet::FileList *) 0 ;
-  RakNet::FileList *arg3 = (RakNet::FileList *) 0 ;
-  char *arg4 = (char *) 0 ;
-  char *arg5 = (char *) 0 ;
-  
-  arg1 = (RakNet::FileList *)jarg1; 
-  arg2 = (RakNet::FileList *)jarg2; 
-  arg3 = (RakNet::FileList *)jarg3; 
-  arg4 = (char *)jarg4; 
-  arg5 = (char *)jarg5; 
-  (arg1)->GetDeltaToCurrent(arg2,arg3,(char const *)arg4,(char const *)arg5);
-}
+//SWIGEXPORT void SWIGSTDCALL CSharp_FileList_GetDeltaToCurrent(void * jarg1, void * jarg2, void * jarg3, char * jarg4, char * jarg5) {
+//  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
+//  RakNet::FileList *arg2 = (RakNet::FileList *) 0 ;
+//  RakNet::FileList *arg3 = (RakNet::FileList *) 0 ;
+//  char *arg4 = (char *) 0 ;
+//  char *arg5 = (char *) 0 ;
+//  
+//  arg1 = (RakNet::FileList *)jarg1; 
+//  arg2 = (RakNet::FileList *)jarg2; 
+//  arg3 = (RakNet::FileList *)jarg3; 
+//  arg4 = (char *)jarg4; 
+//  arg5 = (char *)jarg5; 
+//  (arg1)->GetDeltaToCurrent(arg2,arg3,(char const *)arg4,(char const *)arg5);
+//}
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_FileList_PopulateDataFromDisk(void * jarg1, char * jarg2, unsigned int jarg3, unsigned int jarg4, unsigned int jarg5) {
-  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
-  char *arg2 = (char *) 0 ;
-  bool arg3 ;
-  bool arg4 ;
-  bool arg5 ;
-  
-  arg1 = (RakNet::FileList *)jarg1; 
-  arg2 = (char *)jarg2; 
-  arg3 = jarg3 ? true : false; 
-  arg4 = jarg4 ? true : false; 
-  arg5 = jarg5 ? true : false; 
-  (arg1)->PopulateDataFromDisk((char const *)arg2,arg3,arg4,arg5);
-}
+//SWIGEXPORT void SWIGSTDCALL CSharp_FileList_PopulateDataFromDisk(void * jarg1, char * jarg2, unsigned int jarg3, unsigned int jarg4, unsigned int jarg5) {
+//  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
+//  char *arg2 = (char *) 0 ;
+//  bool arg3 ;
+//  bool arg4 ;
+//  bool arg5 ;
+//  
+//  arg1 = (RakNet::FileList *)jarg1; 
+//  arg2 = (char *)jarg2; 
+//  arg3 = jarg3 ? true : false; 
+//  arg4 = jarg4 ? true : false; 
+//  arg5 = jarg5 ? true : false; 
+//  (arg1)->PopulateDataFromDisk((char const *)arg2,arg3,arg4,arg5);
+//}
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_FileList_FlagFilesAsReferences(void * jarg1) {
-  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
-  
-  arg1 = (RakNet::FileList *)jarg1; 
-  (arg1)->FlagFilesAsReferences();
-}
+//SWIGEXPORT void SWIGSTDCALL CSharp_FileList_FlagFilesAsReferences(void * jarg1) {
+//  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
+//  
+//  arg1 = (RakNet::FileList *)jarg1; 
+//  (arg1)->FlagFilesAsReferences();
+//}
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_FileList_WriteDataToDisk(void * jarg1, char * jarg2) {
-  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
-  char *arg2 = (char *) 0 ;
-  
-  arg1 = (RakNet::FileList *)jarg1; 
-  arg2 = (char *)jarg2; 
-  (arg1)->WriteDataToDisk((char const *)arg2);
-}
+//SWIGEXPORT void SWIGSTDCALL CSharp_FileList_WriteDataToDisk(void * jarg1, char * jarg2) {
+//  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
+//  char *arg2 = (char *) 0 ;
+//  
+//  arg1 = (RakNet::FileList *)jarg1; 
+//  arg2 = (char *)jarg2; 
+//  (arg1)->WriteDataToDisk((char const *)arg2);
+//}
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_FileList_AddFile__SWIG_0(void * jarg1, char * jarg2, char * jarg3, void * jarg4) {
-  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
-  char *arg2 = (char *) 0 ;
-  char *arg3 = (char *) 0 ;
-  FileListNodeContext arg4 ;
-  FileListNodeContext *argp4 ;
-  
-  arg1 = (RakNet::FileList *)jarg1; 
-  arg2 = (char *)jarg2; 
-  arg3 = (char *)jarg3; 
-  argp4 = (FileListNodeContext *)jarg4; 
-  if (!argp4) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null FileListNodeContext", 0);
-    return ;
-  }
-  arg4 = *argp4; 
-  (arg1)->AddFile((char const *)arg2,(char const *)arg3,arg4);
-}
+//SWIGEXPORT void SWIGSTDCALL CSharp_FileList_AddFile__SWIG_0(void * jarg1, char * jarg2, char * jarg3, void * jarg4) {
+//  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
+//  char *arg2 = (char *) 0 ;
+//  char *arg3 = (char *) 0 ;
+//  FileListNodeContext arg4 ;
+//  FileListNodeContext *argp4 ;
+//  
+//  arg1 = (RakNet::FileList *)jarg1; 
+//  arg2 = (char *)jarg2; 
+//  arg3 = (char *)jarg3; 
+//  argp4 = (FileListNodeContext *)jarg4; 
+//  if (!argp4) {
+//    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null FileListNodeContext", 0);
+//    return ;
+//  }
+//  arg4 = *argp4; 
+//  (arg1)->AddFile((char const *)arg2,(char const *)arg3,arg4);
+//}
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_FileList_DeleteFiles(void * jarg1, char * jarg2) {
-  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
-  char *arg2 = (char *) 0 ;
-  
-  arg1 = (RakNet::FileList *)jarg1; 
-  arg2 = (char *)jarg2; 
-  (arg1)->DeleteFiles((char const *)arg2);
-}
+//SWIGEXPORT void SWIGSTDCALL CSharp_FileList_DeleteFiles(void * jarg1, char * jarg2) {
+//  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
+//  char *arg2 = (char *) 0 ;
+//  
+//  arg1 = (RakNet::FileList *)jarg1; 
+//  arg2 = (char *)jarg2; 
+//  (arg1)->DeleteFiles((char const *)arg2);
+//}
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_FileList_AddCallback(void * jarg1, void * jarg2) {
-  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
-  RakNet::FileListProgress *arg2 = (RakNet::FileListProgress *) 0 ;
-  
-  arg1 = (RakNet::FileList *)jarg1; 
-  arg2 = (RakNet::FileListProgress *)jarg2; 
-  (arg1)->AddCallback(arg2);
-}
+//SWIGEXPORT void SWIGSTDCALL CSharp_FileList_AddCallback(void * jarg1, void * jarg2) {
+//  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
+//  RakNet::FileListProgress *arg2 = (RakNet::FileListProgress *) 0 ;
+//  
+//  arg1 = (RakNet::FileList *)jarg1; 
+//  arg2 = (RakNet::FileListProgress *)jarg2; 
+//  (arg1)->AddCallback(arg2);
+//}
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_FileList_RemoveCallback(void * jarg1, void * jarg2) {
-  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
-  RakNet::FileListProgress *arg2 = (RakNet::FileListProgress *) 0 ;
-  
-  arg1 = (RakNet::FileList *)jarg1; 
-  arg2 = (RakNet::FileListProgress *)jarg2; 
-  (arg1)->RemoveCallback(arg2);
-}
+//SWIGEXPORT void SWIGSTDCALL CSharp_FileList_RemoveCallback(void * jarg1, void * jarg2) {
+//  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
+//  RakNet::FileListProgress *arg2 = (RakNet::FileListProgress *) 0 ;
+//  
+//  arg1 = (RakNet::FileList *)jarg1; 
+//  arg2 = (RakNet::FileListProgress *)jarg2; 
+//  (arg1)->RemoveCallback(arg2);
+//}
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_FileList_ClearCallbacks(void * jarg1) {
-  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
-  
-  arg1 = (RakNet::FileList *)jarg1; 
-  (arg1)->ClearCallbacks();
-}
+//SWIGEXPORT void SWIGSTDCALL CSharp_FileList_ClearCallbacks(void * jarg1) {
+//  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
+//  
+//  arg1 = (RakNet::FileList *)jarg1; 
+//  (arg1)->ClearCallbacks();
+//}
 
 
 SWIGEXPORT void SWIGSTDCALL CSharp_FileList_fileList_set(void * jarg1, void * jarg2) {
@@ -16832,74 +16832,74 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_FileList_fileList_get(void * jarg1) {
 }
 
 
-SWIGEXPORT unsigned int SWIGSTDCALL CSharp_FileList_FixEndingSlash(char * jarg1) {
-  unsigned int jresult ;
-  char *arg1 = (char *) 0 ;
-  bool result;
-  
-  arg1 = (char *)jarg1; 
-  result = (bool)RakNet::FileList::FixEndingSlash(arg1);
-  jresult = result; 
-  return jresult;
-}
+//SWIGEXPORT unsigned int SWIGSTDCALL CSharp_FileList_FixEndingSlash(char * jarg1) {
+//  unsigned int jresult ;
+//  char *arg1 = (char *) 0 ;
+//  bool result;
+//  
+//  arg1 = (char *)jarg1; 
+//  result = (bool)RakNet::FileList::FixEndingSlash(arg1);
+//  jresult = result; 
+//  return jresult;
+//}
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_FileList_AddFile__SWIG_1(void * jarg1, char * jarg2, char * jarg3, unsigned char* jarg4, unsigned int jarg5, unsigned int jarg6, void * jarg7, unsigned int jarg8) {
-  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
-  char *arg2 = (char *) 0 ;
-  char *arg3 = (char *) 0 ;
-  unsigned char *arg4 = (unsigned char *) 0 ;
-  unsigned int arg5 ;
-  unsigned int arg6 ;
-  FileListNodeContext arg7 ;
-  bool arg8 ;
-  FileListNodeContext *argp7 ;
-  
-  arg1 = (RakNet::FileList *)jarg1; 
-  arg2 = (char *)jarg2; 
-  arg3 = (char *)jarg3; 
-  arg4 = jarg4;
-  arg5 = (unsigned int)jarg5; 
-  arg6 = (unsigned int)jarg6; 
-  argp7 = (FileListNodeContext *)jarg7; 
-  if (!argp7) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null FileListNodeContext", 0);
-    return ;
-  }
-  arg7 = *argp7; 
-  arg8 = jarg8 ? true : false; 
-  RakNet_FileList_AddFile__SWIG_1(arg1,(char const *)arg2,(char const *)arg3,arg4,arg5,arg6,arg7,arg8);
-  
-  
-}
+//SWIGEXPORT void SWIGSTDCALL CSharp_FileList_AddFile__SWIG_1(void * jarg1, char * jarg2, char * jarg3, unsigned char* jarg4, unsigned int jarg5, unsigned int jarg6, void * jarg7, unsigned int jarg8) {
+//  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
+//  char *arg2 = (char *) 0 ;
+//  char *arg3 = (char *) 0 ;
+//  unsigned char *arg4 = (unsigned char *) 0 ;
+//  unsigned int arg5 ;
+//  unsigned int arg6 ;
+//  FileListNodeContext arg7 ;
+//  bool arg8 ;
+//  FileListNodeContext *argp7 ;
+//  
+//  arg1 = (RakNet::FileList *)jarg1; 
+//  arg2 = (char *)jarg2; 
+//  arg3 = (char *)jarg3; 
+//  arg4 = jarg4;
+//  arg5 = (unsigned int)jarg5; 
+//  arg6 = (unsigned int)jarg6; 
+//  argp7 = (FileListNodeContext *)jarg7; 
+//  if (!argp7) {
+//    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null FileListNodeContext", 0);
+//    return ;
+//  }
+//  arg7 = *argp7; 
+//  arg8 = jarg8 ? true : false; 
+//  RakNet_FileList_AddFile__SWIG_1(arg1,(char const *)arg2,(char const *)arg3,arg4,arg5,arg6,arg7,arg8);
+//  
+//  
+//}
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_FileList_AddFile__SWIG_2(void * jarg1, char * jarg2, char * jarg3, unsigned char* jarg4, unsigned int jarg5, unsigned int jarg6, void * jarg7) {
-  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
-  char *arg2 = (char *) 0 ;
-  char *arg3 = (char *) 0 ;
-  unsigned char *arg4 = (unsigned char *) 0 ;
-  unsigned int arg5 ;
-  unsigned int arg6 ;
-  FileListNodeContext arg7 ;
-  FileListNodeContext *argp7 ;
-  
-  arg1 = (RakNet::FileList *)jarg1; 
-  arg2 = (char *)jarg2; 
-  arg3 = (char *)jarg3; 
-  arg4 = jarg4;
-  arg5 = (unsigned int)jarg5; 
-  arg6 = (unsigned int)jarg6; 
-  argp7 = (FileListNodeContext *)jarg7; 
-  if (!argp7) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null FileListNodeContext", 0);
-    return ;
-  }
-  arg7 = *argp7; 
-  RakNet_FileList_AddFile__SWIG_1(arg1,(char const *)arg2,(char const *)arg3,arg4,arg5,arg6,arg7);
-  
-  
-}
+//SWIGEXPORT void SWIGSTDCALL CSharp_FileList_AddFile__SWIG_2(void * jarg1, char * jarg2, char * jarg3, unsigned char* jarg4, unsigned int jarg5, unsigned int jarg6, void * jarg7) {
+//  RakNet::FileList *arg1 = (RakNet::FileList *) 0 ;
+//  char *arg2 = (char *) 0 ;
+//  char *arg3 = (char *) 0 ;
+//  unsigned char *arg4 = (unsigned char *) 0 ;
+//  unsigned int arg5 ;
+//  unsigned int arg6 ;
+//  FileListNodeContext arg7 ;
+//  FileListNodeContext *argp7 ;
+//  
+//  arg1 = (RakNet::FileList *)jarg1; 
+//  arg2 = (char *)jarg2; 
+//  arg3 = (char *)jarg3; 
+//  arg4 = jarg4;
+//  arg5 = (unsigned int)jarg5; 
+//  arg6 = (unsigned int)jarg6; 
+//  argp7 = (FileListNodeContext *)jarg7; 
+//  if (!argp7) {
+//    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null FileListNodeContext", 0);
+//    return ;
+//  }
+//  arg7 = *argp7; 
+//  RakNet_FileList_AddFile__SWIG_1(arg1,(char const *)arg2,(char const *)arg3,arg4,arg5,arg6,arg7);
+//  
+//  
+//}
 
 
 SWIGEXPORT int SWIGSTDCALL CSharp_REMOTE_MAX_TEXT_INPUT_get() {

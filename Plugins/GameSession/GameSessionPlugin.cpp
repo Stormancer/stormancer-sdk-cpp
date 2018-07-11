@@ -12,7 +12,7 @@ namespace Stormancer
 			if (name.length() > 0)
 			{
 				auto service = std::make_shared<GameSessionService>(scene->shared_from_this());
-				scene->dependencyResolver()->registerDependency<GameSessionService>(service);
+				scene->dependencyResolver().lock()->registerDependency<GameSessionService>(service);
 			}
 		}
 	}
@@ -23,7 +23,7 @@ namespace Stormancer
 			auto name = scene->getHostMetadata("stormancer.gamesession");
 			if (name.length() > 0)
 			{
-				auto gameSession = scene->dependencyResolver()->resolve<GameSessionService>();
+				auto gameSession = scene->dependencyResolver().lock()->resolve<GameSessionService>();
 				if (gameSession)
 				{
 					gameSession->__disconnecting();

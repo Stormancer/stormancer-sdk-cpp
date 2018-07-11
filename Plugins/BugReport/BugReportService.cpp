@@ -6,7 +6,7 @@ namespace Stormancer
 	BugReportService::BugReportService(Scene_ptr scene)
 	{
 		_scene = scene;
-		_rpc = scene->dependencyResolver()->resolve<RpcService>();
+		_rpc = scene->dependencyResolver().lock()->resolve<RpcService>();
 	}
 
 	pplx::task<void> BugReportService::reportBug(std::string category, std::string comments, std::vector<AttachedFileDescriptor> files)

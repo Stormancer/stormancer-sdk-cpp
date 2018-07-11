@@ -159,7 +159,7 @@ namespace Stormancer
 
 	bool ensureSuccessStatusCode(int statusCode);
 
-	STORMANCER_DLL_API std::string stringifyBytesArray(const std::vector<byte>& bytes, bool hex = true);
+	STORMANCER_DLL_API std::string stringifyBytesArray(const std::vector<byte>& bytes, bool hex = true, bool withSpaces = false);
 
 	/// Compares the value of var with expected. If those are equal, replaces var with desired and returns true. Otherwise returns false.
 	/// \param var Reference to the value to compare with expected.

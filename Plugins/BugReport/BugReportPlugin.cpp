@@ -12,7 +12,7 @@ namespace Stormancer
 			if (name.length() > 0)
 			{
 				auto service = std::make_shared<BugReportService>(scene->shared_from_this());
-				scene->dependencyResolver()->registerDependency<BugReportService>(service);
+				scene->dependencyResolver().lock()->registerDependency<BugReportService>(service);
 			}
 		}
 	}

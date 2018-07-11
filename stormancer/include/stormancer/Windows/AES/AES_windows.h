@@ -24,7 +24,7 @@ namespace Stormancer
 
 		void decrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream* outputStream, uint64 keyId) override;
 
-		void generateRandomIV(byte* ivPtr) override;
+		void generateRandomIV(std::vector<BYTE> &iv) override;
 
 		virtual std::streamsize getBlockSize() override;
 

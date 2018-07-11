@@ -108,7 +108,7 @@ namespace Stormancer
 		return getAuthenticationScene()
 			.then([this, rq](Scene_ptr scene)
 		{
-			auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
+			auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
 			return rpcService->rpc<LoginResult, CreateUserParameters>(_createUserRoute, rq);
 		})
 			.then([this](LoginResult loginResult)
@@ -132,7 +132,7 @@ namespace Stormancer
 			.then([this, authenticationContext](Scene_ptr scene)
 		{
 			setConnectionState(GameConnectionState::Authenticating);
-			auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
+			auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
 
 			pplx::task_completion_event<void> tce;
 
@@ -212,7 +212,7 @@ namespace Stormancer
 		return getAuthenticationScene()
 			.then([](Scene_ptr authScene)
 		{
-			auto rpcService = authScene->dependencyResolver()->resolve<RpcService>();
+			auto rpcService = authScene->dependencyResolver().lock()->resolve<RpcService>();
 			return rpcService->rpc<std::string>("sceneauthorization.getbearertoken");
 		});
 	}
@@ -222,7 +222,7 @@ namespace Stormancer
 		return getAuthenticationScene()
 			.then([token](Scene_ptr authScene)
 		{
-			auto rpcService = authScene->dependencyResolver()->resolve<RpcService>();
+			auto rpcService = authScene->dependencyResolver().lock()->resolve<RpcService>();
 			return rpcService->rpc<std::string, std::string>("sceneauthorization.getuserfrombearertoken", token);
 		});
 	}
@@ -237,7 +237,7 @@ namespace Stormancer
 		return getAuthenticationScene()
 			.then([pseudo](Scene_ptr authScene)
 		{
-			auto rpcService = authScene->dependencyResolver()->resolve<RpcService>();
+			auto rpcService = authScene->dependencyResolver().lock()->resolve<RpcService>();
 			return rpcService->rpc<std::string, std::string>("users.getuseridbypseudo", pseudo);
 		});
 	}
@@ -247,7 +247,7 @@ namespace Stormancer
 		return getAuthenticationScene()
 			.then([sceneId](Scene_ptr authScene)
 		{
-			auto rpcService = authScene->dependencyResolver()->resolve<RpcService>();
+			auto rpcService = authScene->dependencyResolver().lock()->resolve<RpcService>();
 			return rpcService->rpc<std::string, std::string>("sceneauthorization.gettoken", sceneId);
 		})
 			.then([this](std::string token)
@@ -278,7 +278,7 @@ namespace Stormancer
 		return getAuthenticationScene()
 			.then([userIds](Scene_ptr authScene)
 		{
-			auto rpcService = authScene->dependencyResolver()->resolve<RpcService>();
+			auto rpcService = authScene->dependencyResolver().lock()->resolve<RpcService>();
 			return rpcService->rpc<std::unordered_map<std::string, std::string>, std::vector<std::string>>("users.getpseudos", userIds);
 		});
 	}
@@ -302,7 +302,7 @@ namespace Stormancer
 		return getAuthenticationScene()
 			.then([email](Scene_ptr authScene)
 		{
-			auto rpcService = authScene->dependencyResolver()->resolve<RpcService>();
+			auto rpcService = authScene->dependencyResolver().lock()->resolve<RpcService>();
 			return rpcService->rpc<void, std::string>("provider.loginpassword.requestPasswordRecovery", email);
 		});
 	}
@@ -317,7 +317,7 @@ namespace Stormancer
 		return getAuthenticationScene()
 			.then([parameter](Scene_ptr authScene)
 		{
-			auto rpcService = authScene->dependencyResolver()->resolve<RpcService>();
+			auto rpcService = authScene->dependencyResolver().lock()->resolve<RpcService>();
 			return rpcService->rpc<void, ChangePasswordParameters>("provider.loginpassword.resetPassword", parameter);
 		});
 	}

@@ -12,9 +12,9 @@ namespace Stormancer
 			auto name = scene->getHostMetadata("stormancer.assetsstorage");
 			if (!name.empty())
 			{
-				auto logger = scene->dependencyResolver()->resolve<ILogger>();
+				auto logger = scene->dependencyResolver().lock()->resolve<ILogger>();
 				auto service = std::make_shared<AssetsStorageService>(scene->shared_from_this(), logger);
-				scene->dependencyResolver()->registerDependency<AssetsStorageService>(service);
+				scene->dependencyResolver().lock()->registerDependency<AssetsStorageService>(service);
 			}
 		}
 	}
