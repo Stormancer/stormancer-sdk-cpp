@@ -12,11 +12,9 @@ namespace Stormancer
 
 	pplx::task<std::shared_ptr<IConnection>> Stormancer::ConnectionsRepository::addPendingConnection(uint64 id)
 	{
-		auto tce = pplx::task_completion_event<std::shared_ptr<IConnection>>();
-		PendingConnection pc;
-		pc.id = id;
-		pc.tce = tce;
-		_pendingP2PConnections[id] = pc;
+		pplx::task_completion_event<std::shared_ptr<IConnection>> tce;
+		_pendingP2PConnections.emplace(id, PendingConnection{ id,tce });
+
 		_logger->log(LogLevel::Info, "P2P", "Added pending connection from id ", std::to_string(id));
 		return pplx::create_task(tce);
 	}

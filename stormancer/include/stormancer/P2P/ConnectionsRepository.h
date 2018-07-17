@@ -22,6 +22,7 @@ namespace Stormancer
 		class PendingConnection
 		{
 		public:
+			
 			uint64 id;
 			pplx::task_completion_event<std::shared_ptr<IConnection>> tce;
 		};

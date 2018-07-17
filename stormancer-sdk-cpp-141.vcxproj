@@ -150,6 +150,7 @@
       <ShowIncludes>false</ShowIncludes>
       <TreatWarningAsError>true</TreatWarningAsError>
       <PrecompiledHeaderFile>stormancer/stdafx.h</PrecompiledHeaderFile>
+      <ProgramDataBaseFileName>$(OutDir)Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -181,6 +182,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <TreatWarningAsError>true</TreatWarningAsError>
       <PrecompiledHeaderFile>stormancer/stdafx.h</PrecompiledHeaderFile>
+      <ProgramDataBaseFileName>$(OutDir)Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -211,6 +213,7 @@
       <ShowIncludes>false</ShowIncludes>
       <TreatWarningAsError>true</TreatWarningAsError>
       <PrecompiledHeaderFile>stormancer/stdafx.h</PrecompiledHeaderFile>
+      <ProgramDataBaseFileName>$(OutDir)Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -242,6 +245,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <TreatWarningAsError>true</TreatWarningAsError>
       <PrecompiledHeaderFile>stormancer/stdafx.h</PrecompiledHeaderFile>
+      <ProgramDataBaseFileName>$(OutDir)Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -273,6 +277,7 @@
       <ShowIncludes>false</ShowIncludes>
       <TreatWarningAsError>true</TreatWarningAsError>
       <PrecompiledHeaderFile>stormancer/stdafx.h</PrecompiledHeaderFile>
+      <ProgramDataBaseFileName>$(OutDir)Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -309,6 +314,7 @@
       <ShowIncludes>false</ShowIncludes>
       <TreatWarningAsError>true</TreatWarningAsError>
       <PrecompiledHeaderFile>stormancer/stdafx.h</PrecompiledHeaderFile>
+      <ProgramDataBaseFileName>$(OutDir)Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
