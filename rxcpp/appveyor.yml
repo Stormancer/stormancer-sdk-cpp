@@ -1,0 +1,49 @@
+version: 2.2.{build}
+
+branches:
+# whitelist
+    only:
+        - master
+        - appveyor
+
+environment:
+  matrix:
+    - VSVER: Visual Studio 12 2013 Win64
+#    - VSVER: Visual Studio 14 2015 Win64
+
+platform:
+  - x64
+
+configuration:
+  - Release
+
+install:
+    - choco install cmake
+    - choco upgrade cmake
+    - cmake --version
+    - git submodule -q update --init
+
+before_build:
+    - cmake -G"%VSVER%" .
+
+build:
+    project: build\rxcpp.sln
+
+test_script:
+  - cd build\test\
+  - ctest -V -C Release
+  - cd ..\..
+
+artifacts:
+  - path: Rx\v2\src\
+    name: rxcpp source
+    type: zip
+  - path: Rx\v2\examples\
+    name: rxcpp examples
+    type: zip
+
+notifications:
+  - provider: Slack
+    auth_token:
+      secure: qaGjbI98VXZa7Zd2s3RmMzfA+ymrfWUDuzevdtOcHssEGBXbcoOJzLHNOmG+Y1nX
+    channel: rxcpp

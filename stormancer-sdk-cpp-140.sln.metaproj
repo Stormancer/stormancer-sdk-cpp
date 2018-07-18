@@ -1,0 +1,389 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" InitialTargets="ValidateSolutionConfiguration;ValidateToolsVersions;ValidateProjects" DefaultTargets="Build">
+  <PropertyGroup>
+    <MSBuildToolsPath32>C:\Program Files (x86)\MSBuild\14.0\bin\</MSBuildToolsPath32>
+    <MSBuildToolsRoot>C:\Program Files (x86)\MSBuild\</MSBuildToolsRoot>
+    <MSBuildFrameworkToolsPath>C:\Windows\Microsoft.NET\Framework\v4.0.30319\</MSBuildFrameworkToolsPath>
+    <MSBuildFrameworkToolsPath32>C:\Windows\Microsoft.NET\Framework\v4.0.30319\</MSBuildFrameworkToolsPath32>
+    <MSBuildFrameworkToolsRoot>C:\Windows\Microsoft.NET\Framework\</MSBuildFrameworkToolsRoot>
+    <MSBuildRuntimeVersion>4.0.30319</MSBuildRuntimeVersion>
+    <FrameworkSDKRoot>C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\</FrameworkSDKRoot>
+    <SDK35ToolsPath>C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\</SDK35ToolsPath>
+    <SDK40ToolsPath>C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.6 Tools\</SDK40ToolsPath>
+    <VCTargetsPath>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\</VCTargetsPath>
+    <VCTargetsPath10>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\</VCTargetsPath10>
+    <VCTargetsPath11>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V110\</VCTargetsPath11>
+    <VCTargetsPath12>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\</VCTargetsPath12>
+    <VCTargetsPath14>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\</VCTargetsPath14>
+    <AndroidTargetsPath>C:\Program Files (x86)\MSBuild\Microsoft\MDD\Android\V140\</AndroidTargetsPath>
+    <VisualStudioVersion>14.0</VisualStudioVersion>
+    <WindowsSDK80Path>C:\Program Files (x86)\Windows Kits\8.1\</WindowsSDK80Path>
+    <AspNetConfiguration>Release</AspNetConfiguration>
+    <SolutionDir>C:\TeamCity\buildAgent\work\3f4f59100bc37114\</SolutionDir>
+    <SolutionExt>.sln</SolutionExt>
+    <SolutionFileName>stormancer-sdk-cpp-140.sln</SolutionFileName>
+    <SolutionName>stormancer-sdk-cpp-140</SolutionName>
+    <SolutionPath>C:\TeamCity\buildAgent\work\3f4f59100bc37114\stormancer-sdk-cpp-140.sln</SolutionPath>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <CurrentSolutionConfigurationContents>
+      <SolutionConfiguration xmlns="">
+  <ProjectConfiguration Project="{D8CF547F-8B5B-4651-A48F-D6E56EE0B8C1}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\stormancer-sdk-cpp-140.vcxproj" BuildProjectInSolution="False">Release|Win32<ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /></ProjectConfiguration>
+  <ProjectConfiguration Project="{DFB15956-69E5-4D05-89C2-E7390F884D50}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\Tester\Tester.vcxproj" BuildProjectInSolution="False">Release|Win32<ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /></ProjectConfiguration>
+  <ProjectConfiguration Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RakNet\Lib\DLL\DLL_vc12.vcxproj" BuildProjectInSolution="False">Release|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\cpprestsdk\Release\src\build\vs14\casablanca140.vcxproj" BuildProjectInSolution="True">Release|ARM</ProjectConfiguration>
+  <ProjectConfiguration Project="{6227F51A-1498-4C4A-B213-F6FDED605125}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\libupnp\build\vc14\libupnp.vcxproj" BuildProjectInSolution="False">Release|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{A91C2062-B9F2-4F9D-A04F-8710F81D8D24}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\Plugins\Plugins-140.vcxproj" BuildProjectInSolution="False">Release|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{43D8B92C-4987-445B-84C7-C5224A98FFD6}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RaknetAndroid\RaknetAndroid.vcxproj" BuildProjectInSolution="True">Release|ARM</ProjectConfiguration>
+  <ProjectConfiguration Project="{73703B65-9D12-4836-8C66-3FB48D3A721E}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RaknetDll\RaknetDll-vc140.vcxproj" BuildProjectInSolution="False">Release|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{DA8EAA28-D2DF-46E8-937E-E061E31EC539}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\SmokeTest\SmokeTest-vc140.vcxproj" BuildProjectInSolution="False">Release|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{CD827855-C824-4CBF-B736-B7FDA2ACD036}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\RakNetIpv6\RakNetIpv6-vc140.vcxproj" BuildProjectInSolution="False">Release|Win32<ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /></ProjectConfiguration>
+</SolutionConfiguration>
+    </CurrentSolutionConfigurationContents>
+  </PropertyGroup>
+  <ItemDefinitionGroup />
+  <ItemGroup>
+    <SolutionConfiguration Include="DebugUE4|ARM">
+      <Configuration>DebugUE4</Configuration>
+      <Platform>ARM</Platform>
+      <Content>
+        <SolutionConfiguration xmlns="">
+  <ProjectConfiguration Project="{D8CF547F-8B5B-4651-A48F-D6E56EE0B8C1}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\stormancer-sdk-cpp-140.vcxproj" BuildProjectInSolution="False">DebugUE4|Win32<ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /></ProjectConfiguration>
+  <ProjectConfiguration Project="{DFB15956-69E5-4D05-89C2-E7390F884D50}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\Tester\Tester.vcxproj" BuildProjectInSolution="False">DebugUE4|Win32<ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /></ProjectConfiguration>
+  <ProjectConfiguration Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RakNet\Lib\DLL\DLL_vc12.vcxproj" BuildProjectInSolution="False">DebugUE4|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\cpprestsdk\Release\src\build\vs14\casablanca140.vcxproj" BuildProjectInSolution="True">DebugUE4|ARM</ProjectConfiguration>
+  <ProjectConfiguration Project="{6227F51A-1498-4C4A-B213-F6FDED605125}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\libupnp\build\vc14\libupnp.vcxproj" BuildProjectInSolution="False">DebugUE4|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{A91C2062-B9F2-4F9D-A04F-8710F81D8D24}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\Plugins\Plugins-140.vcxproj" BuildProjectInSolution="True">Release|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{43D8B92C-4987-445B-84C7-C5224A98FFD6}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RaknetAndroid\RaknetAndroid.vcxproj" BuildProjectInSolution="True">Debug|ARM</ProjectConfiguration>
+  <ProjectConfiguration Project="{73703B65-9D12-4836-8C66-3FB48D3A721E}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RaknetDll\RaknetDll-vc140.vcxproj" BuildProjectInSolution="False">Release|x64</ProjectConfiguration>
+  <ProjectConfiguration Project="{DA8EAA28-D2DF-46E8-937E-E061E31EC539}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\SmokeTest\SmokeTest-vc140.vcxproj" BuildProjectInSolution="True">Release|x64</ProjectConfiguration>
+  <ProjectConfiguration Project="{CD827855-C824-4CBF-B736-B7FDA2ACD036}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\RakNetIpv6\RakNetIpv6-vc140.vcxproj" BuildProjectInSolution="True">Release|x64<ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /></ProjectConfiguration>
+</SolutionConfiguration>
+      </Content>
+    </SolutionConfiguration>
+    <SolutionConfiguration Include="DebugUE4|ARM64">
+      <Configuration>DebugUE4</Configuration>
+      <Platform>ARM64</Platform>
+      <Content>
+        <SolutionConfiguration xmlns="">
+  <ProjectConfiguration Project="{D8CF547F-8B5B-4651-A48F-D6E56EE0B8C1}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\stormancer-sdk-cpp-140.vcxproj" BuildProjectInSolution="False">DebugUE4|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{DFB15956-69E5-4D05-89C2-E7390F884D50}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\Tester\Tester.vcxproj" BuildProjectInSolution="False">DebugUE4|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RakNet\Lib\DLL\DLL_vc12.vcxproj" BuildProjectInSolution="False">DebugUE4|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\cpprestsdk\Release\src\build\vs14\casablanca140.vcxproj" BuildProjectInSolution="False">DebugUE4|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{6227F51A-1498-4C4A-B213-F6FDED605125}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\libupnp\build\vc14\libupnp.vcxproj" BuildProjectInSolution="False">DebugUE4|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{A91C2062-B9F2-4F9D-A04F-8710F81D8D24}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\Plugins\Plugins-140.vcxproj" BuildProjectInSolution="True">Release|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{43D8B92C-4987-445B-84C7-C5224A98FFD6}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RaknetAndroid\RaknetAndroid.vcxproj" BuildProjectInSolution="True">Debug|ARM64</ProjectConfiguration>
+  <ProjectConfiguration Project="{73703B65-9D12-4836-8C66-3FB48D3A721E}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RaknetDll\RaknetDll-vc140.vcxproj" BuildProjectInSolution="False">Release|x64</ProjectConfiguration>
+  <ProjectConfiguration Project="{DA8EAA28-D2DF-46E8-937E-E061E31EC539}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\SmokeTest\SmokeTest-vc140.vcxproj" BuildProjectInSolution="True">Release|x64</ProjectConfiguration>
+  <ProjectConfiguration Project="{CD827855-C824-4CBF-B736-B7FDA2ACD036}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\RakNetIpv6\RakNetIpv6-vc140.vcxproj" BuildProjectInSolution="True">Release|x64</ProjectConfiguration>
+</SolutionConfiguration>
+      </Content>
+    </SolutionConfiguration>
+    <SolutionConfiguration Include="DebugUE4|x64">
+      <Configuration>DebugUE4</Configuration>
+      <Platform>x64</Platform>
+      <Content>
+        <SolutionConfiguration xmlns="">
+  <ProjectConfiguration Project="{D8CF547F-8B5B-4651-A48F-D6E56EE0B8C1}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\stormancer-sdk-cpp-140.vcxproj" BuildProjectInSolution="True">DebugUE4|x64<ProjectDependency Project="{6227F51A-1498-4C4A-B213-F6FDED605125}" /><ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /><ProjectDependency Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" /></ProjectConfiguration>
+  <ProjectConfiguration Project="{DFB15956-69E5-4D05-89C2-E7390F884D50}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\Tester\Tester.vcxproj" BuildProjectInSolution="True">DebugUE4|x64<ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /><ProjectDependency Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" /><ProjectDependency Project="{D8CF547F-8B5B-4651-A48F-D6E56EE0B8C1}" /></ProjectConfiguration>
+  <ProjectConfiguration Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RakNet\Lib\DLL\DLL_vc12.vcxproj" BuildProjectInSolution="True">DebugUE4|x64</ProjectConfiguration>
+  <ProjectConfiguration Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\cpprestsdk\Release\src\build\vs14\casablanca140.vcxproj" BuildProjectInSolution="True">DebugUE4|x64</ProjectConfiguration>
+  <ProjectConfiguration Project="{6227F51A-1498-4C4A-B213-F6FDED605125}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\libupnp\build\vc14\libupnp.vcxproj" BuildProjectInSolution="True">DebugUE4|x64</ProjectConfiguration>
+  <ProjectConfiguration Project="{A91C2062-B9F2-4F9D-A04F-8710F81D8D24}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\Plugins\Plugins-140.vcxproj" BuildProjectInSolution="True">Debug|x64<ProjectDependency Project="{D8CF547F-8B5B-4651-A48F-D6E56EE0B8C1}" /></ProjectConfiguration>
+  <ProjectConfiguration Project="{43D8B92C-4987-445B-84C7-C5224A98FFD6}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RaknetAndroid\RaknetAndroid.vcxproj" BuildProjectInSolution="True">Release|ARM64</ProjectConfiguration>
+  <ProjectConfiguration Project="{73703B65-9D12-4836-8C66-3FB48D3A721E}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RaknetDll\RaknetDll-vc140.vcxproj" BuildProjectInSolution="True">Debug|x64</ProjectConfiguration>
+  <ProjectConfiguration Project="{DA8EAA28-D2DF-46E8-937E-E061E31EC539}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\SmokeTest\SmokeTest-vc140.vcxproj" BuildProjectInSolution="True">Debug|x64</ProjectConfiguration>
+  <ProjectConfiguration Project="{CD827855-C824-4CBF-B736-B7FDA2ACD036}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\RakNetIpv6\RakNetIpv6-vc140.vcxproj" BuildProjectInSolution="True">Debug|x64<ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /><ProjectDependency Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" /></ProjectConfiguration>
+</SolutionConfiguration>
+      </Content>
+    </SolutionConfiguration>
+    <SolutionConfiguration Include="DebugUE4|x86">
+      <Configuration>DebugUE4</Configuration>
+      <Platform>x86</Platform>
+      <Content>
+        <SolutionConfiguration xmlns="">
+  <ProjectConfiguration Project="{D8CF547F-8B5B-4651-A48F-D6E56EE0B8C1}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\stormancer-sdk-cpp-140.vcxproj" BuildProjectInSolution="True">DebugUE4|Win32<ProjectDependency Project="{6227F51A-1498-4C4A-B213-F6FDED605125}" /><ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /><ProjectDependency Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" /></ProjectConfiguration>
+  <ProjectConfiguration Project="{DFB15956-69E5-4D05-89C2-E7390F884D50}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\Tester\Tester.vcxproj" BuildProjectInSolution="True">DebugUE4|Win32<ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /><ProjectDependency Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" /><ProjectDependency Project="{D8CF547F-8B5B-4651-A48F-D6E56EE0B8C1}" /></ProjectConfiguration>
+  <ProjectConfiguration Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RakNet\Lib\DLL\DLL_vc12.vcxproj" BuildProjectInSolution="True">DebugUE4|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\cpprestsdk\Release\src\build\vs14\casablanca140.vcxproj" BuildProjectInSolution="True">DebugUE4|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{6227F51A-1498-4C4A-B213-F6FDED605125}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\libupnp\build\vc14\libupnp.vcxproj" BuildProjectInSolution="True">DebugUE4|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{A91C2062-B9F2-4F9D-A04F-8710F81D8D24}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\Plugins\Plugins-140.vcxproj" BuildProjectInSolution="True">Debug|Win32<ProjectDependency Project="{D8CF547F-8B5B-4651-A48F-D6E56EE0B8C1}" /></ProjectConfiguration>
+  <ProjectConfiguration Project="{43D8B92C-4987-445B-84C7-C5224A98FFD6}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RaknetAndroid\RaknetAndroid.vcxproj" BuildProjectInSolution="True">Release|ARM64</ProjectConfiguration>
+  <ProjectConfiguration Project="{73703B65-9D12-4836-8C66-3FB48D3A721E}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RaknetDll\RaknetDll-vc140.vcxproj" BuildProjectInSolution="True">Debug|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{DA8EAA28-D2DF-46E8-937E-E061E31EC539}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\SmokeTest\SmokeTest-vc140.vcxproj" BuildProjectInSolution="True">Debug|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{CD827855-C824-4CBF-B736-B7FDA2ACD036}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\RakNetIpv6\RakNetIpv6-vc140.vcxproj" BuildProjectInSolution="True">Debug|Win32<ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /><ProjectDependency Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" /></ProjectConfiguration>
+</SolutionConfiguration>
+      </Content>
+    </SolutionConfiguration>
+    <SolutionConfiguration Include="Debug|ARM">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM</Platform>
+      <Content>
+        <SolutionConfiguration xmlns="">
+  <ProjectConfiguration Project="{D8CF547F-8B5B-4651-A48F-D6E56EE0B8C1}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\stormancer-sdk-cpp-140.vcxproj" BuildProjectInSolution="False">Debug|Win32<ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /></ProjectConfiguration>
+  <ProjectConfiguration Project="{DFB15956-69E5-4D05-89C2-E7390F884D50}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\Tester\Tester.vcxproj" BuildProjectInSolution="False">Debug|Win32<ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /></ProjectConfiguration>
+  <ProjectConfiguration Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RakNet\Lib\DLL\DLL_vc12.vcxproj" BuildProjectInSolution="False">Debug|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\cpprestsdk\Release\src\build\vs14\casablanca140.vcxproj" BuildProjectInSolution="True">Debug|ARM</ProjectConfiguration>
+  <ProjectConfiguration Project="{6227F51A-1498-4C4A-B213-F6FDED605125}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\libupnp\build\vc14\libupnp.vcxproj" BuildProjectInSolution="False">Debug|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{A91C2062-B9F2-4F9D-A04F-8710F81D8D24}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\Plugins\Plugins-140.vcxproj" BuildProjectInSolution="False">Debug|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{43D8B92C-4987-445B-84C7-C5224A98FFD6}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RaknetAndroid\RaknetAndroid.vcxproj" BuildProjectInSolution="True">Debug|ARM</ProjectConfiguration>
+  <ProjectConfiguration Project="{73703B65-9D12-4836-8C66-3FB48D3A721E}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RaknetDll\RaknetDll-vc140.vcxproj" BuildProjectInSolution="False">Debug|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{DA8EAA28-D2DF-46E8-937E-E061E31EC539}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\SmokeTest\SmokeTest-vc140.vcxproj" BuildProjectInSolution="False">Debug|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{CD827855-C824-4CBF-B736-B7FDA2ACD036}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\RakNetIpv6\RakNetIpv6-vc140.vcxproj" BuildProjectInSolution="False">Debug|Win32<ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /></ProjectConfiguration>
+</SolutionConfiguration>
+      </Content>
+    </SolutionConfiguration>
+    <SolutionConfiguration Include="Debug|ARM64">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64</Platform>
+      <Content>
+        <SolutionConfiguration xmlns="">
+  <ProjectConfiguration Project="{D8CF547F-8B5B-4651-A48F-D6E56EE0B8C1}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\stormancer-sdk-cpp-140.vcxproj" BuildProjectInSolution="False">Debug|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{DFB15956-69E5-4D05-89C2-E7390F884D50}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\Tester\Tester.vcxproj" BuildProjectInSolution="False">Debug|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RakNet\Lib\DLL\DLL_vc12.vcxproj" BuildProjectInSolution="False">Debug|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\cpprestsdk\Release\src\build\vs14\casablanca140.vcxproj" BuildProjectInSolution="False">Debug|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{6227F51A-1498-4C4A-B213-F6FDED605125}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\libupnp\build\vc14\libupnp.vcxproj" BuildProjectInSolution="False">Debug|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{A91C2062-B9F2-4F9D-A04F-8710F81D8D24}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\Plugins\Plugins-140.vcxproj" BuildProjectInSolution="False">Debug|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{43D8B92C-4987-445B-84C7-C5224A98FFD6}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RaknetAndroid\RaknetAndroid.vcxproj" BuildProjectInSolution="True">Debug|ARM64</ProjectConfiguration>
+  <ProjectConfiguration Project="{73703B65-9D12-4836-8C66-3FB48D3A721E}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RaknetDll\RaknetDll-vc140.vcxproj" BuildProjectInSolution="False">Debug|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{DA8EAA28-D2DF-46E8-937E-E061E31EC539}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\SmokeTest\SmokeTest-vc140.vcxproj" BuildProjectInSolution="False">Debug|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{CD827855-C824-4CBF-B736-B7FDA2ACD036}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\RakNetIpv6\RakNetIpv6-vc140.vcxproj" BuildProjectInSolution="False">Debug|Win32</ProjectConfiguration>
+</SolutionConfiguration>
+      </Content>
+    </SolutionConfiguration>
+    <SolutionConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+      <Content>
+        <SolutionConfiguration xmlns="">
+  <ProjectConfiguration Project="{D8CF547F-8B5B-4651-A48F-D6E56EE0B8C1}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\stormancer-sdk-cpp-140.vcxproj" BuildProjectInSolution="True">Debug|x64<ProjectDependency Project="{6227F51A-1498-4C4A-B213-F6FDED605125}" /><ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /><ProjectDependency Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" /></ProjectConfiguration>
+  <ProjectConfiguration Project="{DFB15956-69E5-4D05-89C2-E7390F884D50}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\Tester\Tester.vcxproj" BuildProjectInSolution="True">Debug|x64<ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /><ProjectDependency Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" /><ProjectDependency Project="{D8CF547F-8B5B-4651-A48F-D6E56EE0B8C1}" /></ProjectConfiguration>
+  <ProjectConfiguration Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RakNet\Lib\DLL\DLL_vc12.vcxproj" BuildProjectInSolution="True">Debug|x64</ProjectConfiguration>
+  <ProjectConfiguration Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\cpprestsdk\Release\src\build\vs14\casablanca140.vcxproj" BuildProjectInSolution="True">Debug|x64</ProjectConfiguration>
+  <ProjectConfiguration Project="{6227F51A-1498-4C4A-B213-F6FDED605125}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\libupnp\build\vc14\libupnp.vcxproj" BuildProjectInSolution="True">Debug|x64</ProjectConfiguration>
+  <ProjectConfiguration Project="{A91C2062-B9F2-4F9D-A04F-8710F81D8D24}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\Plugins\Plugins-140.vcxproj" BuildProjectInSolution="True">Debug|x64<ProjectDependency Project="{D8CF547F-8B5B-4651-A48F-D6E56EE0B8C1}" /></ProjectConfiguration>
+  <ProjectConfiguration Project="{43D8B92C-4987-445B-84C7-C5224A98FFD6}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RaknetAndroid\RaknetAndroid.vcxproj" BuildProjectInSolution="False">Debug|ARM</ProjectConfiguration>
+  <ProjectConfiguration Project="{73703B65-9D12-4836-8C66-3FB48D3A721E}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RaknetDll\RaknetDll-vc140.vcxproj" BuildProjectInSolution="True">Debug|x64</ProjectConfiguration>
+  <ProjectConfiguration Project="{DA8EAA28-D2DF-46E8-937E-E061E31EC539}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\SmokeTest\SmokeTest-vc140.vcxproj" BuildProjectInSolution="True">Debug|x64</ProjectConfiguration>
+  <ProjectConfiguration Project="{CD827855-C824-4CBF-B736-B7FDA2ACD036}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\RakNetIpv6\RakNetIpv6-vc140.vcxproj" BuildProjectInSolution="True">Debug|x64<ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /><ProjectDependency Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" /></ProjectConfiguration>
+</SolutionConfiguration>
+      </Content>
+    </SolutionConfiguration>
+    <SolutionConfiguration Include="Debug|x86">
+      <Configuration>Debug</Configuration>
+      <Platform>x86</Platform>
+      <Content>
+        <SolutionConfiguration xmlns="">
+  <ProjectConfiguration Project="{D8CF547F-8B5B-4651-A48F-D6E56EE0B8C1}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\stormancer-sdk-cpp-140.vcxproj" BuildProjectInSolution="True">Debug|Win32<ProjectDependency Project="{6227F51A-1498-4C4A-B213-F6FDED605125}" /><ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /><ProjectDependency Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" /></ProjectConfiguration>
+  <ProjectConfiguration Project="{DFB15956-69E5-4D05-89C2-E7390F884D50}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\Tester\Tester.vcxproj" BuildProjectInSolution="True">Debug|Win32<ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /><ProjectDependency Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" /><ProjectDependency Project="{D8CF547F-8B5B-4651-A48F-D6E56EE0B8C1}" /></ProjectConfiguration>
+  <ProjectConfiguration Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RakNet\Lib\DLL\DLL_vc12.vcxproj" BuildProjectInSolution="True">Debug|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\cpprestsdk\Release\src\build\vs14\casablanca140.vcxproj" BuildProjectInSolution="True">Debug|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{6227F51A-1498-4C4A-B213-F6FDED605125}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\libupnp\build\vc14\libupnp.vcxproj" BuildProjectInSolution="True">Debug|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{A91C2062-B9F2-4F9D-A04F-8710F81D8D24}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\Plugins\Plugins-140.vcxproj" BuildProjectInSolution="True">Debug|Win32<ProjectDependency Project="{D8CF547F-8B5B-4651-A48F-D6E56EE0B8C1}" /></ProjectConfiguration>
+  <ProjectConfiguration Project="{43D8B92C-4987-445B-84C7-C5224A98FFD6}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RaknetAndroid\RaknetAndroid.vcxproj" BuildProjectInSolution="False">Debug|ARM</ProjectConfiguration>
+  <ProjectConfiguration Project="{73703B65-9D12-4836-8C66-3FB48D3A721E}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RaknetDll\RaknetDll-vc140.vcxproj" BuildProjectInSolution="True">Debug|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{DA8EAA28-D2DF-46E8-937E-E061E31EC539}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\SmokeTest\SmokeTest-vc140.vcxproj" BuildProjectInSolution="True">Debug|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{CD827855-C824-4CBF-B736-B7FDA2ACD036}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\RakNetIpv6\RakNetIpv6-vc140.vcxproj" BuildProjectInSolution="True">Debug|Win32<ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /><ProjectDependency Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" /></ProjectConfiguration>
+</SolutionConfiguration>
+      </Content>
+    </SolutionConfiguration>
+    <SolutionConfiguration Include="Release|ARM">
+      <Configuration>Release</Configuration>
+      <Platform>ARM</Platform>
+      <Content>
+        <SolutionConfiguration xmlns="">
+  <ProjectConfiguration Project="{D8CF547F-8B5B-4651-A48F-D6E56EE0B8C1}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\stormancer-sdk-cpp-140.vcxproj" BuildProjectInSolution="False">Release|Win32<ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /></ProjectConfiguration>
+  <ProjectConfiguration Project="{DFB15956-69E5-4D05-89C2-E7390F884D50}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\Tester\Tester.vcxproj" BuildProjectInSolution="False">Release|Win32<ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /></ProjectConfiguration>
+  <ProjectConfiguration Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RakNet\Lib\DLL\DLL_vc12.vcxproj" BuildProjectInSolution="False">Release|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\cpprestsdk\Release\src\build\vs14\casablanca140.vcxproj" BuildProjectInSolution="True">Release|ARM</ProjectConfiguration>
+  <ProjectConfiguration Project="{6227F51A-1498-4C4A-B213-F6FDED605125}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\libupnp\build\vc14\libupnp.vcxproj" BuildProjectInSolution="False">Release|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{A91C2062-B9F2-4F9D-A04F-8710F81D8D24}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\Plugins\Plugins-140.vcxproj" BuildProjectInSolution="False">Release|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{43D8B92C-4987-445B-84C7-C5224A98FFD6}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RaknetAndroid\RaknetAndroid.vcxproj" BuildProjectInSolution="True">Release|ARM</ProjectConfiguration>
+  <ProjectConfiguration Project="{73703B65-9D12-4836-8C66-3FB48D3A721E}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RaknetDll\RaknetDll-vc140.vcxproj" BuildProjectInSolution="False">Release|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{DA8EAA28-D2DF-46E8-937E-E061E31EC539}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\SmokeTest\SmokeTest-vc140.vcxproj" BuildProjectInSolution="False">Release|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{CD827855-C824-4CBF-B736-B7FDA2ACD036}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\RakNetIpv6\RakNetIpv6-vc140.vcxproj" BuildProjectInSolution="False">Release|Win32<ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /></ProjectConfiguration>
+</SolutionConfiguration>
+      </Content>
+    </SolutionConfiguration>
+    <SolutionConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
+      <Content>
+        <SolutionConfiguration xmlns="">
+  <ProjectConfiguration Project="{D8CF547F-8B5B-4651-A48F-D6E56EE0B8C1}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\stormancer-sdk-cpp-140.vcxproj" BuildProjectInSolution="False">Release|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{DFB15956-69E5-4D05-89C2-E7390F884D50}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\Tester\Tester.vcxproj" BuildProjectInSolution="False">Release|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RakNet\Lib\DLL\DLL_vc12.vcxproj" BuildProjectInSolution="False">Release|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\cpprestsdk\Release\src\build\vs14\casablanca140.vcxproj" BuildProjectInSolution="False">Release|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{6227F51A-1498-4C4A-B213-F6FDED605125}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\libupnp\build\vc14\libupnp.vcxproj" BuildProjectInSolution="False">Release|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{A91C2062-B9F2-4F9D-A04F-8710F81D8D24}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\Plugins\Plugins-140.vcxproj" BuildProjectInSolution="False">Release|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{43D8B92C-4987-445B-84C7-C5224A98FFD6}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RaknetAndroid\RaknetAndroid.vcxproj" BuildProjectInSolution="True">Release|ARM64</ProjectConfiguration>
+  <ProjectConfiguration Project="{73703B65-9D12-4836-8C66-3FB48D3A721E}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RaknetDll\RaknetDll-vc140.vcxproj" BuildProjectInSolution="False">Release|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{DA8EAA28-D2DF-46E8-937E-E061E31EC539}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\SmokeTest\SmokeTest-vc140.vcxproj" BuildProjectInSolution="False">Release|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{CD827855-C824-4CBF-B736-B7FDA2ACD036}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\RakNetIpv6\RakNetIpv6-vc140.vcxproj" BuildProjectInSolution="False">Release|Win32</ProjectConfiguration>
+</SolutionConfiguration>
+      </Content>
+    </SolutionConfiguration>
+    <SolutionConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+      <Content>
+        <SolutionConfiguration xmlns="">
+  <ProjectConfiguration Project="{D8CF547F-8B5B-4651-A48F-D6E56EE0B8C1}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\stormancer-sdk-cpp-140.vcxproj" BuildProjectInSolution="True">Release|x64<ProjectDependency Project="{6227F51A-1498-4C4A-B213-F6FDED605125}" /><ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /><ProjectDependency Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" /></ProjectConfiguration>
+  <ProjectConfiguration Project="{DFB15956-69E5-4D05-89C2-E7390F884D50}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\Tester\Tester.vcxproj" BuildProjectInSolution="True">Release|x64<ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /><ProjectDependency Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" /><ProjectDependency Project="{D8CF547F-8B5B-4651-A48F-D6E56EE0B8C1}" /></ProjectConfiguration>
+  <ProjectConfiguration Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RakNet\Lib\DLL\DLL_vc12.vcxproj" BuildProjectInSolution="True">Release|x64</ProjectConfiguration>
+  <ProjectConfiguration Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\cpprestsdk\Release\src\build\vs14\casablanca140.vcxproj" BuildProjectInSolution="True">Release|x64</ProjectConfiguration>
+  <ProjectConfiguration Project="{6227F51A-1498-4C4A-B213-F6FDED605125}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\libupnp\build\vc14\libupnp.vcxproj" BuildProjectInSolution="True">Release|x64</ProjectConfiguration>
+  <ProjectConfiguration Project="{A91C2062-B9F2-4F9D-A04F-8710F81D8D24}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\Plugins\Plugins-140.vcxproj" BuildProjectInSolution="True">Release|x64<ProjectDependency Project="{D8CF547F-8B5B-4651-A48F-D6E56EE0B8C1}" /></ProjectConfiguration>
+  <ProjectConfiguration Project="{43D8B92C-4987-445B-84C7-C5224A98FFD6}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RaknetAndroid\RaknetAndroid.vcxproj" BuildProjectInSolution="False">Release|ARM</ProjectConfiguration>
+  <ProjectConfiguration Project="{73703B65-9D12-4836-8C66-3FB48D3A721E}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RaknetDll\RaknetDll-vc140.vcxproj" BuildProjectInSolution="True">Release|x64</ProjectConfiguration>
+  <ProjectConfiguration Project="{DA8EAA28-D2DF-46E8-937E-E061E31EC539}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\SmokeTest\SmokeTest-vc140.vcxproj" BuildProjectInSolution="True">Release|x64</ProjectConfiguration>
+  <ProjectConfiguration Project="{CD827855-C824-4CBF-B736-B7FDA2ACD036}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\RakNetIpv6\RakNetIpv6-vc140.vcxproj" BuildProjectInSolution="True">Release|x64<ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /><ProjectDependency Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" /></ProjectConfiguration>
+</SolutionConfiguration>
+      </Content>
+    </SolutionConfiguration>
+    <SolutionConfiguration Include="Release|x86">
+      <Configuration>Release</Configuration>
+      <Platform>x86</Platform>
+      <Content>
+        <SolutionConfiguration xmlns="">
+  <ProjectConfiguration Project="{D8CF547F-8B5B-4651-A48F-D6E56EE0B8C1}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\stormancer-sdk-cpp-140.vcxproj" BuildProjectInSolution="True">Release|Win32<ProjectDependency Project="{6227F51A-1498-4C4A-B213-F6FDED605125}" /><ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /><ProjectDependency Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" /></ProjectConfiguration>
+  <ProjectConfiguration Project="{DFB15956-69E5-4D05-89C2-E7390F884D50}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\Tester\Tester.vcxproj" BuildProjectInSolution="True">Release|Win32<ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /><ProjectDependency Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" /><ProjectDependency Project="{D8CF547F-8B5B-4651-A48F-D6E56EE0B8C1}" /></ProjectConfiguration>
+  <ProjectConfiguration Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RakNet\Lib\DLL\DLL_vc12.vcxproj" BuildProjectInSolution="True">Release|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\cpprestsdk\Release\src\build\vs14\casablanca140.vcxproj" BuildProjectInSolution="True">Release|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{6227F51A-1498-4C4A-B213-F6FDED605125}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\libupnp\build\vc14\libupnp.vcxproj" BuildProjectInSolution="True">Release|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{A91C2062-B9F2-4F9D-A04F-8710F81D8D24}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\Plugins\Plugins-140.vcxproj" BuildProjectInSolution="True">Release|Win32<ProjectDependency Project="{D8CF547F-8B5B-4651-A48F-D6E56EE0B8C1}" /></ProjectConfiguration>
+  <ProjectConfiguration Project="{43D8B92C-4987-445B-84C7-C5224A98FFD6}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RaknetAndroid\RaknetAndroid.vcxproj" BuildProjectInSolution="False">Release|ARM</ProjectConfiguration>
+  <ProjectConfiguration Project="{73703B65-9D12-4836-8C66-3FB48D3A721E}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RaknetDll\RaknetDll-vc140.vcxproj" BuildProjectInSolution="True">Release|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{DA8EAA28-D2DF-46E8-937E-E061E31EC539}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\SmokeTest\SmokeTest-vc140.vcxproj" BuildProjectInSolution="True">Release|Win32</ProjectConfiguration>
+  <ProjectConfiguration Project="{CD827855-C824-4CBF-B736-B7FDA2ACD036}" AbsolutePath="C:\TeamCity\buildAgent\work\3f4f59100bc37114\Samples\RakNetIpv6\RakNetIpv6-vc140.vcxproj" BuildProjectInSolution="False">Release|Win32<ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /><ProjectDependency Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" /></ProjectConfiguration>
+</SolutionConfiguration>
+      </Content>
+    </SolutionConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:\TeamCity\buildAgent\work\3f4f59100bc37114\cpprestsdk\Release\src\build\vs14\casablanca140.vcxproj">
+      <ToolsVersion>
+      </ToolsVersion>
+      <SkipNonexistentProjects>False</SkipNonexistentProjects>
+      <AdditionalProperties>Configuration=Release; Platform=ARM</AdditionalProperties>
+      <Configuration>Release</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectReference>
+    <ProjectReference Include="C:\TeamCity\buildAgent\work\3f4f59100bc37114\RaknetAndroid\RaknetAndroid.vcxproj">
+      <ToolsVersion>
+      </ToolsVersion>
+      <SkipNonexistentProjects>False</SkipNonexistentProjects>
+      <AdditionalProperties>Configuration=Release; Platform=ARM</AdditionalProperties>
+      <Configuration>Release</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectReference>
+  </ItemGroup>
+  <Target Name="ValidateSolutionConfiguration">
+    <Error Condition="('$(CurrentSolutionConfigurationContents)' == '') and ('$(SkipInvalidConfigurations)' != 'true')" Text="The specified solution configuration &quot;$(Configuration)|$(Platform)&quot; is invalid. Please specify a valid solution configuration using the Configuration and Platform properties (e.g. MSBuild.exe Solution.sln /p:Configuration=Debug /p:Platform=&quot;Any CPU&quot;) or leave those properties blank to use the default solution configuration." Code="MSB4126" HelpKeyword="MSBuild.SolutionInvalidSolutionConfiguration" />
+    <Warning Condition="('$(CurrentSolutionConfigurationContents)' == '') and ('$(SkipInvalidConfigurations)' == 'true')" Text="The specified solution configuration &quot;$(Configuration)|$(Platform)&quot; is invalid. Please specify a valid solution configuration using the Configuration and Platform properties (e.g. MSBuild.exe Solution.sln /p:Configuration=Debug /p:Platform=&quot;Any CPU&quot;) or leave those properties blank to use the default solution configuration." Code="MSB4126" HelpKeyword="MSBuild.SolutionInvalidSolutionConfiguration" />
+    <Message Condition="'$(CurrentSolutionConfigurationContents)' != ''" Text="Building solution configuration &quot;$(Configuration)|$(Platform)&quot;." />
+  </Target>
+  <Target Name="ValidateToolsVersions">
+    <Error Condition="'$(MSBuildToolsVersion)' == '2.0' and ('$(ProjectToolsVersion)' != '2.0' and '$(ProjectToolsVersion)' != '')" Text="The tools version &quot;$(MSBuildToolsVersion)&quot; of the solution does not support building projects with a different tools version." Code="MSB4149" HelpKeyword="MSBuild.SolutionToolsVersionDoesNotSupportProjectToolsVersion" />
+  </Target>
+  <Target Name="ValidateProjects">
+    <Message Condition=" ('$(Configuration)' == 'Debug') and ('$(Platform)' == 'ARM') " Text="The project &quot;stormancer-sdk-cpp-lib&quot; is not selected for building in solution configuration &quot;Debug|ARM&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Debug') and ('$(Platform)' == 'ARM64') " Text="The project &quot;stormancer-sdk-cpp-lib&quot; is not selected for building in solution configuration &quot;Debug|ARM64&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'DebugUE4') and ('$(Platform)' == 'ARM') " Text="The project &quot;stormancer-sdk-cpp-lib&quot; is not selected for building in solution configuration &quot;DebugUE4|ARM&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'DebugUE4') and ('$(Platform)' == 'ARM64') " Text="The project &quot;stormancer-sdk-cpp-lib&quot; is not selected for building in solution configuration &quot;DebugUE4|ARM64&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'ARM') " Text="The project &quot;stormancer-sdk-cpp-lib&quot; is not selected for building in solution configuration &quot;Release|ARM&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'ARM64') " Text="The project &quot;stormancer-sdk-cpp-lib&quot; is not selected for building in solution configuration &quot;Release|ARM64&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Debug') and ('$(Platform)' == 'ARM') " Text="The project &quot;Tester&quot; is not selected for building in solution configuration &quot;Debug|ARM&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Debug') and ('$(Platform)' == 'ARM64') " Text="The project &quot;Tester&quot; is not selected for building in solution configuration &quot;Debug|ARM64&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'DebugUE4') and ('$(Platform)' == 'ARM') " Text="The project &quot;Tester&quot; is not selected for building in solution configuration &quot;DebugUE4|ARM&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'DebugUE4') and ('$(Platform)' == 'ARM64') " Text="The project &quot;Tester&quot; is not selected for building in solution configuration &quot;DebugUE4|ARM64&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'ARM') " Text="The project &quot;Tester&quot; is not selected for building in solution configuration &quot;Release|ARM&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'ARM64') " Text="The project &quot;Tester&quot; is not selected for building in solution configuration &quot;Release|ARM64&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Debug') and ('$(Platform)' == 'ARM') " Text="The project &quot;RakNet&quot; is not selected for building in solution configuration &quot;Debug|ARM&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Debug') and ('$(Platform)' == 'ARM64') " Text="The project &quot;RakNet&quot; is not selected for building in solution configuration &quot;Debug|ARM64&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'DebugUE4') and ('$(Platform)' == 'ARM') " Text="The project &quot;RakNet&quot; is not selected for building in solution configuration &quot;DebugUE4|ARM&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'DebugUE4') and ('$(Platform)' == 'ARM64') " Text="The project &quot;RakNet&quot; is not selected for building in solution configuration &quot;DebugUE4|ARM64&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'ARM') " Text="The project &quot;RakNet&quot; is not selected for building in solution configuration &quot;Release|ARM&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'ARM64') " Text="The project &quot;RakNet&quot; is not selected for building in solution configuration &quot;Release|ARM64&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Debug') and ('$(Platform)' == 'ARM64') " Text="The project &quot;cpprestsdk&quot; is not selected for building in solution configuration &quot;Debug|ARM64&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'DebugUE4') and ('$(Platform)' == 'ARM64') " Text="The project &quot;cpprestsdk&quot; is not selected for building in solution configuration &quot;DebugUE4|ARM64&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'ARM64') " Text="The project &quot;cpprestsdk&quot; is not selected for building in solution configuration &quot;Release|ARM64&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Debug') and ('$(Platform)' == 'ARM') " Text="The project &quot;libupnp&quot; is not selected for building in solution configuration &quot;Debug|ARM&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Debug') and ('$(Platform)' == 'ARM64') " Text="The project &quot;libupnp&quot; is not selected for building in solution configuration &quot;Debug|ARM64&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'DebugUE4') and ('$(Platform)' == 'ARM') " Text="The project &quot;libupnp&quot; is not selected for building in solution configuration &quot;DebugUE4|ARM&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'DebugUE4') and ('$(Platform)' == 'ARM64') " Text="The project &quot;libupnp&quot; is not selected for building in solution configuration &quot;DebugUE4|ARM64&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'ARM') " Text="The project &quot;libupnp&quot; is not selected for building in solution configuration &quot;Release|ARM&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'ARM64') " Text="The project &quot;libupnp&quot; is not selected for building in solution configuration &quot;Release|ARM64&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Debug') and ('$(Platform)' == 'ARM') " Text="The project &quot;Plugins&quot; is not selected for building in solution configuration &quot;Debug|ARM&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Debug') and ('$(Platform)' == 'ARM64') " Text="The project &quot;Plugins&quot; is not selected for building in solution configuration &quot;Debug|ARM64&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'ARM') " Text="The project &quot;Plugins&quot; is not selected for building in solution configuration &quot;Release|ARM&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'ARM64') " Text="The project &quot;Plugins&quot; is not selected for building in solution configuration &quot;Release|ARM64&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Debug') and ('$(Platform)' == 'x64') " Text="The project &quot;RaknetAndroid&quot; is not selected for building in solution configuration &quot;Debug|x64&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Debug') and ('$(Platform)' == 'x86') " Text="The project &quot;RaknetAndroid&quot; is not selected for building in solution configuration &quot;Debug|x86&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'x64') " Text="The project &quot;RaknetAndroid&quot; is not selected for building in solution configuration &quot;Release|x64&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'x86') " Text="The project &quot;RaknetAndroid&quot; is not selected for building in solution configuration &quot;Release|x86&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Debug') and ('$(Platform)' == 'ARM') " Text="The project &quot;RaknetDll&quot; is not selected for building in solution configuration &quot;Debug|ARM&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Debug') and ('$(Platform)' == 'ARM64') " Text="The project &quot;RaknetDll&quot; is not selected for building in solution configuration &quot;Debug|ARM64&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'DebugUE4') and ('$(Platform)' == 'ARM') " Text="The project &quot;RaknetDll&quot; is not selected for building in solution configuration &quot;DebugUE4|ARM&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'DebugUE4') and ('$(Platform)' == 'ARM64') " Text="The project &quot;RaknetDll&quot; is not selected for building in solution configuration &quot;DebugUE4|ARM64&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'ARM') " Text="The project &quot;RaknetDll&quot; is not selected for building in solution configuration &quot;Release|ARM&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'ARM64') " Text="The project &quot;RaknetDll&quot; is not selected for building in solution configuration &quot;Release|ARM64&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Debug') and ('$(Platform)' == 'ARM') " Text="The project &quot;SmokeTest-vc140&quot; is not selected for building in solution configuration &quot;Debug|ARM&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Debug') and ('$(Platform)' == 'ARM64') " Text="The project &quot;SmokeTest-vc140&quot; is not selected for building in solution configuration &quot;Debug|ARM64&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'ARM') " Text="The project &quot;SmokeTest-vc140&quot; is not selected for building in solution configuration &quot;Release|ARM&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'ARM64') " Text="The project &quot;SmokeTest-vc140&quot; is not selected for building in solution configuration &quot;Release|ARM64&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Debug') and ('$(Platform)' == 'ARM') " Text="The project &quot;RakNetIpv6-vc140&quot; is not selected for building in solution configuration &quot;Debug|ARM&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Debug') and ('$(Platform)' == 'ARM64') " Text="The project &quot;RakNetIpv6-vc140&quot; is not selected for building in solution configuration &quot;Debug|ARM64&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'ARM') " Text="The project &quot;RakNetIpv6-vc140&quot; is not selected for building in solution configuration &quot;Release|ARM&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'ARM64') " Text="The project &quot;RakNetIpv6-vc140&quot; is not selected for building in solution configuration &quot;Release|ARM64&quot;." />
+    <Message Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'x86') " Text="The project &quot;RakNetIpv6-vc140&quot; is not selected for building in solution configuration &quot;Release|x86&quot;." />
+  </Target>
+  <Target Name="GetSolutionConfigurationContents" Outputs="$(SolutionConfigurationContents)" />
+  <Target Name="Build" Outputs="@(CollectedBuildOutput)">
+    <MSBuild Projects="@(ProjectReference)" BuildInParallel="True" Properties="BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" SkipNonexistentProjects="%(ProjectReference.SkipNonexistentProjects)">
+      <Output TaskParameter="TargetOutputs" ItemName="CollectedBuildOutput" />
+    </MSBuild>
+  </Target>
+  <Target Name="Clean">
+    <MSBuild Projects="@(ProjectReference-&gt;Reverse())" Targets="Clean" BuildInParallel="True" Properties="BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" SkipNonexistentProjects="%(ProjectReference.SkipNonexistentProjects)" />
+  </Target>
+  <Target Name="Rebuild" Outputs="@(CollectedBuildOutput)">
+    <MSBuild Projects="@(ProjectReference)" Targets="Rebuild" BuildInParallel="True" Properties="BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" SkipNonexistentProjects="%(ProjectReference.SkipNonexistentProjects)">
+      <Output TaskParameter="TargetOutputs" ItemName="CollectedBuildOutput" />
+    </MSBuild>
+  </Target>
+  <Target Name="Publish">
+    <MSBuild Projects="@(ProjectReference)" Targets="Publish" BuildInParallel="True" Properties="BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" SkipNonexistentProjects="%(ProjectReference.SkipNonexistentProjects)" />
+  </Target>
+  <Target Name="libs\cpprestsdk\cpprestsdk" Outputs="@(libs_cpprestsdk_cpprestsdkBuildOutput)">
+    <MSBuild Condition="'%(ProjectReference.Identity)' == 'C:\TeamCity\buildAgent\work\3f4f59100bc37114\cpprestsdk\Release\src\build\vs14\casablanca140.vcxproj'" Projects="@(ProjectReference)" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=ARM;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
+      <Output TaskParameter="TargetOutputs" ItemName="libs_cpprestsdk_cpprestsdkBuildOutput" />
+    </MSBuild>
+  </Target>
+  <Target Name="libs\cpprestsdk\cpprestsdk:Clean">
+    <MSBuild Condition="'%(ProjectReference.Identity)' == 'C:\TeamCity\buildAgent\work\3f4f59100bc37114\cpprestsdk\Release\src\build\vs14\casablanca140.vcxproj'" Projects="@(ProjectReference)" Targets="Clean" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=ARM;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
+  </Target>
+  <Target Name="libs\cpprestsdk\cpprestsdk:Rebuild" Outputs="@(libs_cpprestsdk_cpprestsdkBuildOutput)">
+    <MSBuild Condition="'%(ProjectReference.Identity)' == 'C:\TeamCity\buildAgent\work\3f4f59100bc37114\cpprestsdk\Release\src\build\vs14\casablanca140.vcxproj'" Projects="@(ProjectReference)" Targets="Rebuild" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=ARM;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
+      <Output TaskParameter="TargetOutputs" ItemName="libs_cpprestsdk_cpprestsdkBuildOutput" />
+    </MSBuild>
+  </Target>
+  <Target Name="libs\cpprestsdk\cpprestsdk:Publish">
+    <MSBuild Condition="'%(ProjectReference.Identity)' == 'C:\TeamCity\buildAgent\work\3f4f59100bc37114\cpprestsdk\Release\src\build\vs14\casablanca140.vcxproj'" Projects="@(ProjectReference)" Targets="Publish" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=ARM;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
+  </Target>
+  <Target Name="RaknetAndroid" Outputs="@(RaknetAndroidBuildOutput)">
+    <MSBuild Condition="'%(ProjectReference.Identity)' == 'C:\TeamCity\buildAgent\work\3f4f59100bc37114\RaknetAndroid\RaknetAndroid.vcxproj'" Projects="@(ProjectReference)" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=ARM;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
+      <Output TaskParameter="TargetOutputs" ItemName="RaknetAndroidBuildOutput" />
+    </MSBuild>
+  </Target>
+  <Target Name="RaknetAndroid:Clean">
+    <MSBuild Condition="'%(ProjectReference.Identity)' == 'C:\TeamCity\buildAgent\work\3f4f59100bc37114\RaknetAndroid\RaknetAndroid.vcxproj'" Projects="@(ProjectReference)" Targets="Clean" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=ARM;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
+  </Target>
+  <Target Name="RaknetAndroid:Rebuild" Outputs="@(RaknetAndroidBuildOutput)">
+    <MSBuild Condition="'%(ProjectReference.Identity)' == 'C:\TeamCity\buildAgent\work\3f4f59100bc37114\RaknetAndroid\RaknetAndroid.vcxproj'" Projects="@(ProjectReference)" Targets="Rebuild" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=ARM;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
+      <Output TaskParameter="TargetOutputs" ItemName="RaknetAndroidBuildOutput" />
+    </MSBuild>
+  </Target>
+  <Target Name="RaknetAndroid:Publish">
+    <MSBuild Condition="'%(ProjectReference.Identity)' == 'C:\TeamCity\buildAgent\work\3f4f59100bc37114\RaknetAndroid\RaknetAndroid.vcxproj'" Projects="@(ProjectReference)" Targets="Publish" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=ARM;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
+  </Target>
+</Project>

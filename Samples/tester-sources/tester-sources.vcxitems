@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{9781E681-CF17-48EA-BF81-6895F30E10FC}</ItemsProjectGuid>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)test.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)testP2P.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)TestRunner.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)test.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)TestCase.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)testP2P.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)TestPlayerDataPlugin.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)TestRunner.h" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,13 @@
+
+*.suo
+*.user
+*.sdf
+*.db
+*.opendb
+IUpnpErrFile.txt
+IUpnpInfoFile.txt
+Debug
+Release
+x64
+out.*
+.vs
