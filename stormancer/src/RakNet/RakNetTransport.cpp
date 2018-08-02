@@ -355,13 +355,12 @@ namespace Stormancer
 							{
 								_logger->log(LogLevel::Trace, "RakNetTransport", "Unprocessed RakNet message ID", std::to_string(ID));
 							}
-							rakNetPacket = nullptr;
-							break;
 						}
 					}
 					if (rakNetPacket && _peer->IsActive())
 					{
 						_peer->DeallocatePacket(rakNetPacket);
+						rakNetPacket = nullptr;
 					}
 				}
 				catch (const std::exception& ex)
@@ -542,19 +541,17 @@ namespace Stormancer
 #endif
 
 		auto connection = getConnection(rakNetPacket->guid);
-		auto stream = new ibytestream((byte*)rakNetPacket->data, (std::streamsize)rakNetPacket->length);
+		byte* data = new byte[rakNetPacket->length];
+		std::memcpy(data, rakNetPacket->data, rakNetPacket->length);
+		auto stream = new ibytestream(data, (std::streamsize)rakNetPacket->length);
 
 		Packet_ptr packet(new Packet<>(connection, stream), deleter<Packet<>>());
 		auto peer = _peer;
-		packet->cleanup += [=]() {
-			if (stream)
+		packet->cleanup += [data, stream]() {
+			if (data)
 			{
-				stream->rdbuf()->pubsetbuf(nullptr, 0);
+				delete[] data;
 				delete stream;
-			}
-			if (peer && rakNetPacket && peer->IsActive())
-			{
-				peer->DeallocatePacket(rakNetPacket);
 			}
 		};
 

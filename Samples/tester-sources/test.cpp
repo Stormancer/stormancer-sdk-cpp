@@ -27,18 +27,18 @@ namespace Stormancer
 		std::string stateStr = to_string((int)connectionState) + " ";
 		switch (connectionState)
 		{
-		case ConnectionState::Disconnected:
-			stateStr += "Disconnected";
-			break;
-		case ConnectionState::Connecting:
-			stateStr += "Connecting";
-			break;
-		case ConnectionState::Connected:
-			stateStr += "Connected";
-			break;
-		case ConnectionState::Disconnecting:
-			stateStr += "Disconnecting";
-			break;
+			case ConnectionState::Disconnected:
+				stateStr += "Disconnected";
+				break;
+			case ConnectionState::Connecting:
+				stateStr += "Connecting";
+				break;
+			case ConnectionState::Connected:
+				stateStr += "Connected";
+				break;
+			case ConnectionState::Disconnecting:
+				stateStr += "Disconnecting";
+				break;
 		}
 		return stateStr;
 	}

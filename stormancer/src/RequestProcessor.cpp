@@ -174,13 +174,17 @@ namespace Stormancer
 			request->ct = ct;
 			if (ct != pplx::cancellation_token::none())
 			{
-				request->ct_registration = ct.register_callback([tce, request, wThat]() {
+				std::weak_ptr<SystemRequest> wRequest = request;
+				request->ct_registration = ct.register_callback([tce, wRequest, wThat]() {
 					if (auto that = wThat.lock())
 					{
-						if (!request->complete)
+						if (auto request = wRequest.lock())
 						{
-							that->freeRequestSlot(request->id);
-							tce._Cancel();
+							if (!request->complete)
+							{
+								that->freeRequestSlot(request->id);
+								tce._Cancel();
+							}
 						}
 					}
 				});
