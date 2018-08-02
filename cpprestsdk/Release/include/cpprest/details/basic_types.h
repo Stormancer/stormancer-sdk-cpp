@@ -91,7 +91,7 @@ typedef std::stringstream stringstream_t;
 #define ucerr std::cerr
 #endif // endif _UTF16_STRINGS
 
-#ifndef _TURN_OFF_PLATFORM_STRING
+#if !defined(_TURN_OFF_PLATFORM_STRING) && defined(_STORMANCERSDKCPP)
 #define U(x) _XPLATSTR(x)
 #endif // !_TURN_OFF_PLATFORM_STRING
 

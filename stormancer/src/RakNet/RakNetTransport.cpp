@@ -7,6 +7,7 @@
 #include "MessageIdentifiers.h"
 #include "stormancer/SafeCapture.h"
 #include "PacketFileLogger.h"
+#include "stormancer/Debug/StackWalker.h"
 
 #if defined(_WIN32)
 //
@@ -53,7 +54,7 @@ namespace Stormancer
 		_handler = handler;
 		initialize(maxConnections, serverPort);
 
-		_scheduler->schedulePeriodic(15, STRM_SAFE_CAPTURE([this]() {
+		_scheduler->schedulePeriodic(15, createSafeCapture(STRM_WEAK_FROM_THIS(), [this]() {
 			std::lock_guard<std::mutex> lock(_mutex);
 			if (_isRunning)
 			{
@@ -61,7 +62,7 @@ namespace Stormancer
 			}
 		}), ct);
 
-		ct.register_callback(STRM_SAFE_CAPTURE([this]() {
+		ct.register_callback(createSafeCapture(STRM_WEAK_FROM_THIS(), [this]() {
 			stop();
 		}));
 
@@ -80,7 +81,7 @@ namespace Stormancer
 			rakNetLogger->StartLog("packetLogs");
 #endif
 
-			_peer = std::shared_ptr<RakNet::RakPeerInterface>(RakNet::RakPeerInterface::GetInstance(), STRM_SAFE_CAPTURE([=](RakNet::RakPeerInterface* peer) {
+			_peer = std::shared_ptr<RakNet::RakPeerInterface>(RakNet::RakPeerInterface::GetInstance(), createSafeCapture(STRM_WEAK_FROM_THIS(), [=](RakNet::RakPeerInterface* peer) {
 				_logger->log(LogLevel::Trace, "RakNetTransport", "Deleting RakPeerInterface...");
 				RakNet::RakPeerInterface::DestroyInstance(peer);
 				if (rakNetLogger)
@@ -129,7 +130,10 @@ namespace Stormancer
 				if (rakNetPacket->length == 0)
 				{
 					assert(false);
-					_peer->DeallocatePacket(rakNetPacket);
+					if (_peer->IsActive())
+					{
+						_peer->DeallocatePacket(rakNetPacket);
+					}
 					continue;
 				}
 
@@ -146,16 +150,174 @@ namespace Stormancer
 					switch (ID)
 					{
 						// RakNet messages types
-					case DefaultMessageIDTypes::ID_CONNECTION_REQUEST_ACCEPTED:
-					{
-						std::lock_guard<std::mutex> lg(_pendingConnection_mtx);
-
-						std::string packetSystemAddressStr = rakNetPacket->systemAddress.ToString(true, ':');
-						if (!_pendingConnections.empty())
+						case DefaultMessageIDTypes::ID_CONNECTION_REQUEST_ACCEPTED:
 						{
-							auto rq = _pendingConnections.front();
-							if (!_serverConnected)
+							std::lock_guard<std::mutex> lg(_pendingConnection_mtx);
+
+							std::string packetSystemAddressStr = rakNetPacket->systemAddress.ToString(true, ':');
+							if (!_pendingConnections.empty())
 							{
+								auto rq = _pendingConnections.front();
+								if (!_serverConnected)
+								{
+									_pendingConnections.pop();
+									if (rq.cancellationToken.is_canceled())
+									{
+										_peer->CloseConnection(rakNetPacket->guid, false);
+									}
+									else
+									{
+										_logger->log(LogLevel::Trace, "RakNetTransport", "Successfully connected to ", packetSystemAddressStr.c_str());
+										_serverConnected = true;
+										_serverRakNetGUID = rakNetPacket->guid;
+										auto connection = onConnection(rakNetPacket->systemAddress, rakNetPacket->guid, 0);
+										rq.tce.set(connection);
+									}
+									startNextPendingConnections();
+								}
+								else
+								{
+									if (rq.cancellationToken.is_canceled())
+									{
+										_peer->CloseConnection(rakNetPacket->guid, false);
+									}
+									else
+									{
+										RakNet::BitStream data;
+										data.Write((byte)MessageIDTypes::ID_ADVERTISE_PEERID);
+										data.Write(_id);
+										data.Write(false);
+										_peer->Send(&data, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE, 0, rakNetPacket->guid, false);
+									}
+								}
+							}
+							else
+							{
+								_logger->log(LogLevel::Error, "RakNetTransport", "Can't get the pending connection TCE", packetSystemAddressStr.c_str());
+							}
+							break;
+						}
+						case DefaultMessageIDTypes::ID_INCOMPATIBLE_PROTOCOL_VERSION:
+						case DefaultMessageIDTypes::ID_NO_FREE_INCOMING_CONNECTIONS:
+							_logger->log(LogLevel::Trace, "RakNetTransport", "Connection failed because too many concurrent connections.");
+						case DefaultMessageIDTypes::ID_CONNECTION_ATTEMPT_FAILED:
+						{
+							std::string packetSystemAddressStr = rakNetPacket->systemAddress.ToString(true, ':');
+
+							//_peer->CloseConnection(rakNetPacket->guid, false);
+
+							std::lock_guard<std::mutex> lg(_pendingConnection_mtx);
+
+							if (!_pendingConnections.empty())
+							{
+								auto rq = _pendingConnections.front();
+								_pendingConnections.pop();
+								if (!rq.cancellationToken.is_canceled())
+								{
+									_logger->log(LogLevel::Trace, "RakNetTransport", "Connection request failed", packetSystemAddressStr.c_str());
+									rq.tce.set_exception(std::runtime_error("Connection attempt failed"));
+								}
+								startNextPendingConnections();
+							}
+							else
+							{
+								_logger->log(LogLevel::Error, "RakNetTransport", "Can't get the pending connection TCE", packetSystemAddressStr.c_str());
+							}
+							break;
+						}
+						case DefaultMessageIDTypes::ID_ALREADY_CONNECTED:
+						{
+							_logger->log(LogLevel::Error, "RakNetTransport", "Peer already connected", rakNetPacket->systemAddress.ToString(true, ':'));
+							break;
+						}
+						case DefaultMessageIDTypes::ID_NEW_INCOMING_CONNECTION:
+						{
+							_logger->log(LogLevel::Trace, "RakNetTransport", "Incoming connection", rakNetPacket->systemAddress.ToString(true, ':'));
+							RakNet::BitStream data;
+							data.Write((char)MessageIDTypes::ID_ADVERTISE_PEERID);
+							data.Write(_id);
+							data.Write(true);
+							_peer->Send(&data, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE, 0, rakNetPacket->guid, false);
+							break;
+						}
+						case DefaultMessageIDTypes::ID_DISCONNECTION_NOTIFICATION:
+						{
+							_logger->log(LogLevel::Trace, "RakNetTransport", "Remote peer disconnected from this peer", rakNetPacket->systemAddress.ToString(true, ':'));
+							onDisconnection(rakNetPacket, "CLIENT_DISCONNECTED");
+							break;
+						}
+						case DefaultMessageIDTypes::ID_CONNECTION_LOST:
+						{
+							_logger->log(LogLevel::Trace, "RakNetTransport", "Peer lost the connection", rakNetPacket->systemAddress.ToString(true, ':'));
+							onDisconnection(rakNetPacket, "CLIENT_CONNECTION_LOST");
+							break;
+						}
+						case DefaultMessageIDTypes::ID_CONNECTION_BANNED:
+						{
+							_logger->log(LogLevel::Trace, "RakNetTransport", "We are banned from the system we attempted to connect to", rakNetPacket->systemAddress.ToString(true, ':'));
+							break;
+						}
+						case DefaultMessageIDTypes::ID_INVALID_PASSWORD:
+						{
+							_logger->log(LogLevel::Trace, "RakNetTransport", "The remote system is using a password and has refused our connection because we did not set the correct password", rakNetPacket->systemAddress.ToString(true, ':'));
+							break;
+						}
+						case DefaultMessageIDTypes::ID_IP_RECENTLY_CONNECTED:
+						{
+							_logger->log(LogLevel::Trace, "RakNetTransport", "this IP address connected recently, and can't connect again as a security measure", rakNetPacket->systemAddress.ToString(true, ':'));
+							break;
+						}
+						case DefaultMessageIDTypes::ID_UNCONNECTED_PONG:
+						{
+
+							auto address = std::string(rakNetPacket->systemAddress.ToString(true, ':'));
+							_logger->log(LogLevel::Debug, "RakNetTransport", "Received pong message.", address);
+							RakNet::BitStream data(rakNetPacket->data + 1, rakNetPacket->length - 1, false);
+							RakNet::TimeMS sentOn;
+
+							data.Read<RakNet::TimeMS>(sentOn);
+
+							auto it = _pendingPings.find(address);
+
+							if (it != _pendingPings.end())
+							{
+								it->second.set(RakNet::GetTimeMS() - sentOn);
+							}
+							break;
+						}
+						case DefaultMessageIDTypes::ID_UNCONNECTED_PING_OPEN_CONNECTIONS:
+						{
+							break;
+						}
+						case DefaultMessageIDTypes::ID_ADVERTISE_SYSTEM:
+						{
+							_logger->log(LogLevel::Trace, "RakNetTransport", "Inform a remote system of our IP/Port", rakNetPacket->systemAddress.ToString(true, ':'));
+							break;
+						}
+						// Stormancer messages types
+						case (byte)MessageIDTypes::ID_CONNECTION_RESULT:
+						{
+							int64 sid;
+							std::memcpy(&sid, (rakNetPacket->data + 1), sizeof(sid));
+							_logger->log(LogLevel::Trace, "RakNetTransport", "Connection ID received", std::to_string(sid));
+							onConnectionIdReceived(sid);
+							break;
+						}
+						case (byte)DefaultMessageIDTypes::ID_UNCONNECTED_PING:
+							break;
+						case (byte)MessageIDTypes::ID_ADVERTISE_PEERID:
+						{
+							std::lock_guard<std::mutex> lg(_pendingConnection_mtx);
+							std::string packetSystemAddressStr = rakNetPacket->systemAddress.ToString(true, ':');
+							uint64 remotePeerId = 0;
+							RakNet::BitStream data(rakNetPacket->data + 1, rakNetPacket->length - 1, false);
+							data.Read(remotePeerId);
+							bool waitingConnection;
+							data.Read(waitingConnection);
+
+							if (waitingConnection)
+							{
+								auto rq = _pendingConnections.front();
 								_pendingConnections.pop();
 								if (rq.cancellationToken.is_canceled())
 								{
@@ -163,199 +325,41 @@ namespace Stormancer
 								}
 								else
 								{
-									_logger->log(LogLevel::Trace, "RakNetTransport", "Successfully connected to ", packetSystemAddressStr.c_str());
-									_serverConnected = true;
-									_serverRakNetGUID = rakNetPacket->guid;
-									auto connection = onConnection(rakNetPacket->systemAddress, rakNetPacket->guid, 0);
+									_logger->log(LogLevel::Trace, "RakNetTransport", "Connection request accepted", packetSystemAddressStr.c_str());
+									auto connection = onConnection(rakNetPacket->systemAddress, rakNetPacket->guid, (uint64)remotePeerId);
 									rq.tce.set(connection);
 								}
 								startNextPendingConnections();
 							}
 							else
 							{
-								if (rq.cancellationToken.is_canceled())
-								{
-									_peer->CloseConnection(rakNetPacket->guid, false);
-								}
-								else
-								{
-									RakNet::BitStream data;
-									data.Write((byte)MessageIDTypes::ID_ADVERTISE_PEERID);
-									data.Write(_id);
-									data.Write(false);
-									_peer->Send(&data, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE, 0, rakNetPacket->guid, false);
-								}
+								// TODO: review. we don't store the RaknetConnection ?
+								onConnection(rakNetPacket->systemAddress, rakNetPacket->guid, (uint64)remotePeerId);
 							}
+							break;
 						}
-						else
+						case DefaultMessageIDTypes::ID_TIMESTAMP:
+						case (byte)MessageIDTypes::ID_SYSTEM_REQUEST:
+						case (byte)MessageIDTypes::ID_REQUEST_RESPONSE_COMPLETE:
+						case (byte)MessageIDTypes::ID_REQUEST_RESPONSE_ERROR:
+						case (byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG:
+						case (byte)MessageIDTypes::ID_SCENES:
+
+						default:
 						{
-							_logger->log(LogLevel::Error, "RakNetTransport", "Can't get the pending connection TCE", packetSystemAddressStr.c_str());
-						}
-						break;
-					}
-					case DefaultMessageIDTypes::ID_INCOMPATIBLE_PROTOCOL_VERSION:
-					case DefaultMessageIDTypes::ID_NO_FREE_INCOMING_CONNECTIONS:
-						_logger->log(LogLevel::Trace, "RakNetTransport", "Connection failed because too many concurrent connections.");
-					case DefaultMessageIDTypes::ID_CONNECTION_ATTEMPT_FAILED:
-					{
-						std::string packetSystemAddressStr = rakNetPacket->systemAddress.ToString(true, ':');
-
-						//_peer->CloseConnection(rakNetPacket->guid, false);
-
-						std::lock_guard<std::mutex> lg(_pendingConnection_mtx);
-
-						if (!_pendingConnections.empty())
-						{
-							auto rq = _pendingConnections.front();
-							_pendingConnections.pop();
-							if (!rq.cancellationToken.is_canceled())
+							if (ID >= DefaultMessageIDTypes::ID_USER_PACKET_ENUM || (ID >= 58 && ID <= 59))
 							{
-								_logger->log(LogLevel::Trace, "RakNetTransport", "Connection request failed", packetSystemAddressStr.c_str());
-								rq.tce.set_exception(std::runtime_error("Connection attempt failed"));
-							}
-							startNextPendingConnections();
-						}
-						else
-						{
-							_logger->log(LogLevel::Error, "RakNetTransport", "Can't get the pending connection TCE", packetSystemAddressStr.c_str());
-						}
-						break;
-					}
-					case DefaultMessageIDTypes::ID_ALREADY_CONNECTED:
-					{
-						_logger->log(LogLevel::Error, "RakNetTransport", "Peer already connected", rakNetPacket->systemAddress.ToString(true, ':'));
-						break;
-					}
-					case DefaultMessageIDTypes::ID_NEW_INCOMING_CONNECTION:
-					{
-						_logger->log(LogLevel::Trace, "RakNetTransport", "Incoming connection", rakNetPacket->systemAddress.ToString(true, ':'));
-						RakNet::BitStream data;
-						data.Write((char)MessageIDTypes::ID_ADVERTISE_PEERID);
-						data.Write(_id);
-						data.Write(true);
-						_peer->Send(&data, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE, 0, rakNetPacket->guid, false);
-						break;
-					}
-					case DefaultMessageIDTypes::ID_DISCONNECTION_NOTIFICATION:
-					{
-						_logger->log(LogLevel::Trace, "RakNetTransport", "Remote peer disconnected from this peer", rakNetPacket->systemAddress.ToString(true, ':'));
-						onDisconnection(rakNetPacket, "CLIENT_DISCONNECTED");
-						break;
-					}
-					case DefaultMessageIDTypes::ID_CONNECTION_LOST:
-					{
-						_logger->log(LogLevel::Trace, "RakNetTransport", "Peer lost the connection", rakNetPacket->systemAddress.ToString(true, ':'));
-						onDisconnection(rakNetPacket, "CLIENT_CONNECTION_LOST");
-						break;
-					}
-					case DefaultMessageIDTypes::ID_CONNECTION_BANNED:
-					{
-						_logger->log(LogLevel::Trace, "RakNetTransport", "We are banned from the system we attempted to connect to", rakNetPacket->systemAddress.ToString(true, ':'));
-						break;
-					}
-					case DefaultMessageIDTypes::ID_INVALID_PASSWORD:
-					{
-						_logger->log(LogLevel::Trace, "RakNetTransport", "The remote system is using a password and has refused our connection because we did not set the correct password", rakNetPacket->systemAddress.ToString(true, ':'));
-						break;
-					}
-					case DefaultMessageIDTypes::ID_IP_RECENTLY_CONNECTED:
-					{
-						_logger->log(LogLevel::Trace, "RakNetTransport", "this IP address connected recently, and can't connect again as a security measure", rakNetPacket->systemAddress.ToString(true, ':'));
-						break;
-					}
-					case DefaultMessageIDTypes::ID_UNCONNECTED_PONG:
-					{
-
-						auto address = std::string(rakNetPacket->systemAddress.ToString(true, ':'));
-						_logger->log(LogLevel::Debug, "RakNetTransport", "Received pong message.", address);
-						RakNet::BitStream data(rakNetPacket->data + 1, rakNetPacket->length - 1, false);
-						RakNet::TimeMS sentOn;
-
-						data.Read<RakNet::TimeMS>(sentOn);
-
-						auto it = _pendingPings.find(address);
-
-						if (it != _pendingPings.end())
-						{
-							it->second.set(RakNet::GetTimeMS() - sentOn);
-						}
-						break;
-					}
-					case DefaultMessageIDTypes::ID_UNCONNECTED_PING_OPEN_CONNECTIONS:
-					{
-						break;
-					}
-					case DefaultMessageIDTypes::ID_ADVERTISE_SYSTEM:
-					{
-						_logger->log(LogLevel::Trace, "RakNetTransport", "Inform a remote system of our IP/Port", rakNetPacket->systemAddress.ToString(true, ':'));
-						break;
-					}
-					// Stormancer messages types
-					case (byte)MessageIDTypes::ID_CONNECTION_RESULT:
-					{
-						int64 sid;
-						std::memcpy(&sid, (rakNetPacket->data + 1), sizeof(sid));
-						_logger->log(LogLevel::Trace, "RakNetTransport", "Connection ID received", std::to_string(sid));
-						onConnectionIdReceived(sid);
-						break;
-					}
-					case (byte)DefaultMessageIDTypes::ID_UNCONNECTED_PING:
-						break;
-					case (byte)MessageIDTypes::ID_ADVERTISE_PEERID:
-					{
-						std::lock_guard<std::mutex> lg(_pendingConnection_mtx);
-						std::string packetSystemAddressStr = rakNetPacket->systemAddress.ToString(true, ':');
-						uint64 remotePeerId = 0;
-						RakNet::BitStream data(rakNetPacket->data + 1, rakNetPacket->length - 1, false);
-						data.Read(remotePeerId);
-						bool waitingConnection;
-						data.Read(waitingConnection);
-
-						if (waitingConnection)
-						{
-							auto rq = _pendingConnections.front();
-							_pendingConnections.pop();
-							if (rq.cancellationToken.is_canceled())
-							{
-								_peer->CloseConnection(rakNetPacket->guid, false);
+								onMessageReceived(rakNetPacket);
 							}
 							else
 							{
-								_logger->log(LogLevel::Trace, "RakNetTransport", "Connection request accepted", packetSystemAddressStr.c_str());
-								auto connection = onConnection(rakNetPacket->systemAddress, rakNetPacket->guid, (uint64)remotePeerId);
-								rq.tce.set(connection);
+								_logger->log(LogLevel::Trace, "RakNetTransport", "Unprocessed RakNet message ID", std::to_string(ID));
 							}
-							startNextPendingConnections();
+							rakNetPacket = nullptr;
+							break;
 						}
-						else
-						{
-							// TODO: review. we don't store the RaknetConnection ?
-							onConnection(rakNetPacket->systemAddress, rakNetPacket->guid, (uint64)remotePeerId);
-						}
-						break;
 					}
-					case DefaultMessageIDTypes::ID_TIMESTAMP:
-					case (byte)MessageIDTypes::ID_SYSTEM_REQUEST:
-					case (byte)MessageIDTypes::ID_REQUEST_RESPONSE_COMPLETE:
-					case (byte)MessageIDTypes::ID_REQUEST_RESPONSE_ERROR:
-					case (byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG:
-					case (byte)MessageIDTypes::ID_SCENES:
-
-					default:
-					{
-						if (ID >= DefaultMessageIDTypes::ID_USER_PACKET_ENUM || (ID >= 58 && ID <= 59))
-						{
-							onMessageReceived(rakNetPacket);
-						}
-						else
-						{
-							_logger->log(LogLevel::Trace, "RakNetTransport", "Unprocessed RakNet message ID", std::to_string(ID));
-						}
-						rakNetPacket = nullptr;
-						break;
-					}
-					}
-					if (rakNetPacket)
+					if (rakNetPacket && _peer->IsActive())
 					{
 						_peer->DeallocatePacket(rakNetPacket);
 					}
@@ -513,6 +517,7 @@ namespace Stormancer
 
 	void RakNetTransport::onDisconnection(RakNet::Packet* packet, std::string reason)
 	{
+
 		auto msg = std::string() + packet->systemAddress.ToString(true, ':') + " disconnected";
 		_logger->log(LogLevel::Trace, "RakNetTransport", msg.c_str(), reason.c_str());
 
@@ -547,14 +552,14 @@ namespace Stormancer
 				stream->rdbuf()->pubsetbuf(nullptr, 0);
 				delete stream;
 			}
-			if (peer && rakNetPacket)
+			if (peer && rakNetPacket && peer->IsActive())
 			{
 				peer->DeallocatePacket(rakNetPacket);
 			}
 		};
 
 		_onPacketReceived(packet);
-}
+	}
 
 	std::shared_ptr<RakNetConnection> RakNetTransport::getConnection(RakNet::RakNetGUID guid)
 	{
@@ -571,6 +576,13 @@ namespace Stormancer
 			auto logger = _logger;
 			std::weak_ptr<RakNet::RakPeerInterface> weakPeer = _peer;
 			connection->onClose([logger, weakPeer, cid, guid](std::string reason) {
+#if defined(_WIN32)
+				StackWalker sw;
+				sw.outputFunction = [logger](std::string stack) {
+					logger->log(LogLevel::Trace, "RaknetTransport", "Triggered Onclose event", stack);
+				};
+				sw.ShowCallstack();
+#endif
 				auto peer = weakPeer.lock();
 				if (peer)
 				{
@@ -672,7 +684,7 @@ namespace Stormancer
 		for (int i = 0; i < nb; i++)
 		{
 			tasks.push_back(taskDelay(std::chrono::milliseconds(300 * i), cts.get_token())
-				.then(STRM_SAFE_CAPTURE([this, address]()
+				.then(createSafeCapture(STRM_WEAK_FROM_THIS(), [this, address]()
 			{
 				return sendPingImpl(address);
 			}), cts.get_token()));
@@ -709,7 +721,7 @@ namespace Stormancer
 		});
 
 		return cancel_after_timeout(eventSetTask, cts, 1500)
-			.then(STRM_SAFE_CAPTURE([this, address](pplx::task<int> t)
+			.then(createSafeCapture(STRM_WEAK_FROM_THIS(), [this, address](pplx::task<int> t)
 		{
 			std::lock_guard<std::mutex> lg(_pendingPingsMutex);
 			_pendingPings.erase(address); // destroys the tce and cancels the task

@@ -33,6 +33,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\ConnectionState.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\ConnectToSceneMsg.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\ContainerConfigurator.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\Debug\StackWalker.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\DefaultPacketDispatcher.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\DefaultScheduler.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\DependencyResolver.h" />
@@ -134,6 +135,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\ClientFactory.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Configuration.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\ContainerConfigurator.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Debug\stackWalker.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\DefaultPacketDispatcher.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\DefaultScheduler.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\DependencyResolver.cpp" />

@@ -3,7 +3,7 @@
 #include "stormancer/P2P/P2PSession.h"
 #include "stormancer/SystemRequestIDTypes.h"
 #include "stormancer/P2P/RakNet/P2PTunnels.h"
-#include "stormancer/SafeCapture.h"
+#include "stormancer/CustomExceptions.h"
 
 namespace Stormancer
 {
@@ -34,10 +34,17 @@ namespace Stormancer
 			return pplx::task_from_exception<std::shared_ptr<IConnection>>(std::runtime_error("Cannot establish P2P connection. The client must be connected to the server"));
 		}
 
+		std::weak_ptr<P2PService> weakSelf = this->shared_from_this();
 		return _sysCall->sendSystemRequest<P2PSession>(server.get(), (byte)SystemRequestIDTypes::ID_P2P_CREATE_SESSION, p2pToken, ct)
-			.then(STRM_SAFE_CAPTURE([this](P2PSession session)
+			.then([weakSelf](P2PSession session)
 		{
-			auto c = _connections->getConnection(session.remotePeer);
+			auto self = weakSelf.lock();
+			if (!self)
+			{
+				throw PointerDeletedException();
+			}
+
+			auto c = self->_connections->getConnection(session.remotePeer);
 			if (!c)
 			{
 				throw std::runtime_error("Failed to get P2P connection for peer " + std::to_string(session.remotePeer));
@@ -46,6 +53,6 @@ namespace Stormancer
 			{
 				return c;
 			}
-		}), ct);
+		}, ct);
 	}
 };

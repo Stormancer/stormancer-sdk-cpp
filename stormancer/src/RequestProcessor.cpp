@@ -150,7 +150,8 @@ namespace Stormancer
 				if (!request->complete)
 				{
 					request->complete = true;
-					request->tce.set_exception(std::runtime_error(msg + "(msgId:" + std::to_string(request->operation()) + ")"));
+					std::string message = msg + "(msgId:" + std::to_string(request->operation()) + ")";
+					request->tce.set_exception(std::runtime_error(message.c_str()));
 				}
 			}
 			else

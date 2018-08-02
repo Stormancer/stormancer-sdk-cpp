@@ -13,6 +13,8 @@ namespace Stormancer
 	{
 	public:
 
+		friend class RpcService;
+
 #pragma region public_methods
 
 		RpcRequestContext(T* peer, Scene* scene, uint16 id, bool ordered, ibytestream* inputStream, pplx::cancellation_token ct)
@@ -74,6 +76,12 @@ namespace Stormancer
 			}, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE_ORDERED, _rpcClientChannelIdentifier);
 		}
 
+#pragma endregion
+
+	private:
+
+#pragma region private_methods
+
 		void sendComplete() const
 		{
 			if (!_scene)
@@ -86,12 +94,6 @@ namespace Stormancer
 				writeRequestId(stream);
 			}, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE_ORDERED, _rpcClientChannelIdentifier);
 		}
-
-#pragma endregion
-
-	private:
-
-#pragma region private_methods
 
 		void writeRequestId(obytestream* stream) const
 		{

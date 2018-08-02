@@ -539,14 +539,31 @@ namespace Stormancer
 					}), ct)
 						.then(createSafeCapture(weak_from_this(), [this, endpoint]()
 					{
-						if (_synchronisedClock && endpoint.tokenData.Version > 0)
+						if (_synchronisedClock)
 						{
 							_dependencyResolver->resolve<SyncClock>()->start(_serverConnection, _cts.get_token());
 						}
-					}), ct);
+					}), ct)
+						.then(createSafeCaptureNoThrow(weak_from_this(), [this](pplx::task<void> task)
+					{
+						try
+						{
+							task.get();
+						}
+						catch (...)
+						{
+							if (auto connection = _serverConnection.lock())
+							{
+								connection->close();
+							}
+							setConnectionState(ConnectionState::Disconnected);
+							throw;
+						}
+					})); // no ct here because we need this continuation to awalys run
 				}
 				catch (std::exception& ex)
 				{
+					setConnectionState(ConnectionState::Disconnected);
 					return pplx::task_from_exception<void>(std::runtime_error(std::string("Failed to start transport: ") + ex.what()));
 				}
 			}

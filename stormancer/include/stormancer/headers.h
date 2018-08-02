@@ -113,6 +113,7 @@
 #include <list>
 #include <forward_list>
 #include <string>
+#include <stdexcept>
 
 #if defined(_WIN32) //&& defined(_STORMANCERSDKCPP)
 // msgpack needs windows.h, RakNet needs WinSock2.h

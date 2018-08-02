@@ -12,8 +12,8 @@ namespace Stormancer
 		, _peer(peer)
 		, _guid(guid)
 		, _lastActivityDate(nowTime_t())
-		, _logger(logger)
 		, _dependencyResolver(resolver)
+		, _logger(logger)
 	{
 		auto onNext = [=](ConnectionState state) {
 			_connectionState = state;
@@ -103,10 +103,11 @@ namespace Stormancer
 
 	void RakNetConnection::close(std::string reason)
 	{
+		_logger->log(LogLevel::Trace, "raknetConnection", "Closing connection " + reason, std::to_string(id()));
 		if (_connectionState == ConnectionState::Connected || _connectionState == ConnectionState::Connecting)
 		{
 			setConnectionState(ConnectionState::Disconnecting);
-			_closeAction("");
+			_closeAction(reason);
 			setConnectionState(ConnectionState::Disconnected);
 		}
 	}

@@ -13,7 +13,7 @@ namespace Stormancer
 
 		STORMANCER_DLL_API DefaultScheduler();
 
-		STORMANCER_DLL_API ~DefaultScheduler();
+		STORMANCER_DLL_API virtual ~DefaultScheduler();
 		
 		/// Schedule a cancellable periodic task on the scheculder
 		STORMANCER_DLL_API void schedulePeriodic(int delay, std::function<void()> work, pplx::cancellation_token ct) override;

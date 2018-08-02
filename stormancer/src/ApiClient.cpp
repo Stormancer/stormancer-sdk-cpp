@@ -208,7 +208,7 @@ namespace Stormancer
 #endif
 
 		return client.request(rq, ct)
-			.then(STRM_SAFE_CAPTURE([=](pplx::task<web::http::http_response> t)
+			.then(createSafeCapture(STRM_WEAK_FROM_THIS(), [=](pplx::task<web::http::http_response> t)
 		{
 			bool success = false;
 			web::http::http_response response;

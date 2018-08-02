@@ -9,10 +9,6 @@
 #define STRM_WEAK_FROM_THIS() Stormancer::GetWeakFromThis(this)
 #endif
 
-#define STRM_SAFE_CAPTURE(...) Stormancer::createSafeCapture(STRM_WEAK_FROM_THIS(), __VA_ARGS__)
-
-#define STRM_SAFE_CAPTURE_NOTHROW(...) Stormancer::createSafeCaptureNoThrow(STRM_WEAK_FROM_THIS(), __VA_ARGS__)
-
 namespace Stormancer
 {
 	template<typename T>
@@ -91,13 +87,13 @@ namespace Stormancer
 	};
 
 	template<typename TClass, typename TCallable>
-	auto createSafeCapture(std::weak_ptr<TClass> weakPtr, TCallable callable) -> SafeCapture<TClass, TCallable>
+	SafeCapture<TClass, TCallable> createSafeCapture(std::weak_ptr<TClass> weakPtr, TCallable callable)
 	{
 		return SafeCapture<TClass, TCallable>(weakPtr, callable);
 	}
 
 	template<typename TClass, typename TCallable>
-	auto createSafeCaptureNoThrow(std::weak_ptr<TClass> weakPtr, TCallable callable) -> SafeCaptureNoThrow<TClass, TCallable>
+	SafeCaptureNoThrow<TClass, TCallable> createSafeCaptureNoThrow(std::weak_ptr<TClass> weakPtr, TCallable callable)
 	{
 		return SafeCaptureNoThrow<TClass, TCallable>(weakPtr, callable);
 	}

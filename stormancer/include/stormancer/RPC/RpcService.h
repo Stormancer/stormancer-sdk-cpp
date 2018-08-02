@@ -21,7 +21,7 @@ namespace Stormancer
 
 		RpcService(Scene* scene, std::shared_ptr<IActionDispatcher> dispatcher);
 
-		~RpcService();
+		virtual ~RpcService();
 
 		/// Add a procedure to execute when the server send an RPC
 		void addProcedure(const std::string& route, std::function<pplx::task<void>(RpcRequestContext_ptr)> handler, MessageOriginFilter filter = MessageOriginFilter::Host, bool ordered = false);
@@ -95,8 +95,7 @@ namespace Stormancer
 			}, [=](ibytestream* stream) {
 				return _serializer.deserializeOne<TOutput>(stream);
 			});
-		}
-
+		}		
 #pragma endregion
 
 	private:

@@ -8,6 +8,11 @@ namespace Stormancer
 		return _isRunning;
 	}
 
+	SameThreadActionDispatcher::~SameThreadActionDispatcher()
+	{
+
+	}
+
 	void SameThreadActionDispatcher::schedule(pplx::TaskProc_t task, void* param)
 	{
 		task(param);
@@ -59,6 +64,11 @@ namespace Stormancer
 	bool MainThreadActionDispatcher::isRunning()
 	{
 		return _isRunning;
+	}
+
+	MainThreadActionDispatcher::~MainThreadActionDispatcher()
+	{
+
 	}
 
 	void MainThreadActionDispatcher::post(const std::function<void(void)>& action)
@@ -126,4 +136,10 @@ namespace Stormancer
 			task(param);
 		});
 	}
+
+	IActionDispatcher::~IActionDispatcher()
+	{
+
+	}
+
 }

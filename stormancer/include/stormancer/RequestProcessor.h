@@ -66,6 +66,18 @@ namespace Stormancer
 			}, ct);
 		}
 
+		template<typename T>
+		pplx::task<void> sendSystemRequest(IConnection* peer, byte id, const T& parameter, pplx::cancellation_token ct = pplx::cancellation_token::none())
+		{
+			return sendSystemRequest(peer, id, [=, &parameter](obytestream* stream)
+			{
+				_serializer.serialize(stream, parameter);
+			}, PacketPriority::MEDIUM_PRIORITY, ct).then([](Packet_ptr /*packet*/)
+			{
+				// Packet is null for system requests that have no return value.
+			}, ct);
+		}
+
 #pragma endregion
 
 	private:

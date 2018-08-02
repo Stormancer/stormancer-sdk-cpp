@@ -98,17 +98,42 @@ private:
 	bool _server;
 };
 
+void p2pConnect(Stormancer::Client_ptr host, Stormancer::Client_ptr guest, Stormancer::ILogger_ptr logger, std::string sceneId);
+
 void testP2P(std::string endpoint, std::string account, std::string application, std::string sceneId)
 {
 	auto logger = std::make_shared<Stormancer::ConsoleLogger>();
 
-	Stormancer::Scene_ptr hostScene;
 
 	auto hostConfiguration = Stormancer::Configuration::create(endpoint, account, application);
 	hostConfiguration->logger = logger;
 	hostConfiguration->encryptionEnabled = true;
 
 	auto hostClient = Stormancer::Client::create(hostConfiguration);
+
+
+	auto guestConfiguration = Stormancer::Configuration::create(endpoint, account, application);
+	guestConfiguration->logger = logger;
+	guestConfiguration->encryptionEnabled = true;
+
+	auto guestClient = Stormancer::Client::create(guestConfiguration);
+
+	try
+	{
+		p2pConnect(hostClient, guestClient, logger, sceneId);
+		p2pConnect(guestClient, hostClient, logger, sceneId);
+	}
+	catch (const std::exception& e)
+	{
+		logger->log(e);
+	}
+}
+
+void p2pConnect(Stormancer::Client_ptr hostClient, Stormancer::Client_ptr guestClient, Stormancer::ILogger_ptr logger, std::string sceneId)
+{
+	Stormancer::Scene_ptr hostScene;
+	Stormancer::Scene_ptr guestScene;
+
 	try
 	{
 		hostScene = hostClient->connectToPublicScene(sceneId).get();
@@ -119,13 +144,6 @@ void testP2P(std::string endpoint, std::string account, std::string application,
 		throw;
 	}
 
-	Stormancer::Scene_ptr guestScene;
-
-	auto guestConfiguration = Stormancer::Configuration::create(endpoint, account, application);
-	guestConfiguration->logger = logger;
-	guestConfiguration->encryptionEnabled = true;
-
-	auto guestClient = Stormancer::Client::create(guestConfiguration);
 	try
 	{
 		guestScene = guestClient->connectToPublicScene(sceneId).get();
@@ -153,7 +171,10 @@ void testP2P(std::string endpoint, std::string account, std::string application,
 
 	logger->log(std::string("Retrieved guest tunnel: ") + guestTunnel->ip + ":" + std::to_string(guestTunnel->port));
 
+	hostScene->disconnect().wait();
+	guestScene->disconnect().wait();
 
+	logger->log("Disconnected host and guest scenes");
 }
 
 void p2pClient(std::string endpoint, std::string account, std::string application, std::string sceneId)
@@ -189,7 +210,9 @@ void p2pClient(std::string endpoint, std::string account, std::string applicatio
 
 		UdpSocket hostSocket(logger, hostTunnel->port, true);
 
+
 		std::cin.get();
+
 	}
 	else
 	{
@@ -203,6 +226,8 @@ void p2pClient(std::string endpoint, std::string account, std::string applicatio
 		UdpSocket guestSocket(logger, 0, false);
 		guestSocket.Send(tunnel->port);
 
+
 		std::cin.get();
+
 	}
 }

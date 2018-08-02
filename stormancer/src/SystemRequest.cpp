@@ -5,8 +5,8 @@ namespace Stormancer
 {
 	SystemRequest::SystemRequest(byte msgId, pplx::task_completion_event<Packet_ptr> tce, pplx::cancellation_token ct)
 		: tce(tce)
+		, ct(ct)
 		, _msgId(msgId)
-		,ct(ct)
 	{
 	}
 

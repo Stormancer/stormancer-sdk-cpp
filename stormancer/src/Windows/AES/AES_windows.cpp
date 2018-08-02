@@ -200,7 +200,7 @@ namespace Stormancer
 
 	}
 
-	void AESWindows::generateRandomIV(std::vector<BYTE> &iv)
+	void AESWindows::generateRandomIV(std::vector<BYTE>& iv)
 	{
 		for (std::size_t i = 0; i < iv.size(); i++)
 		{

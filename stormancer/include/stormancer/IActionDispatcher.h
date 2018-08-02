@@ -18,7 +18,7 @@ namespace Stormancer
 		virtual pplx::task<void> stop() = 0;
 		virtual void schedule(pplx::TaskProc_t, void *) = 0;
 		virtual bool isRunning() = 0;
-
+		virtual ~IActionDispatcher();
 #pragma endregion
 	};
 
@@ -32,7 +32,7 @@ namespace Stormancer
 		virtual void start() override;
 		virtual pplx::task<void> stop() override;
 		virtual bool isRunning() override;
-
+		virtual ~SameThreadActionDispatcher();
 #pragma endregion
 
 	private:
@@ -65,6 +65,7 @@ namespace Stormancer
 		//current executing action returns.)
 		void update(const std::chrono::milliseconds maxDuration);
 
+		virtual ~MainThreadActionDispatcher();
 #pragma endregion
 
 	private:

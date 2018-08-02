@@ -36,7 +36,7 @@ namespace Stormancer
 
 				
 
-				auto iv = std::vector<BYTE>(static_cast<unsigned int>(ivSize));
+				auto iv = std::vector<byte>(static_cast<unsigned int>(ivSize));
 				_aes->generateRandomIV(iv);
 				
 				_aes->encrypt(dataPtr, dataSize, iv.data(), ivSize, stream,_keyId);

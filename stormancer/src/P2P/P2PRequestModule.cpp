@@ -80,14 +80,14 @@ namespace Stormancer
 		builder->service((byte)SystemRequestIDTypes::ID_P2P_TEST_CONNECTIVITY_CLIENT, [=](RequestContext* ctx) {
 			auto candidate = _serializer->deserializeOne<ConnectivityCandidate>(ctx->inputStream());
 			_logger->log(LogLevel::Debug, "p2p", "Starting connectivity test (CLIENT) " + candidate.clientEndpointCandidate.address + " => " + candidate.listeningEndpointCandidate.address);
-			/*auto connection = _connections->getConnection(candidate.listeningPeer);
+			auto connection = _connections->getConnection(candidate.listeningPeer);
 			if (connection && connection->getConnectionState() == ConnectionState::Connected)
 			{
 				ctx->send([=](obytestream* s) {
-					_serializer->serialize(0, s);
+					_serializer->serialize(s, 0);
 				});
 				return pplx::task_from_result();
-			}*/
+			}
 			if (_config->enableNatPunchthrough == false)
 			{
 				if (candidate.listeningEndpointCandidate.address.substr(0, 9) == "127.0.0.1")
@@ -127,13 +127,12 @@ namespace Stormancer
 		builder->service((byte)SystemRequestIDTypes::ID_P2P_TEST_CONNECTIVITY_HOST, [=](RequestContext* ctx) {
 			auto candidate = _serializer->deserializeOne<ConnectivityCandidate>(ctx->inputStream());
 			_logger->log(LogLevel::Debug, "p2p", "Starting connectivity test (LISTENER) " + candidate.clientEndpointCandidate.address + " => " + candidate.listeningEndpointCandidate.address);
-			/*auto connection = _connections->getConnection(candidate.clientPeer);
+			auto connection = _connections->getConnection(candidate.clientPeer);
 			if (connection && connection->getConnectionState() == ConnectionState::Connected)
 			{
-				ctx->send([=](obytestream* s) {
-				});
+				ctx->send(Writer());
 				return pplx::task_from_result();
-			}*/
+			}
 			if (_config->dedicatedServerEndpoint == "" && _config->enableNatPunchthrough)
 			{
 				_transport->openNat(candidate.clientEndpointCandidate.address);
@@ -144,10 +143,12 @@ namespace Stormancer
 
 		builder->service((byte)SystemRequestIDTypes::ID_P2P_CONNECT_HOST, [=](RequestContext* ctx) {
 			auto candidate = _serializer->deserializeOne<ConnectivityCandidate>(ctx->inputStream());
+			std::string sessionId(candidate.sessionId.begin(), candidate.sessionId.end());
 
 			auto connection = _connections->getConnection(candidate.clientPeer);
 			if (connection && connection->getConnectionState() == ConnectionState::Connected)
 			{
+				_sessions->updateSessionState(sessionId, P2PSessionState::Connected);
 				ctx->send(Writer());
 				return pplx::task_from_result();
 			}
@@ -155,8 +156,6 @@ namespace Stormancer
 			_logger->log(LogLevel::Debug, "p2p", "Waiting connection " + candidate.clientEndpointCandidate.address + " => " + candidate.listeningEndpointCandidate.address);
 			_connections->addPendingConnection(candidate.clientPeer)
 				.then([=](pplx::task<std::shared_ptr<IConnection>> t) {
-
-				std::string sessionId(candidate.sessionId.begin(), candidate.sessionId.end());
 				_sessions->updateSessionState(sessionId, P2PSessionState::Connected);
 			});
 
@@ -166,12 +165,14 @@ namespace Stormancer
 
 		builder->service((byte)SystemRequestIDTypes::ID_P2P_CONNECT_CLIENT, [=](RequestContext* ctx) {
 			auto candidate = _serializer->deserializeOne<ConnectivityCandidate>(ctx->inputStream());
+			std::string sessionId(candidate.sessionId.begin(), candidate.sessionId.end());
 
 			_logger->log(LogLevel::Debug, "p2p", "Starting P2P client connection client peer =" + std::to_string(candidate.clientPeer));
 
 			auto connection = _connections->getConnection(candidate.listeningPeer);
 			if (connection && connection->getConnectionState() == ConnectionState::Connected)
 			{
+				_sessions->updateSessionState(sessionId, P2PSessionState::Connected);
 				ctx->send([=](obytestream* stream) {
 					_serializer->serialize(stream, true);
 				});
@@ -182,7 +183,6 @@ namespace Stormancer
 			_connections->addPendingConnection(candidate.listeningPeer)
 				.then([=](pplx::task<std::shared_ptr<IConnection>> t) {
 
-				std::string sessionId(candidate.sessionId.begin(), candidate.sessionId.end());
 				_sessions->updateSessionState(sessionId, P2PSessionState::Connected);
 			});
 

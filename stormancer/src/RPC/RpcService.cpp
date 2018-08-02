@@ -290,7 +290,7 @@ namespace Stormancer
 
 			std::string msg = _serializer.deserializeOne<std::string>(packet->stream);
 			
-			request->observer.on_error(std::make_exception_ptr(std::runtime_error(msg)));
+			request->observer.on_error(std::make_exception_ptr(std::runtime_error(msg.c_str())));
 		}
 	}
 

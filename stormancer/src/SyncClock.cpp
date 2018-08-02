@@ -46,14 +46,14 @@ namespace Stormancer
 			_cancellationToken = ct;
 
 			auto cts = pplx::cancellation_token_source::create_linked_source(_cancellationToken);
-			scheduler->schedulePeriodic(_interval, STRM_SAFE_CAPTURE([this, cts]()
+			scheduler->schedulePeriodic(_interval, createSafeCapture(STRM_WEAK_FROM_THIS(), [this, cts]()
 			{
 				std::lock_guard<std::mutex> lg(_mutex);
 				syncClockImplAsync();
 			}), _cancellationToken);
 
 			// Do multiple pings at start
-			scheduler->schedulePeriodic(_intervalAtStart, STRM_SAFE_CAPTURE([this, cts]
+			scheduler->schedulePeriodic(_intervalAtStart, createSafeCapture(STRM_WEAK_FROM_THIS(), [this, cts]
 			{
 				bool shouldCallSyncClockImpl = false;
 				{
@@ -73,7 +73,7 @@ namespace Stormancer
 				}
 			}), _cancellationToken);
 
-			_cancellationToken.register_callback(STRM_SAFE_CAPTURE([this]
+			_cancellationToken.register_callback(createSafeCapture(STRM_WEAK_FROM_THIS(), [this]
 			{
 				stop();
 			}));
@@ -138,7 +138,7 @@ namespace Stormancer
 			requestProcessor->sendSystemRequest(remoteConnection.get(), (byte)SystemRequestIDTypes::ID_PING, [&timeStart](obytestream* bs) {
 				(*bs) << timeStart;
 			}, PacketPriority::IMMEDIATE_PRIORITY, _cancellationToken)
-				.then(STRM_SAFE_CAPTURE([=](Packet_ptr packet)
+				.then(createSafeCapture(STRM_WEAK_FROM_THIS(), [=](Packet_ptr packet)
 			{
 				uint64 timeEnd = (uint64)_watch.getElapsedTime();
 

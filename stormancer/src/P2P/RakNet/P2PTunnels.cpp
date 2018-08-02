@@ -50,11 +50,11 @@ namespace Stormancer
 		}
 
 		return _sysClient->sendSystemRequest<OpenTunnelResult>(connection.get(), (byte)SystemRequestIDTypes::ID_P2P_OPEN_TUNNEL, serverId, ct)
-			.then(STRM_SAFE_CAPTURE([this, connectionId, serverId](OpenTunnelResult result)
+			.then(createSafeCapture(STRM_WEAK_FROM_THIS(), [this, connectionId, serverId](OpenTunnelResult result)
 		{
 			if (result.useTunnel)
 			{
-				auto client = std::make_shared<P2PTunnelClient>(STRM_SAFE_CAPTURE([this](P2PTunnelClient* client, RakNet::RNS2RecvStruct* msg) {
+				auto client = std::make_shared<P2PTunnelClient>(createSafeCapture(STRM_WEAK_FROM_THIS(), [this](P2PTunnelClient* client, RakNet::RNS2RecvStruct* msg) {
 					onMsgReceived(client, msg);
 				}), _sysClient, _logger);
 				client->handle = result.handle;
@@ -63,7 +63,7 @@ namespace Stormancer
 				client->serverSide = false;
 				_tunnels[std::make_tuple(connectionId, result.handle)] = client;
 
-				auto tunnel = std::make_shared<P2PTunnel>(STRM_SAFE_CAPTURE([this, connectionId, result]() {
+				auto tunnel = std::make_shared<P2PTunnel>(createSafeCapture(STRM_WEAK_FROM_THIS(), [this, connectionId, result]() {
 					destroyTunnel(connectionId, result.handle);
 				}));
 				tunnel->id = serverId;
@@ -73,7 +73,7 @@ namespace Stormancer
 			}
 			else
 			{
-				auto tunnel = std::make_shared<P2PTunnel>(STRM_SAFE_CAPTURE([this, connectionId, result]() {
+				auto tunnel = std::make_shared<P2PTunnel>(createSafeCapture(STRM_WEAK_FROM_THIS(), [this, connectionId, result]() {
 
 				}));
 				auto el = stringSplit(result.endpoint, ':');
@@ -130,7 +130,7 @@ namespace Stormancer
 				if (connection)
 				{
 					auto handle = std::get<1>(tunnel.first);
-					tasks.push_back(_sysClient->sendSystemRequest<void>(connection.get(), (byte)SystemRequestIDTypes::ID_P2P_CLOSE_TUNNEL, handle).then([](pplx::task<void> t) {
+					tasks.push_back(_sysClient->sendSystemRequest(connection.get(), (byte)SystemRequestIDTypes::ID_P2P_CLOSE_TUNNEL, handle).then([](pplx::task<void> t) {
 						try
 						{
 							t.get();
@@ -160,7 +160,7 @@ namespace Stormancer
 			_tunnels.erase(it);
 			if (connection)
 			{
-				return _sysClient->sendSystemRequest<void>(connection.get(), (byte)SystemRequestIDTypes::ID_P2P_CLOSE_TUNNEL, handle)
+				return _sysClient->sendSystemRequest(connection.get(), (byte)SystemRequestIDTypes::ID_P2P_CLOSE_TUNNEL, handle)
 					.then([](pplx::task<void> t) {
 					try
 					{

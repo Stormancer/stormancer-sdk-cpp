@@ -140,7 +140,7 @@ namespace Stormancer
 				return pplx::task_from_exception<TOut>(std::runtime_error("Scene deleted"));
 			}
 
-			auto rpc = scene->dependencyResolver()->resolve<RpcService>();
+			auto rpc = scene->dependencyResolver().lock()->resolve<RpcService>();
 			return rpc->rpc<TOut, TIn>("gamesession.postresults", results);
 		}
 

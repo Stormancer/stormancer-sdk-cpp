@@ -61,7 +61,7 @@ namespace Stormancer
 		{
 			_scene = scene;
 
-			_scene->addRoute(PLAYERDATA_UPDATED_ROUTE, STRM_SAFE_CAPTURE([this](Packetisp_ptr packet) {
+			_scene->addRoute(PLAYERDATA_UPDATED_ROUTE, createSafeCapture(STRM_WEAK_FROM_THIS(), [this](Packetisp_ptr packet) {
 				if (_onDataUpdated)
 				{
 					auto playerData = packet->readObject<PlayerData<T>>();
