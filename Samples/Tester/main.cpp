@@ -22,6 +22,7 @@ int main(int argc, char** argv)
 	catch (const std::exception&)
 	{
 	}
+
 	std::cin.ignore();
 	return 0;
 }

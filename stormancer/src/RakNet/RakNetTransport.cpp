@@ -573,13 +573,13 @@ namespace Stormancer
 			auto logger = _logger;
 			std::weak_ptr<RakNet::RakPeerInterface> weakPeer = _peer;
 			connection->onClose([logger, weakPeer, cid, guid](std::string reason) {
-#if defined(_WIN32)
-				StackWalker sw;
-				sw.outputFunction = [logger](std::string stack) {
-					logger->log(LogLevel::Trace, "RaknetTransport", "Triggered Onclose event", stack);
-				};
-				sw.ShowCallstack();
-#endif
+//#if defined(_WIN32) && !defined(_XBOX_ONE)
+//				StackWalker sw;
+//				sw.outputFunction = [logger](std::string stack) {
+//					logger->log(LogLevel::Trace, "RaknetTransport", "Triggered Onclose event", stack);
+//				};
+//				sw.ShowCallstack();
+//#endif
 				auto peer = weakPeer.lock();
 				if (peer)
 				{

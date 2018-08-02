@@ -35,7 +35,7 @@ namespace Stormancer
 
 	RakNetConnection::~RakNetConnection()
 	{
-		_logger->log(LogLevel::Info, "raknetConnection", "Destroying connection object ", std::to_string(id()));
+		_logger->log(LogLevel::Trace, "raknetConnection", "Destroying connection object ", std::to_string(id()));
 		close("Connection object destroyed");
 	}
 
