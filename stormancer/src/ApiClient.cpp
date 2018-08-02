@@ -59,8 +59,8 @@ namespace Stormancer
 			{
 				errorMsg = errorMsg + e;
 			}
-
-			return pplx::task_from_exception<SceneEndpoint>(std::runtime_error("Failed to connect to the configured server endpoints : " + errorMsg));
+			std::string message = "Failed to connect to the configured server endpoints : " + errorMsg;
+			return pplx::task_from_exception<SceneEndpoint>(std::runtime_error(message.c_str()));
 		}
 
 		auto it = endpoints.begin();
