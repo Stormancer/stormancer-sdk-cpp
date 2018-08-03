@@ -24,6 +24,8 @@ namespace Stormancer
 
 	std::shared_ptr<P2PTunnel> P2PTunnels::createServer(std::string serverId, std::shared_ptr<P2PTunnels> tunnels)
 	{
+		std::lock_guard<std::mutex> lg(_syncRoot);
+
 		auto tunnel = std::make_shared<P2PTunnel>([tunnels, serverId]() {
 			tunnels->destroyServer(serverId);
 		});
@@ -61,7 +63,11 @@ namespace Stormancer
 				client->peerId = connectionId;
 				client->serverId = serverId;
 				client->serverSide = false;
-				_tunnels[std::make_tuple(connectionId, result.handle)] = client;
+
+				{
+					std::lock_guard<std::mutex> lg(_syncRoot);
+					_tunnels[std::make_tuple(connectionId, result.handle)] = client;
+				}
 
 				auto tunnel = std::make_shared<P2PTunnel>(createSafeCapture(STRM_WEAK_FROM_THIS(), [this, connectionId, result]() {
 					destroyTunnel(connectionId, result.handle);
@@ -87,11 +93,14 @@ namespace Stormancer
 
 	byte P2PTunnels::addClient(std::string serverId, uint64 clientPeerId)
 	{
+		std::lock_guard<std::mutex> lg(_syncRoot);
+
 		auto serverIt = _servers.find(serverId);
 		if (serverIt == _servers.end())
 		{
 			throw std::runtime_error("The server does not exist");
 		}
+
 		for (byte handle = 0; handle < 255; handle++)
 		{
 			peerHandle key(clientPeerId, handle);
@@ -113,6 +122,7 @@ namespace Stormancer
 
 	void P2PTunnels::closeTunnel(byte handle, uint64 peerId)
 	{
+		std::lock_guard<std::mutex> lg(_syncRoot);
 		_tunnels.erase(std::make_tuple(peerId, handle));
 	}
 
@@ -121,30 +131,34 @@ namespace Stormancer
 		std::vector<pplx::task<void>> tasks;
 		std::vector<peerHandle> itemsToDelete;
 
-		for (auto tunnel : _tunnels)
 		{
-			if (tunnel.second->serverId == serverId && tunnel.second->serverSide)
+			std::lock_guard<std::mutex> lg(_syncRoot);
+
+			for (auto tunnel : _tunnels)
 			{
-				auto connection = _connections->getConnection(tunnel.second->peerId);
-				itemsToDelete.push_back(tunnel.first);
-				if (connection)
+				if (tunnel.second->serverId == serverId && tunnel.second->serverSide)
 				{
-					auto handle = std::get<1>(tunnel.first);
-					tasks.push_back(_sysClient->sendSystemRequest(connection.get(), (byte)SystemRequestIDTypes::ID_P2P_CLOSE_TUNNEL, handle).then([](pplx::task<void> t) {
-						try
-						{
-							t.get();
-						}
-						catch (...) {}
-					}));
+					auto connection = _connections->getConnection(tunnel.second->peerId);
+					itemsToDelete.push_back(tunnel.first);
+					if (connection)
+					{
+						auto handle = std::get<1>(tunnel.first);
+						tasks.push_back(_sysClient->sendSystemRequest(connection.get(), (byte)SystemRequestIDTypes::ID_P2P_CLOSE_TUNNEL, handle).then([](pplx::task<void> t) {
+							try
+							{
+								t.get();
+							}
+							catch (...) {}
+						}));
+					}
+
 				}
-
 			}
-		}
 
-		for (auto item : itemsToDelete)
-		{
-			_tunnels.erase(item);
+			for (auto item : itemsToDelete)
+			{
+				_tunnels.erase(item);
+			}
 		}
 
 		return pplx::when_all(tasks.begin(), tasks.end());
@@ -152,6 +166,8 @@ namespace Stormancer
 
 	pplx::task<void> P2PTunnels::destroyTunnel(uint64 peerId, byte handle)
 	{
+		std::lock_guard<std::mutex> lg(_syncRoot);
+
 		auto it = _tunnels.find(std::make_tuple(peerId, handle));
 		if (it != _tunnels.end())
 		{
@@ -178,6 +194,8 @@ namespace Stormancer
 
 	void P2PTunnels::receiveFrom(uint64 id, ibytestream* stream)
 	{
+		std::lock_guard<std::mutex> lg(_syncRoot);
+
 		byte handle;
 		stream->read(&handle, 1);
 		byte buffer[1464];

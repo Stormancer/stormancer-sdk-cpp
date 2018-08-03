@@ -5,19 +5,19 @@
 
 int main(int argc, char** argv)
 {
-	std::string endpoint = (argc >= 2) ? argv[1] : "http://localhost:8081";
+	std::string endpoint = (argc >= 2) ? argv[1] : "http://api2.stormancer.com:8080";
 	std::string account = (argc >= 3) ? argv[2] : "tester";
-	std::string application = (argc >= 4) ? argv[3] : "tester";
+	std::string application = (argc >= 4) ? argv[3] : "test-application";
 
-	//{
-	//	Stormancer::Tester tester(endpoint, account, application);
-	//	tester.run_all_tests();
-	//	std::cin.ignore();
-	//}
+	{
+		Stormancer::Tester tester(endpoint, account, "tester");
+		tester.run_all_tests();
+		std::cin.ignore();
+	}
 
 	try
 	{
-		testP2P(endpoint, account, application, "main");
+		testP2P(endpoint, account, application, "test-scene");
 	}
 	catch (const std::exception&)
 	{
