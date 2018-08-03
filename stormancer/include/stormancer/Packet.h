@@ -40,13 +40,6 @@ namespace Stormancer
 		/// Destructor
 		virtual ~Packet()
 		{
-			clean();
-		}
-
-		void clean()
-		{
-			cleanup();
-			cleanup.clear();
 		}
 
 		/// Read a serialized object
@@ -74,9 +67,6 @@ namespace Stormancer
 
 		/// Data stream
 		ibytestream* stream = nullptr;
-
-		/// Clean-up operations
-		Action<> cleanup;
 
 		/// Metadata
 		std::map<std::string, std::string> metadata;

@@ -54,8 +54,6 @@ namespace Stormancer
 			auto ctxPtr = context.get();
 			std::function<pplx::task<void>(RequestContext*)> handler = it->second;
 			invokeWrapping(handler, ctxPtr).then([=](pplx::task<void> t) {
-				//Clean the packet to deallocate resources
-				p->clean();
 				if (!context->isComplete())
 				{
 					// task faulted

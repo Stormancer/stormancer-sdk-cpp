@@ -545,15 +545,11 @@ namespace Stormancer
 		std::memcpy(data, rakNetPacket->data, rakNetPacket->length);
 		auto stream = new ibytestream(data, (std::streamsize)rakNetPacket->length);
 
-		Packet_ptr packet(new Packet<>(connection, stream), deleter<Packet<>>());
-		auto peer = _peer;
-		packet->cleanup += [data, stream]() {
-			if (data)
-			{
-				delete[] data;
-				delete stream;
-			}
-		};
+		Packet_ptr packet(new Packet<>(connection, stream), [data, stream](Packet<>* packetPtr) {
+			delete packetPtr;
+			delete stream;
+			delete[] data;
+		});
 
 		_onPacketReceived(packet);
 	}
@@ -568,7 +564,7 @@ namespace Stormancer
 		if (_peer)
 		{
 			int64 cid = peerId;
-			auto connection = std::make_shared<RakNetConnection>(raknetGuid, cid, _peer, _logger, _dependencyResolver);
+			auto connection = std::shared_ptr<RakNetConnection>(new RakNetConnection(raknetGuid, cid, _peer, _logger, _dependencyResolver), deleter<RakNetConnection>());
 			RakNet::RakNetGUID guid(connection->guid());
 			auto logger = _logger;
 			std::weak_ptr<RakNet::RakPeerInterface> weakPeer = _peer;

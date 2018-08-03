@@ -16,6 +16,9 @@
 namespace Stormancer
 {
 	class Client;
+	class Scene;
+
+	using Scene_ptr = std::shared_ptr<Scene>;
 
 	/// Communicates with the server scene.
 	/// Get a scene by calling Client::getPublicScene or Client::getScene.
@@ -30,17 +33,6 @@ namespace Stormancer
 		friend class SceneDispatcher;
 
 #pragma region public_methods
-
-		/// Constructor.
-		/// \param connection The connection to the scene.
-		/// \param client The client which manage the connection.
-		/// \param id Scene id.
-		/// \param token Application token.
-		/// \param dto Scene informations.
-		Scene(std::weak_ptr<IConnection> connection, std::weak_ptr<Client> client, const std::string& id, const std::string& token, const SceneInfosDto& dto, std::weak_ptr<DependencyResolver> parentDependencyResolver);
-
-		/// Destructor.
-		~Scene();
 
 		/// initializer
 		void initialize();
@@ -132,8 +124,22 @@ namespace Stormancer
 
 #pragma region private_methods
 
+		/// Constructor.
+		/// \param connection The connection to the scene.
+		/// \param client The client which manage the connection.
+		/// \param id Scene id.
+		/// \param token Application token.
+		/// \param dto Scene informations.
+		Scene(std::weak_ptr<IConnection> connection, std::weak_ptr<Client> client, const std::string& id, const std::string& token, const SceneInfosDto& dto, std::weak_ptr<DependencyResolver> parentDependencyResolver);
+
 		/// Copy constructor deleted.
 		Scene(const Scene& other) = delete;
+
+		/// Move constructor deleted.
+		Scene(const Scene&& other) = delete;
+
+		/// Destructor.
+		~Scene();
 
 		/// Copy operator deleted.
 		Scene& operator=(const Scene& other) = delete;
@@ -233,6 +239,4 @@ namespace Stormancer
 
 #pragma endregion
 	};
-
-	using Scene_ptr = std::shared_ptr<Scene>;
 };

@@ -274,19 +274,11 @@ namespace Stormancer
 				continue;
 			}
 
-			auto stream = new ibytestream;
-			stream->rdbuf()->pubsetbuf(buffer, msgLength);
-			Packet_ptr packet(new Packet<>(_connection, stream), deleter<Packet<>>());
-			packet->cleanup += std::function<void(void)>([=]() {
-				if (stream)
-				{
-					stream->rdbuf()->pubsetbuf(nullptr, 0);
-					delete stream;
-				}
-				if (buffer)
-				{
-					delete[] buffer;
-				}
+			auto stream = new ibytestream(buffer, msgLength);
+			Packet_ptr packet(new Packet<>(_connection, stream), [stream, buffer](Packet<>* packetPtr) {
+				delete packetPtr;
+				delete stream;
+				delete[] buffer;
 			});
 
 			{

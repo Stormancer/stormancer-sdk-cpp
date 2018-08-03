@@ -15,7 +15,8 @@ namespace Stormancer
 			: _endpoint(endpoint)
 			, _accountId(account)
 			, _applicationName(application)
-		{}
+		{
+		}
 
 		Tester() = default;
 

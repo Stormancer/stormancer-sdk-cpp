@@ -38,11 +38,11 @@ This implementation is a compilation of various publicly available
 information and acquired knowledge:
 
 # The indispensable documentation of "Pre-defined Compiler Macros"
-  [@http://sourceforge.net/p/predef/wiki/Endianness Endianness].
+[@http://sourceforge.net/p/predef/wiki/Endianness Endianness].
 # The various endian specifications available in the
-  [@http://wikipedia.org/ Wikipedia] computer architecture pages.
+[@http://wikipedia.org/ Wikipedia] computer architecture pages.
 # Generally available searches for headers that define endianness.
- */
+*/
 
 #define MSGPACK_ENDIAN_BIG_BYTE MSGPACK_VERSION_NUMBER_NOT_AVAILABLE
 #define MSGPACK_ENDIAN_BIG_WORD MSGPACK_VERSION_NUMBER_NOT_AVAILABLE
@@ -50,8 +50,8 @@ information and acquired knowledge:
 #define MSGPACK_ENDIAN_LITTLE_WORD MSGPACK_VERSION_NUMBER_NOT_AVAILABLE
 
 /* GNU libc provides a header defining __BYTE_ORDER, or _BYTE_ORDER.
- * And some OSs provide some for of endian header also.
- */
+* And some OSs provide some for of endian header also.
+*/
 #if !MSGPACK_ENDIAN_BIG_BYTE && !MSGPACK_ENDIAN_BIG_WORD && \
     !MSGPACK_ENDIAN_LITTLE_BYTE && !MSGPACK_ENDIAN_LITTLE_WORD
 #   if MSGPACK_LIB_C_GNU || MSGPACK_OS_ANDROID
@@ -100,7 +100,7 @@ information and acquired knowledge:
 #endif
 
 /* Built-in byte-swpped big-endian macros.
- */
+*/
 #if !MSGPACK_ENDIAN_BIG_BYTE && !MSGPACK_ENDIAN_BIG_WORD && \
     !MSGPACK_ENDIAN_LITTLE_BYTE && !MSGPACK_ENDIAN_LITTLE_WORD
 #   if (defined(__BIG_ENDIAN__) && !defined(__LITTLE_ENDIAN__)) || \
@@ -117,7 +117,7 @@ information and acquired knowledge:
 #endif
 
 /* Built-in byte-swpped little-endian macros.
- */
+*/
 #if !MSGPACK_ENDIAN_BIG_BYTE && !MSGPACK_ENDIAN_BIG_WORD && \
     !MSGPACK_ENDIAN_LITTLE_BYTE && !MSGPACK_ENDIAN_LITTLE_WORD
 #   if (defined(__LITTLE_ENDIAN__) && !defined(__BIG_ENDIAN__)) || \
@@ -134,13 +134,12 @@ information and acquired knowledge:
 #endif
 
 /* Some architectures are strictly one endianess (as opposed
- * the current common bi-endianess).
- */
+* the current common bi-endianess).
+*/
 #if !MSGPACK_ENDIAN_BIG_BYTE && !MSGPACK_ENDIAN_BIG_WORD && \
     !MSGPACK_ENDIAN_LITTLE_BYTE && !MSGPACK_ENDIAN_LITTLE_WORD
 #   include <msgpack/predef/architecture.h>
 #   if MSGPACK_ARCH_M68K || \
-        MSGPACK_ARCH_PARISK || \
         MSGPACK_ARCH_SPARC || \
         MSGPACK_ARCH_SYS370 || \
         MSGPACK_ARCH_SYS390 || \
@@ -148,7 +147,7 @@ information and acquired knowledge:
 #       undef MSGPACK_ENDIAN_BIG_BYTE
 #       define MSGPACK_ENDIAN_BIG_BYTE MSGPACK_VERSION_NUMBER_AVAILABLE
 #   endif
-#   if MSGPACK_ARCH_AMD64 || \
+#   if MSGPACK_ARCH_X86_64 || \
         MSGPACK_ARCH_IA64 || \
         MSGPACK_ARCH_X86 || \
         MSGPACK_ARCH_BLACKFIN
@@ -158,8 +157,8 @@ information and acquired knowledge:
 #endif
 
 /* Windows on ARM, if not otherwise detected/specified, is always
- * byte-swaped little-endian.
- */
+* byte-swaped little-endian.
+*/
 #if !MSGPACK_ENDIAN_BIG_BYTE && !MSGPACK_ENDIAN_BIG_WORD && \
     !MSGPACK_ENDIAN_LITTLE_BYTE && !MSGPACK_ENDIAN_LITTLE_WORD
 #   if MSGPACK_ARCH_ARM
@@ -190,16 +189,16 @@ information and acquired knowledge:
 #define MSGPACK_ENDIAN_LITTLE_WORD_NAME "Word-Swapped Little-Endian"
 
 #include <msgpack/predef/detail/test.h>
-MSGPACK_PREDEF_DECLARE_TEST(MSGPACK_ENDIAN_BIG_BYTE,MSGPACK_ENDIAN_BIG_BYTE_NAME)
+MSGPACK_PREDEF_DECLARE_TEST(MSGPACK_ENDIAN_BIG_BYTE, MSGPACK_ENDIAN_BIG_BYTE_NAME)
 
 #include <msgpack/predef/detail/test.h>
-MSGPACK_PREDEF_DECLARE_TEST(MSGPACK_ENDIAN_BIG_WORD,MSGPACK_ENDIAN_BIG_WORD_NAME)
+MSGPACK_PREDEF_DECLARE_TEST(MSGPACK_ENDIAN_BIG_WORD, MSGPACK_ENDIAN_BIG_WORD_NAME)
 
 #include <msgpack/predef/detail/test.h>
-MSGPACK_PREDEF_DECLARE_TEST(MSGPACK_ENDIAN_LITTLE_BYTE,MSGPACK_ENDIAN_LITTLE_BYTE_NAME)
+MSGPACK_PREDEF_DECLARE_TEST(MSGPACK_ENDIAN_LITTLE_BYTE, MSGPACK_ENDIAN_LITTLE_BYTE_NAME)
 
 #include <msgpack/predef/detail/test.h>
-MSGPACK_PREDEF_DECLARE_TEST(MSGPACK_ENDIAN_LITTLE_WORD,MSGPACK_ENDIAN_LITTLE_WORD_NAME)
+MSGPACK_PREDEF_DECLARE_TEST(MSGPACK_ENDIAN_LITTLE_WORD, MSGPACK_ENDIAN_LITTLE_WORD_NAME)
 
 
 #endif

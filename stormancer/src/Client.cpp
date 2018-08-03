@@ -132,10 +132,7 @@ namespace Stormancer
 			return nullptr;
 		}
 
-		auto client = std::shared_ptr<Client>(new Client(config), [](Client* client)
-		{
-			delete client;
-		});
+		Client_ptr client(new Client(config), [](Client* ptr) { delete ptr; });
 		client->initialize();
 		return client;
 	}
@@ -581,7 +578,7 @@ namespace Stormancer
 			.then(createSafeCapture(STRM_WEAK_FROM_THIS(), [this, sceneId, sep](SceneInfosDto sceneInfos)
 		{
 			logger()->log(LogLevel::Trace, "Client", "Return the scene", sceneId);
-			auto scene = std::make_shared<Scene>(_serverConnection, STRM_WEAK_FROM_THIS(), sceneId, sep.token, sceneInfos, _dependencyResolver);
+			Scene_ptr scene(new Scene(_serverConnection, STRM_WEAK_FROM_THIS(), sceneId, sep.token, sceneInfos, _dependencyResolver), [](Scene* ptr) { delete ptr; });
 			scene->initialize();
 			for (auto plugin : _plugins)
 			{

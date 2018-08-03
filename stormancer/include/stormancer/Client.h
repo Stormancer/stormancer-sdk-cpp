@@ -15,6 +15,7 @@
 namespace Stormancer
 {
 	class Client;
+
 	using Client_ptr = std::shared_ptr<Client>;
 
 	/// Manage the connection to the scenes of an application.
@@ -92,6 +93,7 @@ namespace Stormancer
 
 		Client(Configuration_ptr config);
 		Client(const Client& other) = delete;
+		Client(const Client&& other) = delete;
 		Client& operator=(const Client& other) = delete;
 		~Client();
 		void initialize();
