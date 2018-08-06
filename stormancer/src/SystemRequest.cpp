@@ -18,7 +18,7 @@ namespace Stormancer
 		}
 		if (!complete)
 		{
-			tce.set_exception(std::runtime_error("System request is not finished and has been deleted"));
+			tce.set_exception(std::runtime_error("System request is not finished and has been deleted : id=" + std::to_string(_msgId)));
 		}
 	}
 
