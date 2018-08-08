@@ -181,7 +181,7 @@ namespace Stormancer
 							if (!request->complete)
 							{
 								that->freeRequestSlot(request->id);
-								tce._Cancel();
+								tce.set_exception(pplx::task_canceled());
 							}
 						}
 					}
