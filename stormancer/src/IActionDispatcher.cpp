@@ -10,7 +10,6 @@ namespace Stormancer
 
 	SameThreadActionDispatcher::~SameThreadActionDispatcher()
 	{
-
 	}
 
 	void SameThreadActionDispatcher::schedule(pplx::TaskProc_t task, void* param)
@@ -41,15 +40,13 @@ namespace Stormancer
 		}
 	}
 
-
-
 	void MainThreadActionDispatcher::start()
 	{
 		std::lock_guard<std::mutex> l(_mutex);
 
+		_stopTce = pplx::task_completion_event<void>();
 		_isRunning = true;
 		_stopRequested = false;
-		_actions = std::queue<std::function<void()>>();
 	}
 
 	//Stop will be effective only on the next execution of "run"
@@ -58,6 +55,7 @@ namespace Stormancer
 		std::lock_guard<std::mutex> l(_mutex);
 
 		_stopRequested = true;
+		_actions = std::queue<std::function<void()>>();
 		return pplx::create_task(_stopTce);
 	}
 
@@ -68,7 +66,6 @@ namespace Stormancer
 
 	MainThreadActionDispatcher::~MainThreadActionDispatcher()
 	{
-
 	}
 
 	void MainThreadActionDispatcher::post(const std::function<void(void)>& action)
@@ -98,6 +95,7 @@ namespace Stormancer
 		do
 		{
 			std::function<void()> action;
+
 			{
 				// Retrieve in an inner scope to avoid keeping the mutex when calling action()
 				std::lock_guard<std::mutex> l(_mutex);
@@ -118,6 +116,7 @@ namespace Stormancer
 					}
 				}
 			}
+
 			if (tasksToRun)
 			{
 				action();
@@ -139,7 +138,5 @@ namespace Stormancer
 
 	IActionDispatcher::~IActionDispatcher()
 	{
-
 	}
-
 }
