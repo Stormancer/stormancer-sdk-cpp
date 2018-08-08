@@ -197,9 +197,9 @@ namespace Stormancer
 							}
 							break;
 						}
-						case DefaultMessageIDTypes::ID_INCOMPATIBLE_PROTOCOL_VERSION:
 						case DefaultMessageIDTypes::ID_NO_FREE_INCOMING_CONNECTIONS:
 							_logger->log(LogLevel::Trace, "RakNetTransport", "Connection failed because too many concurrent connections.");
+						case DefaultMessageIDTypes::ID_INCOMPATIBLE_PROTOCOL_VERSION:
 						case DefaultMessageIDTypes::ID_CONNECTION_ATTEMPT_FAILED:
 						{
 							std::string packetSystemAddressStr = rakNetPacket->systemAddress.ToString(true, ':');
