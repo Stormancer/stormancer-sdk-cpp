@@ -435,8 +435,8 @@ namespace Stormancer
 	pplx::task<std::shared_ptr<P2PScenePeer>> Scene::openP2PConnection(const std::string & p2pToken, pplx::cancellation_token ct)
 	{
 		auto p2pService = dependencyResolver().lock()->resolve<P2PService>();
-		return p2pService->openP2PConnection(p2pToken, ct).then(createSafeCapture(STRM_WEAK_FROM_THIS(), [=](pplx::task < std::shared_ptr<IConnection>> t) {
-			return std::make_shared<P2PScenePeer>(this, t.get(), p2pService, P2PConnectToSceneMessage());
+		return p2pService->openP2PConnection(p2pToken, ct).then(createSafeCapture(STRM_WEAK_FROM_THIS(), [=](std::shared_ptr<IConnection> connection) {
+			return std::make_shared<P2PScenePeer>(this, connection, p2pService, P2PConnectToSceneMessage());
 		}), ct);
 		//	auto c = t.get();
 		//	P2PConnectToSceneMessage message;
