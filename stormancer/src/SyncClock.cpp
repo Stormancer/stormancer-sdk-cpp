@@ -7,10 +7,10 @@
 
 namespace Stormancer
 {
-	SyncClock::SyncClock(DependencyResolver* dependencyResolver, int interval)
+	SyncClock::SyncClock(std::weak_ptr<DependencyResolver> dependencyResolver, int interval)
 		: _dependencyResolver(dependencyResolver)
 		, _interval(interval)
-		, _logger(dependencyResolver->resolve<ILogger>())
+		, _logger(dependencyResolver.lock()->resolve<ILogger>())
 	{
 		_watch.reset();
 	}
@@ -25,7 +25,7 @@ namespace Stormancer
 
 	void SyncClock::start(std::weak_ptr<IConnection> connectionPtr, pplx::cancellation_token ct)
 	{
-		auto logger = _dependencyResolver->resolve<ILogger>();
+		auto logger = _dependencyResolver.lock()->resolve<ILogger>();
 		logger->log(LogLevel::Trace, "synchronizedClock", "Starting SyncClock...");
 
 		if (!compareExchange(_mutex, _isRunning, false, true))
@@ -40,7 +40,7 @@ namespace Stormancer
 		}
 		_remoteConnection = connection;
 
-		auto  scheduler = _dependencyResolver->resolve<IScheduler>();
+		auto  scheduler = _dependencyResolver.lock()->resolve<IScheduler>();
 		if (scheduler)
 		{
 			_cancellationToken = ct;
@@ -125,7 +125,7 @@ namespace Stormancer
 		{
 			_lastPingFinished = false;
 			uint64 timeStart = _watch.getElapsedTime();
-			auto requestProcessor = _dependencyResolver->resolve<RequestProcessor>();
+			auto requestProcessor = _dependencyResolver.lock()->resolve<RequestProcessor>();
 			auto remoteConnection = _remoteConnection.lock();
 			if (!remoteConnection)
 			{
@@ -133,7 +133,7 @@ namespace Stormancer
 			}
 
 			// Keep an active reference to the logger, in case the task is cancelled we cannot rely on this being valid
-			auto logger = _dependencyResolver->resolve<ILogger>();
+			auto logger = _dependencyResolver.lock()->resolve<ILogger>();
 			auto cancellationToken = _cancellationToken;
 			requestProcessor->sendSystemRequest(remoteConnection.get(), (byte)SystemRequestIDTypes::ID_PING, [&timeStart](obytestream* bs) {
 				(*bs) << timeStart;
@@ -209,7 +209,7 @@ namespace Stormancer
 		}
 		catch (const std::exception& ex)
 		{
-			auto logger = _dependencyResolver->resolve<ILogger>();
+			auto logger = _dependencyResolver.lock()->resolve<ILogger>();
 			logger->log(LogLevel::Error, "Client::syncClockImpl", "Failed to ping server.", ex.what());
 			throw std::runtime_error(std::string() + ex.what() + "\nFailed to ping server.");
 		}

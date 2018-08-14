@@ -46,6 +46,7 @@ namespace Stormancer
 		pplx::task<void> test_rpc_client_received(RpcRequestContext_ptr rc);
 		pplx::task<void> test_rpc_client_cancel_received(RpcRequestContext_ptr rc);
 		pplx::task<void> test_rpc_client_exception_received(RpcRequestContext_ptr rc);
+		void test_create();
 		void test_connect();
 		void test_echo();
 		void test_rpc_server();

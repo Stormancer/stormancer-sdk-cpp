@@ -17,7 +17,7 @@ namespace Stormancer
 
 #pragma region public_methods
 
-		RakNetConnection(RakNet::RakNetGUID guid, int64 id, std::weak_ptr<RakNet::RakPeerInterface> peer, ILogger_ptr logger, DependencyResolver* resolver);
+		RakNetConnection(RakNet::RakNetGUID guid, int64 id, std::weak_ptr<RakNet::RakPeerInterface> peer, ILogger_ptr logger, std::weak_ptr<DependencyResolver> resolver);
 		~RakNetConnection();
 		uint64 id() const override;
 		time_t connectionDate() const override;
@@ -33,7 +33,7 @@ namespace Stormancer
 		std::string metadata(const std::string& key) const override;
 		void setMetadata(const std::map<std::string, std::string>& metadata) override;
 		void setMetadata(const std::string& key, const std::string& value) override;
-		DependencyResolver* dependencyResolver() override;
+		std::weak_ptr<DependencyResolver> dependencyResolver() override;
 		void close(std::string reason = "") override;
 		virtual void send(const Writer& writer, int channelUid, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const TransformMetadata& transformMetadata = TransformMetadata()) override;
 		int ping() const override;
@@ -88,7 +88,7 @@ namespace Stormancer
 		RakNet::RakNetGUID _guid;
 		time_t _lastActivityDate = nowTime_t();
 		std::map<size_t, void*> _localData;
-		DependencyResolver* _dependencyResolver = nullptr;
+		std::weak_ptr<DependencyResolver> _dependencyResolver;
 		ConnectionState _connectionState = ConnectionState::Disconnected;
 		rxcpp::subjects::subject<ConnectionState> _connectionStateObservable;
 		Action<std::string> _closeAction;

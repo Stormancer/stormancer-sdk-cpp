@@ -7,7 +7,7 @@
 
 namespace Stormancer
 {
-	RakNetConnection::RakNetConnection(RakNet::RakNetGUID guid, int64 id, std::weak_ptr<RakNet::RakPeerInterface> peer, ILogger_ptr logger, DependencyResolver* resolver)
+	RakNetConnection::RakNetConnection(RakNet::RakNetGUID guid, int64 id, std::weak_ptr<RakNet::RakPeerInterface> peer, ILogger_ptr logger, std::weak_ptr<DependencyResolver> resolver)
 		: _id(id)
 		, _peer(peer)
 		, _guid(guid)
@@ -96,7 +96,7 @@ namespace Stormancer
 		_metadata[key] = value;
 	}
 
-	DependencyResolver* RakNetConnection::dependencyResolver()
+	std::weak_ptr<DependencyResolver> RakNetConnection::dependencyResolver()
 	{
 		return _dependencyResolver;
 	}
@@ -127,9 +127,15 @@ namespace Stormancer
 
 	void RakNetConnection::send(const Writer& writer, int channelUid, PacketPriority priority, PacketReliability reliability, const TransformMetadata& transformMetadata)
 	{
+		auto dependencyResolver = _dependencyResolver.lock();
+		if (!dependencyResolver)
+		{
+			throw std::runtime_error("Dependency resolver not available");
+		}
+
 		obytestream stream;
 		std::vector<std::shared_ptr<IPacketTransform>> packetTransforms;
-		packetTransforms.emplace_back(std::make_shared<AESPacketTransform>(_dependencyResolver->resolve<IAES>(), _dependencyResolver->resolve<Configuration>()));
+		packetTransforms.emplace_back(std::make_shared<AESPacketTransform>(dependencyResolver->resolve<IAES>(), dependencyResolver->resolve<Configuration>()));
 		Writer writer2 = writer;
 		for (auto& packetTransform : packetTransforms)
 		{

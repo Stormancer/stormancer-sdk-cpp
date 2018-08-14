@@ -92,9 +92,9 @@ namespace Stormancer
 		_metadata[key] = value;
 	}
 
-	DependencyResolver* RelayConnection::dependencyResolver()
+	std::weak_ptr<DependencyResolver> RelayConnection::dependencyResolver()
 	{
-		return _dependencyResolver.get();
+		return _dependencyResolver;
 	}
 
 	ConnectionState RelayConnection::getConnectionState() const

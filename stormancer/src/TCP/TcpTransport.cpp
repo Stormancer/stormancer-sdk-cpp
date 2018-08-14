@@ -4,10 +4,10 @@
 
 namespace Stormancer
 {
-	TcpTransport::TcpTransport(DependencyResolver* dependencyResolver)
+	TcpTransport::TcpTransport(std::weak_ptr<DependencyResolver> dependencyResolver)
 		: _dependencyResolver(dependencyResolver)
-		, _logger(dependencyResolver->resolve<ILogger>())
-		, _scheduler(dependencyResolver->resolve<IScheduler>())
+		, _logger(dependencyResolver.lock()->resolve<ILogger>())
+		, _scheduler(dependencyResolver.lock()->resolve<IScheduler>())
 		, _name("tcp")
 	{
 	}
@@ -130,7 +130,7 @@ namespace Stormancer
 		return _id;
 	}
 
-	DependencyResolver* TcpTransport::dependencyResolver() const
+	std::weak_ptr<DependencyResolver> TcpTransport::dependencyResolver() const
 	{
 		return _dependencyResolver;
 	}

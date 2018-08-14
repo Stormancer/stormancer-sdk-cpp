@@ -21,8 +21,8 @@ namespace Stormancer
 
 			if (rpcParams == version)
 			{
-				scene->dependencyResolver().lock()->registerDependency<RpcService>([=](DependencyResolver* resolver) {
-					return std::make_shared<RpcService>(scene, resolver->resolve<IActionDispatcher>());
+				scene->dependencyResolver().lock()->registerDependency<RpcService>([=](std::weak_ptr<DependencyResolver> resolver) {
+					return std::make_shared<RpcService>(scene, resolver.lock()->resolve<IActionDispatcher>());
 				}, true);
 			}
 		}

@@ -128,6 +128,9 @@ namespace Stormancer
 	{
 		if (_isMatching)
 		{
+			_matchmakingCTS.cancel();
+			_isMatching = false;
+
 			auto scene = _scene.lock();
 			if (!scene)
 			{
@@ -135,9 +138,7 @@ namespace Stormancer
 				return;
 			}
 
-			_matchmakingCTS.cancel();
 			scene->send("match.cancel", [](obytestream*) {}, PacketPriority::IMMEDIATE_PRIORITY, PacketReliability::RELIABLE_ORDERED);
-			_isMatching = false;
 		}
 	}
 };

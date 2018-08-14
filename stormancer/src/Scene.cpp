@@ -6,7 +6,6 @@
 #include "stormancer/SystemRequestIDTypes.h"
 #include "stormancer/P2P/P2PConnectToSceneMessage.h"
 #include "stormancer/SafeCapture.h"
-#include "..\include\stormancer\Scene.h"
 
 namespace Stormancer
 {

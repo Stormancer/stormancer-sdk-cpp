@@ -63,7 +63,7 @@ namespace Stormancer
 		int64 lastPing() const;
 
 		/// Get dependency resolver
-		DependencyResolver* dependencyResolver();
+		std::weak_ptr<DependencyResolver> dependencyResolver();
 
 		/// Get connection state observable
 		rxcpp::observable<ConnectionState> getConnectionStateChangedObservable() const;

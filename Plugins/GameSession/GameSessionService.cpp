@@ -210,7 +210,6 @@ namespace Stormancer
 	{
 		_tunnel = nullptr;
 		_users.clear();
-		_logger = nullptr;
 	}
 
 	void GameSessionService::ready(std::string data)

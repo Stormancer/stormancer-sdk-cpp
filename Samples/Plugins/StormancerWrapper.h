@@ -56,7 +56,7 @@ namespace Stormancer
 			pplx::task<Scene_ptr> sceneTask;
 			if (needAuthentication)
 			{
-				auto authService = _client->dependencyResolver()->resolve<AuthenticationService>();
+				auto authService = _client->dependencyResolver().lock()->resolve<AuthenticationService>();
 				if (authService->connectionState() != GameConnectionState::Authenticated)
 				{
 					tce.set_exception(std::runtime_error("User not authenticated."));

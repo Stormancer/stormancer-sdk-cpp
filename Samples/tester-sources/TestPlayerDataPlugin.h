@@ -30,12 +30,12 @@ public:
 			setup_connection(client1, "TestPlayerDataClient1").then([this](std::shared_ptr<Stormancer::PlayerDataService<std::string>> data)
 			{
 				data1 = data;
-				id1 = client1->dependencyResolver()->resolve<Stormancer::AuthenticationService>()->userId();
+				id1 = client1->dependencyResolver().lock()->resolve<Stormancer::AuthenticationService>()->userId();
 			}),
 			setup_connection(client2, "TestPlayerDataClient2").then([this](std::shared_ptr<Stormancer::PlayerDataService<std::string>> data)
 			{
 				data2 = data;
-				id2 = client2->dependencyResolver()->resolve<Stormancer::AuthenticationService>()->userId();
+				id2 = client2->dependencyResolver().lock()->resolve<Stormancer::AuthenticationService>()->userId();
 			})
 		};
 
@@ -84,7 +84,7 @@ private:
 			{ "ticket", auth_ticket }
 		};
 
-		auto auth_service = client->dependencyResolver()->resolve<Stormancer::AuthenticationService>();
+		auto auth_service = client->dependencyResolver().lock()->resolve<Stormancer::AuthenticationService>();
 		return auth_service->login(auth_context).then([=]
 		{
 			return auth_service->getPrivateScene("test-player-data-plugin");

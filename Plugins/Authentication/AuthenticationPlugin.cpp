@@ -15,6 +15,6 @@ namespace Stormancer
 	void AuthenticationPlugin::clientCreated(Client* client)
 	{
 		auto authService = std::make_shared<AuthenticationService>(client);
-		client->dependencyResolver()->registerDependency<AuthenticationService>(authService);
+		client->dependencyResolver().lock()->registerDependency<AuthenticationService>(authService);
 	}
 };

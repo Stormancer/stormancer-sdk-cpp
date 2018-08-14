@@ -18,6 +18,7 @@ namespace Stormancer
 		else
 		{
 			_logger->log(LogLevel::Info, "execNextTest", "TESTS SUCCESSFUL !");
+
 			_testsDone = true;
 		}
 	}
@@ -117,6 +118,17 @@ namespace Stormancer
 	pplx::task<void> Tester::test_rpc_client_exception_received(RpcRequestContext_ptr rc)
 	{
 		throw std::runtime_error("An excepion occured!");
+	}
+
+	void Tester::test_create()
+	{
+		// Some platforms require a Client to be created before using pplx::task
+		_config = Configuration::create(_endpoint, _accountId, _applicationName);
+		_config->logger = _logger;
+		//_config->synchronisedClock = false;
+		_client = Client::create(_config);
+
+		execNextTest();
 	}
 
 	void Tester::test_connect()
@@ -557,12 +569,6 @@ namespace Stormancer
 		_testsDone = false;
 		_testsPassed = false;
 
-		// Some platforms require a Client to be created before using pplx::task
-		_config = Configuration::create(_endpoint, _accountId, _applicationName);
-		_config->logger = _logger;
-		//_config->synchronisedClock = false;
-		_client = Client::create(_config);
-
 		_tests.push_back([this]() { test_connect(); });
 		_tests.push_back([this]() { test_echo(); });
 		_tests.push_back([this]() { test_rpc_server(); });
@@ -576,7 +582,7 @@ namespace Stormancer
 		_tests.push_back([this]() { test_disconnect(); });
 		_tests.push_back([this]() { test_clean(); });
 
-		execNextTest();
+		test_create();
 	}
 
 	bool Tester::tests_done()

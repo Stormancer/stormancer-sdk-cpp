@@ -64,12 +64,12 @@ namespace Stormancer
 			if (enabledOnContext)
 			{
 				bool singleInstance = (options.contextFlags & ServiceContextFlags::SingleInstance) != ServiceContextFlags::None;
-				client->dependencyResolver()->registerDependency<T>([](DependencyResolver*) { return std::make_shared<T>(); }, singleInstance);
+				client->dependencyResolver().lock()->registerDependency<T>([](std::weak_ptr<DependencyResolver>) { return std::make_shared<T>(); }, singleInstance);
 			}
 			bool createWithClient = (options.contextFlags & ServiceContextFlags::CreateWithClient) != ServiceContextFlags::None;
 			if (createWithClient)
 			{
-				auto service = client->dependencyResolver()->resolve<T>();
+				auto service = client->dependencyResolver().lock()->resolve<T>();
 				service->setClient(client);
 			}
 		}
@@ -86,7 +86,7 @@ namespace Stormancer
 			if (enabledOnContext && enabledOnScene)
 			{
 				bool singleInstance = (options.contextFlags & ServiceContextFlags::SingleInstance) != ServiceContextFlags::None;
-				scene->dependencyResolver().lock()->registerDependency<T>([](DependencyResolver*) { return std::make_shared<T>(); }, singleInstance);
+				scene->dependencyResolver().lock()->registerDependency<T>([](std::weak_ptr<DependencyResolver>) { return std::make_shared<T>(); }, singleInstance);
 			}
 		}
 

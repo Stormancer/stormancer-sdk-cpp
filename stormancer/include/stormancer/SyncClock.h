@@ -12,7 +12,7 @@ namespace Stormancer
 	{
 	public:
 
-		SyncClock(DependencyResolver* resolver, int interval = 1000);
+		SyncClock(std::weak_ptr<DependencyResolver> resolver, int interval = 1000);
 		~SyncClock();
 		void start(std::weak_ptr<IConnection> connection, pplx::cancellation_token ct);
 		int lastPing();
@@ -32,7 +32,7 @@ namespace Stormancer
 
 		pplx::cancellation_token _cancellationToken = pplx::cancellation_token::none();
 		std::weak_ptr<IConnection> _remoteConnection;
-		DependencyResolver* _dependencyResolver;
+		std::weak_ptr<DependencyResolver> _dependencyResolver;
 		std::mutex _mutex;
 		std::deque<ClockValue> _clockValues;
 		Watch _watch;

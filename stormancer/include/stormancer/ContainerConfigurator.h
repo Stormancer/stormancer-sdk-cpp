@@ -6,5 +6,5 @@
 
 namespace Stormancer
 {
-	void ConfigureContainer(DependencyResolver* dr, Configuration_ptr config);
+	void ConfigureContainer(std::weak_ptr<DependencyResolver> dr, Configuration_ptr config);
 };

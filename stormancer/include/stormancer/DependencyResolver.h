@@ -14,7 +14,7 @@ namespace Stormancer
 		struct Registration
 		{
 		public:
-			std::function<std::shared_ptr<void>(DependencyResolver* resolver)> factory;
+			std::function<std::shared_ptr<void>(std::weak_ptr<DependencyResolver> resolver)> factory;
 			bool singleInstance;
 			std::shared_ptr<void> instance;
 		};
@@ -48,7 +48,7 @@ namespace Stormancer
 		std::shared_ptr<void> resolveInternal(const std::type_info& t);
 
 		template<typename T>
-		void registerDependency(std::function<std::shared_ptr<T>(DependencyResolver* resolver)> factory, bool singleInstance = false)
+		void registerDependency(std::function<std::shared_ptr<T>(std::weak_ptr<DependencyResolver> resolver)> factory, bool singleInstance = false)
 		{
 			auto& t = typeid(T);
 			Registration registration;
@@ -59,7 +59,7 @@ namespace Stormancer
 		template<typename T>
 		void registerDependency(std::shared_ptr<T> instance)
 		{
-			registerDependency<T>([=](DependencyResolver*) {
+			registerDependency<T>([=](std::weak_ptr<DependencyResolver>) {
 				return instance;
 			});
 		}

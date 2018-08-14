@@ -10,11 +10,11 @@
 namespace Stormancer
 {
 	P2PRequestModule::P2PRequestModule(
-		std::shared_ptr<ITransport> transport, 
-		std::shared_ptr<IConnectionManager> connections, 
-		std::shared_ptr<P2PSessions> sessions, 
-		std::shared_ptr<Serializer> serializer, 
-		std::shared_ptr<P2PTunnels> tunnels, 
+		std::shared_ptr<ITransport> transport,
+		std::shared_ptr<IConnectionManager> connections,
+		std::shared_ptr<P2PSessions> sessions,
+		std::shared_ptr<Serializer> serializer,
+		std::shared_ptr<P2PTunnels> tunnels,
 		std::shared_ptr<ILogger> logger,
 		std::shared_ptr<Configuration> config
 	)
@@ -27,7 +27,7 @@ namespace Stormancer
 		_logger = logger;
 		_config = config;
 	}
-	
+
 	void P2PRequestModule::registerModule(RequestModuleBuilder* builder)
 	{
 		builder->service((byte)SystemRequestIDTypes::ID_P2P_GATHER_IP, [=](RequestContext* ctx) {
@@ -114,8 +114,9 @@ namespace Stormancer
 			}
 			else
 			{
-				return _transport->sendPing(candidate.listeningEndpointCandidate.address).then([=](pplx::task<int> t) {
-					auto latency = (int)t.get();
+				return _transport->sendPing(candidate.listeningEndpointCandidate.address)
+					.then([=](int latency)
+				{
 					_logger->log(LogLevel::Debug, "p2p", "Connectivity test complete : " + candidate.clientEndpointCandidate.address + " => " + candidate.listeningEndpointCandidate.address + " ping : " + std::to_string(latency));
 					ctx->send([=](obytestream* stream) {
 						_serializer->serialize(stream, latency);
@@ -154,9 +155,22 @@ namespace Stormancer
 			}
 
 			_logger->log(LogLevel::Debug, "p2p", "Waiting connection " + candidate.clientEndpointCandidate.address + " => " + candidate.listeningEndpointCandidate.address);
+			auto logger = _logger;
 			_connections->addPendingConnection(candidate.clientPeer)
-				.then([=](pplx::task<std::shared_ptr<IConnection>> t) {
+				.then([=](std::shared_ptr<IConnection>)
+			{
 				_sessions->updateSessionState(sessionId, P2PSessionState::Connected);
+			})
+				.then([logger](pplx::task<void> t)
+			{
+				try
+				{
+					t.get();
+				}
+				catch (const std::exception& ex)
+				{
+					logger->log(LogLevel::Debug, "p2p.connect_host", ex.what());
+				}
 			});
 
 			ctx->send(Writer());
@@ -180,14 +194,27 @@ namespace Stormancer
 			}
 
 			_logger->log(LogLevel::Debug, "p2p", "Connecting... " + candidate.clientEndpointCandidate.address + " => " + candidate.listeningEndpointCandidate.address);
+			auto logger = _logger;
 			_connections->addPendingConnection(candidate.listeningPeer)
-				.then([=](pplx::task<std::shared_ptr<IConnection>> t) {
-
+				.then([=](std::shared_ptr<IConnection>)
+			{
 				_sessions->updateSessionState(sessionId, P2PSessionState::Connected);
+			})
+				.then([logger](pplx::task<void> t)
+			{
+				try
+				{
+					t.get();
+				}
+				catch (const std::exception& ex)
+				{
+					logger->log(LogLevel::Debug, "p2p.connect_host", ex.what());
+				}
 			});
 
 			return _transport->connect(candidate.listeningEndpointCandidate.address)
-				.then([=](pplx::task<std::shared_ptr<IConnection>> t) {
+				.then([=](pplx::task<std::shared_ptr<IConnection>> t)
+			{
 				try
 				{
 					auto connection = t.get();
@@ -202,7 +229,6 @@ namespace Stormancer
 					_logger->log(LogLevel::Error, "p2p", "Connection attempt failed: ", ex.what());
 					throw;
 				}
-				
 			});
 		});
 
@@ -218,13 +244,13 @@ namespace Stormancer
 					result.useTunnel = true;
 					result.handle = handle;
 					_serializer->serialize(stream, result);
-					
+
 				});
 			}
 			else
 			{
 				std::string endpoint = _config->getIp_Port();//Dedicated server IP:port
-				ctx->send([endpoint,this](obytestream* stream) {
+				ctx->send([endpoint, this](obytestream* stream) {
 					OpenTunnelResult result;
 					result.useTunnel = false;
 					result.endpoint = endpoint;

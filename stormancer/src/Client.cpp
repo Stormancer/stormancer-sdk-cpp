@@ -61,13 +61,13 @@ namespace Stormancer
 		, _plugins(config->plugins())
 		, _config(config)
 	{
-		ConfigureContainer(this->dependencyResolver(), config);
+		ConfigureContainer(_dependencyResolver, config);
 
 		logger()->log(LogLevel::Trace, "Client", "Creating the client...");
 
-		std::vector<std::shared_ptr<IRequestModule>> modules{ std::dynamic_pointer_cast<IRequestModule>(dependencyResolver()->resolve<P2PRequestModule>()) };
+		std::vector<std::shared_ptr<IRequestModule>> modules{ std::dynamic_pointer_cast<IRequestModule>(_dependencyResolver->resolve<P2PRequestModule>()) };
 
-		RequestProcessor::Initialize(this->dependencyResolver()->resolve<RequestProcessor>(), modules);
+		RequestProcessor::Initialize(_dependencyResolver->resolve<RequestProcessor>(), modules);
 
 
 
@@ -858,17 +858,9 @@ namespace Stormancer
 		return _dependencyResolver->resolve<SyncClock>()->lastPing();
 	}
 
-	DependencyResolver* Client::dependencyResolver()
+	std::weak_ptr<DependencyResolver> Client::dependencyResolver()
 	{
-		auto dependencyResolver = _dependencyResolver;
-		if (dependencyResolver)
-		{
-			return dependencyResolver.get();
-		}
-		else
-		{
-			return nullptr;
-		}
+		return _dependencyResolver;
 	}
 
 	rxcpp::observable<ConnectionState> Client::getConnectionStateChangedObservable() const

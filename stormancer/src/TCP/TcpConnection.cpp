@@ -87,9 +87,9 @@ namespace Stormancer
 		_metadata[key] = value;
 	}
 
-	DependencyResolver* TcpConnection::dependencyResolver()
+	std::weak_ptr<DependencyResolver> TcpConnection::dependencyResolver()
 	{
-		return nullptr;
+		return std::weak_ptr<DependencyResolver>();
 	}
 
 	ConnectionState TcpConnection::getConnectionState() const

@@ -67,7 +67,7 @@ namespace Stormancer
 		const std::string application = "";
 
 		/// Gets or Sets the dispatcher to be used by the client.
-		std::function<std::shared_ptr<IPacketDispatcher>(DependencyResolver*)> dispatcher;
+		std::function<std::shared_ptr<IPacketDispatcher>(std::weak_ptr<DependencyResolver>)> dispatcher;
 
 		/// Maximum number of remote peers that can connect with this client.
 		uint16 maxPeers = 10;
@@ -85,7 +85,7 @@ namespace Stormancer
 		std::shared_ptr<IScheduler> scheduler;
 
 		/// Gets or sets the transport to be used by the client.
-		std::function<std::shared_ptr<ITransport>(DependencyResolver*)> transportFactory;
+		std::function<std::shared_ptr<ITransport>(std::weak_ptr<DependencyResolver>)> transportFactory;
 
 		///Gets or sets the default p2p host port. 0 For automatic attribution.
 		unsigned short serverGamePort = 7777;
@@ -151,7 +151,7 @@ namespace Stormancer
 		/// A string containing the target server endpoint.
 		std::vector<std::string> _serverEndpoints;
 
-		static const std::function<std::shared_ptr<ITransport>(DependencyResolver*)> _defaultTransportFactory;
+		static const std::function<std::shared_ptr<ITransport>(std::weak_ptr<DependencyResolver>)> _defaultTransportFactory;
 
 #pragma endregion
 	};

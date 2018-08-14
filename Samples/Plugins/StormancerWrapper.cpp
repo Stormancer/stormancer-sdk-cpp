@@ -76,7 +76,7 @@ namespace Stormancer
 
 	pplx::task<void> StormancerWrapper::Authenticate(const std::string& provider, const std::string& authenticationToken)
 	{
-		auto authService = _client->dependencyResolver()->resolve<AuthenticationService>();
+		auto authService = _client->dependencyResolver().lock()->resolve<AuthenticationService>();
 
 		const std::map<std::string, std::string> authenticationContext{
 			{ "provider", provider },
@@ -88,14 +88,14 @@ namespace Stormancer
 
 	std::string StormancerWrapper::userId()
 	{
-		auto authService = _client->dependencyResolver()->resolve<AuthenticationService>();
+		auto authService = _client->dependencyResolver().lock()->resolve<AuthenticationService>();
 
 		return authService->userId();
 	}
 
 	std::shared_ptr<IActionDispatcher> StormancerWrapper::getDispatcher()
 	{
-		return _client->dependencyResolver()->resolve<IActionDispatcher>();
+		return _client->dependencyResolver().lock()->resolve<IActionDispatcher>();
 	}
 
 	void StormancerWrapper::setLogger(std::shared_ptr<ILogger> logger)

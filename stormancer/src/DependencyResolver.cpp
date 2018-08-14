@@ -1,4 +1,5 @@
 #include "stormancer/stdafx.h"
+#include "stormancer/SafeCapture.h"
 #include "stormancer/DependencyResolver.h"
 
 namespace Stormancer
@@ -31,7 +32,7 @@ namespace Stormancer
 				{
 					if (registration.factory)
 					{
-						registration.instance = registration.factory(this);
+						registration.instance = registration.factory(STRM_WEAK_FROM_THIS());
 					}
 				}
 				if (registration.instance)
@@ -43,7 +44,7 @@ namespace Stormancer
 			{
 				if (registration.factory)
 				{
-					return registration.factory(this);
+					return registration.factory(STRM_WEAK_FROM_THIS());
 				}
 			}
 		}

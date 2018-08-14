@@ -21,7 +21,7 @@ namespace Stormancer
 		virtual bool isRunning() const = 0;
 		virtual std::string name() const = 0;
 		virtual uint64 id() const = 0;
-		virtual DependencyResolver* dependencyResolver() const = 0;
+		virtual std::weak_ptr<DependencyResolver> dependencyResolver() const = 0;
 		virtual void onPacketReceived(std::function<void(Packet_ptr)> callback) = 0;
 		virtual std::string host() const = 0;
 		virtual uint16 port() const = 0;

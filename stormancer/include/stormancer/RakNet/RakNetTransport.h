@@ -26,14 +26,14 @@ namespace Stormancer
 
 #pragma region public_methods
 
-		RakNetTransport(DependencyResolver* resolver);
+		RakNetTransport(std::weak_ptr<DependencyResolver> resolver);
 		~RakNetTransport();
 		void start(std::string type, std::shared_ptr<IConnectionManager> handler, pplx::cancellation_token ct = pplx::cancellation_token::none(), uint16 maxConnections = 10, uint16 serverPort = 0) override;
 		pplx::task<std::shared_ptr<IConnection>> connect(std::string endpoint, pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
 		bool isRunning() const override;
 		std::string name() const override;
 		uint64 id() const override;
-		DependencyResolver* dependencyResolver() const override;
+		std::weak_ptr<DependencyResolver> dependencyResolver() const override;
 		void onPacketReceived(std::function<void(Packet_ptr)> callback) override;
 		std::string host() const override;
 		uint16 port() const override;
@@ -70,7 +70,7 @@ namespace Stormancer
 #pragma region private_members
 
 		bool _isRunning = false;
-		DependencyResolver* _dependencyResolver = nullptr;
+		std::weak_ptr<DependencyResolver> _dependencyResolver;
 		std::shared_ptr<IConnectionManager> _handler;
 		std::shared_ptr<RakNet::RakPeerInterface> _peer;
 		std::shared_ptr<ILogger> _logger;

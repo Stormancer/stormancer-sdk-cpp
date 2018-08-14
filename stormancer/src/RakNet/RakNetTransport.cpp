@@ -17,11 +17,17 @@
 
 namespace Stormancer
 {
-	RakNetTransport::RakNetTransport(DependencyResolver* resolver)
+	RakNetTransport::RakNetTransport(std::weak_ptr<DependencyResolver> resolver)
 		: _dependencyResolver(resolver)
-		, _logger(resolver->resolve<ILogger>())
-		, _scheduler(resolver->resolve<IScheduler>())
 	{
+		auto dependencyResolver = _dependencyResolver.lock();
+		if (!dependencyResolver)
+		{
+			throw std::runtime_error("Dependency resolver is invalid");
+		}
+
+		_logger = dependencyResolver->resolve<ILogger>();
+		_scheduler = dependencyResolver->resolve<IScheduler>();
 	}
 
 	RakNetTransport::~RakNetTransport()
@@ -93,8 +99,14 @@ namespace Stormancer
 #ifdef STORMANCER_PACKETFILELOGGER
 			_peer->AttachPlugin(rakNetLogger);
 #endif
+			auto dependencyResolver = _dependencyResolver.lock();
+			if (!dependencyResolver)
+			{
+				throw std::runtime_error("Dependency resolver is invalid");
+			}
 
-			_dependencyResolver->registerDependency(_peer);
+			dependencyResolver->registerDependency(_peer);
+
 			if (serverPort != 0)
 			{
 				_socketDescriptor = std::make_shared<RakNet::SocketDescriptor>(serverPort, (const char*)nullptr);
@@ -611,7 +623,7 @@ namespace Stormancer
 		return _id;
 	}
 
-	DependencyResolver* RakNetTransport::dependencyResolver() const
+	std::weak_ptr<DependencyResolver> RakNetTransport::dependencyResolver() const
 	{
 		return _dependencyResolver;
 	}

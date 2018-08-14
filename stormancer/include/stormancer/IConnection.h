@@ -58,7 +58,7 @@ namespace Stormancer
 		virtual void setMetadata(const std::map<std::string, std::string>& metadata) = 0;
 		virtual void setMetadata(const std::string& key, const std::string& value) = 0;
 		
-		virtual DependencyResolver* dependencyResolver() = 0;
+		virtual std::weak_ptr<DependencyResolver> dependencyResolver() = 0;
 
 		/// Returns the connection state.
 		virtual ConnectionState getConnectionState() const = 0;
