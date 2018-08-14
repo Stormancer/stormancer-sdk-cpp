@@ -58,7 +58,7 @@ namespace Stormancer
 				_logger->log(LogLevel::Error, "RpcService", errorMsg, route);
 				throw std::runtime_error(errorMsg);
 			}
-			
+
 			if (metadata[RpcPlugin::pluginName] != RpcPlugin::version)
 			{
 				auto errorMsg = std::string() + "The target remote route '" + route + "' does not support the plugin RPC version " + RpcPlugin::version;
@@ -152,9 +152,9 @@ namespace Stormancer
 
 				{
 					std::lock_guard<std::mutex> lock(_runningRequestsMutex);
-					if (!mapContains(_runningRequests, id))
+					if (_runningRequests.find(id) == _runningRequests.end())
 					{
-						_runningRequests[id] = cts;
+						_runningRequests.emplace(id, cts);
 						ctx = std::make_shared<RpcRequestContext<IScenePeer>>(p->connection.get(), _scene, id, ordered, p->stream, cts.get_token());
 					}
 				}
@@ -289,7 +289,7 @@ namespace Stormancer
 			eraseRequest(request->id);
 
 			std::string msg = _serializer.deserializeOne<std::string>(packet->stream);
-			
+
 			request->observer.on_error(std::make_exception_ptr(std::runtime_error(msg.c_str())));
 		}
 	}

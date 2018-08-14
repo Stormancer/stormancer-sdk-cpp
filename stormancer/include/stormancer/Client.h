@@ -74,6 +74,7 @@ namespace Stormancer
 		/// Set a metadata
 		void setMedatata(const std::string& key, const std::string& value);
 
+		void clear();
 #pragma endregion
 
 	private:
@@ -133,7 +134,7 @@ namespace Stormancer
 		std::shared_ptr<DependencyResolver> _dependencyResolver;
 		std::mutex _connectionStateMutex;
 		ConnectionState _connectionState = ConnectionState::Disconnected;
-		bool _connectionStateObservableCompleted = false;
+		
 		rxcpp::subjects::subject<ConnectionState> _connectionStateObservable;
 		pplx::task<void> _currentTask = pplx::task_from_result();
 		bool _initialized = false;
@@ -144,7 +145,6 @@ namespace Stormancer
 		uint16 _maxPeers = 0;
 		std::map<std::string, std::string> _metadata;
 		double _offset = 0;
-		bool _synchronisedClock = true;
 		std::unordered_map<std::string, ClientScene> _scenes;
 		std::mutex _scenesMutex;
 		std::vector<IPlugin*> _plugins;

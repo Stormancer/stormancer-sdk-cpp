@@ -50,59 +50,16 @@ namespace Stormancer
 {
 	// Client
 
-	Client::Client(Configuration_ptr config)
-		: _dependencyResolver(std::make_shared<DependencyResolver>())
-		, _initialized(false)
+	Client::Client(Configuration_ptr config):
+		 _initialized(false)
 		, _accountId(config->account)
 		, _applicationName(config->application)
 		, _maxPeers(config->maxPeers)
 		, _metadata(config->_metadata)
-		, _synchronisedClock(config->synchronisedClock)
 		, _plugins(config->plugins())
 		, _config(config)
 	{
-		ConfigureContainer(_dependencyResolver, config);
-
-		logger()->log(LogLevel::Trace, "Client", "Creating the client...");
-
-		std::vector<std::shared_ptr<IRequestModule>> modules{ std::dynamic_pointer_cast<IRequestModule>(_dependencyResolver->resolve<P2PRequestModule>()) };
-
-		RequestProcessor::Initialize(_dependencyResolver->resolve<RequestProcessor>(), modules);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-		logger()->log(LogLevel::Trace, "Client", "Client created");
+		
 	}
 
 	Client::~Client()
@@ -133,7 +90,7 @@ namespace Stormancer
 		}
 
 		Client_ptr client(new Client(config), [](Client* ptr) { delete ptr; });
-		client->initialize();
+		
 		return client;
 	}
 
@@ -141,6 +98,51 @@ namespace Stormancer
 	{
 		if (!_initialized)
 		{
+			auto dr = std::make_shared<DependencyResolver>();
+			ConfigureContainer(dr, _config);
+			_dependencyResolver = dr;
+
+			logger()->log(LogLevel::Trace, "Client", "Creating the client...");
+
+			std::vector<std::shared_ptr<IRequestModule>> modules{ std::dynamic_pointer_cast<IRequestModule>(_dependencyResolver->resolve<P2PRequestModule>()) };
+
+			RequestProcessor::Initialize(_dependencyResolver->resolve<RequestProcessor>(), modules);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			logger()->log(LogLevel::Trace, "Client", "Client created");
+
 			logger()->log(LogLevel::Trace, "Client", "Initializing client...");
 			auto transport = _dependencyResolver->resolve<ITransport>();
 
@@ -158,14 +160,28 @@ namespace Stormancer
 			{
 				plugin->clientCreated(this);
 			}
-
+			auto actionDispatcher = _dependencyResolver->resolve<IActionDispatcher>();
+			actionDispatcher->start();
+			_disconnectionTce = pplx::task_completion_event<void>();
 			_initialized = true;
 			_dependencyResolver->resolve<IActionDispatcher>()->start();
 			transport->onPacketReceived(createSafeCapture(STRM_WEAK_FROM_THIS(), [this](Packet_ptr packet) {
 				transport_packetReceived(packet);
 			}));
+			_cts = pplx::cancellation_token_source();
 			logger()->log(LogLevel::Trace, "Client", "Client initialized");
 		}
+	}
+
+	void Client::clear()
+	{
+		std::lock_guard<std::mutex> lg(this->_scenesMutex);
+		_initialized = false;
+		_metadata.clear();
+		_dependencyResolver = nullptr;
+		this->_initialized = false;
+		
+		_connectionSubscription.unsubscribe();
 	}
 
 	const std::string& Client::applicationName() const
@@ -188,6 +204,7 @@ namespace Stormancer
 
 	pplx::task<Scene_ptr> Client::connectToPublicScene(const std::string& sceneId, const SceneInitializer& initializer, pplx::cancellation_token ct)
 	{
+		
 		return getPublicScene(sceneId, ct)
 			.then([initializer, ct](Scene_ptr scene)
 		{
@@ -208,6 +225,7 @@ namespace Stormancer
 
 	pplx::task<Scene_ptr> Client::connectToPrivateScene(const std::string& sceneToken, const SceneInitializer& initializer, pplx::cancellation_token ct)
 	{
+		
 		return getPrivateScene(sceneToken, ct)
 			.then([initializer, ct](Scene_ptr scene)
 		{
@@ -260,6 +278,12 @@ namespace Stormancer
 
 	pplx::task<Scene_ptr> Client::getPublicScene(const std::string& sceneId, pplx::cancellation_token ct)
 	{
+		if (this->getConnectionState() == ConnectionState::Disconnecting)
+		{
+			return pplx::task_from_exception<Scene_ptr>(std::runtime_error("Client disconnecting"));
+		}
+		std::lock_guard<std::mutex> lg(this->_scenesMutex);
+		this->initialize();
 		logger()->log(LogLevel::Trace, "Client", "Get public scene.", sceneId);
 
 		if (sceneId.empty())
@@ -268,7 +292,7 @@ namespace Stormancer
 			return pplx::task_from_exception<Scene_ptr>(std::runtime_error("Bad scene id."));
 		}
 
-		std::lock_guard<std::mutex> lg(_scenesMutex);
+		
 		if (mapContains(_scenes, sceneId))
 		{
 			if (_scenes[sceneId].isPublic)
@@ -305,6 +329,13 @@ namespace Stormancer
 
 	pplx::task<Scene_ptr> Client::getPrivateScene(const std::string& sceneToken, pplx::cancellation_token ct)
 	{
+		if (this->getConnectionState() == ConnectionState::Disconnecting)
+		{
+			return pplx::task_from_exception<Scene_ptr>(std::runtime_error("Client disconnecting"));
+		}
+
+		std::lock_guard<std::mutex> lg(this->_scenesMutex);
+		this->initialize();
 		logger()->log(LogLevel::Trace, "Client", "Get private scene.", sceneToken);
 
 		if (sceneToken.empty())
@@ -317,7 +348,6 @@ namespace Stormancer
 		auto sep = tokenHandler->decodeToken(sceneToken);
 		auto sceneId = sep.tokenData.SceneId;
 
-		std::lock_guard<std::mutex> lg(_scenesMutex);
 		if (mapContains(_scenes, sceneId))
 		{
 			return _scenes[sceneId].task;
@@ -491,7 +521,7 @@ namespace Stormancer
 					}), ct)
 						.then(createSafeCapture(STRM_WEAK_FROM_THIS(), [this, endpoint]()
 					{
-						if (_synchronisedClock)
+						if (_config->synchronisedClock)
 						{
 							_dependencyResolver->resolve<SyncClock>()->start(_serverConnection, _cts.get_token());
 						}
@@ -891,10 +921,10 @@ namespace Stormancer
 
 	void Client::setConnectionState(ConnectionState state)
 	{
-		if (state != _connectionState && !_connectionStateObservableCompleted)
+		if (state != _connectionState )
 		{
 			_connectionState = state;
-			_connectionStateObservableCompleted = (state == ConnectionState::Disconnected);
+			
 
 			// on_next and on_completed handlers could delete this. Do not use this after handlers have been called.
 			auto actionDispatcher = _dependencyResolver->resolve<IActionDispatcher>();
@@ -903,14 +933,12 @@ namespace Stormancer
 			dispatchEvent([=]()
 			{
 				subscriber.on_next(state);
-				if (state == ConnectionState::Disconnected)
-				{
-					subscriber.on_completed();
-				}
+			
 			});
 
 			if (state == ConnectionState::Disconnected)
 			{
+				clear();
 				actionDispatcher->stop(); // This task should never throw an exception, as it is triggered by a tce.
 			}
 		}
