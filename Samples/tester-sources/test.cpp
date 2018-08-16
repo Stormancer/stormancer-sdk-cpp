@@ -27,18 +27,18 @@ namespace Stormancer
 		std::string stateStr = to_string((int)connectionState) + " ";
 		switch (connectionState)
 		{
-		case ConnectionState::Disconnected:
-			stateStr += "Disconnected";
-			break;
-		case ConnectionState::Connecting:
-			stateStr += "Connecting";
-			break;
-		case ConnectionState::Connected:
-			stateStr += "Connected";
-			break;
-		case ConnectionState::Disconnecting:
-			stateStr += "Disconnecting";
-			break;
+			case ConnectionState::Disconnected:
+				stateStr += "Disconnected";
+				break;
+			case ConnectionState::Connecting:
+				stateStr += "Connecting";
+				break;
+			case ConnectionState::Connected:
+				stateStr += "Connected";
+				break;
+			case ConnectionState::Disconnecting:
+				stateStr += "Disconnecting";
+				break;
 		}
 		return stateStr;
 	}
@@ -119,14 +119,47 @@ namespace Stormancer
 		throw std::runtime_error("An exception occured!");
 	}
 
+	void Tester::test_create()
+	{
+		_logger->log(LogLevel::Debug, "test_create", "TEST CREATE");
+
+		_config = Configuration::create(_endpoint, _accountId, _applicationName);
+		_config->logger = _logger;
+		//_config->synchronisedClock = false;
+		_client = Client::create(_config);
+
+		_client->getConnectionStateChangedObservable().subscribe([this](ConnectionState state) {
+			try
+			{
+				auto stateStr = connectionStateToString(state);
+				_logger->log(LogLevel::Debug, "test_connect", "Client connection state changed", stateStr.c_str());
+			}
+			catch (const std::exception& ex)
+			{
+				_logger->log(ex);
+			}
+		}, [this](std::exception_ptr exptr) {
+			try
+			{
+				std::rethrow_exception(exptr);
+			}
+			catch (const std::exception& ex)
+			{
+				_logger->log(LogLevel::Error, "Test", "Client connection state change failed", ex.what());
+			}
+		});
+
+		_logger->log(LogLevel::Debug, "test_create", "TEST CREATE OK");
+
+		execNextTest();
+	}
+
 	void Tester::test_connect()
 	{
 		_logger->log(LogLevel::Info, "test_connect", "CONNECT");
 
 		try
 		{
-
-
 			_logger->log(LogLevel::Debug, "test_connect", "Get scene");
 
 			_client->connectToPublicScene(_sceneName, [this](Scene_ptr scene) {
@@ -505,10 +538,8 @@ namespace Stormancer
 	{
 		_logger->log(LogLevel::Info, "test_clean", "CLEAN");
 
-		//_stop = true;
-
-		/*_client = nullptr;
-		_config = nullptr;*/
+		_client = nullptr;
+		_config = nullptr;
 
 		_logger->log(LogLevel::Debug, "test_clean", "scene and client deleted");
 
@@ -529,59 +560,21 @@ namespace Stormancer
 		_testsDone = false;
 		_testsPassed = false;
 
+		_tests.push_back([this]() { test_connect(); });
+		_tests.push_back([this]() { test_echo(); });
+		_tests.push_back([this]() { test_rpc_server(); });
+		_tests.push_back([this]() { test_rpc_server_cancel(); });
+		_tests.push_back([this]() { test_rpc_server_exception(); });
+		_tests.push_back([this]() { test_rpc_server_clientException(); });
+		_tests.push_back([this]() { test_rpc_client(); });
+		_tests.push_back([this]() { test_rpc_client_cancel(); });
+		_tests.push_back([this]() { test_rpc_client_exception(); });
+		_tests.push_back([this]() { test_syncClock(); });
+		_tests.push_back([this]() { test_disconnect(); });
+		_tests.push_back([this]() { test_clean(); });
+
 		// Some platforms require a Client to be created before using pplx::task
-		_config = Configuration::create(_endpoint, _accountId, _applicationName);
-		_config->logger = _logger;
-		//_config->synchronisedClock = false;
-		_client = Client::create(_config);
-
-
-		_client->getConnectionStateChangedObservable().subscribe([this](ConnectionState state) {
-			try
-			{
-				auto stateStr = connectionStateToString(state);
-				_logger->log(LogLevel::Debug, "test_connect", "Client connection state changed", stateStr.c_str());
-
-
-			}
-			catch (const std::exception& ex)
-			{
-				_logger->log(ex);
-			}
-		}, [this](std::exception_ptr exptr) {
-			try
-			{
-				std::rethrow_exception(exptr);
-			}
-			catch (const std::exception& ex)
-			{
-				_logger->log(LogLevel::Error, "Test", "Client connection state change failed", ex.what());
-			}
-		});
-
-		for (int i = 0; i < 100000; i++)
-		{
-			_testsDone = false;
-			_testsPassed = false;
-			_tests.push_back([this]() { test_connect(); });
-			_tests.push_back([this]() { test_echo(); });
-			_tests.push_back([this]() { test_rpc_server(); });
-			_tests.push_back([this]() { test_rpc_server_cancel(); });
-			_tests.push_back([this]() { test_rpc_server_exception(); });
-			_tests.push_back([this]() { test_rpc_server_clientException(); });
-			_tests.push_back([this]() { test_rpc_client(); });
-			_tests.push_back([this]() { test_rpc_client_cancel(); });
-			_tests.push_back([this]() { test_rpc_client_exception(); });
-			_tests.push_back([this]() { test_syncClock(); });
-			_tests.push_back([this]() { test_disconnect(); });
-			_tests.push_back([this]() { test_clean(); });
-
-			execNextTest();
-			while (!_testsDone)
-			{
-				std::this_thread::sleep_for(100ms);
-			}
-		}
+		test_create();
 	}
 
 	bool Tester::tests_done()

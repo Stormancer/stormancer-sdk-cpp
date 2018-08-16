@@ -5,8 +5,10 @@ namespace Stormancer
 {
 	MatchmakingService::MatchmakingService(Scene_ptr scene)
 		: _scene(scene)
-		, _rpcService(scene->dependencyResolver().lock()->resolve<RpcService>())
 	{
+		_rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
+		_logger = scene->dependencyResolver().lock()->resolve<ILogger>();
+
 		scene->addRoute("match.update", [this](Packetisp_ptr packet) {
 			byte matchStateByte;
 			packet->stream->read((char*)&matchStateByte, 1);
