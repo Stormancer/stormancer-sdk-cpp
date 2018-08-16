@@ -59,6 +59,12 @@ namespace Stormancer
 		, _plugins(config->plugins())
 		, _config(config)
 	{
+		auto dr = std::make_shared<DependencyResolver>();
+		ConfigureContainer(dr, _config);
+		_dependencyResolver = dr;
+		std::vector<std::shared_ptr<IRequestModule>> modules{ std::dynamic_pointer_cast<IRequestModule>(_dependencyResolver->resolve<P2PRequestModule>()) };
+
+		RequestProcessor::Initialize(_dependencyResolver->resolve<RequestProcessor>(), modules);
 		
 	}
 
@@ -96,17 +102,22 @@ namespace Stormancer
 
 	void Client::initialize()
 	{
+		if (firstInit)
+		{
+			firstInit = false;
+			auto transport = _dependencyResolver->resolve<ITransport>();
+			transport->onPacketReceived(createSafeCapture(STRM_WEAK_FROM_THIS(), [this](Packet_ptr packet) {
+				transport_packetReceived(packet);
+			}));
+		}
+
 		if (!_initialized)
 		{
-			auto dr = std::make_shared<DependencyResolver>();
-			ConfigureContainer(dr, _config);
-			_dependencyResolver = dr;
+			
 
 			logger()->log(LogLevel::Trace, "Client", "Creating the client...");
 
-			std::vector<std::shared_ptr<IRequestModule>> modules{ std::dynamic_pointer_cast<IRequestModule>(_dependencyResolver->resolve<P2PRequestModule>()) };
-
-			RequestProcessor::Initialize(_dependencyResolver->resolve<RequestProcessor>(), modules);
+			
 
 
 
@@ -165,9 +176,7 @@ namespace Stormancer
 			_disconnectionTce = pplx::task_completion_event<void>();
 			_initialized = true;
 			_dependencyResolver->resolve<IActionDispatcher>()->start();
-			transport->onPacketReceived(createSafeCapture(STRM_WEAK_FROM_THIS(), [this](Packet_ptr packet) {
-				transport_packetReceived(packet);
-			}));
+			
 			_cts = pplx::cancellation_token_source();
 			logger()->log(LogLevel::Trace, "Client", "Client initialized");
 		}
@@ -178,10 +187,10 @@ namespace Stormancer
 		std::lock_guard<std::mutex> lg(this->_scenesMutex);
 		_initialized = false;
 		_metadata.clear();
-		_dependencyResolver = nullptr;
+		//_dependencyResolver = nullptr;
 		this->_initialized = false;
 		
-		_connectionSubscription.unsubscribe();
+		
 	}
 
 	const std::string& Client::applicationName() const
@@ -480,6 +489,7 @@ namespace Stormancer
 								}
 								_cts.cancel(); // this will cause the syncClock and the transport to stop
 								_serverConnection.reset();
+								_connectionSubscription.unsubscribe();
 							}
 
 							setConnectionState(state);

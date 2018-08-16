@@ -157,6 +157,8 @@ namespace Stormancer
 		rxcpp::composite_subscription _connectionSubscription;
 		Serializer _serializer;
 
+		bool firstInit = true;
+
 #pragma endregion
 	};
 };

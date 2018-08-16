@@ -53,7 +53,7 @@ namespace Stormancer
 		void run();
 		void onConnectionIdReceived(uint64 p);
 		std::shared_ptr<RakNetConnection> onConnection(RakNet::SystemAddress systemAddress, RakNet::RakNetGUID guid, uint64 peerId);
-		void onDisconnection(RakNet::Packet* packet, std::string reason);
+		void onDisconnection(RakNet::RakNetGUID guid, std::string reason);
 		void onMessageReceived(RakNet::Packet* packet);
 		std::shared_ptr<RakNetConnection> getConnection(RakNet::RakNetGUID guid);
 		std::shared_ptr<RakNetConnection> createNewConnection(RakNet::RakNetGUID raknetGuid, uint64 peerId);

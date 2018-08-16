@@ -81,6 +81,7 @@ namespace Stormancer
 
 		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG, new handlerFunction([=](Packet_ptr p) {
 			uint16 id;
+			//std::cout << "processor:"<< p->stream->tellg();
 			*(p->stream) >> id;
 
 			SystemRequest_ptr request = freeRequestSlot(id);
@@ -93,6 +94,7 @@ namespace Stormancer
 				if (!request->complete)
 				{
 					request->complete = true;
+					
 					request->tce.set(p);
 				}
 

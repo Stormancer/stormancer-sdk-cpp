@@ -11,10 +11,11 @@ namespace Stormancer
 
 #pragma region public_methods
 
-		Tester(std::string endpoint, std::string account, std::string application)
+		Tester(std::string endpoint, std::string account, std::string application, std::string sceneId)
 			: _endpoint(endpoint)
 			, _accountId(account)
 			, _applicationName(application)
+			, _sceneName(sceneId)
 		{
 		}
 
@@ -46,7 +47,7 @@ namespace Stormancer
 		pplx::task<void> test_rpc_client_received(RpcRequestContext_ptr rc);
 		pplx::task<void> test_rpc_client_cancel_received(RpcRequestContext_ptr rc);
 		pplx::task<void> test_rpc_client_exception_received(RpcRequestContext_ptr rc);
-		void test_create();
+		
 		void test_connect();
 		void test_echo();
 		void test_rpc_server();
@@ -81,6 +82,8 @@ namespace Stormancer
 		std::deque<std::function<void()>> _tests;
 		bool _testsDone = false;
 		bool _testsPassed = false;
+
+		pplx::task_completion_event<void> testCompletedTce;
 
 #pragma endregion
 	};

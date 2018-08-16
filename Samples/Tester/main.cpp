@@ -5,12 +5,12 @@
 
 int main(int argc, char** argv)
 {
-	std::string endpoint = (argc >= 2) ? argv[1] : "http://api2.stormancer.com:8080";
+	std::string endpoint = (argc >= 2) ? argv[1] : "http://localhost:8081";// "http://api2.stormancer.com:8080";
 	std::string account = (argc >= 3) ? argv[2] : "tester";
 	std::string application = (argc >= 4) ? argv[3] : "test-application";
 
 	{
-		Stormancer::Tester tester(endpoint, account, "tester");
+		Stormancer::Tester tester(endpoint, account, application,"test-scene");
 		tester.run_all_tests();
 		std::cin.ignore();
 	}

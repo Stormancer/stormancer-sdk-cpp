@@ -53,6 +53,7 @@ namespace Stormancer
 			return sendSystemRequest(peer, id, [=, &parameter](obytestream* stream) {
 				_serializer.serialize(stream, parameter);
 			}, PacketPriority::MEDIUM_PRIORITY, ct).then([T1name, logger, serializer, id](Packet_ptr packet) {
+				
 				if (!packet)
 				{
 					auto msg = "Tried to return " + T1name + " from a system request of type " + std::to_string(id) + " that returned void.";
@@ -61,6 +62,9 @@ namespace Stormancer
 				}
 				else
 				{
+					
+					
+					
 					return serializer.deserializeOne<T1>(packet->stream);
 				}
 			}, ct);

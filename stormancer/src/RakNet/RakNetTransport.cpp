@@ -199,6 +199,7 @@ namespace Stormancer
 										data.Write((byte)MessageIDTypes::ID_ADVERTISE_PEERID);
 										data.Write(_id);
 										data.Write(false);
+										
 										_peer->Send(&data, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE, 0, rakNetPacket->guid, false);
 									}
 								}
@@ -255,13 +256,13 @@ namespace Stormancer
 						case DefaultMessageIDTypes::ID_DISCONNECTION_NOTIFICATION:
 						{
 							_logger->log(LogLevel::Trace, "RakNetTransport", "Remote peer disconnected from this peer", rakNetPacket->systemAddress.ToString(true, ':'));
-							onDisconnection(rakNetPacket, "CLIENT_DISCONNECTED");
+							onDisconnection(rakNetPacket->guid, "CLIENT_DISCONNECTED");
 							break;
 						}
 						case DefaultMessageIDTypes::ID_CONNECTION_LOST:
 						{
 							_logger->log(LogLevel::Trace, "RakNetTransport", "Peer lost the connection", rakNetPacket->systemAddress.ToString(true, ':'));
-							onDisconnection(rakNetPacket, "CLIENT_CONNECTION_LOST");
+							onDisconnection(rakNetPacket->guid, "CLIENT_CONNECTION_LOST");
 							break;
 						}
 						case DefaultMessageIDTypes::ID_CONNECTION_BANNED:
@@ -395,7 +396,10 @@ namespace Stormancer
 		{
 			throw std::runtime_error("RakNet transport is not started");
 		}
-
+		if (_serverConnected)
+		{
+			onDisconnection(_serverRakNetGUID, "CLIENT_DISCONNECTION");
+		}
 		auto peer = _peer;
 		_peer.reset();
 		if (peer)
@@ -526,18 +530,20 @@ namespace Stormancer
 		return connection;
 	}
 
-	void RakNetTransport::onDisconnection(RakNet::Packet* packet, std::string reason)
+	void RakNetTransport::onDisconnection(RakNet::RakNetGUID guid, std::string reason)
 	{
-
-		auto msg = std::string() + packet->systemAddress.ToString(true, ':') + " disconnected";
-		_logger->log(LogLevel::Trace, "RakNetTransport", msg.c_str(), reason.c_str());
-
-		auto connection = removeConnection(packet->guid);
+		
+		
+		auto connection = removeConnection(guid);
 
 		_handler->closeConnection(connection, reason);
 
 		connection->_closeAction(reason);
-
+		if (guid == _serverRakNetGUID)
+		{
+			_id = 0;
+			_serverConnected = false;
+		}
 		pplx::task<void>([=]() {
 			// Start this asynchronously because we locked the mutex in run and the user can do something that tries to lock again this mutex
 			connection->setConnectionState(ConnectionState::Disconnected);

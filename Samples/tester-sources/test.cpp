@@ -152,9 +152,10 @@ namespace Stormancer
 				scene->getConnectionStateChangedObservable().subscribe(onNext, onError);
 
 				_logger->log(LogLevel::Debug, "test_connect", "Add route");
-				scene->addRoute("message", [this](Packetisp_ptr p) {
+				scene->addRoute("echo.out", [this](Packetisp_ptr p) {
 					onMessage(p);
 				});
+
 				_logger->log(LogLevel::Debug, "test_connect", "Add route OK");
 
 				_logger->log(LogLevel::Debug, "test_connect", "Add procedure");
@@ -208,7 +209,7 @@ namespace Stormancer
 			}
 
 			_logger->log(LogLevel::Debug, "test_echo", "Sending message...");
-			scene->send("message", [](obytestream* stream) {
+			scene->send("echo.in", [](obytestream* stream) {
 				Serializer serializer;
 				serializer.serialize(stream, "echo");
 			});
@@ -558,7 +559,7 @@ namespace Stormancer
 			}
 		});
 
-		for (int i = 0; i < 10; i++)
+		for (int i = 0; i < 100000; i++)
 		{
 			_testsDone = false;
 			_testsPassed = false;
@@ -566,11 +567,11 @@ namespace Stormancer
 			_tests.push_back([this]() { test_echo(); });
 			_tests.push_back([this]() { test_rpc_server(); });
 			_tests.push_back([this]() { test_rpc_server_cancel(); });
-			_tests.push_back([this]() { test_rpc_server_exception(); });
-			_tests.push_back([this]() { test_rpc_server_clientException(); });
+			//_tests.push_back([this]() { test_rpc_server_exception(); });
+			//_tests.push_back([this]() { test_rpc_server_clientException(); });
 			_tests.push_back([this]() { test_rpc_client(); });
 			_tests.push_back([this]() { test_rpc_client_cancel(); });
-			_tests.push_back([this]() { test_rpc_client_exception(); });
+			//_tests.push_back([this]() { test_rpc_client_exception(); });
 			_tests.push_back([this]() { test_syncClock(); });
 			_tests.push_back([this]() { test_disconnect(); });
 			_tests.push_back([this]() { test_clean(); });
