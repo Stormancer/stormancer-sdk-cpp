@@ -17,8 +17,9 @@ namespace Stormancer
 		}
 		else
 		{
-			_logger->log(LogLevel::Info, "execNextTest", "TESTS SUCCESSFUL !");
-
+			_testsPassed = true;
+			_testsDone = true;
+			_logger->log(LogLevel::Info, "execNextTest", "TESTS SUCCEEDED !");
 		}
 	}
 
@@ -543,8 +544,6 @@ namespace Stormancer
 
 		_logger->log(LogLevel::Debug, "test_clean", "scene and client deleted");
 
-		_testsPassed = true;
-		_testsDone = true;
 		execNextTest();
 	}
 
