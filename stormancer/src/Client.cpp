@@ -109,6 +109,45 @@ namespace Stormancer
 			transport->onPacketReceived(createSafeCapture(STRM_WEAK_FROM_THIS(), [this](Packet_ptr packet) {
 				transport_packetReceived(packet);
 			}));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			for (auto plugin : _plugins)
+			{
+				plugin->clientCreated(this);
+			}
 		}
 
 		if (!_initialized)
@@ -118,39 +157,6 @@ namespace Stormancer
 			logger()->log(LogLevel::Trace, "Client", "Creating the client...");
 
 			
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 			logger()->log(LogLevel::Trace, "Client", "Client created");
 
@@ -167,10 +173,7 @@ namespace Stormancer
 
 			_metadata["protocol"] = "2";
 
-			for (auto plugin : _plugins)
-			{
-				plugin->clientCreated(this);
-			}
+			
 			auto actionDispatcher = _dependencyResolver->resolve<IActionDispatcher>();
 			actionDispatcher->start();
 			_disconnectionTce = pplx::task_completion_event<void>();

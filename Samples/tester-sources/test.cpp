@@ -567,11 +567,11 @@ namespace Stormancer
 			_tests.push_back([this]() { test_echo(); });
 			_tests.push_back([this]() { test_rpc_server(); });
 			_tests.push_back([this]() { test_rpc_server_cancel(); });
-			//_tests.push_back([this]() { test_rpc_server_exception(); });
-			//_tests.push_back([this]() { test_rpc_server_clientException(); });
+			_tests.push_back([this]() { test_rpc_server_exception(); });
+			_tests.push_back([this]() { test_rpc_server_clientException(); });
 			_tests.push_back([this]() { test_rpc_client(); });
 			_tests.push_back([this]() { test_rpc_client_cancel(); });
-			//_tests.push_back([this]() { test_rpc_client_exception(); });
+			_tests.push_back([this]() { test_rpc_client_exception(); });
 			_tests.push_back([this]() { test_syncClock(); });
 			_tests.push_back([this]() { test_disconnect(); });
 			_tests.push_back([this]() { test_clean(); });
