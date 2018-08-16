@@ -287,7 +287,8 @@ namespace Stormancer
 
 	void setUnobservedExceptionHandler(std::function<bool(std::exception_ptr)> handler)
 	{
-		pplx::unobservedExceptionHandler = handler;
+		std::lock_guard<std::mutex> lg(pplx::UnobservedExceptionHandler::unobservedExceptionHandlerMutex);
+		pplx::UnobservedExceptionHandler::unobservedExceptionHandler = handler;
 	}
 
 };

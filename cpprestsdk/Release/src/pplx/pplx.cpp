@@ -36,6 +36,8 @@
 
 namespace pplx
 {
+	std::function<bool(std::exception_ptr)> UnobservedExceptionHandler::unobservedExceptionHandler;
+	std::mutex UnobservedExceptionHandler::unobservedExceptionHandlerMutex;
 
 
 namespace details

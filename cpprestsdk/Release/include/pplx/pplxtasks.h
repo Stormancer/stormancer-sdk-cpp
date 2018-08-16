@@ -70,6 +70,7 @@ void cpprest_init(JavaVM*);
 #include <utility>
 #include <exception>
 #include <algorithm>
+#include <mutex>
 
 #if defined(_MSC_VER)
 #include <intrin.h>
@@ -173,7 +174,12 @@ namespace pplx
 
 #ifndef _UNOBSERVED_EXCEPTION_HANDLER
 #define _UNOBSERVED_EXCEPTION_HANDLER
-	static std::function<bool(std::exception_ptr)> unobservedExceptionHandler;
+	class UnobservedExceptionHandler
+	{
+	public:
+		static std::function<bool(std::exception_ptr)> unobservedExceptionHandler;
+		static std::mutex unobservedExceptionHandlerMutex;
+	};
 #endif
 
 	/// <summary>
@@ -963,9 +969,12 @@ namespace pplx
 				if (_M_exceptionObserved == 0)
 				{
 					bool handled = false;
-					if (pplx::unobservedExceptionHandler)
 					{
-						handled = pplx::unobservedExceptionHandler(_M_stdException);
+						std::lock_guard<std::mutex> lg(pplx::UnobservedExceptionHandler::unobservedExceptionHandlerMutex);
+						if (pplx::UnobservedExceptionHandler::unobservedExceptionHandler)
+						{
+							handled = pplx::UnobservedExceptionHandler::unobservedExceptionHandler(_M_stdException);
+						}
 					}
 
 					if (!handled)
