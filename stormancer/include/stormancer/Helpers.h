@@ -285,7 +285,14 @@ namespace Stormancer
 			}
 			else
 			{
-				return t.get();
+				try
+				{
+					return t.get();
+				}
+				catch (...)
+				{
+					throw;
+				}
 			}
 		});
 	}

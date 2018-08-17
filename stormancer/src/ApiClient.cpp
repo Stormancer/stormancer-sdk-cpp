@@ -82,14 +82,12 @@ namespace Stormancer
 		request.set_request_uri(relativeUri2);
 		request.set_body(utility::string_t());
 
-
 		request.headers().add(U("Content-Type"), U("application/msgpack"));
 		request.headers().add(U("Accept"), U("application/json"));
 		request.headers().add(U("x-version"), U("2"));
 
-
 		return client.request(request, ct)
-			.then([=](pplx::task<web::http::http_response> task)
+			.then(createSafeCapture(STRM_WEAK_FROM_THIS(), [this, baseUri, errors, endpoints, accountId, applicationName, sceneId, ct](pplx::task<web::http::http_response> task)
 		{
 			web::http::http_response response;
 			try
@@ -111,7 +109,7 @@ namespace Stormancer
 				_logger->log(LogLevel::Trace, "ApiClient", msgStr);
 				concurrency::streams::stringstreambuf ss;
 				return response.body().read_to_end(ss)
-					.then([=](size_t)
+					.then(createSafeCapture(STRM_WEAK_FROM_THIS(), [this, ss, statusCode, response, errors, msgStr, endpoints, accountId, applicationName, sceneId, ct](size_t)
 				{
 					
 					std::string responseText = ss.collection();
@@ -136,13 +134,13 @@ namespace Stormancer
 						(*errors).push_back("[" + msgStr + ":" + std::to_string(statusCode) + "]");
 						return getSceneEndpointImpl(endpoints, errors, accountId, applicationName, sceneId, ct);
 					}
-				}, ct);
+				}), ct);
 			}
 			catch (const std::exception& ex)
 			{
 				throw std::runtime_error(std::string() + "Can't get the scene endpoint response: " + ex.what());
 			}
-		}, ct);
+		}), ct);
 	}
 
 	pplx::task<web::http::http_response> ApiClient::requestWithRetries(std::function<web::http::http_request(std::string)> requestFactory, pplx::cancellation_token ct)
@@ -208,7 +206,7 @@ namespace Stormancer
 #endif
 
 		return client.request(rq, ct)
-			.then(createSafeCapture(STRM_WEAK_FROM_THIS(), [=](pplx::task<web::http::http_response> t)
+			.then(createSafeCapture(STRM_WEAK_FROM_THIS(), [this, baseUri, errors, requestFactory, endpoints, ct](pplx::task<web::http::http_response> t)
 		{
 			bool success = false;
 			web::http::http_response response;
