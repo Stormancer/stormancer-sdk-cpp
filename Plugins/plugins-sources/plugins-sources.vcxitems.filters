@@ -34,6 +34,9 @@
     <Filter Include="PlayerProfile">
       <UniqueIdentifier>{c3917200-898e-4c89-8602-cdf744dba3bd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameFinder">
+      <UniqueIdentifier>{3b80db3d-6e5b-4d6c-85d5-da9d0d88c24d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\AssetsStorage\AssetsStoragePlugin.cpp">
@@ -89,6 +92,15 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\Matchmaking\MatchmakingService.cpp">
       <Filter>Matchmaking</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderManager.cpp">
+      <Filter>GameFinder</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderPlugin.cpp">
+      <Filter>GameFinder</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderService.cpp">
+      <Filter>GameFinder</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -163,6 +175,18 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\AssetsStorage\AssetsStorageDto.h">
       <Filter>AssetsStorage</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderManager.h">
+      <Filter>GameFinder</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderPlugin.h">
+      <Filter>GameFinder</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderService.h">
+      <Filter>GameFinder</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderTypes.h">
+      <Filter>GameFinder</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

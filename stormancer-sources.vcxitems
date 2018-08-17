@@ -15,6 +15,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\Action.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\Action2.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\AES\AES.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\AES\AESDecryptStream.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\AES\AESEncryptStream.h" />

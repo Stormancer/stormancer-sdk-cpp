@@ -25,7 +25,7 @@ int main()
 		{
 			t.wait();
 			logger->log("connect OK");
-			stormancerWrapper.getService<Stormancer::LeaderboardService>("services", true, true).then([=](pplx::task<std::shared_ptr<Stormancer::LeaderboardService>> t) {
+			stormancerWrapper.getService<Stormancer::LeaderboardService>("services", true).then([=](pplx::task<std::shared_ptr<Stormancer::LeaderboardService>> t) {
 				try
 				{
 					auto service = t.get();

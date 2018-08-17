@@ -24,41 +24,9 @@ namespace Stormancer
 		MSGPACK_DEFINE(errorMsg, success, userId, username);
 	};
 
-	struct CreateUserParameters
-	{
-		/// <summary>
-		/// Player login
-		/// </summary>
-		std::string login;
 
-		/// <summary>
-		/// password stored in db (can/should be hash)
-		/// </summary>
-		std::string password;
 
-		/// <summary>
-		/// user email for password recovery 
-		/// </summary>
-		std::string email;
-
-		/// <summary>
-		/// Json user data
-		/// </summary>
-		std::string userData;
-
-		MSGPACK_DEFINE(login, password, email, userData);
-	};
-
-	struct ChangePasswordParameters
-	{
-		std::string email;
-		std::string code;
-		std::string newPassword;
-
-		MSGPACK_DEFINE(email, code, newPassword);
-	};
-
-	class AuthenticationService
+	class AuthenticationService :std::enable_shared_from_this<AuthenticationService>
 	{
 	public:
 
@@ -76,9 +44,7 @@ namespace Stormancer
 		std::string loginRoute();
 		void setLoginRoute(const std::string& name);
 
-		pplx::task<void> createAccount(const std::string& login, const std::string& password, const std::string& email, const std::string& key, const std::string& pseudo);
 		pplx::task<void> login(const std::map<std::string, std::string>& authenticationContext);
-		pplx::task<void> login(const std::string& email, const std::string& password);
 		pplx::task<void> loginSteam(const std::string& ticket);
 
 
@@ -87,13 +53,11 @@ namespace Stormancer
 
 
 
-		pplx::task<Scene_ptr> getPrivateScene(const std::string& sceneId);
+		pplx::task<Scene_ptr> connectToPrivateScene(const std::string& sceneId, std::function<void(Scene_ptr)> builder = [](Scene_ptr) {});
 
 		//Impersonate an user using the impersonation plugin. The plugin should be disabled in production environments.
 		pplx::task<void> impersonate(const std::string& provider, const std::string& claimPath, const std::string& uid, const std::string& impersonationSecret);
 
-		pplx::task<void> requestPasswordChange(const std::string& email);
-		pplx::task<void> changePassword(const std::string& email, const std::string& code, const std::string& newPassword);
 
 		pplx::task<Scene_ptr> getAuthenticationScene();
 

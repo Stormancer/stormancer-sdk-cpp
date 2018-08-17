@@ -22,6 +22,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\BugReport\BugReportService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\Friends\Friends.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\Friends\FriendsPlugin.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderManager.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderPlugin.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GameSession\GameSessionPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GameSession\GameSessionService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GameVersion\GameVersionPlugin.cpp" />
@@ -43,6 +46,10 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\BugReport\BugReportService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Friends\Friends.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Friends\FriendsPlugin.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderManager.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderPlugin.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderTypes.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\GameSession\GameSessionPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\GameSession\GameSessionService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\GameVersion\GameVersionPlugin.h" />

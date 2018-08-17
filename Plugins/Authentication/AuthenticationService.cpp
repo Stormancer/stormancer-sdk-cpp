@@ -70,11 +70,7 @@ namespace Stormancer
 		_loginRoute = name;
 	}
 
-	pplx::task<void> AuthenticationService::login(const std::string& email, const std::string& password)
-	{
-		std::map<std::string, std::string> authContext{ { "provider", "loginpassword" }, { "login", email }, {"password",password } };
-		return login(authContext);
-	}
+	
 
 	pplx::task<void> AuthenticationService::loginSteam(const std::string& ticket)
 	{
@@ -98,28 +94,7 @@ namespace Stormancer
 
 
 
-	pplx::task<void> AuthenticationService::createAccount(const std::string& login, const std::string& password, const std::string& email, const std::string& key, const std::string& pseudo)
-	{
-		CreateUserParameters rq;
-		rq.email = email;
-		rq.login = login;
-		rq.password = password;
-		rq.userData = "{\"key\":\"" + key + "\",\"pseudo\":\"" + pseudo + "\"}";
-		return getAuthenticationScene()
-			.then([this, rq](Scene_ptr scene)
-		{
-			auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
-			return rpcService->rpc<LoginResult, CreateUserParameters>(_createUserRoute, rq);
-		})
-			.then([this](LoginResult loginResult)
-		{
-			if (!loginResult.success)
-			{
-				_logger->log(LogLevel::Error, "AuthenticationService", "An error occured while creating an account.", loginResult.errorMsg);
-				throw std::runtime_error(loginResult.errorMsg);
-			}
-		});
-	}
+	
 
 	pplx::task<void> AuthenticationService::login(const std::map<std::string, std::string>& authenticationContext)
 	{
@@ -242,19 +217,22 @@ namespace Stormancer
 		});
 	}
 
-	pplx::task<Scene_ptr> AuthenticationService::getPrivateScene(const std::string& sceneId)
+	pplx::task<Scene_ptr> AuthenticationService::connectToPrivateScene(const std::string& sceneId, std::function<void(Scene_ptr)> builder)
 	{
+		std::weak_ptr<AuthenticationService> wThat = this->shared_from_this();
 		return getAuthenticationScene()
 			.then([sceneId](Scene_ptr authScene)
 		{
 			auto rpcService = authScene->dependencyResolver().lock()->resolve<RpcService>();
 			return rpcService->rpc<std::string, std::string>("sceneauthorization.gettoken", sceneId);
 		})
-			.then([this](std::string token)
+			.then([wThat,builder](std::string token)
 		{
-			if (_client)
+			auto that = wThat.lock();
+			
+			if (that && that->_client)
 			{
-				return _client->getPrivateScene(token);
+				return that->_client->connectToPrivateScene(token,builder);
 			}
 			else
 			{
@@ -295,31 +273,6 @@ namespace Stormancer
 			_connectionState = state;
 			_onConnectionStateChanged(state);
 		}
-	}
-
-	pplx::task<void> AuthenticationService::requestPasswordChange(const std::string& email)
-	{
-		return getAuthenticationScene()
-			.then([email](Scene_ptr authScene)
-		{
-			auto rpcService = authScene->dependencyResolver().lock()->resolve<RpcService>();
-			return rpcService->rpc<void, std::string>("provider.loginpassword.requestPasswordRecovery", email);
-		});
-	}
-
-	pplx::task<void> AuthenticationService::changePassword(const std::string& email, const std::string& code, const std::string& newPassword)
-	{
-		auto parameter = ChangePasswordParameters();
-		parameter.email = email;
-		parameter.code = code;
-		parameter.newPassword = newPassword;
-
-		return getAuthenticationScene()
-			.then([parameter](Scene_ptr authScene)
-		{
-			auto rpcService = authScene->dependencyResolver().lock()->resolve<RpcService>();
-			return rpcService->rpc<void, ChangePasswordParameters>("provider.loginpassword.resetPassword", parameter);
-		});
 	}
 
 	pplx::task<void> AuthenticationService::impersonate(const std::string& provider, const std::string& claimPath, const std::string& uid, const std::string& secret)

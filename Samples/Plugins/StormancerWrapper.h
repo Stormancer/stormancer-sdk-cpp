@@ -49,7 +49,7 @@ namespace Stormancer
 		std::string getMatchMakingSceneName(MatchType type);
 
 		template<typename T>
-		pplx::task<std::shared_ptr<T>> getService(const std::string& sceneId, bool needAuthentication = true, bool connect = true)
+		pplx::task<std::shared_ptr<T>> getService(const std::string& sceneId, bool needAuthentication = true, std::function<void(Scene_ptr)> initializer = [](Scene_ptr) {})
 		{
 			pplx::task_completion_event<std::shared_ptr<T>> tce;
 
@@ -62,48 +62,28 @@ namespace Stormancer
 					tce.set_exception(std::runtime_error("User not authenticated."));
 					return pplx::create_task(tce, pplx::task_options(_actionDispatcher));
 				}
-				sceneTask = authService->getPrivateScene(sceneId);
+				sceneTask = authService->connectToPrivateScene(sceneId, initializer);
 			}
 			else
 			{
-				sceneTask = _client->getPublicScene(sceneId);
+				sceneTask = _client->connectToPublicScene(sceneId, initializer);
 			}
 
-			sceneTask.then([this, connect, tce](pplx::task<Scene_ptr> task) {
+			sceneTask.then([this, tce](pplx::task<Scene_ptr> t)
+			{
 				try
 				{
-					auto scene = task.get();
-					pplx::task<void> connectTask;
-					if (connect)
-					{
-						connectTask = scene->connect();
-					}
-					else
-					{
-						connectTask = pplx::task_from_result();
-					}
-					connectTask
-						.then([this, scene, tce](pplx::task<void> connectTask)
-					{
-						try
-						{
-							connectTask.get();
-							auto service = scene->dependencyResolver().lock()->resolve<T>();
-							assert(service);
-							tce.set(service);
-						}
-						catch (std::exception ex)
-						{
-							tce.set_exception(ex);
-							return;
-						}
-					});
+					auto scene = t.get();
+					auto service = scene->dependencyResolver().lock()->resolve<T>();
+					assert(service);
+					tce.set(service);
 				}
 				catch (std::exception ex)
 				{
 					tce.set_exception(ex);
 					return;
 				}
+
 			});
 
 			return pplx::create_task(tce, pplx::task_options(_actionDispatcher));
