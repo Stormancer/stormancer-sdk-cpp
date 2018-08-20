@@ -7,55 +7,71 @@
 
 namespace Stormancer
 {
-	
-	class GameFinderRequest
+	struct GameFinderRequest
 	{
-	public:
-		MSGPACK_DEFINE(profileIds, MapName)
 		std::map<std::string, std::string> profileIds;
 		std::string MapName;
+
+		MSGPACK_DEFINE(profileIds, MapName);
 	};
 
 	struct PlayerDto
 	{
-		MSGPACK_DEFINE(steamId, playerId, steamName)
-		u_int64 steamId;
+		uint64 steamId;
 		std::string playerId;
 		std::string steamName;
+
+		MSGPACK_DEFINE(steamId, playerId, steamName);
 	};
 
 	struct TeamDto
 	{
-		MSGPACK_DEFINE(team)
 		std::vector<PlayerDto> team;
+
+		MSGPACK_DEFINE(team)
 	};
 
 	struct GameFinderResponseDto
 	{
-		MSGPACK_DEFINE(gameToken, optionalParameters)
-		std::string gameToken;	
-		std::map<std::string,std::string> optionalParameters;
+		std::string gameToken;
+		std::map<std::string, std::string> optionalParameters;
+
+		MSGPACK_DEFINE(gameToken, optionalParameters);
 	};
 
-	class PlayerProfile
+	struct PlayerProfile
 	{
-	public:
-		MSGPACK_DEFINE(Id, PlayerId, Faction, Elo, League, Rank, MaxRank, UnlockedPortrait, SteamId, CurrentXP)
 		std::string Id;
 		std::string PlayerId;
 		std::string Faction;
-		u_int Elo;
-		u_int League;
-		u_int Rank;
-		u_int MaxRank;
-		std::vector<u_int> UnlockedPortrait;
+		uint32 Elo;
+		uint32 League;
+		uint32 Rank;
+		uint32 MaxRank;
+		std::vector<uint32> UnlockedPortrait;
 		std::string SteamId;
-		u_int CurrentXP;
+		uint32 CurrentXP;
+
+		MSGPACK_DEFINE(Id, PlayerId, Faction, Elo, League, Rank, MaxRank, UnlockedPortrait, SteamId, CurrentXP);
 	};
 
-	class ProfileSummary
+	struct ProfileSummary
 	{
-	public:
+		uint32 AdmiralLevel;
+		std::string ProfileName;
+		std::string Difficulty;
+		uint32 Elo;
+		std::string Faction;
+		std::string Id;
+		bool IsSolo;
+		uint32 Rank;
+		uint32 MaxRank;
+		std::string SubFaction;
+		bool IsElite;
+		bool IsRanked;
+		uint32 League;
+		uint32 EloBO3;
+
 		MSGPACK_DEFINE(
 			AdmiralLevel,
 			ProfileName,
@@ -70,26 +86,12 @@ namespace Stormancer
 			IsElite,
 			IsRanked,
 			League,
-			EloBO3)
-			u_int AdmiralLevel;
-		std::string ProfileName;
-		std::string Difficulty;
-		u_int Elo;
-		std::string Faction;
-		std::string Id;
-		bool IsSolo;
-		u_int Rank;
-		u_int MaxRank;
-		std::string SubFaction;
-		bool IsElite;
-		bool IsRanked;
-		u_int League;
-		u_int EloBO3;
+			EloBO3
+		);
 	};
 
-	class ReadyVerificationRequest
+	struct ReadyVerificationRequest
 	{
-	public:
 		std::map<std::string, Readiness> members;
 		std::string matchId;
 		int32 timeout;
@@ -99,14 +101,13 @@ namespace Stormancer
 
 	namespace Internal
 	{
-		class ReadyVerificationRequest
+		struct ReadyVerificationRequest
 		{
-		public:
-			MSGPACK_DEFINE(members, matchId, timeout)
-				std::map<std::string, int32> members;
+			std::map<std::string, int32> members;
 			std::string matchId;
 			int32 timeout;
 
+			MSGPACK_DEFINE(members, matchId, timeout);
 
 			operator Stormancer::ReadyVerificationRequest();
 		};
@@ -115,6 +116,7 @@ namespace Stormancer
 	class GameFinderService : public std::enable_shared_from_this<GameFinderService>
 	{
 	public:
+
 		GameFinderService(Scene_ptr scene);
 		void initialize();
 		~GameFinderService();
@@ -126,16 +128,17 @@ namespace Stormancer
 		pplx::task<void> findMatch(const std::string &provider, std::string json);
 		void resolve(bool acceptMatch);
 		void cancel();
-		
 
 		Action2<GameFinderStatus> GameFinderStatusUpdated;
 		Action2<GameFinderResponse> GameFound;
+
 	private:
+
 		std::weak_ptr<Scene> _scene;
 		std::shared_ptr<RpcService> _rpcService;
-		
+
 		pplx::cancellation_token_source _matchmakingCTS;
-		
+
 		GameFinderStatus _currentState = GameFinderStatus::Idle;
 		Serializer _serializer;
 
