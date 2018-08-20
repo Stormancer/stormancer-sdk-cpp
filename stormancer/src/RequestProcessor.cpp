@@ -26,7 +26,7 @@ namespace Stormancer
 			{
 				throw std::runtime_error("Can only add handler before 'RegisterProcessor' is called.");
 			}
-			_handlers[msgId] = handler;
+			_handlers.emplace(msgId, handler);
 		};
 	}
 

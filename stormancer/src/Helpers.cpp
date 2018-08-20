@@ -108,11 +108,9 @@ namespace Stormancer
 			ct.register_callback([=]() {
 				tce.set();
 			});
-			pplx::task<void> t(tce);
+			pplx::task<void> cancellationTask(tce);
 
-			std::vector<pplx::task<void>> v{ t, sleepTask };
-
-			return pplx::when_any(v.begin(), v.end()).then([](size_t) {});
+			return (cancellationTask || sleepTask);
 		}
 		else
 		{
@@ -267,48 +265,6 @@ namespace Stormancer
 			tokens.push_back(token3);
 		}
 		return pplx::cancellation_token_source::create_linked_source(tokens.begin(), tokens.end());
-	}
-
-	// Cancels the provided task after the specifed delay, if the task
-	// did not complete.
-	template<>
-	pplx::task<void> cancel_after_timeout(pplx::task<void> t, pplx::cancellation_token_source cts, unsigned int timeout)
-	{
-		// Create a task that returns true after the specified task completes.
-		pplx::task<bool> success_task = t.then([]()
-		{
-			return true;
-		});
-		// Create a task that returns false after the specified timeout.
-		pplx::task<bool> failure_task = taskDelay(std::chrono::milliseconds(timeout)).then([]
-		{
-			return false;
-		});
-
-		// Create a continuation task that cancels the overall task 
-		// if the timeout task finishes first.
-		return (failure_task || success_task).then([=](bool success)
-		{
-			if (!success)
-			{
-				// Set the cancellation token. The task that is passed as the
-				// t parameter should respond to the cancellation and stop
-				// as soon as it can.
-				cts.cancel();
-				throw pplx::task_canceled("task timed out");
-			}
-			else
-			{
-				try
-				{
-					return t.get();
-				}
-				catch (...)
-				{
-					throw;
-				}
-			}
-		});
 	}
 
 
