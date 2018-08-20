@@ -3,6 +3,7 @@
 #include "stormancer/MessageIDTypes.h"
 #include "stormancer/Serializer.h"
 #include "stormancer/SystemRequestIDTypes.h"
+#include "stormancer/SafeCapture.h"
 
 namespace Stormancer
 {
@@ -37,7 +38,11 @@ namespace Stormancer
 	{
 		_isRegistered = true;
 
-		config.addProcessor((byte)MessageIDTypes::ID_SYSTEM_REQUEST, new handlerFunction([=](Packet_ptr p) {
+		auto logger = _logger;
+		auto serializer = _serializer;
+
+		config.addProcessor((byte)MessageIDTypes::ID_SYSTEM_REQUEST, new handlerFunction(createSafeCapture(STRM_WEAK_FROM_THIS(), [this, logger, serializer](Packet_ptr p)
+		{
 			byte sysRequestId;
 			*(p->stream) >> sysRequestId;
 			std::shared_ptr<RequestContext> context = std::make_shared<RequestContext>(p);
@@ -45,70 +50,76 @@ namespace Stormancer
 
 			if (it == _handlers.end())
 			{
-				context->error([=](obytestream* stream) {
+				context->error([serializer](obytestream* stream)
+				{
 					std::string message = "No system request handler found.";
-					_serializer.serialize(stream, message);
+					serializer.serialize(stream, message);
 				});
 				return true;
 			}
 			auto ctxPtr = context.get();
 			std::function<pplx::task<void>(RequestContext*)> handler = it->second;
-			invokeWrapping(handler, ctxPtr).then([=](pplx::task<void> t) {
-				if (!context->isComplete())
+			invokeWrapping(handler, ctxPtr)
+				.then([logger, serializer, context](pplx::task<void> t)
+			{
+				try
 				{
-					// task faulted
-					try
+					t.get();
+				}
+				catch (const std::exception& ex)
+				{
+					if (!context->isComplete())
 					{
-						t.get();
-					}
-					catch (const std::exception& ex)
-					{
-						context->error([=](obytestream* stream) {
+						context->error([serializer, ex](obytestream* stream)
+						{
 							std::string message = std::string() + "An error occured on the server. " + ex.what();
-							_serializer.serialize(stream, message);
+							serializer.serialize(stream, message);
 						});
-						return;
 					}
-
-					// task completed
-					context->complete();
+					else
+					{
+						logger->log(LogLevel::Trace, "RequestProcessor", "An error occured", ex.what());
+					}
+					return;
 				}
 
+				if (!context->isComplete())
+				{
+					context->complete();
+				}
 			});
 
 			return true;
-		}));
+		})));
 
-		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG, new handlerFunction([=](Packet_ptr p) {
+		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG, new handlerFunction(createSafeCapture(STRM_WEAK_FROM_THIS(), [this, logger](Packet_ptr p)
+		{
 			uint16 id;
-			//std::cout << "processor:"<< p->stream->tellg();
 			*(p->stream) >> id;
 
 			SystemRequest_ptr request = freeRequestSlot(id);
 
 			if (request)
 			{
-
 				p->metadata["request"] = std::to_string(request->id);
 				time(&request->lastRefresh);
 				if (!request->complete)
 				{
 					request->complete = true;
-					
 					request->tce.set(p);
 				}
-
 			}
 			else
 			{
 				std::string idstr = std::to_string(id);
-				_logger->log(LogLevel::Warn, "RequestProcessor/next", "Unknow request id. " + idstr);
+				logger->log(LogLevel::Warn, "RequestProcessor/next", "Unknow request id. " + idstr);
 			}
 
 			return true;
-		}));
+		})));
 
-		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_COMPLETE, new handlerFunction([=](Packet_ptr p) {
+		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_COMPLETE, new handlerFunction(createSafeCapture(STRM_WEAK_FROM_THIS(), [this, logger](Packet_ptr p)
+		{
 			uint16 id;
 			*(p->stream) >> id;
 
@@ -130,14 +141,15 @@ namespace Stormancer
 				}
 				else
 				{
-					_logger->log(LogLevel::Warn, "RequestProcessor/complete", "Unknow request id " + to_string(id));
+					logger->log(LogLevel::Warn, "RequestProcessor/complete", "Unknow request id " + to_string(id));
 				}
 			}
 
 			return true;
-		}));
+		})));
 
-		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_ERROR, new handlerFunction([=](Packet_ptr p) {
+		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_ERROR, new handlerFunction(createSafeCapture(STRM_WEAK_FROM_THIS(), [this, serializer, logger](Packet_ptr p)
+		{
 			uint16 id;
 			*(p->stream) >> id;
 
@@ -146,7 +158,7 @@ namespace Stormancer
 			if (request)
 			{
 				p->metadata["request"] = std::to_string(request->id);
-				std::string msg = _serializer.deserializeOne<std::string>(p->stream);
+				std::string msg = serializer.deserializeOne<std::string>(p->stream);
 				if (!request->complete)
 				{
 					request->complete = true;
@@ -156,11 +168,11 @@ namespace Stormancer
 			}
 			else
 			{
-				_logger->log(LogLevel::Warn, "RequestProcessor/error", "Unknown request id :" + to_string(id));
+				logger->log(LogLevel::Warn, "RequestProcessor/error", "Unknown request id :" + to_string(id));
 			}
 
 			return true;
-		}));
+		})));
 	}
 
 	pplx::task<Packet_ptr> RequestProcessor::sendSystemRequest(IConnection* peer, byte msgId, const Writer& writer, PacketPriority priority, pplx::cancellation_token ct)
@@ -206,7 +218,7 @@ namespace Stormancer
 					{
 						writer(stream);
 					}
-				}, 0, priority,PacketReliability::RELIABLE, metadata);
+				}, 0, priority, PacketReliability::RELIABLE, metadata);
 			}
 			catch (const std::exception& ex)
 			{
