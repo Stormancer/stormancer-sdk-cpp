@@ -297,6 +297,11 @@ namespace Stormancer
 		});
 	}
 
+	// Cancels the provided task after the specifed delay, if the task
+	// did not complete.
+	template<>
+	pplx::task<void> cancel_after_timeout(pplx::task<void> t, pplx::cancellation_token_source cts, unsigned int timeout);
+
 	inline bool is_ipv4_address(const std::string& str)
 	{
 
