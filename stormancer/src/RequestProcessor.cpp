@@ -20,14 +20,14 @@ namespace Stormancer
 	RequestProcessor::RequestProcessor(std::shared_ptr<ILogger> logger)
 		: _logger(logger)
 	{
-		addSystemRequestHandler = createSafeCapture(STRM_WEAK_FROM_THIS(), [this](byte msgId, std::function<pplx::task<void>(RequestContext*)> handler)
+		addSystemRequestHandler = [this](byte msgId, std::function<pplx::task<void>(RequestContext*)> handler)
 		{
 			if (_isRegistered)
 			{
 				throw std::runtime_error("Can only add handler before 'RegisterProcessor' is called.");
 			}
 			_handlers[msgId] = handler;
-		});
+		};
 	}
 
 	RequestProcessor::~RequestProcessor()
