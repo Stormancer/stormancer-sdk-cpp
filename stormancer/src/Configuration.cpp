@@ -29,7 +29,7 @@ namespace Stormancer
 			throw std::invalid_argument("Check your account and application parameters");
 		}
 
-		return std::shared_ptr<Configuration>(new Configuration(endpoint, account, application));
+		return std::shared_ptr<Configuration>(new Configuration(endpoint, account, application), [](Configuration* ptr) { delete ptr; });
 	}
 
 	Configuration& Configuration::setMetadata(const std::string& key, const std::string& value)

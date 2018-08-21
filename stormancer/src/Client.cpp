@@ -70,6 +70,8 @@ namespace Stormancer
 
 	Client::~Client()
 	{
+		logger()->log(LogLevel::Trace, "Client", "Deleting the client...");
+
 		_cts.cancel();
 
 		if (_connectionSubscription.is_subscribed())
