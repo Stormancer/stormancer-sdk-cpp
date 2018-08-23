@@ -378,7 +378,8 @@ namespace Stormancer
 	{
 		pplx::cancellation_token_source cts;
 
-		TimerThread::getInstance().schedule([cts]() {
+		TimerThread::getInstance().schedule([cts]()
+		{
 			cts.cancel();
 		}, TimerThread::clock_type::now() + duration);
 

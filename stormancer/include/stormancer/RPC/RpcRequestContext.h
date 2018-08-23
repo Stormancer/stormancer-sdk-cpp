@@ -17,7 +17,7 @@ namespace Stormancer
 
 #pragma region public_methods
 
-		RpcRequestContext(T* peer, Scene* scene, uint16 id, bool ordered, ibytestream* inputStream, pplx::cancellation_token ct)
+		RpcRequestContext(T* peer, std::weak_ptr<Scene> scene, uint16 id, bool ordered, ibytestream* inputStream, pplx::cancellation_token ct)
 			: _peer(peer)
 			, _scene(scene)
 			, _inputStream(inputStream)
@@ -48,29 +48,36 @@ namespace Stormancer
 
 		void sendValue(const Writer& writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY)
 		{
-			if (!_scene)
+			auto scene = _scene.lock();
+
+			if (!scene)
 			{
-				throw std::runtime_error("The scene ptr is invalid");
+				throw std::runtime_error("The scene is invalid");
 			}
 
-			_scene->send(RpcPlugin::nextRouteName, [=](obytestream* stream) {
+			scene->send(RpcPlugin::nextRouteName, [this, writer](obytestream* stream)
+			{
 				writeRequestId(stream);
 				if (writer)
 				{
 					writer(stream);
 				}
 			}, priority, (_ordered ? PacketReliability::RELIABLE_ORDERED : PacketReliability::RELIABLE), _rpcClientChannelIdentifier);
+
 			_msgSent = 1;
 		}
 
 		void sendError(std::string errorMsg) const
 		{
-			if (!_scene)
+			auto scene = _scene.lock();
+
+			if (!scene)
 			{
-				throw std::runtime_error("The scene ptr is invalid");
+				throw std::runtime_error("The scene is invalid");
 			}
 
-			_scene->send(RpcPlugin::errorRouteName, [=](obytestream* stream) {
+			scene->send(RpcPlugin::errorRouteName, [this, errorMsg](obytestream* stream)
+			{
 				writeRequestId(stream);
 				_serializer.serialize(stream, errorMsg);
 			}, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE_ORDERED, _rpcClientChannelIdentifier);
@@ -84,12 +91,15 @@ namespace Stormancer
 
 		void sendComplete() const
 		{
-			if (!_scene)
+			auto scene = _scene.lock();
+
+			if (!scene)
 			{
-				throw std::runtime_error("The scene ptr is invalid");
+				throw std::runtime_error("The scene is invalid");
 			}
 
-			_scene->send(RpcPlugin::completeRouteName, [=](obytestream* stream) {
+			scene->send(RpcPlugin::completeRouteName, [this](obytestream* stream)
+			{
 				(*stream) << _msgSent;
 				writeRequestId(stream);
 			}, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE_ORDERED, _rpcClientChannelIdentifier);
@@ -105,7 +115,7 @@ namespace Stormancer
 #pragma region private_members
 
 		T* _peer = nullptr;
-		Scene* _scene = nullptr;
+		std::weak_ptr<Scene> _scene;
 		ibytestream* _inputStream = nullptr;
 		uint16 _id;
 		bool _ordered;

@@ -41,14 +41,18 @@ namespace Stormancer
 		auto logger = _logger;
 		auto serializer = _serializer;
 
-		config.addProcessor((byte)MessageIDTypes::ID_SYSTEM_REQUEST, new handlerFunction(createSafeCapture(STRM_WEAK_FROM_THIS(), [this, logger, serializer](Packet_ptr p)
+		auto wProcessor = STRM_WEAK_FROM_THIS();
+
+		config.addProcessor((byte)MessageIDTypes::ID_SYSTEM_REQUEST, new handlerFunction([wProcessor, logger, serializer](Packet_ptr p)
 		{
+			auto processor = LockOrThrow(wProcessor);
+
 			byte sysRequestId;
 			*(p->stream) >> sysRequestId;
 			std::shared_ptr<RequestContext> context = std::make_shared<RequestContext>(p);
-			auto it = _handlers.find(sysRequestId);
+			auto it = processor->_handlers.find(sysRequestId);
 
-			if (it == _handlers.end())
+			if (it == processor->_handlers.end())
 			{
 				context->error([serializer](obytestream* stream)
 				{
@@ -90,14 +94,16 @@ namespace Stormancer
 			});
 
 			return true;
-		})));
+		}));
 
-		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG, new handlerFunction(createSafeCapture(STRM_WEAK_FROM_THIS(), [this, logger](Packet_ptr p)
+		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG, new handlerFunction([wProcessor, logger](Packet_ptr p)
 		{
+			auto processor = LockOrThrow(wProcessor);
+
 			uint16 id;
 			*(p->stream) >> id;
 
-			SystemRequest_ptr request = freeRequestSlot(id);
+			SystemRequest_ptr request = processor->freeRequestSlot(id);
 
 			if (request)
 			{
@@ -116,10 +122,12 @@ namespace Stormancer
 			}
 
 			return true;
-		})));
+		}));
 
-		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_COMPLETE, new handlerFunction(createSafeCapture(STRM_WEAK_FROM_THIS(), [this, logger](Packet_ptr p)
+		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_COMPLETE, new handlerFunction([wProcessor, logger](Packet_ptr p)
 		{
+			auto processor = LockOrThrow(wProcessor);
+
 			uint16 id;
 			*(p->stream) >> id;
 
@@ -128,7 +136,7 @@ namespace Stormancer
 
 			if (hasValues == 0)
 			{
-				SystemRequest_ptr request = freeRequestSlot(id);
+				SystemRequest_ptr request = processor->freeRequestSlot(id);
 
 				if (request)
 				{
@@ -146,14 +154,16 @@ namespace Stormancer
 			}
 
 			return true;
-		})));
+		}));
 
-		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_ERROR, new handlerFunction(createSafeCapture(STRM_WEAK_FROM_THIS(), [this, serializer, logger](Packet_ptr p)
+		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_ERROR, new handlerFunction([wProcessor, serializer, logger](Packet_ptr p)
 		{
+			auto processor = LockOrThrow(wProcessor);
+
 			uint16 id;
 			*(p->stream) >> id;
 
-			SystemRequest_ptr request = freeRequestSlot(id);
+			SystemRequest_ptr request = processor->freeRequestSlot(id);
 
 			if (request)
 			{
@@ -172,7 +182,7 @@ namespace Stormancer
 			}
 
 			return true;
-		})));
+		}));
 	}
 
 	pplx::task<Packet_ptr> RequestProcessor::sendSystemRequest(IConnection* peer, byte msgId, const Writer& writer, PacketPriority priority, pplx::cancellation_token ct)

@@ -60,17 +60,23 @@ namespace Stormancer
 		_handler = handler;
 		initialize(maxConnections, serverPort);
 
-		_scheduler->schedulePeriodic(15, createSafeCapture(STRM_WEAK_FROM_THIS(), [this]() {
-			std::lock_guard<std::mutex> lock(_mutex);
-			if (_isRunning)
-			{
-				run();
-			}
-		}), ct);
+		auto wTransport = STRM_WEAK_FROM_THIS();
 
-		ct.register_callback(createSafeCapture(STRM_WEAK_FROM_THIS(), [this]() {
-			stop();
-		}));
+		_scheduler->schedulePeriodic(15, [wTransport]() 
+		{
+			auto transport = LockOrThrow(wTransport);
+			std::lock_guard<std::mutex> lock(transport->_mutex);
+			if (transport->_isRunning)
+			{
+				transport->run();
+			}
+		}, ct);
+
+		ct.register_callback([wTransport]()
+		{
+			auto transport = LockOrThrow(wTransport);
+			transport->stop();
+		});
 
 		_logger->log(LogLevel::Trace, "RakNetTransport", "RakNet transport started");
 	}
@@ -87,14 +93,17 @@ namespace Stormancer
 			rakNetLogger->StartLog("packetLogs");
 #endif
 
-			_peer = std::shared_ptr<RakNet::RakPeerInterface>(RakNet::RakPeerInterface::GetInstance(), createSafeCapture(STRM_WEAK_FROM_THIS(), [=](RakNet::RakPeerInterface* peer) {
-				_logger->log(LogLevel::Trace, "RakNetTransport", "Deleting RakPeerInterface...");
+			auto wTransport = STRM_WEAK_FROM_THIS();
+			_peer = std::shared_ptr<RakNet::RakPeerInterface>(RakNet::RakPeerInterface::GetInstance(), [=](RakNet::RakPeerInterface* peer)
+			{
+				auto transport = LockOrThrow(wTransport);
+				transport->_logger->log(LogLevel::Trace, "RakNetTransport", "Deleting RakPeerInterface...");
 				RakNet::RakPeerInterface::DestroyInstance(peer);
 				if (rakNetLogger)
 				{
 					delete rakNetLogger;
 				}
-			}));
+			});
 
 #ifdef STORMANCER_PACKETFILELOGGER
 			_peer->AttachPlugin(rakNetLogger);
@@ -694,11 +703,13 @@ namespace Stormancer
 		std::vector<pplx::task<bool>> tasks;
 		for (int i = 0; i < nb; i++)
 		{
+			auto wTransport = STRM_WEAK_FROM_THIS();
 			tasks.push_back(taskDelay(std::chrono::milliseconds(300 * i), cts.get_token())
-				.then(createSafeCapture(STRM_WEAK_FROM_THIS(), [this, address]()
+				.then([wTransport, address]()
 			{
-				return sendPingImpl(address);
-			}), cts.get_token()));
+				auto transport = LockOrThrow(wTransport);
+				return transport->sendPingImpl(address);
+			}, cts.get_token()));
 		}
 
 		auto logger = _logger;
@@ -731,21 +742,23 @@ namespace Stormancer
 			}
 		});
 
+		auto wTransport = STRM_WEAK_FROM_THIS();
 		return cancel_after_timeout(eventSetTask, cts, 1500)
-			.then(createSafeCapture(STRM_WEAK_FROM_THIS(), [this, address](pplx::task<int> t)
+			.then([wTransport, address](pplx::task<int> t)
 		{
-			std::lock_guard<std::mutex> lg(_pendingPingsMutex);
-			_pendingPings.erase(address); // destroys the tce and cancels the task
+			auto transport = LockOrThrow(wTransport);
+			std::lock_guard<std::mutex> lg(transport->_pendingPingsMutex);
+			transport->_pendingPings.erase(address); // destroys the tce and cancels the task
 			try
 			{
 				return t.get();
 			}
 			catch (std::exception& ex)
 			{
-				_logger->log(LogLevel::Debug, "RakNetTransport", "Ping to " + address + " failed", ex.what());
+				transport->_logger->log(LogLevel::Debug, "RakNetTransport", "Ping to " + address + " failed", ex.what());
 				return -1;
 			}
-		}));
+		});
 	}
 
 	void RakNetTransport::openNat(const std::string& address)

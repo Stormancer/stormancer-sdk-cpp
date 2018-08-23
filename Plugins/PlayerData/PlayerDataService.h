@@ -61,14 +61,17 @@ namespace Stormancer
 		{
 			_scene = scene;
 
-			_scene->addRoute(PLAYERDATA_UPDATED_ROUTE, createSafeCapture(STRM_WEAK_FROM_THIS(), [this](Packetisp_ptr packet) {
-				if (_onDataUpdated)
+			auto wPlayerDataService = STRM_WEAK_FROM_THIS();
+			_scene->addRoute(PLAYERDATA_UPDATED_ROUTE, [wPlayerDataService](Packetisp_ptr packet)
+			{
+				auto playerDataService = LockOrThrow(wPlayerDataService);
+				if (playerDataService->_onDataUpdated)
 				{
 					auto playerData = packet->readObject<PlayerData<T>>();
 					playerData.peerId = packet->connection->id();
-					_onDataUpdated(playerData);
+					playerDataService->_onDataUpdated(playerData);
 				}
-			}));
+			});
 		}
 
 		Scene* GetScene()

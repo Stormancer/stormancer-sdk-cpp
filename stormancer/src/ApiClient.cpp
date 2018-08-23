@@ -86,9 +86,13 @@ namespace Stormancer
 		request.headers().add(U("Accept"), U("application/json"));
 		request.headers().add(U("x-version"), U("2"));
 
+		auto wApiClient = STRM_WEAK_FROM_THIS();
+
 		return client.request(request, ct)
-			.then(createSafeCapture(STRM_WEAK_FROM_THIS(), [this, baseUri, errors, endpoints, accountId, applicationName, sceneId, ct](pplx::task<web::http::http_response> task)
+			.then([wApiClient, baseUri, errors, endpoints, accountId, applicationName, sceneId, ct](pplx::task<web::http::http_response> task)
 		{
+			auto apiClient = LockOrThrow(wApiClient);
+
 			web::http::http_response response;
 			try
 			{
@@ -97,50 +101,51 @@ namespace Stormancer
 			catch (const std::exception& ex)
 			{
 				auto msgStr = "Can't reach the server endpoint. " + baseUri;
-				_logger->log(LogLevel::Warn, "ApiClient", msgStr, ex.what());
+				apiClient->_logger->log(LogLevel::Warn, "ApiClient", msgStr, ex.what());
 				(*errors).push_back("[" + msgStr + ":" + ex.what() + "]");
-				return getSceneEndpointImpl(endpoints, errors, accountId, applicationName, sceneId, ct);
+				return apiClient->getSceneEndpointImpl(endpoints, errors, accountId, applicationName, sceneId, ct);
 			}
 
 			try
 			{
 				uint16 statusCode = response.status_code();
 				auto msgStr = "HTTP request on '" + baseUri + "' returned status code " + std::to_string(statusCode);
-				_logger->log(LogLevel::Trace, "ApiClient", msgStr);
+				apiClient->_logger->log(LogLevel::Trace, "ApiClient", msgStr);
 				concurrency::streams::stringstreambuf ss;
 				return response.body().read_to_end(ss)
-					.then(createSafeCapture(STRM_WEAK_FROM_THIS(), [this, ss, statusCode, response, errors, msgStr, endpoints, accountId, applicationName, sceneId, ct](size_t)
+					.then([wApiClient, ss, statusCode, response, errors, msgStr, endpoints, accountId, applicationName, sceneId, ct](size_t)
 				{
-					
+					auto apiClient = LockOrThrow(wApiClient);
+
 					std::string responseText = ss.collection();
-					_logger->log(LogLevel::Trace, "ApiClient", "Response", responseText);
+					apiClient->_logger->log(LogLevel::Trace, "ApiClient", "Response", responseText);
 
 					if (ensureSuccessStatusCode(statusCode))
 					{
 						auto headers = response.headers();
 						if (headers[U("x-version")] == U("2"))
 						{
-							_logger->log(LogLevel::Trace, "ApiClient", "Get token API version : 2");
-							return pplx::task_from_result(_tokenHandler->getSceneEndpointInfo(responseText));
+							apiClient->_logger->log(LogLevel::Trace, "ApiClient", "Get token API version : 2");
+							return pplx::task_from_result(apiClient->_tokenHandler->getSceneEndpointInfo(responseText));
 						}
 						else
 						{
-							_logger->log(LogLevel::Trace, "ApiClient", "Get token API version : 1");
-							return pplx::task_from_result(_tokenHandler->decodeToken(responseText));
+							apiClient->_logger->log(LogLevel::Trace, "ApiClient", "Get token API version : 1");
+							return pplx::task_from_result(apiClient->_tokenHandler->decodeToken(responseText));
 						}
 					}
 					else
 					{
 						(*errors).push_back("[" + msgStr + ":" + std::to_string(statusCode) + "]");
-						return getSceneEndpointImpl(endpoints, errors, accountId, applicationName, sceneId, ct);
+						return apiClient->getSceneEndpointImpl(endpoints, errors, accountId, applicationName, sceneId, ct);
 					}
-				}), ct);
+				}, ct);
 			}
 			catch (const std::exception& ex)
 			{
 				throw std::runtime_error(std::string() + "Can't get the scene endpoint response: " + ex.what());
 			}
-		}), ct);
+		}, ct);
 	}
 
 	pplx::task<web::http::http_response> ApiClient::requestWithRetries(std::function<web::http::http_request(std::string)> requestFactory, pplx::cancellation_token ct)
@@ -205,9 +210,13 @@ namespace Stormancer
 		web::http::client::http_client client(baseUri, config);
 #endif
 
+		auto wApiClient = STRM_WEAK_FROM_THIS();
+
 		return client.request(rq, ct)
-			.then(createSafeCapture(STRM_WEAK_FROM_THIS(), [this, baseUri, errors, requestFactory, endpoints, ct](pplx::task<web::http::http_response> t)
+			.then([wApiClient, baseUri, errors, requestFactory, endpoints, ct](pplx::task<web::http::http_response> t)
 		{
+			auto apiClient = LockOrThrow(wApiClient);
+
 			bool success = false;
 			web::http::http_response response;
 			try
@@ -227,11 +236,12 @@ namespace Stormancer
 			{
 				errors->push_back("An exception occured while performing an http request to" + baseUri + ex.what());
 			}
+
 			if (!success)
 			{
 				if (endpoints.size() > 0)
 				{
-					return requestWithRetriesImpl(requestFactory, endpoints, errors, ct);
+					return apiClient->requestWithRetriesImpl(requestFactory, endpoints, errors, ct);
 				}
 				else
 				{
@@ -247,6 +257,6 @@ namespace Stormancer
 			{
 				return pplx::task_from_result(response);
 			}
-		}), ct);
+		}, ct);
 	}
 };

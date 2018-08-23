@@ -19,7 +19,7 @@ namespace Stormancer
 
 #pragma region public_methods
 
-		RpcService(Scene* scene, std::shared_ptr<IActionDispatcher> dispatcher);
+		RpcService(std::weak_ptr<Scene> scene, std::shared_ptr<IActionDispatcher> dispatcher);
 
 		virtual ~RpcService();
 
@@ -45,34 +45,39 @@ namespace Stormancer
 		template<typename TOutput>
 		pplx::task<TOutput> rpcWriter(const std::string& procedure, const Writer& writer, const Unwriter<TOutput>& unwriter)
 		{
+			auto logger = _logger;
+
 			pplx::task_completion_event<TOutput> tce;
 
 			auto observable = rpc_observable(procedure, writer, PacketPriority::MEDIUM_PRIORITY);
 
-			auto onNext = [=](Packetisp_ptr packet) {
+			auto onNext = [logger, tce, procedure, unwriter](Packetisp_ptr packet)
+			{
 				try
 				{
 					RpcService::internalOnNext<TOutput>(tce, packet, unwriter); // this is used for managing TOutput = void
 				}
 				catch (const std::exception& ex)
 				{
-					_logger->log(LogLevel::Trace, "RpcHelpers", "An exception occurred during the rpc response deserialization " + procedure);
+					logger->log(LogLevel::Trace, "RpcHelpers", "An exception occurred during the rpc response deserialization " + procedure);
 					tce.set_exception(ex);
 				}
 			};
 
-			auto onError = [=](std::exception_ptr error) {
-				_logger->log(LogLevel::Trace, "RpcHelpers", "An exception occurred during the rpc " + procedure);
+			auto onError = [logger, tce, procedure](std::exception_ptr error)
+			{
+				logger->log(LogLevel::Trace, "RpcHelpers", "An exception occurred during the rpc " + procedure);
 				tce.set_exception(error);
 			};
 
-			auto onComplete = [=]() {
+			auto onComplete = [tce]()
+			{
 				RpcService::internalOnComplete(tce); // this is used for managing TOutput = void
 			};
 
 			observable.subscribe(onNext, onError, onComplete);
 
-			return pplx::create_task(tce, pplx::task_options(getDispatcher()));
+			return pplx::create_task(tce, getDispatcher());
 		}
 
 		/// RPC with writer function.
@@ -90,12 +95,21 @@ namespace Stormancer
 		template<typename TOutput, typename... TInputs>
 		pplx::task<TOutput> rpc(const std::string& procedure, TInputs const&... args)
 		{
-			return rpcWriter<TOutput>(procedure, [=, &args...](obytestream* stream) {
-				_serializer.serialize(stream, args...);
-			}, [=](ibytestream* stream) {
-				return _serializer.deserializeOne<TOutput>(stream);
-			});
-		}		
+			auto serializer = _serializer;
+
+			auto writer = [serializer, &args...](obytestream* stream)
+			{
+				serializer.serialize(stream, args...);
+			};
+
+			auto unwriter = [serializer](ibytestream* stream)
+			{
+				return serializer.deserializeOne<TOutput>(stream);
+			};
+
+			return rpcWriter<TOutput>(procedure, writer, unwriter);
+		}
+
 #pragma endregion
 
 	private:
@@ -133,13 +147,15 @@ namespace Stormancer
 		std::mutex _pendingRequestsMutex;
 		std::map<uint16, pplx::cancellation_token_source> _runningRequests;
 		std::mutex _runningRequestsMutex;
-		Scene* _scene;
+		std::weak_ptr<Scene> _scene;
 		Serializer _serializer;
 		const std::string _rpcServerChannelIdentifier = "RPC_server";
 		ILogger_ptr _logger;
 
 #pragma endregion
 	};
+
+	// Specializations
 
 	template<>
 	inline void RpcService::internalOnNext(pplx::task_completion_event<void>, Packetisp_ptr, const Unwriter<void>&)

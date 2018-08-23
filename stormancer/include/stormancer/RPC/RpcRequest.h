@@ -5,17 +5,16 @@
 
 namespace Stormancer
 {
-	class RpcRequest
+	class STORMANCER_DLL_API RpcRequest
 	{
 	public:
-		STORMANCER_DLL_API RpcRequest(rxcpp::subscriber<Packetisp_ptr>& observer);
-		STORMANCER_DLL_API ~RpcRequest();
 
-	public:
+		RpcRequest(rxcpp::subscriber<Packetisp_ptr>& observer);
+		~RpcRequest();
+
 		uint16 id = 0;
 		rxcpp::subscriber<Packetisp_ptr> observer;
 		pplx::task_completion_event<void> tce;
-		pplx::task<void> task;
 		bool hasCompleted = false;
 	};
 

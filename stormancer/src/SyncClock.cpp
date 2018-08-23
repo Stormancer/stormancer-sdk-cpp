@@ -46,19 +46,25 @@ namespace Stormancer
 			_cancellationToken = ct;
 
 			auto cts = pplx::cancellation_token_source::create_linked_source(_cancellationToken);
-			scheduler->schedulePeriodic(_interval, createSafeCapture(STRM_WEAK_FROM_THIS(), [this, cts]()
+			auto wSyncClock = STRM_WEAK_FROM_THIS();
+
+			scheduler->schedulePeriodic(_interval, [wSyncClock, cts]()
 			{
-				std::lock_guard<std::mutex> lg(_mutex);
-				syncClockImplAsync();
-			}), _cancellationToken);
+				auto syncClock = LockOrThrow(wSyncClock);
+
+				std::lock_guard<std::mutex> lg(syncClock->_mutex);
+				syncClock->syncClockImplAsync();
+			}, _cancellationToken);
 
 			// Do multiple pings at start
-			scheduler->schedulePeriodic(_intervalAtStart, createSafeCapture(STRM_WEAK_FROM_THIS(), [this, cts]
+			scheduler->schedulePeriodic(_intervalAtStart, [wSyncClock, cts]
 			{
+				auto syncClock = LockOrThrow(wSyncClock);
+
 				bool shouldCallSyncClockImpl = false;
 				{
-					std::lock_guard<std::mutex> lg(_mutex);
-					if (_clockValues.size() >= _maxValues)
+					std::lock_guard<std::mutex> lg(syncClock->_mutex);
+					if (syncClock->_clockValues.size() >= syncClock->_maxValues)
 					{
 						cts.cancel();
 					}
@@ -69,14 +75,15 @@ namespace Stormancer
 				}
 				if (shouldCallSyncClockImpl)
 				{
-					syncClockImplAsync();
+					syncClock->syncClockImplAsync();
 				}
-			}), _cancellationToken);
+			}, _cancellationToken);
 
-			_cancellationToken.register_callback(createSafeCapture(STRM_WEAK_FROM_THIS(), [this]
+			_cancellationToken.register_callback([wSyncClock]
 			{
-				stop();
-			}));
+				auto syncClock = LockOrThrow(wSyncClock);
+				syncClock->stop();
+			});
 
 			logger->log(LogLevel::Trace, "synchronizedClock", "SyncClock started");
 		}
@@ -135,40 +142,43 @@ namespace Stormancer
 			// Keep an active reference to the logger, in case the task is cancelled we cannot rely on this being valid
 			auto logger = _dependencyResolver.lock()->resolve<ILogger>();
 			auto cancellationToken = _cancellationToken;
+			auto wSyncClock = STRM_WEAK_FROM_THIS();
 			requestProcessor->sendSystemRequest(remoteConnection.get(), (byte)SystemRequestIDTypes::ID_PING, [&timeStart](obytestream* bs) {
 				(*bs) << timeStart;
 			}, PacketPriority::IMMEDIATE_PRIORITY, _cancellationToken)
-				.then(createSafeCapture(STRM_WEAK_FROM_THIS(), [=](Packet_ptr packet)
+				.then([wSyncClock, timeStart](Packet_ptr packet)
 			{
-				uint64 timeEnd = (uint64)_watch.getElapsedTime();
+				auto syncClock = LockOrThrow(wSyncClock);
 
-				std::lock_guard<std::mutex> lock(_mutex);
+				uint64 timeEnd = (uint64)syncClock->_watch.getElapsedTime();
 
-				_lastPingFinished = true;
+				std::lock_guard<std::mutex> lock(syncClock->_mutex);
+
+				syncClock->_lastPingFinished = true;
 
 				uint64 timeServer;
 				*packet->stream >> timeServer;
 
 				uint16 ping = (uint16)(timeEnd - timeStart);
-				_lastPing = ping;
+				syncClock->_lastPing = ping;
 				double latency = ping / 2.0;
 
 				double offset = timeServer - timeEnd + latency;
 
-				_clockValues.push_back(ClockValue{ latency, offset });
-				if (_clockValues.size() > _maxValues)
+				syncClock->_clockValues.push_back(ClockValue{ latency, offset });
+				if (syncClock->_clockValues.size() > syncClock->_maxValues)
 				{
-					_clockValues.pop_front();
+					syncClock->_clockValues.pop_front();
 				}
-				auto len = _clockValues.size();
+				auto len = syncClock->_clockValues.size();
 
 				std::vector<double> latencies(len);
 				for (std::size_t i = 0; i < len; i++)
 				{
-					latencies[i] = _clockValues[i].latency;
+					latencies[i] = syncClock->_clockValues[i].latency;
 				}
 				std::sort(latencies.begin(), latencies.end());
-				_medianLatency = latencies[len / 2];
+				syncClock->_medianLatency = latencies[len / 2];
 				double pingAvg = std::accumulate(latencies.begin(), latencies.end(), 0.0) / len;
 				double varianceLatency = 0;
 				for (auto v : latencies)
@@ -177,12 +187,12 @@ namespace Stormancer
 					varianceLatency += (tmp * tmp);
 				}
 				varianceLatency /= len;
-				_standardDeviationLatency = std::sqrt(varianceLatency);
+				syncClock->_standardDeviationLatency = std::sqrt(varianceLatency);
 
 				double offsetsAvg = 0;
 				uint32 lenOffsets = 0;
-				double latencyMax = _medianLatency + _standardDeviationLatency;
-				for (auto v : _clockValues)
+				double latencyMax = syncClock->_medianLatency + syncClock->_standardDeviationLatency;
+				for (auto v : syncClock->_clockValues)
 				{
 					if (v.latency < latencyMax)
 					{
@@ -190,9 +200,9 @@ namespace Stormancer
 						lenOffsets++;
 					}
 				}
-				_offset = offsetsAvg / lenOffsets;
-			}), _cancellationToken)
-				.then([=](pplx::task<void> t)
+				syncClock->_offset = offsetsAvg / lenOffsets;
+			}, _cancellationToken)
+				.then([cancellationToken, logger](pplx::task<void> t)
 			{
 				try
 				{
