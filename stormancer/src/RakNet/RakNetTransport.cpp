@@ -712,7 +712,7 @@ namespace Stormancer
 
 		{
 			std::lock_guard<std::mutex> lg(_pendingPingsMutex);
-			_pendingPings[address] = tce;
+			_pendingPings.emplace(address, tce);
 		}
 
 		pplx::task<int> eventSetTask(tce, ct);
@@ -721,16 +721,28 @@ namespace Stormancer
 		for (int i = 0; i < nb; i++)
 		{
 			auto wTransport = STRM_WEAK_FROM_THIS();
-			tasks.push_back(taskDelay(std::chrono::milliseconds(300 * i), cts.get_token())
+			auto pingImplTask = taskDelay(std::chrono::milliseconds(300 * i), cts.get_token())
 				.then([wTransport, address]()
 			{
 				auto transport = LockOrThrow(wTransport);
 				return transport->sendPingImpl(address);
-			}, cts.get_token()));
+			}, cts.get_token());
+			tasks.push_back(pingImplTask);
+
+			pingImplTask.then([](pplx::task<bool> t)
+			{
+				try
+				{
+					t.get();
+				}
+				catch (...) {}
+			});
 		}
 
 		auto logger = _logger;
-		pplx::when_all(tasks.begin(), tasks.end()).then([logger, tce, address](std::vector<bool> results) {
+		pplx::when_all(tasks.begin(), tasks.end())
+			.then([logger, tce, address](std::vector<bool> results)
+		{
 			bool sent = false;
 
 			for (bool result : results)

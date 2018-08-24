@@ -14,7 +14,7 @@ namespace Stormancer
 
 		uint16 id = 0;
 		rxcpp::subscriber<Packetisp_ptr> observer;
-		pplx::task_completion_event<void> tce;
+		pplx::task_completion_event<void> waitingForDataTce;
 		bool hasCompleted = false;
 	};
 

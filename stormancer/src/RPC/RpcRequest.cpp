@@ -10,5 +10,10 @@ namespace Stormancer
 
 	RpcRequest::~RpcRequest()
 	{
+		if (!hasCompleted)
+		{
+			observer.on_error(std::make_exception_ptr(pplx::task_canceled()));
+			hasCompleted = true;
+		}
 	}
 };
