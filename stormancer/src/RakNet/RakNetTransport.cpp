@@ -541,22 +541,31 @@ namespace Stormancer
 
 	void RakNetTransport::onDisconnection(RakNet::RakNetGUID guid, std::string reason)
 	{
-		
-		
 		auto connection = removeConnection(guid);
 
-		_handler->closeConnection(connection, reason);
-
-		connection->_closeAction(reason);
-		if (guid == _serverRakNetGUID)
+		if (connection)
 		{
-			_id = 0;
-			_serverConnected = false;
+			_handler->closeConnection(connection, reason);
+
+			connection->_closeAction(reason);
+
+			if (guid == _serverRakNetGUID)
+			{
+				_id = 0;
+				_serverConnected = false;
+			}
+
+			pplx::task<void>([connection]()
+			{
+				// Start this asynchronously because we locked the mutex in run and the user can do something that tries to lock again this mutex
+				connection->setConnectionState(ConnectionState::Disconnected);
+			});
 		}
-		pplx::task<void>([=]() {
-			// Start this asynchronously because we locked the mutex in run and the user can do something that tries to lock again this mutex
-			connection->setConnectionState(ConnectionState::Disconnected);
-		});
+		else
+		{
+			auto msg = std::string("Attempting to disconnect from unknown peer (guid: " + std::to_string(guid.g) + ")");
+			_logger->log(LogLevel::Warn, "RakNetTransport", msg);
+		}
 	}
 
 	void RakNetTransport::onMessageReceived(RakNet::Packet* rakNetPacket)
@@ -618,9 +627,17 @@ namespace Stormancer
 
 	std::shared_ptr<RakNetConnection> RakNetTransport::removeConnection(RakNet::RakNetGUID guid)
 	{
-		auto connection = _connections[guid.g];
-		_connections.erase(guid.g);
-		return connection;
+		auto it = _connections.find(guid.g);
+		if (it != _connections.end())
+		{
+			auto result = it->second;
+			_connections.erase(it);
+			return result;
+		}
+		else
+		{
+			return nullptr;
+		}
 	}
 
 	bool RakNetTransport::isRunning() const
