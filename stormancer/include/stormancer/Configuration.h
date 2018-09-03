@@ -118,7 +118,9 @@ namespace Stormancer
 
 		ILogger_ptr logger = std::make_shared<NullLogger>();
 
-		std::string endpointRootCertificate;
+
+
+
 
 		bool shoudInitializeNetworkLibraries = true;
 		bool encryptionEnabled = false;

@@ -51,7 +51,7 @@ namespace Stormancer
 	// Client
 
 	Client::Client(Configuration_ptr config) :
-		_initialized(false)
+		 _initialized(false)
 		, _accountId(config->account)
 		, _applicationName(config->application)
 		, _maxPeers(config->maxPeers)
@@ -114,6 +114,10 @@ namespace Stormancer
 				auto client = LockOrThrow(wClient);
 				client->transport_packetReceived(packet);
 			});
+
+
+
+
 
 
 
@@ -325,19 +329,26 @@ namespace Stormancer
 			ClientScene cScene;
 			cScene.isPublic = true;
 
-			auto wClient = STRM_WEAK_FROM_THIS();
-
+			auto weakSelf = GetWeakFromThis(this);
 			auto task = ensureNetworkAvailable()
-				.then([wClient, sceneId, ct]()
+				.then([weakSelf, sceneId, ct]()
 			{
-				auto client = LockOrThrow(wClient);
-				auto apiClient = client->_dependencyResolver->resolve<ApiClient>();
-				return apiClient->getSceneEndpoint(client->_accountId, client->_applicationName, sceneId, ct);
+				auto self = weakSelf.lock();
+				if (!self)
+				{
+					throw PointerDeletedException();
+				}
+				auto apiClient = self->_dependencyResolver->resolve<ApiClient>();
+				return apiClient->getSceneEndpoint(self->_accountId, self->_applicationName, sceneId, ct);
 			}, ct)
-				.then([wClient, sceneId, ct](SceneEndpoint sep)
+				.then([weakSelf, sceneId, ct](SceneEndpoint sep)
 			{
-				auto client = LockOrThrow(wClient);
-				return client->getSceneInternal(sceneId, sep, ct);
+				auto self = weakSelf.lock();
+				if (!self)
+				{
+					throw PointerDeletedException();
+				}
+				return self->getSceneInternal(sceneId, sep, ct);
 			}, ct);
 
 			cScene.task = task;
@@ -447,71 +458,71 @@ namespace Stormancer
 						auto onConnectionStateChangedNext = [wClient](ConnectionState state) {
 							if (auto client = wClient.lock())
 							{
-								if (state == ConnectionState::Disconnecting)
-								{
+							if (state == ConnectionState::Disconnecting)
+							{
 									std::lock_guard<std::mutex> lg(client->_scenesMutex);
 									for (auto sceneIt : client->_scenes)
-									{
-										sceneIt.second.task
+								{
+									sceneIt.second.task
 											.then([wClient](Scene_ptr scene)
-										{
+									{
 											auto client = LockOrThrow(wClient);
 
 											client->dispatchEvent([scene]()
 											{
-												scene->setConnectionState(ConnectionState::Disconnecting);
-											});
+											scene->setConnectionState(ConnectionState::Disconnecting);
+										});
 											for (auto plugin : client->_plugins)
-											{
-												plugin->sceneDisconnecting(scene.get());
-											}
+										{
+											plugin->sceneDisconnecting(scene.get());
+										}
 										})
-											.then([](pplx::task<void> t)
+										.then([](pplx::task<void> t)
+									{
+										try
 										{
-											try
-											{
-												t.get();
-											}
-											catch (const std::exception&)
-											{
-												// catch any exception
-											}
-										});
-									}
+											t.get();
+										}
+										catch (const std::exception&)
+										{
+											// catch any exception
+										}
+									});
 								}
-								else if (state == ConnectionState::Disconnected)
-								{
+							}
+							else if (state == ConnectionState::Disconnected)
+							{
 									std::lock_guard<std::mutex> lg(client->_scenesMutex);
 									for (auto sceneIt : client->_scenes)
-									{
-										sceneIt.second.task
+								{
+									sceneIt.second.task
 											.then([wClient](Scene_ptr scene)
-										{
+									{
 											auto client = LockOrThrow(wClient);
 
 											client->dispatchEvent([scene]()
 											{
-												scene->setConnectionState(ConnectionState::Disconnected);
-											});
-											for (auto plugin : client->_plugins)
-											{
-												plugin->sceneDisconnected(scene.get());
-											}
-										}).then([](pplx::task<void> t) {
-											try
-											{
-												t.wait();
-											}
-											catch (const std::exception&)
-											{
-												// catch any exception
-											}
+											scene->setConnectionState(ConnectionState::Disconnected);
 										});
-									}
+											for (auto plugin : client->_plugins)
+										{
+											plugin->sceneDisconnected(scene.get());
+										}
+										}).then([](pplx::task<void> t) {
+										try
+										{
+											t.wait();
+										}
+										catch (const std::exception&)
+										{
+											// catch any exception
+										}
+									});
+								}
 									client->_cts.cancel(); // this will cause the syncClock and the transport to stop
 									client->_serverConnection.reset();
 									client->_connectionSubscription.unsubscribe();
-								}
+							}
 
 								client->setConnectionState(state);
 							}
@@ -572,8 +583,8 @@ namespace Stormancer
 							{
 								if (auto connection = client->_serverConnection.lock())
 								{
-									connection->close();
-								}
+								connection->close();
+							}
 								client->setConnectionState(ConnectionState::Disconnected);
 							}
 							throw;
@@ -865,13 +876,13 @@ namespace Stormancer
 			{
 				for (auto plugin : client->_plugins)
 				{
-					plugin->sceneDisconnected(scene.get());
-				}
+				plugin->sceneDisconnected(scene.get());
+			}
 
 				client->logger()->log(LogLevel::Debug, "client", "Scene disconnected", sceneId);
 
-				scene->setConnectionState(ConnectionState::Disconnected);
-			}
+			scene->setConnectionState(ConnectionState::Disconnected);
+	}
 		}, timeOutToken);
 	}
 

@@ -102,6 +102,15 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderService.cpp">
       <Filter>GameFinder</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\GameRecovery\GameRecovery.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\GameRecovery\GameRecoveryPlugin.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\GameRecovery\GameRecoveryService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\Party\PartyInvitation.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\Party\PartyManagement.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\Party\PartyPlugin.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\Party\PartyService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\Profile\ProfilePlugin.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\Profile\ProfilesService.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\AssetsStorage\AssetsStoragePlugin.h">
@@ -188,5 +197,17 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderTypes.h">
       <Filter>GameFinder</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Core\ClientAPI.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\GameRecovery\GameRecovery.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\GameRecovery\GameRecoveryPlugin.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\GameRecovery\GameRecoveryService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Leaderboard\Leaderboard.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Party\PartyInvitation.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Party\PartyManagement.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Party\PartyPlugin.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Party\PartyService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Profile\PlayerProfileDto.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Profile\ProfilePlugin.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Profile\ProfileService.h" />
   </ItemGroup>
 </Project>

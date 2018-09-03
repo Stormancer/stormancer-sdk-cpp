@@ -242,6 +242,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <TreatWarningAsError>true</TreatWarningAsError>
       <PrecompiledHeaderFile>stormancer/stdafx.h</PrecompiledHeaderFile>
+      <ProgramDataBaseFileName>$(OutDir)Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

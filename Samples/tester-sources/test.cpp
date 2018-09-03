@@ -28,18 +28,18 @@ namespace Stormancer
 		std::string stateStr = to_string((int)connectionState) + " ";
 		switch (connectionState)
 		{
-			case ConnectionState::Disconnected:
-				stateStr += "Disconnected";
-				break;
-			case ConnectionState::Connecting:
-				stateStr += "Connecting";
-				break;
-			case ConnectionState::Connected:
-				stateStr += "Connected";
-				break;
-			case ConnectionState::Disconnecting:
-				stateStr += "Disconnecting";
-				break;
+		case ConnectionState::Disconnected:
+			stateStr += "Disconnected";
+			break;
+		case ConnectionState::Connecting:
+			stateStr += "Connecting";
+			break;
+		case ConnectionState::Connected:
+			stateStr += "Connected";
+			break;
+		case ConnectionState::Disconnecting:
+			stateStr += "Disconnecting";
+			break;
 		}
 		return stateStr;
 	}
@@ -163,15 +163,18 @@ namespace Stormancer
 		{
 			_logger->log(LogLevel::Debug, "test_connect", "Get scene");
 
-			_client->connectToPublicScene(_sceneName, [this](Scene_ptr scene) {
+			_client->connectToPublicScene(_sceneName, [this](Scene_ptr scene)
+			{
 				_logger->log(LogLevel::Debug, "test_connect", "Get scene OK");
 
-				auto onNext = [this, scene](ConnectionState state) {
+				auto onNext = [this, scene](ConnectionState state) 
+				{
 					auto stateStr = connectionStateToString(state);
 					_logger->log(LogLevel::Debug, "test_connect", "Scene connection state changed", stateStr.c_str());
 				};
 
-				auto onError = [this](std::exception_ptr exptr) {
+				auto onError = [this](std::exception_ptr exptr) 
+				{
 					// On error
 					try
 					{

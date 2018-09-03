@@ -16,6 +16,31 @@ namespace Stormancer
 		};
 		addServerEndpoint(endpoint);
 		_plugins.push_back(new RpcPlugin());
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	}
 
 	Configuration::~Configuration()
