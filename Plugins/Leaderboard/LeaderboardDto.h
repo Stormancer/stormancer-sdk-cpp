@@ -34,9 +34,9 @@ namespace Stormancer
 	struct FieldFilter
 	{
 		std::string field;
-		std::string value;
+		std::vector<std::string> values;
 
-		MSGPACK_DEFINE(field, value);
+		MSGPACK_DEFINE(field, values);
 	};
 
 	struct LeaderboardQuery
