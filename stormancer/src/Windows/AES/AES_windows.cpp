@@ -137,7 +137,7 @@ namespace Stormancer
 		{
 			std::stringstream ss;
 			ss << "Error " << getErrorString(status) << " returned by BCryptEncrypt";
-			throw std::runtime_error(ss.str());
+			throw std::runtime_error(ss.str().c_str());
 		}
 
 		// Write the encrypted data in the output stream
@@ -188,7 +188,7 @@ namespace Stormancer
 		{
 			std::stringstream ss;
 			ss << "Error " << getErrorString(status) << " returned by BCryptDecrypt";
-			throw std::runtime_error(ss.str());
+			throw std::runtime_error(ss.str().c_str());
 		}
 
 		// Write the decrypted data in the output stream
@@ -228,7 +228,7 @@ namespace Stormancer
 		{
 			std::stringstream ss;
 			ss << "Error " << getErrorString(status) << " returned by BCryptOpenAlgorithmProvider";
-			throw std::runtime_error(ss.str());
+			throw std::runtime_error(ss.str().c_str());
 		}
 		if (!NT_SUCCESS(status = BCryptSetProperty(
 			_hAesAlg,
@@ -239,7 +239,7 @@ namespace Stormancer
 		{
 			std::stringstream ss;
 			ss << "Error " << getErrorString(status) << " returned by BCryptSetProperty";
-			throw std::runtime_error(ss.str());
+			throw std::runtime_error(ss.str().c_str());
 		}
 
 		DWORD cbKeyObject = 0;
@@ -256,7 +256,7 @@ namespace Stormancer
 		{
 			std::stringstream ss;
 			ss << "Error " << getErrorString(status) << " returned by BCryptGetProperty";
-			throw std::runtime_error(ss.str());
+			throw std::runtime_error(ss.str().c_str());
 		}
 
 		// Allocate the key object on the heap.
@@ -277,7 +277,7 @@ namespace Stormancer
 		{
 			std::stringstream ss;
 			ss << "Error " << getErrorString(status) << " returned by BCryptGetProperty";
-			throw std::runtime_error(ss.str());
+			throw std::runtime_error(ss.str().c_str());
 		}
 		DWORD bytesDone = 0;
 
@@ -285,7 +285,7 @@ namespace Stormancer
 		{
 			std::stringstream ss;
 			ss << "Error " << getErrorString(status) << " returned byBCryptGetProperty(BCRYPT_AUTH_TAG_LENGTH)";
-			throw std::runtime_error(ss.str());
+			throw std::runtime_error(ss.str().c_str());
 		}
 
 
@@ -301,7 +301,7 @@ namespace Stormancer
 		{
 			std::stringstream ss;
 			ss << "Error " << getErrorString(status) << " returned by BCryptGenerateSymmetricKey";
-			throw std::runtime_error(ss.str());
+			throw std::runtime_error(ss.str().c_str());
 		}
 
 

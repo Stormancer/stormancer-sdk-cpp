@@ -84,14 +84,14 @@ namespace Stormancer
 		bool res = std::regex_search(endpoint, m, ipRegex);
 		if (!res || m.length() < 5)
 		{
-			throw std::invalid_argument("Bad scene endpoint (" + endpoint + ')');
+			throw std::invalid_argument(("Bad scene endpoint (" + endpoint + ')').c_str());
 		}
 
 		//_host = m.str(1);
 		_port = (uint16)std::atoi(m.str(4).c_str());
 		if (_port == 0)
 		{
-			throw std::runtime_error("Scene endpoint port should not be 0 (" + endpoint + ')');
+			throw std::runtime_error(("Scene endpoint port should not be 0 (" + endpoint + ')').c_str());
 		}
 
 		if (_socketId == nullptr)
@@ -162,7 +162,7 @@ namespace Stormancer
 		auto s = socket__(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 		if (s < 0)
 		{
-			throw std::runtime_error(std::string("Could not create the tcp socket. Error: " + std::to_string(s)));
+			throw std::runtime_error((std::string("Could not create the tcp socket. Error: " + std::to_string(s))).c_str());
 		}
 
 		_socketId = std::shared_ptr<SOCKET>(new SOCKET(s), [](SOCKET* socketId)
@@ -217,7 +217,7 @@ namespace Stormancer
 		sin.sin_family = AF_INET;
 		if (inet_pton(AF_INET, _host.c_str(), &sin.sin_addr) <= 0)
 		{
-			_pendingConnections[endpoint].set_exception(std::runtime_error(std::string("Unable to resolve ip ") + endpoint));
+			_pendingConnections[endpoint].set_exception(std::runtime_error((std::string("Unable to resolve ip ") + endpoint).c_str()));
 			return;
 		}
 		sin.sin_port = htons(_port);
@@ -225,7 +225,7 @@ namespace Stormancer
 		auto ret = ::connect__(*_socketId, (sockaddr*)&sin, sizeof(sin));
 		if (ret < 0)
 		{
-			_pendingConnections[endpoint].set_exception(std::runtime_error(std::string("Unable to connect to endpoint ") + endpoint));
+			_pendingConnections[endpoint].set_exception(std::runtime_error((std::string("Unable to connect to endpoint ") + endpoint).c_str()));
 			return;
 		}
 

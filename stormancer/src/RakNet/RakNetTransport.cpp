@@ -130,14 +130,14 @@ namespace Stormancer
 			auto startupResult = _peer->Startup(maxConnections, socketDescriptorsList, 1);
 			if (startupResult != RakNet::StartupResult::RAKNET_STARTED)
 			{
-				throw std::runtime_error(std::string("RakNet peer startup failed (RakNet::StartupResult == ") + std::to_string(startupResult) + ')');
+				throw std::runtime_error((std::string("RakNet peer startup failed (RakNet::StartupResult == ") + std::to_string(startupResult) + ')').c_str());
 			}
 			_peer->SetMaximumIncomingConnections(maxConnections);
 			_logger->log(LogLevel::Trace, "RakNetTransport", "Raknet transport initialized", _type.c_str());
 		}
 		catch (const std::exception& ex)
 		{
-			throw std::runtime_error(std::string() + "Failed to initialize the RakNet peer (" + ex.what() + ")");
+			throw std::runtime_error((std::string() + "Failed to initialize the RakNet peer (" + ex.what() + ")").c_str());
 		}
 	}
 
@@ -487,21 +487,21 @@ namespace Stormancer
 		auto tce = rq.tce;
 		if (split.size() < 2)
 		{
-			tce.set_exception(std::invalid_argument("Bad server endpoint, no port (" + endpoint + ')'));
+			tce.set_exception(std::invalid_argument(("Bad server endpoint, no port (" + endpoint + ')').c_str()));
 			return;
 		}
 
 		std::string portString = split[1];
 		if (endpoint.size() - 1 <= portString.size())
 		{
-			tce.set_exception(std::invalid_argument("Bad server endpoint, no host (" + endpoint + ')'));
+			tce.set_exception(std::invalid_argument(("Bad server endpoint, no host (" + endpoint + ')').c_str()));
 			return;
 		}
 
 		_port = (uint16)std::atoi(portString.c_str());
 		if (_port == 0)
 		{
-			tce.set_exception(std::runtime_error("Server endpoint port should not be 0 (" + endpoint + ')'));
+			tce.set_exception(std::runtime_error(("Server endpoint port should not be 0 (" + endpoint + ')').c_str()));
 			return;
 		}
 
@@ -516,7 +516,7 @@ namespace Stormancer
 		auto result = _peer->Connect(hostStr.c_str(), _port, nullptr, 0, nullptr, 0, 12, 500, 30000);
 		if (result != RakNet::ConnectionAttemptResult::CONNECTION_ATTEMPT_STARTED)
 		{
-			tce.set_exception(std::runtime_error(std::string("Bad RakNet connection attempt result (") + std::to_string(result) + ')'));
+			tce.set_exception(std::runtime_error((std::string("Bad RakNet connection attempt result (") + std::to_string(result) + ')').c_str()));
 			return;
 		}
 	}
@@ -572,7 +572,7 @@ namespace Stormancer
 	{
 #if defined(STORMANCER_LOG_PACKETS) && !defined(STORMANCER_LOG_RAKNET_PACKETS)
 		std::vector<byte> tempBytes(rakNetPacket->data, rakNetPacket->data + rakNetPacket->length);
-		auto bytes = stringifyBytesArray(tempBytes, true);
+		auto bytes = stringifyBytesArray(tempBytes, true, true);
 		_logger->log(LogLevel::Trace, "RakNetTransport", "Packet received", bytes.c_str());
 #endif
 

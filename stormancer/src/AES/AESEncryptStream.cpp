@@ -29,19 +29,15 @@ namespace Stormancer
 		if (_aes)
 		{
 			byte* dataPtr = startPtr();
-			std::streamsize dataSize = writtenBytesCount();
+			std::streamsize dataSize = currentPosition();
 			if (dataPtr && dataSize > 0)
 			{
 				std::streamsize ivSize = _aes->ivSize();
-
-				
 
 				auto iv = std::vector<byte>(static_cast<unsigned int>(ivSize));
 				_aes->generateRandomIV(iv);
 				
 				_aes->encrypt(dataPtr, dataSize, iv.data(), ivSize, stream,_keyId);
-
-				
 			}
 		}
 	}

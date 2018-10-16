@@ -49,9 +49,13 @@ namespace Stormancer
 
 		byte* currentPtr();
 
-		std::streamsize size();
+		byte* endPtr();
 
-		std::streamsize totalReadBytesCount();
+		std::streamsize totalSize();
+
+		std::streamsize availableSize();
+
+		std::streamsize currentPosition();
 
 		ibytestream& read(byte* ptr, std::streamsize size);
 

@@ -47,7 +47,7 @@ namespace Stormancer
 			auto c = self->_connections->getConnection(session.remotePeer);
 			if (!c)
 			{
-				throw std::runtime_error("Failed to get P2P connection for peer " + std::to_string(session.remotePeer));
+				throw std::runtime_error(("Failed to get P2P connection for peer " + std::to_string(session.remotePeer)).c_str());
 			}
 			else
 			{

@@ -143,7 +143,7 @@ namespace Stormancer
 			}
 			catch (const std::exception& ex)
 			{
-				throw std::runtime_error(std::string() + "Can't get the scene endpoint response: " + ex.what());
+				throw std::runtime_error((std::string() + "Can't get the scene endpoint response: " + ex.what()).c_str());
 			}
 		}, ct);
 	}
@@ -250,7 +250,7 @@ namespace Stormancer
 					{
 						str << error << '\n';
 					}
-					throw std::runtime_error(str.str());
+					throw std::runtime_error(str.str().c_str());
 				}
 			}
 			else

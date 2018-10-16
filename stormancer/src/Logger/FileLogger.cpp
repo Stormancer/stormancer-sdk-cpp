@@ -79,7 +79,7 @@ namespace Stormancer
 				}
 				else
 				{
-					throw std::runtime_error("FileLogger can't open the file " + _fileName + " to log.");
+					throw std::runtime_error(("FileLogger can't open the file " + _fileName + " to log.").c_str());
 				}
 			}
 		}

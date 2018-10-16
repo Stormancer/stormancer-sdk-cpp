@@ -106,6 +106,15 @@ namespace Stormancer
 			}
 		}
 
+		void sceneConnected(Scene* scene) override
+		{
+			if (SingleServicePlugin::isEnabled(scene, options.metadataKey))
+			{
+				auto service = scene->dependencyResolver().lock()->resolve<T>();
+				service->sceneConnected(scene);
+			}
+		}
+
 #pragma endregion
 
 #pragma region public_static_methods

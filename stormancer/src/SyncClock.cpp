@@ -221,7 +221,7 @@ namespace Stormancer
 		{
 			auto logger = _dependencyResolver.lock()->resolve<ILogger>();
 			logger->log(LogLevel::Error, "Client::syncClockImpl", "Failed to ping server.", ex.what());
-			throw std::runtime_error(std::string() + ex.what() + "\nFailed to ping server.");
+			throw std::runtime_error((std::string() + ex.what() + "\nFailed to ping server.").c_str());
 		}
 	}
 }

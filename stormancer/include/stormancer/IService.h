@@ -19,6 +19,7 @@ namespace Stormancer
 		STORMANCER_DLL_API virtual void setClient(Client* client);
 		STORMANCER_DLL_API virtual void setTransport(ITransport* transport);
 		STORMANCER_DLL_API virtual void setScene(Scene* scene);
+		STORMANCER_DLL_API virtual void sceneConnected(Scene* scene);
 		STORMANCER_DLL_API virtual void packetReceived(Packet_ptr packet);
 
 #pragma endregion

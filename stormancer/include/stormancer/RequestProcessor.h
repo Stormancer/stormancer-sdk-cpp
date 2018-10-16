@@ -58,7 +58,7 @@ namespace Stormancer
 				{
 					auto msg = "Tried to return " + T1name + " from a system request of type " + std::to_string(id) + " that returned void.";
 					logger->log(Stormancer::LogLevel::Error, "systemrequests", msg);
-					throw std::runtime_error(msg);
+					throw std::runtime_error(msg.c_str());
 				}
 				else
 				{

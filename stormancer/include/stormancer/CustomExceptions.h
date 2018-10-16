@@ -16,7 +16,7 @@ namespace Stormancer
 		}
 
 		PointerDeletedException(const std::string& message)
-			: std::runtime_error(message)
+			: std::runtime_error(message.c_str())
 		{
 		}
 	};

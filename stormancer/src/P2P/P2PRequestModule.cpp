@@ -184,8 +184,9 @@ namespace Stormancer
 
 			logger->log(LogLevel::Debug, "p2p", "Waiting connection " + candidate.clientEndpointCandidate.address + " => " + candidate.listeningEndpointCandidate.address);
 			connections->addPendingConnection(candidate.clientPeer)
-				.then([sessions, sessionId](std::shared_ptr<IConnection>)
+				.then([sessions, sessionId](std::shared_ptr<IConnection> connection)
 			{
+				connection->setMetadata("type", "p2p");
 				sessions->updateSessionState(sessionId, P2PSessionState::Connected);
 			})
 				.then([logger](pplx::task<void> t)
@@ -225,8 +226,9 @@ namespace Stormancer
 
 			logger->log(LogLevel::Debug, "p2p", "Connecting... " + candidate.clientEndpointCandidate.address + " => " + candidate.listeningEndpointCandidate.address);
 			connections->addPendingConnection(candidate.listeningPeer)
-				.then([sessions, sessionId](std::shared_ptr<IConnection>)
+				.then([sessions, sessionId](std::shared_ptr<IConnection> connection)
 			{
+				connection->setMetadata("type", "p2p");
 				sessions->updateSessionState(sessionId, P2PSessionState::Connected);
 			})
 				.then([logger](pplx::task<void> t)

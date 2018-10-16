@@ -54,7 +54,7 @@ namespace Stormancer
 			{
 				std::string message = std::string() + "The target route '" + route + "' does not exist on the remote host.";
 				logger->log(LogLevel::Error, "RpcService", message);
-				throw std::runtime_error(message);
+				throw std::runtime_error(message.c_str());
 			}
 
 			auto metadata = relevantRoute->metadata();
@@ -63,14 +63,14 @@ namespace Stormancer
 			{
 				auto errorMsg = std::string() + "The target remote route '" + route + "' is not an RPC route.";
 				logger->log(LogLevel::Error, "RpcService", errorMsg, route);
-				throw std::runtime_error(errorMsg);
+				throw std::runtime_error(errorMsg.c_str());
 			}
 
 			if (metadata[RpcPlugin::pluginName] != RpcPlugin::version)
 			{
 				auto errorMsg = std::string() + "The target remote route '" + route + "' does not support the plugin RPC version " + RpcPlugin::version;
 				logger->log(LogLevel::Error, "RpcService", errorMsg.c_str(), route);
-				throw std::runtime_error(errorMsg);
+				throw std::runtime_error(errorMsg.c_str());
 			}
 
 			RpcRequest_ptr request(new RpcRequest(subscriber), [](RpcRequest* ptr) { delete ptr; });
@@ -405,7 +405,7 @@ namespace Stormancer
 			if (!pair.second->hasCompleted)
 			{
 				pair.second->hasCompleted = true;
-				pair.second->observer.on_error(std::make_exception_ptr<std::runtime_error>(std::runtime_error(reason)));
+				pair.second->observer.on_error(std::make_exception_ptr<std::runtime_error>(std::runtime_error(reason.c_str())));
 			}
 		}
 	}

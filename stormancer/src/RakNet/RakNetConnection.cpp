@@ -133,9 +133,14 @@ namespace Stormancer
 			throw std::runtime_error("Dependency resolver not available");
 		}
 
+
 		obytestream stream;
 		std::vector<std::shared_ptr<IPacketTransform>> packetTransforms;
-		packetTransforms.emplace_back(std::make_shared<AESPacketTransform>(dependencyResolver->resolve<IAES>(), dependencyResolver->resolve<Configuration>()));
+		// TODO handle encryption for p2p connections
+		if (metadata("type") != "p2p")
+		{
+			packetTransforms.emplace_back(std::make_shared<AESPacketTransform>(dependencyResolver->resolve<IAES>(), dependencyResolver->resolve<Configuration>()));
+		}
 		Writer writer2 = writer;
 		for (auto& packetTransform : packetTransforms)
 		{
@@ -147,10 +152,10 @@ namespace Stormancer
 		}
 		stream.flush();
 		byte* dataPtr = stream.startPtr();
-		std::streamsize dataSize = stream.writtenBytesCount();
+		std::streamsize dataSize = stream.currentPosition();
 
 #if defined(STORMANCER_LOG_PACKETS) || defined(STORMANCER_LOG_RAKNET_PACKETS)
-		auto bytes2 = stringifyBytesArray(stream.bytes(), true);
+		auto bytes2 = stringifyBytesArray(stream.bytes(), true, true);
 		_logger->log(LogLevel::Trace, "RakNetConnection", "Send packet to scene", bytes2.c_str());
 #endif
 

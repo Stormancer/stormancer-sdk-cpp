@@ -19,6 +19,10 @@ namespace Stormancer
 	{
 	}
 
+	void IService::sceneConnected(Scene*)
+	{
+	}
+
 	void IService::packetReceived(Packet_ptr)
 	{
 	}

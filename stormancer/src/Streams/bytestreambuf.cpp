@@ -38,6 +38,11 @@ namespace Stormancer
 		return gptr();
 	}
 
+	byte* bytestreambuf::endReadPtr()
+	{
+		return egptr();
+	}
+
 	byte* bytestreambuf::startWritePtr()
 	{
 		return pbase();
@@ -46,6 +51,11 @@ namespace Stormancer
 	byte* bytestreambuf::currentWritePtr()
 	{
 		return pptr();
+	}
+
+	byte* bytestreambuf::endWritePtr()
+	{
+		return epptr();
 	}
 
 	std::streamsize bytestreambuf::size()
@@ -71,7 +81,7 @@ namespace Stormancer
 		return 0;
 	}
 
-	std::streamsize bytestreambuf::readBytesCount()
+	std::streamsize bytestreambuf::currentReadPosition()
 	{
 		byte* first = eback();
 		byte* next = gptr();
@@ -82,7 +92,7 @@ namespace Stormancer
 		return 0;
 	}
 
-	std::streamsize bytestreambuf::writtenBytesCount()
+	std::streamsize bytestreambuf::currentWritePosition()
 	{
 		byte* first = pbase();
 		byte* next = pptr();

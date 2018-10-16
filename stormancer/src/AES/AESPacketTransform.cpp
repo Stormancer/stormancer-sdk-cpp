@@ -23,8 +23,6 @@ namespace Stormancer
 			writer = [=](obytestream* stream) {
 				(*stream) << (byte)MessageIDTypes::ID_ENCRYPTED;
 
-
-
 				AESEncryptStream aesStream(_aes, peerId);
 				if (writerCopy)
 				{
@@ -40,10 +38,7 @@ namespace Stormancer
 		auto bc = stream->rdbuf()->sgetc();
 		if (bc != bytestreambuf::traits_type::eof())
 		{
-
 			//stream->rdbuf()->sbumpc();
-
-
 
 			byte* dataPtr = stream->startPtr() + 1;
 			std::streamsize dataSize = stream->rdbuf()->in_avail();
@@ -53,11 +48,10 @@ namespace Stormancer
 			aesStream.decrypt(&os);
 
 			byte* decryptedPtr = os.startPtr();
-			std::streamsize decryptedSize = os.writtenBytesCount();
+			std::streamsize decryptedSize = os.currentPosition();
 
 			std::memcpy(dataPtr, decryptedPtr, (std::size_t)decryptedSize);
 			stream->rdbuf()->pubsetbuf(dataPtr, decryptedSize);
-
 		}
 	}
 }

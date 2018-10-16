@@ -92,7 +92,7 @@ namespace Stormancer
 	{
 		if (good())
 		{
-			auto sz = static_cast<std::size_t>(writtenBytesCount());
+			auto sz = static_cast<std::size_t>(currentPosition());
 			std::vector<byte> bytes(sz);
 			std::memcpy(bytes.data(), startPtr(), sz);
 			return bytes;
@@ -120,7 +120,17 @@ namespace Stormancer
 		return nullptr;
 	}
 
-	std::streamsize obytestream::size()
+	byte* obytestream::endPtr()
+	{
+		auto bsb = dynamic_cast<bytestreambuf*>(rdbuf());
+		if (bsb)
+		{
+			return bsb->endWritePtr();
+		}
+		return nullptr;
+	}
+
+	std::streamsize obytestream::totalSize()
 	{
 		auto bsb = dynamic_cast<bytestreambuf*>(rdbuf());
 		if (bsb)
@@ -130,12 +140,22 @@ namespace Stormancer
 		return 0;
 	}
 
-	std::streamsize obytestream::writtenBytesCount()
+	std::streamsize obytestream::availableSize()
 	{
 		auto bsb = dynamic_cast<bytestreambuf*>(rdbuf());
 		if (bsb)
 		{
-			return bsb->writtenBytesCount();
+			return bsb->in_avail();
+		}
+		return 0;
+	}
+
+	std::streamsize obytestream::currentPosition()
+	{
+		auto bsb = dynamic_cast<bytestreambuf*>(rdbuf());
+		if (bsb)
+		{
+			return bsb->currentWritePosition();
 		}
 		return 0;
 	}

@@ -98,6 +98,7 @@ namespace Stormancer
 		}
 
 		Client_ptr client(new Client(config), [](Client* ptr) { delete ptr; });
+		client->initialize();
 
 		return client;
 	}
@@ -432,7 +433,7 @@ namespace Stormancer
 							auto key = utility::conversions::from_base64(utility::string_t(endpoint.getTokenResponse.encryption.key.begin(), endpoint.getTokenResponse.encryption.key.end()));
 							if (key.size() != 256 / 8)
 							{
-								throw std::runtime_error("Unexpected key size. received " + std::to_string(key.size() * 8) + " bits expected 256 bits ");
+								throw std::runtime_error(("Unexpected key size. received " + std::to_string(key.size() * 8) + " bits expected 256 bits ").c_str());
 							}
 							std::copy(key.begin(), key.end(), keyStore->key);
 						}
@@ -454,7 +455,7 @@ namespace Stormancer
 						{
 							throw std::runtime_error("Connection not available");
 						}
-
+						connection->setMetadata("type", "server");
 						auto onConnectionStateChangedNext = [wClient](ConnectionState state) {
 							if (auto client = wClient.lock())
 							{
@@ -594,7 +595,7 @@ namespace Stormancer
 				catch (std::exception& ex)
 				{
 					setConnectionState(ConnectionState::Disconnected);
-					return pplx::task_from_exception<void>(std::runtime_error(std::string("Failed to start transport: ") + ex.what()));
+					return pplx::task_from_exception<void>(std::runtime_error((std::string("Failed to start transport: ") + ex.what()).c_str()));
 				}
 			}
 		}
@@ -1005,7 +1006,6 @@ namespace Stormancer
 			if (state == ConnectionState::Disconnected)
 			{
 				clear();
-				actionDispatcher->stop(); // This task should never throw an exception, as it is triggered by a tce.
 			}
 		}
 	}

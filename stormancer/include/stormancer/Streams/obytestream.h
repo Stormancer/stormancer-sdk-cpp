@@ -49,9 +49,13 @@ namespace Stormancer
 
 		byte* currentPtr();
 
-		std::streamsize size();
+		byte* endPtr();
 
-		std::streamsize writtenBytesCount();
+		std::streamsize totalSize();
+
+		std::streamsize availableSize();
+
+		std::streamsize currentPosition();
 
 		void dynamic(bool dyn);
 
