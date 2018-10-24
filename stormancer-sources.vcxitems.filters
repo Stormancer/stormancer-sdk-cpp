@@ -90,9 +90,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\ConnectToSceneMsg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\ContainerConfigurator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\DefaultPacketDispatcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -393,13 +390,12 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\Debug\StackWalker.h">
       <Filter>Header Files\Debug</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\Action2.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\Action2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Configuration.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\ContainerConfigurator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\DefaultPacketDispatcher.cpp">
@@ -593,6 +589,10 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Debug\stackWalker.cpp">
       <Filter>Source Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\ClientContainerConfigurator.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\ConnectionState.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

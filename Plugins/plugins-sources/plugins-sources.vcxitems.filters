@@ -37,6 +37,18 @@
     <Filter Include="GameFinder">
       <UniqueIdentifier>{3b80db3d-6e5b-4d6c-85d5-da9d0d88c24d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Party">
+      <UniqueIdentifier>{f00ec778-745d-4eb8-ac9e-a13950a17437}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameRecovery">
+      <UniqueIdentifier>{8e4145da-ec19-4b1e-a48b-d047b023b5b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Profiles">
+      <UniqueIdentifier>{d7faf15a-ac93-4d3c-8652-177fbe3a2114}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{5c06ad85-3dd5-4717-bb61-c5a98c171087}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\AssetsStorage\AssetsStoragePlugin.cpp">
@@ -102,6 +114,34 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderService.cpp">
       <Filter>GameFinder</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\Party\PartyPlugin.cpp">
+      <Filter>Party</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\Party\PartyService.cpp">
+      <Filter>Party</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\GameRecovery\GameRecoveryPlugin.cpp">
+      <Filter>GameRecovery</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\GameRecovery\GameRecoveryService.cpp">
+      <Filter>GameRecovery</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\Party\PartyInvitation.cpp">
+      <Filter>Party</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\Party\PartyManagement.cpp">
+      <Filter>Party</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\GameRecovery\GameRecovery.cpp">
+      <Filter>GameRecovery</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\Profile\ProfilePlugin.cpp">
+      <Filter>Profiles</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\PlayerData\PlayerDataService.cpp">
+      <Filter>PlayerData</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\Profile\ProfileService.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\AssetsStorage\AssetsStoragePlugin.h">
@@ -187,6 +227,45 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderTypes.h">
       <Filter>GameFinder</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Party\PartyPlugin.h">
+      <Filter>Party</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Party\PartyService.h">
+      <Filter>Party</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\GameRecovery\GameRecoveryPlugin.h">
+      <Filter>GameRecovery</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\GameRecovery\GameRecoveryService.h">
+      <Filter>GameRecovery</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Party\PartyInvitation.h">
+      <Filter>Party</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Party\PartyManagement.h">
+      <Filter>Party</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Core\ClientAPI.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\GameRecovery\GameRecovery.h">
+      <Filter>GameRecovery</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Leaderboard\Leaderboard.h">
+      <Filter>Leaderboard</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Profile\PlayerProfileDto.h">
+      <Filter>Profiles</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Profile\ProfilePlugin.h">
+      <Filter>Profiles</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Profile\ProfileService.h">
+      <Filter>Profiles</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\PlayerData\PlayerDataUpdate.h">
+      <Filter>PlayerData</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

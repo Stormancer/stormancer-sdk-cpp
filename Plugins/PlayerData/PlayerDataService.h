@@ -5,98 +5,48 @@
 #include "stormancer/Scene.h"
 #include "stormancer/RPC/RpcService.h"
 #include "stormancer/SingleServicePlugin.h"
-#include "stormancer/SafeCapture.h"
+#include "PlayerDataUpdate.h"
+#include <map>
 
 namespace Stormancer
 {
-	template<typename T>
-	struct PlayerData
+
+class PlayerDataService : public IService, public std::enable_shared_from_this<PlayerDataService>
+{
+public:
+
+	static const ServiceOptions service_options;
+
+	bool GetPlayerData(const std::string& stormancerId, const std::string& dataKey, std::string& outData);
+
+	pplx::task<void> SetPlayerData(const std::string dataKey, const std::string& data);
+
+	void OnPlayerDataUpdated(std::function<void(const PlayerDataUpdate&)> callback)
 	{
-		int64 peerId;
-		std::string userId;
-		T data;
+		_onDataUpdated = callback;
+	}
 
-		MSGPACK_DEFINE(peerId, userId, data);
-	};
+	virtual void setScene(Scene* scene) override;
 
-	template<typename T>
-	class PlayerDataService : public IService, public std::enable_shared_from_this<PlayerDataService<T>>
-	{
-	public:
+private:
+	using DataMap = std::map<std::string, std::map<std::string, PlayerDataEntry>>;
 
-		pplx::task<PlayerData<T>> GetPlayerData(const std::string& userId)
-		{
-			for (auto it : _playersData)
-			{
-				if (it.second.userId == userId)
-				{
-					return pplx::task_from_result(it.second);
-				}
-			}
-			return pplx::task_from_exception<PlayerData<T>>(std::runtime_error("Player data not found."));
-		}
+	void onUpdateReceived(Packetisp_ptr packet);
 
-		pplx::task<PlayerData<T>> GetPlayerData(int64 peerId)
-		{
-			if (mapContains(_playersData, peerId))
-			{
-				return pplx::task_from_result(_playersData.at(peerId));
-			}
-			return pplx::task_from_exception<PlayerData<T>>(std::runtime_error("Player data not found."));
-		}
+	static constexpr const char* PLAYERDATA_UPDATED_ROUTE = "playerdata.updated";
+	static constexpr const char* GET_PLAYERDATA_RPC = "playerdata.getplayerdata";
+	static constexpr const char* GET_ALL_PLAYERDATA_RPC = "playerdata.getallplayerdata";
+	static constexpr const char* SET_PLAYERDATA_RPC = "playerdata.setplayerdata";
 
-		pplx::task<void> SetPlayerData(const PlayerData<T>& data)
-		{
-			auto rpc = _scene->dependencyResolver().lock()->resolve<RpcService>();
+	std::weak_ptr<Scene> _scene;
+	ILogger_ptr _logger;
 
-			return rpc->rpc<void>(SET_PLAYERDATA_RPC, data);
-		}
+	DataMap _dataCache;
+	std::mutex _dataMutex;
 
-		void OnPlayerDataUpdated(std::function<void(const std::string&, Packetisp_ptr)> callback)
-		{
-			_onDataUpdated = callback;
-		}
+	std::function<void(const PlayerDataUpdate&)> _onDataUpdated;
+};
 
-		virtual void setScene(Scene* scene) override
-		{
-			_scene = scene;
+using PlayerDataPlugin = SingleServicePlugin<PlayerDataService, PlayerDataService::service_options>;
 
-			auto wPlayerDataService = STRM_WEAK_FROM_THIS();
-			_scene->addRoute(PLAYERDATA_UPDATED_ROUTE, [wPlayerDataService](Packetisp_ptr packet)
-			{
-				auto playerDataService = LockOrThrow(wPlayerDataService);
-				if (playerDataService->_onDataUpdated)
-				{
-					auto playerData = packet->readObject<PlayerData<T>>();
-					playerData.peerId = packet->connection->id();
-					playerDataService->_onDataUpdated(playerData);
-				}
-			});
-		}
-
-		Scene* GetScene()
-		{
-			return _scene;
-		}
-
-	private:
-
-		static constexpr const char* PLAYERDATA_UPDATED_ROUTE = "playerdata.updated";
-		static constexpr const char* GET_PLAYERDATA_RPC = "playerdata.getplayerdata";
-		static constexpr const char* SET_PLAYERDATA_RPC = "playerdata.setplayerdata";
-
-		Scene* _scene;
-
-		std::function<void(PlayerData<T>)> _onDataUpdated;
-
-		std::map<int64, PlayerData<T>> _playersData;
-	};
-
-	ServiceOptions opts{
-		ServiceContextFlags::Scene | ServiceContextFlags::CreateWithScene | ServiceContextFlags::SingleInstance,
-		"stormancer.playerdata"
-	};
-
-	template<typename T>
-	using PlayerDataPlugin = SingleServicePlugin<PlayerDataService<T>, opts>;
 }

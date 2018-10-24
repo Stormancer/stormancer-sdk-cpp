@@ -135,7 +135,7 @@ namespace Stormancer
 	private:
 
 		std::weak_ptr<Scene> _scene;
-		std::shared_ptr<RpcService> _rpcService;
+		std::weak_ptr<RpcService> _rpcService;
 
 		pplx::cancellation_token_source _matchmakingCTS;
 

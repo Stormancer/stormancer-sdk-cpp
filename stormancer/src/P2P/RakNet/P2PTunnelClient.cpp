@@ -1,11 +1,10 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/P2P/RakNet/P2PTunnelClient.h"
-#include "..\..\..\include\stormancer\P2P\RakNet\P2PTunnelClient.h"
 
 namespace Stormancer
 {
 	// Use this intermediate variable to avoid "string literal to char* conversion" warning
-	static char address[] = "127.0.0.1";
+	static char __address[] = "127.0.0.1";
 
 	P2PTunnelClient::P2PTunnelClient(std::function<void(P2PTunnelClient*, RakNet::RNS2RecvStruct*)> onMsgRecv,
 		std::shared_ptr<RequestProcessor> sysCall,
@@ -19,7 +18,7 @@ namespace Stormancer
 		RakNet::RNS2_BerkleyBindParameters bbp;
 
 		bbp.port = 0;
-		bbp.hostAddress = address;
+		bbp.hostAddress = __address;
 		bbp.addressFamily = AF_INET;
 		bbp.type = SOCK_DGRAM;
 		bbp.protocol = 0;

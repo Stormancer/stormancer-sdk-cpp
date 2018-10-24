@@ -1,6 +1,7 @@
-#include "GameFinderPlugin.h"
-#include "GameFinderService.h"
-#include "GameFinderManager.h"
+#include "GameFinder/GameFinderPlugin.h"
+#include "GameFinder/GameFinderService.h"
+#include "GameFinder/GameFinderManager.h"
+#include "Authentication/AuthenticationService.h"
 
 namespace Stormancer
 {
@@ -21,7 +22,8 @@ namespace Stormancer
 	{
 		if (client)
 		{
-			client->dependencyResolver().lock()->registerDependency<GameFinder>(std::make_shared<GameFinder>(client));
+			client->dependencyResolver().lock()->registerDependency<GameFinder>([](std::weak_ptr<DependencyResolver> dr) {
+				return std::make_shared<GameFinder>(dr.lock()->resolve<AuthenticationService>()); });
 		}
 	}
 

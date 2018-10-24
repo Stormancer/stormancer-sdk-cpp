@@ -90,7 +90,6 @@ namespace Stormancer
 		bool _serverConnected = false;
 		std::mutex _pendingPingsMutex;
 		std::unordered_map<std::string, pplx::task_completion_event<int>> _pendingPings;
-		
 
 #pragma endregion
 	};

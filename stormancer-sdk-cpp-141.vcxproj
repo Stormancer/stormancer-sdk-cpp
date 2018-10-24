@@ -1,6 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="DebugUE4-v140|Win32">
+      <Configuration>DebugUE4-v140</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="DebugUE4-v140|x64">
+      <Configuration>DebugUE4-v140</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="DebugUE4|Win32">
       <Configuration>DebugUE4</Configuration>
       <Platform>Win32</Platform>
@@ -27,6 +35,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
+    <EnableUnitySupport>true</EnableUnitySupport>
     <ProjectGuid>{D8CF547F-8B5B-4651-A48F-D6E56EE0B8C1}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>stormancersdkcpp</RootNamespace>
@@ -43,6 +52,12 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugUE4|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugUE4-v140|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
@@ -67,6 +82,12 @@
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugUE4-v140|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -87,6 +108,10 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="UE4\DebugUE4.props" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugUE4-v140|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="UE4\DebugUE4.props" />
+  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -94,6 +119,10 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugUE4|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="UE4\DebugUE4.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugUE4-v140|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="UE4\DebugUE4.props" />
   </ImportGroup>
@@ -113,6 +142,12 @@
     <IntDir>$(SolutionDir)intermediate\$(ProjectName)\$(Configuration)\$(Platform)\</IntDir>
     <TargetName>Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform)</TargetName>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugUE4-v140|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)output\libs\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\$(ProjectName)\$(Configuration)\$(Platform)\</IntDir>
+    <TargetName>Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform)</TargetName>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)output\libs\</OutDir>
@@ -124,6 +159,12 @@
     <OutDir>$(SolutionDir)output\libs\</OutDir>
     <IntDir>$(SolutionDir)intermediate\$(ProjectName)\$(Configuration)\$(Platform)\</IntDir>
     <TargetName>Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugUE4-v140|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)output\libs\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\$(ProjectName)\$(Configuration)\$(Platform)\</IntDir>
+    <TargetName>Stormancer$(PlatformToolsetVersion)_DebugUE4_$(Platform)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -143,7 +184,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;CPPREST_FORCE_PPLX;_DEBUG;STORMANCER_DLL_EXPORT;_STORMANCERSDKCPP;UPNP_USE_MSVCPP;UPNP_STATIC_LIB;__PLATFORM__="$(Platform)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>stormancer\include;cpprestsdk\Release\include;msgpack-c\include;RakNet\Source;rxcpp\Rx\v2\src\rxcpp;libupnp\ixml\inc;libupnp\upnp\inc\win32;libupnp\upnp\inc;libupnp\build\inc\win32;libupnp\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>stormancer\include;cpprestsdk\Release\include;msgpack-c\include;RakNet\Source;rxcpp\Rx\v2\src;libupnp\ixml\inc;libupnp\upnp\inc\win32;libupnp\upnp\inc;libupnp\build\inc\win32;libupnp\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
@@ -151,6 +192,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <PrecompiledHeaderFile>stormancer/stdafx.h</PrecompiledHeaderFile>
       <ProgramDataBaseFileName>$(OutDir)Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform).pdb</ProgramDataBaseFileName>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -174,7 +216,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;CPPREST_FORCE_PPLX;STORMANCER_DLL_EXPORT;_STORMANCERSDKCPP;UPNP_USE_MSVCPP;UPNP_STATIC_LIB;__PLATFORM__="$(Platform)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>stormancer\include;cpprestsdk\Release\include;msgpack-c\include;RakNet\Source;rxcpp\Rx\v2\src\rxcpp;libupnp\ixml\inc;libupnp\upnp\inc\win32;libupnp\upnp\inc;libupnp\build\inc\win32;libupnp\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>stormancer\include;cpprestsdk\Release\include;msgpack-c\include;RakNet\Source;rxcpp\Rx\v2\src;libupnp\ixml\inc;libupnp\upnp\inc\win32;libupnp\upnp\inc;libupnp\build\inc\win32;libupnp\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
@@ -183,6 +225,40 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <PrecompiledHeaderFile>stormancer/stdafx.h</PrecompiledHeaderFile>
       <ProgramDataBaseFileName>$(OutDir)Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform).pdb</ProgramDataBaseFileName>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)RakNet\Lib\DLL\Lib;$(SolutionDir)cpprestsdk\Binaries\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>RakNet$(PlatformToolsetVersion)_$(Configuration)_$(Platform).lib;cpprest$(PlatformToolsetVersion)d_2_8.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Lib>
+      <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)binaries\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+    </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugUE4-v140|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;CPPREST_FORCE_PPLX;STORMANCER_DLL_EXPORT;_STORMANCERSDKCPP;UPNP_USE_MSVCPP;UPNP_STATIC_LIB;__PLATFORM__="$(Platform)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>stormancer\include;cpprestsdk\Release\include;msgpack-c\include;RakNet\Source;rxcpp\Rx\v2\src;libupnp\ixml\inc;libupnp\upnp\inc\win32;libupnp\upnp\inc;libupnp\build\inc\win32;libupnp\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ShowIncludes>false</ShowIncludes>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <PrecompiledHeaderFile>stormancer/stdafx.h</PrecompiledHeaderFile>
+      <ProgramDataBaseFileName>$(OutDir)Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform).pdb</ProgramDataBaseFileName>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -206,7 +282,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;CPPREST_FORCE_PPLX;_DEBUG;STORMANCER_DLL_EXPORT;_STORMANCERSDKCPP;UPNP_USE_MSVCPP;UPNP_STATIC_LIB;__PLATFORM__="$(Platform)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>stormancer\include;cpprestsdk\Release\include;msgpack-c\include;RakNet\Source;rxcpp\Rx\v2\src\rxcpp;libupnp\ixml\inc;libupnp\upnp\inc\win32;libupnp\upnp\inc;libupnp\build\inc\win32;libupnp\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>stormancer\include;cpprestsdk\Release\include;msgpack-c\include;RakNet\Source;rxcpp\Rx\v2\src;libupnp\ixml\inc;libupnp\upnp\inc\win32;libupnp\upnp\inc;libupnp\build\inc\win32;libupnp\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
@@ -214,6 +290,8 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <PrecompiledHeaderFile>stormancer/stdafx.h</PrecompiledHeaderFile>
       <ProgramDataBaseFileName>$(OutDir)Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform).pdb</ProgramDataBaseFileName>
+      <IncludeInUnityFile>true</IncludeInUnityFile>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -237,7 +315,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;CPPREST_FORCE_PPLX;STORMANCER_DLL_EXPORT;_STORMANCERSDKCPP;UPNP_USE_MSVCPP;UPNP_STATIC_LIB;__PLATFORM__="$(Platform)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>stormancer\include;cpprestsdk\Release\include;msgpack-c\include;RakNet\Source;rxcpp\Rx\v2\src\rxcpp;libupnp\ixml\inc;libupnp\upnp\inc\win32;libupnp\upnp\inc;libupnp\build\inc\win32;libupnp\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>stormancer\include;cpprestsdk\Release\include;msgpack-c\include;RakNet\Source;rxcpp\Rx\v2\src;libupnp\ixml\inc;libupnp\upnp\inc\win32;libupnp\upnp\inc;libupnp\build\inc\win32;libupnp\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
@@ -246,6 +324,40 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <PrecompiledHeaderFile>stormancer/stdafx.h</PrecompiledHeaderFile>
       <ProgramDataBaseFileName>$(OutDir)Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform).pdb</ProgramDataBaseFileName>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)binaries\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>RakNet$(PlatformToolsetVersion)_$(Configuration)_$(Platform).lib;cpprest$(PlatformToolsetVersion)d_2_8.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+    <Lib>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)binaries\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugUE4-v140|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;CPPREST_FORCE_PPLX;STORMANCER_DLL_EXPORT;_STORMANCERSDKCPP;UPNP_USE_MSVCPP;UPNP_STATIC_LIB;__PLATFORM__="$(Platform)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>stormancer\include;cpprestsdk\Release\include;msgpack-c\include;RakNet\Source;rxcpp\Rx\v2\src;libupnp\ixml\inc;libupnp\upnp\inc\win32;libupnp\upnp\inc;libupnp\build\inc\win32;libupnp\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ShowIncludes>false</ShowIncludes>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <PrecompiledHeaderFile>stormancer/stdafx.h</PrecompiledHeaderFile>
+      <ProgramDataBaseFileName>$(OutDir)Stormancer$(PlatformToolsetVersion)_DebugUE4_$(Platform).pdb</ProgramDataBaseFileName>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -271,13 +383,14 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;CPPREST_FORCE_PPLX;NDEBUG;STORMANCER_DLL_EXPORT;_STORMANCERSDKCPP;UPNP_USE_MSVCPP;UPNP_STATIC_LIB;__PLATFORM__="$(Platform)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>stormancer\include;cpprestsdk\Release\include;msgpack-c\include;RakNet\Source;rxcpp\Rx\v2\src\rxcpp;libupnp\ixml\inc;libupnp\upnp\inc\win32;libupnp\upnp\inc;libupnp\build\inc\win32;libupnp\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>stormancer\include;cpprestsdk\Release\include;msgpack-c\include;RakNet\Source;rxcpp\Rx\v2\src;libupnp\ixml\inc;libupnp\upnp\inc\win32;libupnp\upnp\inc;libupnp\build\inc\win32;libupnp\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <ShowIncludes>false</ShowIncludes>
       <TreatWarningAsError>true</TreatWarningAsError>
       <PrecompiledHeaderFile>stormancer/stdafx.h</PrecompiledHeaderFile>
       <ProgramDataBaseFileName>$(OutDir)Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform).pdb</ProgramDataBaseFileName>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -306,7 +419,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;CPPREST_FORCE_PPLX;NDEBUG;STORMANCER_DLL_EXPORT;_STORMANCERSDKCPP;UPNP_USE_MSVCPP;UPNP_STATIC_LIB;__PLATFORM__="$(Platform)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>stormancer\include;cpprestsdk\Release\include;msgpack-c\include;RakNet\Source;rxcpp\Rx\v2\src\rxcpp;libupnp\ixml\inc;libupnp\upnp\inc\win32;libupnp\upnp\inc;libupnp\build\inc\win32;libupnp\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>stormancer\include;cpprestsdk\Release\include;msgpack-c\include;RakNet\Source;rxcpp\Rx\v2\src;libupnp\ixml\inc;libupnp\upnp\inc\win32;libupnp\upnp\inc;libupnp\build\inc\win32;libupnp\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
@@ -315,6 +428,8 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <PrecompiledHeaderFile>stormancer/stdafx.h</PrecompiledHeaderFile>
       <ProgramDataBaseFileName>$(OutDir)Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform).pdb</ProgramDataBaseFileName>
+      <IncludeInUnityFile>true</IncludeInUnityFile>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -373,8 +488,8 @@
       <BuildFiles Include="$(SolutionDir)Build\**\*.*" />
     </ItemGroup>
     <Copy SourceFiles="@(BuildFiles)" DestinationFiles="@(BuildFiles->'$(SolutionDir)output\build\%(RecursiveDir)%(Filename)%(Extension)')" />
-    <Copy SourceFiles="@(RaknetIncludes)" DestinationFiles="@(RaknetIncludes->'$(SolutionDir)output\include\%(RecursiveDir)%(Filename)%(Extension)')" />
-    <Copy SourceFiles="@(RxcppIncludes)" DestinationFiles="@(RxcppIncludes->'$(SolutionDir)output\include\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <!--<Copy SourceFiles="@(RaknetIncludes)" DestinationFiles="@(RaknetIncludes->'$(SolutionDir)output\include\%(RecursiveDir)%(Filename)%(Extension)')" />-->
+    <Copy SourceFiles="@(RxcppIncludes)" DestinationFiles="@(RxcppIncludes->'$(SolutionDir)output\include\rxcpp\%(RecursiveDir)%(Filename)%(Extension)')" />
     <Copy SourceFiles="@(RestSdkIncludes)" DestinationFiles="@(RestSdkIncludes->'$(SolutionDir)output\include\%(RecursiveDir)%(Filename)%(Extension)')" />
     <Copy SourceFiles="@(MsgpackIncludes)" DestinationFiles="@(MsgpackIncludes->'$(SolutionDir)output\include\%(RecursiveDir)%(Filename)%(Extension)')" />
     <Copy SourceFiles="@(StormancerIncludes)" DestinationFiles="@(StormancerIncludes->'$(SolutionDir)output\include\%(RecursiveDir)%(Filename)%(Extension)')" />

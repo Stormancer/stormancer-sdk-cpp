@@ -192,7 +192,7 @@ namespace Stormancer
 		}
 
 		auto rpc = scene->dependencyResolver().lock()->resolve<RpcService>();
-		return rpc->rpcWriter("gamesession.reset", [](obytestream*) {});
+		return rpc->rpcWriter("gamesession.reset", pplx::cancellation_token::none(), [](obytestream*) {});
 	}
 
 	pplx::task<void> GameSessionService::disconnect()
@@ -239,18 +239,18 @@ namespace Stormancer
 
 	pplx::task<Stormancer::Scene_ptr> GameSessionManager::getCurrentGameSession()
 	{
-		if (currentGameSessionId.empty())
+		if (!_token.empty())
 		{
-			return _client->getConnectedScene(currentGameSessionId);
-		}
-		else
-		{
-			return _client->getPrivateScene(_token)
+			return _client->connectToPrivateScene(_token)
 				.then([this](Scene_ptr scene)
 			{
 				currentGameSessionId = scene->id();
 				return scene;
 			});
+		}
+		else
+		{
+			return pplx::task_from_exception<Stormancer::Scene_ptr>(std::runtime_error("No current game session. Call setToken before getCurrentGameSession"));
 		}
 	}
 }

@@ -43,7 +43,7 @@ namespace Stormancer
 		/// Call an operation on the server and get the success and the response.
 		/// \return pplx::task<TOutput> A task which exposes the success of the operation and the server response.
 		template<typename TOutput>
-		pplx::task<TOutput> rpcWriter(const std::string& procedure, const Writer& writer, const Unwriter<TOutput>& unwriter)
+		pplx::task<TOutput> rpcWriter(const std::string& procedure, pplx::cancellation_token ct, const Writer& writer, const Unwriter<TOutput>& unwriter)
 		{
 			auto logger = _logger;
 
@@ -75,8 +75,17 @@ namespace Stormancer
 				RpcService::internalOnComplete(tce); // this is used for managing TOutput = void
 			};
 
-			observable.subscribe(onNext, onError, onComplete);
-
+			auto subscription = observable.subscribe(onNext, onError, onComplete);
+			
+			if (ct.is_cancelable())
+			{
+				ct.register_callback([subscription]() {
+					if (subscription.is_subscribed())
+					{
+						subscription.unsubscribe();
+					}
+				});
+			}
 			return pplx::create_task(tce, getDispatcher());
 		}
 
@@ -85,7 +94,7 @@ namespace Stormancer
 		/// \param writer User function for serializing data to send. Use function (or lambda) of type : Writer.
 		/// Call an operation on the server and get the success.
 		/// \return pplx::task<TOutput> A task which exposes the success of the operation.
-		virtual pplx::task<void> rpcWriter(const std::string& procedure, const Writer& writer);
+		virtual pplx::task<void> rpcWriter(const std::string& procedure, pplx::cancellation_token ct, const Writer& writer);
 
 		/// RPC with auto-serialization.
 		/// \param procedure The procedure name.
@@ -96,20 +105,28 @@ namespace Stormancer
 		pplx::task<TOutput> rpc(const std::string& procedure, TInputs const&... args)
 		{
 			auto serializer = _serializer;
-
-			auto writer = [serializer, &args...](obytestream* stream)
-			{
+			return rpcWriter<TOutput>(procedure, pplx::cancellation_token::none(), [serializer, &args...](obytestream* stream) {
 				serializer.serialize(stream, args...);
-			};
-
-			auto unwriter = [serializer](ibytestream* stream)
-			{
+			}, [serializer](ibytestream* stream) {
 				return serializer.deserializeOne<TOutput>(stream);
-			};
-
-			return rpcWriter<TOutput>(procedure, writer, unwriter);
+			});
 		}
-
+		
+		/// RPC with auto-serialization.
+		/// \param procedure The procedure name.
+		/// \param args Variable number of serializable arguments to send, or Writer and Unwriter<TOutput>.
+		/// Call an operation on the server and get the success and the response.
+		/// \return pplx::task<TOutput> A task which exposes the success of the operation and the server response.
+		template<typename TOutput, typename... TInputs>
+		pplx::task<TOutput> rpc(const std::string& procedure, pplx::cancellation_token ct, TInputs const&... args)
+		{
+			auto serializer = _serializer;
+			return rpcWriter<TOutput>(procedure,ct, [serializer, &args...](obytestream* stream) {
+				serializer.serialize(stream, args...);
+			}, [serializer](ibytestream* stream) {
+				return serializer.deserializeOne<TOutput>(stream);
+			});
+		}
 #pragma endregion
 
 	private:

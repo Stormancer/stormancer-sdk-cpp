@@ -48,7 +48,7 @@ namespace Stormancer
 
 		if (!compareExchange(_mutex, _isRunning, false, true))
 		{
-			throw std::runtime_error("RakNet transport is already started.");
+			return;
 		}
 
 		if (handler == nullptr && maxConnections > 0)
@@ -62,7 +62,7 @@ namespace Stormancer
 
 		auto wTransport = STRM_WEAK_FROM_THIS();
 
-		_scheduler->schedulePeriodic(15, [wTransport]() 
+		_scheduler->schedulePeriodic(15, [wTransport]()
 		{
 			auto transport = LockOrThrow(wTransport);
 			std::lock_guard<std::mutex> lock(transport->_mutex);
@@ -87,8 +87,8 @@ namespace Stormancer
 		{
 			_logger->log(LogLevel::Trace, "RakNetTransport", "Initializing raknet transport", _type.c_str());
 
-			RakNet::PacketFileLogger* rakNetLogger = nullptr;
 #ifdef STORMANCER_PACKETFILELOGGER
+			RakNet::PacketFileLogger* rakNetLogger = nullptr;
 			rakNetLogger = new RakNet::PacketFileLogger();
 			rakNetLogger->StartLog("packetLogs");
 #endif
@@ -99,10 +99,12 @@ namespace Stormancer
 				auto transport = LockOrThrow(wTransport);
 				transport->_logger->log(LogLevel::Trace, "RakNetTransport", "Deleting RakPeerInterface...");
 				RakNet::RakPeerInterface::DestroyInstance(peer);
+#ifdef STORMANCER_PACKETFILELOGGER
 				if (rakNetLogger)
 				{
 					delete rakNetLogger;
 				}
+#endif
 			});
 
 #ifdef STORMANCER_PACKETFILELOGGER
@@ -208,7 +210,7 @@ namespace Stormancer
 										data.Write((byte)MessageIDTypes::ID_ADVERTISE_PEERID);
 										data.Write(_id);
 										data.Write(false);
-										
+
 										_peer->Send(&data, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE, 0, rakNetPacket->guid, false);
 									}
 								}
@@ -291,7 +293,6 @@ namespace Stormancer
 						}
 						case DefaultMessageIDTypes::ID_UNCONNECTED_PONG:
 						{
-
 							auto address = std::string(rakNetPacket->systemAddress.ToString(true, ':'));
 							_logger->log(LogLevel::Debug, "RakNetTransport", "Received pong message.", address);
 							RakNet::BitStream data(rakNetPacket->data + 1, rakNetPacket->length - 1, false);
@@ -323,6 +324,15 @@ namespace Stormancer
 							std::memcpy(&sid, (rakNetPacket->data + 1), sizeof(sid));
 							_logger->log(LogLevel::Trace, "RakNetTransport", "Connection ID received", std::to_string(sid));
 							onConnectionIdReceived(sid);
+							break;
+						}
+						case (byte)MessageIDTypes::ID_CLOSE_REASON:
+						{
+							if (auto connection = getConnection(rakNetPacket->guid))
+							{
+								Serializer serializer;
+								connection->_closeReason = serializer.deserializeOne<std::string>((rakNetPacket->data + 1), (rakNetPacket->length - 1));
+							}
 							break;
 						}
 						case (byte)DefaultMessageIDTypes::ID_UNCONNECTED_PING:
@@ -366,7 +376,6 @@ namespace Stormancer
 						case (byte)MessageIDTypes::ID_REQUEST_RESPONSE_ERROR:
 						case (byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG:
 						case (byte)MessageIDTypes::ID_SCENES:
-
 						default:
 						{
 							if (ID >= DefaultMessageIDTypes::ID_USER_PACKET_ENUM || (ID >= 58 && ID <= 59))
@@ -407,7 +416,7 @@ namespace Stormancer
 		}
 		if (_serverConnected)
 		{
-			onDisconnection(_serverRakNetGUID, "CLIENT_DISCONNECTION");
+			onDisconnection(_serverRakNetGUID, "CLIENT_TRANSPORT_STOPPED");
 		}
 		auto peer = _peer;
 		_peer.reset();
@@ -545,6 +554,11 @@ namespace Stormancer
 
 		if (connection)
 		{
+			if (!connection->_closeReason.empty())
+			{
+				reason = connection->_closeReason;
+			}
+
 			_handler->closeConnection(connection, reason);
 
 			connection->_closeAction(reason);
@@ -555,10 +569,10 @@ namespace Stormancer
 				_serverConnected = false;
 			}
 
-			pplx::task<void>([connection]()
+			pplx::task<void>([connection, reason]()
 			{
 				// Start this asynchronously because we locked the mutex in run and the user can do something that tries to lock again this mutex
-				connection->setConnectionState(ConnectionState::Disconnected);
+				connection->setConnectionState(ConnectionState(ConnectionState::Disconnected, reason));
 			});
 		}
 		else
@@ -588,11 +602,19 @@ namespace Stormancer
 		});
 
 		_onPacketReceived(packet);
-	}
+}
 
 	std::shared_ptr<RakNetConnection> RakNetTransport::getConnection(RakNet::RakNetGUID guid)
 	{
-		return _connections[guid.g];
+		auto it = _connections.find(guid.g);
+		if (it != _connections.end())
+		{
+			return it->second;
+		}
+		else
+		{
+			return nullptr;
+		}
 	}
 
 	std::shared_ptr<RakNetConnection> RakNetTransport::createNewConnection(RakNet::RakNetGUID raknetGuid, uint64 peerId)
@@ -605,24 +627,23 @@ namespace Stormancer
 			auto logger = _logger;
 			std::weak_ptr<RakNet::RakPeerInterface> weakPeer = _peer;
 			connection->onClose([logger, weakPeer, cid, guid](std::string reason) {
-//#if defined(_WIN32) && !defined(_XBOX_ONE)
-//				StackWalker sw;
-//				sw.outputFunction = [logger](std::string stack) {
-//					logger->log(LogLevel::Trace, "RaknetTransport", "Triggered Onclose event", stack);
-//				};
-//				sw.ShowCallstack();
-//#endif
-				auto peer = weakPeer.lock();
-				if (peer)
+				//#if defined(_WIN32) && !defined(_XBOX_ONE)
+				//				StackWalker sw;
+				//				sw.outputFunction = [logger](std::string stack) {
+				//					logger->log(LogLevel::Trace, "RaknetTransport", "Triggered Onclose event", stack);
+				//				};
+				//				sw.ShowCallstack();
+				//#endif
+				if (auto peer = weakPeer.lock())
 				{
-					logger->log(LogLevel::Trace, "RakNetTransport", "On close : " + reason, std::to_string(cid));
+					logger->log(LogLevel::Trace, "RakNetTransport", "RakNet connection onClose: " + reason, std::to_string(cid));
 					peer->CloseConnection(guid, true);
 				}
 			});
 			_connections[raknetGuid.g] = connection;
 			return connection;
 		}
-		return std::shared_ptr<RakNetConnection>();
+		return nullptr;
 	}
 
 	std::shared_ptr<RakNetConnection> RakNetTransport::removeConnection(RakNet::RakNetGUID guid)

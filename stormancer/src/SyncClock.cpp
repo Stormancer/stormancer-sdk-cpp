@@ -30,7 +30,7 @@ namespace Stormancer
 
 		if (!compareExchange(_mutex, _isRunning, false, true))
 		{
-			throw std::runtime_error("SyncClock already started");
+			return;
 		}
 
 		auto connection = connectionPtr.lock();

@@ -25,6 +25,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\GameRecovery\GameRecovery.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\GameRecovery\GameRecoveryPlugin.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\GameRecovery\GameRecoveryService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GameSession\GameSessionPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GameSession\GameSessionService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GameVersion\GameVersionPlugin.cpp" />
@@ -35,6 +38,13 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\Leaderboard\LeaderboardService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\Matchmaking\MatchmakingPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\Matchmaking\MatchmakingService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\Party\PartyInvitation.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\Party\PartyManagement.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\Party\PartyPlugin.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\Party\PartyService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\PlayerData\PlayerDataService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\Profile\ProfilePlugin.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\Profile\ProfileService.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\AssetsStorage\AssetsStorageDto.h" />
@@ -44,26 +54,39 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Authentication\AuthenticationService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\BugReport\BugReportPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\BugReport\BugReportService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Core\ClientAPI.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Friends\Friends.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Friends\FriendsPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderTypes.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\GameRecovery\GameRecovery.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\GameRecovery\GameRecoveryPlugin.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\GameRecovery\GameRecoveryService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\GameSession\GameSessionPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\GameSession\GameSessionService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\GameVersion\GameVersionPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\GameVersion\GameVersionService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Invitations\Invitations.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Invitations\InvitationsPlugin.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Leaderboard\Leaderboard.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Leaderboard\LeaderboardDto.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Leaderboard\LeaderboardPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Leaderboard\LeaderboardService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Matchmaking\MatchmakingPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Matchmaking\MatchMakingService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Party\PartyInvitation.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Party\PartyManagement.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Party\PartyPlugin.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Party\PartyService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\PlayerData\PlayerDataService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\PlayerData\PlayerDataUpdate.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\PlayerProfile\PlayerProfile.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\PlayerProfile\PlayerProfilePlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\PlayerProfile\PlayerProfileService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Profile\PlayerProfileDto.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Profile\ProfilePlugin.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Profile\ProfileService.h" />
   </ItemGroup>
 </Project>

@@ -26,6 +26,8 @@ namespace Stormancer
 		STORMANCER_DLL_API virtual void sceneDisconnected(Scene* scene);
 		STORMANCER_DLL_API virtual void packetReceived(Packet_ptr packet);
 
+		STORMANCER_DLL_API virtual void clientDisconnecting(Client* client);
+
 #pragma endregion
 	};
 };

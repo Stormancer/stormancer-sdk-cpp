@@ -12,5 +12,6 @@ namespace Stormancer
 		AuthenticationPlugin();
 		~AuthenticationPlugin();
 		void clientCreated(Client* client) override;
+		void clientDisconnecting(Client* client) override;
 	};
 };

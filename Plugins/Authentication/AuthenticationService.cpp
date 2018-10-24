@@ -1,6 +1,8 @@
+
 #include "stormancer/headers.h"
 #include "stormancer/RPC/RpcService.h"
-#include "AuthenticationService.h"
+#include "Authentication/AuthenticationService.h"
+//#include "stormancer/Debug/StackWalker.h"
 
 namespace Stormancer
 {
@@ -8,31 +10,7 @@ namespace Stormancer
 		: _client(client)
 		, _logger(client->logger())
 	{
-		auto onNext = [this](ConnectionState state) {
-			switch (state)
-			{
-			case ConnectionState::Connecting:
-			case ConnectionState::Disconnecting:
-			case ConnectionState::Disconnected:
-				setConnectionState((GameConnectionState)state);
-				break;
-			default:
-				break;
-			}
-		};
 
-		auto onError = [this](std::exception_ptr exptr) {
-			try
-			{
-				std::rethrow_exception(exptr);
-			}
-			catch (const std::exception& ex)
-			{
-				_logger->log(LogLevel::Error, "AuthenticationService", "Client connection state change failed", ex.what());
-			}
-		};
-
-		_connectionSubscription = client->getConnectionStateChangedObservable().subscribe(onNext, onError);
 	}
 
 	AuthenticationService::~AuthenticationService()
@@ -40,119 +18,217 @@ namespace Stormancer
 		_connectionSubscription.unsubscribe();
 	}
 
-	std::string AuthenticationService::authenticationSceneName()
+	pplx::task<void> AuthenticationService::login()
 	{
-		return _authenticationSceneName;
+		_autoReconnect = true;
+		return getAuthenticationScene().then([](Scene_ptr) {});
 	}
 
-	void AuthenticationService::setAuthenticationSceneName(const std::string& name)
+	pplx::task<Scene_ptr> AuthenticationService::loginImpl(int retry)
 	{
-		_authenticationSceneName = name;
-	}
+		std::weak_ptr<AuthenticationService> wThat = this->shared_from_this();
 
-	std::string AuthenticationService::createUserRoute()
-	{
-		return _createUserRoute;
-	}
-
-	void AuthenticationService::setCreateUserRoute(const std::string& name)
-	{
-		_createUserRoute = name;
-	}
-
-	std::string AuthenticationService::loginRoute()
-	{
-		return _loginRoute;
-	}
-
-	void AuthenticationService::setLoginRoute(const std::string& name)
-	{
-		_loginRoute = name;
-	}
-
-	
-
-	pplx::task<void> AuthenticationService::loginSteam(const std::string& ticket)
-	{
-		std::map<std::string, std::string> authContext{ { "provider", "steam" }, { "ticket", ticket } };
-		return login(authContext);
-	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	
-
-	pplx::task<void> AuthenticationService::login(const std::map<std::string, std::string>& authenticationContext)
-	{
-		if (_authenticated)
+		if (!this->getCredentialsCallback)
 		{
-			return pplx::task_from_exception<void>(std::runtime_error("Authentication service already authenticated."));
+			return pplx::task_from_exception<Scene_ptr>(std::runtime_error("'getCredentialsCallback' must be set before authentication."));
 		}
 
-		return getAuthenticationScene()
-			.then([this, authenticationContext](Scene_ptr scene)
-		{
-			setConnectionState(GameConnectionState::Authenticating);
-			auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
+		return _client->connectToPublicScene(SCENE_ID, [wThat](Scene_ptr scene) {
 
-			pplx::task_completion_event<void> tce;
-
-			rpcService->rpc<LoginResult, std::map<std::string, std::string>>(_loginRoute, authenticationContext)
-				.then([this, tce](pplx::task<LoginResult> task)
+			auto that = wThat.lock();
+			if (that)
 			{
-				try
-				{
-					auto loginResult = task.get();
-					if (loginResult.success)
+				that->_connectionSubscription = scene->getConnectionStateChangedObservable().subscribe([wThat](ConnectionState state) {
+					auto that = wThat.lock();
+					if (that)
 					{
-						_userId = loginResult.userId;
-						_username = loginResult.username;
-						setConnectionState(GameConnectionState::Authenticated);
+						switch (state)
+						{
+						case ConnectionState::Disconnecting:
+							that->setConnectionState(GameConnectionState::Disconnecting);
+							break;
+						case ConnectionState::Disconnected:
+							that->setConnectionState(GameConnectionState::Disconnected);
+							break;
+						default:
+							break;
+						}
+
 					}
-					else
-					{
-						setConnectionState(GameConnectionState::Disconnected);
-						throw std::runtime_error(loginResult.errorMsg);
-					}
-					tce.set();
-				}
-				catch (const std::exception& ex)
+
+				});
+			}
+			scene->dependencyResolver().lock()->resolve<RpcService>()->addProcedure("sendRequest", [wThat](RpcRequestContext_ptr ctx) {
+				OperationCtx opCtx;
+				opCtx.request = ctx;
+				Serializer serializer;
+				serializer.deserialize(ctx->inputStream(), opCtx.operation, opCtx.originId);
+
+				auto that = wThat.lock();
+				if (!that)
 				{
-					tce.set_exception(ex);
+					throw (std::runtime_error("Authentication service destroyed"));
 				}
+
+				auto it = that->_operationHandlers.find(opCtx.operation);
+				if (it == that->_operationHandlers.end())
+				{
+					throw (std::runtime_error("operation.notfound"));
+				}
+
+				return it->second(opCtx);
+
 			});
 
-			return pplx::create_task(tce);
+		}).then([wThat](Scene_ptr scene)
+		{
+			auto that = wThat.lock();
+
+			if (!that)
+			{
+				throw (std::runtime_error("Authentication service destroyed"));
+			}
+
+			if (!that->getCredentialsCallback)
+			{
+				throw std::runtime_error("'getCredentialsCallback' must be set before authentication.");
+			}
+
+			if (!that->_autoReconnect)
+			{
+				throw std::runtime_error("Auto recconnection is disable please login before");
+			}
+
+			return that->getCredentialsCallback().then([scene, wThat](std::unordered_map<std::string, std::string> ctx) {
+				auto that = wThat.lock();
+				if (!that)
+				{
+					throw std::runtime_error("destroyed");
+				}
+				auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
+				return rpcService->rpc<LoginResult>(that->LOGIN_ROUTE, ctx);
+
+			}).then([scene, wThat](LoginResult result) {
+
+				auto that = wThat.lock();
+				if (!that)
+				{
+					throw std::runtime_error("destroyed");
+				}
+
+				if (!result.success)
+				{
+					that->_autoReconnect = false;//disable auto reconnection
+					that->setConnectionState(GameConnectionState::Disconnected);
+					throw std::runtime_error("Login failed : " + result.errorMsg);
+				}
+				else
+				{
+					that->_userId = result.userId;
+					that->_username = result.username;
+					that->setConnectionState(GameConnectionState::Authenticated);
+				}
+
+				return scene;
+			});
+
+		}).then([wThat, retry](pplx::task<Scene_ptr> t) {
+			auto that = wThat.lock();
+			if (!that)
+			{
+				return pplx::task_from_result<Scene_ptr>(nullptr);
+			}
+			try
+			{
+				return pplx::task_from_result(t.get());
+			}
+			catch (std::exception& ex)
+			{
+				that->_logger->log(LogLevel::Error, "authentication", "An error occured while trying to connect to the server.", ex.what());
+				if (that->_autoReconnect && that->connectionState() != GameConnectionState::Disconnected)
+				{
+					return that->reconnect(retry + 1);
+				}
+				else
+				{
+					return pplx::task_from_result<Scene_ptr>(nullptr);
+				}
+			}
+		});
+
+	}
+
+	pplx::task<Scene_ptr> AuthenticationService::reconnect(int retry)
+	{
+		using namespace std::chrono_literals;
+		auto delay = retry * 1000ms;
+		if (delay > 5000ms)
+		{
+			delay = 5000ms;
+		}
+
+		std::weak_ptr<AuthenticationService> wThat = this->shared_from_this();
+
+		this->setConnectionState(GameConnectionState::Reconnecting);
+		return taskDelay(delay).then([wThat, retry]() {
+			auto that = wThat.lock();
+			if (!that)
+			{
+				throw std::runtime_error("destroyed");
+			}
+			return that->loginImpl(retry);
+
 		});
 	}
 
-	pplx::task<Scene_ptr> AuthenticationService::getAuthenticationScene()
+	pplx::task<Scene_ptr> AuthenticationService::getAuthenticationScene(pplx::cancellation_token ct)
 	{
 		if (_client)
 		{
-			return _client->connectToPublicScene(_authenticationSceneName)
-				.then([](Scene_ptr scene)
+			if (!_authTask)
 			{
-				if (scene->getCurrentConnectionState() != ConnectionState::Connected)
+				if (!_autoReconnect)
 				{
-					throw std::runtime_error("Scene is not connected.");
+					return pplx::task_from_exception<Scene_ptr>(std::runtime_error("Authenticator disconnected. Call login before using the authenticationService."));
 				}
-				return scene;
+				else
+				{
+					_authTask = std::make_shared<pplx::task<Scene_ptr>>(loginImpl());
+				}
+			}
+
+			auto t = *_authTask;
+
+			pplx::task_completion_event<Scene_ptr> tce;
+			if (ct.is_cancelable())
+			{
+				ct.register_callback([tce]() {
+					tce.set_exception(pplx::task_canceled());
+				});
+			}
+			t.then([tce, this](pplx::task<Scene_ptr> t) {
+
+				try
+				{
+					auto scene = t.get();
+					if (scene)
+					{
+						tce.set(scene);
+					}
+					else
+					{
+						throw std::runtime_error("Authentication failed");
+					}
+
+				}
+				catch (std::exception& ex)
+				{
+					tce.set_exception(ex);
+				}
+
 			});
+
+			return pplx::create_task(tce, _client->dependencyResolver().lock()->resolve<IActionDispatcher>());
 		}
 		else
 		{
@@ -162,13 +238,25 @@ namespace Stormancer
 
 	pplx::task<void> AuthenticationService::logout()
 	{
-		if (_authenticated)
+		_autoReconnect = false;
+		if (_currentConnectionState != GameConnectionState::Disconnected && _currentConnectionState != GameConnectionState::Disconnecting)
 		{
-			_authenticated = false;
+			this->setConnectionState(GameConnectionState::Disconnecting);
+
 			return getAuthenticationScene()
 				.then([](Scene_ptr scene)
 			{
 				return scene->disconnect();
+			}).then([](auto t) {
+
+				try
+				{
+					t.get();
+				}
+				catch (std::exception&)
+				{
+
+				}
 			});
 		}
 		else
@@ -177,10 +265,7 @@ namespace Stormancer
 		}
 	}
 
-	std::string AuthenticationService::userId()
-	{
-		return _userId;
-	}
+
 
 	pplx::task<std::string> AuthenticationService::getBearerToken()
 	{
@@ -202,9 +287,14 @@ namespace Stormancer
 		});
 	}
 
-	std::string AuthenticationService::getUsername()
+	std::string& AuthenticationService::username()
 	{
 		return _username;
+	}
+
+	std::string& AuthenticationService::userId()
+	{
+		return _userId;
 	}
 
 	pplx::task<std::string> AuthenticationService::getUserIdByPseudo(std::string pseudo)
@@ -226,13 +316,13 @@ namespace Stormancer
 			auto rpcService = authScene->dependencyResolver().lock()->resolve<RpcService>();
 			return rpcService->rpc<std::string, std::string>("sceneauthorization.gettoken", sceneId);
 		})
-			.then([wThat,builder](std::string token)
+			.then([wThat, builder](std::string token)
 		{
 			auto that = wThat.lock();
-			
+
 			if (that && that->_client)
 			{
-				return that->_client->connectToPrivateScene(token,builder);
+				return that->_client->connectToPrivateScene(token, builder);
 			}
 			else
 			{
@@ -241,48 +331,89 @@ namespace Stormancer
 		});
 	}
 
-	Action<GameConnectionState>& AuthenticationService::connectionStateChangedAction()
+	pplx::task<Scene_ptr> AuthenticationService::getSceneForService(const std::string& serviceType, const std::string& serviceName)
 	{
-		return _onConnectionStateChanged;
-	}
-
-	Action<GameConnectionState>::TIterator AuthenticationService::onConnectionStateChanged(const std::function<void(GameConnectionState)>& callback)
-	{
-		return _onConnectionStateChanged.push_back(callback);
-	}
-
-	pplx::task<std::unordered_map<std::string, std::string>> AuthenticationService::getPseudos(std::vector<std::string> userIds)
-	{
+		std::weak_ptr<AuthenticationService> wThat = this->shared_from_this();
 		return getAuthenticationScene()
-			.then([userIds](Scene_ptr authScene)
+			.then([serviceType, serviceName](Scene_ptr authScene)
 		{
 			auto rpcService = authScene->dependencyResolver().lock()->resolve<RpcService>();
-			return rpcService->rpc<std::unordered_map<std::string, std::string>, std::vector<std::string>>("users.getpseudos", userIds);
+			return rpcService->rpc<std::string>("Locator.GetSceneConnectionToken", serviceType, serviceName);
+		})
+			.then([wThat](std::string token)
+		{
+			auto that = wThat.lock();
+
+			if (that && that->_client)
+			{
+				return that->_client->connectToPrivateScene(token);
+			}
+			else
+			{
+				throw std::runtime_error("Client is invalid.");
+			}
 		});
 	}
 
+
 	GameConnectionState AuthenticationService::connectionState() const
 	{
-		return _connectionState;
+		return _currentConnectionState;
 	}
 
 	void AuthenticationService::setConnectionState(GameConnectionState state)
 	{
-		if (_connectionState != state)
+		if (_currentConnectionState != state)
 		{
-			_connectionState = state;
-			_onConnectionStateChanged(state);
+			this->_logger->log(LogLevel::Info, "connection", "Connection state changed", std::to_string((int)state));
+
+
+
+			if (state == GameConnectionState::Disconnected || state == GameConnectionState::Disconnecting)
+			{
+				_authTask = nullptr;
+
+				if (_autoReconnect)
+				{
+					setConnectionState(GameConnectionState::Reconnecting);
+				}
+				else
+				{
+					_currentConnectionState = state;
+					connectionStateChanged(state);
+				}
+
+
+			}
+			else if (state == GameConnectionState::Reconnecting && _currentConnectionState != GameConnectionState::Reconnecting)
+			{
+				_currentConnectionState = state;
+				connectionStateChanged(state);
+				this->getAuthenticationScene().then([](pplx::task<Scene_ptr> t) {
+					try
+					{
+						t.get();
+					}
+					catch (std::exception)
+					{
+
+					}
+
+				});
+			}
+			else
+			{
+				_currentConnectionState = state;
+				connectionStateChanged(state);
+			}
+
 		}
 	}
 
-	pplx::task<void> AuthenticationService::impersonate(const std::string& provider, const std::string& claimPath, const std::string& uid, const std::string& secret)
+	void AuthenticationService::SetOperationHandler(std::string operation, std::function<pplx::task<void>(OperationCtx&)> handler)
 	{
-		std::map<std::string, std::string> authContext{
-			{ "provider", "impersonation" },
-			{ "secret", secret } ,
-			{"impersonated-provider",provider},
-			{"claimPath",claimPath},
-			{"claimValue",uid} };
-		return login(authContext);
+		_operationHandlers[operation] = handler;
 	}
+
+
 };

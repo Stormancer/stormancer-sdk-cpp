@@ -6,6 +6,7 @@
 #include "stormancer/SystemRequestIDTypes.h"
 #include "stormancer/P2P/RakNet/P2PTunnels.h"
 #include "stormancer/P2P/OpenTunnelResult.h"
+#include "stormancer/Client.h"
 
 namespace Stormancer
 {
@@ -16,7 +17,8 @@ namespace Stormancer
 		std::shared_ptr<Serializer> serializer,
 		std::shared_ptr<P2PTunnels> tunnels,
 		std::shared_ptr<ILogger> logger,
-		std::shared_ptr<Configuration> config
+		std::shared_ptr<Configuration> config,
+		std::weak_ptr<Client> client
 	)
 		: _transport(transport)
 		, _connections(connections)
@@ -25,6 +27,7 @@ namespace Stormancer
 		, _tunnels(tunnels)
 		, _logger(logger)
 		, _config(config)
+		, _client(client)
 	{
 	}
 
@@ -37,7 +40,7 @@ namespace Stormancer
 		auto sessions = _sessions;
 		auto connections = _connections;
 		auto tunnels = _tunnels;
-
+		auto client = _client;
 		builder->service((byte)SystemRequestIDTypes::ID_P2P_GATHER_IP, [config, transport, serializer](RequestContext* ctx)
 		{
 			std::vector<std::string> endpoints;
@@ -58,6 +61,19 @@ namespace Stormancer
 				serializer->serialize(stream, endpoints);
 			});
 			return pplx::task_from_result();
+		});
+
+		builder->service((byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, [serializer, client](RequestContext* ctx) {
+			std::string sceneId, reason;
+			serializer->deserialize(ctx->inputStream(), sceneId, reason);
+			if (auto c = client.lock())
+			{
+				return c->disconnect(sceneId, true, reason);
+			}
+			else
+			{
+				return pplx::task_from_result();
+			}
 		});
 
 		builder->service((byte)SystemRequestIDTypes::ID_P2P_CREATE_SESSION, [serializer, sessions](RequestContext* ctx)

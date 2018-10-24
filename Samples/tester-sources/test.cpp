@@ -25,23 +25,39 @@ namespace Stormancer
 
 	std::string Tester::connectionStateToString(ConnectionState connectionState)
 	{
-		std::string stateStr = to_string((int)connectionState) + " ";
+		std::string stateStr = std::to_string((int)connectionState) + " ";
 		switch (connectionState)
 		{
-		case ConnectionState::Disconnected:
-			stateStr += "Disconnected";
-			break;
-		case ConnectionState::Connecting:
-			stateStr += "Connecting";
-			break;
-		case ConnectionState::Connected:
-			stateStr += "Connected";
-			break;
-		case ConnectionState::Disconnecting:
-			stateStr += "Disconnecting";
-			break;
+			case ConnectionState::Disconnected:
+				stateStr += "Disconnected";
+				break;
+			case ConnectionState::Connecting:
+				stateStr += "Connecting";
+				break;
+			case ConnectionState::Connected:
+				stateStr += "Connected";
+				break;
+			case ConnectionState::Disconnecting:
+				stateStr += "Disconnecting";
+				break;
 		}
 		return stateStr;
+	}
+
+	void Tester::onEcho(Packetisp_ptr packet)
+	{
+		Serializer serializer;
+		auto message = serializer.deserializeOne<std::string>(packet->stream);
+
+		if (message == _echoMessage)
+		{
+			_logger->log(LogLevel::Debug, "onMessage", "ECHO OK");
+			execNextTest();
+		}
+		else
+		{
+			_logger->log(LogLevel::Error, "onMessage", "ECHO failed");
+		}
 	}
 
 	void Tester::onMessage(Packetisp_ptr packet)
@@ -51,12 +67,7 @@ namespace Stormancer
 
 		_logger->log(LogLevel::Debug, "onMessage", "Message received", message);
 
-		if (message == "echo")
-		{
-			_logger->log(LogLevel::Debug, "onMessage", "ECHO OK");
-			execNextTest();
-		}
-		else if (message == "rpcServer_CancelOk")
+		if (message == "rpcServer_CancelOk")
 		{
 			_logger->log(LogLevel::Debug, "onMessage", "RPC SERVER CANCEL OK");
 			execNextTest();
@@ -163,18 +174,28 @@ namespace Stormancer
 		{
 			_logger->log(LogLevel::Debug, "test_connect", "Get scene");
 
-			_client->connectToPublicScene(_sceneName, [this](Scene_ptr scene)
-			{
+			_client->connectToPublicScene(_sceneName, [this](Scene_ptr scene) {
 				_logger->log(LogLevel::Debug, "test_connect", "Get scene OK");
 
-				auto onNext = [this, scene](ConnectionState state) 
-				{
+				auto onNext = [this, scene](ConnectionState state) {
 					auto stateStr = connectionStateToString(state);
-					_logger->log(LogLevel::Debug, "test_connect", "Scene connection state changed", stateStr.c_str());
+					_logger->log(LogLevel::Debug, "test_connect", "Scene connection state changed: " + stateStr, state.reason);
+
+					if (_disconnectWithReasonRequested && state == ConnectionState::Disconnected)
+					{
+						if (state.reason == _disconnectReason)
+						{
+							_logger->log(LogLevel::Debug, "test_disconnectWithReason", "Test disconnect with reason OK");
+							execNextTest();
+						}
+						else
+						{
+							_logger->log(LogLevel::Error, "test_disconnectWithReason", "Test disconnect with reason failed");
+						}
+					}
 				};
 
-				auto onError = [this](std::exception_ptr exptr) 
-				{
+				auto onError = [this](std::exception_ptr exptr) {
 					// On error
 					try
 					{
@@ -189,7 +210,23 @@ namespace Stormancer
 				scene->getConnectionStateChangedObservable().subscribe(onNext, onError);
 
 				_logger->log(LogLevel::Debug, "test_connect", "Add route");
+				std::weak_ptr<Scene> wScene = scene;
+				scene->addRoute("echo.in", [this, wScene](Packetisp_ptr p) {
+					if (auto scene = wScene.lock())
+					{
+						scene->send("echo.out", [p](obytestream* stream)
+						{
+							if (p->stream->availableSize() > 0)
+							{
+								stream->write(p->stream->currentPtr(), p->stream->availableSize());
+							}
+						});
+					}
+				});
 				scene->addRoute("echo.out", [this](Packetisp_ptr p) {
+					onEcho(p);
+				});
+				scene->addRoute("message", [this](Packetisp_ptr p) {
 					onMessage(p);
 				});
 
@@ -246,9 +283,10 @@ namespace Stormancer
 			}
 
 			_logger->log(LogLevel::Debug, "test_echo", "Sending message...");
-			scene->send("echo.in", [](obytestream* stream) {
+			auto echoMessage = _echoMessage;
+			scene->send("echo.in", [&echoMessage](obytestream* stream) {
 				Serializer serializer;
-				serializer.serialize(stream, "echo");
+				serializer.serialize(stream, echoMessage);
 			});
 		}
 		catch (std::exception& ex)
@@ -538,6 +576,28 @@ namespace Stormancer
 		});
 	}
 
+	void Tester::test_disconnectWithReason()
+	{
+		_logger->log(LogLevel::Info, "test_disconnectWithReason", "DISCONNECT_WITH_REASON");
+
+		_disconnectWithReasonRequested = true;
+
+		auto scene = _sceneMain.lock();
+		if (!scene)
+		{
+			_logger->log(LogLevel::Error, "StormancerWrapper", "scene deleted");
+			return;
+		}
+
+		auto disconnectReason = _disconnectReason;
+
+		scene->send("message", [disconnectReason](obytestream* stream) {
+			Serializer serializer;
+			serializer.serialize(stream, "disconnectWithReason");
+			serializer.serialize(stream, disconnectReason);
+		});
+	}
+
 	void Tester::test_clean()
 	{
 		_logger->log(LogLevel::Info, "test_clean", "CLEAN");
@@ -572,6 +632,7 @@ namespace Stormancer
 		_tests.push_back([this]() { test_rpc_client_cancel(); });
 		_tests.push_back([this]() { test_rpc_client_exception(); });
 		_tests.push_back([this]() { test_syncClock(); });
+		//_tests.push_back([this]() { test_disconnectWithReason(); });
 		_tests.push_back([this]() { test_disconnect(); });
 		_tests.push_back([this]() { test_clean(); });
 

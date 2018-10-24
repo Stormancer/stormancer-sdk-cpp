@@ -83,7 +83,7 @@ namespace Stormancer
 			{ "ticket", authenticationToken }
 		};
 
-		return authService->login(authenticationContext);
+		return authService->login();
 	}
 
 	std::string StormancerWrapper::userId()

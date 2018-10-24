@@ -93,6 +93,7 @@ namespace Stormancer
 		rxcpp::subjects::subject<ConnectionState> _connectionStateObservable;
 		Action<std::string> _closeAction;
 		ILogger_ptr _logger;
+		std::string _closeReason;
 		
 #pragma endregion
 	};

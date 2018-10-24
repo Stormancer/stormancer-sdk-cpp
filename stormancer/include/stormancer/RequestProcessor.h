@@ -46,27 +46,22 @@ namespace Stormancer
 		template<typename T1, typename T2>
 		pplx::task<T1> sendSystemRequest(IConnection* peer, byte id, const T2& parameter, pplx::cancellation_token ct = pplx::cancellation_token::none())
 		{
-			std::string T1name = typeid(T1).name();
-			auto logger = _logger;
-			auto serializer = _serializer;
-
-			return sendSystemRequest(peer, id, [=, &parameter](obytestream* stream) {
+			return sendSystemRequestInternal<T1>(peer, id, [=, &parameter](obytestream* stream) {
 				_serializer.serialize(stream, parameter);
-			}, PacketPriority::MEDIUM_PRIORITY, ct).then([T1name, logger, serializer, id](Packet_ptr packet) {
-				
-				if (!packet)
-				{
-					auto msg = "Tried to return " + T1name + " from a system request of type " + std::to_string(id) + " that returned void.";
-					logger->log(Stormancer::LogLevel::Error, "systemrequests", msg);
-					throw std::runtime_error(msg.c_str());
-				}
-				else
-				{
-					
-					
-					
-					return serializer.deserializeOne<T1>(packet->stream);
-				}
+			}, PacketPriority::MEDIUM_PRIORITY, ct);
+		}
+
+		template<typename T>
+		pplx::task<T> sendSystemRequest(IConnection* peer, byte id, pplx::cancellation_token ct = pplx::cancellation_token::none())
+		{
+			return sendSystemRequestInternal<T>(peer, id, [](obytestream*) {}, PacketPriority::MEDIUM_PRIORITY, ct);
+		}
+
+		pplx::task<void> sendSystemRequest(IConnection* peer, byte id, pplx::cancellation_token ct = pplx::cancellation_token::none())
+		{
+			return sendSystemRequest(peer, id, [](obytestream*) {}, PacketPriority::MEDIUM_PRIORITY, ct).then([](Packet_ptr /*packet*/)
+			{
+				// Packet is null for system requests that have no return value.
 			}, ct);
 		}
 
@@ -91,6 +86,28 @@ namespace Stormancer
 		SystemRequest_ptr reserveRequestSlot(byte msgId, pplx::task_completion_event<Packet_ptr> tce, pplx::cancellation_token ct = pplx::cancellation_token::none());
 
 		SystemRequest_ptr freeRequestSlot(uint16 requestId);
+
+		template<typename TResult>
+		pplx::task<TResult> sendSystemRequestInternal(IConnection* peer, byte msgId, const Writer& writer, PacketPriority priority, pplx::cancellation_token ct)
+		{
+			std::string Tname = typeid(TResult).name();
+			auto logger = _logger;
+			auto serializer = _serializer;
+
+			return sendSystemRequest(peer, msgId, writer, priority, ct).then([Tname, logger, serializer, msgId](Packet_ptr packet)
+			{
+				if (!packet)
+				{
+					auto msg = "Tried to return " + Tname + " from a system request of type " + std::to_string(msgId) + " that returned void.";
+					logger->log(Stormancer::LogLevel::Error, "systemrequests", msg);
+					throw std::runtime_error(msg.c_str());
+				}
+				else
+				{
+					return serializer.deserializeOne<TResult>(packet->stream);
+				}
+			}, ct);
+		}
 
 #pragma endregion
 

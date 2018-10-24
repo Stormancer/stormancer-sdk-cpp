@@ -43,4 +43,9 @@ namespace Stormancer
 	void IPlugin::packetReceived(Packet_ptr)
 	{
 	}
+
+	void IPlugin::clientDisconnecting(Client*)
+	{
+
+	}
 };

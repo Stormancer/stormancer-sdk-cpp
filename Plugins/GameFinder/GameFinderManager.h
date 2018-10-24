@@ -4,7 +4,7 @@
 
 namespace Stormancer
 {
-	class Client;
+	class AuthenticationService;
 	struct GameFinderContainer;
 
 	struct GameFinderStatusChangedEvent
@@ -21,7 +21,7 @@ namespace Stormancer
 	class GameFinder : public std::enable_shared_from_this<GameFinder>
 	{
 	public:		
-		GameFinder(Client* scene);
+		GameFinder(std::weak_ptr<AuthenticationService> auth);
 
 		
 		pplx::task<void> findGame(std::string gameFinder,const std::string &provider, std::string json);
@@ -32,19 +32,19 @@ namespace Stormancer
 
 		std::unordered_map<std::string, GameFinderStatusChangedEvent> getPendingFindGameStatus();
 		
-		pplx::task<std::shared_ptr<GameFinderContainer>> connectToGameFinder(std::string gameFinderName);
+		pplx::task<void> connectToGameFinder(std::string gameFinderName);
 		pplx::task<void> disconnectFromGameFinder(std::string gameFinderName);
 	private:
 
 		
 		
-		
+		pplx::task<std::shared_ptr<GameFinderContainer>> connectToGameFinderImpl(std::string gameFinderName);
 		pplx::task<std::shared_ptr<GameFinderContainer>> getGameFinderContainer(std::string id);
 		
 
 		std::mutex _lock;
 		std::unordered_map<std::string, pplx::task<std::shared_ptr<GameFinderContainer>>> _gameFinders;
-		Client* _client;
+		std::weak_ptr<AuthenticationService> _auth;
 	};
 
 

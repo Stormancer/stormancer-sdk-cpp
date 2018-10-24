@@ -154,7 +154,7 @@ namespace Stormancer
 
 		if (_connectionState != ConnectionState::Disconnected)
 		{
-			throw std::runtime_error("The scene is not disconnected.");
+			throw std::runtime_error("A route cannot be added to a scene already connected.");
 		}
 
 		if (routeName.size() == 0 || routeName[0] == '@')
@@ -257,7 +257,7 @@ namespace Stormancer
 				writer(stream);
 			}
 		};
-		TransformMetadata transformMetadata {shared_from_this()};
+		TransformMetadata transformMetadata{ shared_from_this() };
 		peer->send(writer2, channelUid, priority, reliability, transformMetadata);
 	}
 
@@ -275,7 +275,7 @@ namespace Stormancer
 			auto client = _client.lock();
 			if (client)
 			{
-				_connectTask = client->connectToScene(_id, _token, mapValues(_localRoutesMap), ct);
+				_connectTask = client->connectToScene(this->shared_from_this(), _token, mapValues(_localRoutesMap), ct);
 			}
 			else
 			{
@@ -297,7 +297,7 @@ namespace Stormancer
 			_logger->log(LogLevel::Trace, "Scene", "Scene disconnecting");
 
 			std::lock_guard<std::mutex> lg(_disconnectMutex);
-
+			_disconnectTask = pplx::task_from_result();
 			if (_connectionState == ConnectionState::Connected)
 			{
 				auto logger = _logger;
@@ -343,11 +343,11 @@ namespace Stormancer
 	}
 
 
-	std::weak_ptr<DependencyResolver> Scene::dependencyResolver() const 
+	std::weak_ptr<DependencyResolver> Scene::dependencyResolver() const
 	{
-			return _dependencyResolver;	
+		return _dependencyResolver;
 	}
-	
+
 	void Scene::completeConnectionInitialization(ConnectionResult& cr)
 	{
 		_handle = cr.SceneHandle;
@@ -435,12 +435,15 @@ namespace Stormancer
 	{
 		auto p2pService = dependencyResolver().lock()->resolve<P2PService>();
 		auto wScene = STRM_WEAK_FROM_THIS();
+		auto dispatcher = dependencyResolver().lock()->resolve<IActionDispatcher>();
+		auto options = pplx::task_options(dispatcher);
+		options.set_cancellation_token(ct);
 		return p2pService->openP2PConnection(p2pToken, ct)
 			.then([wScene, p2pService](std::shared_ptr<IConnection> connection)
 		{
 			auto scene = LockOrThrow(wScene);
 			return std::make_shared<P2PScenePeer>(scene.get(), connection, p2pService, P2PConnectToSceneMessage());
-		}, ct);
+		}, options);
 		//	auto c = t.get();
 		//	P2PConnectToSceneMessage message;
 		//	return this->sendSystemRequest<P2PConnectToSceneMessage, P2PConnectToSceneMessage>(c,(byte)SystemRequestIDTypes::ID_CONNECT_TO_SCENE, message).then([c](P2PConnectToSceneMessage m) {

@@ -23,8 +23,9 @@ namespace Stormancer
 			std::shared_ptr<P2PSessions> sessions,
 			std::shared_ptr<Serializer> serializer,
 			std::shared_ptr<P2PTunnels> tunnels,
-			std::shared_ptr<ILogger> logger, 
-			std::shared_ptr<Configuration> config);
+			std::shared_ptr<ILogger> logger,
+			std::shared_ptr<Configuration> config,
+			std::weak_ptr<Client> client);
 
 		void registerModule(RequestModuleBuilder* builder);
 
@@ -37,5 +38,6 @@ namespace Stormancer
 		std::shared_ptr<P2PTunnels> _tunnels;
 		std::shared_ptr<ILogger> _logger;
 		std::shared_ptr<Configuration> _config;
+		std::weak_ptr<Client> _client;
 	};
 }

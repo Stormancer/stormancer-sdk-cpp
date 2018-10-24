@@ -14,5 +14,9 @@
 #define RAKNET_SUPPORT_IPV6 0
 #endif
 
+#if !defined(RAKNET_DEBUG_PRINTF) && !defined(_DEBUG)
+#define RAKNET_DEBUG_PRINTF printf
+#endif
+
 // USER EDITABLE FILE
 

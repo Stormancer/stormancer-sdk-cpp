@@ -43,6 +43,7 @@ namespace Stormancer
 
 		void execNextTest();
 		std::string connectionStateToString(ConnectionState connectionState);
+		void onEcho(Packetisp_ptr packet);
 		void onMessage(Packetisp_ptr packet);
 		pplx::task<void> test_rpc_client_received(RpcRequestContext_ptr rc);
 		pplx::task<void> test_rpc_client_cancel_received(RpcRequestContext_ptr rc);
@@ -60,6 +61,7 @@ namespace Stormancer
 		void test_rpc_client_exception();
 		void test_syncClock();
 		void test_disconnect();
+		void test_disconnectWithReason();
 		void test_clean();
 
 #pragma endregion
@@ -76,6 +78,9 @@ namespace Stormancer
 		const std::string _accountId = "tester";
 		const std::string _applicationName = "tester";
 		const std::string _sceneName = "main";
+		bool _disconnectWithReasonRequested = false;
+		const std::string _disconnectReason = "DisconnectParticularReason";
+		const std::string _echoMessage = "hello";
 		Configuration_ptr _config;
 		Client_ptr _client;
 		std::weak_ptr<Scene> _sceneMain;

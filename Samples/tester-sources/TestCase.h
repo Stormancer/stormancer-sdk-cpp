@@ -1,6 +1,13 @@
 #pragma once
 #include <string>
 
+struct TestParameters
+{
+	std::string endpoint;
+	std::string account;
+	std::string application;
+};
+
 class TestCase
 {
 public:
@@ -8,7 +15,7 @@ public:
 
 	virtual std::string get_name() = 0;
 
-	virtual void set_up() = 0;
+	virtual void set_up(TestParameters) = 0;
 
 	virtual bool run() = 0;
 

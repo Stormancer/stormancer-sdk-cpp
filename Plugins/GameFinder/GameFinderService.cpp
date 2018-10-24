@@ -106,8 +106,8 @@ namespace Stormancer
 		_currentState = GameFinderStatus::Searching;
 		_matchmakingCTS = pplx::cancellation_token_source();
 		auto matchmakingToken = _matchmakingCTS.get_token();
-
-		return _rpcService->rpc<void>("match.find", provider, mmRequest).then([=](pplx::task<void> res) {
+		
+		return _rpcService.lock()->rpc<void>("match.find", provider, mmRequest).then([=](pplx::task<void> res) {
 			if (matchmakingToken.is_canceled())
 			{
 				return pplx::task_from_exception<void>(std::runtime_error("GameFinder canceled"));
@@ -130,7 +130,7 @@ namespace Stormancer
 		_matchmakingCTS = pplx::cancellation_token_source();
 		auto matchmakingToken = _matchmakingCTS.get_token();
 
-		return _rpcService->rpc<void>("match.find", provider, json).then([=](pplx::task<void> res) {
+		return _rpcService.lock()->rpc<void>("match.find", provider, json).then([=](pplx::task<void> res) {
 			if (matchmakingToken.is_canceled())
 			{
 				return pplx::task_from_exception<void>(std::runtime_error("Operation cancelled"));

@@ -18,4 +18,15 @@ namespace Stormancer
 			}
 		}
 	}
+
+	void FriendsPlugin::clientCreated(Client* client)
+	{
+		if (client)
+		{
+			client->dependencyResolver().lock()->registerDependency<Friends>([](std::weak_ptr<DependencyResolver> dr) {
+				return std::make_shared<Friends>(dr.lock()->resolve<AuthenticationService>()); 
+			}, true);
+
+		}
+	}
 };

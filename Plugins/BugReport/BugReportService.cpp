@@ -23,7 +23,7 @@ namespace Stormancer
 			metadata.files.push_back(attachedFile);
 		}
 
-		return _rpc->rpcWriter( "bugreporting.report", [&](obytestream* stream) {
+		return _rpc->rpcWriter( "bugreporting.report", pplx::cancellation_token::none(), [&](obytestream* stream) {
 			_serializer.serialize(stream, metadata);
 			for (const auto& f : files)
 			{

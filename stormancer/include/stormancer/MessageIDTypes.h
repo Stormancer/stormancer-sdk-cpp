@@ -12,7 +12,9 @@ namespace Stormancer
 		ID_P2P_RELAY = 58,
 		ID_P2P_TUNNEL = 59,
 		ID_ADVERTISE_PEERID = 48, // Borrow id from autopatcher
-		
+
+		ID_CLOSE_REASON = 115,
+
 		/// System request
 		ID_SYSTEM_REQUEST = 134, // = DefaultMessageIDTypes::ID_USER_PACKET_ENUM
 

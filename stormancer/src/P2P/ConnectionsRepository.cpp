@@ -42,7 +42,7 @@ namespace Stormancer
 				_connections[id] = connection;
 
 				std::weak_ptr<ConnectionsRepository> wThat(shared_from_this());
-				connection->onClose([wThat, id](std::string reason) {
+				connection->onClose([wThat, id](std::string /*reason*/) {
 					if (auto that = wThat.lock())
 					{
 						that->_connections.erase(id);

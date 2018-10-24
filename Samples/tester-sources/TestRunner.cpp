@@ -14,7 +14,8 @@ bool TestRunner::run_tests()
 	{
 		_logger->log(Stormancer::LogLevel::Info, "Tester", "Running test", test->get_name());
 
-		test->set_up();
+		// TODO this is not flexible enough
+		test->set_up(TestParameters{});
 		if (test->run())
 		{
 			_logger->log(Stormancer::LogLevel::Info, "Tester", "Test PASSED", test->get_name());

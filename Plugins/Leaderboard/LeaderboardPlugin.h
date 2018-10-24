@@ -12,5 +12,6 @@ namespace Stormancer
 	public:
 
 		void sceneCreated(Scene* scene) override;
+		void clientCreated(Client* client) override;
 	};
 }

@@ -441,15 +441,15 @@ void http_client::build_pipeline(const uri &base_uri, const http_client_config &
         details::verify_uri(base_uri);
         m_pipeline = ::web::http::http_pipeline::create_pipeline(std::make_shared<details::http_network_handler>(base_uri, client_config));
     }
-
-#if !defined(CPPREST_TARGET_XP) 
-    add_handler(std::static_pointer_cast<http::http_pipeline_stage>(
-        std::make_shared<oauth1::details::oauth1_handler>(client_config.oauth1())));
-#endif
-
-    add_handler(std::static_pointer_cast<http::http_pipeline_stage>(
-        std::make_shared<oauth2::details::oauth2_handler>(client_config.oauth2())));
-
+//#if !defined(__ORBIS__) && !defined(__psp2__) && !defined(_XBOX_ONE) && !defined(__NX)
+//#if !defined(CPPREST_TARGET_XP) 
+//    add_handler(std::static_pointer_cast<http::http_pipeline_stage>(
+//        std::make_shared<oauth1::details::oauth1_handler>(client_config.oauth1())));
+//#endif
+//
+//    add_handler(std::static_pointer_cast<http::http_pipeline_stage>(
+//        std::make_shared<oauth2::details::oauth2_handler>(client_config.oauth2())));
+//#endif
 }
 
 const http_client_config & http_client::client_config() const

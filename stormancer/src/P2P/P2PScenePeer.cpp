@@ -2,6 +2,7 @@
 #include "stormancer/Scene.h"
 #include "stormancer/P2P/P2PScenePeer.h"
 #include "stormancer/P2P/P2PConnectToSceneMessage.h"
+#include "stormancer/IActionDispatcher.h"
 
 namespace Stormancer
 {
@@ -26,7 +27,10 @@ namespace Stormancer
 
 	pplx::task<std::shared_ptr<P2PTunnel>> P2PScenePeer::openP2PTunnel(const std::string& serverId)
 	{
-		return _p2p->openTunnel((uint64)_connection->id(), _scene->id() + "." + serverId);
+		auto dispatcher = _scene->dependencyResolver().lock()->resolve<IActionDispatcher>();		
+		return _p2p->openTunnel((uint64)_connection->id(), _scene->id() + "." + serverId).then([](auto t) {
+			return t.get();
+		}, dispatcher);
 	}
 
 	void P2PScenePeer::send(const std::string& routeName, const Writer& writer, PacketPriority packetPriority, PacketReliability packetReliability)

@@ -106,9 +106,9 @@ namespace Stormancer
 		_logger->log(LogLevel::Trace, "raknetConnection", "Closing connection " + reason, std::to_string(id()));
 		if (_connectionState == ConnectionState::Connected || _connectionState == ConnectionState::Connecting)
 		{
-			setConnectionState(ConnectionState::Disconnecting);
+			setConnectionState(ConnectionState(ConnectionState::Disconnecting, reason));
 			_closeAction(reason);
-			setConnectionState(ConnectionState::Disconnected);
+			setConnectionState(ConnectionState(ConnectionState::Disconnected, reason));
 		}
 	}
 
@@ -132,7 +132,6 @@ namespace Stormancer
 		{
 			throw std::runtime_error("Dependency resolver not available");
 		}
-
 
 		obytestream stream;
 		std::vector<std::shared_ptr<IPacketTransform>> packetTransforms;

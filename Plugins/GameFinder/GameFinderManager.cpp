@@ -28,9 +28,9 @@ namespace Stormancer
 	};
 
 
-	GameFinder::GameFinder(Stormancer::Client* client)
+	GameFinder::GameFinder(std::weak_ptr<AuthenticationService> auth)
 	{
-		_client = client;
+		_auth = auth;
 	}
 
 	std::unordered_map<std::string, GameFinderStatusChangedEvent> GameFinder::getPendingFindGameStatus()
@@ -78,19 +78,29 @@ namespace Stormancer
 		}
 		else
 		{
-			auto t = connectToGameFinder(id);
+			auto t = connectToGameFinderImpl(id);
 			_gameFinders.emplace(id, t);
 			return t;
 		}
 	}
 
-	pplx::task<std::shared_ptr<GameFinderContainer>> GameFinder::connectToGameFinder(std::string gameFinderName)
+	pplx::task<void> GameFinder::connectToGameFinder(std::string id)
 	{
-		auto auth = _client->dependencyResolver().lock()->resolve<Stormancer::AuthenticationService>();
+		return connectToGameFinderImpl(id).then([](std::shared_ptr<GameFinderContainer>) {});
+	}
+
+	pplx::task<std::shared_ptr<GameFinderContainer>> GameFinder::connectToGameFinderImpl(std::string gameFinderName)
+	{
+		auto auth = _auth.lock();
+
+		if (!auth)
+		{
+			return pplx::task_from_exception<std::shared_ptr<GameFinderContainer>>(std::runtime_error("Authentication service destroyed."));
+		}
 
 		std::weak_ptr<GameFinder> wThat = this->shared_from_this();
 
-		return auth->connectToPrivateScene(gameFinderName, [](Scene_ptr scene) {}).then([gameFinderName, wThat](pplx::task<Scene_ptr> task) {
+		return auth->getSceneForService("stormancer.plugins.matchmaking", gameFinderName).then([gameFinderName, wThat](pplx::task<Scene_ptr> task) {
 
 			try
 			{
@@ -188,7 +198,17 @@ namespace Stormancer
 
 
 
+	void GameFinder::cancel(std::string gameFinder)
+	{
+		std::lock_guard<std::mutex> lg(this->_lock);
+		
+		auto it = _gameFinders.find(gameFinder);
+		if (it != _gameFinders.end())
+		{
 
+		}
+
+	}
 
 
 

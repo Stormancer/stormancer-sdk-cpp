@@ -415,7 +415,7 @@ namespace Stormancer
 		return _dispatcher;
 	}
 
-	pplx::task<void> RpcService::rpcWriter(const std::string& procedure, const Writer& writer)
+	pplx::task<void> RpcService::rpcWriter(const std::string& procedure, pplx::cancellation_token ct, const Writer& writer)
 	{
 		auto logger = _logger;
 
@@ -441,8 +441,19 @@ namespace Stormancer
 		auto onComplete = [tce]() {
 			tce.set();
 		};
+		
 
-		observable.subscribe(onNext, onError, onComplete);
+		auto subscription = observable.subscribe(onNext, onError, onComplete);
+
+		if (ct.is_cancelable())
+		{
+			ct.register_callback([subscription]() {
+				if (subscription.is_subscribed())
+				{
+					subscription.unsubscribe();
+				}
+			});
+		}
 
 		return pplx::create_task(tce, getDispatcher());
 	}
