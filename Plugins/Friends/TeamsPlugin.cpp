@@ -1,4 +1,4 @@
-#include "stormancer/stdafx.h"
+#include "stormancer/headers.h"
 #include "TeamsPlugin.h"
 #include "TeamsService.h"
 #include "stormancer/Scene.h"

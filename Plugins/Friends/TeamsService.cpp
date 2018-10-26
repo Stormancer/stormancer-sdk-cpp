@@ -1,4 +1,4 @@
-#include "stormancer/stdafx.h"
+#include "stormancer/headers.h"
 #include "TeamsService.h"
 #include "stormancer/Scene.h"
 #include "stormancer/RPC/RpcService.h"
