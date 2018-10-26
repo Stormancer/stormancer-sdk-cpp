@@ -22,6 +22,10 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\BugReport\BugReportService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\Friends\Friends.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\Friends\FriendsPlugin.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\Friends\Teams.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\Friends\TeamsContainer.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\Friends\TeamsPlugin.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\Friends\TeamsService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderService.cpp" />
@@ -57,6 +61,11 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Core\ClientAPI.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Friends\Friends.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Friends\FriendsPlugin.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Friends\Teams.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Friends\TeamsContainer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Friends\TeamsPlugin.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Friends\TeamsService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Friends\TeamsTypes.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderService.h" />

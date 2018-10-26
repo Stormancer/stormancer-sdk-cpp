@@ -1,4 +1,4 @@
-#include "Stormancer/stdafx.h"
+#include "stormancer/stdafx.h"
 #include "stormancer/headers.h"
 #include "AssetsStoragePlugin.h"
 #include "AssetsStorageService.h"
