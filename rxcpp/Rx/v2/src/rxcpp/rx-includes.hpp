@@ -19,7 +19,7 @@
 #define RXCPP_USE_VARIADIC_TEMPLATES 1
 #endif
 
-#if _CPPRTTI
+#if defined(_CPPRTTI) && _CPPRTTI
 #define RXCPP_USE_RTTI 1
 #endif
 

@@ -65,7 +65,7 @@ auto to_stream(std::ostream& os, const T& t, int, int)
     return      os << t;
 }
 
-#if RXCPP_USE_RTTI
+#if defined(RXCPP_USE_RTTI) && RXCPP_USE_RTTI
 template<class T>
 std::ostream& to_stream(std::ostream& os, const T&, int, ...) {
     return os << "< " << typeid(T).name() << " does not support ostream>";
