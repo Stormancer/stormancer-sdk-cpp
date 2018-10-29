@@ -10,9 +10,6 @@
     <Filter Include="BugReport">
       <UniqueIdentifier>{4364a2de-ea2b-439f-a383-5d88fa83f57b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Friends">
-      <UniqueIdentifier>{a1c507dd-bad6-45f2-9efc-d61eb0277e6a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="GameSession">
       <UniqueIdentifier>{8b05d1f0-4a50-4166-83b9-09de65bd4056}</UniqueIdentifier>
     </Filter>
@@ -49,6 +46,9 @@
     <Filter Include="Core">
       <UniqueIdentifier>{5c06ad85-3dd5-4717-bb61-c5a98c171087}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Members">
+      <UniqueIdentifier>{5f8ec175-c670-49ef-b722-9200b7216623}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\AssetsStorage\AssetsStoragePlugin.cpp">
@@ -68,12 +68,6 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\BugReport\BugReportService.cpp">
       <Filter>BugReport</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\Friends\Friends.cpp">
-      <Filter>Friends</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\Friends\FriendsPlugin.cpp">
-      <Filter>Friends</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GameSession\GameSessionPlugin.cpp">
       <Filter>GameSession</Filter>
@@ -141,20 +135,26 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\PlayerData\PlayerDataService.cpp">
       <Filter>PlayerData</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\Friends\TeamsPlugin.cpp">
-      <Filter>Friends</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\Friends\TeamsService.cpp">
-      <Filter>Friends</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\Profile\ProfileService.cpp">
       <Filter>Profiles</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\Friends\TeamsContainer.cpp">
-      <Filter>Friends</Filter>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\Members\Friends.cpp">
+      <Filter>Members</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\Friends\Teams.cpp">
-      <Filter>Friends</Filter>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\Members\FriendsPlugin.cpp">
+      <Filter>Members</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\Members\Organizations.cpp">
+      <Filter>Members</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\Members\OrganizationsContainer.cpp">
+      <Filter>Members</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\Members\OrganizationsPlugin.cpp">
+      <Filter>Members</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\Members\OrganizationsService.cpp">
+      <Filter>Members</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -175,12 +175,6 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\BugReport\BugReportService.h">
       <Filter>BugReport</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\Friends\Friends.h">
-      <Filter>Friends</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\Friends\FriendsPlugin.h">
-      <Filter>Friends</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\GameSession\GameSessionPlugin.h">
       <Filter>GameSession</Filter>
@@ -281,20 +275,26 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\PlayerData\PlayerDataUpdate.h">
       <Filter>PlayerData</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\Friends\TeamsPlugin.h">
-      <Filter>Friends</Filter>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Members\Friends.h">
+      <Filter>Members</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\Friends\TeamsService.h">
-      <Filter>Friends</Filter>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Members\FriendsPlugin.h">
+      <Filter>Members</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\Friends\TeamsTypes.h">
-      <Filter>Friends</Filter>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Members\Organizations.h">
+      <Filter>Members</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\Friends\Teams.h">
-      <Filter>Friends</Filter>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Members\OrganizationsContainer.h">
+      <Filter>Members</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\Friends\TeamsContainer.h">
-      <Filter>Friends</Filter>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Members\OrganizationsPlugin.h">
+      <Filter>Members</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Members\OrganizationsService.h">
+      <Filter>Members</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Members\OrganizationsTypes.h">
+      <Filter>Members</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

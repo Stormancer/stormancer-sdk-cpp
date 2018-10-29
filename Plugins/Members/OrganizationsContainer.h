@@ -3,19 +3,19 @@
 
 namespace Stormancer
 {
-	class TeamsService;
-	class Teams;
+	class OrganizationsService;
+	class Organizations;
 	class Scene;
 
-	class TeamsContainer
+	class OrganizationsContainer
 	{
-		friend class Teams;
+		friend class Organizations;
 
 	public:
 
-		TeamsContainer() = default;
+		OrganizationsContainer() = default;
 
-		std::shared_ptr<TeamsService> service();
+		std::shared_ptr<OrganizationsService> service();
 
 	private:
 

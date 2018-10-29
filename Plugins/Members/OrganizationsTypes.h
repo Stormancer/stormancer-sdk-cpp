@@ -4,7 +4,7 @@
 
 namespace Stormancer
 {
-	enum class TeamMemberStatus : int8
+	enum class MemberStatus : int8
 	{
 		Accepted = 0,
 		InvitationSent = 1,
@@ -21,7 +21,7 @@ namespace Stormancer
 		MSGPACK_DEFINE(name, rights, document);
 	};
 
-	struct Team
+	struct Organization
 	{
 		std::string id;
 		std::string name;
@@ -32,16 +32,16 @@ namespace Stormancer
 		MSGPACK_DEFINE(id, name, ownerId, roleDefinitions, document);
 	};
 
-	struct TeamMember
+	struct Member
 	{
 		std::string id;
-		std::string teamId;
+		std::string organizationId;
 		std::string userId;
 		std::vector<std::string> roles;
-		TeamMemberStatus status;
+		MemberStatus status;
 
-		MSGPACK_DEFINE(id, teamId, userId, roles, status);
+		MSGPACK_DEFINE(id, organizationId, userId, roles, status);
 	};
 }
 
-MSGPACK_ADD_ENUM(Stormancer::TeamMemberStatus);
+MSGPACK_ADD_ENUM(Stormancer::MemberStatus);

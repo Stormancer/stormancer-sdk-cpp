@@ -4,7 +4,7 @@
 
 namespace Stormancer
 {
-	class TeamsPlugin : public IPlugin
+	class OrganizationsPlugin : public IPlugin
 	{
 	public:
 
