@@ -654,27 +654,28 @@ namespace Stormancer
 					}, ct)
 						.then([wClient](pplx::task<void> task)
 					{
-						bool failed = false;
-						std::string reason;
 						try
 						{
 							task.get();
 						}
 						catch (const std::exception& ex)
 						{
-							failed = true;
-							reason = ex.what();
+							if (auto client = wClient.lock())
+							{
+								auto reason = ex.what();
+								if (auto connection = client->_serverConnection.lock())
+								{
+									connection->close(reason);
+								}
+								client->setConnectionState(ConnectionState(ConnectionState::Disconnected, reason));
+							}
+							throw;
 						}
-						catch (...)
-						{
-							failed = true;
-						}
-
-						if (failed)
+						catch (...) // Catching all exceptions (including managed exceptions (C++/CLI))
 						{
 							if (auto client = wClient.lock())
 							{
-								reason = "Connection to server failed: " + reason;
+								auto reason = "Connection failed";
 								if (auto connection = client->_serverConnection.lock())
 								{
 									connection->close(reason);
