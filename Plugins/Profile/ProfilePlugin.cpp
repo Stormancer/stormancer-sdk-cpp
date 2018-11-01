@@ -1,5 +1,6 @@
 #include "Profile/ProfilePlugin.h"
 #include "Profile/ProfileService.h"
+#include "Profile/Profiles.h"
 
 namespace Stormancer
 {
@@ -21,6 +22,15 @@ namespace Stormancer
 				std::shared_ptr<ProfileService> service = std::make_shared<ProfileService>(scene->shared_from_this());
 				scene->dependencyResolver().lock()->registerDependency<ProfileService>(service);
 			}
+		}
+	}
+	
+	void ProfilePlugin::clientCreated(Client* client)
+	{
+		if (client)
+		{
+			client->dependencyResolver().lock()->registerDependency<Profiles>([](std::weak_ptr<DependencyResolver> dr) {
+				return std::make_shared<Profiles>(dr.lock()->resolve<AuthenticationService>()); },true);
 		}
 	}
 };

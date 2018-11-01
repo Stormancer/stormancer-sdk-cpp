@@ -48,6 +48,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\Party\PartyService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\PlayerData\PlayerDataService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\Profile\ProfilePlugin.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\Profile\Profiles.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\Profile\ProfileService.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -94,8 +95,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\PlayerProfile\PlayerProfile.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\PlayerProfile\PlayerProfilePlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\PlayerProfile\PlayerProfileService.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\Profile\PlayerProfileDto.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Profile\ProfilePlugin.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Profile\Profiles.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Profile\ProfileService.h" />
   </ItemGroup>
 </Project>

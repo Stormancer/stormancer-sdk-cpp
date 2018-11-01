@@ -10,5 +10,6 @@ namespace Stormancer
 		ProfilePlugin();
 		~ProfilePlugin();
 		void sceneCreated(Scene* scene) override;
+		void clientCreated(Client* client) override;
 	};
 };

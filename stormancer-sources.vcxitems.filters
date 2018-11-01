@@ -312,12 +312,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\RPC\RpcService.h">
       <Filter>Header Files\RPC</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\TCP\TcpConnection.h">
-      <Filter>Header Files\TCP</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\TCP\TcpTransport.h">
-      <Filter>Header Files\TCP</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\ClientFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -393,6 +387,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\Action2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\TCP\TcpConnection.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\TCP\TcpTransport.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Configuration.cpp">
@@ -542,12 +538,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\RPC\RpcService.cpp">
       <Filter>Source Files\RPC</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\TCP\TcpConnection.cpp">
-      <Filter>Source Files\TCP</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\TCP\TcpTransport.cpp">
-      <Filter>Source Files\TCP</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Serializer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -594,5 +584,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\ConnectionState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\TCP\TcpConnection.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\TCP\TcpTransport.cpp" />
   </ItemGroup>
 </Project>

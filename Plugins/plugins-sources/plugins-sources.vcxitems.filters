@@ -156,6 +156,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\Members\OrganizationsService.cpp">
       <Filter>Members</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\Profile\Profiles.cpp">
+      <Filter>Profiles</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\AssetsStorage\AssetsStoragePlugin.h">
@@ -263,9 +266,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Leaderboard\Leaderboard.h">
       <Filter>Leaderboard</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\Profile\PlayerProfileDto.h">
-      <Filter>Profiles</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Profile\ProfilePlugin.h">
       <Filter>Profiles</Filter>
     </ClInclude>
@@ -295,6 +295,9 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Members\OrganizationsTypes.h">
       <Filter>Members</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Profile\Profiles.h">
+      <Filter>Profiles</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
