@@ -23,44 +23,60 @@ namespace Stormancer
 
 	void ConnectionsRepository::newConnection(std::shared_ptr<IConnection> connection)
 	{
-		_logger->log(LogLevel::Trace, "P2P", "Adding connection " + connection->ipAddress(), std::to_string(connection->id()));
-		if (connection == nullptr)
+		std::lock_guard<std::mutex> l(_mutex);
+		_logger->log(LogLevel::Trace, "Connections", "Adding connection " + connection->ipAddress(), std::to_string(connection->id()));
+
+		if (!connection)
 		{
 			throw std::runtime_error("connection is null");
 		}
 
-		if (connection->id() != 0)
+		auto id = connection->id();
+		auto key = connection->key();
+		auto t = pplx::task_from_result(connection);
+		_connections.emplace(id, t);
+		_connectionsByKey.emplace(key, t);
+
+		std::weak_ptr<ConnectionsRepository> wThat(shared_from_this());
+		connection->onClose([wThat, id, key](std::string /*reason*/) {
+			if (auto that = wThat.lock())
+			{
+				that->_connections.erase(id);
+				that->_connectionsByKey.erase(key);
+			}
+		});
+
+		_logger->log(LogLevel::Info, "P2P", "Transitioning connection from pending", std::to_string(connection->id()));
+		auto it = _pendingP2PConnections.find(connection->id());
+		if (it != _pendingP2PConnections.end())
 		{
-			std::lock_guard<std::mutex> l(_mutex);
-			auto it = _pendingP2PConnections.find(connection->id());
-			if (it != _pendingP2PConnections.end())
-			{
-				auto pc = it->second;
-				_pendingP2PConnections.erase(it);
+			auto pc = it->second;
+			_pendingP2PConnections.erase(it);
+			pc.tce.set(connection);
+		}
 
-				auto id = connection->id();
-				_connections[id] = connection;
 
-				std::weak_ptr<ConnectionsRepository> wThat(shared_from_this());
-				connection->onClose([wThat, id](std::string /*reason*/) {
-					if (auto that = wThat.lock())
-					{
-						that->_connections.erase(id);
-					}
-				});
+	}
 
-				_logger->log(LogLevel::Info, "P2P", "Transitioning connection from pending", std::to_string(connection->id()));
-				pc.tce.set(connection);
-			}
-			else
-			{
-				_connections[connection->id()] = connection;
-				_logger->log(LogLevel::Info, "P2P", "Added connection without pending, id", std::to_string(connection->id()));
-			}
+	std::shared_ptr<IConnection> ConnectionsRepository::getConnection(std::string id)
+	{
+		std::lock_guard<std::mutex> l(_mutex);
+		auto it = _connectionsByKey.find(id);
+		if (it == _connectionsByKey.end())
+		{
+			return std::shared_ptr<IConnection>();
 		}
 		else
 		{
-			_connections[connection->id()] = connection;
+			auto t = it->second;
+			if (t.is_done())
+			{
+				return std::shared_ptr<IConnection>(t.get());
+			}
+			else
+			{
+				return std::shared_ptr<IConnection>();
+			}
 		}
 	}
 
@@ -74,7 +90,15 @@ namespace Stormancer
 		}
 		else
 		{
-			return std::shared_ptr<IConnection>(it->second);
+			auto t = it->second;
+			if (t.is_done())
+			{
+				return std::shared_ptr<IConnection>(t.get());
+			}
+			else
+			{
+				return std::shared_ptr<IConnection>();
+			}
 		}
 	}
 
@@ -82,11 +106,86 @@ namespace Stormancer
 	{
 		std::lock_guard<std::mutex> l(_mutex);
 		_connections.erase(connection->id());
+		_connectionsByKey.erase(connection->key());
+	
 	}
 
 	int ConnectionsRepository::getConnectionCount()
 	{
 		std::lock_guard<std::mutex> l(_mutex);
 		return (int)_connections.size();
+	}
+
+	pplx::task<std::shared_ptr<IConnection>> ConnectionsRepository::getConnection(std::string id, std::function<pplx::task<std::shared_ptr<IConnection>>(std::string)> connectionFactory)
+	{
+		std::lock_guard<std::mutex> l(_mutex);
+		auto it = _connectionsByKey.find(id);
+		if (it != _connectionsByKey.end())
+		{
+			return it->second;
+		}
+		else
+		{
+			auto t = connectionFactory(id);
+			std::weak_ptr<ConnectionsRepository> wThat = this->shared_from_this();
+
+			auto result= t.then([wThat,id](pplx::task<std::shared_ptr<IConnection>> tc) {
+				try
+				{
+					auto connection = tc.get();
+					auto pId = connection->id();
+					auto key = connection->key();
+
+					connection->onClose([wThat, pId, key](std::string /*reason*/) {
+						if (auto that = wThat.lock())
+						{
+							that->_connections.erase(pId);
+							that->_connectionsByKey.erase(key);
+						}
+						
+					});
+					if (auto that = wThat.lock())
+					{
+						that->_connections.emplace(pId, pplx::task_from_result(connection));
+					}
+					return connection;
+				}
+				catch (...)
+				{
+					if (auto that = wThat.lock())
+					{
+						
+						that->_connectionsByKey.erase(id);
+					}
+					throw;
+				}
+			});
+			_connectionsByKey.emplace(id, result);
+			return result;
+		}
+
+		
+	}
+	pplx::task<void> ConnectionsRepository::closeAllConnections(const std::string& reason)
+	{
+		std::weak_ptr<ConnectionsRepository> wThat = this->shared_from_this();
+		std::vector<pplx::task<void>> tasks;
+		auto connections = _connections;
+		for (auto c : connections)
+		{
+			tasks.push_back(c.second.then([wThat,reason](pplx::task<std::shared_ptr<IConnection>> t) {
+				try
+				{
+					t.get()->close(reason);
+				}
+				catch (...)
+				{
+
+				}
+			}));
+			
+		}
+		return pplx::when_all(tasks.begin(), tasks.end());
+			
 	}
 };

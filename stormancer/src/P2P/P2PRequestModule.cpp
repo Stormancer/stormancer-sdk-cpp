@@ -259,7 +259,7 @@ namespace Stormancer
 				}
 			});
 
-			return transport->connect(candidate.listeningEndpointCandidate.address)
+			return transport->connect(candidate.listeningEndpointCandidate.address, sessionId, ctx->packet()->connection->key())
 				.then([logger, serializer, ctx](pplx::task<std::shared_ptr<IConnection>> t)
 			{
 				try
@@ -322,9 +322,9 @@ namespace Stormancer
 		builder->service((byte)SystemRequestIDTypes::ID_P2P_RELAY_OPEN, [serializer, connections, sessions](RequestContext* ctx)
 		{
 			auto relay = serializer->deserializeOne<OpenRelayParameters>(ctx->inputStream());
-
-			connections->newConnection(std::make_shared<RelayConnection>(connections->getConnection(0), relay.remotePeerAddress, relay.remotePeerId));
 			std::string sessionId(relay.sessionId.begin(), relay.sessionId.end());
+			connections->newConnection(std::make_shared<RelayConnection>(connections->getConnection(0), relay.remotePeerAddress, relay.remotePeerId,sessionId));
+			
 			sessions->updateSessionState(sessionId, P2PSessionState::Connected);
 			ctx->send(Writer());
 			return pplx::task_from_result();

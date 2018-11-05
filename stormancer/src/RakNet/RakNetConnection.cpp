@@ -7,8 +7,9 @@
 
 namespace Stormancer
 {
-	RakNetConnection::RakNetConnection(RakNet::RakNetGUID guid, int64 id, std::weak_ptr<RakNet::RakPeerInterface> peer, ILogger_ptr logger, std::weak_ptr<DependencyResolver> resolver)
+	RakNetConnection::RakNetConnection(RakNet::RakNetGUID guid, int64 id,std::string key, std::weak_ptr<RakNet::RakPeerInterface> peer, ILogger_ptr logger, std::shared_ptr<DependencyResolver> resolver)
 		: _id(id)
+		, _key(key)
 		, _peer(peer)
 		, _guid(guid)
 		, _lastActivityDate(nowTime_t())
@@ -127,7 +128,7 @@ namespace Stormancer
 
 	void RakNetConnection::send(const Writer& writer, int channelUid, PacketPriority priority, PacketReliability reliability, const TransformMetadata& transformMetadata)
 	{
-		auto dependencyResolver = _dependencyResolver.lock();
+		auto dependencyResolver = _dependencyResolver;
 		if (!dependencyResolver)
 		{
 			throw std::runtime_error("Dependency resolver not available");
@@ -186,6 +187,11 @@ namespace Stormancer
 	uint64 RakNetConnection::id() const
 	{
 		return _id;
+	}
+
+	std::string RakNetConnection::key() const
+	{
+		return _key;
 	}
 
 	time_t RakNetConnection::connectionDate() const

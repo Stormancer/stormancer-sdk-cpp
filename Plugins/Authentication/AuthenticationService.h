@@ -2,8 +2,9 @@
 #include "stormancer/headers.h"
 #include "stormancer/Client.h"
 #include "stormancer/Logger/ILogger.h"
-#include "stormancer/Action2.h"
+#include "stormancer/Event.h"
 #include "stormancer/RPC/RpcService.h"
+
 namespace Stormancer
 {
 	enum class GameConnectionState
@@ -69,7 +70,7 @@ namespace Stormancer
 
 
 		GameConnectionState connectionState() const;
-		Action2<GameConnectionState> connectionStateChanged;
+		Event<GameConnectionState> connectionStateChanged;
 
 
 		std::function<pplx::task<std::unordered_map<std::string, std::string>>()> getCredentialsCallback;
@@ -92,7 +93,7 @@ namespace Stormancer
 
 #pragma region private_methods
 
-		void setConnectionState(GameConnectionState state);
+		void setConnectionState(GameConnectionState state,std::string reason="");
 		pplx::task<Scene_ptr> loginImpl(int retry = 0);
 		pplx::task<Scene_ptr> reconnect(int retry);
 #pragma endregion
@@ -107,7 +108,7 @@ namespace Stormancer
 		std::string _userId;
 		std::string _username;
 		Client* _client;
-		Action2<GameConnectionState> _connectionStateChanged;
+		Event<GameConnectionState> _connectionStateChanged;
 		GameConnectionState _currentConnectionState;
 		rxcpp::composite_subscription _connectionSubscription;
 		ILogger_ptr _logger;

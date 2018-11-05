@@ -384,11 +384,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\Debug\StackWalker.h">
       <Filter>Header Files\Debug</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\Action2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\TCP\TcpConnection.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\TCP\TcpTransport.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\Event.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Configuration.cpp">
@@ -580,11 +576,11 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Debug\stackWalker.cpp">
       <Filter>Source Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\ClientContainerConfigurator.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\ClientContainerConfigurator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\ConnectionState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\TCP\TcpConnection.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\TCP\TcpTransport.cpp" />
   </ItemGroup>
 </Project>

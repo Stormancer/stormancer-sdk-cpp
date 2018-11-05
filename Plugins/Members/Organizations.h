@@ -1,5 +1,6 @@
 #pragma once
 #include "stormancer/headers.h"
+#include "Core/ClientAPI.h"
 #include "OrganizationsTypes.h"
 
 namespace Stormancer
@@ -7,7 +8,7 @@ namespace Stormancer
 	class OrganizationsContainer;
 	class AuthenticationService;
 
-	class Organizations : public std::enable_shared_from_this<Organizations>
+	class Organizations : public ClientAPI<Organizations>
 	{
 	public:
 
@@ -16,6 +17,7 @@ namespace Stormancer
 		pplx::task<std::shared_ptr<OrganizationsContainer>> initialize(std::string organizationSceneName);
 		pplx::task<Organization> getOrganization(const std::string& organizationId);
 		pplx::task<Organization> getOrganizationByName(const std::string& organizationName);
+		pplx::task<std::vector<Organization>> getUserOrganizations(const std::string& userId, bool showApplyingMembers = false);
 		pplx::task<std::vector<Member>> getMembers(const std::string& organizationId, bool showApplyingMembers = false);
 		pplx::task<Organization> createOrganization(const std::string& organizationName, const std::string& customData = "{}");
 		pplx::task<void> updateOrganizationCustomData(const std::string& organizationId, const std::string& customData);

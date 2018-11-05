@@ -15,9 +15,11 @@
 namespace Stormancer
 {
 	class Client;
+	class IConnectionManager;
+	struct Federation;
 	class P2PRequestModule;
 	using Client_ptr = std::shared_ptr<Client>;
-
+	
 	/// Manage the connection to the scenes of an application.
 	class STORMANCER_DLL_API Client : public std::enable_shared_from_this<Client>
 	{
@@ -63,11 +65,7 @@ namespace Stormancer
 		/// Get dependency resolver
 		std::weak_ptr<DependencyResolver> dependencyResolver();
 
-		/// Get connection state observable
-		rxcpp::observable<ConnectionState> getConnectionStateChangedObservable() const;
-
-		/// Get current connection state
-		ConnectionState getConnectionState() const;
+		
 
 		/// Set a metadata
 		void setMedatata(const std::string& key, const std::string& value);
@@ -106,17 +104,20 @@ namespace Stormancer
 		pplx::task<void> disconnect(std::string sceneId, bool fromServer, std::string reason = "");
 		pplx::task<void> disconnect(Scene_ptr scene, bool fromServer = false, std::string reason = "");
 		pplx::task<void> disconnectAllScenes();
-		pplx::task<Scene_ptr> getSceneInternal(const std::string& sceneId, const SceneEndpoint& sceneEndpoint, pplx::cancellation_token ct = pplx::cancellation_token::none());
+		pplx::task<Scene_ptr> getSceneInternal(const SceneAddress& sceneId, const SceneEndpoint& sceneEndpoint, pplx::cancellation_token ct = pplx::cancellation_token::none());
 		void transport_packetReceived(Packet_ptr packet);
-		pplx::task<void> updateServerMetadata(pplx::cancellation_token ct = pplx::cancellation_token::none());
-		pplx::task<void> ensureConnectedToServer(const SceneEndpoint& sceneEndpoint, pplx::cancellation_token ct = pplx::cancellation_token::none());
+		pplx::task<void> updateServerMetadata(std::shared_ptr<IConnection> connection, pplx::cancellation_token ct = pplx::cancellation_token::none());
+		pplx::task<std::shared_ptr<IConnection>> ensureConnectedToServer(std::string clusterId, SceneEndpoint sceneEndpoint, pplx::cancellation_token ct = pplx::cancellation_token::none());
 		void dispatchEvent(const std::function<void(void)>& ev);
-		void setConnectionState(ConnectionState state);
+		
 		pplx::cancellation_token getLinkedCancellationToken(pplx::cancellation_token ct);
 		void ConfigureContainer(std::weak_ptr<DependencyResolver> dr, Configuration_ptr config);
 		// Ask a session token from the server, or set it if we already have one (i.e in case of a reconnection)
-		pplx::task<void> requestSessionToken(pplx::cancellation_token ct = pplx::cancellation_token::none());
+		pplx::task<void> createOrJoinSession(std::shared_ptr<IConnection> connection, pplx::cancellation_token ct = pplx::cancellation_token::none());
 
+		pplx::task<Federation> getFederation(pplx::cancellation_token ct);
+
+		pplx::task<SceneAddress> parseSceneUrl(std::string url, pplx::cancellation_token ct);
 
 
 
@@ -124,9 +125,9 @@ namespace Stormancer
 		pplx::task<void> ensureNetworkAvailable();
 
 		template<typename T1, typename T2>
-		pplx::task<T1> sendSystemRequest(byte id, const T2& parameter, pplx::cancellation_token ct = pplx::cancellation_token::none())
+		pplx::task<T1> sendSystemRequest(std::shared_ptr<IConnection> peer, byte id, const T2& parameter, pplx::cancellation_token ct = pplx::cancellation_token::none())
 		{
-			auto peer = _serverConnection.lock();
+			
 			if (!peer)
 			{
 				return pplx::task_from_exception<T1>(std::runtime_error("Peer disconnected"));
@@ -140,15 +141,14 @@ namespace Stormancer
 #pragma region private_members
 
 		std::shared_ptr<DependencyResolver> _dependencyResolver;
-		std::mutex _connectionStateMutex;
-		ConnectionState _connectionState = ConnectionState::Disconnected;
+	
 		
-		rxcpp::subjects::subject<ConnectionState> _connectionStateObservable;
+		
 		pplx::task<void> _currentTask = pplx::task_from_result();
 		bool _initialized = false;
 		std::string _accountId;
 		std::string _applicationName;
-		std::weak_ptr<IConnection>  _serverConnection;
+		
 		pplx::cancellation_token_source _cts;
 		uint16 _maxPeers = 0;
 		std::map<std::string, std::string> _metadata;
@@ -167,6 +167,9 @@ namespace Stormancer
 		std::string _sessionToken;
 
 		bool firstInit = true;
+
+		std::shared_ptr<pplx::task<Federation>> _federation;
+		std::weak_ptr<IConnectionManager> _connections;
 
 #pragma endregion
 	};

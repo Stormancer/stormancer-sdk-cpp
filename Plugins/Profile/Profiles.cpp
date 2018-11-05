@@ -11,9 +11,9 @@ namespace Stormancer
 	{
 		return getProfileService()
 			.then([userIds](std::shared_ptr<ProfileService> gr) {return gr->getProfiles(userIds); })
-			.then([](std::unordered_map<std::string, ProfileDto> profiles) {
+			.then([](ProfilesResult profiles) {
 			std::unordered_map<std::string, Profile> result;
-			for (auto& dto : profiles)
+			for (auto& dto : profiles.profiles)
 			{
 				Profile p;
 				p.data = dto.second.Data;
@@ -34,9 +34,9 @@ namespace Stormancer
 	{
 		return getProfileService()
 			.then([pseudoPrefix, skip, take](std::shared_ptr<ProfileService> gr) {return gr->queryProfiles(pseudoPrefix, skip, take); })
-			.then([](std::unordered_map<std::string, ProfileDto> profiles) {
+			.then([](ProfilesResult profiles) {
 			std::unordered_map<std::string, Profile> result;
-			for (auto& dto : profiles)
+			for (auto& dto : profiles.profiles)
 			{
 				Profile p;
 				p.data = dto.second.Data;

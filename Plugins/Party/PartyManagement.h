@@ -1,6 +1,6 @@
 #pragma once
 
-#include "stormancer/Action2.h"
+#include "stormancer/Event.h"
 #include "Party/PartyService.h"
 
 namespace Stormancer
@@ -33,12 +33,12 @@ namespace Stormancer
 		pplx::task<bool> KickPlayer(std::string userId);
 		pplx::task<Stormancer::Party_ptr> CreateParty(const  PartyRequestDto& partyRequestDto);
 
-		Action2<PartySettings> onUpdatedPartySettings;
+		Event<PartySettings> onUpdatedPartySettings;
 
-		Action2<std::vector<PartyUserDto>> onUpdatedPartyMembers;
-		Action2<PartyUserData> onUpdatedUserData;
-		Action2<void> onJoinedParty;
-		Action2<void> onLeftParty;
+		Event<std::vector<PartyUserDto>> onUpdatedPartyMembers;
+		Event<PartyUserData> onUpdatedUserData;
+		Event<void> onJoinedParty;
+		Event<void> onLeftParty;
 	private:
 		
 

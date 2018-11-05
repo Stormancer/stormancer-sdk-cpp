@@ -48,7 +48,7 @@ namespace Stormancer
 							that->setConnectionState(GameConnectionState::Disconnecting);
 							break;
 						case ConnectionState::Disconnected:
-							that->setConnectionState(GameConnectionState::Disconnected);
+							that->setConnectionState(GameConnectionState::Disconnected, state.reason);
 							break;
 						default:
 							break;
@@ -361,18 +361,21 @@ namespace Stormancer
 		return _currentConnectionState;
 	}
 
-	void AuthenticationService::setConnectionState(GameConnectionState state)
+	void AuthenticationService::setConnectionState(GameConnectionState state, std::string reason)
 	{
 		if (_currentConnectionState != state)
 		{
-			this->_logger->log(LogLevel::Info, "connection", "Connection state changed", std::to_string((int)state));
+			this->_logger->log(LogLevel::Info, "connection", "Connection state changed", std::to_string((int)state) + "reason " + reason);
 
 
 
 			if (state == GameConnectionState::Disconnected || state == GameConnectionState::Disconnecting)
 			{
 				_authTask = nullptr;
-
+				if (reason == "User connected elsewhere" || reason == "Authentication failed")
+				{
+					_autoReconnect = false;
+				}
 				if (_autoReconnect)
 				{
 					setConnectionState(GameConnectionState::Reconnecting);

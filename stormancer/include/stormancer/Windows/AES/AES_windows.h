@@ -32,7 +32,7 @@ namespace Stormancer
 
 #pragma region private_methods
 
-		void initAES();
+		bool initAES(uint64 keyId);
 
 		void cleanAES();
 

@@ -18,7 +18,9 @@ namespace Stormancer
 		}
 
 		std::weak_ptr<Organizations> wThat = this->shared_from_this();
-		_organizationsContainerTask = auth->getSceneForService("stormancer.plugins.matchmaking", organizationSceneName).then([wThat](Scene_ptr scene) {
+		_organizationsContainerTask = auth->getSceneForService("stormancer.organizations", organizationSceneName)
+			.then([wThat](Scene_ptr scene)
+		{
 			auto that = wThat.lock();
 			if (!that)
 			{
@@ -27,7 +29,9 @@ namespace Stormancer
 
 			auto container = std::make_shared<OrganizationsContainer>();
 			container->_scene = scene;
-			container->_connectionStateChangedSubscription = scene->getConnectionStateChangedObservable().subscribe([wThat](ConnectionState s) {
+			container->_connectionStateChangedSubscription = scene->getConnectionStateChangedObservable()
+				.subscribe([wThat](ConnectionState s)
+			{
 				if (s == ConnectionState::Disconnected)
 				{
 					if (auto that = wThat.lock())
@@ -37,203 +41,141 @@ namespace Stormancer
 				}
 			});
 			return container;
-
 		});
 		return _organizationsContainerTask;
 	}
 
 	pplx::task<Organization> Organizations::getOrganization(const std::string& organizationId)
 	{
-		std::weak_ptr<Organizations> wOrganizations = this->shared_from_this();
-		return _organizationsContainerTask.then([wOrganizations, organizationId](std::shared_ptr<OrganizationsContainer> organizationsContainer) {
-			auto organizations = wOrganizations.lock();
-			if (!organizations)
-			{
-				throw PointerDeletedException("Organizations deleted");
-			}
-
+		return _organizationsContainerTask
+			.then([organizationId](std::shared_ptr<OrganizationsContainer> organizationsContainer)
+		{
 			return organizationsContainer->service()->getOrganization(organizationId);
 		});
 	}
 
 	pplx::task<Organization> Organizations::getOrganizationByName(const std::string& organizationName)
 	{
-		std::weak_ptr<Organizations> wOrganizations = this->shared_from_this();
-		return _organizationsContainerTask.then([wOrganizations, organizationName](std::shared_ptr<OrganizationsContainer> organizationsContainer) {
-			auto organizations = wOrganizations.lock();
-			if (!organizations)
-			{
-				throw PointerDeletedException("Organizations deleted");
-			}
-
+		return _organizationsContainerTask
+			.then([organizationName](std::shared_ptr<OrganizationsContainer> organizationsContainer)
+		{
 			return organizationsContainer->service()->getOrganizationByName(organizationName);
+		});
+	}
+
+	pplx::task<std::vector<Organization>> Organizations::getUserOrganizations(const std::string& userId, bool showApplyingMembers)
+	{
+		return _organizationsContainerTask
+			.then([userId, showApplyingMembers](std::shared_ptr<OrganizationsContainer> organizationsContainer)
+		{
+			return organizationsContainer->service()->getUserOrganizations(userId, showApplyingMembers);
 		});
 	}
 
 	pplx::task<std::vector<Member>> Organizations::getMembers(const std::string& organizationId, bool showApplyingMembers)
 	{
-		std::weak_ptr<Organizations> wOrganizations = this->shared_from_this();
-		return _organizationsContainerTask.then([wOrganizations, organizationId, showApplyingMembers](std::shared_ptr<OrganizationsContainer> organizationsContainer) {
-			auto organizations = wOrganizations.lock();
-			if (!organizations)
-			{
-				throw PointerDeletedException("Organizations deleted");
-			}
-
+		return _organizationsContainerTask
+			.then([organizationId, showApplyingMembers](std::shared_ptr<OrganizationsContainer> organizationsContainer)
+		{
 			return organizationsContainer->service()->getMembers(organizationId, showApplyingMembers);
 		});
 	}
 
 	pplx::task<Organization> Organizations::createOrganization(const std::string& organizationName, const std::string& customData)
 	{
-		std::weak_ptr<Organizations> wOrganizations = this->shared_from_this();
-		return _organizationsContainerTask.then([wOrganizations, organizationName, customData](std::shared_ptr<OrganizationsContainer> organizationsContainer) {
-			auto organizations = wOrganizations.lock();
-			if (!organizations)
-			{
-				throw PointerDeletedException("Organizations deleted");
-			}
-
+		return _organizationsContainerTask
+			.then([organizationName, customData](std::shared_ptr<OrganizationsContainer> organizationsContainer)
+		{
 			return organizationsContainer->service()->createOrganization(organizationName, customData);
 		});
 	}
 
 	pplx::task<void> Organizations::updateOrganizationCustomData(const std::string& organizationId, const std::string& customData)
 	{
-		std::weak_ptr<Organizations> wOrganizations = this->shared_from_this();
-		return _organizationsContainerTask.then([wOrganizations, organizationId, customData](std::shared_ptr<OrganizationsContainer> organizationsContainer) {
-			auto organizations = wOrganizations.lock();
-			if (!organizations)
-			{
-				throw PointerDeletedException("Organizations deleted");
-			}
-
+		return _organizationsContainerTask
+			.then([organizationId, customData](std::shared_ptr<OrganizationsContainer> organizationsContainer)
+		{
 			return organizationsContainer->service()->updateOrganizationCustomData(organizationId, customData);
 		});
 	}
 
 	pplx::task<void> Organizations::deleteOrganization(const std::string& organizationId)
 	{
-		std::weak_ptr<Organizations> wOrganizations = this->shared_from_this();
-		return _organizationsContainerTask.then([wOrganizations, organizationId](std::shared_ptr<OrganizationsContainer> organizationsContainer) {
-			auto organizations = wOrganizations.lock();
-			if (!organizations)
-			{
-				throw PointerDeletedException("Organizations deleted");
-			}
-
+		return _organizationsContainerTask
+			.then([organizationId](std::shared_ptr<OrganizationsContainer> organizationsContainer)
+		{
 			return organizationsContainer->service()->deleteOrganization(organizationId);
 		});
 	}
 
 	pplx::task<void> Organizations::changeOrganizationOwner(const std::string& newOwnerId, const std::string& organizationId)
 	{
-		std::weak_ptr<Organizations> wOrganizations = this->shared_from_this();
-		return _organizationsContainerTask.then([wOrganizations, newOwnerId, organizationId](std::shared_ptr<OrganizationsContainer> organizationsContainer) {
-			auto organizations = wOrganizations.lock();
-			if (!organizations)
-			{
-				throw PointerDeletedException("Organizations deleted");
-			}
-
+		return _organizationsContainerTask
+			.then([newOwnerId, organizationId](std::shared_ptr<OrganizationsContainer> organizationsContainer)
+		{
 			return organizationsContainer->service()->changeOrganizationOwner(newOwnerId, organizationId);
 		});
 	}
 
 	pplx::task<void> Organizations::inviteInOrganization(const std::string& userId, const std::string& organizationId)
 	{
-		std::weak_ptr<Organizations> wOrganizations = this->shared_from_this();
-		return _organizationsContainerTask.then([wOrganizations, userId, organizationId](std::shared_ptr<OrganizationsContainer> organizationsContainer) {
-			auto organizations = wOrganizations.lock();
-			if (!organizations)
-			{
-				throw PointerDeletedException("Organizations deleted");
-			}
-
+		return _organizationsContainerTask
+			.then([userId, organizationId](std::shared_ptr<OrganizationsContainer> organizationsContainer)
+		{
 			return organizationsContainer->service()->inviteInOrganization(userId, organizationId);
 		});
 	}
 
 	pplx::task<void> Organizations::removeMember(const std::string& memberId, const std::string& organizationId)
 	{
-		std::weak_ptr<Organizations> wOrganizations = this->shared_from_this();
-		return _organizationsContainerTask.then([wOrganizations, memberId, organizationId](std::shared_ptr<OrganizationsContainer> organizationsContainer) {
-			auto organizations = wOrganizations.lock();
-			if (!organizations)
-			{
-				throw PointerDeletedException("Organizations deleted");
-			}
-
+		return _organizationsContainerTask
+			.then([memberId, organizationId](std::shared_ptr<OrganizationsContainer> organizationsContainer)
+		{
 			return organizationsContainer->service()->removeMember(memberId, organizationId);
 		});
 	}
 
 	pplx::task<void> Organizations::manageOrganizationInvitation(bool accept, const std::string& userId, const std::string& organizationId)
 	{
-		std::weak_ptr<Organizations> wOrganizations = this->shared_from_this();
-		return _organizationsContainerTask.then([wOrganizations, accept, userId, organizationId](std::shared_ptr<OrganizationsContainer> organizationsContainer) {
-			auto organizations = wOrganizations.lock();
-			if (!organizations)
-			{
-				throw PointerDeletedException("Organizations deleted");
-			}
-
+		return _organizationsContainerTask
+			.then([accept, userId, organizationId](std::shared_ptr<OrganizationsContainer> organizationsContainer)
+		{
 			return organizationsContainer->service()->manageOrganizationInvitation(accept, userId, organizationId);
 		});
 	}
 
 	pplx::task<void> Organizations::createOrganizationRole(const Role& role, const std::string& organizationId)
 	{
-		std::weak_ptr<Organizations> wOrganizations = this->shared_from_this();
-		return _organizationsContainerTask.then([wOrganizations, role, organizationId](std::shared_ptr<OrganizationsContainer> organizationsContainer) {
-			auto organizations = wOrganizations.lock();
-			if (!organizations)
-			{
-				throw PointerDeletedException("Organizations deleted");
-			}
-
+		return _organizationsContainerTask
+			.then([role, organizationId](std::shared_ptr<OrganizationsContainer> organizationsContainer)
+		{
 			return organizationsContainer->service()->createOrganizationRole(role, organizationId);
 		});
 	}
 
 	pplx::task<void> Organizations::deleteOrganizationRole(const std::string& roleName, const std::string& organizationId)
 	{
-		std::weak_ptr<Organizations> wOrganizations = this->shared_from_this();
-		return _organizationsContainerTask.then([wOrganizations, roleName, organizationId](std::shared_ptr<OrganizationsContainer> organizationsContainer) {
-			auto organizations = wOrganizations.lock();
-			if (!organizations)
-			{
-				throw PointerDeletedException("Organizations deleted");
-			}
-
+		return _organizationsContainerTask
+			.then([roleName, organizationId](std::shared_ptr<OrganizationsContainer> organizationsContainer)
+		{
 			return organizationsContainer->service()->deleteOrganizationRole(roleName, organizationId);
 		});
 	}
 
 	pplx::task<void> Organizations::grantOrganizationRole(const std::string& roleName, const std::string& userId, const std::string& organizationId)
 	{
-		std::weak_ptr<Organizations> wOrganizations = this->shared_from_this();
-		return _organizationsContainerTask.then([wOrganizations, roleName, userId, organizationId](std::shared_ptr<OrganizationsContainer> organizationsContainer) {
-			auto organizations = wOrganizations.lock();
-			if (!organizations)
-			{
-				throw PointerDeletedException("Organizations deleted");
-			}
-
+		return _organizationsContainerTask
+			.then([roleName, userId, organizationId](std::shared_ptr<OrganizationsContainer> organizationsContainer)
+		{
 			return organizationsContainer->service()->grantOrganizationRole(roleName, userId, organizationId);
 		});
 	}
 
 	pplx::task<void> Organizations::ungrantOrganizationRole(const std::string& roleName, const std::string& userId, const std::string& organizationId)
 	{
-		std::weak_ptr<Organizations> wOrganizations = this->shared_from_this();
-		return _organizationsContainerTask.then([wOrganizations, roleName, userId, organizationId](std::shared_ptr<OrganizationsContainer> organizationsContainer) {
-			auto organizations = wOrganizations.lock();
-			if (!organizations)
-			{
-				throw PointerDeletedException("Organizations deleted");
-			}
-
+		return _organizationsContainerTask
+			.then([roleName, userId, organizationId](std::shared_ptr<OrganizationsContainer> organizationsContainer)
+		{
 			return organizationsContainer->service()->grantOrganizationRole(roleName, userId, organizationId);
 		});
 	}

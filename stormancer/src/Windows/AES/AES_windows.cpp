@@ -85,7 +85,7 @@ namespace Stormancer
 	AESWindows::AESWindows(std::shared_ptr<KeyStore> keyStore)
 		: _key(keyStore)
 	{
-		initAES();
+		
 	}
 
 	AESWindows::~AESWindows()
@@ -97,6 +97,8 @@ namespace Stormancer
 
 	void AESWindows::encrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream* outputStream, uint64 keyId)
 	{
+		initAES(keyId);
+		
 		NTSTATUS status = STATUS_UNSUCCESSFUL;
 
 
@@ -214,9 +216,14 @@ namespace Stormancer
 		return _cbBlockLen;
 	}
 
-	void AESWindows::initAES()
+	bool AESWindows::initAES(uint64 keyId)
 	{
 		NTSTATUS status = STATUS_UNSUCCESSFUL;
+		if (_keyHandles.find(keyId) != _keyHandles.end())
+		{
+			return true;// already initialized
+		}
+		PBYTE key = _key->getKey(keyId).data();
 
 
 		// Open an algorithm handle.
@@ -260,8 +267,8 @@ namespace Stormancer
 		}
 
 		// Allocate the key object on the heap.
-		_keyPointers[0] = (PBYTE)HeapAlloc(GetProcessHeap(), 0, cbKeyObject);
-		if (NULL == _keyPointers[0])
+		_keyPointers[keyId] = (PBYTE)HeapAlloc(GetProcessHeap(), 0, cbKeyObject);
+		if (NULL == _keyPointers[keyId])
 		{
 			throw std::runtime_error("memory allocation failed");
 		}
@@ -292,10 +299,10 @@ namespace Stormancer
 		// Generate the key from supplied input key bytes.
 		if (!NT_SUCCESS(status = BCryptGenerateSymmetricKey(
 			_hAesAlg,
-			&_keyHandles[0],
-			_keyPointers[0],
+			&_keyHandles[keyId],
+			_keyPointers[keyId],
 			cbKeyObject,
-			(PBYTE)_key->key,
+			key,
 			(ULONG)32,
 			0)))
 		{
@@ -303,7 +310,7 @@ namespace Stormancer
 			ss << "Error " << getErrorString(status) << " returned by BCryptGenerateSymmetricKey";
 			throw std::runtime_error(ss.str().c_str());
 		}
-
+		return true;
 
 	}
 

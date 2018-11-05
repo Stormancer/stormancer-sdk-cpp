@@ -8,7 +8,7 @@ namespace Stormancer
 {
 	SceneDispatcher::SceneDispatcher(std::shared_ptr<IActionDispatcher> evDispatcher)
 		: _eventDispatcher(evDispatcher)
-		, _scenes((uint32)0xff - (uint32)MessageIDTypes::ID_SCENES + 1)
+		/*, _scenes((uint32)0xff - (uint32)MessageIDTypes::ID_SCENES + 1)*/
 	{
 		handler = new processorFunction([=](uint8 sceneHandle, Packet_ptr packet) {
 			return handler_impl(sceneHandle, packet);
@@ -24,21 +24,38 @@ namespace Stormancer
 		config.addCatchAllProcessor(handler);
 	}
 
-	void SceneDispatcher::addScene(Scene_ptr scene)
+	void SceneDispatcher::addScene(std::shared_ptr<IConnection> connection, Scene_ptr scene)
 	{
-		if (scene)
+		if (scene && connection)
 		{
+			auto handles = connection->dependencyResolver().lock()->resolve<std::vector<std::weak_ptr<Scene>>>();
 			uint8 index = scene->handle() - (uint8)MessageIDTypes::ID_SCENES;
-			_scenes[index] = scene;
+			auto& v = *handles;
+			if (v.capacity() < index + 1)
+			{
+				auto newSize = (index + 1) * 2;
+				if (newSize < 8)
+				{
+					newSize = 8;
+				}
+				if (newSize > 150)
+				{
+					newSize = 150;
+				}
+				v.resize(newSize);
+				
+			}
+			v[index] = scene;
 		}
 	}
 
-	void SceneDispatcher::removeScene(uint8 sceneHandle)
+	void SceneDispatcher::removeScene(std::shared_ptr<IConnection> connection,uint8 sceneHandle)
 	{
 		size_t index = sceneHandle - (uint8)MessageIDTypes::ID_SCENES;
-		if (index < _scenes.size())
+		auto handles = connection->dependencyResolver().lock()->resolve<std::vector<std::weak_ptr<Scene>>>();
+		if (index < handles->size())
 		{
-			_scenes[index].reset();
+			(*handles)[index].reset();
 		}
 	}
 
@@ -51,9 +68,11 @@ namespace Stormancer
 
 		unsigned int sceneIndex = sceneHandle - (uint8)MessageIDTypes::ID_SCENES;
 
-		if (sceneIndex < _scenes.size())
+		auto connection = packet->connection;
+		auto handles = connection->dependencyResolver().lock()->resolve<std::vector<std::weak_ptr<Scene>>>();
+		if (sceneIndex < handles->size())
 		{
-			auto scene_weak = _scenes[sceneIndex];
+			auto scene_weak = (*handles)[sceneIndex];
 			auto scene = scene_weak.lock();
 			if (scene)
 			{

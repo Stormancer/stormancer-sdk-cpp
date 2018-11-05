@@ -44,6 +44,8 @@ namespace Stormancer
 		///Returns the unique id in the node for the connection.
 		virtual uint64 id() const = 0;
 		
+		virtual std::string key() const = 0;
+
 		/// Returns the connection date.
 		virtual time_t connectionDate() const = 0;
 		

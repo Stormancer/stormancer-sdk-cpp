@@ -22,8 +22,8 @@ namespace Stormancer
 			return scene->dependencyResolver().lock()->resolve<GameFinderService>();
 		}
 
-		Action2<GameFinderResponse>::Subscription gameFoundSubscription;
-		Action2<GameFinderStatus>::Subscription gameFinderStateUpdatedSubscription;
+		Event<GameFinderResponse>::Subscription gameFoundSubscription;
+		Event<GameFinderStatus>::Subscription gameFinderStateUpdatedSubscription;
 		rxcpp::subscription connectionStateChangedSubscription;
 	};
 

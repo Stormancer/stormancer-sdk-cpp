@@ -17,9 +17,22 @@ namespace Stormancer
 {
 	class Client;
 	class Scene;
-
+	class IPlugin;
 	using Scene_ptr = std::shared_ptr<Scene>;
+	struct SceneAddress
+	{
+		///urn format : either {sceneI} or scene:/{sceneId} scene:/{app}/{sceneId} , scene:/{account}/{app}/{sceneId} or scene:/{cluster}/{account}/{app}/{sceneId}
+		static SceneAddress  parse(const std::string urn, const std::string& defaultClusterId, const std::string& defaultAccount, const std::string& defaultApp);
+		std::string clusterId;
+		std::string app;
+		std::string account;
+		std::string sceneId;
 
+		std::string normalize()
+		{
+			return clusterId + ":/" + account + "/" + app + "/" + sceneId;
+		}
+	};
 	/// Communicates with the server scene.
 	/// Get a scene by calling Client::getPublicScene or Client::getScene.
 	class STORMANCER_DLL_API Scene : public std::enable_shared_from_this<Scene>
@@ -34,8 +47,6 @@ namespace Stormancer
 
 #pragma region public_methods
 
-		/// initializer
-		void initialize();
 
 		/// Connect to the scene.
 		pplx::task<void> connect(pplx::cancellation_token ct = pplx::cancellation_token::none());
@@ -72,6 +83,9 @@ namespace Stormancer
 
 		/// Returns the scene id.
 		std::string id() const;
+		
+		// Returns the detailed scene address, including cluster, account and app information
+		SceneAddress address() const;
 
 		/// Returns the scene handle.
 		byte handle() const;
@@ -130,7 +144,7 @@ namespace Stormancer
 		/// \param id Scene id.
 		/// \param token Application token.
 		/// \param dto Scene informations.
-		Scene(std::weak_ptr<IConnection> connection, std::weak_ptr<Client> client, const std::string& id, const std::string& token, const SceneInfosDto& dto, std::weak_ptr<DependencyResolver> parentDependencyResolver);
+		Scene(std::weak_ptr<IConnection> connection, std::weak_ptr<Client> client, const SceneAddress& address, const std::string& token, const SceneInfosDto& dto, std::weak_ptr<DependencyResolver> parentDependencyResolver, std::vector<IPlugin*>& plugins);
 
 		/// Copy constructor deleted.
 		Scene(const Scene& other) = delete;
@@ -168,6 +182,10 @@ namespace Stormancer
 			return requestProcessor->sendSystemRequest<T1, T2>(connection.get(), id, parameter, ct);
 		}
 
+		//initializes the scene after construction
+		void initialize();
+	
+
 #pragma endregion
 
 #pragma region private_members
@@ -189,8 +207,8 @@ namespace Stormancer
 		/// Scene metadatas.
 		std::map<std::string, std::string> _metadata;
 
-		/// Scene id.
-		std::string _id;
+		/// Scene address.
+		SceneAddress _address;
 
 		/// The local routes.
 		std::map<std::string, Route_ptr> _localRoutesMap;
@@ -228,7 +246,8 @@ namespace Stormancer
 		/// Scene connected state.
 		ConnectionState _connectionState = ConnectionState::Disconnected;
 		bool _connectionStateObservableCompleted = false;
-		rxcpp::subjects::subject<ConnectionState> _connectionStateObservable;
+		rxcpp::subjects::subject<ConnectionState> _sceneConnectionStateObservable;
+		rxcpp::subscription _hostConnectionStateSubscription;
 
 		rxcpp::subjects::subject<P2PConnectionStateChangedArgs> _p2pConnectionStateChangedObservable;
 		std::unordered_map<uint64, std::shared_ptr<IScenePeer>> _connectedPeers;
@@ -236,6 +255,7 @@ namespace Stormancer
 		std::shared_ptr<P2PService> _p2p;
 
 		ILogger_ptr _logger;
+		std::vector<IPlugin*> _plugins;
 
 #pragma endregion
 	};

@@ -16,13 +16,205 @@ namespace Stormancer
 	{
 	}
 
-	pplx::task<SceneEndpoint> ApiClient::getSceneEndpoint(std::string accountId, std::string applicationName, std::string sceneId, pplx::cancellation_token ct)
+	pplx::task<int> ApiClient::ping(std::string endpoint, pplx::cancellation_token ct)
+	{
+		utility::string_t baseUri2(endpoint.begin(), endpoint.end());
+
+
+		auto config = web::http::client::http_client_config();
+		config.set_timeout(std::chrono::seconds(30));
+
+
+		config.set_initHttpLib(_config->shoudInitializeNetworkLibraries);
+
+
+		web::http::client::http_client client(baseUri2, config);
+		web::http::http_request request(web::http::methods::GET);
+		std::string relativeUri = "/_federation";
+		utility::string_t relativeUri2(relativeUri.begin(), relativeUri.end());
+		request.set_request_uri(relativeUri2);
+		request.set_body(utility::string_t());
+
+		request.headers().add(U("Content-Type"), U("application/msgpack"));
+		request.headers().add(U("Accept"), U("application/json"));
+		request.headers().add(U("x-version"), U("2"));
+
+		auto wApiClient = STRM_WEAK_FROM_THIS();
+		auto start = std::chrono::high_resolution_clock::now();
+		return client.request(request, ct)
+			.then([start](pplx::task<web::http::http_response> task)
+		{
+			auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+
+			return (int)duration.count();
+		});
+	}
+
+	pplx::task<Federation> ApiClient::getFederation(std::vector<std::string> endpoints, pplx::cancellation_token ct)
+	{
+
+		auto errors = std::make_shared<std::vector<std::string>>();
+
+		if (endpoints.size() == 0)
+		{
+			return pplx::task_from_exception<Federation>(std::runtime_error("No server endpoints found in configuration."));
+		}
+
+		if (_config->endpointSelectionMode == EndpointSelectionMode::FALLBACK)
+		{
+			return getFederationImpl(endpoints, errors, ct);
+		}
+		else if (_config->endpointSelectionMode == EndpointSelectionMode::RANDOM)
+		{
+			std::vector<std::string> baseUris2;
+			while (endpoints.size())
+			{
+				int index = std::rand() % endpoints.size();
+				auto it = endpoints.begin() + index;
+				baseUris2.push_back(*it);
+				endpoints.erase(it);
+			}
+			return getFederationImpl(baseUris2, errors, ct);
+		}
+
+		return pplx::task_from_exception<Federation>(std::runtime_error("Error selecting server endpoint."));
+	}
+
+	pplx::task<Federation> ApiClient::getFederationImpl(std::vector<std::string> endpoints, std::shared_ptr<std::vector<std::string>> errors, pplx::cancellation_token ct)
+	{
+		if (endpoints.size() == 0)
+		{
+			std::string errorMsg;
+			for (auto e : *errors)
+			{
+				errorMsg = errorMsg + e;
+			}
+			std::string message = "Failed to connect to the configured server endpoints : " + errorMsg;
+			return pplx::task_from_exception<Federation>(std::runtime_error(message.c_str()));
+		}
+
+		auto it = endpoints.begin();
+		std::string baseUri = *it;
+		utility::string_t baseUri2(baseUri.begin(), baseUri.end());
+		endpoints.erase(it);
+
+		auto config = web::http::client::http_client_config();
+		config.set_timeout(std::chrono::seconds(30));
+
+
+		config.set_initHttpLib(_config->shoudInitializeNetworkLibraries);
+
+
+		web::http::client::http_client client(baseUri2, config);
+		web::http::http_request request(web::http::methods::GET);
+		std::string relativeUri = "/_federation";
+		utility::string_t relativeUri2(relativeUri.begin(), relativeUri.end());
+		request.set_request_uri(relativeUri2);
+		request.set_body(utility::string_t());
+
+		request.headers().add(U("Content-Type"), U("application/msgpack"));
+		request.headers().add(U("Accept"), U("application/json"));
+		request.headers().add(U("x-version"), U("2"));
+
+		auto wApiClient = STRM_WEAK_FROM_THIS();
+
+		return client.request(request, ct)
+			.then([wApiClient, baseUri, errors, endpoints, ct](pplx::task<web::http::http_response> task)
+		{
+			auto apiClient = LockOrThrow(wApiClient);
+
+			web::http::http_response response;
+			try
+			{
+				response = task.get();
+			}
+			catch (const std::exception& ex)
+			{
+				auto msgStr = "Can't reach the server endpoint. " + baseUri;
+				apiClient->_logger->log(LogLevel::Warn, "ApiClient", msgStr, ex.what());
+				(*errors).push_back("[" + msgStr + ":" + ex.what() + "]");
+				return apiClient->getFederationImpl(endpoints, errors, ct);
+			}
+
+			try
+			{
+				uint16 statusCode = response.status_code();
+				auto msgStr = "HTTP request on '" + baseUri + "' returned status code " + std::to_string(statusCode);
+				apiClient->_logger->log(LogLevel::Trace, "ApiClient", msgStr);
+				concurrency::streams::stringstreambuf ss;
+				return response.body().read_to_end(ss)
+					.then([wApiClient, ss, statusCode, response, errors, msgStr, endpoints, ct](size_t)
+				{
+					auto apiClient = LockOrThrow(wApiClient);
+
+					std::string responseText = ss.collection();
+					apiClient->_logger->log(LogLevel::Trace, "ApiClient", "Response", responseText);
+
+					if (ensureSuccessStatusCode(statusCode))
+					{
+
+						apiClient->_logger->log(LogLevel::Trace, "ApiClient", "Get token API version : 1");
+						return pplx::task_from_result(apiClient->readFederationFromJson(responseText));
+
+					}
+					else
+					{
+						(*errors).push_back("[" + msgStr + ":" + std::to_string(statusCode) + "]");
+						return apiClient->getFederationImpl(endpoints, errors, ct);
+					}
+				}, ct);
+			}
+			catch (const std::exception& ex)
+			{
+				throw std::runtime_error((std::string() + "Can't get the scene endpoint response: " + ex.what()).c_str());
+			}
+		}, ct);
+	}
+
+	Federation ApiClient::readFederationFromJson(std::string str)
+	{
+		auto json = utility::string_t(str.begin(), str.end());
+		auto jFed = web::json::value::parse(json);
+
+		Federation f;
+
+		for (auto jCluster : jFed[U("clusters")].as_array())
+		{
+			Cluster cluster;
+			cluster.id = to_string(jCluster[U("id")].as_string());
+			for (auto jEndpoint : jCluster[U("endpoints")].as_array())
+			{
+				cluster.endpoints.push_back(to_string(jEndpoint.as_string()));
+			}
+			for (auto jTag : jCluster[U("tags")].as_array())
+			{
+				cluster.tags.push_back(to_string(jTag.as_string()));
+			}
+			f.clusters.push_back(cluster);
+		}
+
+		//Load data about current cluster
+		Cluster current;
+		auto jCluster = jFed[U("current")];
+		current.id = to_string(jCluster[U("id")].as_string());
+		for (auto jEndpoint : jCluster[U("endpoints")].as_array())
+		{
+			current.endpoints.push_back(to_string(jEndpoint.as_string()));
+		}
+		for (auto jTag : jCluster[U("tags")].as_array())
+		{
+			current.tags.push_back(to_string(jTag.as_string()));
+		}
+		f.current = current;
+		return f;
+	}
+	pplx::task<SceneEndpoint> ApiClient::getSceneEndpoint(std::vector<std::string> baseUris, std::string accountId, std::string applicationName, std::string sceneId, pplx::cancellation_token ct)
 	{
 		std::stringstream ss;
 		ss << accountId << ';' << applicationName << ';' << sceneId;
 		_logger->log(LogLevel::Trace, "ApiClient", "Scene endpoint data", ss.str());
 
-		std::vector<std::string> baseUris = _config->getApiEndpoint();
+
 		auto errors = std::make_shared<std::vector<std::string>>();
 
 		if (baseUris.size() == 0)
@@ -155,7 +347,7 @@ namespace Stormancer
 		return requestWithRetriesImpl(requestFactory, baseUris, errors, ct);
 	}
 
-	pplx::task<ServerEndpoints> ApiClient::GetServerEndpoints()
+	pplx::task<ServerEndpoints> ApiClient::GetServerEndpoints(std::vector<std::string> endpoints)
 	{
 		auto account = _config->account;
 		auto application = _config->application;
@@ -258,5 +450,24 @@ namespace Stormancer
 				return pplx::task_from_result(response);
 			}
 		}, ct);
+	}
+
+	Cluster Federation::getCluster(std::string id)
+	{
+		if (current.id == id)
+		{
+			return current;
+		}
+		else
+		{
+			for (auto cluster : clusters)
+			{
+				if (cluster.id == id)
+				{
+					return cluster;
+				}
+			}
+		}
+		throw std::runtime_error("Cluster '"+id+"' not found in federation.");
 	}
 };

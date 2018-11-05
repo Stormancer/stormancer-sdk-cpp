@@ -81,6 +81,7 @@ namespace Stormancer
 	class PartyService : public std::enable_shared_from_this<PartyService>
 	{
 	public:
+
 		PartyService(Scene_ptr scene);
 
 		///
@@ -118,16 +119,17 @@ namespace Stormancer
 		///
 		/// Callback member
 		///
-		Action2<GameFinderStatus> PartyGameFinderStateUpdated;
-		Action2<GameFinderResponse> onPartyMatchFound;
+		Event<GameFinderStatus> PartyGameFinderStateUpdated;
+		Event<GameFinderResponse> onPartyMatchFound;
 
-		Action2<void> LeftParty;
+		Event<void> LeftParty;
 
-		Action2<std::vector<PartyUserDto>> UpdatedPartyMembers;
-		Action2<PartyUserData> UpdatedPartyUserData;
-		Action2<PartySettings> UpdatedPartySettings;
+		Event<std::vector<PartyUserDto>> UpdatedPartyMembers;
+		Event<PartyUserData> UpdatedPartyUserData;
+		Event<PartySettings> UpdatedPartySettings;
 
 		std::vector<PartyUserDto> members();
+
 	private:
 
 		///
@@ -154,11 +156,12 @@ namespace Stormancer
 	class Party
 	{
 	public:
+
 		Party(Scene_ptr scene, 
-			Action2<void>::Subscription LeftPartySubscription,
-			Action2<std::vector<PartyUserDto>>::Subscription UpdatedPartyMembersSubscription,
-			Action2<PartyUserData>::Subscription UpdatedPartyUserDataSubscription,
-			Action2<PartySettings>::Subscription UpdatedPartySettingsSubscription);
+			Event<void>::Subscription LeftPartySubscription,
+			Event<std::vector<PartyUserDto>>::Subscription UpdatedPartyMembersSubscription,
+			Event<PartyUserData>::Subscription UpdatedPartyUserDataSubscription,
+			Event<PartySettings>::Subscription UpdatedPartySettingsSubscription);
 
 		PartySettings partySettings;
 
@@ -170,13 +173,13 @@ namespace Stormancer
 		Scene_ptr getScene();
 
 	private:
-		Action2<void>::Subscription LeftPartySubscription;
 
-		Action2<std::vector<PartyUserDto>>::Subscription UpdatedPartyMembersSubscription;
-		Action2<PartyUserData>::Subscription UpdatedPartyUserDataSubscription;
-		Action2<PartySettings>::Subscription UpdatedPartySettingsSubscription;
+		Event<void>::Subscription LeftPartySubscription;
 
-		
+		Event<std::vector<PartyUserDto>>::Subscription UpdatedPartyMembersSubscription;
+		Event<PartyUserData>::Subscription UpdatedPartyUserDataSubscription;
+		Event<PartySettings>::Subscription UpdatedPartySettingsSubscription;
+
 		Scene_ptr _partyScene;
 	};
 }

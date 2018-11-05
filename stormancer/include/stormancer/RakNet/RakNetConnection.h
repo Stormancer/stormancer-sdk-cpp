@@ -12,14 +12,16 @@ namespace Stormancer
 	class RakNetConnection : public IConnection
 	{
 	public:
-
+		friend class ConnectionsRepository;
 		friend class RakNetTransport;
 
 #pragma region public_methods
 
-		RakNetConnection(RakNet::RakNetGUID guid, int64 id, std::weak_ptr<RakNet::RakPeerInterface> peer, ILogger_ptr logger, std::weak_ptr<DependencyResolver> resolver);
+		RakNetConnection(RakNet::RakNetGUID guid, int64 id, std::string key, std::weak_ptr<RakNet::RakPeerInterface> peer, ILogger_ptr logger, std::shared_ptr<DependencyResolver> resolver);
 		~RakNetConnection();
 		uint64 id() const override;
+		std::string key() const override;
+
 		time_t connectionDate() const override;
 		const std::string& account() const override;
 		const std::string& application() const override;
@@ -83,12 +85,13 @@ namespace Stormancer
 		std::string _account;
 		std::string _application;
 		uint64 _id = 0;
+		std::string _key;
 		time_t _connectionDate = nowTime_t();
 		std::weak_ptr<RakNet::RakPeerInterface> _peer;
 		RakNet::RakNetGUID _guid;
 		time_t _lastActivityDate = nowTime_t();
 		std::map<size_t, void*> _localData;
-		std::weak_ptr<DependencyResolver> _dependencyResolver;
+		std::shared_ptr<DependencyResolver> _dependencyResolver;
 		ConnectionState _connectionState = ConnectionState::Disconnected;
 		rxcpp::subjects::subject<ConnectionState> _connectionStateObservable;
 		Action<std::string> _closeAction;

@@ -5,11 +5,10 @@
 namespace Stormancer
 {
 	template<typename TManager>
-	class ClientAPI : std::enable_shared_from_this<TManager>
+	class ClientAPI : public std::enable_shared_from_this<TManager>
 	{
-
-
 	protected:
+
 		ClientAPI(std::weak_ptr<AuthenticationService> auth) :_auth(auth) {}
 
 
@@ -17,7 +16,6 @@ namespace Stormancer
 		{
 			return this->shared_from_this();
 		}
-
 
 		template<class TService>
 		pplx::task<std::shared_ptr<TService>> getService(std::string type,
@@ -113,10 +111,9 @@ namespace Stormancer
 	private:
 
 		std::shared_ptr<pplx::task<std::shared_ptr<Scene>>> _scene;
+
 		rxcpp::subscription _connectionChangedSub;
 
 		std::weak_ptr<AuthenticationService> _auth;
-
-
 	};
 }

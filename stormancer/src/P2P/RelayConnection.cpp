@@ -4,10 +4,11 @@
 
 namespace Stormancer
 {
-	RelayConnection::RelayConnection(std::shared_ptr<IConnection> serverConnection, std::string address, uint64 id)
+	RelayConnection::RelayConnection(std::shared_ptr<IConnection> serverConnection, std::string address, uint64 id, std::string key)
 		: _serverConnection(serverConnection)
 		, _id(id)
 		, _ipAddress(address)
+		, _key(key)
 	{
 	}
 
@@ -42,6 +43,11 @@ namespace Stormancer
 	int RelayConnection::ping() const
 	{
 		return _serverConnection->ping();
+	}
+
+	std::string RelayConnection::key() const
+	{
+		return _key;
 	}
 
 	uint64 RelayConnection::id() const

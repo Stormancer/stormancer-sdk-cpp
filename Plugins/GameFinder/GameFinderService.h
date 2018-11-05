@@ -3,7 +3,7 @@
 #include "stormancer/headers.h"
 #include "stormancer/stormancer.h"
 #include "GameFinderTypes.h"
-#include "stormancer/Action2.h"
+#include "stormancer/Event.h"
 
 namespace Stormancer
 {
@@ -129,8 +129,8 @@ namespace Stormancer
 		void resolve(bool acceptMatch);
 		void cancel();
 
-		Action2<GameFinderStatus> GameFinderStatusUpdated;
-		Action2<GameFinderResponse> GameFound;
+		Event<GameFinderStatus> GameFinderStatusUpdated;
+		Event<GameFinderResponse> GameFound;
 
 	private:
 

@@ -13,7 +13,10 @@ namespace Stormancer
 		std::unordered_map<std::string, std::string> Data;
 		MSGPACK_DEFINE(Data)
 	};
-
+	struct ProfilesResult
+	{
+		std::unordered_map<std::string, ProfileDto> profiles;
+	};
 	class ProfileService : public std::enable_shared_from_this<ProfileService>
 	{
 	public:
@@ -23,9 +26,9 @@ namespace Stormancer
 		ProfileService(const ProfileService&& other) = delete;
 		ProfileService& operator=(const ProfileService&& other) = delete;
 
-		pplx::task<std::unordered_map<std::string, ProfileDto>> getProfiles(const std::list<std::string>& userIds);
+		pplx::task<ProfilesResult> getProfiles(const std::list<std::string>& userIds);
 		pplx::task<void> updateUserHandle(const std::string& userIds);
-		pplx::task<std::unordered_map<std::string, ProfileDto>> queryProfiles(const std::string& pseudoPrefix, const int& skip, const int& take);
+		pplx::task<ProfilesResult> queryProfiles(const std::string& pseudoPrefix, const int& skip, const int& take);
 
 	private:
 		std::weak_ptr<Scene> _scene;

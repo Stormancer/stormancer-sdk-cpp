@@ -172,10 +172,7 @@ namespace Stormancer
 
 	pplx::task<std::shared_ptr<FriendsService>> Friends::getFriendService()
 	{
-
-		return this->getService<FriendsService>("stormancer.friends",
-			[](auto that, auto friends, auto scene){
-
+		auto initializer = [](auto that, auto friends, auto scene) {
 			auto wThat = that->weak_from_this();
 			that->_friendListChangedSubscription = friends->friendListChanged.subscribe([wThat](FriendListUpdateEvent ev)
 			{
@@ -187,14 +184,12 @@ namespace Stormancer
 
 				that->friendListChanged(ev);
 			});
+		};
 
-		},
-			[](auto that, auto scene) {
-		
+		auto cleanup = [](auto that, auto type) {
 			that->_friendListChangedSubscription = nullptr;
-		});
+		};
 
+		return this->getService<FriendsService>("stormancer.friends", initializer, cleanup);
 	}
-
-
 }

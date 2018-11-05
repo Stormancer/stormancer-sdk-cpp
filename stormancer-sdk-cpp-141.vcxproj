@@ -325,6 +325,7 @@
       <PrecompiledHeaderFile>stormancer/stdafx.h</PrecompiledHeaderFile>
       <ProgramDataBaseFileName>$(OutDir)Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform).pdb</ProgramDataBaseFileName>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <IncludeInUnityFile>true</IncludeInUnityFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

@@ -12,12 +12,17 @@ namespace Stormancer
 {
 	/// Core functions for communicating over the network using RakNet.
 
-	class ConnectionRequest
+	struct ConnectionRequest
 	{
-	public:
 		pplx::task_completion_event<std::shared_ptr<IConnection>> tce;
 		std::string endpoint;
 		pplx::cancellation_token cancellationToken = pplx::cancellation_token::none();
+		std::string id;
+		std::string parentId;
+		bool isP2P()
+		{
+			return parentId != "";
+		}
 	};
 
 	class RakNetTransport : public ITransport, public std::enable_shared_from_this<RakNetTransport>
@@ -29,10 +34,10 @@ namespace Stormancer
 		RakNetTransport(std::weak_ptr<DependencyResolver> resolver);
 		~RakNetTransport();
 		void start(std::string type, std::shared_ptr<IConnectionManager> handler, pplx::cancellation_token ct = pplx::cancellation_token::none(), uint16 maxConnections = 10, uint16 serverPort = 0) override;
-		pplx::task<std::shared_ptr<IConnection>> connect(std::string endpoint, pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
+		pplx::task<std::shared_ptr<IConnection>> connect(std::string endpoint,std::string id, std::string parentId, pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
 		bool isRunning() const override;
 		std::string name() const override;
-		uint64 id() const override;
+		
 		std::weak_ptr<DependencyResolver> dependencyResolver() const override;
 		void onPacketReceived(std::function<void(Packet_ptr)> callback) override;
 		std::string host() const override;
@@ -51,13 +56,13 @@ namespace Stormancer
 		void stop();
 		void initialize(uint16 maxConnections, uint16 serverPort = 0);
 		void run();
-		void onConnectionIdReceived(uint64 p);
-		std::shared_ptr<RakNetConnection> onConnection(RakNet::SystemAddress systemAddress, RakNet::RakNetGUID guid, uint64 peerId);
-		void onDisconnection(RakNet::RakNetGUID guid, std::string reason);
+		
+		std::shared_ptr<RakNetConnection> onConnection(RakNet::SystemAddress systemAddress, RakNet::RakNetGUID guid, uint64 peerId, std::string key);
+		void onDisconnection(uint64 guid, std::string reason);
 		void onMessageReceived(RakNet::Packet* packet);
-		std::shared_ptr<RakNetConnection> getConnection(RakNet::RakNetGUID guid);
-		std::shared_ptr<RakNetConnection> createNewConnection(RakNet::RakNetGUID raknetGuid, uint64 peerId);
-		std::shared_ptr<RakNetConnection> removeConnection(RakNet::RakNetGUID guid);
+		std::shared_ptr<RakNetConnection> getConnection(uint64 guid);
+		std::shared_ptr<RakNetConnection> createNewConnection(RakNet::RakNetGUID raknetGuid, uint64 peerId, std::string key);
+		std::shared_ptr<RakNetConnection> removeConnection(uint64 guid);
 		pplx::task<int> sendPing(const std::string& address, pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
 		bool sendPingImpl(const std::string& address);
 		pplx::task<int> sendPing(const std::string& address, const int nb, pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
@@ -82,12 +87,11 @@ namespace Stormancer
 		std::shared_ptr<RakNet::SocketDescriptor> _socketDescriptor;
 		std::mutex _mutex;
 		std::string _name = "raknet";
-		uint64 _id = 0;
+		
 		Action<Packet_ptr> _onPacketReceived;
 		std::string _host;
 		uint16 _port = 0;
-		RakNet::RakNetGUID _serverRakNetGUID;
-		bool _serverConnected = false;
+		
 		std::mutex _pendingPingsMutex;
 		std::unordered_map<std::string, pplx::task_completion_event<int>> _pendingPings;
 

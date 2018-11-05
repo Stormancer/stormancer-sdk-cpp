@@ -140,26 +140,7 @@ namespace Stormancer
 		//_config->synchronisedClock = false;
 		_client = Client::create(_config);
 
-		_client->getConnectionStateChangedObservable().subscribe([this](ConnectionState state) {
-			try
-			{
-				auto stateStr = connectionStateToString(state);
-				_logger->log(LogLevel::Debug, "test_connect", "Client connection state changed", stateStr.c_str());
-			}
-			catch (const std::exception& ex)
-			{
-				_logger->log(ex);
-			}
-		}, [this](std::exception_ptr exptr) {
-			try
-			{
-				std::rethrow_exception(exptr);
-			}
-			catch (const std::exception& ex)
-			{
-				_logger->log(LogLevel::Error, "Test", "Client connection state change failed", ex.what());
-			}
-		});
+		
 
 		_logger->log(LogLevel::Debug, "test_create", "TEST CREATE OK");
 

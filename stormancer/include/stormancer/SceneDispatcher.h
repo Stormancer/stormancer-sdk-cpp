@@ -20,8 +20,8 @@ namespace Stormancer
 		virtual ~SceneDispatcher();
 
 		void registerProcessor(PacketProcessorConfig& config);
-		void addScene(Scene_ptr scene);
-		void removeScene(uint8 sceneHandle);
+		void addScene(std::shared_ptr<IConnection> connection, Scene_ptr scene);
+		void removeScene(std::shared_ptr<IConnection> connection, uint8 sceneHandle);
 
 #pragma endregion
 
@@ -37,7 +37,7 @@ namespace Stormancer
 
 		std::shared_ptr<IActionDispatcher> _eventDispatcher;
 		processorFunction* handler = nullptr;
-		std::vector<std::weak_ptr<Scene>> _scenes;
+
 
 #pragma endregion
 	};

@@ -9,13 +9,14 @@ namespace Stormancer
 	{
 	public:
 
-		RelayConnection(std::shared_ptr<IConnection> serverConnection, std::string address, uint64 id);
+		RelayConnection(std::shared_ptr<IConnection> serverConnection, std::string address, uint64 id, std::string key);
 		virtual void send(const Writer& writer, int channelUid, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const TransformMetadata& transformMetadata = TransformMetadata()) override;
 		void setApplication(std::string account, std::string application) override;
 		void close(std::string reason = "") override;
 		std::string ipAddress() const override;
 		int ping() const override;
 		uint64 id() const override;
+		std::string key() const override;
 		time_t connectionDate() const override;
 		const std::string& account() const override;
 		const std::string& application() const override;
@@ -31,8 +32,10 @@ namespace Stormancer
 		Action<std::string>& onCloseAction() override;
 
 	private:
+
 		std::shared_ptr<IConnection> _serverConnection;
 		std::map<std::string, std::string> _metadata;
+		std::string _key;
 		uint64 _id;
 		std::string _ipAddress;
 		time_t _connectionDate = nowTime_t();

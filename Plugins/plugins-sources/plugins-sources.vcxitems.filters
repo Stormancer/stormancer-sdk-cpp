@@ -135,6 +135,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\PlayerData\PlayerDataService.cpp">
       <Filter>PlayerData</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\Profile\Profiles.cpp">
+      <Filter>Profiles</Filter>
+    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\Profile\ProfileService.cpp">
       <Filter>Profiles</Filter>
     </ClCompile>
@@ -275,7 +278,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\PlayerData\PlayerDataUpdate.h">
       <Filter>PlayerData</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\Members\Friends.h">
+<ClInclude Include="$(MSBuildThisFileDirectory)..\Profile\Profiles.h">
+      <Filter>Profiles</Filter>
+    </ClInclude>    <ClInclude Include="$(MSBuildThisFileDirectory)..\Members\Friends.h">
       <Filter>Members</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Members\FriendsPlugin.h">

@@ -76,7 +76,7 @@ namespace Stormancer
 		bool _stop = false;
 		const std::string _endpoint = "https://api2.stormancer.com";
 		const std::string _accountId = "tester";
-		const std::string _applicationName = "tester";
+		const std::string _applicationName = "test-application";
 		const std::string _sceneName = "main";
 		bool _disconnectWithReasonRequested = false;
 		const std::string _disconnectReason = "DisconnectParticularReason";

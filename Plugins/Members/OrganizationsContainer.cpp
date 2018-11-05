@@ -2,16 +2,19 @@
 #include "OrganizationsContainer.h"
 #include "OrganizationsService.h"
 #include "stormancer/Scene.h"
+#include "stormancer/SafeCapture.h"
 
 namespace Stormancer
 {
 	std::shared_ptr<OrganizationsService> OrganizationsContainer::service()
 	{
-		if (auto scene = _scene.lock())
+		auto scene = _scene.lock();
+
+		if (!scene)
 		{
-			return scene->dependencyResolver().lock()->resolve<OrganizationsService>();
+			throw PointerDeletedException("Scene deleted");
 		}
 
-		return nullptr;
+		return scene->dependencyResolver().lock()->resolve<OrganizationsService>();
 	}
 }

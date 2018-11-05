@@ -23,7 +23,7 @@ namespace Stormancer
 		if (client)
 		{
 			client->dependencyResolver().lock()->registerDependency<GameRecovery>([](std::weak_ptr<DependencyResolver> dr) {
-				return std::make_shared<GameRecovery>(dr.lock()->resolve<AuthenticationService>()); });
+				return std::make_shared<GameRecovery>(dr.lock()->resolve<AuthenticationService>()); },true);
 		}
 	}
 }

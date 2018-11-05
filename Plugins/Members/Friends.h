@@ -1,7 +1,7 @@
 #pragma once
 
 #include "stormancer/stormancer.h"
-#include "stormancer/Action2.h"
+#include "stormancer/Event.h"
 #include "Core/ClientAPI.h"
 
 namespace Stormancer
@@ -59,7 +59,7 @@ namespace Stormancer
 	public:
 
 		FriendsService(Scene_ptr scene, std::shared_ptr<ILogger> logger);
-		Action2<FriendListUpdateEvent> friendListChanged;
+		Event<FriendListUpdateEvent> friendListChanged;
 		std::unordered_map<std::string,std::shared_ptr<Friend>> friends;
 		pplx::task<void> inviteFriend(std::string userId);
 		pplx::task<void> answerFriendInvitation(std::string originId, bool accept = true);
@@ -83,7 +83,7 @@ namespace Stormancer
 	public:
 
 		Friends(std::weak_ptr<AuthenticationService> auth);
-		Action2<FriendListUpdateEvent> friendListChanged;
+		Event<FriendListUpdateEvent> friendListChanged;
 		pplx::task<std::unordered_map<std::string, std::shared_ptr<Friend>>> friends();
 		pplx::task<void> inviteFriend(std::string userId);
 		pplx::task<void> answerFriendInvitation(std::string originId, bool accept = true);
@@ -93,7 +93,7 @@ namespace Stormancer
 	private:
 		
 		pplx::task<std::shared_ptr<FriendsService>> getFriendService();
-		Action2<FriendListUpdateEvent>::Subscription _friendListChangedSubscription;
+		Event<FriendListUpdateEvent>::Subscription _friendListChangedSubscription;
 	};
 }
 

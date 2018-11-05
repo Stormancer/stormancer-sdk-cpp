@@ -227,10 +227,10 @@ namespace Stormancer
 				auto partyService = scene->dependencyResolver().lock()->resolve<PartyService>();
 				
 				/*Party(Scene_ptr scene, 
-				Action2<void>::Subscription LeftPartySubscription,
-				Action2<std::vector<PartyUserDto>>::Subscription UpdatedPartyMembersSubscription,
-				Action2<PartyUserData>::Subscription UpdatedPartyUserDataSubscription,
-				Action2<PartySettings>::Subscription UpdatedPartySettingsSubscription);*/
+				Event<void>::Subscription LeftPartySubscription,
+				Event<std::vector<PartyUserDto>>::Subscription UpdatedPartyMembersSubscription,
+				Event<PartyUserData>::Subscription UpdatedPartyUserDataSubscription,
+				Event<PartySettings>::Subscription UpdatedPartySettingsSubscription);*/
 				auto party = std::make_shared<Party>(task.get(),
 					partyService->LeftParty.subscribe([wPartyManagement]()
 				{
