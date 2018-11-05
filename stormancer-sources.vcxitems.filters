@@ -384,7 +384,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\Debug\StackWalker.h">
       <Filter>Header Files\Debug</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\Event.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\Event.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Configuration.cpp">

@@ -20,6 +20,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\Authentication\AuthenticationService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\BugReport\BugReportPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\BugReport\BugReportService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\Core\ClientApi.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderService.cpp" />

@@ -162,6 +162,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\Profile\Profiles.cpp">
       <Filter>Profiles</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\Core\ClientApi.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\AssetsStorage\AssetsStoragePlugin.h">
@@ -278,9 +281,10 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\PlayerData\PlayerDataUpdate.h">
       <Filter>PlayerData</Filter>
     </ClInclude>
-<ClInclude Include="$(MSBuildThisFileDirectory)..\Profile\Profiles.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Profile\Profiles.h">
       <Filter>Profiles</Filter>
-    </ClInclude>    <ClInclude Include="$(MSBuildThisFileDirectory)..\Members\Friends.h">
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\Members\Friends.h">
       <Filter>Members</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Members\FriendsPlugin.h">
