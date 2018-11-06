@@ -13,6 +13,8 @@
 #include "stormancer/SafeCapture.h"
 #include "stormancer/KeyStore.h"
 #include "stormancer/IConnectionManager.h"
+#include "stormancer/IPacketDispatcher.h"
+
 
 
 
@@ -83,7 +85,7 @@ namespace Stormancer
 		}
 	}
 
-	Client_ptr Client::create(Configuration_ptr config)
+	std::shared_ptr<IClient> IClient::create(Configuration_ptr config)
 	{
 		if (!config)
 		{
@@ -92,7 +94,7 @@ namespace Stormancer
 
 		Client_ptr client(new Client(config), [](Client* ptr) { delete ptr; });
 		client->initialize();
-		return client;
+		return std::reinterpret_pointer_cast<IClient>(client);
 	}
 
 	void Client::initialize()
@@ -118,7 +120,7 @@ namespace Stormancer
 			transport->start("client", _dependencyResolver->resolve<IConnectionManager>(), _cts.get_token(), _config->clientSDKPort, (uint16)_maxPeers + 1);
 			for (auto plugin : _plugins)
 			{
-				plugin->transportStarted(transport.get());
+				plugin->transportStarted(transport);
 			}
 			_connections = _dependencyResolver->resolve< IConnectionManager>();
 
@@ -157,7 +159,7 @@ namespace Stormancer
 
 			for (auto plugin : _plugins)
 			{
-				plugin->clientCreated(this);
+				plugin->clientCreated(this->shared_from_this());
 			}
 		}
 
@@ -225,7 +227,7 @@ namespace Stormancer
 		}
 	}
 
-	pplx::task<Scene_ptr> Client::connectToPublicScene(const std::string& sceneId, const SceneInitializer& initializer, pplx::cancellation_token ct)
+	pplx::task<std::shared_ptr<Scene>> Client::connectToPublicScene(const std::string& sceneId, const SceneInitializer& initializer, pplx::cancellation_token ct)
 	{
 		std::weak_ptr<Client> wThat = this->shared_from_this();
 		return getPublicScene(sceneId, ct)
@@ -270,10 +272,10 @@ namespace Stormancer
 			{
 				return pplx::task_from_result(scene);
 			}
-		}, ct);
+		}, ct).then([](Scene_ptr s) {return std::reinterpret_pointer_cast<Scene>(s); });
 	}
 
-	pplx::task<Scene_ptr> Client::connectToPrivateScene(const std::string& sceneToken, const SceneInitializer& initializer, pplx::cancellation_token ct)
+	pplx::task<std::shared_ptr<Scene>> Client::connectToPrivateScene(const std::string& sceneToken, const SceneInitializer& initializer, pplx::cancellation_token ct)
 	{
 		auto tokenHandler = _dependencyResolver->resolve<ITokenHandler>();
 		auto sep = tokenHandler->decodeToken(sceneToken);
@@ -327,27 +329,27 @@ namespace Stormancer
 			}
 
 
-		}, ct);
+		}, ct).then([](Scene_ptr s) {return std::reinterpret_pointer_cast<Scene>(s); });
 	}
 
-	pplx::task<Scene_ptr> Client::getConnectedScene(const std::string& sceneId, pplx::cancellation_token ct)
+	pplx::task<std::shared_ptr<Scene>> Client::getConnectedScene(const std::string& sceneId, pplx::cancellation_token ct)
 	{
 		logger()->log(LogLevel::Trace, "Client", "Get connected scene.", sceneId);
 
 		if (sceneId.empty())
 		{
 			logger()->log(LogLevel::Error, "Client", "SceneId is empty");
-			return pplx::task_from_exception<Scene_ptr>(std::runtime_error("SceneId is empty"));
+			return pplx::task_from_exception<std::shared_ptr<Scene>>(std::runtime_error("SceneId is empty"));
 		}
 
 		std::lock_guard<std::mutex> lg(_scenesMutex);
 		auto it = _scenes.find(sceneId);
 		if (it != _scenes.end())
 		{
-			return it->second.task;
+			return it->second.task.then([](Scene_ptr s) {return std::reinterpret_pointer_cast<Scene>(s); });
 		}
 
-		return pplx::task_from_result<Scene_ptr>(nullptr);
+		return pplx::task_from_result<std::shared_ptr<Scene>>(nullptr);
 	}
 
 	std::vector<std::string> Client::getSceneIds()
@@ -530,7 +532,7 @@ namespace Stormancer
 			try
 			{
 
-				auto transport = client->dependencyResolver().lock()->resolve<ITransport>();
+				auto transport = client->dependencyResolver()->resolve<ITransport>();
 				//Start transport and execute plugin event
 
 				//Protocol v1 is not supported anymore.
@@ -665,7 +667,7 @@ namespace Stormancer
 			auto connection = std::get<1>(tuple);
 
 
-			Scene_ptr scene(new Scene(connection, wClient, sceneAddress, sep.token, sceneInfos, client->_dependencyResolver, client->_plugins), [](Scene* ptr) { delete ptr; });
+			Scene_ptr scene(new Scene_Impl(connection, wClient, sceneAddress, sep.token, sceneInfos, client->_dependencyResolver, client->_plugins), [](Scene_Impl* ptr) { delete ptr; });
 			scene->initialize();
 
 
@@ -771,16 +773,16 @@ namespace Stormancer
 
 		for (auto plugin : this->_plugins)
 		{
-			plugin->clientDisconnecting(this);
+			plugin->clientDisconnecting(this->shared_from_this());
 		}
 
 		// Stops the synchronised clock, disconnect the scenes, closes the server connection then stops the underlying transports.
 
 		auto loggerPtr = logger();
-		
+
 		auto wConnections = _connections;
 		return disconnectAllScenes()
-			.then([ loggerPtr,wConnections](pplx::task<void> t)
+			.then([loggerPtr, wConnections](pplx::task<void> t)
 		{
 			try
 			{
@@ -789,7 +791,7 @@ namespace Stormancer
 				{
 					return c->closeAllConnections("Client disconnection requested by user");
 				}
-				
+
 
 			}
 			catch (const std::exception& ex)
@@ -839,23 +841,6 @@ namespace Stormancer
 
 		scene->setConnectionState(ConnectionState(ConnectionState::Disconnecting, reason));
 
-		for (auto plugin : _plugins)
-		{
-			try
-			{
-				plugin->sceneDisconnecting(scene.get());
-			}
-			catch (const std::exception& ex)
-			{
-				auto logger = this->logger();
-				if (logger)
-				{
-					logger->log(Stormancer::LogLevel::Warn, "client.disconnect", "a plugin threw an error while running sceneDisconnecting", ex.what());
-					logger->log(ex);
-				}
-			}
-		}
-
 		auto sceneDispatcher = _dependencyResolver->resolve<SceneDispatcher>();
 		auto connections = _connections.lock();
 
@@ -879,10 +864,7 @@ namespace Stormancer
 			{
 				if (auto client = wClient.lock())
 				{
-					for (auto plugin : client->_plugins)
-					{
-						plugin->sceneDisconnected(scene.get());
-					}
+					
 
 					client->logger()->log(LogLevel::Debug, "client", "Scene disconnected", sceneId);
 
@@ -970,7 +952,7 @@ namespace Stormancer
 		return _dependencyResolver->resolve<SyncClock>()->lastPing();
 	}
 
-	std::weak_ptr<DependencyResolver> Client::dependencyResolver()
+	std::shared_ptr<DependencyResolver> Client::dependencyResolver()
 	{
 		return _dependencyResolver;
 	}
@@ -1122,7 +1104,7 @@ namespace Stormancer
 	pplx::task<Federation> Client::getFederation(pplx::cancellation_token ct)
 	{
 		std::lock_guard<std::mutex> lg(_connectionMutex);
-		auto api = this->dependencyResolver().lock()->resolve<ApiClient>();
+		auto api = this->dependencyResolver()->resolve<ApiClient>();
 		if (!_federation)
 		{
 			_federation = std::make_shared<pplx::task<Federation>>(api->getFederation(_config->_serverEndpoints, ct));

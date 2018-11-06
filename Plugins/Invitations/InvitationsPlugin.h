@@ -8,6 +8,6 @@ namespace Stormancer
 	class InvitationsPlugin : public IPlugin
 	{
 	public:
-		void sceneCreated(Scene* scene) override;
+		void sceneCreated(std::shared_ptr<Scene> scene) override;
 	};
 }

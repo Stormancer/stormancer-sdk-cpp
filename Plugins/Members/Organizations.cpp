@@ -3,7 +3,7 @@
 #include "OrganizationsContainer.h"
 #include "OrganizationsService.h"
 #include "stormancer/Scene.h"
-#include "stormancer/SafeCapture.h"
+#include "stormancer/Exceptions.h"
 #include "../Authentication/AuthenticationService.h"
 
 namespace Stormancer
@@ -19,7 +19,7 @@ namespace Stormancer
 
 		std::weak_ptr<Organizations> wThat = this->shared_from_this();
 		_organizationsContainerTask = auth->getSceneForService("stormancer.organizations", organizationSceneName)
-			.then([wThat](Scene_ptr scene)
+			.then([wThat](std::shared_ptr<Scene> scene)
 		{
 			auto that = wThat.lock();
 			if (!that)

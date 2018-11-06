@@ -4,7 +4,7 @@
 
 namespace Stormancer
 {
-	void MatchmakingPlugin::sceneCreated(Scene* scene)
+	void MatchmakingPlugin::sceneCreated(std::shared_ptr<Scene> scene)
 	{
 		if (scene)
 		{
@@ -12,8 +12,8 @@ namespace Stormancer
 
 			if (name.length() > 0 )
 			{
-				auto service = std::make_shared<MatchmakingService>(scene->shared_from_this());
-				scene->dependencyResolver().lock()->registerDependency<MatchmakingService>(service);
+				auto service = std::make_shared<MatchmakingService>(scene);
+				scene->dependencyResolver()->registerDependency<MatchmakingService>(service);
 			}
 		}
 	}

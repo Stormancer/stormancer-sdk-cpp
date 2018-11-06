@@ -1,6 +1,6 @@
 #include "GameFinderManager.h"
 #include "Authentication/AuthenticationService.h"
-#include "stormancer/Client.h"
+#include "stormancer/IClient.h"
 #include "GameFinderService.h"
 
 namespace Stormancer
@@ -19,7 +19,7 @@ namespace Stormancer
 		std::shared_ptr<Scene> scene;
 		std::shared_ptr<GameFinderService> service()
 		{
-			return scene->dependencyResolver().lock()->resolve<GameFinderService>();
+			return scene->dependencyResolver()->resolve<GameFinderService>();
 		}
 
 		Event<GameFinderResponse>::Subscription gameFoundSubscription;
@@ -100,7 +100,7 @@ namespace Stormancer
 
 		std::weak_ptr<GameFinder> wThat = this->shared_from_this();
 
-		return auth->getSceneForService("stormancer.plugins.matchmaking", gameFinderName).then([gameFinderName, wThat](pplx::task<Scene_ptr> task) {
+		return auth->getSceneForService("stormancer.plugins.matchmaking", gameFinderName).then([gameFinderName, wThat](pplx::task<std::shared_ptr<Scene>> task) {
 
 			try
 			{

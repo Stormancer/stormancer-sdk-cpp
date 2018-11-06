@@ -2,6 +2,8 @@
 
 
 
+#include "stormancer/utilities/taskUtilities.h"
+
 
 using namespace std::literals;
 
@@ -138,7 +140,7 @@ namespace Stormancer
 		_config = Configuration::create(_endpoint, _accountId, _applicationName);
 		_config->logger = _logger;
 		//_config->synchronisedClock = false;
-		_client = Client::create(_config);
+		_client = IClient::create(_config);
 
 		
 
@@ -155,7 +157,7 @@ namespace Stormancer
 		{
 			_logger->log(LogLevel::Debug, "test_connect", "Get scene");
 
-			_client->connectToPublicScene(_sceneName, [this](Scene_ptr scene) {
+			_client->connectToPublicScene(_sceneName, [this](std::shared_ptr<Scene> scene) {
 				_logger->log(LogLevel::Debug, "test_connect", "Get scene OK");
 
 				auto onNext = [this, scene](ConnectionState state) {
@@ -214,14 +216,14 @@ namespace Stormancer
 				_logger->log(LogLevel::Debug, "test_connect", "Add route OK");
 
 				_logger->log(LogLevel::Debug, "test_connect", "Add procedure");
-				auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
+				auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
 				rpcService->addProcedure("rpc", [this](RpcRequestContext_ptr rc) { return test_rpc_client_received(rc); }, MessageOriginFilter::Host, true);
 				rpcService->addProcedure("rpcCancel", [this](RpcRequestContext_ptr rc) { return test_rpc_client_cancel_received(rc); }, MessageOriginFilter::Host, true);
 				rpcService->addProcedure("rpcException", [this](RpcRequestContext_ptr rc) { return test_rpc_client_exception_received(rc); }, MessageOriginFilter::Host, true);
 				_logger->log(LogLevel::Debug, "test_connect", "Add procedure OK");
 
 				_logger->log(LogLevel::Debug, "test_connect", "Connect to scene");
-			}).then([this](pplx::task<Scene_ptr> task) {
+			}).then([this](pplx::task<std::shared_ptr<Scene>> task) {
 				try
 				{
 					auto scene = task.get();
@@ -288,7 +290,7 @@ namespace Stormancer
 		}
 
 		// get the RPC service
-		auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
+		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
 
 		//int i = 123;
 		//rpcService->rpc<void>("rpc2").then([]() { std::cout << "void 0" << std::endl; } );
@@ -363,7 +365,7 @@ namespace Stormancer
 			return;
 		}
 
-		auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
+		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
 
 		auto observable = rpcService->rpc_observable("rpcCancel", [](obytestream* stream) {
 			Serializer serializer;
@@ -417,7 +419,7 @@ namespace Stormancer
 			return;
 		}
 
-		auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
+		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
 
 		rpcService->rpc<void>("rpcException").then([this](pplx::task<void> t) {
 			try
@@ -444,7 +446,7 @@ namespace Stormancer
 			return;
 		}
 
-		auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
+		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
 
 		rpcService->rpc<void>("rpcClientException").then([this](pplx::task<void> t) {
 			try
@@ -527,7 +529,7 @@ namespace Stormancer
 				int64 clock = _client->clock();
 				if (clock)
 				{
-					std::string clockStr = to_string(clock / 1000.0);
+					std::string clockStr = std::to_string(clock / 1000.0);
 					_logger->log(LogLevel::Debug, "test_syncclock", "clock", clockStr.c_str());
 					_logger->log(LogLevel::Debug, "test_syncclock", "SyncClock OK");
 					execNextTest();

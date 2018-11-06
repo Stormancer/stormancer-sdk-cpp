@@ -3,7 +3,7 @@
 #include "stormancer/headers.h"
 #include "stormancer/Configuration.h"
 #include "stormancer/SceneEndpoint.h"
-#include "stormancer/Scene.h"
+#include "stormancer/SceneImpl.h"
 #include "stormancer/Logger/ILogger.h"
 #include "stormancer/SceneDispatcher.h"
 #include "stormancer/RequestProcessor.h"
@@ -11,6 +11,7 @@
 #include "stormancer/IScheduler.h"
 #include "stormancer/Watch.h"
 #include "stormancer/ITokenHandler.h"
+#include "stormancer/IClient.h"
 
 namespace Stormancer
 {
@@ -19,30 +20,26 @@ namespace Stormancer
 	struct Federation;
 	class P2PRequestModule;
 	using Client_ptr = std::shared_ptr<Client>;
-	
+
 	/// Manage the connection to the scenes of an application.
-	class STORMANCER_DLL_API Client : public std::enable_shared_from_this<Client>
+	class STORMANCER_DLL_API Client : public IClient, public std::enable_shared_from_this<Client>
 	{
 		friend P2PRequestModule;
 	public:
 
 		/// The scene need to access some private methods of the client.
-		friend class Scene;
+		friend class Scene_Impl;
+		friend class IClient;
 
-		using SceneInitializer = std::function<void(Scene_ptr)>;
 
 #pragma region public_methods
 
-		/// Factory.
-		/// \param config A pointer to a Configuration.
-		static Client_ptr create(Configuration_ptr config);
 
-		
-		pplx::task<Scene_ptr> connectToPublicScene(const std::string& sceneId, const SceneInitializer& initializer = SceneInitializer(), pplx::cancellation_token ct = pplx::cancellation_token::none());
+		pplx::task<std::shared_ptr<Scene>> connectToPublicScene(const std::string& sceneId, const SceneInitializer& initializer = SceneInitializer(), pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
 
-		pplx::task<Scene_ptr> connectToPrivateScene(const std::string& sceneToken, const SceneInitializer& initializer = SceneInitializer(), pplx::cancellation_token ct = pplx::cancellation_token::none());
+		pplx::task<std::shared_ptr<Scene>> connectToPrivateScene(const std::string& sceneToken, const SceneInitializer& initializer = SceneInitializer(), pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
 
-		pplx::task<Scene_ptr> getConnectedScene(const std::string& sceneId, pplx::cancellation_token ct = pplx::cancellation_token::none());
+		pplx::task<std::shared_ptr<Scene>> getConnectedScene(const std::string& sceneId, pplx::cancellation_token ct = pplx::cancellation_token::none());
 
 		std::vector<std::string> getSceneIds();
 
@@ -54,21 +51,21 @@ namespace Stormancer
 
 		/// Disconnect and close all connections.
 		/// this method returns nothing. So it's useful for application close.
-		pplx::task<void> disconnect();
+		pplx::task<void> disconnect() override;
 
 		/// Get sync clock value
-		int64 clock() const;
+		int64 clock() const override;
 
 		/// Get last ping from sync clock
-		int64 lastPing() const;
+		int64 lastPing() const override;
 
 		/// Get dependency resolver
-		std::weak_ptr<DependencyResolver> dependencyResolver();
+		std::shared_ptr<DependencyResolver> dependencyResolver() override;
 
-		
+
 
 		/// Set a metadata
-		void setMedatata(const std::string& key, const std::string& value);
+		void setMedatata(const std::string& key, const std::string& value) override;
 
 		void clear();
 #pragma endregion
@@ -109,7 +106,7 @@ namespace Stormancer
 		pplx::task<void> updateServerMetadata(std::shared_ptr<IConnection> connection, pplx::cancellation_token ct = pplx::cancellation_token::none());
 		pplx::task<std::shared_ptr<IConnection>> ensureConnectedToServer(std::string clusterId, SceneEndpoint sceneEndpoint, pplx::cancellation_token ct = pplx::cancellation_token::none());
 		void dispatchEvent(const std::function<void(void)>& ev);
-		
+
 		pplx::cancellation_token getLinkedCancellationToken(pplx::cancellation_token ct);
 		void ConfigureContainer(std::weak_ptr<DependencyResolver> dr, Configuration_ptr config);
 		// Ask a session token from the server, or set it if we already have one (i.e in case of a reconnection)
@@ -127,7 +124,7 @@ namespace Stormancer
 		template<typename T1, typename T2>
 		pplx::task<T1> sendSystemRequest(std::shared_ptr<IConnection> peer, byte id, const T2& parameter, pplx::cancellation_token ct = pplx::cancellation_token::none())
 		{
-			
+
 			if (!peer)
 			{
 				return pplx::task_from_exception<T1>(std::runtime_error("Peer disconnected"));
@@ -141,14 +138,14 @@ namespace Stormancer
 #pragma region private_members
 
 		std::shared_ptr<DependencyResolver> _dependencyResolver;
-	
-		
-		
+
+
+
 		pplx::task<void> _currentTask = pplx::task_from_result();
 		bool _initialized = false;
 		std::string _accountId;
 		std::string _applicationName;
-		
+
 		pplx::cancellation_token_source _cts;
 		uint16 _maxPeers = 0;
 		std::map<std::string, std::string> _metadata;

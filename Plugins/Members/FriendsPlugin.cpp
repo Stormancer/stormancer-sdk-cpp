@@ -4,7 +4,7 @@
 
 namespace Stormancer
 {
-	void FriendsPlugin::sceneCreated(Scene* scene)
+	void FriendsPlugin::sceneCreated(std::shared_ptr<Scene> scene)
 	{
 		if (scene)
 		{
@@ -12,18 +12,18 @@ namespace Stormancer
 			if (name.length() > 0)
 			{
 				
-				scene->dependencyResolver().lock()->registerDependency<FriendsService>([scene](std::weak_ptr<DependencyResolver> dr) {
-					return std::make_shared<FriendsService>(scene->shared_from_this(), dr.lock()->resolve<ILogger>());
+				scene->dependencyResolver()->registerDependency<FriendsService>([scene](std::weak_ptr<DependencyResolver> dr) {
+					return std::make_shared<FriendsService>(scene, dr.lock()->resolve<ILogger>());
 				},true);
 			}
 		}
 	}
 
-	void FriendsPlugin::clientCreated(Client* client)
+	void FriendsPlugin::clientCreated(std::shared_ptr<IClient> client)
 	{
 		if (client)
 		{
-			client->dependencyResolver().lock()->registerDependency<Friends>([](std::weak_ptr<DependencyResolver> dr) {
+			client->dependencyResolver()->registerDependency<Friends>([](std::weak_ptr<DependencyResolver> dr) {
 				return std::make_shared<Friends>(dr.lock()->resolve<AuthenticationService>()); 
 			}, true);
 

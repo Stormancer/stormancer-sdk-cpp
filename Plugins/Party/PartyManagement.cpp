@@ -1,9 +1,9 @@
 ﻿#include "GameFinder/GameFinderManager.h"
 #include "Party/PartyManagement.h"
 #include "Authentication/AuthenticationService.h"
-#include "stormancer/Client.h"
+#include "stormancer/IClient.h"
 #include "stormancer/Logger/ILogger.h"
-#include "stormancer/RPC/RpcService.h"
+#include "stormancer/RPC/service.h"
 #include "Party/PartyService.h"
 
 namespace Stormancer
@@ -11,15 +11,15 @@ namespace Stormancer
 	///
 	/// ParytManagement	
 	/// Change the signature and remove scene ptr
-	PartyManagementService::PartyManagementService(Scene_ptr scene)
+	PartyManagementService::PartyManagementService(std::shared_ptr<Scene> scene)
 	{
 		_scene = scene;
-		_logger = scene->dependencyResolver().lock()->resolve<ILogger>();
+		_logger = scene->dependencyResolver()->resolve<ILogger>();
 	}
 
 	pplx::task<std::string> PartyManagementService::CreateParty(const PartyRequestDto& partyRequestDto)
 	{
-		auto rpc = _scene.lock()->dependencyResolver().lock()->resolve<RpcService>();
+		auto rpc = _scene.lock()->dependencyResolver()->resolve<RpcService>();
 		return rpc->rpc<std::string, PartyRequestDto>("partymanagement.createsession", partyRequestDto);
 	}
 
@@ -43,7 +43,7 @@ namespace Stormancer
 		}
 
 		std::weak_ptr<PartyManagement> wThat = this->shared_from_this();
-		return auth->getSceneForService("stormancer.plugins.partyManagement").then([wThat, partySettings](pplx::task<Stormancer::Scene_ptr> task)
+		return auth->getSceneForService("stormancer.plugins.partyManagement").then([wThat, partySettings](pplx::task<std::shared_ptr<Stormancer::Scene>> task)
 		{
 			auto that = wThat.lock();
 			if (!that)
@@ -51,7 +51,7 @@ namespace Stormancer
 				throw std::runtime_error("destroyed");
 			}
 			auto scene = task.get();
-			auto partyManagementService = scene->dependencyResolver().lock()->resolve<Stormancer::PartyManagementService>();
+			auto partyManagementService = scene->dependencyResolver()->resolve<Stormancer::PartyManagementService>();
 
 
 			return partyManagementService->CreateParty(partySettings);
@@ -168,7 +168,7 @@ namespace Stormancer
 	{
 		return getParty().then([playerStatus](pplx::task<Stormancer::Party_ptr> task) {
 			Stormancer::Party_ptr party = task.get();
-			auto partyService = party->getScene()->dependencyResolver().lock()->resolve<Stormancer::PartyService>();
+			auto partyService = party->getScene()->dependencyResolver()->resolve<Stormancer::PartyService>();
 			return partyService->updatePlayerStatus(playerStatus);
 		});
 	}
@@ -177,7 +177,7 @@ namespace Stormancer
 	{
 		return getParty().then([partySettingsDto](pplx::task<Party_ptr> task) {
 			auto party = task.get();
-			std::shared_ptr<Stormancer::PartyService> partyService = party->getScene()->dependencyResolver().lock()->resolve<Stormancer::PartyService>();
+			std::shared_ptr<Stormancer::PartyService> partyService = party->getScene()->dependencyResolver()->resolve<Stormancer::PartyService>();
 			return partyService->updatePartySettings(partySettingsDto);
 		});
 	}
@@ -186,7 +186,7 @@ namespace Stormancer
 	{
 		return getParty().then([data](pplx::task<Party_ptr> task) {
 			auto party = task.get();
-			std::shared_ptr<Stormancer::PartyService> partyService = party->getScene()->dependencyResolver().lock()->resolve<Stormancer::PartyService>();
+			std::shared_ptr<Stormancer::PartyService> partyService = party->getScene()->dependencyResolver()->resolve<Stormancer::PartyService>();
 			partyService->updatePlayerData(data);
 		});
 	}
@@ -195,7 +195,7 @@ namespace Stormancer
 	{
 		return getParty().then([userId](pplx::task<Party_ptr> task) {
 			auto party = task.get();
-			std::shared_ptr<Stormancer::PartyService> partyService = party->getScene()->dependencyResolver().lock()->resolve<Stormancer::PartyService>();
+			std::shared_ptr<Stormancer::PartyService> partyService = party->getScene()->dependencyResolver()->resolve<Stormancer::PartyService>();
 			return partyService->PromoteLeader(userId);
 		});
 	}
@@ -204,7 +204,7 @@ namespace Stormancer
 	{
 		return getParty().then([userId](pplx::task<Party_ptr> task) {
 			auto party = task.get();
-			std::shared_ptr<Stormancer::PartyService> partyService = party->getScene()->dependencyResolver().lock()->resolve<Stormancer::PartyService>();
+			std::shared_ptr<Stormancer::PartyService> partyService = party->getScene()->dependencyResolver()->resolve<Stormancer::PartyService>();
 			return partyService->KickPlayer(userId);
 		});
 	}
@@ -215,22 +215,22 @@ namespace Stormancer
 		auto auth = _auth.lock();
 		std::weak_ptr<PartyManagement> wPartyManagement = this->shared_from_this();
 
-		return auth->getSceneForService("stormancer.plugins.partyManagement", uniqueOnlinePartyName).then([wPartyManagement, uniqueOnlinePartyName](pplx::task<Scene_ptr> task)
+		return auth->getSceneForService("stormancer.plugins.partyManagement", uniqueOnlinePartyName).then([wPartyManagement, uniqueOnlinePartyName](pplx::task<std::shared_ptr<Scene>> task)
 		{
-			Scene_ptr scene = nullptr;
+			std::shared_ptr<Scene> scene = nullptr;
 			try
 			{
 				
 
 
 
-				auto partyService = scene->dependencyResolver().lock()->resolve<PartyService>();
+				auto partyService = scene->dependencyResolver()->resolve<PartyService>();
 				
-				/*Party(Scene_ptr scene, 
-				Event<void>::Subscription LeftPartySubscription,
-				Event<std::vector<PartyUserDto>>::Subscription UpdatedPartyMembersSubscription,
-				Event<PartyUserData>::Subscription UpdatedPartyUserDataSubscription,
-				Event<PartySettings>::Subscription UpdatedPartySettingsSubscription);*/
+				/*Party(std::shared_ptr<Scene> scene, 
+				Action2<void>::Subscription LeftPartySubscription,
+				Action2<std::vector<PartyUserDto>>::Subscription UpdatedPartyMembersSubscription,
+				Action2<PartyUserData>::Subscription UpdatedPartyUserDataSubscription,
+				Action2<PartySettings>::Subscription UpdatedPartySettingsSubscription);*/
 				auto party = std::make_shared<Party>(task.get(),
 					partyService->LeftParty.subscribe([wPartyManagement]()
 				{

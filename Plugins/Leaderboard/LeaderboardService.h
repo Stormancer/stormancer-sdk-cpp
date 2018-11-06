@@ -2,7 +2,7 @@
 
 #include "cpprest/json.h"
 #include "stormancer/headers.h"
-#include "stormancer/RPC/RpcService.h"
+#include "stormancer/RPC/service.h"
 #include "LeaderboardDto.h"
 
 namespace Stormancer
@@ -13,7 +13,7 @@ namespace Stormancer
 
 #pragma region public_methods
 
-		LeaderboardService(Scene* scene);
+		LeaderboardService(std::shared_ptr<Scene> scene);
 
 		//Query a leaderboard
 		pplx::task<LeaderboardResult> query(LeaderboardQuery query);
@@ -27,7 +27,7 @@ namespace Stormancer
 
 #pragma region
 
-		Scene* _scene = nullptr;
+		std::shared_ptr<Scene> _scene = nullptr;
 		std::shared_ptr<RpcService> _rpcService;
 
 #pragma endregion

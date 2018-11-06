@@ -2,7 +2,7 @@
 
 #include "stormancer/headers.h"
 #include "stormancer/Scene.h"
-#include "stormancer/RPC/RpcService.h"
+#include "stormancer/RPC/service.h"
 #include "stormancer/Serializer.h"
 
 namespace Stormancer
@@ -39,7 +39,7 @@ namespace Stormancer
 
 #pragma region public_methods
 
-		BugReportService(Scene_ptr scene);
+		BugReportService(std::shared_ptr<Scene> scene);
 
 		//Reports a bug with optional attached files
 		pplx::task<void> reportBug(std::string category, std::string comments, std::vector<AttachedFileDescriptor> files);

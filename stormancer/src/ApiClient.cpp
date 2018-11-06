@@ -1,6 +1,7 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/ApiClient.h"
 #include "stormancer/SafeCapture.h"
+#include "stormancer/Helpers.h"
 
 namespace Stormancer
 {

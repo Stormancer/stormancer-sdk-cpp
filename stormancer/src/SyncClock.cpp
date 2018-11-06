@@ -4,6 +4,8 @@
 #include "stormancer/RequestProcessor.h"
 #include "stormancer/SystemRequestIDTypes.h"
 #include "stormancer/SafeCapture.h"
+#include "stormancer/Helpers.h"
+#include <numeric>
 
 namespace Stormancer
 {

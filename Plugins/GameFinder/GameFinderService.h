@@ -1,12 +1,15 @@
 #pragma once
 #include <memory>
 #include "stormancer/headers.h"
-#include "stormancer/stormancer.h"
 #include "GameFinderTypes.h"
 #include "stormancer/Event.h"
+#include "stormancer/scene.h"
 
 namespace Stormancer
 {
+	class RpcService;
+	class ILogger;
+
 	struct GameFinderRequest
 	{
 		std::map<std::string, std::string> profileIds;
@@ -34,7 +37,7 @@ namespace Stormancer
 	struct GameFinderResponseDto
 	{
 		std::string gameToken;
-		std::map<std::string, std::string> optionalParameters;
+		std::unordered_map<std::string, std::string> optionalParameters;
 
 		MSGPACK_DEFINE(gameToken, optionalParameters);
 	};
@@ -117,7 +120,7 @@ namespace Stormancer
 	{
 	public:
 
-		GameFinderService(Scene_ptr scene);
+		GameFinderService(std::shared_ptr<Scene> scene);
 		void initialize();
 		~GameFinderService();
 		GameFinderService(const GameFinderService& other) = delete;
@@ -129,8 +132,8 @@ namespace Stormancer
 		void resolve(bool acceptMatch);
 		void cancel();
 
-		Event<GameFinderStatus> GameFinderStatusUpdated;
-		Event<GameFinderResponse> GameFound;
+		Action2<GameFinderStatus> GameFinderStatusUpdated;
+		Action2<GameFinderResponse> GameFound;
 
 	private:
 

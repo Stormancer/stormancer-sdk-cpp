@@ -1,7 +1,7 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/SceneDispatcher.h"
 #include "stormancer/IActionDispatcher.h"
-#include "stormancer/Scene.h"
+#include "stormancer/SceneImpl.h"
 #include "stormancer/MessageIDTypes.h"
 
 namespace Stormancer
@@ -28,7 +28,7 @@ namespace Stormancer
 	{
 		if (scene && connection)
 		{
-			auto handles = connection->dependencyResolver().lock()->resolve<std::vector<std::weak_ptr<Scene>>>();
+			auto handles = connection->dependencyResolver()->resolve<std::vector<std::weak_ptr<Scene_Impl>>>();
 			uint8 index = scene->handle() - (uint8)MessageIDTypes::ID_SCENES;
 			auto& v = *handles;
 			if (v.capacity() < index + 1)
@@ -52,7 +52,7 @@ namespace Stormancer
 	void SceneDispatcher::removeScene(std::shared_ptr<IConnection> connection,uint8 sceneHandle)
 	{
 		size_t index = sceneHandle - (uint8)MessageIDTypes::ID_SCENES;
-		auto handles = connection->dependencyResolver().lock()->resolve<std::vector<std::weak_ptr<Scene>>>();
+		auto handles = connection->dependencyResolver()->resolve<std::vector<std::weak_ptr<Scene_Impl>>>();
 		if (index < handles->size())
 		{
 			(*handles)[index].reset();
@@ -69,7 +69,7 @@ namespace Stormancer
 		unsigned int sceneIndex = sceneHandle - (uint8)MessageIDTypes::ID_SCENES;
 
 		auto connection = packet->connection;
-		auto handles = connection->dependencyResolver().lock()->resolve<std::vector<std::weak_ptr<Scene>>>();
+		auto handles = connection->dependencyResolver()->resolve<std::vector<std::weak_ptr<Scene_Impl>>>();
 		if (sceneIndex < handles->size())
 		{
 			auto scene_weak = (*handles)[sceneIndex];

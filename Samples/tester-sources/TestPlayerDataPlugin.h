@@ -1,10 +1,10 @@
 #pragma once
 #include <array>
 #include "TestCase.h"
-#include "stormancer/stormancer.h"
 #include "PlayerData/PlayerDataService.h"
 #include "Authentication/AuthenticationPlugin.h"
 #include "Authentication/AuthenticationService.h"
+#include "stormancer/IClient.h"
 
 class TestPlayerDataPlugin : public TestCase
 {

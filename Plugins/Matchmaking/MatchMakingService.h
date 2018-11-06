@@ -2,7 +2,7 @@
 
 #include "stormancer/headers.h"
 #include "stormancer/Scene.h"
-#include "stormancer/RPC/RpcService.h"
+#include "stormancer/RPC/service.h"
 
 namespace Stormancer
 {
@@ -73,7 +73,7 @@ namespace Stormancer
 
 #pragma region public_methods
 
-		MatchmakingService(Scene_ptr scene);
+		MatchmakingService(std::shared_ptr<Scene> scene);
 		~MatchmakingService();
 
 		MatchmakingService(const MatchmakingService& other) = delete;

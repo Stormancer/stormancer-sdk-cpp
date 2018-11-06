@@ -4,7 +4,7 @@
 
 namespace Stormancer
 {
-	void GameVersionPlugin::sceneCreated(Scene* scene)
+	void GameVersionPlugin::sceneCreated(std::shared_ptr<Scene> scene)
 	{
 		if (scene)
 		{
@@ -13,7 +13,7 @@ namespace Stormancer
 			if (!name.empty())
 			{
 				auto service = std::make_shared<GameVersionService>(scene);
-				scene->dependencyResolver().lock()->registerDependency<GameVersionService>(service);
+				scene->dependencyResolver()->registerDependency<GameVersionService>(service);
 			}
 		}
 	}

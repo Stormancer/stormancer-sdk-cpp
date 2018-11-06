@@ -4,9 +4,10 @@
 #include "stormancer/SystemRequestIDTypes.h"
 #include "stormancer/MessageIDTypes.h"
 #include "stormancer/P2P/RakNet/P2PTunnelClient.h"
-#include "stormancer/Scene.h"
+#include "stormancer/SceneImpl.h"
 #include "stormancer/SafeCapture.h"
 #include "stormancer/P2P/OpenTunnelResult.h"
+#include "stormancer/ChannelUidStore.h"
 
 namespace Stormancer
 {
@@ -242,7 +243,7 @@ namespace Stormancer
 			}
 			std::stringstream ss;
 			ss << "P2PTunnels_" << connection->id();
-			int channelUid = connection->getChannelUidStore().getChannelUid(ss.str());
+			int channelUid = connection->dependencyResolver()->resolve<ChannelUidStore>()->getChannelUid(ss.str());
 			connection->send([=](obytestream* stream) {
 				(*stream) << (byte)MessageIDTypes::ID_P2P_TUNNEL;
 				(*stream) << client->handle;

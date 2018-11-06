@@ -1,13 +1,14 @@
-#include "stormancer/Logger/ILogger.h"
-#include "stormancer/RPC/RpcService.h"
 #include "ProfileService.h"
+#include "stormancer/Logger/ILogger.h"
+#include "stormancer/scene.h"
+#include "stormancer/RPC/service.h"
 
 namespace Stormancer
 {
 	ProfileService::ProfileService(std::shared_ptr<Scene> scene)
 		: _scene(scene)
-		, _rpcService(scene->dependencyResolver().lock()->resolve<RpcService>())
-		, _logger(scene->dependencyResolver().lock()->resolve<ILogger>())
+		, _rpcService(scene->dependencyResolver()->resolve<RpcService>())
+		, _logger(scene->dependencyResolver()->resolve<ILogger>())
 	{
 	}
 

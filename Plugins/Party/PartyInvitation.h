@@ -2,6 +2,7 @@
 //#include "stormancer/stormancer.h"
 #include <memory>
 #include "GameFinder/GameFinderService.h"
+#include "stormancer/Action.h"
 
 //Forward declares
 class Scene;

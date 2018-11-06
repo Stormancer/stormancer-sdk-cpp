@@ -10,7 +10,7 @@ namespace Stormancer
 	{
 	public:
 
-		void sceneCreated(Scene* scene) override;
-		void clientCreated(Client* client) override;
+		void sceneCreated(std::shared_ptr<Scene> scene) override;
+		void clientCreated(std::shared_ptr<IClient> client) override;
 	};
 }

@@ -3,7 +3,7 @@
 
 namespace Stormancer
 {
-	GameVersionService::GameVersionService(Scene* scene)
+	GameVersionService::GameVersionService(std::shared_ptr<Scene> scene)
 	{
 		if (!scene)
 		{

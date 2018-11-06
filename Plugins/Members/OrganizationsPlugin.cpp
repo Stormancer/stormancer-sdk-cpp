@@ -5,7 +5,7 @@
 
 namespace Stormancer
 {
-	void OrganizationsPlugin::sceneCreated(Scene* scene)
+	void OrganizationsPlugin::sceneCreated(std::shared_ptr<Scene> scene)
 	{
 		if (scene)
 		{
@@ -13,8 +13,8 @@ namespace Stormancer
 
 			if (!name.empty())
 			{
-				auto service = std::make_shared<OrganizationsService>(scene->shared_from_this());
-				scene->dependencyResolver().lock()->registerDependency<OrganizationsService>(service);
+				auto service = std::make_shared<OrganizationsService>(scene);
+				scene->dependencyResolver()->registerDependency<OrganizationsService>(service);
 			}
 		}
 	}

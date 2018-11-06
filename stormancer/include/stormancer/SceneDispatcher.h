@@ -3,7 +3,7 @@
 #include "stormancer/headers.h"
 #include "stormancer/IPacketProcessor.h"
 #include "stormancer/IActionDispatcher.h"
-#include "stormancer/Scene.h"
+#include "stormancer/SceneImpl.h"
 
 namespace Stormancer
 {

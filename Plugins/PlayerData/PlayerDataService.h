@@ -3,7 +3,7 @@
 #include "stormancer/headers.h"
 #include "stormancer/IService.h"
 #include "stormancer/Scene.h"
-#include "stormancer/RPC/RpcService.h"
+#include "stormancer/RPC/service.h"
 #include "stormancer/SingleServicePlugin.h"
 #include "PlayerDataUpdate.h"
 #include <map>
@@ -26,7 +26,7 @@ public:
 		_onDataUpdated = callback;
 	}
 
-	virtual void setScene(Scene* scene) override;
+	virtual void setScene(std::shared_ptr<Scene> scene) override;
 
 private:
 	using DataMap = std::map<std::string, std::map<std::string, PlayerDataEntry>>;

@@ -4,6 +4,7 @@
 #include "stormancer/AES/AESPacketTransform.h"
 #include "stormancer/AES/IAES.h"
 #include "stormancer/Configuration.h"
+#include "stormancer/ChannelUidStore.h"
 
 namespace Stormancer
 {
@@ -30,8 +31,12 @@ namespace Stormancer
 				_logger->log(LogLevel::Error, "RakNetConnection", "Connection state change failed", ex.what());
 			}
 		};
-
+		
 		_connectionStateObservable.get_observable().subscribe(onNext, onError);
+
+		_dependencyResolver->registerDependency<ChannelUidStore>([](auto dr) {
+			return std::make_shared<ChannelUidStore>();
+		},true);
 	}
 
 	RakNetConnection::~RakNetConnection()
@@ -97,7 +102,7 @@ namespace Stormancer
 		_metadata[key] = value;
 	}
 
-	std::weak_ptr<DependencyResolver> RakNetConnection::dependencyResolver()
+	std::shared_ptr<DependencyResolver> RakNetConnection::dependencyResolver()
 	{
 		return _dependencyResolver;
 	}
@@ -108,7 +113,7 @@ namespace Stormancer
 		if (_connectionState == ConnectionState::Connected || _connectionState == ConnectionState::Connecting)
 		{
 			setConnectionState(ConnectionState(ConnectionState::Disconnecting, reason));
-			_closeAction(reason);
+			onClose(reason);
 			setConnectionState(ConnectionState(ConnectionState::Disconnected, reason));
 		}
 	}
@@ -233,13 +238,7 @@ namespace Stormancer
 		return _connectionStateObservable.get_observable();
 	}
 
-	Action<std::string>::TIterator RakNetConnection::onClose(std::function<void(std::string)> callback)
-	{
-		return _closeAction.push_back(callback);
-	}
+	
 
-	Action<std::string>& RakNetConnection::onCloseAction()
-	{
-		return _closeAction;
-	}
+	
 };

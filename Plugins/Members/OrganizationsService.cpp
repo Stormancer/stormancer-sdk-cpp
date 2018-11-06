@@ -1,7 +1,7 @@
 #include "stormancer/headers.h"
 #include "OrganizationsService.h"
 #include "stormancer/Scene.h"
-#include "stormancer/RPC/RpcService.h"
+#include "stormancer/RPC/service.h"
 
 namespace Stormancer
 {
@@ -19,7 +19,7 @@ namespace Stormancer
 			return pplx::task_from_exception<Organization>(std::runtime_error("Scene not available"));
 		}
 
-		auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
+		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
 
 		return rpcService->rpc<Organization>("organizations.getorganization", organizationId);
 	}
@@ -33,7 +33,7 @@ namespace Stormancer
 			return pplx::task_from_exception<Organization>(std::runtime_error("Scene not available"));
 		}
 
-		auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
+		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
 
 		return rpcService->rpc<Organization>("organizations.getorganizationbyname", organizationName);
 	}
@@ -47,7 +47,7 @@ namespace Stormancer
 			return pplx::task_from_exception<std::vector<Organization>>(std::runtime_error("Scene not available"));
 		}
 
-		auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
+		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
 
 		return rpcService->rpc<std::vector<Organization>>("organizations.getuserorganizations", userId, showApplyingMembers);
 	}
@@ -61,7 +61,7 @@ namespace Stormancer
 			return pplx::task_from_exception<std::vector<Member>>(std::runtime_error("Scene not available"));
 		}
 
-		auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
+		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
 
 		return rpcService->rpc<std::vector<Member>>("organizations.getmembers", organizationId, showApplyingMembers);
 	}
@@ -75,7 +75,7 @@ namespace Stormancer
 			return pplx::task_from_exception<Organization>(std::runtime_error("Scene not available"));
 		}
 
-		auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
+		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
 
 		return rpcService->rpc<Organization>("organizations.createorganization", organizationName, customData);
 	}
@@ -89,7 +89,7 @@ namespace Stormancer
 			return pplx::task_from_exception<void>(std::runtime_error("Scene not available"));
 		}
 
-		auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
+		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
 
 		return rpcService->rpc<void>("organizations.updateorganizationcustomdata", organizationId, customData);
 	}
@@ -103,7 +103,7 @@ namespace Stormancer
 			return pplx::task_from_exception<void>(std::runtime_error("Scene not available"));
 		}
 
-		auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
+		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
 
 		return rpcService->rpc<void>("organizations.deleteorganization", organizationId);
 	}
@@ -117,7 +117,7 @@ namespace Stormancer
 			return pplx::task_from_exception<void>(std::runtime_error("Scene not available"));
 		}
 
-		auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
+		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
 
 		return rpcService->rpc<void>("organizations.changeowner", newOwnerId, organizationId);
 	}
@@ -131,7 +131,7 @@ namespace Stormancer
 			return pplx::task_from_exception<void>(std::runtime_error("Scene not available"));
 		}
 
-		auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
+		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
 
 		return rpcService->rpc<void>("organizations.invite", userId, organizationId);
 	}
@@ -145,7 +145,7 @@ namespace Stormancer
 			return pplx::task_from_exception<void>(std::runtime_error("Scene not available"));
 		}
 
-		auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
+		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
 
 		return rpcService->rpc<void>("organizations.removemember", memberId, organizationId);
 	}
@@ -159,7 +159,7 @@ namespace Stormancer
 			return pplx::task_from_exception<void>(std::runtime_error("Scene not available"));
 		}
 
-		auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
+		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
 
 		return rpcService->rpc<void>("organizations.manageinvitation", accept, userId, organizationId);
 	}
@@ -173,7 +173,7 @@ namespace Stormancer
 			return pplx::task_from_exception<void>(std::runtime_error("Scene not available"));
 		}
 
-		auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
+		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
 
 		return rpcService->rpc<void>("organizations.createrole", role, organizationId);
 	}
@@ -187,7 +187,7 @@ namespace Stormancer
 			return pplx::task_from_exception<void>(std::runtime_error("Scene not available"));
 		}
 
-		auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
+		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
 
 		return rpcService->rpc<void>("organizations.deleterole", roleName, organizationId);
 	}
@@ -201,7 +201,7 @@ namespace Stormancer
 			return pplx::task_from_exception<void>(std::runtime_error("Scene not available"));
 		}
 
-		auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
+		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
 
 		return rpcService->rpc<void>("organizations.grantrole", roleName, userId, organizationId);
 	}
@@ -215,7 +215,7 @@ namespace Stormancer
 			return pplx::task_from_exception<void>(std::runtime_error("Scene not available"));
 		}
 
-		auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
+		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
 
 		return rpcService->rpc<void>("organizations.ungrantrole", roleName, userId, organizationId);
 	}

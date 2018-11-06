@@ -1,6 +1,7 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/ClientFactory.h"
 #include "stormancer/IClientFactory.h"
+#include "stormancer/Client.h"
 
 namespace Stormancer
 {
@@ -9,7 +10,7 @@ namespace Stormancer
 		ClientFactory::SetConfig(id, configurator);
 	}
 
-	std::shared_ptr<Client> IClientFactory::GetClient(size_t id)
+	std::shared_ptr<IClient> IClientFactory::GetClient(size_t id)
 	{
 		return ClientFactory::GetClient(id);
 	}
@@ -24,7 +25,7 @@ namespace Stormancer
 		_configurators[id] = configurator;
 	}
 
-	std::shared_ptr<Client> ClientFactory::GetClient(size_t id)
+	std::shared_ptr<IClient> ClientFactory::GetClient(size_t id)
 	{
 		std::lock_guard<std::mutex> lg(_mutex);
 
@@ -38,7 +39,7 @@ namespace Stormancer
 			}
 			auto config = confIt->second();
 			auto client = Client::create(config);
-			_clients[id] = client;
+			_clients[id] =  client;
 			return client;
 		}
 		else
@@ -54,6 +55,6 @@ namespace Stormancer
 	}
 
 	std::mutex ClientFactory::_mutex;
-	std::unordered_map<size_t, std::shared_ptr<Client>> ClientFactory::_clients;
+	std::unordered_map<size_t, std::shared_ptr<IClient>> ClientFactory::_clients;
 	std::unordered_map<size_t, std::function<std::shared_ptr<Configuration>()>> ClientFactory::_configurators;
 }

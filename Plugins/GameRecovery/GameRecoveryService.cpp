@@ -2,12 +2,12 @@
 
 namespace Stormancer
 {
-	GameRecoveryService::GameRecoveryService(Scene* scene)
+	GameRecoveryService::GameRecoveryService(std::shared_ptr<Scene> scene)
 	{
 		_scene = scene;
 		if (scene)
 		{
-			_rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
+			_rpcService = scene->dependencyResolver()->resolve<RpcService>();
 		}
 	}
 

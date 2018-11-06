@@ -1,4 +1,5 @@
 #pragma once
+#include <unordered_map>
 namespace Stormancer
 {
 	enum class Readiness
@@ -26,6 +27,6 @@ namespace Stormancer
 	{
 
 		std::string connectionToken;
-		std::map<std::string, std::string> optionalParameters;
+		std::unordered_map<std::string, std::string> optionalParameters;
 	};
 }

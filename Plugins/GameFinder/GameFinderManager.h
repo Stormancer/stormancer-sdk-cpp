@@ -1,4 +1,5 @@
 #pragma once
+#include "stormancer/headers.h"
 #include "stormancer/Event.h"
 #include "GameFinderTypes.h"
 
@@ -27,8 +28,8 @@ namespace Stormancer
 		pplx::task<void> findGame(std::string gameFinder,const std::string &provider, std::string json);
 		void cancel(std::string gameFinder);
 
-		Event<GameFinderStatusChangedEvent> gameFinderStateChanged;
-		Event<gameFoundEvent> gameFound;
+		Action2<GameFinderStatusChangedEvent> gameFinderStateChanged;
+		Action2<gameFoundEvent> gameFound;
 
 		std::unordered_map<std::string, GameFinderStatusChangedEvent> getPendingFindGameStatus();
 		

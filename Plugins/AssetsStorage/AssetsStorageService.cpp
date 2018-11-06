@@ -1,6 +1,7 @@
-#include "stormancer/stdafx.h"
 #include "stormancer/headers.h"
-#include "stormancer/stormancer.h"
+#include "stormancer/Logger/ILogger.h"
+#include "stormancer/scene.h"
+#include "stormancer/RPC/service.h"
 #include "AssetsStorageService.h"
 
 namespace Stormancer
@@ -24,7 +25,7 @@ namespace Stormancer
 			return pplx::task_from_exception<MetafileDto>(std::runtime_error("scene deleted"));
 		}
 
-		auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
+		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
 		return rpcService->rpc<MetafileDto>("assetsstorage.getfile", branchName, path)
 			.then([](MetafileDto mfDto)
 		{

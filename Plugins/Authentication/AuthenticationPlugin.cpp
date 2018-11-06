@@ -12,16 +12,16 @@ namespace Stormancer
 	{
 	}
 
-	void AuthenticationPlugin::clientCreated(Client* client)
+	void AuthenticationPlugin::clientCreated(std::shared_ptr<IClient> client)
 	{
 		auto authService = std::make_shared<AuthenticationService>(client);
-		client->dependencyResolver().lock()->registerDependency<AuthenticationService>(authService);
+		client->dependencyResolver()->registerDependency<AuthenticationService>(authService);
 		
 	}
 
-	void AuthenticationPlugin::clientDisconnecting(Client* client)
+	void AuthenticationPlugin::clientDisconnecting(std::shared_ptr<IClient> client)
 	{
-		auto auth = client->dependencyResolver().lock()->resolve<AuthenticationService>();
+		auto auth = client->dependencyResolver()->resolve<AuthenticationService>();
 		auth->logout();
 	}
 };

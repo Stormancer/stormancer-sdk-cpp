@@ -5,6 +5,7 @@
 #include "stormancer/IConnection.h"
 #include "stormancer/PacketPriority.h"
 #include "stormancer/Logger/ILogger.h"
+#include "stormancer/Helpers.h"
 
 namespace Stormancer
 {
@@ -35,13 +36,12 @@ namespace Stormancer
 		std::string metadata(const std::string& key) const override;
 		void setMetadata(const std::map<std::string, std::string>& metadata) override;
 		void setMetadata(const std::string& key, const std::string& value) override;
-		std::weak_ptr<DependencyResolver> dependencyResolver() override;
+		std::shared_ptr<DependencyResolver> dependencyResolver() override;
 		void close(std::string reason = "") override;
 		virtual void send(const Writer& writer, int channelUid, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const TransformMetadata& transformMetadata = TransformMetadata()) override;
 		int ping() const override;
 		void setApplication(std::string account, std::string application) override;
-		Action<std::string>::TIterator onClose(std::function<void(std::string)> callback) override;
-		Action<std::string>& onCloseAction() override;
+		
 		rxcpp::observable<ConnectionState> getConnectionStateChangedObservable() const override;
 
 		template<typename T>
@@ -94,7 +94,7 @@ namespace Stormancer
 		std::shared_ptr<DependencyResolver> _dependencyResolver;
 		ConnectionState _connectionState = ConnectionState::Disconnected;
 		rxcpp::subjects::subject<ConnectionState> _connectionStateObservable;
-		Action<std::string> _closeAction;
+		
 		ILogger_ptr _logger;
 		std::string _closeReason;
 		

@@ -1,15 +1,16 @@
 #include "stormancer/stdafx.h"
-#include "stormancer/Scene.h"
+#include "stormancer/SceneImpl.h"
 #include "stormancer/ScenePeer.h"
 #include "stormancer/Client.h"
 #include "stormancer/TransformMetadata.h"
 #include "stormancer/SystemRequestIDTypes.h"
 #include "stormancer/P2P/P2PConnectToSceneMessage.h"
 #include "stormancer/SafeCapture.h"
+#include "stormancer/ChannelUidStore.h"
 
 namespace Stormancer
 {
-	Scene::Scene(std::weak_ptr<IConnection> connection, std::weak_ptr<Client> client, const SceneAddress& address, const std::string& token, const SceneInfosDto& dto, std::weak_ptr<DependencyResolver> parentDependencyResolver, std::vector<IPlugin*>& plugins)
+	Scene_Impl::Scene_Impl(std::weak_ptr<IConnection> connection, std::weak_ptr<Client> client, const SceneAddress& address, const std::string& token, const SceneInfosDto& dto, std::weak_ptr<DependencyResolver> parentDependencyResolver, std::vector<IPlugin*>& plugins)
 		: _dependencyResolver(std::make_shared<DependencyResolver>(parentDependencyResolver))
 		, _peer(connection)
 		, _token(token)
@@ -26,10 +27,10 @@ namespace Stormancer
 
 
 	}
-	void Scene::initialize()
+	void Scene_Impl::initialize()
 	{
-		_host = std::make_shared<ScenePeer>(_peer, _handle, _remoteRoutesMap, this);
-		std::weak_ptr<Scene> wThat;
+		_host = std::make_shared<ScenePeer>(_peer, _handle, _remoteRoutesMap, this->shared_from_this());
+		std::weak_ptr<Scene_Impl> wThat;
 		auto onNext = [wThat](ConnectionState state) {
 			if (auto that = wThat.lock())
 			{
@@ -57,7 +58,7 @@ namespace Stormancer
 			if (auto that = wThat.lock())
 			{
 				auto sceneState = that->getCurrentConnectionState();
-				auto actionDispatcher = that->dependencyResolver().lock()->resolve<IActionDispatcher>();
+				auto actionDispatcher = that->dependencyResolver()->resolve<IActionDispatcher>();
 				// We check the connection is disconnecting, and the scene is not already disconnecting or disconnected
 				if (state == ConnectionState::Disconnecting && sceneState != ConnectionState::Disconnecting && sceneState != ConnectionState::Disconnected)
 				{
@@ -102,14 +103,14 @@ namespace Stormancer
 
 		for (auto plugin : this->_plugins)
 		{
-			plugin->registerSceneDependencies(this);
+			plugin->registerSceneDependencies(this->shared_from_this());
 		}
 		for (auto plugin : this->_plugins)
 		{
-			plugin->sceneCreated(this);
+			plugin->sceneCreated(this->shared_from_this());
 		}
 	}
-	Scene::~Scene()
+	Scene_Impl::~Scene_Impl()
 	{
 		if (_hostConnectionStateSubscription.is_subscribed())
 		{
@@ -147,7 +148,7 @@ namespace Stormancer
 
 
 
-	std::string Scene::getHostMetadata(const std::string& key) const
+	std::string Scene_Impl::getHostMetadata(const std::string& key) const
 	{
 		if (mapContains(_metadata, key))
 		{
@@ -156,45 +157,45 @@ namespace Stormancer
 		return std::string();
 	}
 
-	byte Scene::handle() const
+	byte Scene_Impl::handle() const
 	{
 		return _handle;
 	}
-	SceneAddress Scene::address() const
+	SceneAddress Scene_Impl::address() const
 	{
 		return _address;
 	}
-	std::string Scene::id() const
+	std::string Scene_Impl::id() const
 	{
 		return _address.sceneId;
 	}
 
-	ConnectionState Scene::getCurrentConnectionState() const
+	ConnectionState Scene_Impl::getCurrentConnectionState() const
 	{
 		return _connectionState;
 	}
 
-	rxcpp::observable<ConnectionState> Scene::getConnectionStateChangedObservable() const
+	rxcpp::observable<ConnectionState> Scene_Impl::getConnectionStateChangedObservable() const
 	{
 		return _sceneConnectionStateObservable.get_observable();
 	}
 
-	std::weak_ptr<IConnection> Scene::hostConnection() const
+	std::weak_ptr<IConnection> Scene_Impl::hostConnection() const
 	{
 		return _peer;
 	}
 
-	std::vector<Route_ptr> Scene::localRoutes() const
+	std::vector<Route_ptr> Scene_Impl::localRoutes() const
 	{
 		return mapValues(_localRoutesMap);
 	}
 
-	std::vector<Route_ptr> Scene::remoteRoutes() const
+	std::vector<Route_ptr> Scene_Impl::remoteRoutes() const
 	{
 		return mapValues(_remoteRoutesMap);
 	}
 
-	void Scene::addRoute(const std::string& routeName, std::function<void(Packetisp_ptr)> handler, MessageOriginFilter filter, const std::map<std::string, std::string>& metadata)
+	void Scene_Impl::addRoute(const std::string& routeName, std::function<void(Packetisp_ptr)> handler, MessageOriginFilter filter, const std::map<std::string, std::string>& metadata)
 	{
 		auto observable = onMessage(routeName, filter, metadata);
 
@@ -214,7 +215,7 @@ namespace Stormancer
 		_subscriptions.push_back(subscription);
 	}
 
-	rxcpp::observable<Packetisp_ptr> Scene::onMessage(const std::string& routeName, MessageOriginFilter filter, const std::map<std::string, std::string>& metadata)
+	rxcpp::observable<Packetisp_ptr> Scene_Impl::onMessage(const std::string& routeName, MessageOriginFilter filter, const std::map<std::string, std::string>& metadata)
 	{
 		std::lock_guard<std::mutex> lg(_connectMutex);
 
@@ -244,7 +245,7 @@ namespace Stormancer
 		return onMessage(route);
 	}
 
-	rxcpp::observable<Packetisp_ptr> Scene::onMessage(Route_ptr route)
+	rxcpp::observable<Packetisp_ptr> Scene_Impl::onMessage(Route_ptr route)
 	{
 		auto observable = rxcpp::observable<>::create<Packetisp_ptr>([=](rxcpp::subscriber<Packetisp_ptr> subscriber) {
 			auto handler = std::function<void(Packet_ptr)>([=](Packet_ptr p) {
@@ -280,7 +281,7 @@ namespace Stormancer
 		return observable.as_dynamic();
 	}
 
-	void Scene::send(const PeerFilter&, const std::string& routeName, const Writer& writer, PacketPriority priority, PacketReliability reliability, const std::string& channelIdentifier)
+	void Scene_Impl::send(const PeerFilter&, const std::string& routeName, const Writer& writer, PacketPriority priority, PacketReliability reliability, const std::string& channelIdentifier)
 	{
 		auto client = _client.lock();
 		if (!client)
@@ -315,11 +316,11 @@ namespace Stormancer
 		{
 			std::stringstream ss;
 			ss << "Scene_" << id() << "_" << routeName;
-			channelUid = peer->getChannelUidStore().getChannelUid(ss.str());
+			channelUid = peer->dependencyResolver()->resolve<ChannelUidStore>()->getChannelUid(ss.str());
 		}
 		else
 		{
-			channelUid = peer->getChannelUidStore().getChannelUid(channelIdentifier);
+			channelUid = peer->dependencyResolver()->resolve<ChannelUidStore>()->getChannelUid(channelIdentifier);
 		}
 		auto writer2 = [=, &writer](obytestream* stream) {
 			(*stream) << _handle;
@@ -333,12 +334,12 @@ namespace Stormancer
 		peer->send(writer2, channelUid, priority, reliability, transformMetadata);
 	}
 
-	void Scene::send(const std::string& routeName, const Writer& writer, PacketPriority priority, PacketReliability reliability, const std::string& channelIdentifier)
+	void Scene_Impl::send(const std::string& routeName, const Writer& writer, PacketPriority priority, PacketReliability reliability, const std::string& channelIdentifier)
 	{
 		send(MatchSceneHost(), routeName, writer, priority, reliability, channelIdentifier);
 	}
 
-	pplx::task<void> Scene::connect(pplx::cancellation_token ct)
+	pplx::task<void> Scene_Impl::connect(pplx::cancellation_token ct)
 	{
 		std::lock_guard<std::mutex> lg(_connectMutex);
 
@@ -362,7 +363,7 @@ namespace Stormancer
 		return _connectTask;
 	}
 
-	pplx::task<void> Scene::disconnect()
+	pplx::task<void> Scene_Impl::disconnect()
 	{
 		try
 		{
@@ -415,12 +416,12 @@ namespace Stormancer
 	}
 
 
-	std::weak_ptr<DependencyResolver> Scene::dependencyResolver() const
+	std::shared_ptr<DependencyResolver> Scene_Impl::dependencyResolver() const
 	{
 		return _dependencyResolver;
 	}
 
-	void Scene::completeConnectionInitialization(ConnectionResult& cr)
+	void Scene_Impl::completeConnectionInitialization(ConnectionResult& cr)
 	{
 		_handle = cr.SceneHandle;
 
@@ -431,7 +432,7 @@ namespace Stormancer
 		}
 	}
 
-	void Scene::handleMessage(Packet_ptr packet)
+	void Scene_Impl::handleMessage(Packet_ptr packet)
 	{
 		_onPacketReceived(packet);
 
@@ -470,51 +471,51 @@ namespace Stormancer
 		}
 	}
 
-	std::vector<IScenePeer*> Scene::remotePeers() const
+	std::vector<IScenePeer*> Scene_Impl::remotePeers() const
 	{
 		std::vector<IScenePeer*> container;
 		container.push_back(host());
 		return container;
 	}
 
-	IScenePeer* Scene::host() const
+	IScenePeer* Scene_Impl::host() const
 	{
 		return _host.get();
 	}
 
-	bool Scene::isHost() const
+	bool Scene_Impl::isHost() const
 	{
 		return _isHost;
 	}
 
-	std::unordered_map<uint64, std::shared_ptr<IScenePeer>> Scene::connectedPeers() const
+	std::unordered_map<uint64, std::shared_ptr<IScenePeer>> Scene_Impl::connectedPeers() const
 	{
 		return _connectedPeers;
 	}
 
-	rxcpp::observable<P2PConnectionStateChangedArgs> Scene::p2pConnectionStateChanged() const
+	rxcpp::observable<P2PConnectionStateChangedArgs> Scene_Impl::p2pConnectionStateChanged() const
 	{
 		return _p2pConnectionStateChangedObservable.get_observable();
 	}
 
-	std::shared_ptr<P2PTunnel> Scene::registerP2PServer(const std::string & p2pServerId)
+	std::shared_ptr<P2PTunnel> Scene_Impl::registerP2PServer(const std::string & p2pServerId)
 	{
-		auto p2p = dependencyResolver().lock()->resolve<P2PService>();
+		auto p2p = dependencyResolver()->resolve<P2PService>();
 		return p2p->registerP2PServer(this->id() + "." + p2pServerId);
 	}
 
-	pplx::task<std::shared_ptr<P2PScenePeer>> Scene::openP2PConnection(const std::string & p2pToken, pplx::cancellation_token ct)
+	pplx::task<std::shared_ptr<IP2PScenePeer>> Scene_Impl::openP2PConnection(const std::string & p2pToken, pplx::cancellation_token ct)
 	{
-		auto p2pService = dependencyResolver().lock()->resolve<P2PService>();
+		auto p2pService = dependencyResolver()->resolve<P2PService>();
 		auto wScene = STRM_WEAK_FROM_THIS();
-		auto dispatcher = dependencyResolver().lock()->resolve<IActionDispatcher>();
+		auto dispatcher = dependencyResolver()->resolve<IActionDispatcher>();
 		auto options = pplx::task_options(dispatcher);
 		options.set_cancellation_token(ct);
 		return p2pService->openP2PConnection(p2pToken, ct)
 			.then([wScene, p2pService](std::shared_ptr<IConnection> connection)
 		{
 			auto scene = LockOrThrow(wScene);
-			return std::make_shared<P2PScenePeer>(scene.get(), connection, p2pService, P2PConnectToSceneMessage());
+			return std::reinterpret_pointer_cast<IP2PScenePeer>(std::make_shared<P2PScenePeer>(scene, connection, p2pService, P2PConnectToSceneMessage()));
 		}, options);
 		//	auto c = t.get();
 		//	P2PConnectToSceneMessage message;
@@ -527,22 +528,19 @@ namespace Stormancer
 		//});
 	}
 
-	const std::map<std::string, std::string>& Scene::getSceneMetadata()
+	const std::map<std::string, std::string>& Scene_Impl::getSceneMetadata()
 	{
 		return _metadata;
 	}
 
-	Action<Packet_ptr>::TIterator Scene::onPacketReceived(std::function<void(Packet_ptr)> callback)
-	{
-		return _onPacketReceived.push_back(callback);
-	}
-
-	Action<Packet_ptr>& Scene::packetReceivedAction()
+	Action2<Packet_ptr> Scene_Impl::onPacketReceived()
 	{
 		return _onPacketReceived;
 	}
 
-	void Scene::setConnectionState(ConnectionState state)
+	
+
+	void Scene_Impl::setConnectionState(ConnectionState state)
 	{
 		if (_connectionState != state && !_connectionStateObservableCompleted)
 		{
@@ -557,25 +555,25 @@ namespace Stormancer
 			case ConnectionState::Connecting:
 				for (auto plugin : this->_plugins)
 				{
-					plugin->sceneConnecting(this);
+					plugin->sceneConnecting(this->shared_from_this());
 				}
 				break;
 			case ConnectionState::Connected:
 				for (auto plugin : this->_plugins)
 				{
-					plugin->sceneConnected(this);
+					plugin->sceneConnected(this->shared_from_this());
 				}
 				break;
 			case ConnectionState::Disconnecting:
 				for (auto plugin : this->_plugins)
 				{
-					plugin->sceneDisconnecting(this);
+					plugin->sceneDisconnecting(this->shared_from_this());
 				}
 				break;
 			case ConnectionState::Disconnected:
 				for (auto plugin : this->_plugins)
 				{
-					plugin->sceneDisconnected(this);
+					plugin->sceneDisconnected(this->shared_from_this());
 				}
 				break;
 			default:
@@ -591,7 +589,7 @@ namespace Stormancer
 
 	}
 
-	pplx::task<std::shared_ptr<P2PScenePeer>> Scene::createScenePeerFromP2PConnection(std::shared_ptr<IConnection> /*connection*/, pplx::cancellation_token /*ct*/)
+	pplx::task<std::shared_ptr<P2PScenePeer>> Scene_Impl::createScenePeerFromP2PConnection(std::shared_ptr<IConnection> /*connection*/, pplx::cancellation_token /*ct*/)
 	{
 		throw std::runtime_error("Not implemented");
 	}

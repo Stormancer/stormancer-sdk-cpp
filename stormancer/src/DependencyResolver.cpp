@@ -23,9 +23,10 @@ namespace Stormancer
 	std::shared_ptr<void> DependencyResolver::resolveInternal(const std::type_info& t)
 	{
 		auto h = t.hash_code();
-		if (mapContains(_factories, h))
+		auto it = _factories.find(h);
+		if (it != _factories.end())
 		{
-			auto& registration = _factories[h];
+			auto& registration = it->second;
 			if (registration.singleInstance)
 			{
 				if (registration.instance == nullptr)

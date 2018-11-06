@@ -17,6 +17,7 @@
 #include "stormancer/PacketTransformProcessor.h"
 #include "stormancer/Configuration.h"
 #include "stormancer/Client.h"
+#include "stormancer/IPacketDispatcher.h"
 
 void Stormancer::Client::ConfigureContainer(std::weak_ptr<DependencyResolver> wResolver, Configuration_ptr config)
 {

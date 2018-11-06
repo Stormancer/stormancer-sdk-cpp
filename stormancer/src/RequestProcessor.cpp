@@ -4,6 +4,8 @@
 #include "stormancer/Serializer.h"
 #include "stormancer/SystemRequestIDTypes.h"
 #include "stormancer/SafeCapture.h"
+#include "stormancer/utilities/taskUtilities.h"
+#include "stormancer/Helpers.h"
 
 namespace Stormancer
 {

@@ -1,6 +1,7 @@
 #pragma once
 #include "stormancer/headers.h"
 #include "OrganizationsTypes.h"
+#include "pplx/pplxtasks.h"
 
 namespace Stormancer
 {

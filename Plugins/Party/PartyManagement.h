@@ -15,6 +15,9 @@ namespace Stormancer
 	class AuthenticationService;
 	class ILogger;
 	class GameFinder;
+	class IScenePeer;
+	template<typename T>
+	class RpcRequestContext;
 
 	class PartyManagement : public std::enable_shared_from_this<PartyManagement>
 	{
@@ -66,7 +69,7 @@ namespace Stormancer
 
 	public:
 
-		PartyManagementService(Scene_ptr scene);
+		PartyManagementService(std::shared_ptr<Scene> scene);
 
 		pplx::task<std::string> CreateParty(const  PartyRequestDto& partyRequestDto);
 
@@ -77,6 +80,6 @@ namespace Stormancer
 		std::weak_ptr<Scene> _scene;
 
 		//Internal callbacks
-		std::function<void(RpcRequestContext_ptr requestContext)> _onCreateSession;
+		std::function<void(std::shared_ptr<RpcRequestContext<IScenePeer>> requestContext)> _onCreateSession;
 	};
 }

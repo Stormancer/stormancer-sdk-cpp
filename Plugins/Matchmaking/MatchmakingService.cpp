@@ -3,11 +3,11 @@
 
 namespace Stormancer
 {
-	MatchmakingService::MatchmakingService(Scene_ptr scene)
+	MatchmakingService::MatchmakingService(std::shared_ptr<Scene> scene)
 		: _scene(scene)
 	{
-		_rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
-		_logger = scene->dependencyResolver().lock()->resolve<ILogger>();
+		_rpcService = scene->dependencyResolver()->resolve<RpcService>();
+		_logger = scene->dependencyResolver()->resolve<ILogger>();
 
 		scene->addRoute("match.update", [this](Packetisp_ptr packet) {
 			byte matchStateByte;

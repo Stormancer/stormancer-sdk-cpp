@@ -1,10 +1,12 @@
 #pragma once
 #include "stormancer/headers.h"
-#include "stormancer/stormancer.h"
 #include "AssetsStorage/AssetsStorageDto.h"
+#include "stormancer/Logger/ILogger.h"
+#include "stormancer/scene.h"
 
 namespace Stormancer
 {
+	
 	class AssetsStorageService
 	{
 	public:

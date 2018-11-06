@@ -81,8 +81,7 @@ namespace Stormancer
 	class PartyService : public std::enable_shared_from_this<PartyService>
 	{
 	public:
-
-		PartyService(Scene_ptr scene);
+		PartyService(std::shared_ptr<Scene> scene);
 
 		///
 		/// Sent to server the new party status
@@ -119,17 +118,16 @@ namespace Stormancer
 		///
 		/// Callback member
 		///
-		Event<GameFinderStatus> PartyGameFinderStateUpdated;
-		Event<GameFinderResponse> onPartyMatchFound;
+		Action2<GameFinderStatus> PartyGameFinderStateUpdated;
+		Action2<GameFinderResponse> onPartyMatchFound;
 
-		Event<void> LeftParty;
+		Action2<void> LeftParty;
 
-		Event<std::vector<PartyUserDto>> UpdatedPartyMembers;
-		Event<PartyUserData> UpdatedPartyUserData;
-		Event<PartySettings> UpdatedPartySettings;
+		Action2<std::vector<PartyUserDto>> UpdatedPartyMembers;
+		Action2<PartyUserData> UpdatedPartyUserData;
+		Action2<PartySettings> UpdatedPartySettings;
 
 		std::vector<PartyUserDto> members();
-
 	private:
 
 		///
@@ -145,7 +143,7 @@ namespace Stormancer
 		pplx::task<void> setNewLocalSettings(const PartySettingsDto partySettings);
 
 		std::shared_ptr<ILogger> _logger;
-		Scene_ptr _scene;
+		std::shared_ptr<Scene> _scene;
 		std::shared_ptr<RpcService> _rpcService;
 		
 		bool _playerReady;
@@ -156,31 +154,30 @@ namespace Stormancer
 	class Party
 	{
 	public:
-
-		Party(Scene_ptr scene, 
-			Event<void>::Subscription LeftPartySubscription,
-			Event<std::vector<PartyUserDto>>::Subscription UpdatedPartyMembersSubscription,
-			Event<PartyUserData>::Subscription UpdatedPartyUserDataSubscription,
-			Event<PartySettings>::Subscription UpdatedPartySettingsSubscription);
+		Party(std::shared_ptr<Scene> scene, 
+			Action2<void>::Subscription LeftPartySubscription,
+			Action2<std::vector<PartyUserDto>>::Subscription UpdatedPartyMembersSubscription,
+			Action2<PartyUserData>::Subscription UpdatedPartyUserDataSubscription,
+			Action2<PartySettings>::Subscription UpdatedPartySettingsSubscription);
 
 		PartySettings partySettings;
 
 		std::vector<PartyUserDto> members()
 		{
-			return _partyScene->dependencyResolver().lock()->resolve<PartyService>()->members();
+			return _partyScene->dependencyResolver()->resolve<PartyService>()->members();
 		}
 		bool isLeader();
-		Scene_ptr getScene();
+		std::shared_ptr<Scene> getScene();
 
 	private:
+		Action2<void>::Subscription LeftPartySubscription;
 
-		Event<void>::Subscription LeftPartySubscription;
+		Action2<std::vector<PartyUserDto>>::Subscription UpdatedPartyMembersSubscription;
+		Action2<PartyUserData>::Subscription UpdatedPartyUserDataSubscription;
+		Action2<PartySettings>::Subscription UpdatedPartySettingsSubscription;
 
-		Event<std::vector<PartyUserDto>>::Subscription UpdatedPartyMembersSubscription;
-		Event<PartyUserData>::Subscription UpdatedPartyUserDataSubscription;
-		Event<PartySettings>::Subscription UpdatedPartySettingsSubscription;
-
-		Scene_ptr _partyScene;
+		
+		std::shared_ptr<Scene> _partyScene;
 	};
 }
 MSGPACK_ADD_ENUM(Stormancer::PartyUserStatus)

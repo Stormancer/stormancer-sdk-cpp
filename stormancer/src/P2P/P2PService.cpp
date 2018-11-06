@@ -3,7 +3,7 @@
 #include "stormancer/P2P/P2PSession.h"
 #include "stormancer/SystemRequestIDTypes.h"
 #include "stormancer/P2P/RakNet/P2PTunnels.h"
-#include "stormancer/CustomExceptions.h"
+#include "stormancer/exceptions.h"
 
 namespace Stormancer
 {

@@ -16,7 +16,7 @@ namespace Stormancer
 		{
 		}
 
-		void setScene(Scene* scene) override
+		void setScene(std::shared_ptr<Scene> scene) override
 		{
 			_scene = scene;
 		}
@@ -39,7 +39,7 @@ namespace Stormancer
 
 #pragma region private_members
 
-		Scene* _scene = nullptr;
+		std::shared_ptr<Scene> _scene = nullptr;
 
 #pragma endregion
 	};

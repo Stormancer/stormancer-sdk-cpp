@@ -1,9 +1,10 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/ScenePeer.h"
+#include "stormancer/ChannelUidStore.h"
 
 namespace Stormancer
 {
-	ScenePeer::ScenePeer(std::weak_ptr<IConnection> connection, byte sceneHandle, std::map<std::string, Route_ptr>& routeMapping, Scene* scene)
+	ScenePeer::ScenePeer(std::weak_ptr<IConnection> connection, byte sceneHandle, std::map<std::string, Route_ptr>& routeMapping, std::weak_ptr<Scene> scene)
 		: _connection(connection),
 		_sceneHandle(sceneHandle),
 		_routeMapping(routeMapping),
@@ -30,7 +31,7 @@ namespace Stormancer
 		Route_ptr r = _routeMapping[routeName];
 		std::stringstream ss;
 		ss << "ScenePeer_" << id() << "_" << routeName;
-		int channelUid = connection->getChannelUidStore().getChannelUid(ss.str());
+		int channelUid = connection->dependencyResolver()->resolve<ChannelUidStore>()->getChannelUid(ss.str());
 		connection->send([=, &writer](obytestream* stream) {
 			(*stream) << _sceneHandle;
 			(*stream) << r->handle();
@@ -43,12 +44,22 @@ namespace Stormancer
 
 	void ScenePeer::disconnect()
 	{
-		if (_scene)
+		auto scene = _scene.lock();
+		if (scene)
 		{
-			_scene->disconnect();
+			scene->disconnect();
 		}
 	}
+	std::string ScenePeer::getSceneId() const
+	{
+		auto scene = _scene.lock();
+		if (!scene)
+		{
+			throw std::runtime_error("Scene destroyed");
 
+		}
+		return scene->id();
+	}
 	uint64 ScenePeer::id()
 	{
 		auto connection = _connection.lock();

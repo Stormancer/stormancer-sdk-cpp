@@ -1,13 +1,16 @@
 #pragma once
 #include <memory>
 #include <unordered_map>
-#include "stormancer/stormancer.h"
+#include "stormancer/msgpack_define.h"
+#include "pplx/pplxtasks.h"
 
-class Scene;
-class RpcService;
 
 namespace Stormancer
 {
+	class Scene;
+	class RpcService;
+	class ILogger;
+
 	struct ProfileDto
 	{
 		std::unordered_map<std::string, std::string> Data;

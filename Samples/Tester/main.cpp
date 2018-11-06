@@ -5,7 +5,7 @@
 
 int main(int argc, char** argv)
 {
-	std::string endpoint = (argc >= 2) ? argv[1] : "http://api2.stormancer.com:8080";//"http://localhost:8081";
+	std::string endpoint = (argc >= 2) ? argv[1] : "http://localhost:8081";
 	std::string account = (argc >= 3) ? argv[2] : "tester";
 	std::string application = (argc >= 4) ? argv[3] : "test-application";
 

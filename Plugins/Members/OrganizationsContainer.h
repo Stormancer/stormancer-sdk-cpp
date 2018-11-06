@@ -1,5 +1,6 @@
 #pragma once
 #include "stormancer/headers.h"
+#include "rxcpp/rx.hpp"
 
 namespace Stormancer
 {

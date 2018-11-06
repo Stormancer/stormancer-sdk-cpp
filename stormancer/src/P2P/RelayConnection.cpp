@@ -98,7 +98,7 @@ namespace Stormancer
 		_metadata[key] = value;
 	}
 
-	std::weak_ptr<DependencyResolver> RelayConnection::dependencyResolver()
+	std::shared_ptr<DependencyResolver> RelayConnection::dependencyResolver()
 	{
 		return _dependencyResolver;
 	}
@@ -118,13 +118,7 @@ namespace Stormancer
 		throw std::runtime_error("Not supported");
 	}
 
-	Action<std::string>::TIterator RelayConnection::onClose(std::function<void(std::string)> callback)
-	{
-		throw std::runtime_error("Not supported");
-	}
+	
 
-	Action<std::string>& RelayConnection::onCloseAction()
-	{
-		throw std::runtime_error("Not supported");
-	}
+	
 }

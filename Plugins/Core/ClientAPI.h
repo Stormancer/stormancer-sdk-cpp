@@ -19,8 +19,8 @@ namespace Stormancer
 
 		template<class TService>
 		pplx::task<std::shared_ptr<TService>> getService(std::string type,
-			std::function < void(std::shared_ptr<TManager>, std::shared_ptr<TService>, Scene_ptr)> initializer = [](auto that, auto service, auto scene) {},
-			std::function<void(std::shared_ptr<TManager>, Scene_ptr)> cleanup = [](auto that, auto scene) {},
+			std::function < void(std::shared_ptr<TManager>, std::shared_ptr<TService>, std::shared_ptr<Scene>)> initializer = [](auto that, auto service, auto scene) {},
+			std::function<void(std::shared_ptr<TManager>, std::shared_ptr<Scene>)> cleanup = [](auto that, auto scene) {},
 			std::string name = "")
 		{
 			auto auth = _auth.lock();
@@ -33,7 +33,7 @@ namespace Stormancer
 			{
 
 
-				_scene = std::make_shared<pplx::task<std::shared_ptr<Scene>>>(auth->getSceneForService(type, name).then([wThat, cleanup](Scene_ptr scene) {
+				_scene = std::make_shared<pplx::task<std::shared_ptr<Scene>>>(auth->getSceneForService(type, name).then([wThat, cleanup](std::shared_ptr<Scene> scene) {
 					auto that = wThat.lock();
 					if (!that)
 					{
@@ -69,7 +69,7 @@ namespace Stormancer
 						that->_scene = nullptr;
 					}
 					return scene;
-				}).then([wThat, cleanup](pplx::task<Scene_ptr> t) {
+				}).then([wThat, cleanup](pplx::task<std::shared_ptr<Scene>> t) {
 					try
 					{
 						return t.get();
@@ -95,9 +95,9 @@ namespace Stormancer
 
 			}
 
-			return _scene->then([wThat, initializer](Scene_ptr scene) {
+			return _scene->then([wThat, initializer](std::shared_ptr<Scene> scene) {
 
-				auto service = scene->dependencyResolver().lock()->resolve<TService>();
+				auto service = scene->dependencyResolver()->resolve<TService>();
 				auto that = wThat.lock();
 				if (!that)
 				{

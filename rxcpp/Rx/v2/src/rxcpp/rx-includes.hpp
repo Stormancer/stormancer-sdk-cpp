@@ -158,7 +158,7 @@
 #if !CPPREST_FORCE_PPLX
 #include <future>
 #else
-#include "pplx/pplx.h"
+#include "pplx/pplxtasks.h"
 #endif
 #include <vector>
 #include <list>

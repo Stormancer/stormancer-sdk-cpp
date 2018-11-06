@@ -2,7 +2,7 @@
 
 #include "stormancer/headers.h"
 #include "stormancer/IPlugin.h"
-#include "stormancer/Client.h"
+#include "stormancer/IClient.h"
 
 namespace Stormancer
 {
@@ -11,7 +11,7 @@ namespace Stormancer
 	public:
 		AuthenticationPlugin();
 		~AuthenticationPlugin();
-		void clientCreated(Client* client) override;
-		void clientDisconnecting(Client* client) override;
+		void clientCreated(std::shared_ptr<IClient> client) override;
+		void clientDisconnecting(std::shared_ptr<IClient> client) override;
 	};
 };

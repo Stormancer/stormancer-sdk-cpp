@@ -1,5 +1,6 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/PacketProcessorConfig.h"
+#include "stormancer/Helpers.h"
 
 namespace Stormancer
 {

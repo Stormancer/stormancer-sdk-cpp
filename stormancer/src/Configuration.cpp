@@ -2,20 +2,27 @@
 #include "stormancer/Configuration.h"
 #include "stormancer/RakNet/RakNetTransport.h"
 #include "stormancer/RPC/RpcPlugin.h"
+#include "stormancer/Logger/NullLogger.h"
+#include "stormancer/DefaultScheduler.h"
+#include "stormancer/DefaultPacketDispatcher.h"
 
 namespace Stormancer
 {
 	Configuration::Configuration(const std::string& endpoint, const std::string& account, const std::string& application)
 		: account(account)
-		, application(application)			
+		, application(application)
+		, logger(std::make_shared<NullLogger>())
+		, actionDispatcher(std::make_shared<SameThreadActionDispatcher>())
+		, scheduler(std::make_shared<DefaultScheduler>())
+		, transportFactory(_defaultTransportFactory)
 	{
-		scheduler = std::make_shared<DefaultScheduler>();
-		transportFactory = _defaultTransportFactory;
 		dispatcher = [](std::weak_ptr<DependencyResolver> dr) {
 			return std::make_shared<DefaultPacketDispatcher>(dr.lock()->resolve<ILogger>());
 		};
+
 		addServerEndpoint(endpoint);
 		_plugins.push_back(new RpcPlugin());
+
 
 
 
@@ -95,6 +102,6 @@ namespace Stormancer
 
 	const std::string Configuration::getIp_Port()
 	{
-		return dedicatedServerEndpoint + ":" + std::to_string(serverGamePort); 
+		return dedicatedServerEndpoint + ":" + std::to_string(serverGamePort);
 	}
 };

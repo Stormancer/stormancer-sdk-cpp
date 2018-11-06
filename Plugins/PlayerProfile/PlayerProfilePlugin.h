@@ -8,7 +8,7 @@ namespace Stormancer
 	template<class T>
 	class PlayerProfilePlugin : public IPlugin
 	{
-		virtual void registerSceneDependencies(Scene* scene) override
+		virtual void registerSceneDependencies(std::shared_ptr<Scene> scene) override
 		{
 			if (scene)
 			{

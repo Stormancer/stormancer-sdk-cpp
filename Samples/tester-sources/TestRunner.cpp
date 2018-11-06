@@ -1,11 +1,10 @@
 #include "TestRunner.h"
-#include "TestPlayerDataPlugin.h"
 
 TestRunner::TestRunner(Stormancer::ILogger_ptr logger)
 	: _logger(logger)
 {
 	// I cannot list-initialize the vector as it requires a copy ctor for elements
-	_tests.emplace_back(new TestPlayerDataPlugin);
+	//_tests.emplace_back(new TestPlayerDataPlugin);
 }
 
 bool TestRunner::run_tests()

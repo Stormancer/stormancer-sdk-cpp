@@ -11,7 +11,7 @@ namespace Stormancer
 
 #pragma region public_methods
 
-		GameVersionService(Scene* scene);
+		GameVersionService(std::shared_ptr<Scene> scene);
 		~GameVersionService();
 		std::string gameVersion() const;
 		void onGameVersionUpdate(std::function<void(std::string)> callback);

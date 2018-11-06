@@ -2,7 +2,7 @@
 #include "OrganizationsContainer.h"
 #include "OrganizationsService.h"
 #include "stormancer/Scene.h"
-#include "stormancer/SafeCapture.h"
+#include "stormancer/Exceptions.h"
 
 namespace Stormancer
 {
@@ -15,6 +15,6 @@ namespace Stormancer
 			throw PointerDeletedException("Scene deleted");
 		}
 
-		return scene->dependencyResolver().lock()->resolve<OrganizationsService>();
+		return scene->dependencyResolver()->resolve<OrganizationsService>();
 	}
 }

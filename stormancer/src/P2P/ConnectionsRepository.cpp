@@ -33,18 +33,23 @@ namespace Stormancer
 
 		auto id = connection->id();
 		auto key = connection->key();
-		auto t = pplx::task_from_result(connection);
-		_connections.emplace(id, t);
-		_connectionsByKey.emplace(key, t);
+		
 
 		std::weak_ptr<ConnectionsRepository> wThat(shared_from_this());
-		connection->onClose([wThat, id, key](std::string /*reason*/) {
+		
+		ConnectionContainer container;
+		container.connection = connection;
+		container.onCloseSubscription = connection->onClose.subscribe([wThat, id, key](std::string /*reason*/) {
 			if (auto that = wThat.lock())
 			{
 				that->_connections.erase(id);
 				that->_connectionsByKey.erase(key);
 			}
 		});
+
+		auto t = pplx::task_from_result(container);
+		_connections.emplace(id, t);
+		_connectionsByKey.emplace(key, t);
 
 		_logger->log(LogLevel::Info, "P2P", "Transitioning connection from pending", std::to_string(connection->id()));
 		auto it = _pendingP2PConnections.find(connection->id());
@@ -71,7 +76,7 @@ namespace Stormancer
 			auto t = it->second;
 			if (t.is_done())
 			{
-				return std::shared_ptr<IConnection>(t.get());
+				return std::shared_ptr<IConnection>(t.get().connection);
 			}
 			else
 			{
@@ -93,7 +98,7 @@ namespace Stormancer
 			auto t = it->second;
 			if (t.is_done())
 			{
-				return std::shared_ptr<IConnection>(t.get());
+				return std::shared_ptr<IConnection>(t.get().connection);
 			}
 			else
 			{
@@ -122,7 +127,7 @@ namespace Stormancer
 		auto it = _connectionsByKey.find(id);
 		if (it != _connectionsByKey.end())
 		{
-			return it->second;
+			return it->second.then([](ConnectionContainer container) {return container.connection; });
 		}
 		else
 		{
@@ -135,8 +140,9 @@ namespace Stormancer
 					auto connection = tc.get();
 					auto pId = connection->id();
 					auto key = connection->key();
-
-					connection->onClose([wThat, pId, key](std::string /*reason*/) {
+					ConnectionContainer container;
+					container.connection = connection;
+					container.onCloseSubscription = connection->onClose.subscribe([wThat, pId, key](std::string /*reason*/) {
 						if (auto that = wThat.lock())
 						{
 							that->_connections.erase(pId);
@@ -146,9 +152,9 @@ namespace Stormancer
 					});
 					if (auto that = wThat.lock())
 					{
-						that->_connections.emplace(pId, pplx::task_from_result(connection));
+						that->_connections.emplace(pId, pplx::task_from_result(container));
 					}
-					return connection;
+					return container;
 				}
 				catch (...)
 				{
@@ -161,7 +167,7 @@ namespace Stormancer
 				}
 			});
 			_connectionsByKey.emplace(id, result);
-			return result;
+			return result.then([](ConnectionContainer c) {return c.connection; });
 		}
 
 		
@@ -173,10 +179,10 @@ namespace Stormancer
 		auto connections = _connections;
 		for (auto c : connections)
 		{
-			tasks.push_back(c.second.then([wThat,reason](pplx::task<std::shared_ptr<IConnection>> t) {
+			tasks.push_back(c.second.then([wThat,reason](pplx::task<ConnectionContainer> t) {
 				try
 				{
-					t.get()->close(reason);
+					t.get().connection->close(reason);
 				}
 				catch (...)
 				{

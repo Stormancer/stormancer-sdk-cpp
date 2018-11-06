@@ -4,7 +4,7 @@
 #include "Leaderboard/Leaderboard.h"
 namespace Stormancer
 {
-	void LeaderboardPlugin::sceneCreated(Scene* scene)
+	void LeaderboardPlugin::sceneCreated(std::shared_ptr<Scene> scene)
 	{
 		if (scene)
 		{
@@ -13,15 +13,15 @@ namespace Stormancer
 			if (!name.empty())
 			{
 				auto service = std::make_shared<LeaderboardService>(scene);
-				scene->dependencyResolver().lock()->registerDependency<LeaderboardService>(service);
+				scene->dependencyResolver()->registerDependency<LeaderboardService>(service);
 			}
 		}
 	}
-	void LeaderboardPlugin::clientCreated(Client* client)
+	void LeaderboardPlugin::clientCreated(std::shared_ptr<IClient> client)
 	{
 		if (client)
 		{
-			client->dependencyResolver().lock()->registerDependency<Leaderboard>([](std::weak_ptr<DependencyResolver> dr) {
+			client->dependencyResolver()->registerDependency<Leaderboard>([](std::weak_ptr<DependencyResolver> dr) {
 				return std::make_shared<Leaderboard>(dr.lock()->resolve<AuthenticationService>()); });
 		}
 	}

@@ -1,5 +1,7 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/IPlugin.h"
+#include "stormancer/IClient.h"
+#include "stormancer/scene.h"
 #include "stormancer/Packet.h"
 
 namespace Stormancer
@@ -8,43 +10,43 @@ namespace Stormancer
 	{
 	}
 
-	void IPlugin::clientCreated(Client*)
+	void IPlugin::clientCreated(std::shared_ptr<IClient>)
 	{
 	}
 
-	void IPlugin::transportStarted(ITransport*)
+	void IPlugin::transportStarted(std::shared_ptr<ITransport>)
 	{
 	}
 
-	void IPlugin::registerSceneDependencies(Scene*)
+	void IPlugin::registerSceneDependencies(std::shared_ptr<Scene>)
 	{
 	}
 
-	void IPlugin::sceneCreated(Scene*)
+	void IPlugin::sceneCreated(std::shared_ptr<Scene>)
 	{
 	}
 
-	void IPlugin::sceneConnecting(Scene*)
+	void IPlugin::sceneConnecting(std::shared_ptr<Scene>)
 	{
 	}
 
-	void IPlugin::sceneConnected(Scene*)
+	void IPlugin::sceneConnected(std::shared_ptr<Scene>)
 	{
 	}
 
-	void IPlugin::sceneDisconnecting(Scene*)
+	void IPlugin::sceneDisconnecting(std::shared_ptr<Scene>)
 	{
 	}
 
-	void IPlugin::sceneDisconnected(Scene*)
+	void IPlugin::sceneDisconnected(std::shared_ptr<Scene>)
 	{
 	}
 
-	void IPlugin::packetReceived(Packet_ptr)
+	void IPlugin::packetReceived(std::shared_ptr<Packet<IConnection>>)
 	{
 	}
 
-	void IPlugin::clientDisconnecting(Client*)
+	void IPlugin::clientDisconnecting(std::shared_ptr<IClient>)
 	{
 
 	}

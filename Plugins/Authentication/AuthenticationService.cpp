@@ -1,14 +1,15 @@
 
 #include "stormancer/headers.h"
-#include "stormancer/RPC/RpcService.h"
+#include "stormancer/RPC/service.h"
 #include "Authentication/AuthenticationService.h"
+#include "stormancer/utilities/taskUtilities.h"
 //#include "stormancer/Debug/StackWalker.h"
 
 namespace Stormancer
 {
-	AuthenticationService::AuthenticationService(Client* client)
+	AuthenticationService::AuthenticationService(std::shared_ptr<IClient> client)
 		: _client(client)
-		, _logger(client->logger())
+		, _logger(client->dependencyResolver()->resolve<ILogger>())
 	{
 
 	}
@@ -21,19 +22,23 @@ namespace Stormancer
 	pplx::task<void> AuthenticationService::login()
 	{
 		_autoReconnect = true;
-		return getAuthenticationScene().then([](Scene_ptr) {});
+		return getAuthenticationScene().then([](std::shared_ptr<Scene>) {});
 	}
 
-	pplx::task<Scene_ptr> AuthenticationService::loginImpl(int retry)
+	pplx::task<std::shared_ptr<Scene>> AuthenticationService::loginImpl(int retry)
 	{
 		std::weak_ptr<AuthenticationService> wThat = this->shared_from_this();
 
 		if (!this->getCredentialsCallback)
 		{
-			return pplx::task_from_exception<Scene_ptr>(std::runtime_error("'getCredentialsCallback' must be set before authentication."));
+			return pplx::task_from_exception<std::shared_ptr<Scene>>(std::runtime_error("'getCredentialsCallback' must be set before authentication."));
 		}
-
-		return _client->connectToPublicScene(SCENE_ID, [wThat](Scene_ptr scene) {
+		auto client = _client.lock();
+		if (!client)
+		{
+			return pplx::task_from_exception<std::shared_ptr<Scene>>(std::runtime_error("'Client destroyed."));
+		}
+		return client->connectToPublicScene(SCENE_ID, [wThat](std::shared_ptr<Scene> scene) {
 
 			auto that = wThat.lock();
 			if (that)
@@ -58,7 +63,7 @@ namespace Stormancer
 
 				});
 			}
-			scene->dependencyResolver().lock()->resolve<RpcService>()->addProcedure("sendRequest", [wThat](RpcRequestContext_ptr ctx) {
+			scene->dependencyResolver()->resolve<RpcService>()->addProcedure("sendRequest", [wThat](RpcRequestContext_ptr ctx) {
 				OperationCtx opCtx;
 				opCtx.request = ctx;
 				Serializer serializer;
@@ -80,7 +85,7 @@ namespace Stormancer
 
 			});
 
-		}).then([wThat](Scene_ptr scene)
+		}).then([wThat](std::shared_ptr<Scene> scene)
 		{
 			auto that = wThat.lock();
 
@@ -105,7 +110,7 @@ namespace Stormancer
 				{
 					throw std::runtime_error("destroyed");
 				}
-				auto rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
+				auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
 				return rpcService->rpc<LoginResult>(that->LOGIN_ROUTE, ctx);
 
 			}).then([scene, wThat](LoginResult result) {
@@ -132,11 +137,11 @@ namespace Stormancer
 				return scene;
 			});
 
-		}).then([wThat, retry](pplx::task<Scene_ptr> t) {
+		}).then([wThat, retry](pplx::task<std::shared_ptr<Scene>> t) {
 			auto that = wThat.lock();
 			if (!that)
 			{
-				return pplx::task_from_result<Scene_ptr>(nullptr);
+				return pplx::task_from_result<std::shared_ptr<Scene>>(nullptr);
 			}
 			try
 			{
@@ -151,14 +156,14 @@ namespace Stormancer
 				}
 				else
 				{
-					return pplx::task_from_result<Scene_ptr>(nullptr);
+					return pplx::task_from_result<std::shared_ptr<Scene>>(nullptr);
 				}
 			}
 		});
 
 	}
 
-	pplx::task<Scene_ptr> AuthenticationService::reconnect(int retry)
+	pplx::task<std::shared_ptr<Scene>> AuthenticationService::reconnect(int retry)
 	{
 		using namespace std::chrono_literals;
 		auto delay = retry * 1000ms;
@@ -181,32 +186,33 @@ namespace Stormancer
 		});
 	}
 
-	pplx::task<Scene_ptr> AuthenticationService::getAuthenticationScene(pplx::cancellation_token ct)
+	pplx::task<std::shared_ptr<Scene>> AuthenticationService::getAuthenticationScene(pplx::cancellation_token ct)
 	{
-		if (_client)
+
+		if (!_client.expired())
 		{
 			if (!_authTask)
 			{
 				if (!_autoReconnect)
 				{
-					return pplx::task_from_exception<Scene_ptr>(std::runtime_error("Authenticator disconnected. Call login before using the authenticationService."));
+					return pplx::task_from_exception<std::shared_ptr<Scene>>(std::runtime_error("Authenticator disconnected. Call login before using the authenticationService."));
 				}
 				else
 				{
-					_authTask = std::make_shared<pplx::task<Scene_ptr>>(loginImpl());
+					_authTask = std::make_shared<pplx::task<std::shared_ptr<Scene>>>(loginImpl());
 				}
 			}
 
 			auto t = *_authTask;
-
-			pplx::task_completion_event<Scene_ptr> tce;
+			std::weak_ptr<AuthenticationService> wThat = this->shared_from_this();
+			pplx::task_completion_event<std::shared_ptr<Scene>> tce;
 			if (ct.is_cancelable())
 			{
 				ct.register_callback([tce]() {
 					tce.set_exception(pplx::task_canceled());
 				});
 			}
-			t.then([tce, this](pplx::task<Scene_ptr> t) {
+			t.then([tce, wThat](pplx::task<std::shared_ptr<Scene>> t) {
 
 				try
 				{
@@ -227,12 +233,18 @@ namespace Stormancer
 				}
 
 			});
-
-			return pplx::create_task(tce, _client->dependencyResolver().lock()->resolve<IActionDispatcher>());
+			if (auto that = wThat.lock())
+			{
+				if (auto client = _client.lock())
+				{
+					return pplx::create_task(tce, client->dependencyResolver()->resolve<IActionDispatcher>());
+				}
+			}
+			return pplx::create_task(tce);
 		}
 		else
 		{
-			return pplx::task_from_exception<Scene_ptr>(std::runtime_error("Client is invalid."));
+			return pplx::task_from_exception<std::shared_ptr<Scene>>(std::runtime_error("Client is invalid."));
 		}
 	}
 
@@ -244,7 +256,7 @@ namespace Stormancer
 			this->setConnectionState(GameConnectionState::Disconnecting);
 
 			return getAuthenticationScene()
-				.then([](Scene_ptr scene)
+				.then([](std::shared_ptr<Scene> scene)
 			{
 				return scene->disconnect();
 			}).then([](auto t) {
@@ -270,9 +282,9 @@ namespace Stormancer
 	pplx::task<std::string> AuthenticationService::getBearerToken()
 	{
 		return getAuthenticationScene()
-			.then([](Scene_ptr authScene)
+			.then([](std::shared_ptr<Scene> authScene)
 		{
-			auto rpcService = authScene->dependencyResolver().lock()->resolve<RpcService>();
+			auto rpcService = authScene->dependencyResolver()->resolve<RpcService>();
 			return rpcService->rpc<std::string>("sceneauthorization.getbearertoken");
 		});
 	}
@@ -280,9 +292,9 @@ namespace Stormancer
 	pplx::task<std::string> AuthenticationService::getUserFromBearerToken(std::string token)
 	{
 		return getAuthenticationScene()
-			.then([token](Scene_ptr authScene)
+			.then([token](std::shared_ptr<Scene> authScene)
 		{
-			auto rpcService = authScene->dependencyResolver().lock()->resolve<RpcService>();
+			auto rpcService = authScene->dependencyResolver()->resolve<RpcService>();
 			return rpcService->rpc<std::string, std::string>("sceneauthorization.getuserfrombearertoken", token);
 		});
 	}
@@ -300,58 +312,62 @@ namespace Stormancer
 	pplx::task<std::string> AuthenticationService::getUserIdByPseudo(std::string pseudo)
 	{
 		return getAuthenticationScene()
-			.then([pseudo](Scene_ptr authScene)
+			.then([pseudo](std::shared_ptr<Scene> authScene)
 		{
-			auto rpcService = authScene->dependencyResolver().lock()->resolve<RpcService>();
+			auto rpcService = authScene->dependencyResolver()->resolve<RpcService>();
 			return rpcService->rpc<std::string, std::string>("users.getuseridbypseudo", pseudo);
 		});
 	}
 
-	pplx::task<Scene_ptr> AuthenticationService::connectToPrivateScene(const std::string& sceneId, std::function<void(Scene_ptr)> builder)
+	pplx::task<std::shared_ptr<Scene>> AuthenticationService::connectToPrivateScene(const std::string& sceneId, std::function<void(std::shared_ptr<Scene>)> builder)
 	{
 		std::weak_ptr<AuthenticationService> wThat = this->shared_from_this();
 		return getAuthenticationScene()
-			.then([sceneId](Scene_ptr authScene)
+			.then([sceneId](std::shared_ptr<Scene> authScene)
 		{
-			auto rpcService = authScene->dependencyResolver().lock()->resolve<RpcService>();
+			auto rpcService = authScene->dependencyResolver()->resolve<RpcService>();
 			return rpcService->rpc<std::string, std::string>("sceneauthorization.gettoken", sceneId);
 		})
 			.then([wThat, builder](std::string token)
 		{
 			auto that = wThat.lock();
 
-			if (that && that->_client)
+			if (that)
 			{
-				return that->_client->connectToPrivateScene(token, builder);
+				if (auto client = that->_client.lock())
+				{
+					return client->connectToPrivateScene(token, builder);
+				}
 			}
-			else
-			{
-				throw std::runtime_error("Client is invalid.");
-			}
+
+			throw std::runtime_error("Client is invalid.");
+
 		});
 	}
 
-	pplx::task<Scene_ptr> AuthenticationService::getSceneForService(const std::string& serviceType, const std::string& serviceName)
+	pplx::task<std::shared_ptr<Scene>> AuthenticationService::getSceneForService(const std::string& serviceType, const std::string& serviceName)
 	{
 		std::weak_ptr<AuthenticationService> wThat = this->shared_from_this();
 		return getAuthenticationScene()
-			.then([serviceType, serviceName](Scene_ptr authScene)
+			.then([serviceType, serviceName](std::shared_ptr<Scene> authScene)
 		{
-			auto rpcService = authScene->dependencyResolver().lock()->resolve<RpcService>();
+			auto rpcService = authScene->dependencyResolver()->resolve<RpcService>();
 			return rpcService->rpc<std::string>("Locator.GetSceneConnectionToken", serviceType, serviceName);
 		})
 			.then([wThat](std::string token)
 		{
 			auto that = wThat.lock();
 
-			if (that && that->_client)
+			if (that)
 			{
-				return that->_client->connectToPrivateScene(token);
+				if (auto client = that->_client.lock())
+				{
+					return client->connectToPrivateScene(token);
+				}
 			}
-			else
-			{
-				throw std::runtime_error("Client is invalid.");
-			}
+
+			throw std::runtime_error("Client is invalid.");
+
 		});
 	}
 
@@ -392,7 +408,7 @@ namespace Stormancer
 			{
 				_currentConnectionState = state;
 				connectionStateChanged(state);
-				this->getAuthenticationScene().then([](pplx::task<Scene_ptr> t) {
+				this->getAuthenticationScene().then([](pplx::task<std::shared_ptr<Scene>> t) {
 					try
 					{
 						t.get();

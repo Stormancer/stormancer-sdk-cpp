@@ -1,13 +1,8 @@
 #pragma once
 
 #include "stormancer/headers.h"
-#include "stormancer/IPacketDispatcher.h"
-#include "stormancer/DefaultScheduler.h"
-#include "stormancer/DefaultPacketDispatcher.h"
 #include "stormancer/IPlugin.h"
 #include "stormancer/IActionDispatcher.h"
-#include "stormancer/ITransport.h"
-#include "stormancer/Logger/NullLogger.h"
 
 namespace Stormancer
 {
@@ -25,7 +20,7 @@ namespace Stormancer
 	class STORMANCER_DLL_API Configuration
 	{
 	public:
-
+		
 		friend class Client;
 
 #pragma region public_methods
@@ -66,8 +61,7 @@ namespace Stormancer
 		/// A string containing the name of the application.
 		const std::string application = "";
 
-		/// Gets or Sets the dispatcher to be used by the client.
-		std::function<std::shared_ptr<IPacketDispatcher>(std::weak_ptr<DependencyResolver>)> dispatcher;
+		
 
 		/// Maximum number of remote peers that can connect with this client.
 		uint16 maxPeers = 10;
@@ -84,8 +78,7 @@ namespace Stormancer
 		/// The scheduler used by the client to run the transport and other repeated tasks.
 		std::shared_ptr<IScheduler> scheduler;
 
-		/// Gets or sets the transport to be used by the client.
-		std::function<std::shared_ptr<ITransport>(std::weak_ptr<DependencyResolver>)> transportFactory;
+		
 
 		///Gets or sets the default p2p host port. 0 For automatic attribution.
 		unsigned short serverGamePort = 7777;
@@ -106,7 +99,7 @@ namespace Stormancer
 		/// By default, events are dispatched on the current network thread. Replace the dispatcher with a MainThreadActionDispatcher to dispatch to your main thread.
 		/// your main game loop for instance.
 		/// </remarks>
-		std::shared_ptr<IActionDispatcher> actionDispatcher = std::make_shared<SameThreadActionDispatcher>();
+		std::shared_ptr<IActionDispatcher> actionDispatcher;
 
 		/// use the syncClock
 		bool synchronisedClock = true;
@@ -116,7 +109,7 @@ namespace Stormancer
 
 		EndpointSelectionMode endpointSelectionMode = EndpointSelectionMode::FALLBACK;
 
-		ILogger_ptr logger = std::make_shared<NullLogger>();
+		ILogger_ptr logger;
 
 
 
@@ -154,6 +147,12 @@ namespace Stormancer
 		std::vector<std::string> _serverEndpoints;
 
 		static const std::function<std::shared_ptr<ITransport>(std::weak_ptr<DependencyResolver>)> _defaultTransportFactory;
+
+		/// Gets or Sets the dispatcher to be used by the client.
+		std::function<std::shared_ptr<IPacketDispatcher>(std::weak_ptr<DependencyResolver>)> dispatcher;
+
+		/// Gets or sets the transport to be used by the client.
+		std::function<std::shared_ptr<ITransport>(std::weak_ptr<DependencyResolver>)> transportFactory;
 
 #pragma endregion
 	};

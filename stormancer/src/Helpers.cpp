@@ -1,5 +1,6 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/Helpers.h"
+#include "stormancer/utilities/taskUtilities.h"
 
 
 // Needed for string/wstring conversion, not present on Vita.

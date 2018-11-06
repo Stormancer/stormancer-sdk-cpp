@@ -1,6 +1,6 @@
 #pragma once
-#include "msgpack.hpp"
-#include "stormancer\RouteDto.h"
+#include "stormancer/msgpack_define.h"
+#include "stormancer/RouteDto.h"
 namespace Stormancer
 {
 	struct P2PConnectToSceneMessage

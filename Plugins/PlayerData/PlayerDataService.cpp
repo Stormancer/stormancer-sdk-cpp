@@ -29,14 +29,14 @@ namespace Stormancer
 			return pplx::task_from_exception<void>(std::runtime_error("PlayerDataService::SetPlayerData: scene was deleted"));
 		}
 
-		auto rpc = scene->dependencyResolver().lock()->resolve<RpcService>();
+		auto rpc = scene->dependencyResolver()->resolve<RpcService>();
 		return rpc->rpc<void>(SET_PLAYERDATA_RPC, dataKey, data);
 	}
 
-	void PlayerDataService::setScene(Scene* scene)
+	void PlayerDataService::setScene(std::shared_ptr<Scene> scene)
 	{
-		_scene = scene->shared_from_this();
-		_logger = scene->dependencyResolver().lock()->resolve<ILogger>();
+		_scene = scene;
+		_logger = scene->dependencyResolver()->resolve<ILogger>();
 
 		std::weak_ptr<PlayerDataService> weakThis = shared_from_this();
 		scene->addRoute(PLAYERDATA_UPDATED_ROUTE, [weakThis](Packetisp_ptr packet)
@@ -70,7 +70,7 @@ namespace Stormancer
 			auto strongScene = _scene.lock();
 			if (_onDataUpdated && strongScene)
 			{
-				auto dr = strongScene->dependencyResolver().lock();
+				auto dr = strongScene->dependencyResolver();
 				if (dr)
 				{
 					auto callback = _onDataUpdated;

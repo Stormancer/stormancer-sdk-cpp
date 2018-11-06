@@ -15,11 +15,11 @@ namespace Stormancer
 	{
 	}
 
-	void IService::setScene(Scene*)
+	void IService::setScene(std::shared_ptr<Scene>)
 	{
 	}
 
-	void IService::sceneConnected(Scene*)
+	void IService::sceneConnected(std::shared_ptr<Scene>)
 	{
 	}
 

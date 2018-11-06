@@ -2,6 +2,7 @@
 
 #include "stormancer/headers.h"
 #include "stormancer/IConnection.h"
+#include "stormancer/Helpers.h"
 
 namespace Stormancer
 {
@@ -24,12 +25,12 @@ namespace Stormancer
 		std::string metadata(const std::string& key) const override;
 		void setMetadata(const std::map<std::string, std::string>& metadata) override;
 		void setMetadata(const std::string& key, const std::string & value) override;
-		std::weak_ptr<DependencyResolver> dependencyResolver() override;
+		std::shared_ptr<DependencyResolver> dependencyResolver() override;
 		ConnectionState getConnectionState() const override;
 		rxcpp::observable<ConnectionState> getConnectionStateChangedObservable() const override;
 		void setConnectionState(ConnectionState connectionState) override;
-		Action<std::string>::TIterator onClose(std::function<void(std::string)> callback) override;
-		Action<std::string>& onCloseAction() override;
+		
+		
 
 	private:
 

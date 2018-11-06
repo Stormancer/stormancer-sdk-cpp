@@ -1,5 +1,6 @@
 #include "GameFinderService.h"
-
+#include "stormancer/Logger/ILogger.h"
+#include "stormancer/RPC/service.h"
 namespace Stormancer
 {
 	Internal::ReadyVerificationRequest::operator Stormancer::ReadyVerificationRequest()
@@ -16,9 +17,9 @@ namespace Stormancer
 		return readyUpdate;
 	}
 
-	GameFinderService::GameFinderService(Scene_ptr scene)
+	GameFinderService::GameFinderService(std::shared_ptr<Scene> scene)
 		: _scene(scene)
-		, _rpcService(scene->dependencyResolver().lock()->resolve<RpcService>())
+		, _rpcService(scene->dependencyResolver()->resolve<RpcService>())
 	{
 
 		

@@ -184,7 +184,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;CPPREST_FORCE_PPLX;_DEBUG;STORMANCER_DLL_EXPORT;_STORMANCERSDKCPP;UPNP_USE_MSVCPP;UPNP_STATIC_LIB;__PLATFORM__="$(Platform)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>stormancer\include;cpprestsdk\Release\include;msgpack-c\include;RakNet\Source;rxcpp\Rx\v2\src;libupnp\ixml\inc;libupnp\upnp\inc\win32;libupnp\upnp\inc;libupnp\build\inc\win32;libupnp\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>stormancer\public;stormancer\include;cpprestsdk\Release\include;msgpack-c\include;RakNet\Source;rxcpp\Rx\v2\src;libupnp\ixml\inc;libupnp\upnp\inc\win32;libupnp\upnp\inc;libupnp\build\inc\win32;libupnp\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
@@ -216,7 +216,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;CPPREST_FORCE_PPLX;STORMANCER_DLL_EXPORT;_STORMANCERSDKCPP;UPNP_USE_MSVCPP;UPNP_STATIC_LIB;__PLATFORM__="$(Platform)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>stormancer\include;cpprestsdk\Release\include;msgpack-c\include;RakNet\Source;rxcpp\Rx\v2\src;libupnp\ixml\inc;libupnp\upnp\inc\win32;libupnp\upnp\inc;libupnp\build\inc\win32;libupnp\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>stormancer\public;stormancer\include;cpprestsdk\Release\include;msgpack-c\include;RakNet\Source;rxcpp\Rx\v2\src;libupnp\ixml\inc;libupnp\upnp\inc\win32;libupnp\upnp\inc;libupnp\build\inc\win32;libupnp\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
@@ -282,7 +282,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;CPPREST_FORCE_PPLX;_DEBUG;STORMANCER_DLL_EXPORT;_STORMANCERSDKCPP;UPNP_USE_MSVCPP;UPNP_STATIC_LIB;__PLATFORM__="$(Platform)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>stormancer\include;cpprestsdk\Release\include;msgpack-c\include;RakNet\Source;rxcpp\Rx\v2\src;libupnp\ixml\inc;libupnp\upnp\inc\win32;libupnp\upnp\inc;libupnp\build\inc\win32;libupnp\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>stormancer\public;stormancer\include;cpprestsdk\Release\include;msgpack-c\include;RakNet\Source;rxcpp\Rx\v2\src;libupnp\ixml\inc;libupnp\upnp\inc\win32;libupnp\upnp\inc;libupnp\build\inc\win32;libupnp\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
@@ -315,7 +315,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;CPPREST_FORCE_PPLX;STORMANCER_DLL_EXPORT;_STORMANCERSDKCPP;UPNP_USE_MSVCPP;UPNP_STATIC_LIB;__PLATFORM__="$(Platform)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>stormancer\include;cpprestsdk\Release\include;msgpack-c\include;RakNet\Source;rxcpp\Rx\v2\src;libupnp\ixml\inc;libupnp\upnp\inc\win32;libupnp\upnp\inc;libupnp\build\inc\win32;libupnp\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>stormancer\public;stormancer\include;cpprestsdk\Release\include;msgpack-c\include;RakNet\Source;rxcpp\Rx\v2\src;libupnp\ixml\inc;libupnp\upnp\inc\win32;libupnp\upnp\inc;libupnp\build\inc\win32;libupnp\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
@@ -384,7 +384,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;CPPREST_FORCE_PPLX;NDEBUG;STORMANCER_DLL_EXPORT;_STORMANCERSDKCPP;UPNP_USE_MSVCPP;UPNP_STATIC_LIB;__PLATFORM__="$(Platform)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>stormancer\include;cpprestsdk\Release\include;msgpack-c\include;RakNet\Source;rxcpp\Rx\v2\src;libupnp\ixml\inc;libupnp\upnp\inc\win32;libupnp\upnp\inc;libupnp\build\inc\win32;libupnp\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>stormancer\public;stormancer\include;cpprestsdk\Release\include;msgpack-c\include;RakNet\Source;rxcpp\Rx\v2\src;libupnp\ixml\inc;libupnp\upnp\inc\win32;libupnp\upnp\inc;libupnp\build\inc\win32;libupnp\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <ShowIncludes>false</ShowIncludes>
@@ -420,7 +420,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;CPPREST_FORCE_PPLX;NDEBUG;STORMANCER_DLL_EXPORT;_STORMANCERSDKCPP;UPNP_USE_MSVCPP;UPNP_STATIC_LIB;__PLATFORM__="$(Platform)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>stormancer\include;cpprestsdk\Release\include;msgpack-c\include;RakNet\Source;rxcpp\Rx\v2\src;libupnp\ixml\inc;libupnp\upnp\inc\win32;libupnp\upnp\inc;libupnp\build\inc\win32;libupnp\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>stormancer\public;stormancer\include;cpprestsdk\Release\include;msgpack-c\include;RakNet\Source;rxcpp\Rx\v2\src;libupnp\ixml\inc;libupnp\upnp\inc\win32;libupnp\upnp\inc;libupnp\build\inc\win32;libupnp\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
@@ -484,7 +484,7 @@
       <RxcppIncludes Include="$(ProjectDir)rxcpp\Rx\v2\src\rxcpp\**\*.*" />
       <RestSdkIncludes Include="$(ProjectDir)cpprestsdk\Release\include\**\*.*" />
       <MsgpackIncludes Include="$(ProjectDir)msgpack-c\include\**\*.*" />
-      <StormancerIncludes Include="$(ProjectDir)stormancer\include\**\*.*" />
+      <StormancerIncludes Include="$(ProjectDir)stormancer\public\**\*.*" />
       <RaknetIncludes Include="$(ProjectDir)RakNet\Source\**\*.h" />
       <BuildFiles Include="$(SolutionDir)Build\**\*.*" />
     </ItemGroup>

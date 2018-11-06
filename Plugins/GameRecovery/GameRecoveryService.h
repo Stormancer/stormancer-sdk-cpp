@@ -1,6 +1,6 @@
 #pragma once
 #include "stormancer/headers.h"
-#include "stormancer/RPC/RpcService.h"
+#include "stormancer/RPC/service.h"
 
 namespace Stormancer
 {
@@ -17,7 +17,7 @@ namespace Stormancer
 
 #pragma region public_methods
 
-		GameRecoveryService(Scene* scene);
+		GameRecoveryService(std::shared_ptr<Scene> scene);
 		
 		/// Tries to obtain the current recoverable game of the player.
 		pplx::task<std::shared_ptr<RecoverableGameDto>> getCurrent();
@@ -30,7 +30,7 @@ namespace Stormancer
 
 #pragma region
 
-		Scene* _scene = nullptr;
+		std::shared_ptr<Scene> _scene = nullptr;
 		std::shared_ptr<RpcService> _rpcService;
 
 #pragma endregion

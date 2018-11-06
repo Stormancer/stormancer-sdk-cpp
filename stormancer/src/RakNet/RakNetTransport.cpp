@@ -8,6 +8,8 @@
 #include "stormancer/SafeCapture.h"
 #include "PacketFileLogger.h"
 #include "stormancer/Debug/StackWalker.h"
+#include "stormancer/utilities/taskUtilities.h"
+#include "stormancer/SceneImpl.h"
 
 #if defined(_WIN32)
 //
@@ -94,10 +96,12 @@ namespace Stormancer
 #endif
 
 			auto wTransport = STRM_WEAK_FROM_THIS();
-			_peer = std::shared_ptr<RakNet::RakPeerInterface>(RakNet::RakPeerInterface::GetInstance(), [=](RakNet::RakPeerInterface* peer)
+			_peer = std::shared_ptr<RakNet::RakPeerInterface>(RakNet::RakPeerInterface::GetInstance(), [wTransport](RakNet::RakPeerInterface* peer)
 			{
-				auto transport = LockOrThrow(wTransport);
-				transport->_logger->log(LogLevel::Trace, "RakNetTransport", "Deleting RakPeerInterface...");
+				if (auto transport = wTransport.lock())
+				{
+					transport->_logger->log(LogLevel::Trace, "RakNetTransport", "Deleting RakPeerInterface...");
+				}
 				RakNet::RakPeerInterface::DestroyInstance(peer);
 #ifdef STORMANCER_PACKETFILELOGGER
 				if (rakNetLogger)
@@ -588,7 +592,7 @@ namespace Stormancer
 
 			_handler->closeConnection(connection, reason);
 
-			connection->_closeAction(reason);
+			connection->onClose(reason);
 
 
 			pplx::task<void>([connection, reason]()
@@ -631,7 +635,7 @@ namespace Stormancer
 		auto it = _connections.find(guid);
 		if (it != _connections.end())
 		{
-			return it->second;
+			return it->second.connection;
 		}
 		else
 		{
@@ -645,14 +649,16 @@ namespace Stormancer
 		{
 			int64 cid = peerId;
 			auto dr = std::make_shared<DependencyResolver>(_dependencyResolver);
-			dr->registerDependency<std::vector<std::weak_ptr<Scene>>>([](auto dr) {
-				return std::make_shared<std::vector<std::weak_ptr<Scene>>>();
+			dr->registerDependency<std::vector<std::weak_ptr<Scene_Impl>>>([](auto dr) {
+				return std::make_shared<std::vector<std::weak_ptr<Scene_Impl>>>();
 			}, true);
 			auto connection = std::shared_ptr<RakNetConnection>(new RakNetConnection(raknetGuid, cid, key, _peer, _logger, dr), deleter<RakNetConnection>());
 			RakNet::RakNetGUID guid(connection->guid());
 			auto logger = _logger;
 			std::weak_ptr<RakNet::RakPeerInterface> weakPeer = _peer;
-			connection->onClose([logger, weakPeer, cid, guid](std::string reason) {
+			ConnectionContainer container;
+			container.connection = connection;
+			container.onCloseSubscription = connection->onClose.subscribe([logger, weakPeer, cid, guid](std::string reason) {
 				//#if defined(_WIN32) && !defined(_XBOX_ONE)
 				//				StackWalker sw;
 				//				sw.outputFunction = [logger](std::string stack) {
@@ -666,7 +672,7 @@ namespace Stormancer
 					peer->CloseConnection(guid, true);
 				}
 			});
-			_connections[raknetGuid.g] = connection;
+			_connections[raknetGuid.g] = container;
 			return connection;
 		}
 		return nullptr;
@@ -679,7 +685,7 @@ namespace Stormancer
 		{
 			auto result = it->second;
 			_connections.erase(it);
-			return result;
+			return result.connection;
 		}
 		else
 		{

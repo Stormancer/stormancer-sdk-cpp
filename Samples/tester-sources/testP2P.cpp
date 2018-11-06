@@ -1,7 +1,12 @@
-#include "stormancer/stormancer.h"
+
 #include "testP2P.h"
+#include "stormancer/headers.h"
 #include "RakNetSocket2.h"
 #include "RakPeer.h"
+#include "stormancer/Logger/ILogger.h"
+#include "stormancer/Logger/ConsoleLogger.h"
+#include "stormancer/IClient.h"
+#include "stormancer/RPC/service.h"
 
 //static std::string endpoint = "http://api.stormancer.com:8081/";
 //static std::string account = "samples";
@@ -98,7 +103,7 @@ private:
 	bool _server;
 };
 
-void p2pConnect(Stormancer::Client_ptr host, Stormancer::Client_ptr guest, Stormancer::ILogger_ptr logger, std::string sceneId);
+void p2pConnect(std::shared_ptr<Stormancer::IClient> host, std::shared_ptr<Stormancer::IClient> guest, Stormancer::ILogger_ptr logger, std::string sceneId);
 
 void testP2P(std::string endpoint, std::string account, std::string application, std::string sceneId)
 {
@@ -109,14 +114,14 @@ void testP2P(std::string endpoint, std::string account, std::string application,
 	hostConfiguration->logger = logger;
 	hostConfiguration->encryptionEnabled = true;
 
-	auto hostClient = Stormancer::Client::create(hostConfiguration);
+	auto hostClient = Stormancer::IClient::create(hostConfiguration);
 
 
 	auto guestConfiguration = Stormancer::Configuration::create(endpoint, account, application);
 	guestConfiguration->logger = logger;
 	guestConfiguration->encryptionEnabled = true;
 
-	auto guestClient = Stormancer::Client::create(guestConfiguration);
+	auto guestClient = Stormancer::IClient::create(guestConfiguration);
 
 	try
 	{
@@ -129,10 +134,10 @@ void testP2P(std::string endpoint, std::string account, std::string application,
 	}
 }
 
-void p2pConnect(Stormancer::Client_ptr hostClient, Stormancer::Client_ptr guestClient, Stormancer::ILogger_ptr logger, std::string sceneId)
+void p2pConnect(std::shared_ptr<Stormancer::IClient> hostClient, std::shared_ptr<Stormancer::IClient> guestClient, Stormancer::ILogger_ptr logger, std::string sceneId)
 {
-	Stormancer::Scene_ptr hostScene;
-	Stormancer::Scene_ptr guestScene;
+	std::shared_ptr<Stormancer::Scene> hostScene;
+	std::shared_ptr<Stormancer::Scene> guestScene;
 
 	try
 	{
@@ -154,8 +159,8 @@ void p2pConnect(Stormancer::Client_ptr hostClient, Stormancer::Client_ptr guestC
 		throw;
 	}
 
-	auto hostRpc = hostScene->dependencyResolver().lock()->resolve<Stormancer::RpcService>();
-	auto guestRpc = guestScene->dependencyResolver().lock()->resolve<Stormancer::RpcService>();
+	auto hostRpc = hostScene->dependencyResolver()->resolve<Stormancer::RpcService>();
+	auto guestRpc = guestScene->dependencyResolver()->resolve<Stormancer::RpcService>();
 	std::string p2pToken = guestRpc->rpc<std::string>("getP2PToken", true).get();
 
 	logger->log(std::string("Got P2P token ") + p2pToken);
@@ -164,10 +169,10 @@ void p2pConnect(Stormancer::Client_ptr hostClient, Stormancer::Client_ptr guestC
 
 	logger->log(std::string("Retrieved host tunnel: ") + hostTunnel->ip + ":" + std::to_string(hostTunnel->port));
 
-	std::shared_ptr<Stormancer::P2PScenePeer> guestPeer = guestScene->openP2PConnection(p2pToken).get();
+	auto guestPeer = guestScene->openP2PConnection(p2pToken).get();
 	logger->log("Retrieved guestPeer.");
 
-	std::shared_ptr<Stormancer::P2PTunnel> guestTunnel = guestPeer->openP2PTunnel("pingServer").get();
+	auto guestTunnel = guestPeer->openP2PTunnel("pingServer").get();
 
 	logger->log(std::string("Retrieved guest tunnel: ") + guestTunnel->ip + ":" + std::to_string(guestTunnel->port));
 
@@ -185,9 +190,9 @@ void p2pClient(std::string endpoint, std::string account, std::string applicatio
 	auto config = Stormancer::Configuration::create(endpoint, account, application);
 	config->logger = logger;
 
-	auto client = Stormancer::Client::create(config);
+	auto client = Stormancer::IClient::create(config);
 	auto scene = client->connectToPublicScene(sceneId)
-		.then([logger](pplx::task<Stormancer::Scene_ptr> sceneTask)
+		.then([logger](pplx::task<std::shared_ptr<Stormancer::Scene>> sceneTask)
 	{
 		try
 		{
@@ -200,7 +205,7 @@ void p2pClient(std::string endpoint, std::string account, std::string applicatio
 		}
 	}).get();
 
-	auto rpc = scene->dependencyResolver().lock()->resolve<Stormancer::RpcService>();
+	auto rpc = scene->dependencyResolver()->resolve<Stormancer::RpcService>();
 	std::string p2pToken = rpc->rpc<std::string>("getP2PToken", true).get();
 	logger->log(std::string("Obtained P2P token: ") + p2pToken);
 	if (p2pToken.empty())

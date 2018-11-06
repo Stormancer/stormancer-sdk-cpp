@@ -73,6 +73,11 @@ namespace Stormancer
 #pragma endregion
 
 #pragma region private_members
+		struct ConnectionContainer
+		{
+			std::shared_ptr<RakNetConnection> connection;
+			Action2<std::string>::Subscription onCloseSubscription;
+		};
 
 		bool _isRunning = false;
 		std::weak_ptr<DependencyResolver> _dependencyResolver;
@@ -80,7 +85,7 @@ namespace Stormancer
 		std::shared_ptr<RakNet::RakPeerInterface> _peer;
 		std::shared_ptr<ILogger> _logger;
 		std::string _type;
-		std::map<uint64, std::shared_ptr<RakNetConnection>> _connections;
+		std::map<uint64, ConnectionContainer> _connections;
 		std::mutex _pendingConnection_mtx;
 		std::queue<ConnectionRequest> _pendingConnections;
 		std::shared_ptr<IScheduler> _scheduler;

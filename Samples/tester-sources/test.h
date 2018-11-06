@@ -1,7 +1,7 @@
 #pragma once
-
-#include "stormancer/stormancer.h"
-#include "stormancer/Logger/VisualStudioLogger.h"
+#include "stormancer/RPC/service.h"
+#include "stormancer/IClient.h"
+#include "stormancer/Logger/ConsoleLogger.h"
 
 namespace Stormancer
 {
@@ -82,7 +82,7 @@ namespace Stormancer
 		const std::string _disconnectReason = "DisconnectParticularReason";
 		const std::string _echoMessage = "hello";
 		Configuration_ptr _config;
-		Client_ptr _client;
+		std::shared_ptr<IClient> _client;
 		std::weak_ptr<Scene> _sceneMain;
 
 		std::deque<std::function<void()>> _tests;

@@ -1,6 +1,6 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/TransformMetadata.h"
-#include "stormancer/Scene.h"
+#include "stormancer/SceneImpl.h"
 
 namespace Stormancer
 {

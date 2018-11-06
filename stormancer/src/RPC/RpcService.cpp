@@ -1,14 +1,16 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/RPC/RpcPlugin.h"
-#include "stormancer/RPC/RpcService.h"
+#include "stormancer/RPC/service.h"
 #include "stormancer/IActionDispatcher.h"
+#include "stormancer/RPC/RpcRequest.h"
+#include "stormancer/utilities/taskUtilities.h"
 
 namespace Stormancer
 {
 	RpcService::RpcService(std::weak_ptr<Scene> scene, std::shared_ptr<IActionDispatcher> dispatcher)
 		: _dispatcher(dispatcher)
 		, _scene(scene)
-		, _logger(scene.lock()->dependencyResolver().lock()->resolve<ILogger>())
+		, _logger(scene.lock()->dependencyResolver()->resolve<ILogger>())
 	{
 	}
 
@@ -57,18 +59,18 @@ namespace Stormancer
 				throw std::runtime_error(message.c_str());
 			}
 
-			auto metadata = relevantRoute->metadata();
-
-			if (!mapContains(metadata, RpcPlugin::pluginName))
+			auto& metadata = relevantRoute->metadata();
+			auto it = metadata.find(Stormancer::rpc::pluginName);
+			if (it == metadata.end())
 			{
 				auto errorMsg = std::string() + "The target remote route '" + route + "' is not an RPC route.";
 				logger->log(LogLevel::Error, "RpcService", errorMsg, route);
 				throw std::runtime_error(errorMsg.c_str());
 			}
 
-			if (metadata[RpcPlugin::pluginName] != RpcPlugin::version)
+			if (it->second != Stormancer::rpc::version)
 			{
-				auto errorMsg = std::string() + "The target remote route '" + route + "' does not support the plugin RPC version " + RpcPlugin::version;
+				auto errorMsg = std::string() + "The target remote route '" + route + "' does not support the plugin RPC version " + Stormancer::rpc::version;
 				logger->log(LogLevel::Error, "RpcService", errorMsg.c_str(), route);
 				throw std::runtime_error(errorMsg.c_str());
 			}
@@ -118,7 +120,7 @@ namespace Stormancer
 							{
 								try
 								{
-									scene->send(RpcPlugin::cancellationRouteName, [request](obytestream* stream)
+									scene->send(Stormancer::rpc::cancellationRouteName, [request](obytestream* stream)
 									{
 										(*stream) << request->id;
 									}, PacketPriority::IMMEDIATE_PRIORITY, PacketReliability::RELIABLE_ORDERED, _rpcServerChannelIdentifier);
@@ -161,7 +163,7 @@ namespace Stormancer
 
 		try
 		{
-			std::map<std::string, std::string> rpcMetadatas{ { RpcPlugin::pluginName, RpcPlugin::version } };
+			std::map<std::string, std::string> rpcMetadatas{ { Stormancer::rpc::pluginName, Stormancer::rpc::version } };
 
 			scene->addRoute(route, [this, handler, ordered](Packetisp_ptr p)
 			{
@@ -191,8 +193,8 @@ namespace Stormancer
 
 							{
 								std::lock_guard<std::mutex> lock(_runningRequestsMutex);
-
-								requestFound = mapContains(_runningRequests, id);
+								auto it = _runningRequests.find(id);
+								requestFound = it != _runningRequests.end();
 								if (requestFound)
 								{
 									_runningRequests.erase(id);
@@ -231,8 +233,8 @@ namespace Stormancer
 		{
 			i++;
 			id++;
-
-			if (!mapContains(_pendingRequests, id))
+			auto it = _pendingRequests.find(id);
+			if (it == _pendingRequests.end())
 			{
 #ifdef STORMANCER_LOG_RPC
 				auto idStr = std::to_string(id);
@@ -392,7 +394,7 @@ namespace Stormancer
 			_runningRequests.clear();
 		}
 
-		std::map<uint16, RpcRequest_ptr> pendingRequestsCopy;
+		std::unordered_map<uint16, RpcRequest_ptr> pendingRequestsCopy;
 
 		{
 			std::lock_guard<std::mutex> lock(_pendingRequestsMutex);
