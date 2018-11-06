@@ -7,6 +7,7 @@
 #include "stormancer/P2P/RakNet/P2PTunnels.h"
 #include "stormancer/P2P/OpenTunnelResult.h"
 #include "stormancer/Client.h"
+#include "stormancer/SafeCapture.h"
 
 namespace Stormancer
 {
@@ -39,7 +40,7 @@ namespace Stormancer
 		auto serializer = _serializer;
 		auto sessions = _sessions;
 		auto connections = _connections;
-		auto tunnels = _tunnels;
+		std::weak_ptr<P2PTunnels> tunnels = _tunnels;
 		auto client = _client;
 		builder->service((byte)SystemRequestIDTypes::ID_P2P_GATHER_IP, [config, transport, serializer](RequestContext* ctx)
 		{
@@ -287,7 +288,8 @@ namespace Stormancer
 			auto peerId = ctx->packet()->connection->id();
 			if (!config->hasPublicIp())
 			{
-				auto handle = tunnels->addClient(serverId, peerId);
+				auto strongTunnels = LockOrThrow(tunnels);
+				auto handle = strongTunnels->addClient(serverId, peerId);
 
 				ctx->send([serializer, handle](obytestream* stream)
 				{
@@ -315,7 +317,7 @@ namespace Stormancer
 		{
 			auto handle = serializer->deserializeOne<byte>(ctx->inputStream());
 
-			tunnels->closeTunnel(handle, ctx->packet()->connection->id());
+			LockOrThrow(tunnels)->closeTunnel(handle, ctx->packet()->connection->id());
 			return pplx::task_from_result();
 		});
 
