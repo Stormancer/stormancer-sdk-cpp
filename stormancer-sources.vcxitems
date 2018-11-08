@@ -106,6 +106,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\public\stormancer\DependencyResolver.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\public\stormancer\Event.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\public\stormancer\Exceptions.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\public\stormancer\Federation.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\public\stormancer\headers.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\public\stormancer\IActionDispatcher.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\public\stormancer\IClient.h" />

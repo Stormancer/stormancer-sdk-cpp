@@ -3,6 +3,7 @@
 #include "pplx/pplxtasks.h"
 #include "stormancer/scene.h"
 #include "stormancer/Configuration.h"
+#include "stormancer/Federation.h"
 namespace Stormancer
 {
 	class IClient
@@ -36,5 +37,10 @@ namespace Stormancer
 		/// Set a metadata
 		virtual void setMedatata(const std::string& key, const std::string& value) = 0;
 
+		///Gets the ping to a cluster in the federation
+		virtual pplx::task<int> pingCluster(std::string clusterId, pplx::cancellation_token ct = pplx::cancellation_token::none()) = 0;
+
+		///Gets informations about the federation the client is connected to.
+		virtual pplx::task<Federation> getFederation(pplx::cancellation_token ct = pplx::cancellation_token::none()) = 0;
 	};
 }

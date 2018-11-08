@@ -178,13 +178,13 @@ namespace Stormancer
 
 			_metadata["serializers"] = "msgpack/array";
 			_metadata["transport"] = transport->name();
-			_metadata["version"] = "1.3.0";
+			_metadata["version"] = "1.4.0";
 
 
 
 			_metadata["platform"] = __PLATFORM__;
 
-			_metadata["protocol"] = "2";
+			_metadata["protocol"] = "3";
 
 
 			auto actionDispatcher = _dependencyResolver->resolve<IActionDispatcher>();
@@ -864,7 +864,7 @@ namespace Stormancer
 			{
 				if (auto client = wClient.lock())
 				{
-					
+
 
 					client->logger()->log(LogLevel::Debug, "client", "Scene disconnected", sceneId);
 
@@ -1110,6 +1110,17 @@ namespace Stormancer
 			_federation = std::make_shared<pplx::task<Federation>>(api->getFederation(_config->_serverEndpoints, ct));
 		}
 		return *_federation;
+	}
+
+	pplx::task<int> Client::pingCluster(std::string clusterId, pplx::cancellation_token ct)
+	{
+		std::weak_ptr<Client> wClient = this->shared_from_this();
+		return getFederation(ct).then([clusterId, ct, wClient](Federation fed) {
+			auto client = LockOrThrow(wClient);
+			auto api = client->dependencyResolver()->resolve<ApiClient>();
+			auto cluster = fed.getCluster(clusterId);
+			return api->ping(cluster.endpoints.front(), ct);
+		});
 	}
 
 	SceneAddress SceneAddress::parse(const std::string urn, const std::string& defaultClusterId, const std::string& defaultAccount, const std::string& defaultApp)

@@ -38,7 +38,7 @@ namespace Stormancer
 
 		request.headers().add(U("Content-Type"), U("application/msgpack"));
 		request.headers().add(U("Accept"), U("application/json"));
-		request.headers().add(U("x-version"), U("2"));
+		request.headers().add(U("x-version"), U("3"));
 
 		auto wApiClient = STRM_WEAK_FROM_THIS();
 		auto start = std::chrono::high_resolution_clock::now();
@@ -115,7 +115,7 @@ namespace Stormancer
 
 		request.headers().add(U("Content-Type"), U("application/msgpack"));
 		request.headers().add(U("Accept"), U("application/json"));
-		request.headers().add(U("x-version"), U("2"));
+		request.headers().add(U("x-version"), U("3"));
 
 		auto wApiClient = STRM_WEAK_FROM_THIS();
 
@@ -277,7 +277,7 @@ namespace Stormancer
 
 		request.headers().add(U("Content-Type"), U("application/msgpack"));
 		request.headers().add(U("Accept"), U("application/json"));
-		request.headers().add(U("x-version"), U("2"));
+		request.headers().add(U("x-version"), U("3"));
 
 		auto wApiClient = STRM_WEAK_FROM_THIS();
 
@@ -316,7 +316,8 @@ namespace Stormancer
 					if (ensureSuccessStatusCode(statusCode))
 					{
 						auto headers = response.headers();
-						if (headers[U("x-version")] == U("2"))
+						auto xVersion = headers[U("x-version")];
+						if (xVersion == U("2") || xVersion == U("3"))
 						{
 							apiClient->_logger->log(LogLevel::Trace, "ApiClient", "Get token API version : 2");
 							return pplx::task_from_result(apiClient->_tokenHandler->getSceneEndpointInfo(responseText));
@@ -360,7 +361,7 @@ namespace Stormancer
 #if defined(_WIN32)
 			request.set_request_uri(std::wstring(relativeUri.begin(), relativeUri.end()));
 			request.headers().add(L"Accept", L"application/json");
-			request.headers().add(L"x-version", L"1.0.0");
+			request.headers().add(L"x-version", L"3");
 			request.set_body(std::wstring());
 #else
 			request.set_request_uri(relativeUri);
@@ -469,6 +470,6 @@ namespace Stormancer
 				}
 			}
 		}
-		throw std::runtime_error("Cluster '"+id+"' not found in federation.");
+		throw std::runtime_error("Cluster '" + id + "' not found in federation.");
 	}
 };

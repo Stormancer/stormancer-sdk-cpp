@@ -453,6 +453,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\public\stormancer\TransformMetadata.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\public\stormancer\Federation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Configuration.cpp">

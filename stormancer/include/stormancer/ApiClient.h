@@ -4,24 +4,13 @@
 #include "stormancer/Configuration.h"
 #include "stormancer/SceneEndpoint.h"
 #include "stormancer/ITokenHandler.h"
-
+#include "stormancer/Federation.h"
 namespace Stormancer
 {
 	class ServerEndpoints
 	{
 	};
-	struct Cluster
-	{
-		std::string id;
-		std::vector<std::string> endpoints;
-		std::vector<std::string> tags;
-	};
-	struct Federation
-	{
-		Cluster current;
-		std::vector<Cluster> clusters;
-		Cluster getCluster(std::string id);
-	};
+	
 
 	/// Retrieve informations from the Api.
 	class ApiClient : public std::enable_shared_from_this<ApiClient>

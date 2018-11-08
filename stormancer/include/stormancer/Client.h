@@ -67,6 +67,10 @@ namespace Stormancer
 		/// Set a metadata
 		void setMedatata(const std::string& key, const std::string& value) override;
 
+		pplx::task<Federation> getFederation(pplx::cancellation_token ct) override;
+
+		pplx::task<int> pingCluster(std::string clusterId, pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
+
 		void clear();
 #pragma endregion
 
@@ -112,7 +116,7 @@ namespace Stormancer
 		// Ask a session token from the server, or set it if we already have one (i.e in case of a reconnection)
 		pplx::task<void> createOrJoinSession(std::shared_ptr<IConnection> connection, pplx::cancellation_token ct = pplx::cancellation_token::none());
 
-		pplx::task<Federation> getFederation(pplx::cancellation_token ct);
+		
 
 		pplx::task<SceneAddress> parseSceneUrl(std::string url, pplx::cancellation_token ct);
 
