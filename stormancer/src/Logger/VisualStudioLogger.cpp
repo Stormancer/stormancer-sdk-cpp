@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "stormancer/stdafx.h"
 #include "stormancer/Logger/VisualStudioLogger.h"
 #include <locale>
 
