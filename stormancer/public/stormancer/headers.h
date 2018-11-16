@@ -76,9 +76,6 @@
 #endif
 #endif
 
-
-#define CPPREST_FORCE_PPLX 1
-
 //#define STORMANCER_LOG_RPC
 //#define STORMANCER_LOG_PACKETS
 //#define STORMANCER_LOG_RAKNET_PACKETS
@@ -90,29 +87,10 @@
 #endif
 
 // standard libs
-//#include <mutex>
-//#include <condition_variable>
-//#include <algorithm>
-//#include <chrono>
 #include <functional>
-//#include <locale>
-//#include <iostream>
-//#include <map>
 #include <memory>
-//#include <sstream>
-//#include <cstdint>
-//#include <cstdio>
 #include <string>
-//#include <typeinfo>
 #include <vector>
-//#include <list>
-//#include <iomanip>
-//#include <thread>
-//#include <regex>
-//#include <numeric>
-//#include <list>
-//#include <forward_list>
-//#include <stdexcept>
 
 #if defined(_WIN32) //&& defined(_STORMANCERSDKCPP)
 // msgpack needs windows.h, RakNet needs WinSock2.h
@@ -123,8 +101,12 @@
 #include <WS2tcpip.h>
 #endif
 
-// cpprestsdk
+// cpprestsdk / pplx
 
+
+
+#define CPPREST_FORCE_PPLX 1
+#include <pplx/pplxtasks.h>
 
 
 #ifdef _STORMANCERSDKCPP
@@ -137,14 +119,12 @@
 #endif
 
 
-
 #if defined(UE_EDITOR) || defined(UE_GAME)
 #undef check
 #endif
 
 #include "stormancer/stormancerTypes.h"
 
-// msgpack
 #include "msgpack.hpp"
 
 #if (defined(UE_EDITOR) || defined(UE_GAME))
