@@ -9,7 +9,7 @@ namespace Stormancer
 	{
 		if (scene)
 		{
-			auto name = scene->getHostMetadata("stormancer.plugins.matchmaking");
+			auto name = scene->getHostMetadata("stormancer.plugins.gamefinder");
 			if (!name.empty())
 			{
 				auto service = std::make_shared<GameFinderService>(scene);
@@ -23,7 +23,7 @@ namespace Stormancer
 		if (client)
 		{
 			client->dependencyResolver()->registerDependency<GameFinder>([](std::weak_ptr<DependencyResolver> dr) {
-				return std::make_shared<GameFinder>(dr.lock()->resolve<AuthenticationService>()); });
+				return std::make_shared<GameFinder>(dr.lock()->resolve<AuthenticationService>()); },true);
 		}
 	}
 

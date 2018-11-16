@@ -86,7 +86,7 @@ namespace Stormancer
 
 	pplx::task<void> GameFinder::connectToGameFinder(std::string id)
 	{
-		return connectToGameFinderImpl(id).then([](std::shared_ptr<GameFinderContainer>) {});
+		return getGameFinderContainer(id).then([](std::shared_ptr<GameFinderContainer>) {});
 	}
 
 	pplx::task<std::shared_ptr<GameFinderContainer>> GameFinder::connectToGameFinderImpl(std::string gameFinderName)
@@ -100,7 +100,7 @@ namespace Stormancer
 
 		std::weak_ptr<GameFinder> wThat = this->shared_from_this();
 
-		return auth->getSceneForService("stormancer.plugins.matchmaking", gameFinderName).then([gameFinderName, wThat](pplx::task<std::shared_ptr<Scene>> task) {
+		return auth->getSceneForService("stormancer.plugins.gamefinder", gameFinderName).then([gameFinderName, wThat](pplx::task<std::shared_ptr<Scene>> task) {
 
 			try
 			{

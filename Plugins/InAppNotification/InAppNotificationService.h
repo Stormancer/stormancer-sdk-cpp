@@ -1,17 +1,20 @@
 #pragma once
 #include "Stormancer/headers.h"
-#include "Stormancer/RPC/RpcService.h"
+#include "Stormancer/RPC/Service.h"
 #include "InAppNotification.h"
 
 namespace Stormancer
 {
-	class InAppNotificationService
+	class InAppNotificationPlugin;
+
+	class InAppNotificationService : public std::enable_shared_from_this<InAppNotificationService>
 	{
+		friend InAppNotificationPlugin;
 	public:
 
 #pragma region public_methods
 
-		InAppNotificationService(Scene* scene);
+		InAppNotificationService(std::shared_ptr<Scene> scene);
 
 		void registerNotificationsCallback(const std::function<void(InAppNotification)>& callback);
 
@@ -22,10 +25,10 @@ namespace Stormancer
 #pragma endregion
 
 	private:
-
+		void initialize();
 #pragma region
-	
-		Scene* _scene;
+
+		std::weak_ptr<Scene> _scene;
 		std::shared_ptr<RpcService> _rpcService;
 		std::function<void(const InAppNotification&)> _callback;
 		std::queue<InAppNotification> _pendingNotifications;

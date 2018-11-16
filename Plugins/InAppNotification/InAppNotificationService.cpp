@@ -1,24 +1,30 @@
-#include "Stormancer/stdafx.h"
 #include "InAppNotificationService.h"
 
 namespace Stormancer
 {
-	InAppNotificationService::InAppNotificationService(Scene* scene)
+	InAppNotificationService::InAppNotificationService(std::shared_ptr<Scene> scene)
 	{
 		_scene = scene;
 		if (scene)
 		{
-			_rpcService = scene->dependencyResolver().lock()->resolve<RpcService>();
-			_dispatcher = scene->dependencyResolver().lock()->resolve<IActionDispatcher>();
+			_rpcService = scene->dependencyResolver()->resolve<RpcService>();
+			_dispatcher = scene->dependencyResolver()->resolve<IActionDispatcher>();
 
-			scene->addRoute("inappnotification.push", [this](Packetisp_ptr packet) {
-				Serializer serializer;
-				InAppNotification notification = serializer.deserializeOne<InAppNotification>(packet->stream);
-				notificationReceived(notification);
-			});
+
 		}
 	}
-
+	void InAppNotificationService::initialize()
+	{
+		std::weak_ptr<InAppNotificationService> wThat = this->shared_from_this();
+		_scene.lock()->addRoute("inappnotification.push", [wThat](Packetisp_ptr packet) {
+			if (auto that = wThat.lock())
+			{
+				Serializer serializer;
+				InAppNotification notification = serializer.deserializeOne<InAppNotification>(packet->stream);
+				that->notificationReceived(notification);
+			}
+		});
+	}
 	void InAppNotificationService::registerNotificationsCallback(const std::function<void(InAppNotification)>& callback)
 	{
 		std::lock_guard<std::mutex> lg(_lock);

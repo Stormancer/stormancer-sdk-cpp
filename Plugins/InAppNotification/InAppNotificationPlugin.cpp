@@ -1,10 +1,9 @@
-#include "Stormancer/stdafx.h"
 #include "InAppNotificationPlugin.h"
 #include "InAppNotificationService.h"
 
 namespace Stormancer
 {
-	void InAppNotificationPlugin::sceneCreated(Scene* scene)
+	void InAppNotificationPlugin::sceneCreated(std::shared_ptr<Scene> scene)
 	{
 		if (scene)
 		{
@@ -12,8 +11,12 @@ namespace Stormancer
 
 			if (!name.empty())
 			{
-				auto service = std::make_shared<InAppNotificationService>(scene);
-				scene->dependencyResolver().lock()->registerDependency<InAppNotificationService>(service);
+
+				scene->dependencyResolver()->registerDependency<InAppNotificationService>([](auto dr) {
+					auto service = std::make_shared<InAppNotificationService>(dr.lock()->resolve<Scene>());
+					service->initialize();
+					return service;
+				}, true);
 			}
 		}
 	}

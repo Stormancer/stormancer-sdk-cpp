@@ -1,4 +1,3 @@
-
 #include "stormancer/headers.h"
 #include "stormancer/RPC/service.h"
 #include "Authentication/AuthenticationService.h"
@@ -53,14 +52,15 @@ namespace Stormancer
 							that->setConnectionState(GameConnectionState::Disconnecting);
 							break;
 						case ConnectionState::Disconnected:
-							that->setConnectionState(GameConnectionState::Disconnected, state.reason);
+							that->setConnectionState(GameConnectionState(GameConnectionState::State::Disconnected, state.reason));
+							break;
+						case ConnectionState::Connecting:
+							that->connectionStateChanged(GameConnectionState::Connecting);
 							break;
 						default:
 							break;
 						}
-
 					}
-
 				});
 			}
 			scene->dependencyResolver()->resolve<RpcService>()->addProcedure("sendRequest", [wThat](RpcRequestContext_ptr ctx) {
@@ -104,14 +104,14 @@ namespace Stormancer
 				throw std::runtime_error("Auto recconnection is disable please login before");
 			}
 
-			return that->getCredentialsCallback().then([scene, wThat](std::unordered_map<std::string, std::string> ctx) {
+			return that->getCredentialsCallback().then([scene, wThat](AuthParameters ctx) {
 				auto that = wThat.lock();
 				if (!that)
 				{
 					throw std::runtime_error("destroyed");
 				}
 				auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
-				return rpcService->rpc<LoginResult>(that->LOGIN_ROUTE, ctx);
+				return rpcService->rpc<LoginResult>("Authentication.Login", ctx);
 
 			}).then([scene, wThat](LoginResult result) {
 
@@ -318,7 +318,26 @@ namespace Stormancer
 			return rpcService->rpc<std::string, std::string>("users.getuseridbypseudo", pseudo);
 		});
 	}
+	pplx::task<std::shared_ptr<Scene>> AuthenticationService::connectToPrivateSceneByToken(const std::string& token, std::function<void(std::shared_ptr<Scene>)> builder)
+	{
+		std::weak_ptr<AuthenticationService> wThat = this->shared_from_this();
+		return getAuthenticationScene()
+			.then([token,wThat,builder](std::shared_ptr<Scene> authScene)
+		{
+			auto that = wThat.lock();
 
+			if (that)
+			{
+				if (auto client = that->_client.lock())
+				{
+					return client->connectToPrivateScene(token, builder);
+				}
+			}
+
+			throw std::runtime_error("Client is invalid.");
+
+		});
+	}
 	pplx::task<std::shared_ptr<Scene>> AuthenticationService::connectToPrivateScene(const std::string& sceneId, std::function<void(std::shared_ptr<Scene>)> builder)
 	{
 		std::weak_ptr<AuthenticationService> wThat = this->shared_from_this();
@@ -377,18 +396,18 @@ namespace Stormancer
 		return _currentConnectionState;
 	}
 
-	void AuthenticationService::setConnectionState(GameConnectionState state, std::string reason)
+	void AuthenticationService::setConnectionState(GameConnectionState state)
 	{
 		if (_currentConnectionState != state)
 		{
-			this->_logger->log(LogLevel::Info, "connection", "Connection state changed", std::to_string((int)state) + "reason " + reason);
+			this->_logger->log(LogLevel::Info, "connection", "Connection state changed", std::to_string((int)state) + "reason " + state.reason);
 
 
 
 			if (state == GameConnectionState::Disconnected || state == GameConnectionState::Disconnecting)
 			{
 				_authTask = nullptr;
-				if (reason == "User connected elsewhere" || reason == "Authentication failed")
+				if (state.reason == "User connected elsewhere" || state.reason == "Authentication failed")
 				{
 					_autoReconnect = false;
 				}
@@ -435,4 +454,45 @@ namespace Stormancer
 	}
 
 
+	GameConnectionState::GameConnectionState(State state2)
+		: state(state2)
+	{
+	}
+
+	GameConnectionState::GameConnectionState(State state2, std::string reason2)
+		: state(state2)
+		, reason(reason2)
+	{
+	}
+
+	GameConnectionState& GameConnectionState::operator=(State state2)
+	{
+		state = state2;
+		return *this;
+	}
+
+	bool GameConnectionState::operator==(GameConnectionState& other) const
+	{
+		return state == other.state;
+	}
+
+	bool GameConnectionState::operator!=(GameConnectionState& other) const
+	{
+		return state != other.state;
+	}
+
+	bool GameConnectionState::operator==(State state2) const
+	{
+		return state == state2;
+	}
+
+	bool GameConnectionState::operator!=(State state2) const
+	{
+		return state != state2;
+	}
+
+	GameConnectionState::operator int()
+	{
+		return (int)state;
+	}
 };

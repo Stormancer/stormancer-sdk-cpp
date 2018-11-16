@@ -13,7 +13,7 @@ namespace Stormancer
 		std::string Application;
 		std::string ContentType;
 		std::string DeploymentId;
-		std::map<std::string, std::string> Endpoints;
+		std::shared_ptr<std::map<std::string, std::string>> Endpoints;
 		int64 Expiration;
 		int64 Issued;
 		std::string Routing;

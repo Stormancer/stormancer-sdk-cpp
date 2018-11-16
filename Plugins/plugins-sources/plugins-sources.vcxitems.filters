@@ -22,9 +22,6 @@
     <Filter Include="Leaderboard">
       <UniqueIdentifier>{1f2621d6-c8e1-4759-922b-9fe7441c359f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Matchmaking">
-      <UniqueIdentifier>{cd1c2541-f9a3-4ac6-a362-25298071d065}</UniqueIdentifier>
-    </Filter>
     <Filter Include="PlayerData">
       <UniqueIdentifier>{c5ee2737-0a08-4d52-834e-5e4ef1adec9e}</UniqueIdentifier>
     </Filter>
@@ -93,12 +90,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\Leaderboard\LeaderboardService.cpp">
       <Filter>Leaderboard</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\Matchmaking\MatchmakingPlugin.cpp">
-      <Filter>Matchmaking</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\Matchmaking\MatchmakingService.cpp">
-      <Filter>Matchmaking</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GameFinder\GameFinderManager.cpp">
       <Filter>GameFinder</Filter>
     </ClCompile>
@@ -119,9 +110,6 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GameRecovery\GameRecoveryService.cpp">
       <Filter>GameRecovery</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\Party\PartyInvitation.cpp">
-      <Filter>Party</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\Party\PartyManagement.cpp">
       <Filter>Party</Filter>
@@ -212,12 +200,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Leaderboard\LeaderboardService.h">
       <Filter>Leaderboard</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\Matchmaking\MatchmakingPlugin.h">
-      <Filter>Matchmaking</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\Matchmaking\MatchMakingService.h">
-      <Filter>Matchmaking</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\PlayerData\PlayerDataService.h">
       <Filter>PlayerData</Filter>
     </ClInclude>
@@ -256,9 +238,6 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\GameRecovery\GameRecoveryService.h">
       <Filter>GameRecovery</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\Party\PartyInvitation.h">
-      <Filter>Party</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Party\PartyManagement.h">
       <Filter>Party</Filter>

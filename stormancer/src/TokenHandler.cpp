@@ -30,19 +30,6 @@ namespace Stormancer
 
 		ConnectionData cData = _serializer.deserializeOne<ConnectionData>((byte*)vectorData.data(), vectorData.size());
 
-		std::stringstream ss;
-		ss << cData.AccountId
-			<< " " << cData.Application
-			<< " " << cData.ContentType
-			<< " " << cData.DeploymentId
-			<< " " << cData.Endpoints.size()
-			<< " " << cData.Expiration
-			<< " " << cData.Issued
-			<< " " << cData.Routing
-			<< " " << cData.SceneId
-			<< " " << cData.UserData
-			<< " " << cData.Version;
-		_logger->log(LogLevel::Trace, "TokenHandler", "Decoded token : " + ss.str());
 
 		return SceneEndpoint(token, cData);
 	}
@@ -70,6 +57,8 @@ namespace Stormancer
 				endpoint.getTokenResponse.endpoints[to_string(transport.first)].push_back(to_string(e.as_string()));
 			}
 		}
+		endpoint.tokenData = decodeToken(endpoint.token).tokenData;
+		endpoint.version = endpoint.tokenData.Version;
 		return endpoint;
 	}
 

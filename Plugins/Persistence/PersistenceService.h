@@ -1,5 +1,6 @@
 #pragma once
-#include <stormancer.h>
+#include "stormancer/headers.h"
+#include "stormancer/scene.h"
 #include "PersistenceModels.h"
 
 namespace Stormancer
@@ -9,7 +10,7 @@ namespace Stormancer
 	{
 	public:
 
-		PersistenceService(Scene* scene);
+		PersistenceService(std::shared_ptr<Scene> scene);
 
 
 
@@ -23,7 +24,7 @@ namespace Stormancer
 		pplx::task<SearchResponse> search(SearchRequest rq);
 
 	private:
-		Scene* _scene = nullptr;
+		std::weak_ptr<Scene> _scene;
 
 	};
 }

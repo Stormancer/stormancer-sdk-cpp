@@ -51,7 +51,7 @@ namespace Stormancer
 		_connections.emplace(id, t);
 		_connectionsByKey.emplace(key, t);
 
-		_logger->log(LogLevel::Info, "P2P", "Transitioning connection from pending", std::to_string(connection->id()));
+		_logger->log(LogLevel::Info, "connections", "Completed connection", std::to_string(connection->id()));
 		auto it = _pendingP2PConnections.find(connection->id());
 		if (it != _pendingP2PConnections.end())
 		{

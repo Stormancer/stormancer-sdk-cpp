@@ -2,7 +2,7 @@
 
 #include "stormancer/headers.h"
 #include "stormancer/Scene.h"
-#include "stormancer/RPC/RpcService.h"
+#include "stormancer/RPC/Service.h"
 #include "stormancer/Serializer.h"
 
 namespace Stormancer
@@ -34,13 +34,13 @@ namespace Stormancer
 		MSGPACK_DEFINE(type, comment, detailsJson, files);
 	};
 
-	class PlayerReportService
+	class PlayerReportService : public std::enable_shared_from_this<PlayerReportService>
 	{
 	public:
 
 #pragma region public_methods
 
-		PlayerReportService(Scene_ptr scene);
+		PlayerReportService(std::shared_ptr<Scene> scene);
 
 		// Reports a player with optional attached files
 		pplx::task<void> report(std::string type, std::string comments, std::string json, std::vector<AttachedFileDescriptor> files);
@@ -51,8 +51,10 @@ namespace Stormancer
 
 #pragma region private_members
 
-		Scene_ptr _scene;
-		std::shared_ptr<RpcService> _rpc;
+		std::shared_ptr<ILogger> _logger;
+		std::weak_ptr<Scene> _scene;
+		std::shared_ptr<RpcService> _rpcService;
+
 		Serializer _serializer;
 
 #pragma endregion

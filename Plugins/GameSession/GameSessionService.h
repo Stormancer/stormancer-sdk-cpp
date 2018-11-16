@@ -2,12 +2,19 @@
 #include "stormancer/headers.h"
 #include "stormancer/Scene.h"
 #include "stormancer/IClient.h"
-#include "stormancer/RPC/service.h"
+#include "stormancer/RPC/Service.h"
+#include "stormancer/Event.h"
 #include "stormancer/Action.h"
 
 namespace Stormancer
 {
+	///
+	/// Const var
 	const std::string GAMESESSION_P2P_SERVER_ID = "GameSession";
+
+	///
+	/// Forward declare
+	struct GameSessionContainer;
 
 	struct SetResult
 	{
@@ -82,25 +89,57 @@ namespace Stormancer
 		MSGPACK_DEFINE(UserId, Status, Data);
 	};
 
-	class GameSessionManager
+	struct EndGameDto
 	{
-	public:
-		GameSessionManager(std::shared_ptr<IClient> client);
-
-		std::string currentGameSessionId;
-
-		void setToken(std::string token);
-
-		pplx::task<std::shared_ptr<Scene>> getCurrentGameSession();
-
-	private:
-		std::string _token;
-		std::weak_ptr<IClient> _client;
+		Stormancer::uint64 score;
+		std::string LeaderboardName;
+		MSGPACK_DEFINE(score, LeaderboardName)
 	};
 
-	class GameSessionService
+	struct GameSessionResult
 	{
+		std::map<std::string, std::string> usersScore;
+		MSGPACK_DEFINE(usersScore)
+	};
 
+	struct GameSessionConnectionParameters
+	{
+		bool isHost;
+		std::string hostMap;
+		std::string Endpoint;
+		std::string ErrorMessage;
+	};
+
+	class GameSession : public std::enable_shared_from_this<GameSession>
+	{
+	public:
+		GameSession(std::weak_ptr<IClient> client);
+
+		pplx::task<GameSessionConnectionParameters> ConnectToGameSession(std::string token, std::string mapName);
+		pplx::task<void> SetPlayerReady(std::string data);
+		pplx::task<GameSessionResult> PostResult(EndGameDto gameSessioResult);
+		pplx::task<void> DisconectFromGameSession();
+
+		Event<void> OnAllPlayerReady;
+		Event<GameSessionConnectionParameters> OnRoleRecieved;
+		Event<GameSessionConnectionParameters> OnTunnelOpened;
+
+	private:
+		std::string _mapName;
+		std::weak_ptr<IClient> _wClient;
+		pplx::task<std::shared_ptr<GameSessionContainer>> _currentGameSession;
+		pplx::task_completion_event<GameSessionConnectionParameters> _gameSessionNegotiationTce;
+
+		pplx::task<std::shared_ptr<GameSessionContainer>> connectToGameSessionImpl(std::string token);
+		pplx::task<std::shared_ptr<GameSessionContainer>> getCurrentGameSession();
+		pplx::task<std::string> P2PTokenRequest(std::shared_ptr<GameSessionContainer> gameSessionContainer);
+
+		std::mutex _lock;
+	};
+
+	class GameSessionService : public std::enable_shared_from_this<GameSessionService>
+	{
+		friend GameSession;
 	private:
 		struct SessionPlayerUpdateArg
 		{
@@ -113,24 +152,30 @@ namespace Stormancer
 		};
 
 	public:
-		GameSessionService(std::shared_ptr<Stormancer::Scene> scene);
+		GameSessionService(std::weak_ptr<Scene> scene);
 		~GameSessionService();
 
-		pplx::task<std::string> waitServerReady(pplx::cancellation_token);
+		void Initialize();
+		pplx::task<void> InitializeTunnel(std::string p2pToken);
+
+		pplx::task<void> waitServerReady(pplx::cancellation_token);
 
 		std::vector<SessionPlayer> GetConnectedPlayers();
 
 		std::function<void()> OnConnectedPlayerChanged(std::function<void(SessionPlayer, std::string)> callback);
-		std::function<void()> OnRoleReceived(std::function<void(std::string)> callback);
-		void OnTunnelOpened(std::function<void(std::shared_ptr<Stormancer::P2PTunnel>)> callback);
+		//std::function<void()> OnRoleReceived(std::function<void(std::string)> callback);
 
+		// This functions need to be replace by action2 (event)
+		//void OnTunnelOpened(std::function<void(std::shared_ptr<Stormancer::P2PTunnel>)> callback);
 		void OnP2PConnected(std::function<void(std::shared_ptr<Stormancer::IP2PScenePeer>)> callback);
-
 		void OnShutdownReceived(std::function<void(void)> callback);
-
 		void OnConnectionFailure(std::function<void(std::string)> callback);
 
-		void OnAllPlayerReady(std::function<void(void)> callback);
+		Event<void> OnAllPlayerReady;
+		Event<std::string> OnRoleReceived;
+		Event<std::shared_ptr<Stormancer::P2PTunnel>> OnTunnelOpened;
+
+
 
 		template<typename TOut, typename TIn>
 		pplx::task<TOut> sendGameResults(TIn results)
@@ -145,7 +190,9 @@ namespace Stormancer
 			return rpc->rpc<TOut, TIn>("gamesession.postresults", results);
 		}
 
-		
+		pplx::task<std::string> P2PTokenRequest();
+
+		//pplx::task<void> connect();
 		pplx::task<void> reset();
 		pplx::task<void> disconnect();
 
@@ -156,22 +203,20 @@ namespace Stormancer
 		void __disconnecting();
 
 		void ready(std::string data);
-	private:
-		void unsubscribeConnectedPlayersChanged(Action<SessionPlayerUpdateArg>::TIterator handle);
-		void unsubscribeRoleReceived(Action<std::string>::TIterator handle);
 
 	private:
+
+		void unsubscribeConnectedPlayersChanged(Action<SessionPlayerUpdateArg>::TIterator handle);
+
 		std::shared_ptr<P2PTunnel> _tunnel;
 		Action<SessionPlayerUpdateArg> _onConnectedPlayersChanged;
-		Action<std::string> _onRoleReceived;
 		Action<std::string> _onConnectionFailure;
-		Action<void> _onAllPlayerReady;
 		std::function<void(void)> _onShutdownReceived;
-		std::function<void(std::shared_ptr<Stormancer::P2PTunnel>)> _onTunnelOpened;
 		std::function<void(std::shared_ptr<Stormancer::IP2PScenePeer>)> _onConnectionOpened;
+		pplx::task_completion_event<void> _waitServerTce;
+
 		std::weak_ptr<Scene> _scene;
 		std::vector<SessionPlayer> _users;
-		pplx::task_completion_event<std::string> _waitServerTce;
 		std::shared_ptr<Stormancer::ILogger> _logger;
 		bool _receivedP2PToken = false;
 	};

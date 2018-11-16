@@ -7,15 +7,42 @@
 
 namespace Stormancer
 {
-	enum class GameConnectionState
+	struct GameConnectionState
 	{
-		Disconnected = 0,
-		Connecting = 1,
-		Authenticated = 2,
-		Disconnecting = 3,
-		Authenticating = 4,
-		Reconnecting = 5
+		/// State of a network connection.
+		enum State
+		{
+			Disconnected = 0,
+			Connecting = 1,
+			Authenticated = 2,
+			Disconnecting = 3,
+			Authenticating = 4,
+			Reconnecting = 5
+		};
+
+		// Methods
+
+		GameConnectionState() = default;
+		GameConnectionState(State state2);
+		GameConnectionState(State state2, std::string reason2);
+
+		GameConnectionState& operator=(State state2);
+
+		bool operator==(GameConnectionState& other) const;
+		bool operator!=(GameConnectionState& other) const;
+
+		bool operator==(State state2) const;
+		bool operator!=(State state2) const;
+
+		operator int();
+
+		// Members
+
+		State state = GameConnectionState::Disconnected;
+		std::string reason;
 	};
+
+
 
 	struct LoginResult
 	{
@@ -34,6 +61,13 @@ namespace Stormancer
 		RpcRequestContext_ptr request;
 
 	};
+	struct AuthParameters
+	{
+		std::string type;
+		std::unordered_map<std::string, std::string> parameters;
+
+		MSGPACK_DEFINE(type, parameters);
+	};
 
 
 	class AuthenticationService : public std::enable_shared_from_this<AuthenticationService>
@@ -51,7 +85,7 @@ namespace Stormancer
 
 
 		pplx::task<std::shared_ptr<Scene>> connectToPrivateScene(const std::string& sceneId, std::function<void(std::shared_ptr<Scene>)> builder = [](std::shared_ptr<Scene>) {});
-
+		pplx::task<std::shared_ptr<Scene>> connectToPrivateSceneByToken(const std::string& token, std::function<void(std::shared_ptr<Scene>)> builder = [](std::shared_ptr<Scene>) {});
 		//Gets a connected scene for a service a serviceType and optional serviceName
 		pplx::task<std::shared_ptr<Scene>> getSceneForService(const std::string& serviceType, const std::string& serviceName = "");
 
@@ -73,7 +107,7 @@ namespace Stormancer
 		Action2<GameConnectionState> connectionStateChanged;
 
 
-		std::function<pplx::task<std::unordered_map<std::string, std::string>>()> getCredentialsCallback;
+		std::function<pplx::task<AuthParameters>()> getCredentialsCallback;
 
 		template<typename TResult, typename... TArgs >
 		pplx::task<TResult> sendRequestToUser(const std::string& userId, const std::string& operation, pplx::cancellation_token ct, const TArgs&... args)
@@ -82,7 +116,7 @@ namespace Stormancer
 				auto rpc = scene->dependencyResolver()->resolve<RpcService>();
 				return rpc->rpc<TResult>("sendRequest", ct, args...);
 			});
-			
+
 		}
 
 		void SetOperationHandler(std::string operation, std::function<pplx::task<void>(OperationCtx&)> handler);
@@ -93,7 +127,7 @@ namespace Stormancer
 
 #pragma region private_methods
 
-		void setConnectionState(GameConnectionState state,std::string reason="");
+		void setConnectionState(GameConnectionState state);
 		pplx::task<std::shared_ptr<Scene>> loginImpl(int retry = 0);
 		pplx::task<std::shared_ptr<Scene>> reconnect(int retry);
 

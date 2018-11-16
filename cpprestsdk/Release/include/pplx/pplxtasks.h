@@ -28,6 +28,10 @@
 #ifndef _PPLXTASKS_H
 #define _PPLXTASKS_H
 
+#if !defined(CPPREST_FORCE_PPLX)
+#define CPPREST_FORCE_PPLX 0
+#endif
+
 #if (defined(_MSC_VER) && (_MSC_VER >= 1800)) && !CPPREST_FORCE_PPLX
 #include <ppltasks.h>
 namespace pplx = Concurrency;

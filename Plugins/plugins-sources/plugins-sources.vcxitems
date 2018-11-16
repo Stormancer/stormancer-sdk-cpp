@@ -35,15 +35,12 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\Invitations\InvitationsPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\Leaderboard\LeaderboardPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\Leaderboard\LeaderboardService.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\Matchmaking\MatchmakingPlugin.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\Matchmaking\MatchmakingService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\Members\Friends.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\Members\FriendsPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\Members\Organizations.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\Members\OrganizationsContainer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\Members\OrganizationsPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\Members\OrganizationsService.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\Party\PartyInvitation.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\Party\PartyManagement.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\Party\PartyPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\Party\PartyService.cpp" />
@@ -78,8 +75,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Leaderboard\LeaderboardDto.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Leaderboard\LeaderboardPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Leaderboard\LeaderboardService.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\Matchmaking\MatchmakingPlugin.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\Matchmaking\MatchMakingService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Members\Friends.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Members\FriendsPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Members\Organizations.h" />
@@ -87,7 +82,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Members\OrganizationsPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Members\OrganizationsService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Members\OrganizationsTypes.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\Party\PartyInvitation.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Party\PartyManagement.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Party\PartyPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\Party\PartyService.h" />

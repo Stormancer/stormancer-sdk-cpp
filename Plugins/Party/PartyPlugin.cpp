@@ -1,6 +1,5 @@
 #include "stormancer/Scene.h"
 #include "Party/PartyPlugin.h"
-#include "Party/PartyInvitation.h"
 #include "Party/PartyService.h"
 #include "Party/PartyManagement.h"
 #include "Authentication/AuthenticationService.h"
@@ -16,6 +15,7 @@ namespace Stormancer
 			if (name.length() > 0)
 			{
 				auto service = std::make_shared<PartyService>(scene);
+				service->initialize();
 				scene->dependencyResolver()->registerDependency<PartyService>(service);
 			}
 
@@ -28,30 +28,16 @@ namespace Stormancer
 		}
 	}
 
-	void PartyPlugin::sceneDisconnected(std::shared_ptr<Scene> scene)
-	{
-		if (scene)
-		{
-			auto name = scene->getHostMetadata("stormancer.party");
-			if (name.length() > 0)
-			{
-				auto partyService = scene->dependencyResolver()->resolve<PartyService>();
-				partyService->onDisconnected();
-			}
-		}
-	}
 
 	void PartyPlugin::clientCreated(std::shared_ptr<IClient> client)
 	{
 		if (client)
 		{
-			auto service = std::make_shared<PartyInvitationService>();
-			client->dependencyResolver()->registerDependency<PartyInvitationService>(service);
-		}
-		if (client)
-		{
 			client->dependencyResolver()->registerDependency<PartyManagement>([](std::weak_ptr<DependencyResolver> dr) {
-				return std::make_shared<PartyManagement>(dr.lock()->resolve<AuthenticationService>(), dr.lock()->resolve<ILogger>(), dr.lock()->resolve<GameFinder>()); }, true);
+				auto service =  std::make_shared<PartyManagement>(dr.lock()->resolve<AuthenticationService>(), dr.lock()->resolve<ILogger>(), dr.lock()->resolve<GameFinder>());
+				service->initialize();
+				return service;
+			}, true);
 		}
 	}
 

@@ -1,6 +1,7 @@
 #include "stormancer/headers.h"
 #include "GameSessionPlugin.h"
 #include "GameSessionService.h"
+#include "stormancer/IClient.h"
 
 namespace Stormancer
 {
@@ -12,6 +13,7 @@ namespace Stormancer
 			if (name.length() > 0)
 			{
 				auto service = std::make_shared<GameSessionService>(scene);
+				service->Initialize();
 				scene->dependencyResolver()->registerDependency<GameSessionService>(service);
 			}
 		}
@@ -29,6 +31,18 @@ namespace Stormancer
 					gameSession->__disconnecting();
 				}
 			}
+		}
+	}
+
+	void GameSessionPlugin::clientCreated(std::shared_ptr<IClient> client)
+	{
+		if (client)
+		{
+			std::weak_ptr<IClient> wClient = client;
+			client->dependencyResolver()->registerDependency<GameSession>([wClient](std::weak_ptr<DependencyResolver> dr) {
+				return std::make_shared<GameSession>(wClient);
+			}, true);
+
 		}
 	}
 };

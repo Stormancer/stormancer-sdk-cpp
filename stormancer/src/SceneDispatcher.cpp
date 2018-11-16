@@ -53,9 +53,12 @@ namespace Stormancer
 	{
 		size_t index = sceneHandle - (uint8)MessageIDTypes::ID_SCENES;
 		auto handles = connection->dependencyResolver()->resolve<std::vector<std::weak_ptr<Scene_Impl>>>();
-		if (index < handles->size())
+		if (handles)
 		{
-			(*handles)[index].reset();
+			if (index < handles->size())
+			{
+				(*handles)[index].reset();
+			}
 		}
 	}
 

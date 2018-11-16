@@ -116,7 +116,7 @@ namespace Stormancer
 		{
 			_hostConnectionStateSubscription.unsubscribe();
 		}
-		_logger->log(LogLevel::Trace, "Scene", "deleting scene...", _address.normalize());
+		_logger->log(LogLevel::Trace, "Scene", "destroying scene", _address.toUri());
 
 		auto logger = _logger;
 		disconnect().then([logger](pplx::task<void> t) {
@@ -143,7 +143,7 @@ namespace Stormancer
 		_localRoutesMap.clear();
 		_remoteRoutesMap.clear();
 
-		_logger->log(LogLevel::Trace, "Scene", "Scene deleted.", _address.normalize());
+		_logger->log(LogLevel::Trace, "Scene", "Scene destroyed.", _address.toUri());
 	}
 
 

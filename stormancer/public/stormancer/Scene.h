@@ -24,9 +24,9 @@ namespace Stormancer
 		std::string account;
 		std::string sceneId;
 
-		std::string normalize()
+		std::string toUri()
 		{
-			return clusterId + ":/" + account + "/" + app + "/" + sceneId;
+			return "scene:/"+clusterId + "/" + account + "/" + app + "/" + sceneId;
 		}
 	};
 

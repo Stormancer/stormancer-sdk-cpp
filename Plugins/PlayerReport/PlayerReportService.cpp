@@ -1,13 +1,12 @@
-#include "Stormancer/stdafx.h"
 #include "stormancer/headers.h"
 #include "PlayerReportService.h"
 
 namespace Stormancer
 {
-	PlayerReportService::PlayerReportService(Scene_ptr scene)
+	PlayerReportService::PlayerReportService(std::shared_ptr<Scene> scene)
 	{
 		_scene = scene;
-		_rpc = scene->dependencyResolver().lock()->resolve<RpcService>();
+		_rpcService = scene->dependencyResolver()->resolve<RpcService>();
 	}
 
 	pplx::task<void> PlayerReportService::report(std::string type, std::string comments, std::string json, std::vector<AttachedFileDescriptor> files)
@@ -25,7 +24,7 @@ namespace Stormancer
 			metadata.files.push_back(attachedFile);
 		}
 
-		return _rpc->rpcWriter("playerreporting.report", [&](obytestream* stream) {
+		return _rpcService->rpcWriter("playerreporting.report", pplx::cancellation_token::none(), [&](obytestream* stream) {
 			_serializer.serialize(stream, metadata);
 			for (const auto& f : files)
 			{

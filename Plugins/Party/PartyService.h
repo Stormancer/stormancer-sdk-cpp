@@ -1,5 +1,4 @@
 #pragma once
-//#include "stormancer/stormancer.h"
 #include <memory>
 #include "GameFinder/GameFinderService.h"
 
@@ -46,11 +45,16 @@ namespace Stormancer
 		/// </summary>
 		std::string leaderId;
 
+		/// <summary>
+		/// Party size
+		/// </summary>
 		uint16 partySize;
 
 		std::string customData;
 
-		MSGPACK_DEFINE(gameFinderName, leaderId,partySize, customData)
+		bool startOnlyIfPartyFull;
+
+		MSGPACK_DEFINE(gameFinderName, leaderId,partySize, customData, startOnlyIfPartyFull)
 	};
 	
 
@@ -72,6 +76,8 @@ namespace Stormancer
 		uint16 partySize;
 
 		std::string customData;
+
+		bool startOnlyIfPartyFull;
 	};
 
 	class Party;
@@ -81,7 +87,7 @@ namespace Stormancer
 	class PartyService : public std::enable_shared_from_this<PartyService>
 	{
 	public:
-		PartyService(std::shared_ptr<Scene> scene);
+		PartyService(std::weak_ptr<Scene> scene);
 
 		///
 		/// Sent to server the new party status
@@ -99,11 +105,6 @@ namespace Stormancer
 		/// 
 		pplx::task<void> updatePlayerData(std::string data);
 
-	
-		///
-		/// Call when client is disconnected from scene
-		///
-		void onDisconnected();
 
 		///
 		/// Promote player to leader of the party
@@ -122,14 +123,25 @@ namespace Stormancer
 		Action2<GameFinderResponse> onPartyMatchFound;
 
 		Action2<void> LeftParty;
-
-		Action2<std::vector<PartyUserDto>> UpdatedPartyMembers;
+		Action2<void> JoinedParty;
+		Action2<void> KickedFromParty;
+		Action2<std::vector<PartyUserDto>> UpdatedPartyMembers;		
 		Action2<PartyUserData> UpdatedPartyUserData;
 		Action2<PartySettings> UpdatedPartySettings;
 
-		std::vector<PartyUserDto> members();
+		std::vector<PartyUserDto>& members() {
+			return _members;
+		}
+		
+		PartySettings& settings()
+		{
+			return _settings;
+		}
+
+		void initialize();
 	private:
 
+		PartySettings _settings;
 		///
 		/// Connect the client to gameFinder
 		///
@@ -140,10 +152,10 @@ namespace Stormancer
 		///
 		void sendPlayerPartyStatus();
 
-		pplx::task<void> setNewLocalSettings(const PartySettingsDto partySettings);
+		void setNewLocalSettings(const PartySettingsDto partySettings);
 
 		std::shared_ptr<ILogger> _logger;
-		std::shared_ptr<Scene> _scene;
+		std::weak_ptr<Scene> _scene;
 		std::shared_ptr<RpcService> _rpcService;
 		
 		bool _playerReady;
@@ -154,24 +166,39 @@ namespace Stormancer
 	class Party
 	{
 	public:
-		Party(std::shared_ptr<Scene> scene, 
+		Party(std::shared_ptr<Scene> scene,
+			Action2<void>::Subscription JoinedPartySubscription,
 			Action2<void>::Subscription LeftPartySubscription,
+			Action2<void>::Subscription KickedFromPartySubscription,
 			Action2<std::vector<PartyUserDto>>::Subscription UpdatedPartyMembersSubscription,
 			Action2<PartyUserData>::Subscription UpdatedPartyUserDataSubscription,
 			Action2<PartySettings>::Subscription UpdatedPartySettingsSubscription);
 
-		PartySettings partySettings;
+		bool is_settings_valid() const
+		{
+			return (_partyScene != nullptr && _partyScene->dependencyResolver()->resolve<PartyService>());
+		}
 
-		std::vector<PartyUserDto> members()
+		PartySettings& settings()
+		{
+			return  _partyScene->dependencyResolver()->resolve<PartyService>()->settings();
+		}
+
+		std::vector<PartyUserDto>& members()
 		{
 			return _partyScene->dependencyResolver()->resolve<PartyService>()->members();
 		}
+
 		bool isLeader();
 		std::shared_ptr<Scene> getScene();
-
+		std::string id()
+		{
+			return _partyScene->id();
+		}
 	private:
 		Action2<void>::Subscription LeftPartySubscription;
-
+		Action2<void>::Subscription JoinedPartySubscription;
+		Action2<void>::Subscription KickedFromPartySubscription;
 		Action2<std::vector<PartyUserDto>>::Subscription UpdatedPartyMembersSubscription;
 		Action2<PartyUserData>::Subscription UpdatedPartyUserDataSubscription;
 		Action2<PartySettings>::Subscription UpdatedPartySettingsSubscription;
