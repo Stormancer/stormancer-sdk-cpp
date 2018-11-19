@@ -109,7 +109,7 @@ namespace Stormancer
 			ct.register_callback([=]() {
 				tce.set();
 			});
-			pplx::task<void> cancellationTask(tce);
+			pplx::task<void> cancellationTask = pplx::create_task(tce);
 
 			return (cancellationTask || sleepTask);
 		}
