@@ -60,6 +60,7 @@ namespace Stormancer
 		void test_rpc_client_cancel();
 		void test_rpc_client_exception();
 		void test_syncClock();
+		void test_setServerTimeout();
 		void test_disconnect();
 		void test_disconnectWithReason();
 		void test_clean();

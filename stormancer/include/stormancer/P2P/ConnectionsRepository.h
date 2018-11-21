@@ -19,6 +19,7 @@ namespace Stormancer
 		pplx::task<void> closeAllConnections(const std::string& reason) override;
 		pplx::task<std::shared_ptr<IConnection>> getConnection(std::string id,std::function<pplx::task<std::shared_ptr<IConnection>>(std::string)> connectionFactory) override;
 		int getConnectionCount() override;
+		pplx::task<void> setTimeout(std::chrono::milliseconds timeout, pplx::cancellation_token ct) override;
 
 	private:
 

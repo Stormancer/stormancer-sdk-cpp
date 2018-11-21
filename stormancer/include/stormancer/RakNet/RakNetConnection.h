@@ -36,6 +36,7 @@ namespace Stormancer
 		std::string metadata(const std::string& key) const override;
 		void setMetadata(const std::map<std::string, std::string>& metadata) override;
 		void setMetadata(const std::string& key, const std::string& value) override;
+		pplx::task<void> updatePeerMetadata(pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
 		std::shared_ptr<DependencyResolver> dependencyResolver() override;
 		void close(std::string reason = "") override;
 		virtual void send(const Writer& writer, int channelUid, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const TransformMetadata& transformMetadata = TransformMetadata()) override;
@@ -43,6 +44,8 @@ namespace Stormancer
 		void setApplication(std::string account, std::string application) override;
 		
 		rxcpp::observable<ConnectionState> getConnectionStateChangedObservable() const override;
+
+		pplx::task<void> setTimeout(std::chrono::milliseconds timeout, pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
 
 		template<typename T>
 		void registerComponent(T* component)

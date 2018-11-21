@@ -71,6 +71,8 @@ namespace Stormancer
 
 		pplx::task<int> pingCluster(std::string clusterId, pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
 
+		pplx::task<void> setServerTimeout(std::chrono::milliseconds timeout, pplx::cancellation_token ct) override;
+
 		void clear();
 #pragma endregion
 
@@ -107,7 +109,6 @@ namespace Stormancer
 		pplx::task<void> disconnectAllScenes();
 		pplx::task<Scene_ptr> getSceneInternal(const SceneAddress& sceneId, const SceneEndpoint& sceneEndpoint, pplx::cancellation_token ct = pplx::cancellation_token::none());
 		void transport_packetReceived(Packet_ptr packet);
-		pplx::task<void> updateServerMetadata(std::shared_ptr<IConnection> connection, pplx::cancellation_token ct = pplx::cancellation_token::none());
 		pplx::task<std::shared_ptr<IConnection>> ensureConnectedToServer(std::string clusterId, SceneEndpoint sceneEndpoint, pplx::cancellation_token ct = pplx::cancellation_token::none());
 		void dispatchEvent(const std::function<void(void)>& ev);
 
@@ -158,7 +159,6 @@ namespace Stormancer
 		std::mutex _scenesMutex;
 		std::vector<IPlugin*> _plugins;
 		std::mutex _connectionMutex;
-		pplx::task<void> _connectionTask;
 		pplx::task_completion_event<void> _disconnectionTce;
 		bool _connectionTaskSet = false;
 		Action<ConnectionState> _onConnectionStateChanged;
@@ -171,6 +171,7 @@ namespace Stormancer
 
 		std::shared_ptr<pplx::task<Federation>> _federation;
 		std::weak_ptr<IConnectionManager> _connections;
+		std::chrono::milliseconds _serverTimeout;
 
 #pragma endregion
 	};

@@ -22,6 +22,9 @@ namespace Stormancer
 
 		virtual pplx::task<void> closeAllConnections(const std::string& reason) = 0;
 
+		/// Set a timeout duration on all the current open connections
+		virtual pplx::task<void> setTimeout(std::chrono::milliseconds timeout, pplx::cancellation_token ct = pplx::cancellation_token::none()) = 0;
+
 #pragma endregion
 	};
 };

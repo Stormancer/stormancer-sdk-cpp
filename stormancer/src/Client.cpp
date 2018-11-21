@@ -60,6 +60,7 @@ namespace Stormancer
 		, _plugins(config->plugins())
 		, _config(config)
 		, _dependencyResolver(std::make_shared<DependencyResolver>())
+		, _serverTimeout(config->defaultTimeout)
 	{
 	}
 
@@ -593,8 +594,11 @@ namespace Stormancer
 
 					}
 
-					return client->updateServerMetadata(connection, ct).then([connection]() {return connection; });
-
+					return connection->setTimeout(client->_serverTimeout, ct).then([connection] { return connection; });
+				}, ct)
+					.then([ct](std::shared_ptr<IConnection> connection)
+				{
+					return connection->updatePeerMetadata(ct).then([connection] { return connection; });
 				}, ct)
 					.then([wClient, ct](std::shared_ptr<IConnection> connection)
 				{
@@ -673,7 +677,7 @@ namespace Stormancer
 
 			connection->setMetadata("serializer", sceneInfos.SelectedSerializer);
 
-			return client->updateServerMetadata(connection, ct)
+			return connection->updatePeerMetadata(ct)
 				.then([tuple]()
 			{
 				return tuple;
@@ -691,37 +695,6 @@ namespace Stormancer
 
 
 			return scene;
-		}, ct);
-	}
-
-	pplx::task<void> Client::updateServerMetadata(std::shared_ptr<IConnection> serverConnection, pplx::cancellation_token ct)
-	{
-		auto loggerPtr = logger();
-		loggerPtr->log(LogLevel::Trace, "Client", "Update server metadata");
-
-		ct = getLinkedCancellationToken(ct);
-		auto connections = _connections.lock();
-		if (!connections)
-		{
-			return pplx::task_from_exception<void>(Stormancer::PointerDeletedException(""));
-		}
-
-
-		if (!serverConnection)
-		{
-			throw std::runtime_error("Connection not available");
-		}
-
-		auto requestProcessor = _dependencyResolver->resolve<RequestProcessor>();
-
-		auto serializer = _serializer;
-		return requestProcessor->sendSystemRequest(serverConnection.get(), (byte)SystemRequestIDTypes::ID_SET_METADATA, [serializer, serverConnection](obytestream* stream)
-		{
-			serializer.serialize(stream, serverConnection->metadata());
-		}, PacketPriority::MEDIUM_PRIORITY, ct)
-			.then([loggerPtr](Packet_ptr)
-		{
-			loggerPtr->log(LogLevel::Trace, "Client", "Updated server metadata");
 		}, ct);
 	}
 
@@ -1140,6 +1113,19 @@ namespace Stormancer
 			auto cluster = fed.getCluster(clusterId);
 			return api->ping(cluster.endpoints.front(), ct);
 		});
+	}
+
+	pplx::task<void> Client::setServerTimeout(std::chrono::milliseconds timeout, pplx::cancellation_token ct)
+	{
+		_serverTimeout = timeout;
+
+		if (auto connections = _connections.lock())
+		{
+			ct = create_linked_shutdown_token(ct);
+			return connections->setTimeout(timeout, ct);
+		}
+
+		return pplx::task_from_result();
 	}
 
 	SceneAddress SceneAddress::parse(const std::string urn, const std::string& defaultClusterId, const std::string& defaultAccount, const std::string& defaultApp)

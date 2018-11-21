@@ -59,12 +59,15 @@ namespace Stormancer
 		virtual std::string metadata(const std::string& key) const = 0;
 		virtual void setMetadata(const std::map<std::string, std::string>& metadata) = 0;
 		virtual void setMetadata(const std::string& key, const std::string& value) = 0;
+		virtual pplx::task<void> updatePeerMetadata(pplx::cancellation_token /*ct*/ = pplx::cancellation_token::none()) { return pplx::task_from_result(); }
 		
 		virtual std::shared_ptr<DependencyResolver> dependencyResolver() = 0;
 
 		/// Returns the connection state.
 		virtual ConnectionState getConnectionState() const = 0;
 		virtual rxcpp::observable<ConnectionState> getConnectionStateChangedObservable() const = 0;
+
+		virtual pplx::task<void> setTimeout(std::chrono::milliseconds /*timeout*/, pplx::cancellation_token /*ct*/ = pplx::cancellation_token::none()) { return pplx::task_from_result(); }
 
 		 Action2<std::string> onClose;
 

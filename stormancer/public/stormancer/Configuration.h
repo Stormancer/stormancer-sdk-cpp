@@ -113,6 +113,9 @@ namespace Stormancer
 
 		ILogger_ptr logger;
 
+		/// The default timeout duration for server connections
+		std::chrono::milliseconds defaultTimeout = std::chrono::milliseconds(10'000);
+
 
 
 

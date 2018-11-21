@@ -238,6 +238,7 @@ namespace Stormancer
 	pplx::cancellation_token_source create_linked_source(pplx::cancellation_token token1, pplx::cancellation_token token2);
 	pplx::cancellation_token_source create_linked_source(pplx::cancellation_token token1, pplx::cancellation_token token2, pplx::cancellation_token token3);
 
+	pplx::cancellation_token create_linked_shutdown_token(pplx::cancellation_token token);
 
 	// Cancels the provided task after the specifed delay, if the task
 	// did not complete.

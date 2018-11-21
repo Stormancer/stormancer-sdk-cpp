@@ -538,6 +538,17 @@ namespace Stormancer
 		});
 	}
 
+	void Tester::test_setServerTimeout()
+	{
+		_logger->log(LogLevel::Info, "test_setServerTimeout", "SET SERVER TIMEOUT");
+		
+		_client->setServerTimeout(10s).then([this]
+		{
+			_logger->log(LogLevel::Debug, "test_setServerTimeout", "setServerTimeout OK");
+			execNextTest();
+		});
+	}
+
 	void Tester::test_disconnect()
 	{
 		_logger->log(LogLevel::Info, "test_disconnect", "DISCONNECT");
@@ -615,6 +626,7 @@ namespace Stormancer
 		_tests.push_back([this]() { test_rpc_client_cancel(); });
 		_tests.push_back([this]() { test_rpc_client_exception(); });
 		_tests.push_back([this]() { test_syncClock(); });
+		_tests.push_back([this]() { test_setServerTimeout(); });
 		//_tests.push_back([this]() { test_disconnectWithReason(); });
 		_tests.push_back([this]() { test_disconnect(); });
 		_tests.push_back([this]() { test_clean(); });

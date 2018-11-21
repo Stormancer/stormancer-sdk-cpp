@@ -111,6 +111,9 @@ namespace Stormancer
 
 		ILogger_ptr logger;
 
+		/// The default timeout value for the peers that the client will connect to
+		std::chrono::milliseconds timeout = std::chrono::milliseconds(10'000);
+
 
 
 

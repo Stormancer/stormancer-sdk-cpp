@@ -5,6 +5,11 @@
 #include "stormancer/AES/IAES.h"
 #include "stormancer/Configuration.h"
 #include "stormancer/ChannelUidStore.h"
+#include "stormancer/RequestProcessor.h"
+#include "stormancer/SystemRequestIDTypes.h"
+#include "stormancer/Helpers.h"
+#include "stormancer/Exceptions.h"
+#include <limits>
 
 namespace Stormancer
 {
@@ -100,6 +105,23 @@ namespace Stormancer
 	void RakNetConnection::setMetadata(const std::string& key, const std::string& value)
 	{
 		_metadata[key] = value;
+	}
+
+	pplx::task<void> RakNetConnection::updatePeerMetadata(pplx::cancellation_token ct)
+	{
+		auto requestProcessor = _dependencyResolver->resolve<RequestProcessor>();
+		auto logger = _logger;
+
+		ct = create_linked_shutdown_token(ct);
+
+		return requestProcessor->sendSystemRequest(this, (byte)SystemRequestIDTypes::ID_SET_METADATA, [this](obytestream* stream)
+		{
+			_dependencyResolver->resolve<Serializer>()->serialize(stream, metadata());
+		}, PacketPriority::MEDIUM_PRIORITY, ct)
+			.then([logger](Packet_ptr)
+		{
+			logger->log(LogLevel::Trace, "RakNetConnection::updatePeerMetadata", "Updated peer metadata");
+		}, ct);
 	}
 
 	std::shared_ptr<DependencyResolver> RakNetConnection::dependencyResolver()
@@ -238,7 +260,31 @@ namespace Stormancer
 		return _connectionStateObservable.get_observable();
 	}
 
-	
+	pplx::task<void> RakNetConnection::setTimeout(std::chrono::milliseconds timeout, pplx::cancellation_token ct)
+	{
+		auto totalMs = timeout.count();
+		auto totalMsStr = std::to_string(totalMs);
+		if (totalMs > static_cast<std::chrono::milliseconds::rep>(std::numeric_limits<RakNet::TimeMS>::max()) ||
+			totalMs < static_cast<std::chrono::milliseconds::rep>(std::numeric_limits<RakNet::TimeMS>::min()))
+		{
+			_logger->log(LogLevel::Error, "RakNetConnection::setTimeout", "timeout value doesn't fit in RakNet::TimeMS", totalMsStr);
+			return pplx::task_from_exception<void>(std::out_of_range("timeout value doesn't fit in RakNet::TimeMS"));
+		}
+		
+		if (_connectionState != ConnectionState::Connected)
+		{
+			return pplx::task_from_exception<void>(std::runtime_error("cannot set timeout when not in Connected state"));
+		}
 
-	
+		setMetadata("timeout", totalMsStr);
+		if (auto peer = _peer.lock())
+		{
+			peer->SetTimeoutTime(static_cast<RakNet::TimeMS>(totalMs), peer->GetSystemAddressFromGuid(_guid));
+		}
+		else
+		{
+			return pplx::task_from_exception<void>(PointerDeletedException("peer"));
+		}
+		return updatePeerMetadata(ct);
+	}
 };

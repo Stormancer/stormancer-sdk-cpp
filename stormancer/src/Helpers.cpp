@@ -1,6 +1,7 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/Helpers.h"
 #include "stormancer/utilities/taskUtilities.h"
+#include "stormancer/Shutdown.h"
 
 
 // Needed for string/wstring conversion, not present on Vita.
@@ -266,6 +267,11 @@ namespace Stormancer
 			tokens.push_back(token3);
 		}
 		return pplx::cancellation_token_source::create_linked_source(tokens.begin(), tokens.end());
+	}
+
+	pplx::cancellation_token create_linked_shutdown_token(pplx::cancellation_token token)
+	{
+		return create_linked_source(token, Shutdown::instance().getShutdownToken()).get_token();
 	}
 
 

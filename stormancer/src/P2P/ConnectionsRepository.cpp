@@ -194,4 +194,20 @@ namespace Stormancer
 		return pplx::when_all(tasks.begin(), tasks.end());
 			
 	}
+
+	pplx::task<void> ConnectionsRepository::setTimeout(std::chrono::milliseconds timeout, pplx::cancellation_token ct)
+	{
+		std::vector<pplx::task<void>> tasks;
+
+		for (auto& conn : _connections)
+		{
+			tasks.push_back(conn.second.then([timeout, ct](ConnectionContainer connectionContainer)
+			{
+				return connectionContainer.connection->setTimeout(timeout, ct);
+			}, ct));
+		}
+
+		return pplx::when_all(tasks.begin(), tasks.end());
+	}
+
 };
