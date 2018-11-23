@@ -30,7 +30,7 @@ namespace Stormancer
 	void Scene_Impl::initialize()
 	{
 		_host = std::make_shared<ScenePeer>(_peer, _handle, _remoteRoutesMap, this->shared_from_this());
-		std::weak_ptr<Scene_Impl> wThat;
+		std::weak_ptr<Scene_Impl> wThat = this->shared_from_this();
 		auto onNext = [wThat](ConnectionState state) {
 			if (auto that = wThat.lock())
 			{

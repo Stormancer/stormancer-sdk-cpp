@@ -442,7 +442,24 @@ namespace Stormancer
 				{
 					try
 					{
-						return t.get();
+						auto scene= t.get();
+						if (auto that = wThat.lock())
+						{
+							auto it = that->_scenes.find(uSceneId);
+							if (it != that->_scenes.end())
+							{
+								it->second.stateChangedSubscription = scene->getConnectionStateChangedObservable().subscribe([wThat, uSceneId](ConnectionState state) {
+									if (state == ConnectionState::Disconnecting)
+									{
+										if (auto that = wThat.lock())
+										{
+											that->_scenes.erase(uSceneId);
+										}
+									}
+								});
+							}
+						}
+						return scene;
 					}
 					catch (std::exception&)
 					{
@@ -841,39 +858,44 @@ namespace Stormancer
 			throw PointerDeletedException("Client destroyed");
 		}
 
-		auto c = connections->getConnection(scene->host()->id());
-		sceneDispatcher->removeScene(c, sceneHandle);
-
-
-		pplx::cancellation_token_source cts;
-
-		auto timeOutToken = timeout(std::chrono::milliseconds(5000));
-		if (!initiatedByServer)
+		if (auto c = connections->getConnection(scene->host()->id()))
 		{
-			auto wClient = STRM_WEAK_FROM_THIS();
-			return sendSystemRequest<void>(c, (byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, sceneHandle)
-				.then([wClient, scene, sceneId, reason]()
+			sceneDispatcher->removeScene(c, sceneHandle);
+
+
+			pplx::cancellation_token_source cts;
+
+			auto timeOutToken = timeout(std::chrono::milliseconds(5000));
+			if (!initiatedByServer)
 			{
-				if (auto client = wClient.lock())
+				auto wClient = STRM_WEAK_FROM_THIS();
+				return sendSystemRequest<void>(c, (byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, sceneHandle)
+					.then([wClient, scene, sceneId, reason]()
 				{
+					if (auto client = wClient.lock())
+					{
 
 
-					client->logger()->log(LogLevel::Debug, "client", "Scene disconnected", sceneId);
+						client->logger()->log(LogLevel::Debug, "client", "Scene disconnected", sceneId);
 
-					scene->setConnectionState(ConnectionState(ConnectionState::Disconnected, reason));
-				}
-			}, timeOutToken);
+						scene->setConnectionState(ConnectionState(ConnectionState::Disconnected, reason));
+					}
+				}, timeOutToken);
+			}
+			else
+			{
+
+
+				this->logger()->log(LogLevel::Debug, "client", "Scene disconnected", sceneId);
+
+				scene->setConnectionState(ConnectionState(ConnectionState::Disconnected, reason));
+				return pplx::task_from_result();
+			}
 		}
 		else
 		{
-
-
-			this->logger()->log(LogLevel::Debug, "client", "Scene disconnected", sceneId);
-
-			scene->setConnectionState(ConnectionState(ConnectionState::Disconnected, reason));
 			return pplx::task_from_result();
 		}
-
 	}
 
 	pplx::task<void> Client::disconnectAllScenes()

@@ -91,6 +91,14 @@ namespace Stormancer
 			pplx::task<Scene_ptr> task;
 			bool connecting = false;
 			bool isPublic = true;
+			rxcpp::subscription stateChangedSubscription;
+			~ClientScene()
+			{
+				if (stateChangedSubscription.is_subscribed())
+				{
+					stateChangedSubscription.unsubscribe();
+				}
+			}
 		};
 
 #pragma endregion

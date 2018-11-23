@@ -322,7 +322,7 @@ namespace Stormancer
 	{
 		std::weak_ptr<AuthenticationService> wThat = this->shared_from_this();
 		return getAuthenticationScene()
-			.then([token,wThat,builder](std::shared_ptr<Scene> authScene)
+			.then([token, wThat, builder](std::shared_ptr<Scene> authScene)
 		{
 			auto that = wThat.lock();
 
@@ -404,12 +404,16 @@ namespace Stormancer
 
 
 
-			if (state == GameConnectionState::Disconnected || state == GameConnectionState::Disconnecting)
+			if (state == GameConnectionState::Disconnected)
 			{
 				_authTask = nullptr;
-				if (state.reason == "User connected elsewhere" || state.reason == "Authentication failed")
+				if (state.reason == "User connected elsewhere" || state.reason == "Authentication failed" || state.reason == "auth.login.new_connection")
 				{
 					_autoReconnect = false;
+					if (auto client = _client.lock())
+					{
+						client->disconnect();//Disconnect still connected scenes.
+					}
 				}
 				if (_autoReconnect)
 				{
