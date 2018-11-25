@@ -112,7 +112,7 @@ void testP2P(std::string endpoint, std::string account, std::string application,
 
 	auto hostConfiguration = Stormancer::Configuration::create(endpoint, account, application);
 	hostConfiguration->logger = logger;
-	hostConfiguration->encryptionEnabled = true;
+	//hostConfiguration->encryptionEnabled = true;
 
 	auto hostClient = Stormancer::IClient::create(hostConfiguration);
 

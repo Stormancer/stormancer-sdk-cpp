@@ -26,9 +26,9 @@ namespace Stormancer
 		return _tunnels->openTunnel(connectionId, id, ct);
 	}
 
-	pplx::task<std::shared_ptr<IConnection>> P2PService::openP2PConnection(const std::string& p2pToken, pplx::cancellation_token ct)
+	pplx::task<std::shared_ptr<IConnection>> P2PService::openP2PConnection(std::shared_ptr<IConnection> server, const std::string& p2pToken, pplx::cancellation_token ct)
 	{
-		auto server = _connections->getConnection(0);
+		
 		if (!server)
 		{
 			return pplx::task_from_exception<std::shared_ptr<IConnection>>(std::runtime_error("Cannot establish P2P connection. The client must be connected to the server"));

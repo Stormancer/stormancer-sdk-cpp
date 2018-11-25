@@ -511,7 +511,7 @@ namespace Stormancer
 		auto dispatcher = dependencyResolver()->resolve<IActionDispatcher>();
 		auto options = pplx::task_options(dispatcher);
 		options.set_cancellation_token(ct);
-		return p2pService->openP2PConnection(p2pToken, ct)
+		return p2pService->openP2PConnection(_peer.lock(),p2pToken, ct)
 			.then([wScene, p2pService](std::shared_ptr<IConnection> connection)
 		{
 			auto scene = LockOrThrow(wScene);

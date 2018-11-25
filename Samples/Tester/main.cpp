@@ -10,9 +10,9 @@ int main(int argc, char** argv)
 	std::string application = (argc >= 4) ? argv[3] : "test-application";
 
 	{
-		Stormancer::Tester tester(endpoint, account, application,"test-scene");
+		/*Stormancer::Tester tester(endpoint, account, application,"test-scene");
 		tester.run_all_tests();
-		std::cin.ignore();
+		std::cin.ignore();*/
 	}
 
 	try
