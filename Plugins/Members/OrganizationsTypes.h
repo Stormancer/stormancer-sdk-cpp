@@ -26,7 +26,7 @@ namespace Stormancer
 		std::string id;
 		std::string name;
 		std::string ownerId;
-		std::map<std::string, Role> roleDefinitions;
+		std::vector<Role> roleDefinitions;
 		std::string document = "{}";
 
 		MSGPACK_DEFINE(id, name, ownerId, roleDefinitions, document);
@@ -39,8 +39,9 @@ namespace Stormancer
 		std::string userId;
 		std::vector<std::string> roles;
 		MemberStatus status;
+		std::vector<std::string> tags;
 
-		MSGPACK_DEFINE(id, organizationId, userId, roles, status);
+		MSGPACK_DEFINE(id, userId, organizationId, roles, status, tags);
 	};
 }
 

@@ -1,6 +1,7 @@
 #include "stormancer/headers.h"
 #include "OrganizationsPlugin.h"
 #include "OrganizationsService.h"
+#include "Organizations.h"
 #include "stormancer/Scene.h"
 
 namespace Stormancer
@@ -16,6 +17,20 @@ namespace Stormancer
 				auto service = std::make_shared<OrganizationsService>(scene);
 				scene->dependencyResolver()->registerDependency<OrganizationsService>(service);
 			}
+		}
+	}
+
+	void OrganizationsPlugin::clientCreated(std::shared_ptr<IClient> client)
+	{
+		if (client)
+		{
+			client->dependencyResolver()->registerDependency<Organizations>([](std::weak_ptr<DependencyResolver> dr)
+			{
+				auto authService = dr.lock()->resolve<AuthenticationService>();
+				auto organizations = std::make_shared<Organizations>(authService);
+				organizations->initialize();
+				return organizations;
+			}, true);
 		}
 	}
 }

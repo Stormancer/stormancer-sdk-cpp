@@ -24,18 +24,18 @@ namespace Stormancer
 		return rpcService->rpc<Organization>("organizations.getorganization", organizationId);
 	}
 
-	pplx::task<Organization> OrganizationsService::getOrganizationByName(const std::string& organizationName)
+	pplx::task<std::vector<Organization>> OrganizationsService::getOrganizations(const std::string& nameContains, int size, int skip)
 	{
 		auto scene = _scene.lock();
 
 		if (!scene)
 		{
-			return pplx::task_from_exception<Organization>(std::runtime_error("Scene not available"));
+			return pplx::task_from_exception<std::vector<Organization>>(std::runtime_error("Scene not available"));
 		}
 
 		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
 
-		return rpcService->rpc<Organization>("organizations.getorganizationbyname", organizationName);
+		return rpcService->rpc<std::vector<Organization>>("organizations.getorganizations", nameContains, size, skip);
 	}
 
 	pplx::task<std::vector<Organization>> OrganizationsService::getUserOrganizations(const std::string& userId, bool showApplyingMembers)

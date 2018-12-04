@@ -8,7 +8,13 @@
 
 namespace Stormancer
 {
-	pplx::task<std::shared_ptr<OrganizationsContainer>> Organizations::initialize(std::string organizationSceneName)
+	Organizations::Organizations(std::weak_ptr<AuthenticationService> auth)
+		: ClientAPI(auth)
+		, _auth(auth)
+	{
+	}
+
+	pplx::task<std::shared_ptr<OrganizationsContainer>> Organizations::initialize()
 	{
 		auto auth = _auth.lock();
 
@@ -17,12 +23,12 @@ namespace Stormancer
 			return pplx::task_from_exception<std::shared_ptr<OrganizationsContainer>>(std::runtime_error("Authentication service destroyed."));
 		}
 
-		std::weak_ptr<Organizations> wThat = this->shared_from_this();
-		_organizationsContainerTask = auth->getSceneForService("stormancer.organizations", organizationSceneName)
-			.then([wThat](std::shared_ptr<Scene> scene)
+		std::weak_ptr<Organizations> wOrganizations = this->shared_from_this();
+		_organizationsContainerTask = auth->getSceneForService("stormancer.plugins.organizations")
+			.then([wOrganizations](std::shared_ptr<Scene> scene)
 		{
-			auto that = wThat.lock();
-			if (!that)
+			auto organizations = wOrganizations.lock();
+			if (!organizations)
 			{
 				throw PointerDeletedException("Authentication service destroyed.");
 			}
@@ -30,13 +36,13 @@ namespace Stormancer
 			auto container = std::make_shared<OrganizationsContainer>();
 			container->_scene = scene;
 			container->_connectionStateChangedSubscription = scene->getConnectionStateChangedObservable()
-				.subscribe([wThat](ConnectionState s)
+				.subscribe([wOrganizations](ConnectionState s)
 			{
 				if (s == ConnectionState::Disconnected)
 				{
-					if (auto that = wThat.lock())
+					if (auto organizations = wOrganizations.lock())
 					{
-						that->_organizationsContainerTask = pplx::task_from_result<std::shared_ptr<OrganizationsContainer>>(nullptr);
+						organizations->_organizationsContainerTask = pplx::task_from_result<std::shared_ptr<OrganizationsContainer>>(nullptr);
 					}
 				}
 			});
@@ -54,12 +60,12 @@ namespace Stormancer
 		});
 	}
 
-	pplx::task<Organization> Organizations::getOrganizationByName(const std::string& organizationName)
+	pplx::task<std::vector<Organization>> Organizations::getOrganizations(const std::string& nameContains, int size, int skip)
 	{
 		return _organizationsContainerTask
-			.then([organizationName](std::shared_ptr<OrganizationsContainer> organizationsContainer)
+			.then([nameContains, size, skip](std::shared_ptr<OrganizationsContainer> organizationsContainer)
 		{
-			return organizationsContainer->service()->getOrganizationByName(organizationName);
+			return organizationsContainer->service()->getOrganizations(nameContains, size, skip);
 		});
 	}
 
@@ -176,7 +182,7 @@ namespace Stormancer
 		return _organizationsContainerTask
 			.then([roleName, userId, organizationId](std::shared_ptr<OrganizationsContainer> organizationsContainer)
 		{
-			return organizationsContainer->service()->grantOrganizationRole(roleName, userId, organizationId);
+			return organizationsContainer->service()->ungrantOrganizationRole(roleName, userId, organizationId);
 		});
 	}
 }

@@ -12,11 +12,12 @@ namespace Stormancer
 	{
 	public:
 
-		Organizations() = default;
+		Organizations(std::weak_ptr<AuthenticationService> auth);
 
-		pplx::task<std::shared_ptr<OrganizationsContainer>> initialize(std::string organizationSceneName);
+		pplx::task<std::shared_ptr<OrganizationsContainer>> initialize();
+
 		pplx::task<Organization> getOrganization(const std::string& organizationId);
-		pplx::task<Organization> getOrganizationByName(const std::string& organizationName);
+		pplx::task<std::vector<Organization>> getOrganizations(const std::string& nameContains, int size = 10, int skip = 0);
 		pplx::task<std::vector<Organization>> getUserOrganizations(const std::string& userId, bool showApplyingMembers = false);
 		pplx::task<std::vector<Member>> getMembers(const std::string& organizationId, bool showApplyingMembers = false);
 		pplx::task<Organization> createOrganization(const std::string& organizationName, const std::string& customData = "{}");
