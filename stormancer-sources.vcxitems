@@ -27,7 +27,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\Compatibility\IStormancerTask.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\Compatibility\pplxtasks_noexcept.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\Compatibility\StormancerResult.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\Configuration.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\ConnectionData.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\ConnectionResult.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\ConnectionState.h" />

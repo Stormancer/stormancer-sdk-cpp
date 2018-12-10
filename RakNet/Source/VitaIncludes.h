@@ -2,7 +2,10 @@
 
 #include <net.h>
 
-int doResolverNtoa(const char *hostname, SceNetInAddr *addr);
+namespace RakNet
+{
+	int doResolverNtoa(const char *hostname, SceNetInAddr *addr);
+}
 
 
 

@@ -69,9 +69,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\Client.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\Configuration.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\ConnectionData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
