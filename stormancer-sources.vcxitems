@@ -119,7 +119,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\public\stormancer\Logger\FileLogger.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\public\stormancer\Logger\ILogger.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\public\stormancer\Logger\NullLogger.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\public\stormancer\Logger\VisualStudioLogger.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\public\stormancer\MessageOriginFilter.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\public\stormancer\msgpack_define.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\public\stormancer\P2P\IP2PScenePeer.h" />
@@ -173,7 +172,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Logger\FileLogger.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Logger\ILogger.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Logger\NullLogger.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Logger\VisualStudioLogger.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\P2P\ConnectionsRepository.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\P2P\EndpointCandidate.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\P2P\P2PPacketDispatcher.cpp" />

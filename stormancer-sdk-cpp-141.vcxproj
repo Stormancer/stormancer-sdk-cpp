@@ -469,8 +469,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stormancer\include\Windows\AES\AES_windows.h" />
+    <ClInclude Include="stormancer\public\stormancer\Logger\VisualStudioLogger.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="stormancer\src\Logger\VisualStudioLogger.cpp" />
     <ClCompile Include="stormancer\src\Windows\AES\AES_windows.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

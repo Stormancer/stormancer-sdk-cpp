@@ -414,9 +414,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\public\stormancer\Route.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\public\stormancer\Logger\VisualStudioLogger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\public\stormancer\Logger\ConsoleLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -648,9 +645,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Shutdown.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)stormancer\src\Logger\VisualStudioLogger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

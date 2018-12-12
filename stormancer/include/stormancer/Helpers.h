@@ -2,6 +2,8 @@
 
 #include "stormancer/headers.h"
 #include "stormancer/Streams/bytestream.h"
+#include "stormancer/TimerThread.h"
+#include "stormancer/Utilities/TaskUtilities.h"
 
 namespace Stormancer
 {
