@@ -93,9 +93,9 @@ namespace Stormancer
 			return nullptr;
 		}
 
-		Client_ptr client(new Client(config), [](Client* ptr) { delete ptr; });
-		client->initialize();
-		return std::reinterpret_pointer_cast<IClient>(client);
+		std::shared_ptr<IClient> client(new Client(config), [](IClient* ptr) { delete ptr; });
+		static_cast<Client*>(client.get())->initialize();
+		return client;
 	}
 
 	void Client::initialize()
@@ -273,7 +273,7 @@ namespace Stormancer
 			{
 				return pplx::task_from_result(scene);
 			}
-		}, ct).then([](Scene_ptr s) {return std::reinterpret_pointer_cast<Scene>(s); });
+		}, ct).then([](Scene_ptr s) {return std::static_pointer_cast<Scene>(s); });
 	}
 
 	pplx::task<std::shared_ptr<Scene>> Client::connectToPrivateScene(const std::string& sceneToken, const SceneInitializer& initializer, pplx::cancellation_token ct)
@@ -341,7 +341,7 @@ namespace Stormancer
 			}
 
 
-		}, ct).then([](Scene_ptr s) {return std::reinterpret_pointer_cast<Scene>(s); });
+		}, ct).then([](Scene_ptr s) {return std::static_pointer_cast<Scene>(s); });
 	}
 
 	pplx::task<std::shared_ptr<Scene>> Client::getConnectedScene(const std::string& sceneId, pplx::cancellation_token ct)
@@ -358,7 +358,7 @@ namespace Stormancer
 		auto it = _scenes.find(sceneId);
 		if (it != _scenes.end())
 		{
-			return it->second.task.then([](Scene_ptr s) {return std::reinterpret_pointer_cast<Scene>(s); });
+			return it->second.task.then([](Scene_ptr s) {return std::static_pointer_cast<Scene>(s); });
 		}
 
 		return pplx::task_from_result<std::shared_ptr<Scene>>(nullptr);

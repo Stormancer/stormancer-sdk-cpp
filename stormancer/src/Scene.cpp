@@ -515,7 +515,7 @@ namespace Stormancer
 			.then([wScene, p2pService](std::shared_ptr<IConnection> connection)
 		{
 			auto scene = LockOrThrow(wScene);
-			return std::reinterpret_pointer_cast<IP2PScenePeer>(std::make_shared<P2PScenePeer>(scene, connection, p2pService, P2PConnectToSceneMessage()));
+			return std::static_pointer_cast<IP2PScenePeer>(std::make_shared<P2PScenePeer>(scene, connection, p2pService, P2PConnectToSceneMessage()));
 		}, options);
 		//	auto c = t.get();
 		//	P2PConnectToSceneMessage message;
