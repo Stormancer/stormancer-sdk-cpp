@@ -42,7 +42,7 @@ namespace Stormancer
 			}
 			auto invitation = that->invitations.ReceivePartyInvitation(senderId, sceneId);
 			pplx::task_completion_event<void> tce;
-			auto subscription = invitation->onAnswer.subscribe([tce, ctx](bool answer)
+			auto subscription = invitation->onAnswer.subscribe([tce, ctx](bool /*answer*/)
 			{
 				ctx.request->sendValue([](obytestream*) {});
 				tce.set();

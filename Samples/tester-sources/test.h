@@ -3,6 +3,9 @@
 #include "stormancer/IClient.h"
 #include "stormancer/Logger/ConsoleLogger.h"
 
+
+
+
 namespace Stormancer
 {
 	class Tester
