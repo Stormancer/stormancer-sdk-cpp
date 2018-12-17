@@ -406,7 +406,7 @@
     <RemoveDuplicates Inputs="@(_RestoreGraphEntry)">
       <Output TaskParameter="Filtered" ItemName="_RestoreGraphEntryFiltered" />
     </RemoveDuplicates>
-    <RestoreTask RestoreGraphItems="@(_RestoreGraphEntryFiltered)" RestoreDisableParallel="$(RestoreDisableParallel)" RestoreNoCache="$(RestoreNoCache)" RestoreIgnoreFailedSources="$(RestoreIgnoreFailedSources)" RestoreRecursive="$(RestoreRecursive)" RestoreForce="$(RestoreForce)" HideWarningsAndErrors="$(HideWarningsAndErrors)" Interactive="$(NuGetInteractive)" />
+    <RestoreTask RestoreGraphItems="@(_RestoreGraphEntryFiltered)" RestoreDisableParallel="$(RestoreDisableParallel)" RestoreNoCache="$(RestoreNoCache)" RestoreIgnoreFailedSources="$(RestoreIgnoreFailedSources)" RestoreRecursive="$(RestoreRecursive)" RestoreForce="$(RestoreForce)" HideWarningsAndErrors="$(HideWarningsAndErrors)" Interactive="$(NuGetInteractive)" RestoreForceEvaluate="$(RestoreForceEvaluate)" />
   </Target>
   <Target Name="GenerateRestoreGraphFile" DependsOnTargets="_GenerateRestoreGraph">
     <Error Condition="$(RestoreGraphOutputPath) == ''" Text="Missing RestoreGraphOutputPath property!" />

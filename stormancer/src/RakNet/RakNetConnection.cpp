@@ -273,7 +273,8 @@ namespace Stormancer
 		
 		if (_connectionState != ConnectionState::Connected)
 		{
-			return pplx::task_from_exception<void>(std::runtime_error("cannot set timeout when not in Connected state"));
+			_logger->log(LogLevel::Error, "RakNetConnection::setTimeout", "Failed to set timeout because connection is not established", std::to_string(_connectionState));
+			return pplx::task_from_result();// pplx::task_from_exception<void>(std::runtime_error("cannot set timeout when not in Connected state"));
 		}
 
 		setMetadata("timeout", totalMsStr);

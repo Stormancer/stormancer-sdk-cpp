@@ -344,8 +344,9 @@ namespace Stormancer
 					case (byte)MessageIDTypes::ID_ADVERTISE_PEERID:
 					{
 						std::lock_guard<std::mutex> lg(_pendingConnection_mtx);
-						char* parentId = nullptr;
-						char* id = nullptr;
+						char* buffer = new char[512];
+						std::string parentId;
+						std::string id;
 						bool requestResponse = false;
 						uint64 remotePeerId = 0;
 						std::string packetSystemAddressStr = rakNetPacket->systemAddress.ToString(true, ':');
@@ -356,8 +357,13 @@ namespace Stormancer
 							RakNet::BitStream data(rakNetPacket->data + 1, rakNetPacket->length - 1, false);
 							data.Read(remotePeerId);
 
-							data.Read(parentId);
-							data.Read(id);
+							data.Read(buffer);
+							parentId = buffer;
+							delete[] buffer;
+							buffer = new char[512];
+							data.Read(buffer);
+							id = buffer;
+							delete[] buffer;
 							data.Read(requestResponse);
 						}
 

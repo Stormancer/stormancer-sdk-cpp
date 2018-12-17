@@ -63,21 +63,7 @@ namespace Stormancer
 				if (state == ConnectionState::Disconnecting && sceneState != ConnectionState::Disconnecting && sceneState != ConnectionState::Disconnected)
 				{
 					// We are disconnecting the scene
-					actionDispatcher->post([wThat, state]()
-					{
-						if (auto that = wThat.lock())
-						{
-							that->setConnectionState(ConnectionState(ConnectionState::Disconnecting, state.reason));
-						}
-					});
-
-
-				}
-				// We check the connection is disconnected, and the scene is not already disconnected
-				else if (state == ConnectionState::Disconnected && sceneState != ConnectionState::Disconnected)
-				{
-					// We ensure the scene is disconnecting
-					if (sceneState != ConnectionState::Disconnecting)
+					if (actionDispatcher)
 					{
 						actionDispatcher->post([wThat, state]()
 						{
@@ -88,14 +74,36 @@ namespace Stormancer
 						});
 					}
 
-					// We disconnect the scene
-					actionDispatcher->post([wThat, state]()
+
+				}
+				// We check the connection is disconnected, and the scene is not already disconnected
+				else if (state == ConnectionState::Disconnected && sceneState != ConnectionState::Disconnected)
+				{
+					// We ensure the scene is disconnecting
+					if (sceneState != ConnectionState::Disconnecting)
 					{
-						if (auto that = wThat.lock())
+						if (actionDispatcher)
 						{
-							that->setConnectionState(ConnectionState(ConnectionState::Disconnected, state.reason));
+							actionDispatcher->post([wThat, state]()
+							{
+								if (auto that = wThat.lock())
+								{
+									that->setConnectionState(ConnectionState(ConnectionState::Disconnecting, state.reason));
+								}
+							});
 						}
-					});
+					}
+					if (actionDispatcher)
+					{
+						// We disconnect the scene
+						actionDispatcher->post([wThat, state]()
+						{
+							if (auto that = wThat.lock())
+							{
+								that->setConnectionState(ConnectionState(ConnectionState::Disconnected, state.reason));
+							}
+						});
+					}
 
 				}
 			}

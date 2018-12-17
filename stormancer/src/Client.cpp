@@ -576,7 +576,7 @@ namespace Stormancer
 				//This client requires a grid with support for Federation/transport sniffing.
 
 				//Connect to server
-
+				std::srand((unsigned int)std::time(nullptr));
 				auto& endpoints = sceneEndpoint.getTokenResponse.endpoints.at(transport->name());
 				auto endpointUrl = endpoints.at(std::rand() % endpoints.size());
 
