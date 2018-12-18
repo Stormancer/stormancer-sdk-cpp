@@ -1,6 +1,7 @@
 #pragma once
 
 #include "stormancer/Streams/bytestreambuf.h"
+#include <istream>
 #include <vector>
 namespace Stormancer
 {

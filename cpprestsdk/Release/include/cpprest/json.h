@@ -31,6 +31,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <algorithm>
 #include <unordered_map>
 #include <cstdint>
 #include "cpprest/details/basic_types.h"
