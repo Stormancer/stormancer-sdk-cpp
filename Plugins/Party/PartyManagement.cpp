@@ -237,20 +237,16 @@ namespace Stormancer
 		}
 		else
 		{
-			return pplx::task_from_result(Party_ptr());
+			return pplx::task_from_exception<Party_ptr>(std::runtime_error("party.notInParty"));
 		}
 	}
 
 	pplx::task<void> PartyManagement::updatePlayerStatus(Stormancer::PartyUserStatus playerStatus)
 	{
-		return getParty().then([playerStatus](pplx::task<Stormancer::Party_ptr> task)
+		return getParty().then([playerStatus](Party_ptr party)
 		{
-			Stormancer::Party_ptr party = task.get();
-			if (party)
-			{
-				auto partyService = party->getScene()->dependencyResolver()->resolve<Stormancer::PartyService>();
-				return partyService->updatePlayerStatus(playerStatus);
-			}
+			auto partyService = party->getScene()->dependencyResolver()->resolve<Stormancer::PartyService>();
+			return partyService->updatePlayerStatus(playerStatus);
 		});
 	}
 
@@ -260,8 +256,7 @@ namespace Stormancer
 		{
 			partySettingsDto.customData = "{}";
 		}
-		return getParty().then([partySettingsDto](pplx::task<Party_ptr> task) {
-			auto party = task.get();
+		return getParty().then([partySettingsDto](Party_ptr party) {
 			std::shared_ptr<Stormancer::PartyService> partyService = party->getScene()->dependencyResolver()->resolve<Stormancer::PartyService>();
 			return partyService->updatePartySettings(partySettingsDto);
 		});
@@ -269,8 +264,7 @@ namespace Stormancer
 
 	pplx::task<void> PartyManagement::updatePlayerData(std::string data)
 	{
-		return getParty().then([data](pplx::task<Party_ptr> task) {
-			auto party = task.get();
+		return getParty().then([data](Party_ptr party) {
 			std::shared_ptr<Stormancer::PartyService> partyService = party->getScene()->dependencyResolver()->resolve<Stormancer::PartyService>();
 			partyService->updatePlayerData(data);
 		});
@@ -278,8 +272,7 @@ namespace Stormancer
 
 	pplx::task<bool> PartyManagement::PromoteLeader(std::string userId)
 	{
-		return getParty().then([userId](pplx::task<Party_ptr> task) {
-			auto party = task.get();
+		return getParty().then([userId](Party_ptr party) {
 			std::shared_ptr<Stormancer::PartyService> partyService = party->getScene()->dependencyResolver()->resolve<Stormancer::PartyService>();
 			return partyService->PromoteLeader(userId);
 		});
@@ -287,8 +280,7 @@ namespace Stormancer
 
 	pplx::task<bool> PartyManagement::kickPlayer(std::string userId)
 	{
-		return getParty().then([userId](pplx::task<Party_ptr> task) {
-			auto party = task.get();
+		return getParty().then([userId](Party_ptr party) {
 			std::shared_ptr<Stormancer::PartyService> partyService = party->getScene()->dependencyResolver()->resolve<Stormancer::PartyService>();
 			return partyService->KickPlayer(userId);
 		});
@@ -450,11 +442,6 @@ namespace Stormancer
 			{
 				return pplx::task_from_exception<void>(std::runtime_error("destroyed"));
 			}
-			if (!party)
-			{
-				return pplx::task_from_exception<void>(std::runtime_error("party.notConnected"));
-			}
-
 
 			auto senderId = auth->userId();
 			auto partyId = party->id();
