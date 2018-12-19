@@ -620,7 +620,7 @@ namespace Stormancer
 					.then([wClient, ct](std::shared_ptr<IConnection> connection)
 				{
 					auto client = LockOrThrow(wClient);
-					return client->createOrJoinSession(connection, ct).then([connection]() {return connection; });
+					return client->requestSessionToken(connection, 1, ct).then([connection]() {return connection; });
 				}, ct)
 					.then([wClient, sceneEndpoint](std::shared_ptr<IConnection> connection)
 				{
@@ -1087,7 +1087,7 @@ namespace Stormancer
 
 	}
 
-	pplx::task<void> Client::createOrJoinSession(std::shared_ptr<IConnection> peer, pplx::cancellation_token ct)
+	pplx::task<void> Client::requestSessionToken(std::shared_ptr<IConnection> peer, int numRetries, pplx::cancellation_token ct)
 	{
 		auto wClient = STRM_WEAK_FROM_THIS();
 
@@ -1107,11 +1107,30 @@ namespace Stormancer
 		{
 			task = requestProcessor->sendSystemRequest<std::string, std::string>(peer.get(), (byte)SystemRequestIDTypes::ID_JOIN_SESSION, _sessionToken, ct);
 		}
-
-		return task.then([wClient](std::string sessionToken)
+		
+		return task.then([wClient, peer, numRetries, ct](pplx::task<std::string> sessionTokenTask)
 		{
 			auto client = LockOrThrow(wClient);
-			client->_sessionToken = sessionToken;
+
+			try
+			{
+				client->_sessionToken = sessionTokenTask.get();
+				return pplx::task_from_result(); // all control paths should return a value...
+			}
+			catch (const std::exception& ex)
+			{
+				client->_sessionToken.clear();
+				if (numRetries > 0)
+				{
+					if (auto logger = client->logger())
+					{
+						logger->log(LogLevel::Warn, "Client::requestSessionToken", std::string("Server returned an error: ") + ex.what() + ", trying " + std::to_string(numRetries) + " more time(s)");
+					}
+					return client->requestSessionToken(peer, numRetries - 1, ct);
+				}
+				// No more retries: pass the exception to the caller
+				throw ex;
+			}
 		}, ct);
 	}
 

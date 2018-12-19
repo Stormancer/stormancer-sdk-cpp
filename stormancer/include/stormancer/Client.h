@@ -122,10 +122,9 @@ namespace Stormancer
 
 		pplx::cancellation_token getLinkedCancellationToken(pplx::cancellation_token ct);
 		void ConfigureContainer(std::weak_ptr<DependencyResolver> dr, Configuration_ptr config);
-		// Ask a session token from the server, or set it if we already have one (i.e in case of a reconnection)
-		pplx::task<void> createOrJoinSession(std::shared_ptr<IConnection> connection, pplx::cancellation_token ct = pplx::cancellation_token::none());
-
-		
+		// Request a session token from the server, or set it if we already have one (i.e in case of a reconnection)
+		// In case of failure, clear the session token and retry, at most numRetries times.
+		pplx::task<void> requestSessionToken(std::shared_ptr<IConnection> connection, int numRetries = 1, pplx::cancellation_token ct = pplx::cancellation_token::none());
 
 		pplx::task<SceneAddress> parseSceneUrl(std::string url, pplx::cancellation_token ct);
 
