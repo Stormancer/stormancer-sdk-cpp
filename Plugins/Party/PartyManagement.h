@@ -8,7 +8,7 @@ namespace Stormancer
 	struct PartyRequestDto
 	{
 		std::string PlatformSessionId;
-		u_int64 PartySize;
+		uint64 PartySize;
 		std::string GameFinderName;
 		std::string CustomData;
 		bool StartOnlyIfPartyFull;

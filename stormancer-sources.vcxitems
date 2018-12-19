@@ -89,7 +89,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\SceneInfosRequestDto.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\ScenePeer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\Shutdown.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\SingleServicePlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\stdafx.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\CustomExceptions.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\SyncClock.h" />

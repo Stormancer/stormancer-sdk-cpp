@@ -156,9 +156,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\ScenePeer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\SingleServicePlugin.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
