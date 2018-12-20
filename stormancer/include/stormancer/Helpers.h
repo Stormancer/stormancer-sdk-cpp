@@ -296,8 +296,6 @@ namespace Stormancer
 		});
 	}
 
-	pplx::cancellation_token_source create_timeout_source(std::chrono::milliseconds ms, pplx::cancellation_token ct = pplx::cancellation_token::none());
-
 	inline bool is_ipv4_address(const std::string& str)
 	{
 

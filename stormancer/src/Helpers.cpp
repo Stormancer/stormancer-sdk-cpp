@@ -120,18 +120,6 @@ namespace Stormancer
 		}
 	}
 
-	pplx::cancellation_token_source create_timeout_source(std::chrono::milliseconds ms, pplx::cancellation_token ct)
-	{
-		auto cts = pplx::cancellation_token_source::create_linked_source(ct);
-
-		taskDelay(ms, ct).then([cts]
-		{
-			cts.cancel();
-		});
-
-		return cts;
-	}
-
 	std::time_t nowTime_t()
 	{
 		return std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());

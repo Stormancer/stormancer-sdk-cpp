@@ -320,7 +320,7 @@ namespace Stormancer
 
 			_mapName = mapName;
 			std::weak_ptr<GameSession> wThat = this->shared_from_this();
-			auto connectionTask = DisconectFromGameSession(ct).then([wThat, token, ct]()
+			auto connectionTask = DisconectFromGameSession().then([wThat, token, ct]()
 			{
 				if (auto that = wThat.lock())
 				{
@@ -436,11 +436,11 @@ namespace Stormancer
 		});
 	}
 
-	pplx::task<void> GameSession::DisconectFromGameSession(pplx::cancellation_token ct)
+	pplx::task<void> GameSession::DisconectFromGameSession()
 	{
 		std::weak_ptr<GameSession> wThat = this->shared_from_this();
 		// catch err
-		return this->getCurrentGameSession(ct).then([wThat](pplx::task<std::shared_ptr<GameSessionContainer>> task) {
+		return this->getCurrentGameSession().then([wThat](pplx::task<std::shared_ptr<GameSessionContainer>> task) {
 			try
 			{
 				auto container = task.get();
@@ -458,7 +458,7 @@ namespace Stormancer
 			{
 				return pplx::task_from_result();
 			}
-		}, ct);
+		});
 	}
 
 	pplx::task<std::string> GameSession::P2PTokenRequest(std::shared_ptr<GameSessionContainer> container, pplx::cancellation_token ct)
