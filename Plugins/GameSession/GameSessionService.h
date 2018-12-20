@@ -115,10 +115,10 @@ namespace Stormancer
 	public:
 		GameSession(std::weak_ptr<IClient> client);
 
-		pplx::task<GameSessionConnectionParameters> ConnectToGameSession(std::string token, std::string mapName);
-		pplx::task<void> SetPlayerReady(std::string data);
-		pplx::task<GameSessionResult> PostResult(EndGameDto gameSessioResult);
-		pplx::task<void> DisconectFromGameSession();
+		pplx::task<GameSessionConnectionParameters> ConnectToGameSession(std::string token, std::string mapName, pplx::cancellation_token ct = pplx::cancellation_token::none());
+		pplx::task<void> SetPlayerReady(std::string data, pplx::cancellation_token ct = pplx::cancellation_token::none());
+		pplx::task<GameSessionResult> PostResult(EndGameDto gameSessioResult, pplx::cancellation_token ct = pplx::cancellation_token::none());
+		pplx::task<void> DisconectFromGameSession(pplx::cancellation_token ct = pplx::cancellation_token::none());
 
 		Event<void> OnAllPlayerReady;
 		Event<GameSessionConnectionParameters> OnRoleRecieved;
@@ -130,9 +130,9 @@ namespace Stormancer
 		pplx::task<std::shared_ptr<GameSessionContainer>> _currentGameSession;
 		pplx::task_completion_event<GameSessionConnectionParameters> _gameSessionNegotiationTce;
 
-		pplx::task<std::shared_ptr<GameSessionContainer>> connectToGameSessionImpl(std::string token);
-		pplx::task<std::shared_ptr<GameSessionContainer>> getCurrentGameSession();
-		pplx::task<std::string> P2PTokenRequest(std::shared_ptr<GameSessionContainer> gameSessionContainer);
+		pplx::task<std::shared_ptr<GameSessionContainer>> connectToGameSessionImpl(std::string token, pplx::cancellation_token ct);
+		pplx::task<std::shared_ptr<GameSessionContainer>> getCurrentGameSession(pplx::cancellation_token ct);
+		pplx::task<std::string> P2PTokenRequest(std::shared_ptr<GameSessionContainer> gameSessionContainer, pplx::cancellation_token ct);
 
 		std::mutex _lock;
 	};
@@ -156,7 +156,7 @@ namespace Stormancer
 		~GameSessionService();
 
 		void Initialize();
-		pplx::task<void> InitializeTunnel(std::string p2pToken);
+		pplx::task<void> InitializeTunnel(std::string p2pToken, pplx::cancellation_token ct);
 
 		pplx::task<void> waitServerReady(pplx::cancellation_token);
 
@@ -178,7 +178,7 @@ namespace Stormancer
 
 
 		template<typename TOut, typename TIn>
-		pplx::task<TOut> sendGameResults(TIn results)
+		pplx::task<TOut> sendGameResults(TIn results, pplx::cancellation_token ct)
 		{
 			auto scene = _scene.lock();
 			if (!scene)
@@ -190,23 +190,24 @@ namespace Stormancer
 			return rpc->rpc<TOut, TIn>("gamesession.postresults", results);
 		}
 
-		pplx::task<std::string> P2PTokenRequest();
+		pplx::task<std::string> P2PTokenRequest(pplx::cancellation_token ct);
 
-		//pplx::task<void> connect();
-		pplx::task<void> reset();
+		pplx::task<void> reset(pplx::cancellation_token ct);
 		pplx::task<void> disconnect();
 
 		bool shouldEstablishTunnel = true;
 
 		std::weak_ptr<Scene> GetScene();
 
-		void __disconnecting();
+		void onDisconnecting();
 
 		void ready(std::string data);
 
 	private:
 
 		void unsubscribeConnectedPlayersChanged(Action<SessionPlayerUpdateArg>::TIterator handle);
+
+		pplx::cancellation_token linkTokenToDisconnection(pplx::cancellation_token tokenToLink);
 
 		std::shared_ptr<P2PTunnel> _tunnel;
 		Action<SessionPlayerUpdateArg> _onConnectedPlayersChanged;
@@ -219,5 +220,6 @@ namespace Stormancer
 		std::vector<SessionPlayer> _users;
 		std::shared_ptr<Stormancer::ILogger> _logger;
 		bool _receivedP2PToken = false;
+		pplx::cancellation_token_source _disconnectionCts;
 	};
 }

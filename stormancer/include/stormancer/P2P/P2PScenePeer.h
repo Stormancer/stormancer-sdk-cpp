@@ -23,7 +23,7 @@ namespace Stormancer
 
 		uint64 id() override;
 		void disconnect() override;
-		pplx::task<std::shared_ptr<P2PTunnel>> openP2PTunnel(const std::string& serverId) override;
+		pplx::task<std::shared_ptr<P2PTunnel>> openP2PTunnel(const std::string& serverId, pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
 
 #pragma endregion
 

@@ -28,7 +28,7 @@ namespace Stormancer
 				auto gameSession = scene->dependencyResolver()->resolve<GameSessionService>();
 				if (gameSession)
 				{
-					gameSession->__disconnecting();
+					gameSession->onDisconnecting();
 				}
 			}
 		}

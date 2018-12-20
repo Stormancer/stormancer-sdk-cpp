@@ -32,17 +32,19 @@ namespace Stormancer
 		return scene->id();
 	}
 
-	pplx::task<std::shared_ptr<P2PTunnel>> P2PScenePeer::openP2PTunnel(const std::string& serverId)
+	pplx::task<std::shared_ptr<P2PTunnel>> P2PScenePeer::openP2PTunnel(const std::string& serverId, pplx::cancellation_token ct)
 	{
 		auto scene = _scene.lock();
 		if (!scene)
 		{
-			return pplx::task_from_exception<std::shared_ptr<P2PTunnel>>(std::runtime_error("Unable to establish P2P tunnel: scene destroyed."));
+			return pplx::task_from_exception<std::shared_ptr<P2PTunnel>>(std::runtime_error("Unable to establish P2P tunnel: scene destroyed."), ct);
 		}
-		auto dispatcher = scene->dependencyResolver()->resolve<IActionDispatcher>();		
-		return _p2p->openTunnel((uint64)_connection->id(), scene->id() + "." + serverId).then([](auto t) {
+		auto dispatcher = scene->dependencyResolver()->resolve<IActionDispatcher>();
+		pplx::task_options options(dispatcher);
+		options.set_cancellation_token(ct);
+		return _p2p->openTunnel((uint64)_connection->id(), scene->id() + "." + serverId, ct).then([](auto t) {
 			return t.get();
-		}, dispatcher);
+		}, options);
 	}
 
 	void P2PScenePeer::send(const std::string& routeName, const Writer& writer, PacketPriority packetPriority, PacketReliability packetReliability)
