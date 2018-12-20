@@ -577,7 +577,12 @@ namespace Stormancer
 
 				//Connect to server
 				std::srand((unsigned int)std::time(nullptr));
-				auto& endpoints = sceneEndpoint.getTokenResponse.endpoints.at(transport->name());
+				auto it= sceneEndpoint.getTokenResponse.endpoints.find(transport->name());
+				if (it == sceneEndpoint.getTokenResponse.endpoints.end())
+				{
+					throw std::runtime_error("No transport of type '" + transport->name() + "' available on this server");
+				}
+				auto& endpoints = it->second;
 				auto endpointUrl = endpoints.at(std::rand() % endpoints.size());
 
 
