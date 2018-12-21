@@ -119,7 +119,6 @@
 	#endif
 #endif
 
-
 #if defined(UE_EDITOR) || defined(UE_GAME)
 #undef check
 #endif

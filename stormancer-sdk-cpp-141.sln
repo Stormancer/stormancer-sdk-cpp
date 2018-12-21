@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2036
+VisualStudioVersion = 15.0.28010.2003
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "stormancer-sdk-cpp-lib", "stormancer-sdk-cpp-141.vcxproj", "{D8CF547F-8B5B-4651-A48F-D6E56EE0B8C1}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -49,8 +49,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RakNetIpv6-vc141", "Samples
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tester-sources", "Samples\tester-sources\tester-sources.vcxitems", "{9781E681-CF17-48EA-BF81-6895F30E10FC}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "plugins-sources", "Plugins\plugins-sources\plugins-sources.vcxitems", "{89CE20EA-ACE0-44DF-8254-E19797639C16}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libupnp", "libupnp\build\vc141\libupnp.vcxproj", "{6227F51A-1498-4C4A-B213-F6FDED605125}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libupnp-sources", "libupnp\build\libupnp-sources\libupnp-sources.vcxitems", "{5EEBA6DB-45F0-4437-9B6E-1ECCDF3D8753}"
@@ -62,6 +60,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthreads-sources", "libupnp\pthreads\pthreads-sources\pthreads-sources.vcxitems", "{1696F6BA-63DD-406D-8226-09201676F202}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libupnp-sources-win32", "libupnp\build\libupnp-sources-win32\libupnp-sources-win32.vcxitems", "{745DA240-BF13-47BD-8E03-422E6D83D6D6}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "plugins-sources", "Plugins\plugins-sources.vcxitems", "{89CE20EA-ACE0-44DF-8254-E19797639C16}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -76,11 +76,11 @@ Global
 		libupnp\build\libupnp-sources\libupnp-sources.vcxitems*{6227f51a-1498-4c4a-b213-f6fded605125}*SharedItemsImports = 4
 		libupnp\pthreads\pthreads-sources\pthreads-sources.vcxitems*{6227f51a-1498-4c4a-b213-f6fded605125}*SharedItemsImports = 4
 		libupnp\build\libupnp-sources-win32\libupnp-sources-win32.vcxitems*{745da240-bf13-47bd-8e03-422e6d83d6d6}*SharedItemsImports = 9
-		Plugins\plugins-sources\plugins-sources.vcxitems*{89ce20ea-ace0-44df-8254-e19797639c16}*SharedItemsImports = 9
+		Plugins\plugins-sources.vcxitems*{89ce20ea-ace0-44df-8254-e19797639c16}*SharedItemsImports = 9
 		Samples\tester-sources\tester-sources.vcxitems*{9781e681-cf17-48ea-bf81-6895f30e10fc}*SharedItemsImports = 9
 		RakNet\raknet-sources.vcxitems*{bc75cd23-cb75-4233-a305-b7328825a9a5}*SharedItemsImports = 4
 		stormancer-sources.vcxitems*{d8cf547f-8b5b-4651-a48f-d6e56ee0b8c1}*SharedItemsImports = 4
-		Plugins\plugins-sources\plugins-sources.vcxitems*{dfb15956-69e5-4d05-89c2-e7390f884d50}*SharedItemsImports = 4
+		Plugins\plugins-sources.vcxitems*{dfb15956-69e5-4d05-89c2-e7390f884d50}*SharedItemsImports = 4
 		Samples\tester-sources\tester-sources.vcxitems*{dfb15956-69e5-4d05-89c2-e7390f884d50}*SharedItemsImports = 4
 		stormancer-sources.vcxitems*{f2476793-1238-43ab-9574-526f57986e4c}*SharedItemsImports = 9
 		cpprestsdk\Release\src\build\win32.vcxitems*{f40f4804-50f9-4257-8d74-b9cbb19ac4c3}*SharedItemsImports = 9
@@ -237,7 +237,6 @@ Global
 		{73703B65-9D12-4836-8C66-3FB48D3A721E}.DebugUE4|ARM.ActiveCfg = Release|x64
 		{73703B65-9D12-4836-8C66-3FB48D3A721E}.DebugUE4|ARM64.ActiveCfg = Release|x64
 		{73703B65-9D12-4836-8C66-3FB48D3A721E}.DebugUE4|x64.ActiveCfg = Debug|x64
-		{73703B65-9D12-4836-8C66-3FB48D3A721E}.DebugUE4|x64.Build.0 = Debug|x64
 		{73703B65-9D12-4836-8C66-3FB48D3A721E}.DebugUE4|x86.ActiveCfg = Debug|Win32
 		{73703B65-9D12-4836-8C66-3FB48D3A721E}.DebugUE4|x86.Build.0 = Debug|Win32
 		{73703B65-9D12-4836-8C66-3FB48D3A721E}.DebugUE4-v140|ARM.ActiveCfg = DebugUE4-v140|Win32
@@ -263,7 +262,6 @@ Global
 		{DA8EAA28-D2DF-46E8-937E-E061E31EC539}.DebugUE4|ARM64.ActiveCfg = Release|x64
 		{DA8EAA28-D2DF-46E8-937E-E061E31EC539}.DebugUE4|ARM64.Build.0 = Release|x64
 		{DA8EAA28-D2DF-46E8-937E-E061E31EC539}.DebugUE4|x64.ActiveCfg = Debug|x64
-		{DA8EAA28-D2DF-46E8-937E-E061E31EC539}.DebugUE4|x64.Build.0 = Debug|x64
 		{DA8EAA28-D2DF-46E8-937E-E061E31EC539}.DebugUE4|x86.ActiveCfg = Debug|Win32
 		{DA8EAA28-D2DF-46E8-937E-E061E31EC539}.DebugUE4|x86.Build.0 = Debug|Win32
 		{DA8EAA28-D2DF-46E8-937E-E061E31EC539}.DebugUE4-v140|ARM.ActiveCfg = DebugUE4-v140|Win32
@@ -289,7 +287,6 @@ Global
 		{CD827855-C824-4CBF-B736-B7FDA2ACD036}.DebugUE4|ARM64.ActiveCfg = Release|x64
 		{CD827855-C824-4CBF-B736-B7FDA2ACD036}.DebugUE4|ARM64.Build.0 = Release|x64
 		{CD827855-C824-4CBF-B736-B7FDA2ACD036}.DebugUE4|x64.ActiveCfg = Debug|x64
-		{CD827855-C824-4CBF-B736-B7FDA2ACD036}.DebugUE4|x64.Build.0 = Debug|x64
 		{CD827855-C824-4CBF-B736-B7FDA2ACD036}.DebugUE4|x86.ActiveCfg = Debug|Win32
 		{CD827855-C824-4CBF-B736-B7FDA2ACD036}.DebugUE4|x86.Build.0 = Debug|Win32
 		{CD827855-C824-4CBF-B736-B7FDA2ACD036}.DebugUE4-v140|ARM.ActiveCfg = DebugUE4-v140|Win32
@@ -349,7 +346,6 @@ Global
 		{DA8EAA28-D2DF-46E8-937E-E061E31EC539} = {D796A1C3-82DC-4845-8F6E-521F9B757D84}
 		{CD827855-C824-4CBF-B736-B7FDA2ACD036} = {D796A1C3-82DC-4845-8F6E-521F9B757D84}
 		{9781E681-CF17-48EA-BF81-6895F30E10FC} = {D796A1C3-82DC-4845-8F6E-521F9B757D84}
-		{89CE20EA-ACE0-44DF-8254-E19797639C16} = {D796A1C3-82DC-4845-8F6E-521F9B757D84}
 		{6227F51A-1498-4C4A-B213-F6FDED605125} = {D9F8F27A-441E-40C1-957C-8665976E7500}
 		{5EEBA6DB-45F0-4437-9B6E-1ECCDF3D8753} = {D9F8F27A-441E-40C1-957C-8665976E7500}
 		{943C2341-0D05-4371-B201-D97184C7AD46} = {DE483714-925D-43E1-A20C-2699E8F1D3B5}
