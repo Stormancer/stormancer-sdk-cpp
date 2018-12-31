@@ -1,1 +1,0 @@
-#include "stormancer/stdafx.h"
