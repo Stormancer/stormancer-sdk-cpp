@@ -1,5 +1,7 @@
 #pragma once
 
+#include "stormancer/BuildConfig.h"
+
 namespace Stormancer
 {
 	enum class P2PConnectionStateChangeType

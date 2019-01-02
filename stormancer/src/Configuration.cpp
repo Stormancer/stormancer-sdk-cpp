@@ -5,6 +5,7 @@
 #include "stormancer/Logger/NullLogger.h"
 #include "stormancer/DefaultScheduler.h"
 #include "stormancer/DefaultPacketDispatcher.h"
+#include "stormancer/IActionDispatcher.h"
 
 namespace Stormancer
 {

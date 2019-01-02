@@ -1,6 +1,7 @@
-#include <cassert>
 #include "stormancer/stdafx.h"
 #include "stormancer/TimerThread.h"
+#include "stormancer/Tasks.h"
+#include <cassert>
 
 namespace Stormancer
 {

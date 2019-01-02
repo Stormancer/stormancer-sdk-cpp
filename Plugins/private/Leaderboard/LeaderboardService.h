@@ -1,7 +1,7 @@
 #pragma once
 
 #include "cpprest/json.h"
-#include "stormancer/headers.h"
+
 #include "stormancer/RPC/service.h"
 #include "LeaderboardModels.h"
 

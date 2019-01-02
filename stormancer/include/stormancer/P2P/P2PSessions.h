@@ -1,6 +1,8 @@
 #pragma once
 
-#include "stormancer/headers.h"
+#include "stormancer/BuildConfig.h"
+
+
 #include "stormancer/P2P/P2PEnums.h"
 #include "stormancer/P2P/P2PSession.h"
 #include "stormancer/IConnectionManager.h"

@@ -1,6 +1,7 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/Logger/NullLogger.h"
 #include "stormancer/Helpers.h"
+#include <sstream>
 
 namespace Stormancer
 {

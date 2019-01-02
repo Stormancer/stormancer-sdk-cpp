@@ -2,7 +2,6 @@
 #include STORMANCER_CUSTOM_PCH
 #endif
 #include "Authentication/AuthenticationService.h"
-#include "stormancer/headers.h"
 #include "stormancer/RPC/service.h"
 #include "stormancer/utilities/taskUtilities.h"
 

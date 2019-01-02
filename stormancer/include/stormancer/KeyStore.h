@@ -1,5 +1,11 @@
 #pragma once
-#include "stormancer/stormancerTypes.h"
+
+#include "stormancer/BuildConfig.h"
+
+#include "stormancer/StormancerTypes.h"
+#include <stdexcept>
+#include <unordered_map>
+#include <vector>
 
 namespace Stormancer
 {

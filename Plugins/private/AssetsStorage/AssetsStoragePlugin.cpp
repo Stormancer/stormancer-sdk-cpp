@@ -2,9 +2,9 @@
 #include STORMANCER_CUSTOM_PCH
 #endif
 #include "AssetsStorage/AssetsStoragePlugin.h"
-#include "stormancer/headers.h"
 #include "stormancer/Logger/ILogger.h"
 #include "AssetsStorage/AssetsStorageService.h"
+#include "stormancer/Scene.h"
 
 namespace Stormancer
 {

@@ -1,7 +1,10 @@
 #pragma once
+
+#include "stormancer/Tasks.h"
+#include "Profile/ProfileModels.h"
 #include <memory>
-#include "stormancer/headers.h"
-#include "ProfileModels.h"
+#include <string>
+#include <list>
 
 namespace Stormancer
 {

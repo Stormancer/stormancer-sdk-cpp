@@ -2,7 +2,6 @@
 #include STORMANCER_CUSTOM_PCH
 #endif
 #include "BugReport/BugReportService.h"
-#include "stormancer/headers.h"
 
 namespace Stormancer
 {

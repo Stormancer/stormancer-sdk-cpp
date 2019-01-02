@@ -1,6 +1,10 @@
 #pragma once
 
+#include "stormancer/BuildConfig.h"
+
 #include <memory>
+#include <string>
+#include <map>
 
 namespace Stormancer
 {

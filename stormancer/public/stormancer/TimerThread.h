@@ -1,5 +1,7 @@
 #pragma once
 
+#include "stormancer/BuildConfig.h"
+
 #include <thread>
 #include <condition_variable>
 #include <mutex>

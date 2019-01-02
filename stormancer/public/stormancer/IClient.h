@@ -1,6 +1,8 @@
 #pragma once
-#include "stormancer/headers.h"
-#include "pplx/pplxtasks.h"
+
+#include "stormancer/BuildConfig.h"
+
+#include "stormancer/Tasks.h"
 #include "stormancer/scene.h"
 #include "stormancer/Configuration.h"
 #include "stormancer/Federation.h"

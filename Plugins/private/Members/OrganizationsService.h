@@ -1,6 +1,9 @@
 #pragma once
+#include "stormancer/Tasks.h"
 #include "OrganizationsTypes.h"
-#include "stormancer/headers.h"
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace Stormancer
 {

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "stormancer/BuildConfig.h"
+
 #include "stormancer/IConnection.h"
 #include "stormancer/IScenePeer.h"
 #include "stormancer/Serializer.h"

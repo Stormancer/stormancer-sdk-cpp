@@ -1,5 +1,5 @@
 #include "OrganizationsService.h"
-#include "stormancer/headers.h"
+
 #include "OrganizationsService.h"
 #include "stormancer/Scene.h"
 #include "stormancer/RPC/Service.h"

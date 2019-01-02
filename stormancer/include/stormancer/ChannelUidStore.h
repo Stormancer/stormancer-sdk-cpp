@@ -1,6 +1,8 @@
 #pragma once
 
-#include "stormancer/headers.h"
+#include "stormancer/BuildConfig.h"
+
+
 
 namespace Stormancer
 {

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "stormancer/BuildConfig.h"
+
 #include "stormancer/stormancerTypes.h"
 #include <streambuf>
 

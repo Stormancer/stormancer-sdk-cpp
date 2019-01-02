@@ -1,8 +1,11 @@
 #pragma once
 
-#include "stormancer/headers.h"
+#include "stormancer/BuildConfig.h"
+
+
 #include "stormancer/IConnectionManager.h"
 #include "stormancer/Logger/ILogger.h"
+#include <unordered_map>
 
 namespace Stormancer
 {

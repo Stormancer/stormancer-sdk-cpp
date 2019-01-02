@@ -1,5 +1,6 @@
 #pragma once
-#include "stormancer/RPC/service.h"
+#include "stormancer/Tasks.h"
+#include <memory>
 
 
 
@@ -7,6 +8,8 @@ namespace Stormancer
 {
 	/// Forward declare
 	struct RecoverableGameDto;
+	class Scene;
+	class RpcService;
 
 	class GameRecoveryService
 	{

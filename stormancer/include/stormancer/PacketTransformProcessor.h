@@ -1,4 +1,6 @@
 #pragma once
+
+#include "stormancer/BuildConfig.h"
 #include "stormancer/IPacketProcessor.h"
 #include "stormancer/AES/AESPacketTransform.h"
 

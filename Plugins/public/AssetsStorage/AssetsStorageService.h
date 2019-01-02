@@ -1,11 +1,14 @@
 #pragma once
-#include "stormancer/headers.h"
+
 #include "AssetsStorage/AssetsStorageDto.h"
+#include "stormancer/Tasks.h"
 #include "stormancer/Logger/ILogger.h"
-#include "stormancer/scene.h"
+#include <memory>
+#include <string>
 
 namespace Stormancer
 {
+	class Scene;
 	
 	class AssetsStorageService
 	{
@@ -18,6 +21,6 @@ namespace Stormancer
 	private:
 
 		std::weak_ptr<Scene> _scene;
-		std::shared_ptr<Stormancer::ILogger> _logger;		
+		std::shared_ptr<ILogger> _logger;		
 	};
 }

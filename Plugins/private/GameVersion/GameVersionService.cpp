@@ -2,7 +2,7 @@
 #include STORMANCER_CUSTOM_PCH
 #endif
 #include "GameVersion/GameVersionService.h"
-#include "stormancer/headers.h"
+
 
 namespace Stormancer
 {

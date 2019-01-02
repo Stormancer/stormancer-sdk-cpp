@@ -1,6 +1,7 @@
 #pragma once
-#include "stormancer/headers.h"
+
 #include "stormancer/IPlugin.h"
+#include <memory>
 
 namespace Stormancer
 {

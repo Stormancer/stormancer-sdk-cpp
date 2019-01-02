@@ -2,7 +2,7 @@
 #include STORMANCER_CUSTOM_PCH
 #endif
 #include "LeaderboardPlugin.h"
-#include "stormancer/headers.h"
+
 #include "LeaderboardService.h"
 #include "Leaderboard_Impl.h"
 #include "Leaderboard/Leaderboard.h"

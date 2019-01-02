@@ -1,6 +1,8 @@
 #pragma once
 
-#include "stormancer/headers.h"
+#include "stormancer/BuildConfig.h"
+
+
 #include "stormancer/P2P/EndpointCandidate.h"
 
 namespace Stormancer

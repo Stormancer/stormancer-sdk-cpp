@@ -3,6 +3,8 @@
 #endif
 #include "GameRecoveryService.h"
 #include "GameRecoveryModels.h"
+#include "stormancer/Scene.h"
+#include "stormancer/RPC/Service.h"
 
 namespace Stormancer
 {

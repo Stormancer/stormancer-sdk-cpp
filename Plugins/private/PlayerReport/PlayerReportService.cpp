@@ -2,7 +2,7 @@
 #include STORMANCER_CUSTOM_PCH
 #endif
 #include "PlayerReport/PlayerReportService.h"
-#include "stormancer/headers.h"
+
 
 namespace Stormancer
 {

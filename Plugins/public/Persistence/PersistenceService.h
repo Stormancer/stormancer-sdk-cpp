@@ -1,5 +1,5 @@
 #pragma once
-#include "stormancer/headers.h"
+
 #include "stormancer/scene.h"
 #include "PersistenceModels.h"
 

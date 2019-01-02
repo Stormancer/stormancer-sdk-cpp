@@ -1,9 +1,14 @@
 #pragma once
 
-#include "stormancer/headers.h"
+
 #include "stormancer/Scene.h"
 #include "stormancer/RPC/service.h"
 #include "stormancer/Serializer.h"
+#include "stormancer/msgpack_define.h"
+#include "stormancer/Tasks.h"
+#include <string>
+#include <vector>
+#include <memory>
 
 namespace Stormancer
 {

@@ -1,5 +1,5 @@
 #pragma once
-#include "stormancer/headers.h"
+
 #include "Profile/ProfileModels.h"
 
 namespace Stormancer

@@ -1,5 +1,7 @@
 #pragma once
-#include "pplx/pplxtasks.h"
+
+#include "stormancer/BuildConfig.h"
+#include "stormancer/Tasks.h"
 namespace Stormancer
 {
 	class Shutdown

@@ -1,6 +1,10 @@
 #pragma once
-#include <string>
+
 #include "stormancer/msgpack_define.h"
+#include "stormancer/StormancerTypes.h"
+#include <string>
+#include <map>
+#include <vector>
 
 namespace Stormancer
 {

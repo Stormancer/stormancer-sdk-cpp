@@ -1,7 +1,10 @@
 #pragma once
 
-#include "stormancer/headers.h"
+#include "stormancer/BuildConfig.h"
+
 #include "stormancer/Logger/ILogger.h"
+#include <mutex>
+#include <fstream>
 
 namespace Stormancer
 {

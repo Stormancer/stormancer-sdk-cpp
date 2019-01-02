@@ -1,8 +1,12 @@
 #pragma once
 
-#include "stormancer/headers.h"
+#include "stormancer/BuildConfig.h"
+
 #include <mutex>
-#include "pplx/pplxtasks.h"
+#include <list>
+#include <memory>
+#include <functional>
+#include "stormancer/Tasks.h"
 
 namespace Stormancer
 {

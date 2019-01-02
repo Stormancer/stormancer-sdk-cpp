@@ -1,4 +1,6 @@
 #pragma once
+
+#include "stormancer/BuildConfig.h"
 #include <memory>
 #include <functional>
 #include <map>

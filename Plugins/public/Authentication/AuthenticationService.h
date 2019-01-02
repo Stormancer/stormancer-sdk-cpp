@@ -1,9 +1,14 @@
 #pragma once
-#include "stormancer/headers.h"
+
 #include "stormancer/IClient.h"
 #include "stormancer/Logger/ILogger.h"
 #include "stormancer/Event.h"
 #include "stormancer/RPC/service.h"
+#include "stormancer/Tasks.h"
+#include "stormancer/msgpack_define.h"
+#include <string>
+#include <unordered_map>
+#include <memory>
 
 namespace Stormancer
 {

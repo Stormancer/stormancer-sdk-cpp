@@ -1,6 +1,10 @@
 #pragma once
 
-#include "stormancer/headers.h"
+#include "stormancer/BuildConfig.h"
+
+#include "stormancer/StormancerTypes.h"
+#include <chrono>
+#include <mutex>
 
 namespace Stormancer
 {

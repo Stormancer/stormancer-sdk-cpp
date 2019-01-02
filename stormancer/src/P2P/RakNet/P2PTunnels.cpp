@@ -1,9 +1,9 @@
 #include "stormancer/stdafx.h"
+#include "stormancer/P2P/RakNet/P2PTunnelClient.h" // Includes RakNet ; must be included before any mention of windows.h (needed for tasks)
 #include "stormancer/P2P/RakNet/P2PTunnels.h"
 #include "stormancer/IConnectionManager.h"
 #include "stormancer/SystemRequestIDTypes.h"
 #include "stormancer/MessageIDTypes.h"
-#include "stormancer/P2P/RakNet/P2PTunnelClient.h"
 #include "stormancer/SceneImpl.h"
 #include "stormancer/SafeCapture.h"
 #include "stormancer/P2P/OpenTunnelResult.h"

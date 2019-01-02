@@ -2,7 +2,7 @@
 #include STORMANCER_CUSTOM_PCH
 #endif
 #include "GameSession/GameSessionService.h"
-#include "stormancer/headers.h"
+
 #include "stormancer/RPC/Service.h"
 
 namespace Stormancer

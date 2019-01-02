@@ -1,7 +1,9 @@
 #pragma once
-#include <string>
-#include "stormancer/headers.h"
+
 #include "stormancer/Event.h"
+#include "stormancer/msgpack_define.h"
+#include "stormancer/StormancerTypes.h"
+#include <string>
 
 namespace Stormancer
 {	

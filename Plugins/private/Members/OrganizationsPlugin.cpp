@@ -1,5 +1,5 @@
 #include "OrganizationsPlugin.h"
-#include "stormancer/headers.h"
+
 #include "OrganizationsPlugin.h"
 #include "OrganizationsService.h"
 #include "Organizations_Impl.h"

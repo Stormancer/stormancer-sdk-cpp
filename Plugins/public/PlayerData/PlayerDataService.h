@@ -1,6 +1,6 @@
 #pragma once
 
-#include "stormancer/headers.h"
+
 #include "stormancer/IService.h"
 #include "stormancer/Scene.h"
 #include "stormancer/RPC/service.h"

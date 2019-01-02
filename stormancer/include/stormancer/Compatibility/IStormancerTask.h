@@ -1,5 +1,7 @@
 #pragma once
 
+#include "stormancer/BuildConfig.h"
+
 #include <functional>
 #include <memory>
 #include "stormancer/Compatibility/StormancerResult.h"

@@ -1,9 +1,15 @@
 #pragma once
 
-#include "stormancer/headers.h"
+#include "stormancer/BuildConfig.h"
+
 #include "stormancer/IPlugin.h"
-#include "stormancer/IActionDispatcher.h"
 #include "stormancer/Logger/ILogger.h"
+#include "stormancer/StormancerTypes.h"
+#include <map>
+#include <vector>
+#include <chrono>
+#include <string>
+#include <functional>
 
 namespace Stormancer
 {
@@ -17,7 +23,7 @@ namespace Stormancer
 	class Configuration;
 	using Configuration_ptr = std::shared_ptr<Configuration>;
 	class DependencyResolver;
-
+	class IActionDispatcher;
 	class IScheduler;
 
 	/// Used by a Client for initialization.

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "stormancer/BuildConfig.h"
+
 #include "stormancer/Streams/obytestream.h"
 #include "stormancer/Streams/ibytestream.h"
 #include <functional>

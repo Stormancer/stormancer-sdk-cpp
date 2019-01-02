@@ -2,7 +2,7 @@
 #include STORMANCER_CUSTOM_PCH
 #endif
 #include "Invitations/InvitationsPlugin.h"
-#include "stormancer/headers.h"
+
 #include "stormancer/Scene.h"
 #include "Invitations/Invitations.h"
 #include "stormancer/Logger/ILogger.h"

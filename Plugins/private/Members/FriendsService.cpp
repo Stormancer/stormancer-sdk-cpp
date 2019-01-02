@@ -2,7 +2,7 @@
 #include STORMANCER_CUSTOM_PCH
 #endif
 #include "Members/FriendsService.h"
-#include "stormancer/headers.h"
+#include "Members/FriendsModels.h"
 #include "Authentication/AuthenticationService.h"
 #include "stormancer/Scene.h"
 

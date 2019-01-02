@@ -4,6 +4,7 @@
 #include "stormancer/P2P/P2PConnectToSceneMessage.h"
 #include "stormancer/IActionDispatcher.h"
 #include "stormancer/ChannelUidStore.h"
+#include <sstream>
 
 namespace Stormancer
 {

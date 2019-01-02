@@ -1,7 +1,12 @@
 #pragma once
 
 #include "stormancer/Event.h"
+#include "stormancer/Tasks.h"
 #include "Members/FriendsModels.h"
+#include <unordered_map>
+#include <functional>
+#include <string>
+#include <memory>
 
 namespace Stormancer
 {

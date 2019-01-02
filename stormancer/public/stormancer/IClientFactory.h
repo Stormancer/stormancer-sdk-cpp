@@ -1,5 +1,7 @@
 #pragma once
 
+#include "stormancer/BuildConfig.h"
+
 #include "stormancer/IClient.h"
 
 namespace Stormancer

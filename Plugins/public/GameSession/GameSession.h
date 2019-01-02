@@ -1,5 +1,5 @@
 #pragma once
-#include "stormancer/headers.h"
+
 #include "stormancer/Event.h"
 #include "GameSession/GameSessionModels.h"
 

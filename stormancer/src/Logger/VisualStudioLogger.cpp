@@ -1,6 +1,7 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/Logger/VisualStudioLogger.h"
 #include <locale>
+#include <Windows.h>
 
 namespace Stormancer
 {

@@ -1,8 +1,10 @@
 #pragma once
 
+#include "stormancer/BuildConfig.h"
+
 #include <functional>
 #include <queue>
-#include "pplx/pplxtasks.h"
+#include "stormancer/Tasks.h"
 
 namespace Stormancer
 {

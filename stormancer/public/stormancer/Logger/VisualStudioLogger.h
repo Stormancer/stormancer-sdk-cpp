@@ -1,6 +1,8 @@
 #pragma once
 
+#include "stormancer/BuildConfig.h"
 #include "stormancer/Logger/ILogger.h"
+#include <mutex>
 
 namespace Stormancer
 {

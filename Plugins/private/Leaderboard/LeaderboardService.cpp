@@ -2,7 +2,7 @@
 #include STORMANCER_CUSTOM_PCH
 #endif
 #include "LeaderboardService.h"
-#include "stormancer/headers.h"
+
 #include "Leaderboard_Impl.h"
 #include "Authentication/AuthenticationService.h"
 

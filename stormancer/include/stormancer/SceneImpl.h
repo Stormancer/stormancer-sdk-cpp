@@ -1,6 +1,8 @@
 #pragma once
 
-#include "stormancer/headers.h"
+#include "stormancer/BuildConfig.h"
+
+
 #include "stormancer/scene.h"
 #include "stormancer/Streams/bytestream.h"
 #include "stormancer/PacketPriority.h"

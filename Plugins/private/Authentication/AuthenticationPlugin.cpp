@@ -2,7 +2,6 @@
 #include STORMANCER_CUSTOM_PCH
 #endif
 #include "Authentication/AuthenticationPlugin.h"
-#include "stormancer/headers.h"
 #include "Authentication/AuthenticationService.h"
 
 namespace Stormancer

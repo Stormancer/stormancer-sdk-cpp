@@ -1,7 +1,9 @@
 #pragma once
 
-#include "stormancer/headers.h"
+#include "stormancer/BuildConfig.h"
+
 #include "stormancer/Logger/ILogger.h"
+#include <mutex>
 
 #if defined(_WIN32)
 #include "stormancer/Logger/ConsoleLoggerWindows.h"

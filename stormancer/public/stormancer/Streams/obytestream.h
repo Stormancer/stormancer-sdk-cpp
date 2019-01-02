@@ -1,8 +1,12 @@
 #pragma once
 
+#include "stormancer/BuildConfig.h"
+
 #include "stormancer/Streams/bytestreambuf.h"
 #include <istream>
 #include <vector>
+#include <iostream>
+
 namespace Stormancer
 {
 	class obytestream : public std::basic_ostream<byte>

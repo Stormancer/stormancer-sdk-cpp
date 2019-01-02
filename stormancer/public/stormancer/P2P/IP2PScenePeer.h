@@ -1,7 +1,9 @@
 #pragma once
+
+#include "stormancer/BuildConfig.h"
 #include "stormancer/IScenePeer.h"
 #include "stormancer/P2P/P2PTunnel.h"
-#include "pplx/pplxtasks.h"
+#include "stormancer/Tasks.h"
 
 namespace Stormancer
 {
