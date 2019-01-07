@@ -26,8 +26,13 @@ namespace Stormancer
 	class IActionDispatcher;
 	class IScheduler;
 
-	/// Used by a Client for initialization.
-	/// For instance to target a custom Stormancer cluster change the ServerEndoint property to the http API endpoint of your custom cluster.
+	/// <summary>
+	/// This class contains parameters needed to initialize and configure a <c>IClient</c>.
+	/// </summary>
+	/// <remarks>
+	/// Creating a <c>Configuration</c> using <see cref="Configuration::create()"/> is the first step before creating a <c>IClient</c>
+	/// to start using Stormancer functionality.
+	/// </remarks>
 	class STORMANCER_DLL_API Configuration
 	{
 	public:
@@ -38,95 +43,192 @@ namespace Stormancer
 
 		~Configuration();
 
-		/// Create an account with an account and an application name and returns a Configuration smart ptr.
+		/// <summary>
+		/// Factory method for <c>Configuration</c>.
+		/// Always use this method to instantiate <c>Configuration</c>.
+		/// </summary>
+		/// <param name="endpoint">HTTP endpoint of the Stormancer cluster to connect to.
+		/// Once the configuration is instantiated, you can add more candidate endpoints by calling <c>addServerEndpoint()</c>.</param>
+		/// <param name="account">Stormancer account to use on the cluster.</param>
+		/// <param name="application">Name of the Stormancer application to connect to. It must belong to the chosen account.</param>
+		/// <returns>A <c>Configuration</c> <c>std::shared_ptr</c> with the supplied parameters.</returns>
 		static Configuration_ptr create(const std::string& endpoint, const std::string& account, const std::string& application);
 
-		/// Add a server endpoint in the internal list
+		/// <summary>
+		/// Add a candidate server endpoint.
+		/// </summary>
+		/// <param name="serverEndpoint">HTTP endpoint to add to the list of candidates.</param>
 		void addServerEndpoint(const std::string& serverEndpoint);
 
-		/// Get the Api endpoint.
+		/// <summary>
+		/// Get the list of candidate server endpoints for this <c>Configuration</c>.
+		/// </summary>
+		/// <returns>List of candidate endpoints.</returns>
 		std::vector<std::string> getApiEndpoint();
 
+		/// <summary>
 		/// Add a plugin to the client.
-		/// Plugins enable developpers to plug custom code in the stormancer client's extensibility points. Possible uses include: custom high level protocols, logger or analyzers.
-		/// \param plugin The plugin instance to add.
+		/// </summary>
+		/// <remarks>
+		/// Plugins enable developers to plug custom code in the stormancer client's extensibility points. Possible uses include: custom high level protocols, logger or analyzers.
+		/// </remarks>
+		/// <param name="plugin">The plugin instance to add.
+		/// It must be dynamically allocated by you, and will be freed by the <c>Configuration</c> when it is destroyed.</param>
 		void addPlugin(IPlugin* plugin);
 
-		/// Get a reference to the plugins list
+		/// <summary>
+		/// Get the list of plugins in this <c>Configuration</c>.
+		/// Use <c>addPlugin()</c> to add new plugins.
+		/// </summary>
+		/// <returns>The <c>Configuration</c>'s list of plugins.</returns>
 		const std::vector<IPlugin*> plugins();
 
-		/// Return if the configuration have a public ip setup
-		/// This configuration used for dedicated server without P2P tunnel.
+		/// <summary>
+		/// Check whether this <c>Configuration</c> has a public IP address setup.
+		/// </summary>
+		/// <remarks>
+		/// This is typically used for dedicated game servers.
+		/// To set the public IP for the <c>Configuration</c>, use the <c>dedicatedServerEndpoint</c> member variable.
+		/// </remarks>
+		/// <returns><c>true</c> if this <c>Configuration</c> has a public IP setup.</returns>
 		const bool hasPublicIp();
 
-		/// Return the couple of IP Port setup in configuration
-		/// 
+		/// <summary>
+		/// Return the IP:Port couple setup for this <c>Configuration</c>.
+		/// </summary>
+		/// <returns>A <c>std::string</c> in the <c>ip:port</c> format.</returns>
 		const std::string getIp_Port();
 #pragma endregion
 
 #pragma region public_members
 
+		/// <summary>
 		/// A string containing the account name of the application.
+		/// </summary>
 		const std::string account = "";
 
+		/// <summary>
 		/// A string containing the name of the application.
+		/// </summary>
 		const std::string application = "";
 
 		
 
+		/// <summary>
 		/// Maximum number of remote peers that can connect with this client.
+		/// </summary>
 		uint16 maxPeers = 10;
 
-		/// Optional server port
+		/// <summary>
+		/// Port that this client's stormancer transport socket should bind to.
+		/// By default, set to 0 for automatic attribution.
+		/// </summary>
 		uint16 clientSDKPort = 0;
 
-		/// Enable or disable the asynchrounous dispatch of received messages. Enabled by default.
+		/// <summary>
+		/// Was used to enable or disable asynchrounous dispatch of received messages.
+		/// Has no effect.
+		/// If you want to control how message handlers are dispatched, use <c>actionDispatcher</c> instead.
+		/// </summary>
+		/// \deprecated Set a custom <see cref="actionDispatcher"/> instead.
 		bool asynchronousDispatch = true;
 
-		///Size of the threadpool. Defaults to 5. Less than 3 can provoke deadlocks.
+		/// <summary>
+		/// On non-Win32 platforms, set the size of the threadpool (number of threads) for the default dispatcher.
+		/// </summary>
 		int threadpoolSize = 10;
 
 		
 
-		///Gets or sets the default p2p host port. 0 For automatic attribution.
+		/// <summary>
+		/// Local application port for direct communication with other clients, as P2P host or dedicated server.
+		/// </summary>
 		unsigned short serverGamePort = 7777;
 
-		/// Ip of the sever where game dedicated serveur is launch
+		/// <summary>
+		/// If this stormancer client runs on a dedicated server, set this to the public IP of the server.
+		/// This enables other clients to connect to it directly.
+		/// </summary>
 		std::string dedicatedServerEndpoint;
 
-		/// Disable or enable nat punch through on client side
+		/// <summary>
+		/// Disable or enable nat punch through on client side.
+		/// </summary>
 		bool enableNatPunchthrough = true;
 
+		/// <summary>
 		/// Force a specific endpoint. Configuration used to connect client directly by localhost address.
+		/// </summary>
 		std::string forceTransportEndpoint = "";
 
 		/// <summary>
-		/// Dispatches events
+		/// Provide a custom <c>IActionDispatcher</c> to control how event handlers are dispatched.
 		/// </summary>
 		/// <remarks>
 		/// By default, events are dispatched on the current network thread. Replace the dispatcher with a MainThreadActionDispatcher to dispatch to your main thread.
 		/// your main game loop for instance.
+		/// An event can be an incoming route message, an RPC response, a subscription notification, etc.
+		/// Generally, it is anything in the Stormancer API that you can register a handler for,
+		/// be it a <c>pplx::task</c> continuation, an <c>Action</c>, an <c>Event</c> or an <c>rxcpp::subscription</c>.
 		/// </remarks>
 		std::shared_ptr<IActionDispatcher> actionDispatcher;
 
-		/// use the syncClock
+		/// <summary>
+		/// Whether the Stormancer's synchronized clock should be enabled on this client or not.
+		/// </summary>
 		bool synchronisedClock = true;
 
-		/// The interval between successive ping requests, in milliseconds. Default is 5000 ms.
+		/// <summary>
+		/// The interval between successive ping requests for the synchronized clock, in milliseconds. Default is 5000 ms.
+		/// </summary>
 		int32 synchronisedClockInterval = 5000;
 
+		/// <summary>
+		/// Set how an endpoint should be selected among the candidates.
+		/// </summary>
 		EndpointSelectionMode endpointSelectionMode = EndpointSelectionMode::FALLBACK;
 
+		/// <summary>
+		/// Set the logger for this stormancer client.
+		/// </summary>
+		/// <remarks>
+		/// By default, it will be <c>NullLogger</c>, which doesn't print anything.
+		/// There are a number of predefined loggers that you can pick from, or implement your own.
+		/// <see cref="ConsoleLogger"/>
+		/// <see cref="FileLogger"/>
+		/// <see cref="VisualStudioLogger"/>
+		/// </remarks>
 		ILogger_ptr logger;
 
-		/// The default timeout duration for server connections
+		/// <summary>
+		/// The default timeout duration for Stormancer server connections.
+		/// </summary>
 		std::chrono::milliseconds defaultTimeout = std::chrono::milliseconds(10000);
 
 
 
 
 
+
+
+
+
+
+
+
+		/// <summary>
+		/// On platforms that need specific initialization for their network libraries,
+		/// set whether the Stormancer client should perform this initialization.
+		/// </summary>
+		/// <remarks>
+		/// Typically, you should set this to <c>false</c> if your application directly calls system network libraries,
+		/// and initializes them before initializing the Stormancer client library.
+		/// </remarks>
 		bool shoudInitializeNetworkLibraries = true;
+
+		/// <summary>
+		/// Set whether the connection to the Stormancer server should be encrypted.
+		/// </summary>
 		bool encryptionEnabled = false;
 #pragma endregion
 
