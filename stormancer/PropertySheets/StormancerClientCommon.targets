@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="AfterBuild">
+    <ItemGroup>
+      <RxcppIncludes Include="$(StormancerSdkRoot)dependencies\rxcpp\Rx\v2\src\rxcpp\**\*.*" />
+      <RestSdkIncludes Include="$(StormancerSdkRoot)dependencies\cpprestsdk\Release\include\**\*.*" />
+      <MsgpackIncludes Include="$(StormancerSdkRoot)dependencies\msgpack-c\include\**\*.*" />
+      <StormancerIncludes Include="$(StormancerSdkRoot)stormancer\stormancer-sources\include\public\**\*.*" />
+      <RaknetIncludes Include="$(StormancerSdkRoot)dependencies\RakNet\RakNet\Source\**\*.h" />
+      <BuildFiles Include="$(StormancerSdkRoot)Build\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(BuildFiles)" DestinationFiles="@(BuildFiles->'$(StormancerOutputDir)build\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <!--<Copy SourceFiles="@(RaknetIncludes)" DestinationFiles="@(RaknetIncludes->'$(StormancerOutputDir)include\%(RecursiveDir)%(Filename)%(Extension)')" />-->
+    <Copy SourceFiles="@(RxcppIncludes)" DestinationFiles="@(RxcppIncludes->'$(StormancerOutputDir)include\rxcpp\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(RestSdkIncludes)" DestinationFiles="@(RestSdkIncludes->'$(StormancerOutputDir)include\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Delete Files="$(StormancerOutputDir)include\stdafx.h" />
+    <Copy SourceFiles="@(MsgpackIncludes)" DestinationFiles="@(MsgpackIncludes->'$(StormancerOutputDir)include\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(StormancerIncludes)" DestinationFiles="@(StormancerIncludes->'$(StormancerOutputDir)include\%(RecursiveDir)%(Filename)%(Extension)')" />
+  </Target>
+</Project>
