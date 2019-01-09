@@ -1,9 +1,6 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/Windows/AES/AES_Windows.h"
 #include "stormancer/KeyStore.h"
-#include <sstream>
-#include <stdexcept>
-#include <string>
 
 #ifndef STATUS_UNSUCCESSFUL
 #define STATUS_UNSUCCESSFUL         ((NTSTATUS)0xC0000001L)

@@ -210,7 +210,7 @@ xcuserdata/
 /ARM/Release
 Release
 *.self
-*.prx
+
 *.a
 /RaknetDll/x64/Debug
 /SmokeTest/x64/Debug

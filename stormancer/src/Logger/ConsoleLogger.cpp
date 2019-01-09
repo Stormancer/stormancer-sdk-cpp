@@ -1,6 +1,5 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/Logger/ConsoleLogger.h"
-#include <iostream>
 
 #if defined(_WIN32)
 #else

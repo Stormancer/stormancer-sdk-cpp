@@ -1,8 +1,6 @@
 #pragma once
 
-#include "stormancer/BuildConfig.h"
-
-
+#include "stormancer/headers.h"
 #include "stormancer/IPacketProcessor.h"
 #include "stormancer/IActionDispatcher.h"
 #include "stormancer/SceneImpl.h"

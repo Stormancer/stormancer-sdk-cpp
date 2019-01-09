@@ -1,9 +1,5 @@
 #pragma once
 
-#include "stormancer/BuildConfig.h"
-
-#include <memory>
-
 namespace Stormancer
 {
 	class IClient;

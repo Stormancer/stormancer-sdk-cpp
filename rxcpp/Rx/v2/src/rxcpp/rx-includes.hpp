@@ -155,9 +155,10 @@
 #include <mutex>
 #include <deque>
 #include <thread>
-// On Windows, <future> includes <ppl>. This breaks pplx.
-#if !defined(_WIN32)
+#if !CPPREST_FORCE_PPLX
 #include <future>
+#else
+#include "pplx/pplxtasks.h"
 #endif
 #include <vector>
 #include <list>

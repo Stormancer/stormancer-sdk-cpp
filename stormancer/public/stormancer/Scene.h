@@ -1,6 +1,6 @@
 #pragma once
-
-#include "stormancer/BuildConfig.h"
+#include <memory>
+#include "stormancer/headers.h"
 #include "stormancer/MessageOriginFilter.h"
 #include "stormancer/Route.h"
 #include "stormancer/PeerFilter.h"
@@ -10,10 +10,8 @@
 #include "stormancer/Packet.h"
 #include "stormancer/DependencyResolver.h"
 #include "rxcpp/rx.hpp"
-#include "stormancer/Tasks.h"
+#include "pplx/pplxtasks.h"
 #include "stormancer/Event.h"
-#include <memory>
-#include <unordered_map>
 
 namespace Stormancer
 {

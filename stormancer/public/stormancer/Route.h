@@ -1,6 +1,4 @@
 #pragma once
-
-#include "stormancer/BuildConfig.h"
 #include "stormancer/MessageOriginFilter.h"
 #include "stormancer/stormancerTypes.h"
 #include <map>

@@ -1,8 +1,6 @@
 #pragma once
 
-#include "stormancer/BuildConfig.h"
-
-#include "stormancer/Tasks.h"
+#include "stormancer/headers.h"
 #include "stormancer/IScheduler.h"
 #include "stormancer/TimerThread.h"
 

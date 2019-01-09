@@ -1,7 +1,5 @@
 #pragma once
 
-#include "stormancer/BuildConfig.h"
-
 #include "stormancer/Streams/bytestream.h"
 #include "stormancer/stormancerTypes.h"
 #include <vector>

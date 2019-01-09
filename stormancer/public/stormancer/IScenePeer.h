@@ -1,7 +1,5 @@
 #pragma once
 
-#include "stormancer/BuildConfig.h"
-
 #include <string>
 #include "stormancer/Streams/bytestream.h"
 #include "stormancer/PacketPriority.h"

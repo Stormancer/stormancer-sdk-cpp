@@ -41,16 +41,16 @@ namespace Stormancer
 		
 		SceneEndpoint endpoint;
 		endpoint.version = 2;
-		endpoint.token = to_string(getTokenResponse[_XPLATSTR("token")].as_string());
+		endpoint.token = to_string(getTokenResponse[U("token")].as_string());
 
-		endpoint.getTokenResponse.token = to_string(getTokenResponse[_XPLATSTR("token")].as_string());
+		endpoint.getTokenResponse.token = to_string(getTokenResponse[U("token")].as_string());
 
-		endpoint.getTokenResponse.encryption.algorithm = to_string(getTokenResponse[_XPLATSTR("encryption")][_XPLATSTR("algorithm")].as_string());
-		endpoint.getTokenResponse.encryption.key = to_string(getTokenResponse[_XPLATSTR("encryption")][_XPLATSTR("key")].as_string());
-		endpoint.getTokenResponse.encryption.mode = to_string(getTokenResponse[_XPLATSTR("encryption")][_XPLATSTR("mode")].as_string());
-		endpoint.getTokenResponse.encryption.token = to_string(getTokenResponse[_XPLATSTR("encryption")][_XPLATSTR("token")].as_string());
+		endpoint.getTokenResponse.encryption.algorithm = to_string(getTokenResponse[U("encryption")][U("algorithm")].as_string());
+		endpoint.getTokenResponse.encryption.key = to_string(getTokenResponse[U("encryption")][U("key")].as_string());
+		endpoint.getTokenResponse.encryption.mode = to_string(getTokenResponse[U("encryption")][U("mode")].as_string());
+		endpoint.getTokenResponse.encryption.token = to_string(getTokenResponse[U("encryption")][U("token")].as_string());
 
-		for (auto transport : getTokenResponse[_XPLATSTR("endpoints")].as_object())
+		for (auto transport : getTokenResponse[U("endpoints")].as_object())
 		{
 			for (auto e : transport.second.as_array())
 			{

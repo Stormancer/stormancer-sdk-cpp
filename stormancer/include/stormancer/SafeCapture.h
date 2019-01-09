@@ -1,9 +1,7 @@
 #pragma once
 
-#include "stormancer/BuildConfig.h"
-
+#include "stormancer/headers.h"
 #include "stormancer/exceptions.h"
-#include <memory>
 
 #if __cplusplus >= 201703L
 #define STRM_WEAK_FROM_THIS() this->weak_from_this()

@@ -2,8 +2,7 @@
 
 #include <windows.h>
 #include <bcrypt.h>
-#include <unordered_map>
-#include "stormancer/StormancerTypes.h"
+#include "stormancer/headers.h"
 #include "stormancer/AES/IAES.h"
 
 namespace Stormancer

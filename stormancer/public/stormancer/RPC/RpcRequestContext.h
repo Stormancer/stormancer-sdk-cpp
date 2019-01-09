@@ -1,12 +1,10 @@
 #pragma once
 
-#include "stormancer/BuildConfig.h"
-
 #include "stormancer/scene.h"
 #include "stormancer/Streams/bytestream.h"
 #include "stormancer/PacketPriority.h"
 #include "stormancer/IScenePeer.h"
-#include "stormancer/Tasks.h"
+#include "pplx/pplxtasks.h"
 #include "stormancer/Serializer.h"
 #include "stormancer/RPC/Constants.h"
 

@@ -1,6 +1,5 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/Streams/bytestreambuf.h"
-#include <algorithm>
 
 namespace Stormancer
 {

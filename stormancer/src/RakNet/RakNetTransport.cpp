@@ -425,12 +425,8 @@ namespace Stormancer
 						rakNetPacket = nullptr;
 					}
 				}
-				catch (const PointerDeletedException&)
-				{
-				}
 				catch (const std::exception& ex)
 				{
-					
 					_logger->log(LogLevel::Error, "RakNetTransport", "An error occured while handling a message", ex.what());
 				}
 			}

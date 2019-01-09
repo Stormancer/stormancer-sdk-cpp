@@ -1,8 +1,6 @@
 #pragma once
 
-#include "stormancer/BuildConfig.h"
-
-
+#include "stormancer/headers.h"
 #include "stormancer/Streams/bytestream.h"
 #include "stormancer/IPacketTransform.h"
 #include "stormancer/TransformMetadata.h"

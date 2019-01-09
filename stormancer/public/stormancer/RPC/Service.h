@@ -1,12 +1,10 @@
 #pragma once
 
-#include "stormancer/BuildConfig.h"
-
 #include <memory>
 #include <string>
 #include <unordered_map>
-
-#include "stormancer/Tasks.h"
+#include "stormancer/headers.h"
+#include "pplx/pplxtasks.h"
 #include "rxcpp/rx.hpp"
 #include "stormancer/RPC/RpcRequestContext.h"
 #include "stormancer/Scene.h"

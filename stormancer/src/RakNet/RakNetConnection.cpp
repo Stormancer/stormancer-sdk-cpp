@@ -10,10 +10,6 @@
 #include "stormancer/Helpers.h"
 #include "stormancer/Exceptions.h"
 #include <limits>
-#include <chrono>
-
-#undef max
-#undef min
 
 namespace Stormancer
 {

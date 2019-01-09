@@ -1,10 +1,7 @@
 #pragma once
 
-#include "stormancer/BuildConfig.h"
-
+#include "stormancer/headers.h"
 #include "stormancer/P2P/P2PEnums.h"
-#include "stormancer/msgpack_define.h"
-#include <string>
 
 namespace Stormancer
 {

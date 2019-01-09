@@ -1,8 +1,6 @@
 #pragma once
 
-#include "stormancer/BuildConfig.h"
-
-#include <cstdint>
+#include <stdint.h>
 
 // custom types
 namespace Stormancer
@@ -18,8 +16,8 @@ namespace Stormancer
 	using uint32 = uint32_t;
 	using uint64 = uint64_t;
 
-	using float32 = float;
-	using float64 = double;
+	using float32 = float_t;
+	using float64 = double_t;
 #else
 	using int8 = signed char;
 	using int16 = signed short int;

@@ -1,7 +1,6 @@
 #pragma once
 
-#include "stormancer/BuildConfig.h"
-
+#include "stormancer/headers.h"
 #include <exception>
 #include <stdexcept>
 

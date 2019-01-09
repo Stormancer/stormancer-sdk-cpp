@@ -1,9 +1,7 @@
 #pragma once
 
-#include "stormancer/BuildConfig.h"
-
+#include "stormancer/headers.h"
 #include "stormancer/IConnection.h"
-#include "stormancer/StormancerTypes.h"
 
 namespace Stormancer
 {

@@ -1,15 +1,10 @@
 #pragma once
 
-#include "stormancer/BuildConfig.h"
-
+#include "stormancer/headers.h"
 #include "stormancer/Configuration.h"
 #include "stormancer/SceneEndpoint.h"
 #include "stormancer/ITokenHandler.h"
 #include "stormancer/Federation.h"
-#include "stormancer/Tasks.h"
-#include "cpprest/http_client.h"
-
-
 namespace Stormancer
 {
 	class ServerEndpoints

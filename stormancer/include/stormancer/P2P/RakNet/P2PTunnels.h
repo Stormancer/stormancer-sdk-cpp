@@ -1,7 +1,6 @@
 #pragma once
 
-#include "stormancer/BuildConfig.h"
-
+#include "stormancer/headers.h"
 #include "stormancer/RequestProcessor.h"
 #include "stormancer/Serializer.h"
 #include "stormancer/IConnectionManager.h"
@@ -9,8 +8,6 @@
 #include "stormancer/P2P/ServerDescriptor.h"
 #include "stormancer/Configuration.h"
 #include "stormancer/Logger/ILogger.h"
-#include <unordered_map>
-#include <mutex>
 
 namespace RakNet
 {

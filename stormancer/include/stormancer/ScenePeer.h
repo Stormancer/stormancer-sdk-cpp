@@ -1,8 +1,6 @@
 #pragma once
 
-#include "stormancer/BuildConfig.h"
-
-
+#include "stormancer/headers.h"
 #include "stormancer/IScenePeer.h"
 #include "stormancer/SceneImpl.h"
 #include "stormancer/Route.h"

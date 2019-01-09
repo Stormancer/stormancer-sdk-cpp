@@ -1,13 +1,8 @@
 #pragma once
 
-#include "stormancer/BuildConfig.h"
-
-
+#include "stormancer/headers.h"
 #include "stormancer/Streams/bytestream.h"
-#include "stormancer/StormancerTypes.h"
 #include "stormancer/AES/AES.h"
-#include <memory>
-#include <vector>
 
 namespace Stormancer
 {

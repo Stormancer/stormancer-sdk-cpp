@@ -60,6 +60,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\Action.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\include\stormancer\ApiClient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -330,6 +333,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\public\stormancer\PacketPriority.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\public\stormancer\headers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\public\stormancer\MessageOriginFilter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -439,12 +445,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\public\stormancer\Federation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\public\stormancer\Tasks.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)stormancer\public\stormancer\BuildConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

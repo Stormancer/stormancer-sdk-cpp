@@ -2,7 +2,6 @@
 #include "stormancer/ApiClient.h"
 #include "stormancer/SafeCapture.h"
 #include "stormancer/Helpers.h"
-#include "cpprest/http_client.h"
 
 namespace Stormancer
 {
@@ -37,9 +36,9 @@ namespace Stormancer
 		request.set_request_uri(relativeUri2);
 		request.set_body(utility::string_t());
 
-		request.headers().add(_XPLATSTR("Content-Type"), _XPLATSTR("application/msgpack"));
-		request.headers().add(_XPLATSTR("Accept"), _XPLATSTR("application/json"));
-		request.headers().add(_XPLATSTR("x-version"), _XPLATSTR("3"));
+		request.headers().add(U("Content-Type"), U("application/msgpack"));
+		request.headers().add(U("Accept"), U("application/json"));
+		request.headers().add(U("x-version"), U("3"));
 
 		auto wApiClient = STRM_WEAK_FROM_THIS();
 		auto start = std::chrono::high_resolution_clock::now();
@@ -114,9 +113,9 @@ namespace Stormancer
 		request.set_request_uri(relativeUri2);
 		request.set_body(utility::string_t());
 
-		request.headers().add(_XPLATSTR("Content-Type"), _XPLATSTR("application/msgpack"));
-		request.headers().add(_XPLATSTR("Accept"), _XPLATSTR("application/json"));
-		request.headers().add(_XPLATSTR("x-version"), _XPLATSTR("3"));
+		request.headers().add(U("Content-Type"), U("application/msgpack"));
+		request.headers().add(U("Accept"), U("application/json"));
+		request.headers().add(U("x-version"), U("3"));
 
 		auto wApiClient = STRM_WEAK_FROM_THIS();
 
@@ -180,15 +179,15 @@ namespace Stormancer
 
 		Federation f;
 
-		for (auto jCluster : jFed[_XPLATSTR("clusters")].as_array())
+		for (auto jCluster : jFed[U("clusters")].as_array())
 		{
 			Cluster cluster;
-			cluster.id = to_string(jCluster[_XPLATSTR("id")].as_string());
-			for (auto jEndpoint : jCluster[_XPLATSTR("endpoints")].as_array())
+			cluster.id = to_string(jCluster[U("id")].as_string());
+			for (auto jEndpoint : jCluster[U("endpoints")].as_array())
 			{
 				cluster.endpoints.push_back(to_string(jEndpoint.as_string()));
 			}
-			for (auto jTag : jCluster[_XPLATSTR("tags")].as_array())
+			for (auto jTag : jCluster[U("tags")].as_array())
 			{
 				cluster.tags.push_back(to_string(jTag.as_string()));
 			}
@@ -197,13 +196,13 @@ namespace Stormancer
 
 		//Load data about current cluster
 		Cluster current;
-		auto jCluster = jFed[_XPLATSTR("current")];
-		current.id = to_string(jCluster[_XPLATSTR("id")].as_string());
-		for (auto jEndpoint : jCluster[_XPLATSTR("endpoints")].as_array())
+		auto jCluster = jFed[U("current")];
+		current.id = to_string(jCluster[U("id")].as_string());
+		for (auto jEndpoint : jCluster[U("endpoints")].as_array())
 		{
 			current.endpoints.push_back(to_string(jEndpoint.as_string()));
 		}
-		for (auto jTag : jCluster[_XPLATSTR("tags")].as_array())
+		for (auto jTag : jCluster[U("tags")].as_array())
 		{
 			current.tags.push_back(to_string(jTag.as_string()));
 		}
@@ -276,9 +275,9 @@ namespace Stormancer
 		request.set_request_uri(relativeUri2);
 		request.set_body(utility::string_t());
 
-		request.headers().add(_XPLATSTR("Content-Type"), _XPLATSTR("application/msgpack"));
-		request.headers().add(_XPLATSTR("Accept"), _XPLATSTR("application/json"));
-		request.headers().add(_XPLATSTR("x-version"), _XPLATSTR("3"));
+		request.headers().add(U("Content-Type"), U("application/msgpack"));
+		request.headers().add(U("Accept"), U("application/json"));
+		request.headers().add(U("x-version"), U("3"));
 
 		auto wApiClient = STRM_WEAK_FROM_THIS();
 
@@ -317,8 +316,8 @@ namespace Stormancer
 					if (ensureSuccessStatusCode(statusCode))
 					{
 						auto headers = response.headers();
-						auto xVersion = headers[_XPLATSTR("x-version")];
-						if (xVersion == _XPLATSTR("2") || xVersion == _XPLATSTR("3"))
+						auto xVersion = headers[U("x-version")];
+						if (xVersion == U("2") || xVersion == U("3"))
 						{
 							apiClient->_logger->log(LogLevel::Trace, "ApiClient", "Get token API version : 2");
 							return pplx::task_from_result(apiClient->_tokenHandler->getSceneEndpointInfo(responseText));

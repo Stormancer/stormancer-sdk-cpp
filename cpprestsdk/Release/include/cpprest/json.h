@@ -34,7 +34,6 @@
 #include <algorithm>
 #include <unordered_map>
 #include <cstdint>
-#include <algorithm>
 #include "cpprest/details/basic_types.h"
 #include "cpprest/asyncrt_utils.h"
 

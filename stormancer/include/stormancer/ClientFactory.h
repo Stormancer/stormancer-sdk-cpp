@@ -1,18 +1,13 @@
 #pragma once
-
-#include "stormancer/BuildConfig.h"
-
-#include "stormancer/IClient.h"
 #include "stormancer/Configuration.h"
+#include "stormancer/IClient.h"
 #include <functional>
 #include <memory>
-#include <unordered_map>
-#include <mutex>
 
 namespace Stormancer
 {
+	class Client;
 	class IClient;
-	class Configuration;
 	class ClientFactory
 	{
 	public:

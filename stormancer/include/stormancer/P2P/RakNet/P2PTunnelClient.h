@@ -1,9 +1,7 @@
 #pragma once
 
-#include "stormancer/BuildConfig.h"
-
 #include "RakPeerInterface.h"
-#include "stormancer/StormancerTypes.h"
+#include "stormancer/headers.h"
 #include "stormancer/RequestProcessor.h"
 
 namespace Stormancer

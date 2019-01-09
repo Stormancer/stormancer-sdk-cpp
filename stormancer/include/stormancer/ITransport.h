@@ -1,8 +1,6 @@
 #pragma once
 
-#include "stormancer/BuildConfig.h"
-
-
+#include "stormancer/headers.h"
 #include "stormancer/IConnectionManager.h"
 #include "stormancer/Packet.h"
 #include "stormancer/Helpers.h"

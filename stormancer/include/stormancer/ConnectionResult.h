@@ -1,11 +1,6 @@
 #pragma once
 
-#include "stormancer/BuildConfig.h"
-
-#include "stormancer/StormancerTypes.h"
-#include "stormancer/msgpack_define.h"
-#include <map>
-#include <string>
+#include "stormancer/headers.h"
 
 namespace Stormancer
 {

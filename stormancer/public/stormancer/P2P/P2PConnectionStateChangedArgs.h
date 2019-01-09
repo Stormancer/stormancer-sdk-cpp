@@ -1,7 +1,5 @@
 #pragma once
 
-#include "stormancer/BuildConfig.h"
-
 #include "stormancer/stormancerTypes.h"
 #include "stormancer/P2P/P2PEnums.h"
 

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "stormancer/BuildConfig.h"
-
 
 
 #if defined(_WIN32)

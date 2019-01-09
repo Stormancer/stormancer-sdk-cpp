@@ -1,9 +1,7 @@
 #pragma once
 
-#include "stormancer/BuildConfig.h"
-
 #include "RakPeerInterface.h"
-
+#include "stormancer/headers.h"
 #include "stormancer/ITransport.h"
 #include "stormancer/Logger/ILogger.h"
 #include "stormancer/RakNet/RaknetConnection.h"

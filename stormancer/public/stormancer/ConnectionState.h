@@ -1,6 +1,4 @@
 #pragma once
-
-#include "stormancer/BuildConfig.h"
 #include <string>
 
 namespace Stormancer
