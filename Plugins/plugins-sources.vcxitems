@@ -32,9 +32,10 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)private\GameSession\GameSession_Impl.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\GameVersion\GameVersionPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\GameVersion\GameVersionService.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\InAppNotification\InAppNotification.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)private\InAppNotification\InAppNotificationContainer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\InAppNotification\InAppNotificationPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\InAppNotification\InAppNotificationService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)private\InAppNotification\InAppNotification_Impl.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Invitations\Invitations.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Invitations\InvitationsPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Leaderboard\LeaderboardPlugin.cpp" />
@@ -72,6 +73,10 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameSession\GameSessionPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameSession\GameSessionService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameSession\GameSession_Impl.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)private\InAppNotification\InAppNotificationContainer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)private\InAppNotification\InAppNotificationPlugin.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)private\InAppNotification\InAppNotificationService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)private\InAppNotification\InAppNotification_Impl.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Leaderboard\LeaderboardModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Leaderboard\LeaderboardPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Leaderboard\LeaderboardService.h" />
@@ -109,9 +114,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameSession\GameSession.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameVersion\GameVersionPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameVersion\GameVersionService.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\InAppNotification\InAppNotification.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\InAppNotification\InAppNotificationPlugin.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\InAppNotification\InAppNotificationService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\InAppNotification\InAppNotificationManager.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\InAppNotification\InAppNotificationModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Invitations\Invitations.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Invitations\InvitationsPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\Leaderboard.h" />

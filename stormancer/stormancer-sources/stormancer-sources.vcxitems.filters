@@ -60,9 +60,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\Action.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ApiClient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -73,9 +70,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ConnectionResult.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ConnectionState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ConnectToSceneMsg.h">
@@ -90,9 +84,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\Helpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IActionDispatcher.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IConnectionManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -105,13 +96,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IRequestModule.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IScenePeer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IScheduler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IService.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ITokenHandler.h">
@@ -124,9 +109,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\PacketProcessorConfig.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\PeerFilter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\RequestContext.h">
@@ -156,9 +138,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ScenePeer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SingleServicePlugin.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -169,9 +148,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SystemRequestIDTypes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\TimerThread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\TokenHandler.h">
@@ -288,9 +264,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SafeCapture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\CustomExceptions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\OpenTunnelResult.h">
       <Filter>Header Files\P2P</Filter>
     </ClInclude>
@@ -301,9 +274,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\Shutdown.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\TransformMetadata.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\Debug\StackWalker.h">
@@ -411,9 +381,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Route.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Logger\VisualStudioLogger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Logger\ConsoleLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -450,10 +417,10 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Federation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\public\stormancer\BuildConfig.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\BuildConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\public\stormancer\Tasks.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Tasks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

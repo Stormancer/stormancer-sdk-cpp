@@ -14,7 +14,6 @@ namespace Stormancer
 
 			if (!name.empty())
 			{
-
 				scene->dependencyResolver()->registerDependency<InAppNotificationService>([](auto dr) {
 					auto service = std::make_shared<InAppNotificationService>(dr.lock()->template resolve<Scene>());
 					service->initialize();

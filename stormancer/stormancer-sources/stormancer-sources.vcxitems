@@ -14,7 +14,6 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\Action.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\AES\AES.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\AES\AESDecryptStream.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\AES\AESEncryptStream.h" />
@@ -29,22 +28,18 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\Compatibility\StormancerResult.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ConnectionData.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ConnectionResult.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ConnectionState.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ConnectToSceneMsg.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ContainerConfigurator.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\Debug\StackWalker.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\DefaultPacketDispatcher.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\DefaultScheduler.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\Helpers.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IActionDispatcher.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IConnectionManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IPacketDispatcher.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IPacketProcessor.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IPacketTransform.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IRequestModule.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IScenePeer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IScheduler.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ITokenHandler.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ITransport.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\KeyStore.h" />
@@ -73,9 +68,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\ServerDescriptor.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\PacketProcessorConfig.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\PacketTransformProcessor.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\PeerFilter.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\public\stormancer\BuildConfig.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\public\stormancer\Tasks.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\RakNet\RakNetConnection.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\RakNet\RakNetTransport.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\RequestContext.h" />
@@ -91,17 +83,14 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SceneInfosRequestDto.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ScenePeer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\Shutdown.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SingleServicePlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\stdafx.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\CustomExceptions.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SyncClock.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SystemRequest.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SystemRequestIDTypes.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\TimerThread.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\TokenHandler.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\TransformMetadata.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\Watch.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Action.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\BuildConfig.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Configuration.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\ConnectionState.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\DependencyResolver.h" />
@@ -120,7 +109,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Logger\FileLogger.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Logger\ILogger.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Logger\NullLogger.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Logger\VisualStudioLogger.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\MessageOriginFilter.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\msgpack_define.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\P2P\IP2PScenePeer.h" />
@@ -143,6 +131,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Streams\bytestreambuf.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Streams\ibytestream.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Streams\obytestream.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Tasks.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\TimerThread.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\TransformMetadata.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\TaskUtilities.h" />

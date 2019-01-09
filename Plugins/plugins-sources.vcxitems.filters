@@ -144,9 +144,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)private\GameVersion\GameVersionService.cpp">
       <Filter>private\GameVersion</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\InAppNotification\InAppNotification.cpp">
-      <Filter>private\InAppNotification</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)private\InAppNotification\InAppNotificationPlugin.cpp">
       <Filter>private\InAppNotification</Filter>
     </ClCompile>
@@ -239,6 +236,8 @@
       <Filter>private\Profile</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)private\GameFinder\GameFinder_Impl.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)private\InAppNotification\InAppNotificationContainer.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)private\InAppNotification\InAppNotification_Impl.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Leaderboard\Leaderboard_Impl.h">
@@ -282,15 +281,6 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameVersion\GameVersionService.h">
       <Filter>public\GameVersion</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\InAppNotification\InAppNotification.h">
-      <Filter>public\InAppNotification</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\InAppNotification\InAppNotificationPlugin.h">
-      <Filter>public\InAppNotification</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\InAppNotification\InAppNotificationService.h">
-      <Filter>public\InAppNotification</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Invitations\Invitations.h">
       <Filter>public\Invitations</Filter>
@@ -434,5 +424,11 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Profile\ProfileService.h">
       <Filter>private\Profile</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\InAppNotification\InAppNotificationManager.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\InAppNotification\InAppNotificationModels.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)private\InAppNotification\InAppNotification_Impl.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)private\InAppNotification\InAppNotificationContainer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)private\InAppNotification\InAppNotificationPlugin.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)private\InAppNotification\InAppNotificationService.h" />
   </ItemGroup>
 </Project>

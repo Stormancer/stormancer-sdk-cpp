@@ -1,7 +1,7 @@
 #pragma once
 
+#include "InAppNotification/InAppNotificationModels.h"
 #include "Stormancer/RPC/Service.h"
-#include "InAppNotification.h"
 
 namespace Stormancer
 {
@@ -16,10 +16,13 @@ namespace Stormancer
 
 		InAppNotificationService(std::shared_ptr<Scene> scene);
 
+		// Register a callback to process the incoming notifications
 		void registerNotificationsCallback(const std::function<void(InAppNotification)>& callback);
 
+		// Push a notification (this will fire the registered callback)
 		void notificationReceived(const InAppNotification& notification);
 
+		// Acknowledge a notification (this is automatically done if the acknowledgement is not 'ByUser')
 		pplx::task<void> acknowledgeNotification(const std::string& notificationId);
 
 #pragma endregion
@@ -28,6 +31,7 @@ namespace Stormancer
 		void initialize();
 #pragma region
 
+		std::shared_ptr<ILogger> _logger;
 		std::weak_ptr<Scene> _scene;
 		std::shared_ptr<RpcService> _rpcService;
 		std::function<void(const InAppNotification&)> _callback;

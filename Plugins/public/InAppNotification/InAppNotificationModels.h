@@ -1,7 +1,8 @@
 #pragma once
+
+#include <string>
 #include "stormancer/msgpack_define.h"
 #include "stormancer/StormancerTypes.h"
-#include <string>
 
 namespace Stormancer
 {
@@ -23,9 +24,9 @@ namespace Stormancer
 		int64 createdOn;
 		bool shouldExpire;
 		int64 expirationDate;
-		InAppNotificationAcknowledgment Acknowledgment;
+		InAppNotificationAcknowledgment acknowledgment;
 
-		MSGPACK_DEFINE(id, type, userId, message, data, createdOn, shouldExpire, expirationDate, Acknowledgment);
+		MSGPACK_DEFINE(id, type, userId, message, data, createdOn, shouldExpire, expirationDate, acknowledgment);
 	};
 }
 

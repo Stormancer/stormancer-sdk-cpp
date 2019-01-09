@@ -10,7 +10,7 @@
 #include "AllowWindowsPlatformTypes.h"
 #endif // _WIN32
 // UE's "check" macro conflicts with msgpack
-#define UE_check check
+#pragma push_macro("check")
 #undef check
 #endif // defined(UE_EDITOR) || defined(UE_GAME)
 
@@ -18,8 +18,7 @@
 
 #if defined(UE_EDITOR) || defined(UE_GAME)
 
-#define check UE_check
-#undef UE_check
+#pragma pop_macro("check")
 
 #ifdef _WIN32
 #include "HideWindowsPlatformTypes.h"

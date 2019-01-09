@@ -12,8 +12,7 @@ namespace Stormancer
 		{
 			_rpcService = scene->dependencyResolver()->resolve<RpcService>();
 			_dispatcher = scene->dependencyResolver()->resolve<IActionDispatcher>();
-
-
+			_logger = scene->dependencyResolver()->resolve<ILogger>();
 		}
 	}
 	void InAppNotificationService::initialize()
@@ -67,11 +66,16 @@ namespace Stormancer
 			}
 			else
 			{
+				if (_pendingNotifications.size() > 100)
+				{
+					_logger->log(LogLevel::Warn, "InAppNotificationService", "Too many notifications received. Don't forget to subscribe to the NotificationReceived event (plugin InAppNotification).");
+					_pendingNotifications.pop(); // Discarding the oldest notification
+				}
 				_pendingNotifications.push(notification);
 			}
 		}
 
-		if (notification.Acknowledgment == InAppNotificationAcknowledgment::OnReceive)
+		if (notification.acknowledgment == InAppNotificationAcknowledgment::OnReceive)
 		{
 			acknowledgeNotification(notification.id);
 		}
