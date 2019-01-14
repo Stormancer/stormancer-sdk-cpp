@@ -61,8 +61,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Profile\Profiles_Impl.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\GameFinder\GameFinderModels.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\GameFinder\GameFinderPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameFinder\GameFinderService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameFinder\GameFinder_Impl.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameRecovery\GameRecoveryModels.h" />
@@ -109,8 +107,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\BugReport\BugReportService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Core\ClientAPI.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameFinder\GameFinder.h" />
+	<ClInclude Include="$(MSBuildThisFileDirectory)public\GameFinder\GameFinderPlugin.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\GameFinder\GameFinderModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameRecovery\GameRecovery.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\GameRecovery\GameRecovery_Impl.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameSession\GameSession.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameVersion\GameVersionPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameVersion\GameVersionService.h" />

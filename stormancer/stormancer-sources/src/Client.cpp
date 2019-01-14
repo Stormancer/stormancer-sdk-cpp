@@ -612,8 +612,7 @@ namespace Stormancer
 						{
 							throw std::runtime_error(("Unexpected key size. received " + std::to_string(key.size() * 8) + " bits expected 256 bits ").c_str());
 						}
-						keyStore->keys.emplace(connection->id(), key);
-
+						keyStore->keys.emplace(connection->id(), std::vector<byte>(key.begin(), key.end()));
 					}
 
 					return connection->setTimeout(client->_serverTimeout, ct).then([connection] { return connection; });

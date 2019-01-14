@@ -335,7 +335,7 @@ namespace Stormancer
 						if (auto connection = getConnection(rakNetPacket->guid.g))
 						{
 							Serializer serializer;
-							connection->_closeReason = serializer.deserializeOne<std::string>((rakNetPacket->data + 1), (rakNetPacket->length - 1));
+							connection->_closeReason = serializer.deserializeOne<std::string>((byte*)(rakNetPacket->data + 1), (rakNetPacket->length - 1));
 						}
 						break;
 					}

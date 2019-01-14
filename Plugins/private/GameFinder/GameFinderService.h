@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 
-#include "GameFinderModels.h"
+#include "GameFinder/GameFinderModels.h"
 #include "stormancer/Event.h"
 #include "stormancer/scene.h"
 

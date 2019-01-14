@@ -1,7 +1,7 @@
 #if defined(STORMANCER_CUSTOM_PCH)
 #include STORMANCER_CUSTOM_PCH
 #endif
-#include "GameFinderPlugin.h"
+#include "GameFinder/GameFinderPlugin.h"
 #include "GameFinderService.h"
 #include "GameFinder/GameFinder.h"
 #include "GameFinder_Impl.h"

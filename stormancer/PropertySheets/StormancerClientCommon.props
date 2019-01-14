@@ -2,13 +2,26 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
-	<!-- Default value ; override on the MSBuild command line with /p:StormancerOutputDir=<path> if needed -->
+	<!-- 
+		This is the destination directory for the stormancer client library and public header files.
+		Override it on the MSBuild command line with /p:StormancerOutputDir=<path> if needed
+	-->
 	<StormancerOutputDir>$(StormancerSdkRoot)output\</StormancerOutputDir>
+	
+	<StormancerDependenciesOutputDir>$(StormancerSdkRoot)binaries\$(Configuration)\$(Platform)\</StormancerDependenciesOutputDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Platform)'!='Win32' AND '$(Platform)'!='x64'">
+	<!-- Not building on Windows - toolset version is inapplicable or irrelevant -->
+    <IntDir>$(StormancerSdkRoot)intermediate\$(ProjectName)\$(Configuration)\$(Platform)\</IntDir>
+    <TargetName>Stormancer_$(Configuration)_$(Platform)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Platform)'=='Win32' OR '$(Platform)'=='x64'">
+	<!-- Building on Windows - toolset version matters -->
+    <IntDir>$(StormancerSdkRoot)intermediate\$(ProjectName)\$(Configuration)\$(Platform)\$(PlatformToolsetVersion)\</IntDir>
+    <TargetName>Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform)</TargetName>
   </PropertyGroup>
   <PropertyGroup>
-    <IntDir>$(StormancerSdkRoot)intermediate\$(ProjectName)\$(Configuration)\$(Platform)\</IntDir>
     <OutDir>$(StormancerOutputDir)libs\</OutDir>
-    <TargetName>Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
