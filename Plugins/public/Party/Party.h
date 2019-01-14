@@ -1,12 +1,17 @@
 #pragma once
 
-#include "Party/PartyModels.h"
-#include "Party/PartyManagementService.h"
-
 namespace Stormancer
 {
+
+	struct PartyRequestDto;
+	enum class PartyUserStatus;
+	struct PartyUserDto;
+	struct PartyUserData;
+	struct PartySettingsDto;
+	struct PartySettings;
 	class PartyContainer;
 	class Subscription;
+	class PartyInvitations;
 
 	class Party
 	{

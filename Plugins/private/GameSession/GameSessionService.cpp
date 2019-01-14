@@ -185,8 +185,15 @@ namespace Stormancer
 
 	pplx::cancellation_token GameSessionService::linkTokenToDisconnection(pplx::cancellation_token tokenToLink)
 	{
-		auto tokens = { tokenToLink, _disconnectionCts.get_token() };
-		return pplx::cancellation_token_source::create_linked_source(tokens.begin(), tokens.end()).get_token();
+		if (tokenToLink.is_cancelable())
+		{
+			auto tokens = { tokenToLink, _disconnectionCts.get_token() };
+			return pplx::cancellation_token_source::create_linked_source(tokens.begin(), tokens.end()).get_token();
+		}
+		else
+		{
+			return _disconnectionCts.get_token();
+		}
 	}
 
 	std::function<void()> Stormancer::GameSessionService::OnConnectedPlayerChanged(std::function<void(SessionPlayer, std::string)> callback)
