@@ -3,7 +3,7 @@
 
 #include "stormancer/Event.h"
 #include "Party/Party.h"
-#include "PartyModels.h"
+#include "Party/PartyModels.h"
 #include "PartyManagementService.h"
 #include "Authentication/AuthenticationService.h"
 
@@ -17,7 +17,6 @@ namespace Stormancer
 	{
 	public:
 		Party_Impl(std::weak_ptr<AuthenticationService> auth, std::weak_ptr<ILogger> logger, std::weak_ptr<GameFinder> gameFinder);
-		virtual ~Party_Impl();
 
 		pplx::task<std::shared_ptr<PartyContainer>> joinPartySceneByPlatformSessionId(const std::string uniqueOnlinePartyName) override;
 		pplx::task<std::shared_ptr<PartyContainer>> joinPartySceneByConnectionToken(const std::string& connectionToken) override;
@@ -57,7 +56,6 @@ namespace Stormancer
 		Event<void> _onJoinedParty;
 		Event<void> _onKickedFromParty;
 		Event<void> _onLeftParty;
-
 
 		pplx::task<std::shared_ptr<PartyContainer>> getPartySceneByOnlinePartyName(const std::string uniqueOnlinePartyName);
 		pplx::task<std::shared_ptr<PartyContainer>> getPartySceneByToken(const std::string& connectionToken);

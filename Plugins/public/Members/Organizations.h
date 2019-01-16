@@ -14,6 +14,8 @@ namespace Stormancer
 	{
 	public:
 
+		virtual ~Organizations() {}
+
 		virtual pplx::task<std::shared_ptr<OrganizationsContainer>> initialize() = 0;
 
 		virtual pplx::task<Organization> getOrganization(const std::string& organizationId) = 0;

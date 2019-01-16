@@ -216,7 +216,9 @@ namespace Stormancer
 		auto it = _gameFinders.find(gameFinder);
 		if (it != _gameFinders.end())
 		{
-
+			it->second.then([](std::shared_ptr<GameFinderContainer> gameFinder) {
+				gameFinder->service()->cancel();
+			});
 		}
 
 	}

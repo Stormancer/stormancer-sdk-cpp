@@ -13,6 +13,11 @@ namespace Stormancer
 	{
 	}
 
+	Organizations_Impl::~Organizations_Impl()
+	{
+
+	}
+
 	pplx::task<std::shared_ptr<OrganizationsContainer>> Organizations_Impl::initialize()
 	{
 		auto auth = _auth.lock();

@@ -9,6 +9,7 @@ namespace Stormancer
 	class GameRecovery
 	{
 	public:
+		virtual ~GameRecovery() {}
 		virtual pplx::task<std::shared_ptr<RecoverableGame>> getCurrent() = 0;
 
 		virtual pplx::task<void> cancelCurrent() = 0;

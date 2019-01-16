@@ -13,8 +13,7 @@ namespace Stormancer
 	class GameFinder_Impl : public std::enable_shared_from_this<GameFinder_Impl>, public GameFinder
 	{
 	public:		
-		GameFinder_Impl(std::weak_ptr<AuthenticationService> auth);
-
+		GameFinder_Impl(std::weak_ptr<AuthenticationService> auth);		
 		
 		pplx::task<void> findGame(std::string gameFinder,const std::string &provider, std::string json) override;
 		void cancel(std::string gameFinder) override;

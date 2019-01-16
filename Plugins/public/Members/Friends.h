@@ -13,6 +13,7 @@ namespace Stormancer
 	class Friends
 	{
 	public:
+		virtual ~Friends() {}
 		virtual pplx::task<std::unordered_map<std::string, std::shared_ptr<Friend>>> friends() = 0;
 		virtual pplx::task<void> inviteFriend(std::string userId) = 0;
 		virtual pplx::task<void> answerFriendInvitation(std::string originId, bool accept = true) = 0;

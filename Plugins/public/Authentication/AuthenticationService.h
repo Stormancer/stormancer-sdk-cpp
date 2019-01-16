@@ -1,5 +1,4 @@
 #pragma once
-
 #include "stormancer/IClient.h"
 #include "stormancer/Logger/ILogger.h"
 #include "stormancer/Event.h"
@@ -9,6 +8,10 @@
 #include <string>
 #include <unordered_map>
 #include <memory>
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunknown-pragmas"	// warning : unknown pragma ignored [-Wunknown-pragmas]
+#endif
 
 namespace Stormancer
 {
@@ -115,11 +118,11 @@ namespace Stormancer
 		std::function<pplx::task<AuthParameters>()> getCredentialsCallback;
 
 		template<typename TResult, typename... TArgs >
-		pplx::task<TResult> sendRequestToUser(const std::string& userId, const std::string& operation, pplx::cancellation_token ct, const TArgs&... args)
+		pplx::task<TResult> sendRequestToUser(const std::string& /*userId*/, const std::string& /*operation*/, pplx::cancellation_token ct, const TArgs&... args)
 		{
-			return getAuthenticationScene().then([ct, userId, operation, args...](std::shared_ptr<Scene> scene) {
+			return getAuthenticationScene().then([ct, args...](std::shared_ptr<Scene> scene) {
 				auto rpc = scene->dependencyResolver()->resolve<RpcService>();
-				return rpc->rpc<TResult>("sendRequest", ct, userId, operation, args...);
+				return rpc->rpc<TResult>("sendRequest", ct, args...);
 			});
 
 		}
@@ -161,3 +164,7 @@ namespace Stormancer
 #pragma endregion
 	};
 };
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif

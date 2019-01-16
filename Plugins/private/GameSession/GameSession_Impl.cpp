@@ -155,11 +155,19 @@ namespace Stormancer
 
 	pplx::task<GameSessionResult> GameSession_Impl::PostResult(EndGameDto gameSessioResult, pplx::cancellation_token ct)
 	{
-		return this->getCurrentGameSession(ct).then([gameSessioResult, ct](std::shared_ptr<GameSessionContainer> container) {
+		std::weak_ptr<GameSession_Impl> wThat = this->shared_from_this();
+		return this->getCurrentGameSession(ct).then([gameSessioResult, wThat, ct](std::shared_ptr<GameSessionContainer> container) {
 			if (container)
 			{
 				std::shared_ptr<Stormancer::GameSessionService> gameSessionService = container->scene->dependencyResolver()->resolve<Stormancer::GameSessionService>();
-				return gameSessionService->sendGameResults<GameSessionResult, EndGameDto>(gameSessioResult, ct);
+				return gameSessionService->sendGameResults<GameSessionResult, EndGameDto>(gameSessioResult, ct).then([wThat](GameSessionResult result)
+				{
+					if (auto that = wThat.lock())
+					{
+						that->OnPostedResultsReceived(result);
+					}
+					return result;
+				});
 			}
 			else
 			{
@@ -208,6 +216,16 @@ namespace Stormancer
 		return OnTunnelOpened.subscribe(callback);
 	}
 
+	Event<Stormancer::GameSessionResult>::Subscription GameSession_Impl::subscribeOnPostedResultReceived(std::function<void(GameSessionResult)> callback)
+	{
+		return OnPostedResultsReceived.subscribe(callback);
+	}
+
+	Event<Stormancer::ConnectionState>::Subscription GameSession_Impl::subscribeOnGameSessionConnectionChange(std::function<void(ConnectionState)> callback)
+	{
+		return OnGameSessionConnectionChange.subscribe(callback);
+	}
+
 	pplx::task<std::string> GameSession_Impl::P2PTokenRequest(std::shared_ptr<GameSessionContainer> container, pplx::cancellation_token ct)
 	{
 		std::weak_ptr<GameSession> wThat = this->shared_from_this();
@@ -238,12 +256,23 @@ namespace Stormancer
 				auto gameSessionContainer = std::make_shared<GameSessionContainer>();
 				gameSessionContainer->scene = scene;
 
+				that->OnGameSessionConnectionChange(ConnectionState::Connected);
+
 				gameSessionContainer->SceneConnectionState = scene->getConnectionStateChangedObservable().subscribe([wThat](ConnectionState state)
 				{
 					if (state == ConnectionState::Disconnected)
 					{
 						if (auto that = wThat.lock())
 						{
+							if (auto client = that->_wClient.lock())
+							{
+								pplx::create_task([wThat, state]() {
+									if (auto that = wThat.lock())
+									{
+										that->OnGameSessionConnectionChange(state);
+									}
+								}, client->dependencyResolver()->resolve<IActionDispatcher>());
+							}
 							that->_currentGameSession = pplx::task_from_result<std::shared_ptr<GameSessionContainer>>(nullptr);
 						}
 					}

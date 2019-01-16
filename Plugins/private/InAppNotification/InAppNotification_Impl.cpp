@@ -15,10 +15,6 @@ namespace Stormancer
 	{
 	}
 
-	InAppNotification_Impl::~InAppNotification_Impl()
-	{
-	}
-
 	void InAppNotification_Impl::initialize()
 	{
 		auto auth = _auth.lock();

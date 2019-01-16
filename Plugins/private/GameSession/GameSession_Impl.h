@@ -3,6 +3,7 @@
 #include "stormancer/Event.h"
 #include "GameSession/GameSessionModels.h"
 #include "GameSession/GameSession.h"
+#include "stormancer/ConnectionState.h"
 
 namespace Stormancer
 {
@@ -23,12 +24,17 @@ namespace Stormancer
 		Event<void>::Subscription subscibeOnAllPlayerReady(std::function<void()> callback) override;
 		Event<GameSessionConnectionParameters>::Subscription subscibeOnRoleRecieved(std::function<void(GameSessionConnectionParameters)> callback) override;
 		Event<GameSessionConnectionParameters>::Subscription subscibeOnTunnelOpened(std::function<void(GameSessionConnectionParameters)> callback) override;
+		Event<GameSessionResult>::Subscription subscribeOnPostedResultReceived(std::function<void(GameSessionResult)> callback) override;
+		Event<ConnectionState>::Subscription subscribeOnGameSessionConnectionChange(std::function<void(ConnectionState)> callback) override;
 	private:
 
 		//Events
 		Event<void> OnAllPlayerReady;
 		Event<GameSessionConnectionParameters> OnRoleRecieved;
 		Event<GameSessionConnectionParameters> OnTunnelOpened;
+
+		Event<GameSessionResult> OnPostedResultsReceived;
+		Event<ConnectionState> OnGameSessionConnectionChange;
 
 		std::string _mapName;
 		std::weak_ptr<IClient> _wClient;

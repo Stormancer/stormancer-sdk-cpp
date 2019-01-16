@@ -34,7 +34,6 @@ namespace Stormancer
 	
 	enum class PartyUserStatus
 	{
-		unknown = -1,
 		NotReady = 0,
 		Ready = 1
 	};

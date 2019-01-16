@@ -140,7 +140,7 @@ namespace Stormancer
 			return gameFinderManager->connectToGameFinder(gameFinderName).then([partyService]()
 			{
 				partyService->_clientReady = true;
-				partyService->sendPlayerPartyStatus();
+				//partyService->sendPlayerPartyStatus();
 			});
 		}
 		else {

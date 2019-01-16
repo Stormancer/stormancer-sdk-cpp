@@ -12,6 +12,8 @@ namespace Stormancer
 	{
 	public:
 
+		virtual ~InAppNotificationManager() {}
+
 		virtual void initialize() = 0;
 
 		virtual Event<InAppNotification>::Subscription subscribeNotificationReceived(std::function<void(InAppNotification)> callback) = 0;

@@ -13,9 +13,7 @@ namespace Stormancer
 	{
 	public:
 
-		InAppNotification_Impl(std::weak_ptr<AuthenticationService> auth, std::shared_ptr<ILogger> logger);
-
-		~InAppNotification_Impl();
+		InAppNotification_Impl(std::weak_ptr<AuthenticationService> auth, std::shared_ptr<ILogger> logger);		
 
 		void initialize() override;
 

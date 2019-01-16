@@ -1,7 +1,7 @@
 #pragma once
 #include "Core/ClientAPI.h"
 #include "stormancer/Event.h"
-#include "PartyModels.h"
+#include "Party/PartyModels.h"
 
 namespace Stormancer
 {

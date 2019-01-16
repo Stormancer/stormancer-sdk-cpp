@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 #include "stormancer/Event.h"
-#include "PartyModels.h"
+#include "Party/PartyModels.h"
 #include "GameFinder/GameFinderModels.h"
 
 namespace Stormancer

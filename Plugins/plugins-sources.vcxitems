@@ -107,7 +107,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\BugReport\BugReportService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Core\ClientAPI.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameFinder\GameFinder.h" />
-	<ClInclude Include="$(MSBuildThisFileDirectory)public\GameFinder\GameFinderPlugin.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\GameFinder\GameFinderPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameFinder\GameFinderModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameRecovery\GameRecovery.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameSession\GameSession.h" />

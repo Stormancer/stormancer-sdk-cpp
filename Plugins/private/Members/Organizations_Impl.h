@@ -14,6 +14,8 @@ namespace Stormancer
 
 		Organizations_Impl(std::shared_ptr<AuthenticationService> auth);
 
+		virtual ~Organizations_Impl();
+
 		pplx::task<std::shared_ptr<OrganizationsContainer>> initialize() override;
 
 		pplx::task<Organization> getOrganization(const std::string& organizationId) override;

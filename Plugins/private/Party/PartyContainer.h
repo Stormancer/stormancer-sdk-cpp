@@ -1,6 +1,6 @@
 #pragma once
 #include "stormancer/Event.h"
-#include "PartyModels.h"
+#include "Party/PartyModels.h"
 #include "PartyService.h"
 #include "stormancer/Scene.h"
 

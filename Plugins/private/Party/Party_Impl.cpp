@@ -15,10 +15,6 @@ namespace Stormancer
 		_gameFinder = gameFinder;
 	}
 
-	Party_Impl::~Party_Impl()
-	{
-	}
-
 	void Party_Impl::initialize()
 	{
 		auto wThat = this->weak_from_this();
@@ -111,8 +107,8 @@ namespace Stormancer
 				if (auto that = wPartyManagement.lock())
 				{
 					that->_onJoinedParty();
-					that->_onUpdatedPartyMembers(p->members());
-					that->_onUpdatedPartySettings(p->settings());
+					//that->_onUpdatedPartyMembers(p->members());
+					//that->_onUpdatedPartySettings(p->settings());
 				}
 				return p;
 			}

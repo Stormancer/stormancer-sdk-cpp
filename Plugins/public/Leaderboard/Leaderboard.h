@@ -7,6 +7,8 @@ namespace Stormancer
 	class Leaderboard 
 	{
 	public:
+		virtual ~Leaderboard() {}
+
 		//Query a leaderboard
 		virtual pplx::task<LeaderboardResult> query(LeaderboardQuery query) = 0;
 

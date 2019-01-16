@@ -8,6 +8,7 @@ namespace Stormancer
 	class GameFinder
 	{
 	public:
+		virtual ~GameFinder() {}
 
 		virtual pplx::task<void> findGame(std::string gameFinder, const std::string &provider, std::string json) = 0;
 		virtual void cancel(std::string gameFinder) = 0;
