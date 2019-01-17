@@ -129,7 +129,7 @@ namespace Stormancer
 
 			}).then([completionTask]() {
 				return completionTask;
-			});
+			},options);
 		}
 		else
 		{
