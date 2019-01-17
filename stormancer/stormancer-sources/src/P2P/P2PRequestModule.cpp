@@ -113,7 +113,7 @@ namespace Stormancer
 		{
 			auto candidate = serializer->deserializeOne<ConnectivityCandidate>(ctx->inputStream());
 
-			logger->log(LogLevel::Debug, "p2p", "Starting connectivity test (CLIENT) " + candidate.clientEndpointCandidate.address + " => " + candidate.listeningEndpointCandidate.address);
+			logger->log(LogLevel::Debug, "p2p", "Starting connectivity test (CLIENT) ");
 
 			auto connection = connections->getConnection(candidate.listeningPeer);
 			if (connection && connection->getConnectionState() == ConnectionState::Connected)
@@ -156,7 +156,7 @@ namespace Stormancer
 				return transport->sendPing(candidate.listeningEndpointCandidate.address)
 					.then([logger, candidate, serializer, ctx](int latency)
 				{
-					logger->log(LogLevel::Debug, "p2p", "Connectivity test complete : " + candidate.clientEndpointCandidate.address + " => " + candidate.listeningEndpointCandidate.address + " ping : " + std::to_string(latency));
+					logger->log(LogLevel::Debug, "p2p", "Connectivity test complete  ping : " + std::to_string(latency));
 					ctx->send([serializer, latency](obytestream* stream)
 					{
 						serializer->serialize(stream, latency);
@@ -169,7 +169,7 @@ namespace Stormancer
 		{
 			auto candidate = serializer->deserializeOne<ConnectivityCandidate>(ctx->inputStream());
 
-			logger->log(LogLevel::Debug, "p2p", "Starting connectivity test (LISTENER) " + candidate.clientEndpointCandidate.address + " => " + candidate.listeningEndpointCandidate.address);
+			logger->log(LogLevel::Debug, "p2p", "Starting connectivity test (LISTENER) " );
 
 			auto connection = connections->getConnection(candidate.clientPeer);
 			if (connection && connection->getConnectionState() == ConnectionState::Connected)
@@ -199,7 +199,7 @@ namespace Stormancer
 				return pplx::task_from_result();
 			}
 
-			logger->log(LogLevel::Debug, "p2p", "Waiting connection " + candidate.clientEndpointCandidate.address + " => " + candidate.listeningEndpointCandidate.address);
+			logger->log(LogLevel::Debug, "p2p", "Waiting connection ");
 			connections->addPendingConnection(candidate.clientPeer)
 				.then([sessions, sessionId](std::shared_ptr<IConnection> connection)
 			{
@@ -241,7 +241,7 @@ namespace Stormancer
 				return pplx::task_from_result();
 			}
 
-			logger->log(LogLevel::Debug, "p2p", "Connecting... " + candidate.clientEndpointCandidate.address + " => " + candidate.listeningEndpointCandidate.address);
+			logger->log(LogLevel::Debug, "p2p", "Connecting... " );
 			connections->addPendingConnection(candidate.listeningPeer)
 				.then([sessions, sessionId](std::shared_ptr<IConnection> connection)
 			{
