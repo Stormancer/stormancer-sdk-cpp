@@ -9,6 +9,8 @@
       <RaknetIncludes Include="$(StormancerSdkRoot)dependencies\RakNet\RakNet\Source\**\*.h" />
       <BuildFiles Include="$(StormancerSdkRoot)Build\**\*.*" />
     </ItemGroup>
+	<!-- Clean old includes -->
+	<RemoveDir Directories="$(StormancerOutputDir)include" />
     <Copy SourceFiles="@(BuildFiles)" DestinationFiles="@(BuildFiles->'$(StormancerOutputDir)build\%(RecursiveDir)%(Filename)%(Extension)')" />
     <!--<Copy SourceFiles="@(RaknetIncludes)" DestinationFiles="@(RaknetIncludes->'$(StormancerOutputDir)include\%(RecursiveDir)%(Filename)%(Extension)')" />-->
     <Copy SourceFiles="@(RxcppIncludes)" DestinationFiles="@(RxcppIncludes->'$(StormancerOutputDir)include\rxcpp\%(RecursiveDir)%(Filename)%(Extension)')" />
