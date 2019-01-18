@@ -58,29 +58,6 @@ namespace Stormancer
 				that->OnAllPlayerReady();
 			}
 		});
-
-		auto ct = _disconnectionCts.get_token();
-		_scene.lock()->addRoute("player.p2ptoken", [wThat, ct](Packetisp_ptr packet) {
-			auto that = wThat.lock();
-			if (that)
-			{
-				that->_waitServerTce.set();
-				auto p2pToken = packet->readObject<std::string>();
-				that->InitializeTunnel(p2pToken, ct).then([wThat](pplx::task<void> task)
-				{
-					try {
-						task.get();
-					}
-					catch (std::exception& ex)
-					{
-						if (auto that = wThat.lock())
-						{
-							that->_logger->log(LogLevel::Error, "GameSession", "An error occured during tunnel initialization", ex.what());
-						}
-					}
-				}, ct);
-			}
-		});
 	}
 
 	pplx::task<void> GameSessionService::InitializeTunnel(std::string p2pToken, pplx::cancellation_token ct)
@@ -100,6 +77,7 @@ namespace Stormancer
 		}
 
 		_receivedP2PToken = true;
+		_waitServerTce.set();
 		if (p2pToken.empty()) //host
 		{
 			_logger->log(LogLevel::Trace, "gamession.p2ptoken", "received empty p2p token: I'm the host.");
