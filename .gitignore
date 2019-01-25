@@ -216,3 +216,6 @@ Release
 /SmokeTest/x64/Debug
 /x64/Debug
 /stormancer-sdk-cpp-20180714.7z
+
+# user-defined plugin list
+plugins.json

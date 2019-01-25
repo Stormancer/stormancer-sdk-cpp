@@ -448,4 +448,5 @@
     </PropertyGroup>
   </Target>
   <Import Project="..\PropertySheets\StormancerClientCommon.targets" />
+  <!--<Import Project="..\..\Plugins\embedded-plugins\embedded-plugins.targets" />-->
 </Project>
