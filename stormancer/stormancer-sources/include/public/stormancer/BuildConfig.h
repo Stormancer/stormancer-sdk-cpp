@@ -44,7 +44,7 @@
 
 
 #if CPPREST_FORCE_PPLX != 1
-#error "CPPREST_FORCE_PPLX must be set to 1 on this platform. Make sure you included stormancer/Tasks.h instead of pplx/pplxtask.h""
+#error "CPPREST_FORCE_PPLX must be set to 1 on this platform. Make sure you included stormancer/Tasks.h instead of pplx/pplxtask.h"
 #endif
 #endif
 
