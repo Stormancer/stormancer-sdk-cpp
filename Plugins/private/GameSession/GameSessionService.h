@@ -43,6 +43,8 @@ namespace Stormancer
 
 		std::function<void()> OnConnectedPlayerChanged(std::function<void(SessionPlayer, std::string)> callback);
 
+		pplx::task<std::string> GetUserFromBearerToken(std::string token);
+
 		void OnP2PConnected(std::function<void(std::shared_ptr<Stormancer::IP2PScenePeer>)> callback);
 		void OnShutdownReceived(std::function<void(void)> callback);
 		void OnConnectionFailure(std::function<void(std::string)> callback);

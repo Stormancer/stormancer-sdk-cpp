@@ -176,6 +176,21 @@ namespace Stormancer
 		});
 	}
 
+	pplx::task<std::string> GameSession_Impl::GetUserFromBearerToken(std::string token)
+	{
+		return this->getCurrentGameSession().then([token](std::shared_ptr<GameSessionContainer> container) {
+			if (container)
+			{
+				std::shared_ptr<Stormancer::GameSessionService> gameSessionService = container->scene->dependencyResolver()->resolve<Stormancer::GameSessionService>();
+				return gameSessionService->GetUserFromBearerToken(token);
+			}
+			else
+			{
+				throw std::runtime_error("Not connected to any game session");
+			}
+		});
+	}
+
 	pplx::task<void> GameSession_Impl::DisconectFromGameSession()
 	{
 		std::weak_ptr<GameSession> wThat = this->shared_from_this();

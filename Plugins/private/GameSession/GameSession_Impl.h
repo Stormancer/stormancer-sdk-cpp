@@ -16,10 +16,11 @@ namespace Stormancer
 	public:
 		GameSession_Impl(std::weak_ptr<IClient> client);
 
-		pplx::task<GameSessionConnectionParameters> ConnectToGameSession(std::string token, std::string mapName, pplx::cancellation_token ct = pplx::cancellation_token::none());
-		pplx::task<void> SetPlayerReady(std::string data, pplx::cancellation_token ct = pplx::cancellation_token::none());
-		pplx::task<GameSessionResult> PostResult(EndGameDto gameSessioResult, pplx::cancellation_token ct = pplx::cancellation_token::none());
-		pplx::task<void> DisconectFromGameSession();		
+		pplx::task<GameSessionConnectionParameters> ConnectToGameSession(std::string token, std::string mapName, pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
+		pplx::task<void> SetPlayerReady(std::string data, pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
+		pplx::task<GameSessionResult> PostResult(EndGameDto gameSessioResult, pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
+		pplx::task<std::string> GetUserFromBearerToken(std::string token) override;
+		pplx::task<void> DisconectFromGameSession() override;
 
 		Event<void>::Subscription subscibeOnAllPlayerReady(std::function<void()> callback) override;
 		Event<GameSessionConnectionParameters>::Subscription subscibeOnRoleRecieved(std::function<void(GameSessionConnectionParameters)> callback) override;

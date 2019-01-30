@@ -202,6 +202,19 @@ namespace Stormancer
 		return _scene;
 	}
 
+	pplx::task<std::string> GameSessionService::GetUserFromBearerToken(std::string token)
+	{
+		if (auto scene = _scene.lock())
+		{
+			auto rpc = scene->dependencyResolver()->resolve<RpcService>();
+			return rpc->rpc<std::string, std::string>("GameSession.GetUserFromBearerToken", token);
+		}
+		else
+		{
+			throw pplx::task_from_exception<std::string>(std::runtime_error("Scene destroyed"));
+		}
+	}
+
 	pplx::task<std::string> GameSessionService::P2PTokenRequest(pplx::cancellation_token ct)
 	{
 		if (auto scene = _scene.lock())

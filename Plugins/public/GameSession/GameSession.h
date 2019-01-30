@@ -13,6 +13,7 @@ namespace Stormancer
 		virtual pplx::task<GameSessionConnectionParameters> ConnectToGameSession(std::string token, std::string mapName, pplx::cancellation_token ct = pplx::cancellation_token::none()) = 0;
 		virtual pplx::task<void> SetPlayerReady(std::string data, pplx::cancellation_token ct = pplx::cancellation_token::none()) = 0;
 		virtual pplx::task<GameSessionResult> PostResult(EndGameDto gameSessioResult, pplx::cancellation_token ct = pplx::cancellation_token::none()) = 0;
+		virtual pplx::task<std::string> GetUserFromBearerToken(std::string token) = 0;
 		virtual pplx::task<void> DisconectFromGameSession() = 0;
 
 		virtual Event<void>::Subscription subscibeOnAllPlayerReady(std::function<void()> callback) = 0;
