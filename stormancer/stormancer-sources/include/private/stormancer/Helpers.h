@@ -306,19 +306,6 @@ namespace Stormancer
 
 	bool is_ipv6_address(const std::string& str);
 
-	template< class Rep, class Period >
-	pplx::cancellation_token timeout(std::chrono::duration<Rep, Period> duration)
-	{
-		pplx::cancellation_token_source cts;
-
-		TimerThread::getInstance().schedule([cts]()
-		{
-			cts.cancel();
-		}, TimerThread::clock_type::now() + duration);
-
-		return cts.get_token();
-	}
-
 
 	// The PS Vita doesn't have the codecvt header, which is used by these functions.
 	std::wstring utf8_to_wstring(const std::string& str);

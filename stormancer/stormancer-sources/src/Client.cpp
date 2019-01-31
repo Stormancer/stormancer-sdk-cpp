@@ -1118,7 +1118,11 @@ namespace Stormancer
 
 			try
 			{
-				client->_sessionToken = sessionTokenTask.get();
+				if (client->_sessionToken.empty())
+				{
+					client->_sessionToken = sessionTokenTask.get();
+				}
+				
 				return pplx::task_from_result(); // all control paths should return a value...
 			}
 			catch (const std::exception& ex)

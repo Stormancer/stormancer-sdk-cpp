@@ -3,7 +3,7 @@
 #include "stormancer/RPC/Service.h"
 #include "stormancer/Event.h"
 #include "stormancer/Action.h"
-#include "GameSessionModels.h"
+#include "GameSession/GameSessionModels.h"
 
 namespace Stormancer
 {

@@ -67,7 +67,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameRecovery\GameRecoveryPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameRecovery\GameRecoveryService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameRecovery\GameRecovery_Impl.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\GameSession\GameSessionModels.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\GameSession\GameSessionModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameSession\GameSessionPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameSession\GameSessionService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameSession\GameSession_Impl.h" />

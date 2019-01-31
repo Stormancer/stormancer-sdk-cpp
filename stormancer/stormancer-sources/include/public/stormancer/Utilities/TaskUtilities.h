@@ -20,4 +20,17 @@ namespace Stormancer
 			return pplx::task_from_exception<T>(ex);
 		}
 	}
+
+	template< class Rep, class Period >
+	pplx::cancellation_token timeout(std::chrono::duration<Rep, Period> duration)
+	{
+		pplx::cancellation_token_source cts;
+
+		TimerThread::getInstance().schedule([cts]()
+		{
+			cts.cancel();
+		}, TimerThread::clock_type::now() + duration);
+
+		return cts.get_token();
+	}
 };

@@ -13,8 +13,8 @@ namespace Stormancer
 		, _connection(connection)
 		, _p2p(p2p)
 		, _handle(message.sceneHandle)
-		,_metadata(message.metadata)
-		
+		, _metadata(message.metadata)
+
 	{
 		if (!_connection)
 		{
@@ -42,7 +42,10 @@ namespace Stormancer
 		}
 		auto dispatcher = scene->dependencyResolver()->resolve<IActionDispatcher>();
 		pplx::task_options options(dispatcher);
-		options.set_cancellation_token(ct);
+		if (ct.is_cancelable())
+		{
+			options.set_cancellation_token(ct);
+		}
 		return _p2p->openTunnel((uint64)_connection->id(), scene->id() + "." + serverId, ct).then([](auto t) {
 			return t.get();
 		}, options);
