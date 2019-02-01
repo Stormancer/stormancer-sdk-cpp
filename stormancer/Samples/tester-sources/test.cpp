@@ -27,18 +27,18 @@ namespace Stormancer
 		std::string stateStr = std::to_string((int)connectionState) + " ";
 		switch (connectionState)
 		{
-			case ConnectionState::Disconnected:
-				stateStr += "Disconnected";
-				break;
-			case ConnectionState::Connecting:
-				stateStr += "Connecting";
-				break;
-			case ConnectionState::Connected:
-				stateStr += "Connected";
-				break;
-			case ConnectionState::Disconnecting:
-				stateStr += "Disconnecting";
-				break;
+		case ConnectionState::Disconnected:
+			stateStr += "Disconnected";
+			break;
+		case ConnectionState::Connecting:
+			stateStr += "Connecting";
+			break;
+		case ConnectionState::Connected:
+			stateStr += "Connected";
+			break;
+		case ConnectionState::Disconnecting:
+			stateStr += "Disconnecting";
+			break;
 		}
 		return stateStr;
 	}
@@ -139,7 +139,7 @@ namespace Stormancer
 		//_config->synchronisedClock = false;
 		_client = IClient::create(_config);
 
-		
+
 
 		_logger->log(LogLevel::Debug, "test_create", "TEST CREATE OK");
 
@@ -538,7 +538,7 @@ namespace Stormancer
 	void Tester::test_setServerTimeout()
 	{
 		_logger->log(LogLevel::Info, "test_setServerTimeout", "SET SERVER TIMEOUT");
-		
+
 		_client->setServerTimeout(10s).then([this]
 		{
 			_logger->log(LogLevel::Debug, "test_setServerTimeout", "setServerTimeout OK");
@@ -608,6 +608,28 @@ namespace Stormancer
 		_stop = true;
 	}
 
+	void Tester::test_Ping_Cluster()
+	{
+		_client->getFederation().then([this](Federation fed) {
+
+			std::vector<pplx::task<int>> ping;
+			for (auto cluster : fed.clusters)
+			{
+				ping.push_back(_client->pingCluster(cluster.id));
+			}
+			return pplx::when_all(ping.begin(), ping.end());
+		}).then([](pplx::task<std::vector<int>> task) {
+			try
+			{		
+				std::vector<int> test = task.get();
+			}
+			catch (std::exception ex)
+			{
+				std::string currentEx = ex.what();
+			}
+		});
+	}
+
 	void Tester::run_all_tests_nonblocking()
 	{
 		_testsDone = false;
@@ -624,9 +646,10 @@ namespace Stormancer
 		_tests.push_back([this]() { test_rpc_client_exception(); });
 		_tests.push_back([this]() { test_syncClock(); });
 		_tests.push_back([this]() { test_setServerTimeout(); });
-		//_tests.push_back([this]() { test_disconnectWithReason(); });
+		//_tests.push_back([this]() { test_disconnectwithreason(); });
 		_tests.push_back([this]() { test_disconnect(); });
 		_tests.push_back([this]() { test_clean(); });
+		_tests.push_back([this]() { test_Ping_Cluster(); });
 
 		// Some platforms require a Client to be created before using pplx::task
 		test_create();
