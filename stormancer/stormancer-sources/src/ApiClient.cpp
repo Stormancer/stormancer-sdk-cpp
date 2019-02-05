@@ -44,17 +44,10 @@ namespace Stormancer
 		auto wApiClient = STRM_WEAK_FROM_THIS();
 		auto start = std::chrono::high_resolution_clock::now();
 		return client.request(request, ct)
-			.then([start, wApiClient, endpoint](pplx::task<web::http::http_response> task)
+			.then([start](web::http::http_response task)
 		{
 			auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-			try 
-			{
-				task.get();
-			}
-			catch (std::exception ex)
-			{				
-				throw ex;
-			}
+
 			return (int)duration.count();
 		});
 	}
