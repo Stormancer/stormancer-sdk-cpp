@@ -50,11 +50,20 @@ namespace Stormancer
 			});
 			return container;
 		});
-		_notificationContainerTask.then([logger](pplx::task<std::shared_ptr<InAppNotificationContainer>> t)
+		_notificationContainerTask.then([logger,wNotifications](pplx::task<std::shared_ptr<InAppNotificationContainer>> t)
 		{
 			try
 			{
-				t.get();
+				if (auto notifications = wNotifications.lock())
+				{
+					auto container = t.get();
+					container->service()->registerNotificationsCallback([wNotifications](InAppNotification notif) {
+						if (auto notifications = wNotifications.lock())
+						{
+							notifications->notificationReceived(notif);
+						}
+					});
+				}
 			}
 			catch (const std::exception& ex)
 			{
@@ -70,11 +79,7 @@ namespace Stormancer
 
 	void InAppNotification_Impl::notificationReceived(const InAppNotification& notification)
 	{
-		_notificationContainerTask
-			.then([notification](std::shared_ptr<InAppNotificationContainer> notificationContainer)
-		{
-			return notificationContainer->service()->notificationReceived(notification);
-		});
+		_onNotificationReceived(notification);
 	}
 
 	pplx::task<void> InAppNotification_Impl::acknowledgeNotification(const std::string& notificationId)

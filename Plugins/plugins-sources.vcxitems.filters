@@ -336,9 +336,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\PlayerReport\PlayerReportService.h">
       <Filter>public\PlayerReport</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\GameSession\GameSessionModels.h">
-      <Filter>public\GameSession</Filter>
-    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\GameSession\GameSessionModels.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="private">
