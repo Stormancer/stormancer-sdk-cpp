@@ -1095,7 +1095,6 @@ namespace Stormancer
 	{
 		auto wClient = STRM_WEAK_FROM_THIS();
 
-
 		if (!peer)
 		{
 			return pplx::task_from_exception<void>(std::runtime_error("Peer disconnected"));
@@ -1118,9 +1117,10 @@ namespace Stormancer
 
 			try
 			{
+				std::string serverToken = sessionTokenTask.get();
 				if (client->_sessionToken.empty())
 				{
-					client->_sessionToken = sessionTokenTask.get();
+					client->_sessionToken = serverToken;
 				}
 				
 				return pplx::task_from_result(); // all control paths should return a value...

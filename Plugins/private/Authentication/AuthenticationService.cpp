@@ -38,6 +38,8 @@ namespace Stormancer
 		{
 			return pplx::task_from_exception<std::shared_ptr<Scene>>(std::runtime_error("'Client destroyed."));
 		}
+		auto userActionDispatcher = client->dependencyResolver()->resolve<IActionDispatcher>();
+
 		return client->connectToPublicScene(SCENE_ID, [wThat](std::shared_ptr<Scene> scene) {
 
 			auto that = wThat.lock();
@@ -138,7 +140,7 @@ namespace Stormancer
 				return scene;
 			});
 
-		}).then([wThat, retry](pplx::task<std::shared_ptr<Scene>> t) {
+		}, userActionDispatcher).then([wThat, retry](pplx::task<std::shared_ptr<Scene>> t) {
 			auto that = wThat.lock();
 			if (!that)
 			{

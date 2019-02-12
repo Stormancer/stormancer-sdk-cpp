@@ -237,9 +237,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameSession\GameSession_Impl.h">
       <Filter>private\GameSession</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\GameSession\GameSessionPlugin.h">
-      <Filter>private\GameSession</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameSession\GameSessionService.h">
       <Filter>private\GameSession</Filter>
     </ClInclude>
@@ -336,7 +333,12 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\PlayerReport\PlayerReportService.h">
       <Filter>public\PlayerReport</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\GameSession\GameSessionModels.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\GameSession\GameSessionModels.h">
+      <Filter>public\GameSession</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\GameSession\GameSessionPlugin.h">
+      <Filter>public\GameSession</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="private">

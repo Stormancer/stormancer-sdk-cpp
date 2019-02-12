@@ -68,7 +68,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameRecovery\GameRecoveryService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameRecovery\GameRecovery_Impl.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameSession\GameSessionModels.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\GameSession\GameSessionPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameSession\GameSessionService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameSession\GameSession_Impl.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\InAppNotification\InAppNotificationContainer.h" />
@@ -111,6 +110,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameFinder\GameFinderModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameRecovery\GameRecovery.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameSession\GameSession.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\GameSession\GameSessionPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameVersion\GameVersionPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameVersion\GameVersionService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\InAppNotification\InAppNotificationManager.h" />
