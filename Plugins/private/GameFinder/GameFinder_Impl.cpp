@@ -30,7 +30,6 @@ namespace Stormancer
 		rxcpp::subscription connectionStateChangedSubscription;
 	};
 
-
 	GameFinder_Impl::GameFinder_Impl(std::weak_ptr<AuthenticationService> auth)
 	{
 		_auth = auth;
@@ -62,12 +61,36 @@ namespace Stormancer
 
 	pplx::task<void> GameFinder_Impl::findGame(std::string gameFinder, const std::string &provider, std::string json)
 	{
-		std::weak_ptr<GameFinder> wThat = this->shared_from_this();
+		std::weak_ptr<GameFinder_Impl> wThat = this->shared_from_this();
+		{
+			std::lock_guard<std::mutex> lg(_lock);
 
-		return getGameFinderContainer(gameFinder).then([provider, json](std::shared_ptr<GameFinderContainer> c) {
+			auto pendingRequest = _pendingFindGameRequests.find(gameFinder);
+			if (pendingRequest != _pendingFindGameRequests.end())
+			{
+				return pplx::task_from_exception<void>(std::runtime_error(("A findGame request is already running for GameFinder '"+gameFinder+"'").c_str()));
+			}
+			_pendingFindGameRequests.emplace(gameFinder, pplx::cancellation_token_source{});
+		}
+		auto ct = _pendingFindGameRequests[gameFinder].get_token();
 
-			return c->service()->findMatch(provider, json);
-
+		return getGameFinderContainer(gameFinder).then([provider, json, gameFinder, ct](std::shared_ptr<GameFinderContainer> gameFinderContainer)
+		{
+			if (ct.is_canceled())
+			{
+				pplx::cancel_current_task();
+			}
+			auto findMatchTask = gameFinderContainer->service()->findMatch(provider, json);
+			ct.register_callback([gameFinderContainer] { gameFinderContainer->service()->cancel(); });
+			return findMatchTask;
+		}).then([wThat, gameFinder](pplx::task<void> task)
+		{
+			if (auto that = wThat.lock())
+			{
+				std::lock_guard<std::mutex> lg(that->_lock);
+				that->_pendingFindGameRequests.erase(gameFinder);
+			}
+			return task;
 		});
 	}
 
@@ -213,16 +236,11 @@ namespace Stormancer
 	{
 		std::lock_guard<std::mutex> lg(this->_lock);
 		
-		auto it = _gameFinders.find(gameFinder);
-		if (it != _gameFinders.end())
+		auto findGameRequest = _pendingFindGameRequests.find(gameFinder);
+		if (findGameRequest != _pendingFindGameRequests.end())
 		{
-			it->second.then([](std::shared_ptr<GameFinderContainer> gameFinder) {
-				gameFinder->service()->cancel();
-			});
+			findGameRequest->second.cancel();
 		}
-
 	}
-
-
 
 }

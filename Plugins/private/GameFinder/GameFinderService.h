@@ -38,6 +38,8 @@ namespace Stormancer
 		pplx::task<void> findMatch(const std::string &provider, const GameFinderRequest &mmRequest);
 		pplx::task<void> findMatch(const std::string &provider, std::string json);
 		void resolve(bool acceptMatch);
+		// If cancel() is called very shortly after findMatch(), there might be a race condition.
+		// It can be prevented by waiting for the first GameFinderStatusUpdated event received after calling findMatch() before calling cancel().
 		void cancel();
 
 		Event<GameFinderStatus> GameFinderStatusUpdated;

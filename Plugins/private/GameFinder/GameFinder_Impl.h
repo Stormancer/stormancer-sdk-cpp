@@ -36,6 +36,7 @@ namespace Stormancer
 
 		std::mutex _lock;
 		std::unordered_map<std::string, pplx::task<std::shared_ptr<GameFinderContainer>>> _gameFinders;
+		std::unordered_map<std::string, pplx::cancellation_token_source> _pendingFindGameRequests;
 		std::weak_ptr<AuthenticationService> _auth;
 	};
 }

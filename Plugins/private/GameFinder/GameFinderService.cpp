@@ -111,10 +111,10 @@ namespace Stormancer
 		_matchmakingCTS = pplx::cancellation_token_source();
 		auto matchmakingToken = _matchmakingCTS.get_token();
 		
-		return _rpcService.lock()->rpc<void>("match.find", provider, mmRequest).then([=](pplx::task<void> res) {
+		return _rpcService.lock()->rpc<void>("match.find", provider, mmRequest).then([matchmakingToken](pplx::task<void> res) {
 			if (matchmakingToken.is_canceled())
 			{
-				return pplx::task_from_exception<void>(std::runtime_error("GameFinder canceled"));
+				pplx::cancel_current_task();
 			}
 			else
 			{
@@ -134,14 +134,13 @@ namespace Stormancer
 		_matchmakingCTS = pplx::cancellation_token_source();
 		auto matchmakingToken = _matchmakingCTS.get_token();
 
-		return _rpcService.lock()->rpc<void>("match.find", provider, json).then([=](pplx::task<void> res) {
+		return _rpcService.lock()->rpc<void>("match.find", provider, json).then([matchmakingToken](pplx::task<void> res) {
 			if (matchmakingToken.is_canceled())
 			{
-				return pplx::task_from_exception<void>(std::runtime_error("Operation cancelled"));
+				pplx::cancel_current_task();
 			}
 			else
 			{
-				
 				return res;
 			}
 		});
@@ -162,7 +161,6 @@ namespace Stormancer
 			auto scene = _scene.lock();
 			_matchmakingCTS.cancel();
 			scene->send("match.cancel", [](obytestream*) {}, PacketPriority::IMMEDIATE_PRIORITY, PacketReliability::RELIABLE_ORDERED);
-			
 		}
 	}
 };

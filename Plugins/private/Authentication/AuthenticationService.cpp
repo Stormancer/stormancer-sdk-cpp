@@ -367,16 +367,16 @@ namespace Stormancer
 		});
 	}
 
-	pplx::task<std::shared_ptr<Scene>> AuthenticationService::getSceneForService(const std::string& serviceType, const std::string& serviceName)
+	pplx::task<std::shared_ptr<Scene>> AuthenticationService::getSceneForService(const std::string& serviceType, const std::string& serviceName, pplx::cancellation_token ct)
 	{
 		std::weak_ptr<AuthenticationService> wThat = this->shared_from_this();
-		return getAuthenticationScene()
-			.then([serviceType, serviceName](std::shared_ptr<Scene> authScene)
+		return getAuthenticationScene(ct)
+			.then([serviceType, serviceName, ct](std::shared_ptr<Scene> authScene)
 		{
 			auto rpcService = authScene->dependencyResolver()->resolve<RpcService>();
-			return rpcService->rpc<std::string>("Locator.GetSceneConnectionToken", serviceType, serviceName);
+			return rpcService->rpc<std::string>("Locator.GetSceneConnectionToken", ct, serviceType, serviceName);
 		})
-			.then([wThat](std::string token)
+			.then([wThat, ct](std::string token)
 		{
 			auto that = wThat.lock();
 
@@ -384,7 +384,7 @@ namespace Stormancer
 			{
 				if (auto client = that->_client.lock())
 				{
-					return client->connectToPrivateScene(token);
+					return client->connectToPrivateScene(token, Stormancer::IClient::SceneInitializer(), ct);
 				}
 			}
 
