@@ -172,7 +172,7 @@
       ]
     },
     "System.Collections.Immutable/1.5.0": {
-      "sha512": "RGxi2aQoXgZ5ge0zxrKqI4PU9LrYYoLC+cnEnWXKsSduCOUhE1GEAAoTexUVT8RZOILQyy1B27HC8Xw/XLGzdQ==",
+      "sha512": "EXKiDFsChZW0RjrZ4FYHu9aW6+P4MCgEDCklsVseRfhoO0F+dXeMSsMRAlVXIo06kGJ/zv+2w1a2uc2+kxxSaQ==",
       "type": "package",
       "path": "system.collections.immutable/1.5.0",
       "files": [
@@ -242,11 +242,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\TeamCity\\buildAgent\\work\\942796f7257fc0aa\\src\\clients\\cpp\\Plugins\\PluginSelector\\PluginSelector.csproj",
+      "projectUniqueName": "E:\\BuildAgent\\work\\942796f7257fc0aa\\src\\clients\\cpp\\Plugins\\PluginSelector\\PluginSelector.csproj",
       "projectName": "PluginSelector",
-      "projectPath": "C:\\TeamCity\\buildAgent\\work\\942796f7257fc0aa\\src\\clients\\cpp\\Plugins\\PluginSelector\\PluginSelector.csproj",
+      "projectPath": "E:\\BuildAgent\\work\\942796f7257fc0aa\\src\\clients\\cpp\\Plugins\\PluginSelector\\PluginSelector.csproj",
       "packagesPath": "C:\\Windows\\system32\\config\\systemprofile\\.nuget\\packages\\",
-      "outputPath": "C:\\TeamCity\\buildAgent\\work\\942796f7257fc0aa\\src\\clients\\cpp\\Plugins\\PluginSelector\\obj\\",
+      "outputPath": "E:\\BuildAgent\\work\\942796f7257fc0aa\\src\\clients\\cpp\\Plugins\\PluginSelector\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
