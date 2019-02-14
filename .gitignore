@@ -219,3 +219,5 @@ Release
 
 # user-defined plugin list
 plugins.json
+# Doxygen-generated tag file
+stormancer.client.cpp.tag
