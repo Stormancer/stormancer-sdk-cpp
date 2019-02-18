@@ -1,6 +1,3 @@
-#if defined(STORMANCER_CUSTOM_PCH)
-#include STORMANCER_CUSTOM_PCH
-#endif
 #include "Authentication/AuthenticationPlugin.h"
 #include "Authentication/AuthenticationService.h"
 

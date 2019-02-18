@@ -1,7 +1,3 @@
-
-#if defined(STORMANCER_CUSTOM_PCH)
-#include STORMANCER_CUSTOM_PCH
-#endif
 #include "AssetsStorage/AssetsStorageService.h"
 #include "stormancer/Logger/ILogger.h"
 #include "stormancer/scene.h"

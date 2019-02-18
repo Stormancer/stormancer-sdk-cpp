@@ -3,7 +3,6 @@
 #include <Ws2tcpip.h>
 #endif
 #include "stormancer/Helpers.h"
-#include "stormancer/utilities/taskUtilities.h"
 #include "stormancer/Shutdown.h"
 
 // Needed for string/wstring conversion, not present on Vita.
@@ -88,41 +87,6 @@ namespace Stormancer
 		str.erase(find_if(str.rbegin(), str.rend(), not1(ischar)).base(), str.end());
 		return str;
 	};
-
-
-	pplx::task<void> taskIf(bool condition, std::function<pplx::task<void>()> action)
-	{
-		if (condition)
-		{
-			return action();
-		}
-		else
-		{
-			return pplx::task_from_result();
-		}
-	}
-
-	pplx::task<void> taskDelay(std::chrono::milliseconds milliseconds, pplx::cancellation_token ct)
-	{
-		pplx::task<void> sleepTask = pplx::task<void>([=]() {
-			std::this_thread::sleep_for(milliseconds);
-		}, pplx::task_options(ct));
-
-		if (ct.is_cancelable())
-		{
-			pplx::task_completion_event<void> tce;
-			ct.register_callback([=]() {
-				tce.set();
-			});
-			pplx::task<void> cancellationTask = pplx::create_task(tce);
-
-			return (cancellationTask || sleepTask);
-		}
-		else
-		{
-			return sleepTask;
-		}
-	}
 
 	std::time_t nowTime_t()
 	{

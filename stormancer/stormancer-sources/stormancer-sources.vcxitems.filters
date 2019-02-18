@@ -620,5 +620,8 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Shutdown.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\TaskUtilities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

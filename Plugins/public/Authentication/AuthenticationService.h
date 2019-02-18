@@ -118,11 +118,11 @@ namespace Stormancer
 		std::function<pplx::task<AuthParameters>()> getCredentialsCallback;
 
 		template<typename TResult, typename... TArgs >
-		pplx::task<TResult> sendRequestToUser(const std::string& /*userId*/, const std::string& /*operation*/, pplx::cancellation_token ct, const TArgs&... args)
+		pplx::task<TResult> sendRequestToUser(const std::string& userId, const std::string& operation, pplx::cancellation_token ct, const TArgs&... args)
 		{
-			return getAuthenticationScene().then([ct, args...](std::shared_ptr<Scene> scene) {
+			return getAuthenticationScene().then([ct, userId, operation, args...](std::shared_ptr<Scene> scene) {
 				auto rpc = scene->dependencyResolver()->resolve<RpcService>();
-				return rpc->rpc<TResult>("sendRequest", ct, args...);
+				return rpc->rpc<TResult>("sendRequest", ct, userId, operation, args...);
 			});
 
 		}

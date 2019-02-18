@@ -1,12 +1,10 @@
-#if defined(STORMANCER_CUSTOM_PCH)
-#include STORMANCER_CUSTOM_PCH
-#endif
 #include "GameSession_Impl.h"
 #include "stormancer/Scene.h"
 #include "GameSessionService.h"
 #include "stormancer/P2P/P2PTunnel.h"
 #include "stormancer/IClient.h"
-
+#include "stormancer/Utilities/TaskUtilities.h"
+#include <chrono>
 namespace Stormancer
 {	
 
@@ -46,12 +44,28 @@ namespace Stormancer
 	pplx::task<GameSessionConnectionParameters> GameSession_Impl::ConnectToGameSession(std::string token, std::string mapName, pplx::cancellation_token ct)
 	{
 		std::lock_guard<std::mutex> lg(_lock);
+		
+		
+		bool isDone = _currentGameSession.is_done();
+		if (!_currentGameSession.is_done())
+		{
+			throw pplx::task_from_exception<GameSessionConnectionParameters>(std::runtime_error("Game session connection is in pending. Cannot connect to an other game session"));
+		}
+
 		if (!token.empty())
 		{
 			_gameSessionNegotiationTce = pplx::task_completion_event<GameSessionConnectionParameters>();
-
+			
 			_mapName = mapName;
 			std::weak_ptr<GameSession_Impl> wThat = this->shared_from_this();
+			ct.register_callback([wThat]() {
+				if (auto that = wThat.lock())
+				{
+					that->_gameSessionNegotiationTce.set_exception(pplx::task_canceled());
+				}
+			});
+
+			// Disconnect from gameSession if the current ct equal the pending CT.
 			auto connectionTask = DisconectFromGameSession().then([wThat, token,ct]()
 			{
 				if (auto that = wThat.lock())
@@ -106,6 +120,10 @@ namespace Stormancer
 
 						}, ct);
 					}
+					catch (pplx::task_canceled&)
+					{
+						throw;
+					}
 					catch (std::exception&)
 					{
 						throw std::runtime_error("Game Session container doesn't exist");
@@ -115,21 +133,54 @@ namespace Stormancer
 				{
 					throw std::runtime_error("Game session deleted");
 				}
-			}, ct);
+			},ct);
 
 			pplx::task_options options(_wClient.lock()->dependencyResolver()->resolve<IActionDispatcher>());
 			options.set_cancellation_token(ct);
-			auto completionTask = pplx::create_task(_gameSessionNegotiationTce, options);
-			_currentGameSession = completionTask.then([connectionTask](GameSessionConnectionParameters) {
+			
+			auto completionTask = pplx::create_task(_gameSessionNegotiationTce, options);			
+			_currentGameSession = completionTask.then([connectionTask](GameSessionConnectionParameters) {				
 				return connectionTask;
 			});
 
 			return connectionTask.then([ct](std::shared_ptr<GameSessionContainer> c) {
 				return c->service()->waitServerReady(ct);
 
-			}).then([completionTask]() {
+			}, ct).then([completionTask]() {
 				return completionTask;
-			},options);
+			}, options).then([wThat](pplx::task<GameSessionConnectionParameters> task)
+			{
+				try {
+					task.get();
+				}
+				catch (...) 
+				{
+					if (auto that = wThat.lock())
+					{
+						std::exception_ptr ptrEx = std::current_exception();
+						return that->DisconectFromGameSession().then([wThat, ptrEx](pplx::task<void> task)
+						{
+							try
+							{
+								task.get();								
+							}
+							catch (const std::exception& ex)
+							{
+								if (auto that = wThat.lock())
+								{
+									auto logger = that->_wClient.lock()->dependencyResolver()->resolve<ILogger>();
+									logger->log(LogLevel::Warn, "GameSessionConnection", "Cannot disconnect from game session after connection timeout or cancel.", ex.what());
+								}
+							}
+
+							std::rethrow_exception(ptrEx);
+
+							return GameSessionConnectionParameters();
+						});
+					}					
+				}
+				return task;
+			});
 		}
 		else
 		{

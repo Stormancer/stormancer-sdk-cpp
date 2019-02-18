@@ -200,6 +200,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Streams\obytestream.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\SyncClock.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\SystemRequest.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\TaskUtilities.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\TimerThread.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\TokenHandler.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\TransformMetadata.cpp" />
