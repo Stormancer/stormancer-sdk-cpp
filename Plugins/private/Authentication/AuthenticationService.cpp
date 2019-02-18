@@ -27,15 +27,20 @@ namespace Stormancer
 
 	pplx::task<std::shared_ptr<Scene>> AuthenticationService::loginImpl(int retry)
 	{
+		setConnectionState(GameConnectionState::Connecting);
 		std::weak_ptr<AuthenticationService> wThat = this->shared_from_this();
 
 		if (!this->getCredentialsCallback)
 		{
+			_autoReconnect = false;
+			setConnectionState(GameConnectionState::Disconnected);
 			return pplx::task_from_exception<std::shared_ptr<Scene>>(std::runtime_error("'getCredentialsCallback' must be set before authentication."));
 		}
 		auto client = _client.lock();
 		if (!client)
 		{
+			_autoReconnect = false;
+			setConnectionState(GameConnectionState::Disconnected);
 			return pplx::task_from_exception<std::shared_ptr<Scene>>(std::runtime_error("'Client destroyed."));
 		}
 		auto userActionDispatcher = client->dependencyResolver()->resolve<IActionDispatcher>();

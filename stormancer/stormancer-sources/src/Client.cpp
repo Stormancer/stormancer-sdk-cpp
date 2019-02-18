@@ -1146,11 +1146,7 @@ namespace Stormancer
 	{
 		std::lock_guard<std::mutex> lg(_connectionMutex);
 		auto api = this->dependencyResolver()->resolve<ApiClient>();
-		if (!_federation)
-		{
-			_federation = std::make_shared<pplx::task<Federation>>(api->getFederation(_config->_serverEndpoints, ct));
-		}
-		return *_federation;
+		return api->getFederation(_config->_serverEndpoints, ct);
 	}
 
 	pplx::task<int> Client::pingCluster(std::string clusterId, pplx::cancellation_token ct)
