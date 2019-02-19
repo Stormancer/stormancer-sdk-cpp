@@ -2,6 +2,8 @@
 
 #include "stormancer/BuildConfig.h"
 #include "stormancer/Tasks.h"
+#include "stormancer/TimerThread.h"
+
 namespace Stormancer
 {
 	pplx::task<void> taskIf(bool condition, std::function<pplx::task<void>()> action);
