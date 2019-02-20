@@ -46,12 +46,12 @@ namespace Stormancer
 		pplx::task<std::string> GetUserFromBearerToken(std::string token);
 
 		void OnP2PConnected(std::function<void(std::shared_ptr<Stormancer::IP2PScenePeer>)> callback);
-		void OnShutdownReceived(std::function<void(void)> callback);
 		void OnConnectionFailure(std::function<void(std::string)> callback);
 
 		Event<void> OnAllPlayerReady;
 		Event<std::string> OnRoleReceived;
 		Event<std::shared_ptr<Stormancer::P2PTunnel>> OnTunnelOpened;
+		Event<void> OnShutdownReceived;
 
 		template<typename TOut, typename TIn>
 		pplx::task<TOut> sendGameResults(TIn results, pplx::cancellation_token ct)
@@ -87,8 +87,7 @@ namespace Stormancer
 		
 		std::shared_ptr<P2PTunnel> _tunnel;
 		Action<SessionPlayerUpdateArg> _onConnectedPlayersChanged;
-		Action<std::string> _onConnectionFailure;
-		std::function<void(void)> _onShutdownReceived;
+		Action<std::string> _onConnectionFailure;		
 		std::function<void(std::shared_ptr<Stormancer::IP2PScenePeer>)> _onConnectionOpened;
 		pplx::task_completion_event<void> _waitServerTce;
 

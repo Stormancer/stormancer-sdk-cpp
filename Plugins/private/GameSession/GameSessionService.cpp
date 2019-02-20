@@ -8,7 +8,6 @@
 namespace Stormancer
 {
 	GameSessionService::GameSessionService(std::weak_ptr<Scene> scene) :
-		_onShutdownReceived([]() {}),
 		_scene(scene),
 		_logger(scene.lock()->dependencyResolver()->resolve<ILogger>())
 	{
@@ -23,10 +22,7 @@ namespace Stormancer
 			auto that = wThat.lock();
 			if (that)
 			{
-				if (that->_onShutdownReceived)
-				{
-					that->_onShutdownReceived();
-				}
+				that->OnShutdownReceived();
 			}
 		});
 
@@ -185,11 +181,6 @@ namespace Stormancer
 	void GameSessionService::OnP2PConnected(std::function<void(std::shared_ptr<Stormancer::IP2PScenePeer>)> callback)
 	{
 		_onConnectionOpened = callback;
-	}
-
-	void GameSessionService::OnShutdownReceived(std::function<void(void)> callback)
-	{
-		_onShutdownReceived = callback;
 	}
 
 	void GameSessionService::OnConnectionFailure(std::function<void(std::string)> callback)

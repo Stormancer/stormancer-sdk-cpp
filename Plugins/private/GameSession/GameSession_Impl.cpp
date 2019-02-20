@@ -22,6 +22,7 @@ namespace Stormancer
 		Event<void>::Subscription AllPlayerReady;
 		Event<std::string>::Subscription OnRoleRecieved;
 		Event<std::shared_ptr<Stormancer::P2PTunnel>>::Subscription OnTunnelOpened;
+		Event<void>::Subscription OnShutdownRecieved;
 
 		rxcpp::subscription SceneConnectionState;
 		~GameSessionContainer()
@@ -292,6 +293,11 @@ namespace Stormancer
 		return OnGameSessionConnectionChange.subscribe(callback);
 	}
 
+	Stormancer::Event<void>::Subscription GameSession_Impl::subscribeOnShutdownRecieved(std::function<void()> callback)
+	{
+		return _onShutdownReceived.subscribe(callback);
+	}
+
 	pplx::task<std::string> GameSession_Impl::P2PTokenRequest(std::shared_ptr<GameSessionContainer> container, pplx::cancellation_token ct)
 	{
 		std::weak_ptr<GameSession> wThat = this->shared_from_this();
@@ -378,6 +384,14 @@ namespace Stormancer
 					if (auto that = wThat.lock())
 					{
 						that->OnAllPlayerReady();
+					}
+				});
+
+				gameSessionContainer->OnShutdownRecieved = gameSessionContainer->service()->OnShutdownReceived.subscribe([wThat]()
+				{
+					if (auto that = wThat.lock())
+					{
+						that->_onShutdownReceived();
 					}
 				});
 

@@ -21,5 +21,6 @@ namespace Stormancer
 		virtual Event<GameSessionConnectionParameters>::Subscription subscibeOnTunnelOpened(std::function<void(GameSessionConnectionParameters)> callback) = 0;
 		virtual Event<GameSessionResult>::Subscription subscribeOnPostedResultReceived(std::function<void(GameSessionResult)> callback) = 0;
 		virtual Event<ConnectionState>::Subscription subscribeOnGameSessionConnectionChange(std::function<void(ConnectionState)> callback) = 0;
+		virtual Event<void>::Subscription subscribeOnShutdownRecieved(std::function<void()> callback) = 0;
 	};
 }

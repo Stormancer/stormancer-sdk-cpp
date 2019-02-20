@@ -27,15 +27,16 @@ namespace Stormancer
 		Event<GameSessionConnectionParameters>::Subscription subscibeOnTunnelOpened(std::function<void(GameSessionConnectionParameters)> callback) override;
 		Event<GameSessionResult>::Subscription subscribeOnPostedResultReceived(std::function<void(GameSessionResult)> callback) override;
 		Event<ConnectionState>::Subscription subscribeOnGameSessionConnectionChange(std::function<void(ConnectionState)> callback) override;
+		Event<void>::Subscription subscribeOnShutdownRecieved(std::function<void()> callback) override;
 	private:
 
 		//Events
 		Event<void> OnAllPlayerReady;
 		Event<GameSessionConnectionParameters> OnRoleRecieved;
 		Event<GameSessionConnectionParameters> OnTunnelOpened;
-
 		Event<GameSessionResult> OnPostedResultsReceived;
 		Event<ConnectionState> OnGameSessionConnectionChange;
+		Event<void> _onShutdownReceived;
 
 		std::string _mapName;
 		std::weak_ptr<IClient> _wClient;
