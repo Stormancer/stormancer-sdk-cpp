@@ -8,11 +8,12 @@
 
 namespace Stormancer
 {
+	class Serializer;
 	class RelayConnection : public IConnection
 	{
 	public:
 
-		RelayConnection(std::shared_ptr<IConnection> serverConnection, std::string address, uint64 id, std::string key);
+		RelayConnection(std::shared_ptr<IConnection> serverConnection, std::string address, uint64 id, std::string key, std::weak_ptr<Serializer> serializer);
 		virtual void send(const Writer& writer, int channelUid, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const TransformMetadata& transformMetadata = TransformMetadata()) override;
 		void setApplication(std::string account, std::string application) override;
 		void close(std::string reason = "") override;
@@ -43,5 +44,6 @@ namespace Stormancer
 		std::string _ipAddress;
 		time_t _connectionDate = nowTime_t();
 		std::shared_ptr<DependencyResolver> _dependencyResolver;
+		std::weak_ptr<Serializer> _serializer;
 	};
 }

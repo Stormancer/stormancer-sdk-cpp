@@ -5,19 +5,34 @@
 
 namespace Stormancer
 {
-	P2PPacketDispatcher::P2PPacketDispatcher(std::shared_ptr<P2PTunnels> tunnels, std::shared_ptr<IConnectionManager> connections, std::shared_ptr<ILogger> logger)
+	P2PPacketDispatcher::P2PPacketDispatcher(std::shared_ptr<P2PTunnels> tunnels, std::shared_ptr<IConnectionManager> connections, std::shared_ptr<ILogger> logger, std::weak_ptr<Serializer> serializer)
 		: _tunnels(tunnels)
 		, _connections(connections)
-		,_logger(logger)
+		, _logger(logger)
+		, _serializer(serializer)
 	{
 	}
 
 	void P2PPacketDispatcher::registerProcessor(PacketProcessorConfig& config)
 	{
-		config.addProcessor((byte)MessageIDTypes::ID_P2P_RELAY, new handlerFunction([=](Packet_ptr p) {
+		auto wSerializer = _serializer;
+		std::weak_ptr<IConnectionManager> wConnections = _connections;
+		config.addProcessor((byte)MessageIDTypes::ID_P2P_RELAY, new handlerFunction([wSerializer, wConnections](Packet_ptr p) {
 			uint64 peerId;
-			*p->stream >> peerId;
-			auto connection = _connections->getConnection(peerId);
+			auto serializer = wSerializer.lock();
+			if (!serializer)
+			{
+				return false;
+			}
+			auto connections = wConnections.lock();
+			if (!connections)
+			{
+				return false;
+			}
+
+			serializer->deserialize(p->stream, peerId);
+
+			auto connection = connections->getConnection(peerId);
 			if (connection)
 			{
 				p->connection = connection;

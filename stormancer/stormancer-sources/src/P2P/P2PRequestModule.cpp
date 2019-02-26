@@ -325,7 +325,7 @@ namespace Stormancer
 		{
 			auto relay = serializer->deserializeOne<OpenRelayParameters>(ctx->inputStream());
 			std::string sessionId(relay.sessionId.begin(), relay.sessionId.end());
-			connections->newConnection(std::make_shared<RelayConnection>(connections->getConnection(0), relay.remotePeerAddress, relay.remotePeerId,sessionId));
+			connections->newConnection(std::make_shared<RelayConnection>(connections->getConnection(0), relay.remotePeerAddress, relay.remotePeerId,sessionId, serializer));
 			
 			sessions->updateSessionState(sessionId, P2PSessionState::Connected);
 			ctx->send(Writer());

@@ -15,7 +15,11 @@ namespace Stormancer
 	{
 	public:
 
-		P2PPacketDispatcher(std::shared_ptr<P2PTunnels> tunnels, std::shared_ptr<IConnectionManager> connections, std::shared_ptr<ILogger> logger);
+		P2PPacketDispatcher(
+			std::shared_ptr<P2PTunnels> tunnels, 
+			std::shared_ptr<IConnectionManager> connections, 
+			std::shared_ptr<ILogger> logger,
+			std::weak_ptr<Serializer> serializer);
 		void registerProcessor(PacketProcessorConfig& config);
 
 	private:
@@ -23,5 +27,6 @@ namespace Stormancer
 		std::shared_ptr<P2PTunnels> _tunnels;
 		std::shared_ptr<IConnectionManager> _connections;
 		std::shared_ptr<ILogger> _logger;
+		std::weak_ptr<Serializer> _serializer;
 	};
 }

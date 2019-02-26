@@ -52,7 +52,7 @@ void Stormancer::Client::ConfigureContainer(std::weak_ptr<DependencyResolver> wR
 	resolver->registerDependency<IActionDispatcher>(config->actionDispatcher);
 
 	resolver->registerDependency<P2PPacketDispatcher>([](std::weak_ptr<DependencyResolver> resolver) {
-		return std::make_shared<P2PPacketDispatcher>(resolver.lock()->resolve<P2PTunnels>(), resolver.lock()->resolve<IConnectionManager>(), resolver.lock()->resolve<ILogger>());
+		return std::make_shared<P2PPacketDispatcher>(resolver.lock()->resolve<P2PTunnels>(), resolver.lock()->resolve<IConnectionManager>(), resolver.lock()->resolve<ILogger>(), resolver.lock()->resolve<Serializer>());
 	}, true);
 
 	resolver->registerDependency<SceneDispatcher>([](std::weak_ptr<DependencyResolver> resolver) {

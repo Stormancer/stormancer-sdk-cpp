@@ -1,27 +1,35 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/P2P/RelayConnection.h"
 #include "stormancer/MessageIDTypes.h"
+#include "stormancer/Serializer.h"
 
 namespace Stormancer
 {
-	RelayConnection::RelayConnection(std::shared_ptr<IConnection> serverConnection, std::string address, uint64 id, std::string key)
+	RelayConnection::RelayConnection(std::shared_ptr<IConnection> serverConnection, std::string address, uint64 id, std::string key, std::weak_ptr<Serializer> serializer)
 		: _serverConnection(serverConnection)
 		, _id(id)
 		, _ipAddress(address)
 		, _key(key)
+		,_serializer(serializer)
 	{
 	}
 
 	void RelayConnection::send(const Writer& writer, int channelUid, PacketPriority priority, PacketReliability reliability, const TransformMetadata& /*transformMetadata*/)
 	{
-		_serverConnection->send([=](obytestream* s) {
+		auto wSerializer = _serializer;
+		auto cId = id();
+		_serverConnection->send([wSerializer,cId,priority,reliability,writer](obytestream* s) {
 			(*s) << (byte)MessageIDTypes::ID_P2P_RELAY;
-			(*s) << id();
-			(*s) << (uint8)priority;
-			(*s) << (uint8)reliability;
-			if (writer)
+			if (auto serializer = wSerializer.lock())
 			{
-				writer(s);
+				serializer->serialize(s, cId);
+				serializer->serialize(s, (uint8)priority);
+				serializer->serialize(s, (uint8)reliability);
+
+				if (writer)
+				{
+					writer(s);
+				}
 			}
 		}, channelUid, priority, reliability);
 	}
