@@ -1,8 +1,4 @@
-#if defined(STORMANCER_CUSTOM_PCH)
-#include STORMANCER_CUSTOM_PCH
-#endif
 #include "GameSession/GameSessionPlugin.h"
-
 #include "GameSession/GameSessionService.h"
 #include "GameSession_Impl.h"
 #include "stormancer/IClient.h"

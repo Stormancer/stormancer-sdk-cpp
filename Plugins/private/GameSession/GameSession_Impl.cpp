@@ -59,12 +59,14 @@ namespace Stormancer
 			
 			_mapName = mapName;
 			std::weak_ptr<GameSession_Impl> wThat = this->shared_from_this();
-			ct.register_callback([wThat]() {
-				if (auto that = wThat.lock())
-				{
-					that->_gameSessionNegotiationTce.set_exception(pplx::task_canceled());
-				}
-			});
+			if (ct != pplx::cancellation_token::none()) {
+				ct.register_callback([wThat]() {
+					if (auto that = wThat.lock())
+					{
+						that->_gameSessionNegotiationTce.set_exception(pplx::task_canceled());
+					}
+				});
+			}
 
 			// Disconnect from gameSession if the current ct equal the pending CT.
 			auto connectionTask = DisconectFromGameSession().then([wThat, token,ct]()

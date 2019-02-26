@@ -43,15 +43,17 @@ namespace pplx
 {
 	pplx::cancellation_token operator||(pplx::cancellation_token token1, pplx::cancellation_token token2)
 	{
-		std::vector<pplx::cancellation_token> tokens;
-		if (token1.is_cancelable())
+		std::vector<pplx::cancellation_token> tokens;		
+		if (!token1.is_cancelable())
 		{
-			tokens.push_back(token1);
+			return token2;
 		}
-		if (token2.is_cancelable())
+		if (!token2.is_cancelable())
 		{
-			tokens.push_back(token2);
+			return token1;
 		}
+		tokens.push_back(token1);
+		tokens.push_back(token2);
 		return pplx::cancellation_token_source::create_linked_source(tokens.begin(), tokens.end()).get_token();
 	}
 }

@@ -84,7 +84,7 @@
   },
   "libraries": {
     "Microsoft.Build.Framework/15.9.20": {
-      "sha512": "C7Z32whwtZkhIDm8ruQ9TOyR4iEYJIvibH8s4unsQh7NiaL1qnlrxzACbXfw1mYZUj5SLytlgD0ZP9UQB7Ku+A==",
+      "sha512": "j7KrBtZrD+YQPAu+8K1a0J7HgDf0X18bSnqu5llKXxHZ5Cb1t3eSlEtZPUDFqsv3RCBzByggjIBaxrmdvHxLqA==",
       "type": "package",
       "path": "microsoft.build.framework/15.9.20",
       "files": [
@@ -102,7 +102,7 @@
       ]
     },
     "Microsoft.Build.Utilities.Core/15.9.20": {
-      "sha512": "5Bg4sOFgGA52ex3UGa0VmbO7xwBCQkACKMQckvLqjN1W6NzIce270DJU7H+MX843FcXPi+0uJqDakGlbmIkx1Q==",
+      "sha512": "s5F2IDARivpFJ+RiwOBnCt6Higu88nhDYfaUWwJ2ecBSf83HZsc3E/EjyQIs+4fPAeS5IZsL2ak7gOdxEXubSA==",
       "type": "package",
       "path": "microsoft.build.utilities.core/15.9.20",
       "files": [
@@ -120,7 +120,7 @@
       ]
     },
     "Microsoft.VisualStudio.Setup.Configuration.Interop/1.16.30": {
-      "sha512": "YQ98WZeF3IlJu++LL0Y9GickgfHcwBv6BAsdb1YIaYN9IU6dBJk3BdvfPkrRK2ajJENlmJrGrES844zvSXLWGw==",
+      "sha512": "lC6SqNkraWUSY7cyF5GUmXSECoTMwslBc/r1dguChjsi0D0BlF7G6PLsvXD0NFCwnpKlgVzUYrIq7DQakdGerw==",
       "type": "package",
       "path": "microsoft.visualstudio.setup.configuration.interop/1.16.30",
       "files": [
@@ -133,7 +133,7 @@
       ]
     },
     "Newtonsoft.Json/12.0.1": {
-      "sha512": "jmVyoEyk0In8r+AObYQyFKVFm7uSRzE0XSHSbEtBJcZDMV6DqJoyB4FLcHwprPVhAh826so0db3DIKXVnpGoPA==",
+      "sha512": "pBR3wCgYWZGiaZDYP+HHYnalVnPJlpP1q55qvVb+adrDHmFMDc1NAKio61xTwftK3Pw5h7TZJPJEEVMd6ty8rg==",
       "type": "package",
       "path": "newtonsoft.json/12.0.1",
       "files": [
@@ -172,7 +172,7 @@
       ]
     },
     "System.Collections.Immutable/1.5.0": {
-      "sha512": "EXKiDFsChZW0RjrZ4FYHu9aW6+P4MCgEDCklsVseRfhoO0F+dXeMSsMRAlVXIo06kGJ/zv+2w1a2uc2+kxxSaQ==",
+      "sha512": "T5XGQlcHhEO75Qx38GGCUDPdk4n/7yrRmTgy4yczzJV8alPHaxPU55TBC2UFrkQ42bu34sZPfK0dU+nWZUOEJA==",
       "type": "package",
       "path": "system.collections.immutable/1.5.0",
       "files": [
@@ -236,23 +236,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Windows\\system32\\config\\systemprofile\\.nuget\\packages\\": {},
+    "C:\\Users\\hlabanca\\.nuget\\packages\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\BuildAgent\\work\\942796f7257fc0aa\\src\\clients\\cpp\\Plugins\\PluginSelector\\PluginSelector.csproj",
+      "projectUniqueName": "D:\\TCBuildAgent\\work\\942796f7257fc0aa\\src\\clients\\cpp\\Plugins\\PluginSelector\\PluginSelector.csproj",
       "projectName": "PluginSelector",
-      "projectPath": "E:\\BuildAgent\\work\\942796f7257fc0aa\\src\\clients\\cpp\\Plugins\\PluginSelector\\PluginSelector.csproj",
-      "packagesPath": "C:\\Windows\\system32\\config\\systemprofile\\.nuget\\packages\\",
-      "outputPath": "E:\\BuildAgent\\work\\942796f7257fc0aa\\src\\clients\\cpp\\Plugins\\PluginSelector\\obj\\",
+      "projectPath": "D:\\TCBuildAgent\\work\\942796f7257fc0aa\\src\\clients\\cpp\\Plugins\\PluginSelector\\PluginSelector.csproj",
+      "packagesPath": "C:\\Users\\hlabanca\\.nuget\\packages\\",
+      "outputPath": "D:\\TCBuildAgent\\work\\942796f7257fc0aa\\src\\clients\\cpp\\Plugins\\PluginSelector\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Windows\\system32\\config\\systemprofile\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\hlabanca\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
