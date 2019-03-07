@@ -47,7 +47,9 @@ namespace Stormancer
 
 				that->GameFinderStatusUpdated(that->_currentState);
 
-				if (that->_currentState == GameFinderStatus::Success)
+				switch (that->_currentState)
+				{
+				case GameFinderStatus::Success:
 				{
 					Serializer serializer;
 					auto dto = serializer.deserializeOne<GameFinderResponseDto>(packet->stream);
@@ -59,11 +61,26 @@ namespace Stormancer
 					that->GameFound(response);
 					that->_currentState = GameFinderStatus::Idle;
 					that->GameFinderStatusUpdated(that->_currentState);
+					break;
 				}
-				else if(that->_currentState == GameFinderStatus::Canceled)
+				case GameFinderStatus::Canceled:
 				{
 					that->_currentState = GameFinderStatus::Idle;
 					that->GameFinderStatusUpdated(that->_currentState);
+					break;
+				}
+				case GameFinderStatus::Failed:
+				{
+					std::string reason;
+					if (packet->stream->good())
+					{
+						reason = Serializer().deserializeOne<std::string>(packet->stream);
+					}
+					that->FindGameRequestFailed(reason);
+					that->_currentState = GameFinderStatus::Idle;
+					that->GameFinderStatusUpdated(that->_currentState);
+					break;
+				}
 				}
 			}
 		});

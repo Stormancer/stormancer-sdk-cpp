@@ -48,6 +48,12 @@ namespace Stormancer
 		std::string gameFinder;
 	};
 
+	struct FindGameFailedEvent
+	{
+		std::string reason;
+		std::string gameFinder;
+	};
+
 	struct GameFinderRequest
 	{
 		std::map<std::string, std::string> profileIds;

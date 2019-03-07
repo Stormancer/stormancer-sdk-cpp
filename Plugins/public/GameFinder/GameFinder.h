@@ -15,6 +15,7 @@ namespace Stormancer
 
 		/// <summary>
 		/// Start a GameFinder query.
+		/// Only if you do not use the Party system.
 		/// </summary>
 		/// <remarks>
 		/// This method will attempt to connect to the server and the scene for the given <c>gameFinder</c> if the client is not yet connected to them.
@@ -22,7 +23,9 @@ namespace Stormancer
 		/// You should listen to these updates by providing callbacks to <c>subsribeGameFinderStateChanged()</c> and <c>subsribeGameFound()</c>.
 		/// If you want to cancel the request, you should call <c>cancel()</c>, with the same <c>gameFinder</c> as the one passed to <c>findGame()</c>.
 		/// We use this technique here instead of the more common <c>pplx::cancellation_token</c>-based one in order to support party scenarios,
-		/// where a member of a party can cancel the party-wide <c>findGame</c> query even if they did not initiate it themselves.
+		/// where a member of a party can cancel the party-wide GameFinder query.
+		/// For parties:
+		/// Do not use this method if you are in a party, as the GameFinder query will be initiated automatically by the server when all party members are ready.
 		/// </remarks>
 		/// <param name="gameFinder">Name of the server-side GameFinder to connect to.
 		/// This will typically be the name of a scene, configured in the serviceLocator of the server application.</param>
@@ -83,5 +86,17 @@ namespace Stormancer
 		/// <returns>A reference-counted <c>Subscription</c> object that tracks the lifetime of the subscription.
 		/// When the reference count of this object drops to zero, the subscription will be canceled.</returns>
 		virtual Event<GameFoundEvent>::Subscription subsribeGameFound(std::function<void(GameFoundEvent)> callback) = 0;
+
+		/// <summary>
+		/// Be notified when a FindGame query fails.
+		/// </summary>
+		/// <remarks>
+		/// A FindGame failure could be caused by a variety of reasons, including but not limited to custom GameFinder logic.
+		/// The <c>FindGameFailedEvent</c> argument passed to the <c>callback</c> may contain the reason for the failure.
+		/// </remarks>
+		/// <param name="callback">Callable object to be called when a FindGame failure occurs.</param>
+		/// <returns>A reference-counted <c>Subscription</c> object that tracks the lifetime of the subscription.
+		/// When the reference count of this object drops to zero, the subscription will be canceled.</returns>
+		virtual Event<FindGameFailedEvent>::Subscription subscribeFindGameFailed(std::function<void(FindGameFailedEvent)> callback) = 0;
 	};
 }

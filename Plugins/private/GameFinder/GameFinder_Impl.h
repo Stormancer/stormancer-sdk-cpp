@@ -20,6 +20,7 @@ namespace Stormancer
 
 		Action2<GameFinderStatusChangedEvent> gameFinderStateChanged;
 		Action2<GameFoundEvent> gameFound;
+		Action2<FindGameFailedEvent> findGameFailed;
 
 		std::unordered_map<std::string, GameFinderStatusChangedEvent> getPendingFindGameStatus() override;
 		
@@ -28,6 +29,7 @@ namespace Stormancer
 
 		Event<GameFinderStatusChangedEvent>::Subscription subsribeGameFinderStateChanged(std::function<void(GameFinderStatusChangedEvent)> callback) override;
 		Event<GameFoundEvent>::Subscription subsribeGameFound(std::function<void(GameFoundEvent)> callback)  override;
+		Event<FindGameFailedEvent>::Subscription subscribeFindGameFailed(std::function<void(FindGameFailedEvent)> callback) override;
 	private:
 		
 		pplx::task<std::shared_ptr<GameFinderContainer>> connectToGameFinderImpl(std::string gameFinderName);

@@ -27,6 +27,7 @@ namespace Stormancer
 
 		Event<GameFinderResponse>::Subscription gameFoundSubscription;
 		Event<GameFinderStatus>::Subscription gameFinderStateUpdatedSubscription;
+		Event<std::string>::Subscription findGamefailedSubscription;
 		rxcpp::subscription connectionStateChangedSubscription;
 	};
 
@@ -167,6 +168,15 @@ namespace Stormancer
 						that->gameFinderStateChanged(ev);
 					}
 				});
+				container->findGamefailedSubscription = container->service()->FindGameRequestFailed.subscribe([wThat, gameFinderName](std::string reason) {
+					if (auto that = wThat.lock())
+					{
+						FindGameFailedEvent ev;
+						ev.gameFinder = gameFinderName;
+						ev.reason = reason;
+						that->findGameFailed(ev);
+					}
+				});
 				return container;
 			}
 			catch (const std::exception& ex)
@@ -230,6 +240,11 @@ namespace Stormancer
 	Stormancer::Event<Stormancer::GameFoundEvent>::Subscription GameFinder_Impl::subsribeGameFound(std::function<void(GameFoundEvent)> callback)
 	{
 		return gameFound.subscribe(callback);
+	}
+
+	Event<FindGameFailedEvent>::Subscription GameFinder_Impl::subscribeFindGameFailed(std::function<void(FindGameFailedEvent)> callback)
+	{
+		return findGameFailed.subscribe(callback);
 	}
 
 	void GameFinder_Impl::cancel(std::string gameFinder)

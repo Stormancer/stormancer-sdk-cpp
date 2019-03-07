@@ -46,8 +46,6 @@ namespace Stormancer
 	{
 		std::lock_guard<std::mutex> lg(_lock);
 		
-		
-		bool isDone = _currentGameSession.is_done();
 		if (!_currentGameSession.is_done())
 		{
 			throw pplx::task_from_exception<GameSessionConnectionParameters>(std::runtime_error("Game session connection is in pending. Cannot connect to an other game session"));
@@ -161,7 +159,7 @@ namespace Stormancer
 					if (auto that = wThat.lock())
 					{
 						std::exception_ptr ptrEx = std::current_exception();
-						return that->DisconectFromGameSession().then([wThat, ptrEx](pplx::task<void> task)
+						return that->DisconectFromGameSession().then([wThat, ptrEx](pplx::task<void> task) -> GameSessionConnectionParameters
 						{
 							try
 							{
@@ -177,8 +175,6 @@ namespace Stormancer
 							}
 
 							std::rethrow_exception(ptrEx);
-
-							return GameSessionConnectionParameters();
 						});
 					}					
 				}

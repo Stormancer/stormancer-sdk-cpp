@@ -44,6 +44,7 @@ namespace Stormancer
 
 		Event<GameFinderStatus> GameFinderStatusUpdated;
 		Event<GameFinderResponse> GameFound;
+		Event<std::string> FindGameRequestFailed;
 
 	private:
 
