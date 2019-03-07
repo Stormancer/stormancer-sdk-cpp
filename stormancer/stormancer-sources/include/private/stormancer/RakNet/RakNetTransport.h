@@ -58,8 +58,10 @@ namespace Stormancer
 		void stop();
 		void initialize(uint16 maxConnections, uint16 serverPort = 0);
 		void run();
-		
-		std::shared_ptr<RakNetConnection> onConnection(RakNet::SystemAddress systemAddress, RakNet::RakNetGUID guid, uint64 peerId, std::string key);
+		// This overload sets the request as completed after it has updated its ConnectionState.
+		std::shared_ptr<RakNetConnection> onConnection(RakNet::SystemAddress systemAddress, RakNet::RakNetGUID guid, uint64 peerId, const ConnectionRequest& request);
+		// This overolad is for connections that do not have an associated ConnectionRequest.
+		std::shared_ptr<RakNetConnection> onConnection(RakNet::SystemAddress systemAddress, RakNet::RakNetGUID guid, uint64 peerId, std::string connectionId);
 		void onDisconnection(uint64 guid, std::string reason);
 		void onMessageReceived(RakNet::Packet* packet);
 		std::shared_ptr<RakNetConnection> getConnection(uint64 guid);

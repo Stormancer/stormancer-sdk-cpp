@@ -2,7 +2,7 @@
 #include STORMANCER_CUSTOM_PCH
 #endif
 #include "GameRecovery_Impl.h"
-#include "GameRecoveryModels.h"
+#include "GameRecovery/GameRecoveryModels.h"
 #include "GameRecoveryService.h"
 
 namespace Stormancer

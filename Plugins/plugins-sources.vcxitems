@@ -63,10 +63,10 @@
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameFinder\GameFinderService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameFinder\GameFinder_Impl.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\GameRecovery\GameRecoveryModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameRecovery\GameRecoveryPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameRecovery\GameRecoveryService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameRecovery\GameRecovery_Impl.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\GameRecovery\GameRecoveryModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameSession\GameSessionModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameSession\GameSessionService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameSession\GameSession_Impl.h" />

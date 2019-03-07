@@ -323,10 +323,8 @@ namespace Stormancer
 
 							_logger->log(LogLevel::Trace, "RakNetTransport", "Successfully connected to ", rakNetPacket->systemAddress.ToString());
 
-							auto connection = onConnection(rakNetPacket->systemAddress, rakNetPacket->guid, sid, rq.id);
-							rq.tce.set(connection);
+							auto connection = onConnection(rakNetPacket->systemAddress, rakNetPacket->guid, sid, rq);
 							startNextPendingConnections();
-
 						}
 						break;
 					}
@@ -378,8 +376,7 @@ namespace Stormancer
 							else
 							{
 								_logger->log(LogLevel::Trace, "RakNetTransport", "Connection request accepted", packetSystemAddressStr.c_str());
-								auto connection = onConnection(rakNetPacket->systemAddress, rakNetPacket->guid, (uint64)remotePeerId, rq.id);
-								rq.tce.set(connection);
+								auto connection = onConnection(rakNetPacket->systemAddress, rakNetPacket->guid, (uint64)remotePeerId, rq);
 							}
 							startNextPendingConnections();
 						}
@@ -571,16 +568,36 @@ namespace Stormancer
 		}
 	}
 
-	std::shared_ptr<RakNetConnection> RakNetTransport::onConnection(RakNet::SystemAddress systemAddress, RakNet::RakNetGUID guid, uint64 peerId, std::string key)
+	std::shared_ptr<RakNetConnection> RakNetTransport::onConnection(RakNet::SystemAddress systemAddress, RakNet::RakNetGUID guid, uint64 peerId, const ConnectionRequest& request)
 	{
 		auto msg = std::string() + systemAddress.ToString(true, ':') + " connected";
 		_logger->log(LogLevel::Trace, "RakNetTransport", msg.c_str());
 
-		auto connection = createNewConnection(guid, peerId, key);
+		auto connection = createNewConnection(guid, peerId, request.id);
 
 		_handler->newConnection(connection);
 
-		pplx::task<void>([=]() {
+		auto tce = request.tce;
+		pplx::task<void>([connection, tce] {
+			// Start this asynchronously because we locked the mutex in run and the user can do something that tries to lock again this mutex
+			connection->setConnectionState(ConnectionState::Connecting); // we should set connecting state sooner (when the user call connect)
+			connection->setConnectionState(ConnectionState::Connected);
+			tce.set(connection);
+		});
+
+		return connection;
+	}
+
+	std::shared_ptr<RakNetConnection> RakNetTransport::onConnection(RakNet::SystemAddress systemAddress, RakNet::RakNetGUID guid, uint64 peerId, std::string connectionId)
+	{
+		auto msg = std::string() + systemAddress.ToString(true, ':') + " connected";
+		_logger->log(LogLevel::Trace, "RakNetTransport", msg.c_str());
+
+		auto connection = createNewConnection(guid, peerId, connectionId);
+
+		_handler->newConnection(connection);
+
+		pplx::task<void>([connection] {
 			// Start this asynchronously because we locked the mutex in run and the user can do something that tries to lock again this mutex
 			connection->setConnectionState(ConnectionState::Connecting); // we should set connecting state sooner (when the user call connect)
 			connection->setConnectionState(ConnectionState::Connected);

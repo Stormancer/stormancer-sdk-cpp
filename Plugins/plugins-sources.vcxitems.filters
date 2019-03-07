@@ -222,9 +222,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameRecovery\GameRecovery_Impl.h">
       <Filter>private\GameRecovery</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\GameRecovery\GameRecoveryModels.h">
-      <Filter>private\GameRecovery</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameRecovery\GameRecoveryPlugin.h">
       <Filter>private\GameRecovery</Filter>
     </ClInclude>
@@ -338,6 +335,9 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameSession\GameSessionPlugin.h">
       <Filter>public\GameSession</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\GameRecovery\GameRecoveryModels.h">
+      <Filter>public\GameRecovery</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

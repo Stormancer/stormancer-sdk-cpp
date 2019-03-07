@@ -100,7 +100,8 @@ namespace Stormancer
 		return _currentState;
 	}
 
-	pplx::task<void> GameFinderService::findMatch(const std::string &provider, const GameFinderRequest &mmRequest)
+	template<typename T>
+	pplx::task<void> GameFinderService::findMatchInternal(const std::string& provider, T data)
 	{
 		if (currentState() != GameFinderStatus::Idle)
 		{
@@ -109,41 +110,25 @@ namespace Stormancer
 
 		_currentState = GameFinderStatus::Searching;
 		_matchmakingCTS = pplx::cancellation_token_source();
-		auto matchmakingToken = _matchmakingCTS.get_token();
-		
-		return _rpcService.lock()->rpc<void>("match.find", provider, mmRequest).then([matchmakingToken](pplx::task<void> res) {
-			if (matchmakingToken.is_canceled())
+
+		std::weak_ptr<GameFinderService> wThat = this->shared_from_this();
+		return _rpcService.lock()->rpc<void>("match.find", provider, data).then([wThat](pplx::task<void> res) {
+			if (auto that = wThat.lock())
 			{
-				pplx::cancel_current_task();
+				that->_currentState = GameFinderStatus::Idle;
 			}
-			else
-			{
-				return res;
-			}
+			return res;
 		});
+	}
+
+	pplx::task<void> GameFinderService::findMatch(const std::string &provider, const GameFinderRequest &mmRequest)
+	{
+		return findMatchInternal<const GameFinderRequest&>(provider, mmRequest);
 	}
 
 	pplx::task<void> GameFinderService::findMatch(const std::string &provider, std::string json)
 	{
-		if (currentState() != GameFinderStatus::Idle)
-		{
-			return pplx::task_from_exception<void>(std::runtime_error("Already matching !"));
-		}
-		
-		_currentState = GameFinderStatus::Searching;
-		_matchmakingCTS = pplx::cancellation_token_source();
-		auto matchmakingToken = _matchmakingCTS.get_token();
-
-		return _rpcService.lock()->rpc<void>("match.find", provider, json).then([matchmakingToken](pplx::task<void> res) {
-			if (matchmakingToken.is_canceled())
-			{
-				pplx::cancel_current_task();
-			}
-			else
-			{
-				return res;
-			}
-		});
+		return findMatchInternal(provider, json);
 	}
 
 	void GameFinderService::resolve(bool acceptMatch)

@@ -3,8 +3,9 @@
 
 namespace Stormancer
 {
-	RpcRequest::RpcRequest(rxcpp::subscriber<Packetisp_ptr>& observer)
+	RpcRequest::RpcRequest(rxcpp::subscriber<Packetisp_ptr>& observer, std::string route)
 		: observer(observer)
+		, route(route)
 	{
 	}
 

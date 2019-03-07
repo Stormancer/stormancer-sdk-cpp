@@ -47,6 +47,9 @@ namespace Stormancer
 
 	private:
 
+		template<typename T>
+		pplx::task<void> findMatchInternal(const std::string& provider, T data);
+
 		std::weak_ptr<Scene> _scene;
 		std::weak_ptr<RpcService> _rpcService;
 
