@@ -3,7 +3,7 @@
 
 #include "stormancer/IService.h"
 #include "stormancer/Scene.h"
-#include "stormancer/RPC/service.h"
+#include "stormancer/RPC/Service.h"
 #include "stormancer/SingleServicePlugin.h"
 #include "PlayerDataUpdate.h"
 #include <map>

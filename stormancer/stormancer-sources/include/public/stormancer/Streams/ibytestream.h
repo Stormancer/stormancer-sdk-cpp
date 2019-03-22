@@ -1,10 +1,9 @@
 #pragma once
 
 #include "stormancer/BuildConfig.h"
-
 #include "stormancer/Streams/bytestreambuf.h"
 #include <istream>
-#include <vector>
+#include <vector> 
 #include <iostream>
 
 namespace Stormancer
@@ -63,9 +62,9 @@ namespace Stormancer
 
 		ibytestream& read(byte* ptr, std::streamsize size);
 
-
+#if !defined(_LIBCPP_VERSION)
 		ibytestream& read(char* ptr, std::streamsize size);
-
+#endif
 
 #pragma endregion
 

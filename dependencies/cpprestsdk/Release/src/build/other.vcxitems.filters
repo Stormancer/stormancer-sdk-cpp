@@ -9,17 +9,18 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\pplx\pplxapple.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\http\client\x509_cert_utilities_apple.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\http\client\http_client_asio.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\pplx\threadpool.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\pplx\pplxlinux.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\pplx\threadpool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\pplx\pplxlinux.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\pplx\threadpool.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\pplx\threadpool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

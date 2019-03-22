@@ -165,21 +165,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\Compatibility\StormancerResult.h">
       <Filter>Header Files\Compatibility</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\Logger\ConsoleLogger.h">
-      <Filter>Header Files\Logger</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\Logger\ConsoleLoggerWindows.h">
-      <Filter>Header Files\Logger</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\Logger\FileLogger.h">
-      <Filter>Header Files\Logger</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\Logger\ILogger.h">
-      <Filter>Header Files\Logger</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\Logger\NullLogger.h">
-      <Filter>Header Files\Logger</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\ConnectionsRepository.h">
       <Filter>Header Files\P2P</Filter>
     </ClInclude>
@@ -190,9 +175,6 @@
       <Filter>Header Files\P2P</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\OpenRelayParameters.h">
-      <Filter>Header Files\P2P</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\P2PEnums.h">
       <Filter>Header Files\P2P</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\P2PPacketDispatcher.h">

@@ -95,6 +95,9 @@ void Stormancer::Client::ConfigureContainer(std::weak_ptr<DependencyResolver> wR
 
 
 
+#else
+#include "stormancer/Linux/AES/AES_Linux.h"
+		return std::make_shared<AESLinux>(resolver.lock()->resolve<KeyStore>());
 #endif
 
 	}, true);

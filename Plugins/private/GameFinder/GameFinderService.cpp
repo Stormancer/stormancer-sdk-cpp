@@ -3,7 +3,7 @@
 #endif
 #include "GameFinderService.h"
 #include "stormancer/Logger/ILogger.h"
-#include "stormancer/RPC/service.h"
+#include "stormancer/RPC/Service.h"
 namespace Stormancer
 {
 	Internal::ReadyVerificationRequest::operator Stormancer::ReadyVerificationRequest()
@@ -130,9 +130,23 @@ namespace Stormancer
 
 		std::weak_ptr<GameFinderService> wThat = this->shared_from_this();
 		return _rpcService.lock()->rpc<void>("match.find", provider, data).then([wThat](pplx::task<void> res) {
-			if (auto that = wThat.lock())
+			// If the RPC fails (e.g. because of a disconnection), we might not have received a failed/canceled status update.
+			// Make sure we go back to Idle state anyway.
+			try
 			{
-				that->_currentState = GameFinderStatus::Idle;
+				res.get();
+			}
+			catch (...)
+			{
+				if (auto that = wThat.lock())
+				{
+					if (that->_currentState != GameFinderStatus::Idle)
+					{
+						that->_currentState = GameFinderStatus::Idle;
+						that->GameFinderStatusUpdated(that->_currentState);
+					}
+				}
+				throw;
 			}
 			return res;
 		});

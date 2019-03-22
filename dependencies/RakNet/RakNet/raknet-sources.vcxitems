@@ -28,6 +28,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\ConnectionGraph2.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\ConsoleServer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\DataCompressor.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Source\DirectoryDeltaTransfer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\DR_SHA1.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\DS_BinarySearchTree.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\DS_BPlusTree.h" />
@@ -54,6 +55,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\DS_WeightedGraph.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\DynDNS.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\EmailSender.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Source\EmptyHeader.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\EpochTimeToString.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\Export.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\FileList.h" />
@@ -100,6 +102,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\PacketPriority.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\PluginInterface2.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\PS3Includes.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Source\PS4Includes.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\Rackspace.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\RakAlloca.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\RakAssert.h" />
@@ -122,12 +125,15 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\RakThread.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\RakWString.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\Rand.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Source\RandSync.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\ReadyEvent.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\RefCountedObj.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\RelayPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\ReliabilityLayer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\ReplicaEnums.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\ReplicaManager3.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Source\Router2.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Source\RPC4Plugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\SecureHandshake.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\SendToThread.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\SignaledEvent.h" />

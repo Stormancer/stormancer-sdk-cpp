@@ -71,70 +71,49 @@ namespace Stormancer
 			{
 				if (auto that = wThat.lock())
 				{
-					return that->connectToGameSessionImpl(token,ct).then([wThat](pplx::task<std::shared_ptr<GameSessionContainer>> task)
-					{
-						if (auto that = wThat.lock()) {
-							return task;
-						}
-						else
-						{
-							throw std::runtime_error("Game session destroyed");
-						}
-					}, ct);
+					return that->connectToGameSessionImpl(token, ct);
 				}
 				else
 				{
 					throw std::runtime_error("Game session destroyed");
 				}
-			}, ct).then([wThat, ct](pplx::task<std::shared_ptr<GameSessionContainer>> task)
+			}, ct).then([wThat, ct](std::shared_ptr<GameSessionContainer> gameSessionContainer)
 			{
 				if (auto that = wThat.lock())
 				{
-					try
+					return that->P2PTokenRequest(gameSessionContainer, ct).then([gameSessionContainer, ct](pplx::task<std::string> task)
 					{
-						auto gameSessionContainer = task.get();
-						return that->P2PTokenRequest(gameSessionContainer, ct).then([gameSessionContainer, ct](pplx::task<std::string> task)
+						auto service = gameSessionContainer->service();
+						auto logger = gameSessionContainer->scene->dependencyResolver()->resolve<ILogger>();
+						try
 						{
-							auto service = gameSessionContainer->service();
-							auto logger = gameSessionContainer->scene->dependencyResolver()->resolve<ILogger>();
-							try
-							{
-								auto token = task.get();
-								return service->InitializeTunnel(token, ct);
-							}
-							catch (std::exception& e)
-							{
-								e.what();
-								throw std::runtime_error("Cannot get p2pToken");
-							}
-						}, ct).then([gameSessionContainer](pplx::task<void> t) {
-							try
-							{
-								t.get();
-								return gameSessionContainer;
-							}
-							catch (std::exception& e)
-							{
-								e.what();
-								throw;
-							}
+							auto token = task.get();
+							return service->InitializeTunnel(token, ct);
+						}
+						catch (std::exception& e)
+						{
+							e.what();
+							throw std::runtime_error("Cannot get p2pToken");
+						}
+					}, ct).then([gameSessionContainer](pplx::task<void> t) {
+						try
+						{
+							t.get();
+							return gameSessionContainer;
+						}
+						catch (std::exception& e)
+						{
+							e.what();
+							throw;
+						}
 
-						}, ct);
-					}
-					catch (pplx::task_canceled&)
-					{
-						throw;
-					}
-					catch (std::exception&)
-					{
-						throw std::runtime_error("Game Session container doesn't exist");
-					}
+					}, ct);
 				}
 				else
 				{
 					throw std::runtime_error("Game session deleted");
 				}
-			},ct);
+			}, ct);
 
 			pplx::task_options options(_wClient.lock()->dependencyResolver()->resolve<IActionDispatcher>());
 			options.set_cancellation_token(ct);
@@ -158,6 +137,7 @@ namespace Stormancer
 				{
 					if (auto that = wThat.lock())
 					{
+						that->_gameSessionNegotiationTce.set_exception(pplx::task_canceled());
 						std::exception_ptr ptrEx = std::current_exception();
 						return that->DisconectFromGameSession().then([wThat, ptrEx](pplx::task<void> task) -> GameSessionConnectionParameters
 						{

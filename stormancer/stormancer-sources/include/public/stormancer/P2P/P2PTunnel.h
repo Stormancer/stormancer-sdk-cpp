@@ -5,7 +5,7 @@
 #include "stormancer/P2P/P2PEnums.h"
 #include <functional>
 #include <string>
-#include "stormancer/stormancerTypes.h"
+#include "stormancer/StormancerTypes.h"
 
 namespace Stormancer
 {

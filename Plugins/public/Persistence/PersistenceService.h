@@ -1,6 +1,6 @@
 #pragma once
 
-#include "stormancer/scene.h"
+#include "stormancer/Scene.h"
 #include "PersistenceModels.h"
 
 namespace Stormancer

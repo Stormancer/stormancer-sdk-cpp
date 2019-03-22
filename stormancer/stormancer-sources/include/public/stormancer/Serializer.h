@@ -97,7 +97,7 @@ namespace Stormancer
 			UnstackAndDeserialize(data, dataSize, readOffset, args...);
 		}
 
-		void UnstackAndDeserialize(const byte*, const uint64, uint64*) const;
+		void UnstackAndDeserialize(const byte*, const uint64, uint64*) const { /*do nothing */ }
 
 #pragma endregion
 	};

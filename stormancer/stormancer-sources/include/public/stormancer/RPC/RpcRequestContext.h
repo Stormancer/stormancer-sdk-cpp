@@ -2,7 +2,7 @@
 
 #include "stormancer/BuildConfig.h"
 
-#include "stormancer/scene.h"
+#include "stormancer/Scene.h"
 #include "stormancer/Streams/bytestream.h"
 #include "stormancer/PacketPriority.h"
 #include "stormancer/IScenePeer.h"

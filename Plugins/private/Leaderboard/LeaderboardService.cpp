@@ -1,8 +1,4 @@
-#if defined(STORMANCER_CUSTOM_PCH)
-#include STORMANCER_CUSTOM_PCH
-#endif
 #include "LeaderboardService.h"
-
 #include "Leaderboard_Impl.h"
 #include "Authentication/AuthenticationService.h"
 

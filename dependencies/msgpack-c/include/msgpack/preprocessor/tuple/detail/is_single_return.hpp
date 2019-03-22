@@ -16,7 +16,7 @@
 #
 # /* MSGPACK_PP_TUPLE_IS_SINGLE_RETURN */
 #
-# if MSGPACK_PP_VARIADICS && MSGPACK_PP_VARIADICS_MSVC
+# if defined(MSGPACK_PP_VARIADICS) && MSGPACK_PP_VARIADICS && defined(MSGPACK_PP_VARIADICS_MSVC) && MSGPACK_PP_VARIADICS_MSVC
 # include <msgpack/preprocessor/control/iif.hpp>
 # include <msgpack/preprocessor/facilities/is_1.hpp>
 # include <msgpack/preprocessor/tuple/size.hpp>

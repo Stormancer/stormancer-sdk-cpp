@@ -174,11 +174,11 @@ namespace Stormancer
 		std::basic_ostream<byte>::write(ptr, size);
 		return (*this);
 	}
-
+#if !defined(_LIBCPP_VERSION)
 	obytestream& obytestream::write(const char* ptr, std::streamsize size)
 	{
 		std::basic_ostream<byte>::write((byte*)ptr, size);
 		return (*this);
 	}
-
+#endif
 }

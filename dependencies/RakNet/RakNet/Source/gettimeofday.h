@@ -35,14 +35,11 @@ int gettimeofday(struct timeval *tv, struct timezone *tz);
 
 #else
 
-
-
-
-
+#include <sys/time.h>
 
 // Uncomment this if you need to
 /*
-#include <sys/time.h>
+
 
 #include <unistd.h>
 // http://www.halcode.com/archives/2008/08/26/retrieving-system-time-gettimeofday/

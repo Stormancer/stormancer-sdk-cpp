@@ -34,9 +34,9 @@ namespace Stormancer
 	using float32 = float;
 	using float64 = double;
 #endif
-
-
-
+#if defined(_LIBCPP_VERSION) //<-- this preprocessor macro is defined only if there are at least one C++ standard include.
+	using byte = char;
+#else
 	using byte = uint8;
-
+#endif
 };

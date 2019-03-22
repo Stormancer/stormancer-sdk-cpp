@@ -2,7 +2,7 @@
 #include "stormancer/IClient.h"
 #include "stormancer/Logger/ILogger.h"
 #include "stormancer/Event.h"
-#include "stormancer/RPC/service.h"
+#include "stormancer/RPC/Service.h"
 #include "stormancer/Tasks.h"
 #include "stormancer/msgpack_define.h"
 #include <string>

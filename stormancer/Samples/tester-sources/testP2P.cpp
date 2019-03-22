@@ -6,7 +6,7 @@
 #include "stormancer/Logger/ILogger.h"
 #include "stormancer/Logger/ConsoleLogger.h"
 #include "stormancer/IClient.h"
-#include "stormancer/RPC/service.h"
+#include "stormancer/RPC/Service.h"
 
 //static std::string endpoint = "http://api.stormancer.com:8081/";
 //static std::string account = "samples";

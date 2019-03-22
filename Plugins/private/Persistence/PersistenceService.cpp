@@ -2,7 +2,7 @@
 #include STORMANCER_CUSTOM_PCH
 #endif
 #include "Persistence/PersistenceService.h"
-#include "stormancer/RPC/service.h"
+#include "stormancer/RPC/Service.h"
 
 Stormancer::PersistenceService::PersistenceService(std::shared_ptr<Scene> scene) :
 	_scene(scene)

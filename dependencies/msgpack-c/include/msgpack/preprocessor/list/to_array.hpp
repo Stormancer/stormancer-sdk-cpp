@@ -20,13 +20,13 @@
 # include <msgpack/preprocessor/list/adt.hpp>
 # include <msgpack/preprocessor/tuple/elem.hpp>
 # include <msgpack/preprocessor/tuple/rem.hpp>
-# if MSGPACK_PP_VARIADICS && MSGPACK_PP_VARIADICS_MSVC && (_MSC_VER <= 1400)
+# if defined(MSGPACK_PP_VARIADICS) && MSGPACK_PP_VARIADICS && defined(MSGPACK_PP_VARIADICS_MSVC) && MSGPACK_PP_VARIADICS_MSVC && defined(_MSC_VER) && (_MSC_VER <= 1400)
 # include <msgpack/preprocessor/control/iif.hpp>
 # endif
 #
 # /* MSGPACK_PP_LIST_TO_ARRAY */
 #
-# if MSGPACK_PP_VARIADICS && MSGPACK_PP_VARIADICS_MSVC && (_MSC_VER <= 1400)
+# if defined(MSGPACK_PP_VARIADICS) && MSGPACK_PP_VARIADICS && defined(MSGPACK_PP_VARIADICS_MSVC) && MSGPACK_PP_VARIADICS_MSVC && defined(_MSC_VER) && (_MSC_VER <= 1400)
 # define MSGPACK_PP_LIST_TO_ARRAY(list) \
 	MSGPACK_PP_IIF \
 		( \
@@ -136,7 +136,7 @@
 #
 # /* MSGPACK_PP_LIST_TO_ARRAY_D */
 #
-# if MSGPACK_PP_VARIADICS && MSGPACK_PP_VARIADICS_MSVC && (_MSC_VER <= 1400)
+# if defined(MSGPACK_PP_VARIADICS) && MSGPACK_PP_VARIADICS && defined(MSGPACK_PP_VARIADICS_MSVC) && MSGPACK_PP_VARIADICS_MSVC && defined (_MSC_VER) && (_MSC_VER <= 1400)
 # define MSGPACK_PP_LIST_TO_ARRAY_D(d, list) \
 	MSGPACK_PP_IIF \
 		( \

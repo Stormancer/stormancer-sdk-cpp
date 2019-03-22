@@ -17,8 +17,8 @@
 # include <msgpack/preprocessor/config/config.hpp>
 # include <msgpack/preprocessor/variadic/size.hpp>
 #
-# if MSGPACK_PP_VARIADICS
-#    if MSGPACK_PP_VARIADICS_MSVC
+# if defined(MSGPACK_PP_VARIADICS) && MSGPACK_PP_VARIADICS
+#    if defined(MSGPACK_PP_VARIADICS_MSVC) && MSGPACK_PP_VARIADICS_MSVC
 #        define MSGPACK_PP_TUPLE_SIZE(tuple) MSGPACK_PP_CAT(MSGPACK_PP_VARIADIC_SIZE tuple,)
 #    else
 #        define MSGPACK_PP_TUPLE_SIZE(tuple) MSGPACK_PP_VARIADIC_SIZE tuple

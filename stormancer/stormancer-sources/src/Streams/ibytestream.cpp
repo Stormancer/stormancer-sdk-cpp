@@ -171,11 +171,11 @@ namespace Stormancer
 		std::basic_istream<byte>::read(ptr, size);
 		return (*this);
 	}
-
+#if !defined(_LIBCPP_VERSION)
 	ibytestream& ibytestream::read(char* ptr, std::streamsize size)
 	{
 		std::basic_istream<byte>::read((byte*)ptr, size);
 		return (*this);
 	}
-
+#endif
 }

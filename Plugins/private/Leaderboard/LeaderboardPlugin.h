@@ -1,7 +1,4 @@
 #pragma once
-
-#include <cpprest/json.h>
-
 #include "stormancer/IPlugin.h"
 #include "stormancer/Scene.h"
 

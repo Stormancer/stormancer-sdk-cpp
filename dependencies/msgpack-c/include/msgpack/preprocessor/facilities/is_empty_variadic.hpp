@@ -19,7 +19,7 @@
 # include <msgpack/preprocessor/punctuation/is_begin_parens.hpp>
 # include <msgpack/preprocessor/facilities/detail/is_empty.hpp>
 #
-#if MSGPACK_PP_VARIADICS_MSVC && _MSC_VER <= 1400
+#if defined(MSGPACK_PP_VARIADICS_MSVC) && MSGPACK_PP_VARIADICS_MSVC && defined(_MSC_VER) && _MSC_VER <= 1400
 #
 #define MSGPACK_PP_IS_EMPTY(param) \
     MSGPACK_PP_DETAIL_IS_EMPTY_IIF \

@@ -23,8 +23,8 @@
 # include <msgpack/preprocessor/variadic/elem.hpp>
 # include <msgpack/preprocessor/tuple/detail/is_single_return.hpp>
 #
-# if MSGPACK_PP_VARIADICS
-#    if MSGPACK_PP_VARIADICS_MSVC
+# if defined (MSGPACK_PP_VARIADICS) && MSGPACK_PP_VARIADICS
+#    if defined (MSGPACK_PP_VARIADICS_MSVC) && MSGPACK_PP_VARIADICS_MSVC
 #        define MSGPACK_PP_TUPLE_ELEM(...) MSGPACK_PP_TUPLE_ELEM_I(MSGPACK_PP_OVERLOAD(MSGPACK_PP_TUPLE_ELEM_O_, __VA_ARGS__), (__VA_ARGS__))
 #        define MSGPACK_PP_TUPLE_ELEM_I(m, args) MSGPACK_PP_TUPLE_ELEM_II(m, args)
 #        define MSGPACK_PP_TUPLE_ELEM_II(m, args) MSGPACK_PP_CAT(m ## args,)

@@ -1,7 +1,7 @@
 #include "AssetsStorage/AssetsStorageService.h"
 #include "stormancer/Logger/ILogger.h"
-#include "stormancer/scene.h"
-#include "stormancer/RPC/service.h"
+#include "stormancer/Scene.h"
+#include "stormancer/RPC/Service.h"
 
 
 namespace Stormancer

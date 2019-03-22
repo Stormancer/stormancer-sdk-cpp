@@ -4,7 +4,7 @@
 #include "PartyManagementService.h"
 #include "stormancer/Logger/ILogger.h"
 #include "stormancer/RPC/Service.h"
-#include "stormancer/exceptions.h"
+#include "stormancer/Exceptions.h"
 
 namespace Stormancer
 {

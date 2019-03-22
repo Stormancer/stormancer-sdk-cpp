@@ -276,14 +276,14 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Party\PartyContainer.h">
       <Filter>private\Party</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Party\PartyModels.h">
-      <Filter>private\Party</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Party\PartyPlugin.h">
       <Filter>private\Party</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Party\PartyService.h">
       <Filter>private\Party</Filter>
+    </ClInclude>
+	<ClInclude Include="$(MSBuildThisFileDirectory)public\Party\PartyModels.h">
+      <Filter>public\Party</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Party\Party.h">
       <Filter>public\Party</Filter>
@@ -293,9 +293,6 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Profile\Profiles.h">
       <Filter>public\Profile</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Profile\ProfileModels.h">
-      <Filter>private\Profile</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Profile\ProfilePlugin.h">
       <Filter>private\Profile</Filter>
@@ -335,6 +332,9 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameSession\GameSessionPlugin.h">
       <Filter>public\GameSession</Filter>
+    </ClInclude>   
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Profile\ProfileModels.h">
+      <Filter>public\Profile</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameRecovery\GameRecoveryModels.h">
       <Filter>public\GameRecovery</Filter>

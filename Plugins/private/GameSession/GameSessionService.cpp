@@ -127,6 +127,7 @@ namespace Stormancer
 						that->_onConnectionFailure(ex.what());
 						that->_logger->log(ex);
 					}
+					throw;
 				}
 			}, ct);
 		}

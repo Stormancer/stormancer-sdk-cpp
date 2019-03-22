@@ -1,9 +1,8 @@
 #pragma once
 
 #include "stormancer/BuildConfig.h"
-
 #include "stormancer/Streams/bytestreambuf.h"
-#include <istream>
+#include <ostream> 
 #include <vector>
 #include <iostream>
 
@@ -64,9 +63,9 @@ namespace Stormancer
 		void dynamic(bool dyn);
 
 		obytestream& write(const byte* ptr, std::streamsize size);
-
+#if !defined(_LIBCPP_VERSION)
 		obytestream& write(const char* ptr, std::streamsize size);
-
+#endif
 
 #pragma endregion
 

@@ -3,7 +3,7 @@
 #include "stormancer/BuildConfig.h"
 
 #include "stormancer/Tasks.h"
-#include "stormancer/scene.h"
+#include "stormancer/Scene.h"
 #include "stormancer/Configuration.h"
 #include "stormancer/Federation.h"
 namespace Stormancer

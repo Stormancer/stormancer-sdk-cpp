@@ -3,7 +3,7 @@
 #endif
 #include "Invitations/Invitations.h"
 
-#include "stormancer/RPC/service.h"
+#include "stormancer/RPC/Service.h"
 #include "stormancer/Logger/ILogger.h"
 
 Stormancer::InvitationsService::InvitationsService(std::shared_ptr<Scene> scene, std::shared_ptr<ILogger> logger) :

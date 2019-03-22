@@ -38,7 +38,11 @@ namespace Stormancer
 
 };
 
+
+
+
 namespace pplx
+
 {
 	pplx::cancellation_token operator||(pplx::cancellation_token token1, pplx::cancellation_token token2);
 }

@@ -150,7 +150,7 @@
 #include "cpprest/details/http_helpers.h"
 
 // oauth
-
+#if !defined(LINUX)
 #if !defined(_WIN32) || _WIN32_WINNT >= _WIN32_WINNT_VISTA
 #include "cpprest/oauth1.h"
 #endif
@@ -162,7 +162,7 @@
 #include "cpprest/ws_msg.h"
 
 #if !defined(__cplusplus_winrt)
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA && !defined(LINUX)
 #include "cpprest/details/http_server.h"
 #include "cpprest/http_listener.h"
 #include "cpprest/details/http_server_api.h"
@@ -172,12 +172,12 @@
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 #include "cpprest/details/http_server_httpsys.h"
 #endif // _WIN32_WINNT >= _WIN32_WINNT_VISTA
-#else
+#elif !defined(LINUX)
 #include "cpprest/details/http_server_asio.h"
 #endif
 
 #endif
-
+#endif
 
 #if defined(max)
 #error: max macro defined -- make sure to #define NOMINMAX before including windows.h

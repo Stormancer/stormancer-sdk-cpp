@@ -2,7 +2,6 @@
 
 #include "stormancer/IPlugin.h"
 #include "stormancer/Scene.h"
-#include <cpprest/json.h>
 
 namespace Stormancer
 {

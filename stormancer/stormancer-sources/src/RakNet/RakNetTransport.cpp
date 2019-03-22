@@ -8,7 +8,7 @@
 #include "stormancer/SafeCapture.h"
 #include "PacketFileLogger.h"
 #include "stormancer/Debug/StackWalker.h"
-#include "stormancer/utilities/taskUtilities.h"
+#include "stormancer/Utilities/TaskUtilities.h"
 #include "stormancer/SceneImpl.h"
 
 #if defined(_WIN32)

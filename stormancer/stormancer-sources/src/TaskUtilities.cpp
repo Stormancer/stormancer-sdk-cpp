@@ -1,5 +1,5 @@
 #include "stormancer/stdafx.h"
-#include "stormancer/utilities/TaskUtilities.h"
+#include "stormancer/Utilities/TaskUtilities.h"
 
 namespace Stormancer
 {
@@ -39,11 +39,15 @@ namespace Stormancer
 	}
 }
 
+
+
+
 namespace pplx
+
 {
 	pplx::cancellation_token operator||(pplx::cancellation_token token1, pplx::cancellation_token token2)
 	{
-		std::vector<pplx::cancellation_token> tokens;		
+		std::vector<pplx::cancellation_token> tokens;
 		if (!token1.is_cancelable())
 		{
 			return token2;

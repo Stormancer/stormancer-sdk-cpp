@@ -1,6 +1,6 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/RPC/RpcPlugin.h"
-#include "stormancer/RPC/service.h"
+#include "stormancer/RPC/Service.h"
 #include "stormancer/IActionDispatcher.h"
 #include "stormancer/RPC/Constants.h"
 namespace Stormancer

@@ -3,7 +3,7 @@
 
 #include "GameFinder/GameFinderModels.h"
 #include "stormancer/Event.h"
-#include "stormancer/scene.h"
+#include "stormancer/Scene.h"
 
 namespace Stormancer
 {

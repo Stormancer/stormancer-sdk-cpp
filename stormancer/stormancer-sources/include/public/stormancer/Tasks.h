@@ -8,6 +8,10 @@
 #else
 #include "AllowWindowsPlatformTypes.h"
 #endif
+#if PLATFORM_LINUX // Ignore Unreal Engine warning as error ([-Werror, -Wundef]).
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wundef"
+#endif
 #endif
 
 #ifdef _WIN32
@@ -30,5 +34,8 @@
 #include "XboxOneHidePlatformTypes.h"
 #else
 #include "HideWindowsPlatformTypes.h"
+#endif
+#if PLATFORM_LINUX
+#pragma clang diagnostic pop
 #endif
 #endif

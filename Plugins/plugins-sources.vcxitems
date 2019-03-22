@@ -89,11 +89,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Members\Organizations_Impl.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Party\PartyContainer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Party\PartyManagementService.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Party\PartyModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Party\PartyPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Party\PartyService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Party\Party_Impl.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Profile\ProfileModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Profile\ProfilePlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Profile\ProfileService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Profile\Profiles_Impl.h" />
@@ -121,12 +119,14 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Members\Friends.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Members\Organizations.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Party\Party.h" />
+	<ClInclude Include="$(MSBuildThisFileDirectory)public\Party\PartyModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Persistence\PersistenceModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Persistence\PersistenceService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\PlayerData\PlayerDataService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\PlayerData\PlayerDataUpdate.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\PlayerReport\PlayerReportPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\PlayerReport\PlayerReportService.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Profile\Profiles.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Profile\ProfileModels.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Profile\Profiles.h" />    
   </ItemGroup>
 </Project>

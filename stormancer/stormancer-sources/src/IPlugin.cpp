@@ -1,7 +1,7 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/IPlugin.h"
 #include "stormancer/IClient.h"
-#include "stormancer/scene.h"
+#include "stormancer/Scene.h"
 #include "stormancer/Packet.h"
 
 namespace Stormancer

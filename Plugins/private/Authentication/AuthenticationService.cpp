@@ -1,6 +1,6 @@
 #include "Authentication/AuthenticationService.h"
-#include "stormancer/RPC/service.h"
-#include "stormancer/utilities/taskUtilities.h"
+#include "stormancer/RPC/Service.h"
+#include "stormancer/Utilities/TaskUtilities.h"
 
 namespace Stormancer
 {

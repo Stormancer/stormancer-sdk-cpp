@@ -7,6 +7,7 @@
     <SharedGUID>388fd5af-5c41-4452-97f0-2841cee780b6</SharedGUID>
     <ItemsProjectGuid>{3d5908f7-7673-4229-bc46-2007a7af9cae}</ItemsProjectGuid>
     <ItemsRootNamespace>other</ItemsRootNamespace>
+    <ItemsProjectName>linux</ItemsProjectName>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
@@ -15,8 +16,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\http\client\http_client_asio.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\http\client\x509_cert_utilities_apple.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\pplx\pplxapple.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\pplx\pplxlinux.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\pplx\threadpool.cpp" />
   </ItemGroup>
   <ItemGroup>

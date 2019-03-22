@@ -3,7 +3,7 @@
 #include "stormancer/BuildConfig.h"
 
 #include "stormancer/Streams/bytestream.h"
-#include "stormancer/stormancerTypes.h"
+#include "stormancer/StormancerTypes.h"
 #include <vector>
 
 namespace Stormancer

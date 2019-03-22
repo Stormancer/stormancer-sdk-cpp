@@ -27,6 +27,8 @@
 
 #include "stdafx.h"
 
+#include "pplx/threadpool.h"
+
 #if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-local-typedef"

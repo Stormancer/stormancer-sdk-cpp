@@ -16,6 +16,11 @@
 // UE's "check" macro conflicts with msgpack
 #pragma push_macro("check")
 #undef check
+
+#if PLATFORM_LINUX // Ignore Unreal Engine warning as error ([-Werror, -Wundef]).
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wundef"
+#endif
 #endif // defined(UE_EDITOR) || defined(UE_GAME)
 
 #include "msgpack.hpp"
@@ -31,7 +36,9 @@
 #include "HideWindowsPlatformTypes.h"
 #endif
 #endif // _WIN32
-
+#if PLATFORM_LINUX
+#pragma clang diagnostic pop
+#endif
 #endif // defined(UE_EDITOR) || defined(UE_GAME)
 
 #else

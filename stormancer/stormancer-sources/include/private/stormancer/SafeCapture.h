@@ -2,7 +2,7 @@
 
 #include "stormancer/BuildConfig.h"
 
-#include "stormancer/exceptions.h"
+#include "stormancer/Exceptions.h"
 #include <memory>
 
 #if __cplusplus >= 201703L

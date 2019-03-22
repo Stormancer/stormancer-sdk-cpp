@@ -15,13 +15,13 @@ namespace Stormancer
 	void Watch::reset()
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
-		_startTime = std::chrono::high_resolution_clock::now();
+		_startTime = std::chrono::steady_clock::now();
 	}
 
 	int64 Watch::getElapsedTime()
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
-		auto now = std::chrono::high_resolution_clock::now();
+		auto now = std::chrono::steady_clock::now();
 		auto dif = now - _startTime;
 		auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(dif);
 		return ms.count() + _baseTime;

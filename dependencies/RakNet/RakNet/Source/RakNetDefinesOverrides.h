@@ -8,7 +8,15 @@
  *
  */
 
-#if !defined(ANDROID)
+//#if defined(__ORBIS__) || defined(__psp2__) || defined(ANDROID) || defined(NN_NINTENDO_SDK) || defined(_XBOX_ONE)
+//#define RAKNET_SUPPORT_IPV6 0
+//#else
+//#define RAKNET_SUPPORT_IPV6 1
+//#endif
+
+#if defined(_WIN32)
+#define RAKNET_SUPPORT_IPV6 1
+#elif defined(__APPLE__)
 #define RAKNET_SUPPORT_IPV6 1
 #else
 #define RAKNET_SUPPORT_IPV6 0

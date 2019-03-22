@@ -2,7 +2,7 @@
 
 #include "stormancer/BuildConfig.h"
 
-#include "stormancer/stormancerTypes.h"
+#include "stormancer/StormancerTypes.h"
 #include <streambuf>
 
 

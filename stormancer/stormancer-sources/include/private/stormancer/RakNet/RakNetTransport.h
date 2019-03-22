@@ -6,7 +6,7 @@
 
 #include "stormancer/ITransport.h"
 #include "stormancer/Logger/ILogger.h"
-#include "stormancer/RakNet/RaknetConnection.h"
+#include "stormancer/RakNet/RakNetConnection.h"
 #include "stormancer/DependencyResolver.h"
 #include "stormancer/IScheduler.h"
 

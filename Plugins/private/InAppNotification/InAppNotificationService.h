@@ -1,7 +1,7 @@
 #pragma once
 
 #include "InAppNotification/InAppNotificationModels.h"
-#include "Stormancer/RPC/Service.h"
+#include "stormancer/RPC/Service.h"
 
 namespace Stormancer
 {

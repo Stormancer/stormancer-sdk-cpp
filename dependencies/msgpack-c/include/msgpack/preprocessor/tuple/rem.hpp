@@ -21,8 +21,8 @@
 #
 # /* MSGPACK_PP_REM */
 #
-# if MSGPACK_PP_VARIADICS
-# 	 if MSGPACK_PP_VARIADICS_MSVC
+# if defined(MSGPACK_PP_VARIADICS) && MSGPACK_PP_VARIADICS
+# 	 if defined(MSGPACK_PP_VARIADICS_MSVC) && MSGPACK_PP_VARIADICS_MSVC
 		/* To be used internally when __VA_ARGS__ could be empty ( or is a single element ) */
 #    	define MSGPACK_PP_REM_CAT(...) MSGPACK_PP_CAT(__VA_ARGS__,)
 # 	 endif
@@ -36,8 +36,8 @@
 /*
   VC++8.0 cannot handle the variadic version of MSGPACK_PP_TUPLE_REM(size)
 */
-# if MSGPACK_PP_VARIADICS && !(MSGPACK_PP_VARIADICS_MSVC && _MSC_VER <= 1400)
-# 	 if MSGPACK_PP_VARIADICS_MSVC
+# if defined(MSGPACK_PP_VARIADICS) && MSGPACK_PP_VARIADICS && !(defined (MSGPACK_PP_VARIADICS_MSVC) && MSGPACK_PP_VARIADICS_MSVC && defined(_MSC_VER) && _MSC_VER <= 1400)
+# 	 if defined (MSGPACK_PP_VARIADICS_MSVC) && MSGPACK_PP_VARIADICS_MSVC
 		/* To be used internally when the size could be 0 ( or 1 ) */
 #    	define MSGPACK_PP_TUPLE_REM_CAT(size) MSGPACK_PP_REM_CAT
 # 	 endif
@@ -119,8 +119,8 @@
 #
 # /* MSGPACK_PP_TUPLE_REM_CTOR */
 #
-# if MSGPACK_PP_VARIADICS
-#    if MSGPACK_PP_VARIADICS_MSVC
+# if defined(MSGPACK_PP_VARIADICS) && MSGPACK_PP_VARIADICS
+#    if defined(MSGPACK_PP_VARIADICS_MSVC) && MSGPACK_PP_VARIADICS_MSVC
 #        define MSGPACK_PP_TUPLE_REM_CTOR(...) MSGPACK_PP_TUPLE_REM_CTOR_I(MSGPACK_PP_OVERLOAD(MSGPACK_PP_TUPLE_REM_CTOR_O_, __VA_ARGS__), (__VA_ARGS__))
 #        define MSGPACK_PP_TUPLE_REM_CTOR_I(m, args) MSGPACK_PP_TUPLE_REM_CTOR_II(m, args)
 #        define MSGPACK_PP_TUPLE_REM_CTOR_II(m, args) MSGPACK_PP_CAT(m ## args,)

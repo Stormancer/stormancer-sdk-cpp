@@ -25,6 +25,11 @@
 
 #pragma once
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunknown-pragmas"	// warning : unknown pragma ignored [-Wunknown-pragmas]
+#endif
+
 #ifndef _PPLXTASKS_H
 #define _PPLXTASKS_H
 
@@ -945,7 +950,7 @@ namespace pplx
 		private:
 			void ReportUnhandledError()
 			{
-#if _MSC_VER >= 1800 && defined(__cplusplus_winrt)
+#if defined(_MSC_VER) && _MSC_VER >= 1800 && defined(__cplusplus_winrt)
 				if (_M_winRTException != nullptr)
 				{
 					::Platform::Details::ReportUnhandledError(_M_winRTException);
@@ -1485,7 +1490,7 @@ namespace pplx
 			virtual ~_ContinuationTaskHandleBase() {}
 		};
 
-#if _PPLTASK_ASYNC_LOGGING
+#if defined(_PPLTASK_ASYNC_LOGGING) && _PPLTASK_ASYNC_LOGGING
 		// GUID used for identifying causality logs from PPLTask
 		const ::Platform::Guid _PPLTaskCausalityPlatformID(0x7A76B220, 0xA758, 0x4E6E, 0xB0, 0xE0, 0xD7, 0xC6, 0xD7, 0x4A, 0x88, 0xFE);
 
@@ -2406,7 +2411,7 @@ namespace pplx
 			_Task_impl_base const & operator=(_Task_impl_base const&);
 		};
 
-#if _PPLTASK_ASYNC_LOGGING
+#if defined(_PPLTASK_ASYNC_LOGGING) && _PPLTASK_ASYNC_LOGGING
 		inline void _TaskEventLogger::_LogTaskCompleted()
 		{
 			if (_M_scheduled)
@@ -7319,7 +7324,7 @@ namespace pplx
 	}
 
 	// Work around VS 2010 compiler bug
-#if _MSC_VER == 1600
+#if defined(_MSC_VER) && _MSC_VER == 1600
 	inline task<bool> task_from_result(bool _Param)
 	{
 		task_completion_event<bool> _Tce;
@@ -7387,3 +7392,7 @@ namespace concurrency = Concurrency;
 #endif
 
 #endif // _PPLXTASKS_H
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif

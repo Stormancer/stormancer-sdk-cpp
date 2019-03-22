@@ -1,8 +1,5 @@
 #pragma once
-
-#include "cpprest/json.h"
-
-#include "stormancer/RPC/service.h"
+#include "stormancer/RPC/Service.h"
 #include "LeaderboardModels.h"
 
 namespace Stormancer
