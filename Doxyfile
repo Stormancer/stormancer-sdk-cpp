@@ -1213,7 +1213,7 @@ HTML_EXTRA_STYLESHEET  = ../../../doc/themes/doxygen/customdoxygen.css
 # files will be copied as-is; there are no commands or markers available.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_EXTRA_FILES       = ../../../doc/themes/doxygen/doxy-boot.js
+HTML_EXTRA_FILES       = ../../../doc/themes/doxygen/doxy-boot.js ../../../doc/themes/doxygen/jquery.smartmenus.js ../../../doc/themes/doxygen/bootstrap/jquery.smartmenus.bootstrap.js ../../../doc/themes/doxygen/bootstrap/jquery.smartmenus.bootstrap.css
 
 # The HTML_COLORSTYLE_HUE tag controls the color of the HTML output. Doxygen
 # will adjust the colors in the style sheet and background images according to
