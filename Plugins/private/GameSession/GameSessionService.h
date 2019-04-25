@@ -53,18 +53,7 @@ namespace Stormancer
 		Event<std::shared_ptr<Stormancer::P2PTunnel>> OnTunnelOpened;
 		Event<void> OnShutdownReceived;
 
-		template<typename TOut, typename TIn>
-		pplx::task<TOut> sendGameResults(TIn results, pplx::cancellation_token ct)
-		{
-			auto scene = _scene.lock();
-			if (!scene)
-			{
-				return pplx::task_from_exception<TOut>(std::runtime_error("Scene deleted"));
-			}
-
-			auto rpc = scene->dependencyResolver()->resolve<RpcService>();
-			return rpc->rpc<TOut, TIn>("gamesession.postresults", results);
-		}
+		pplx::task<Packetisp_ptr> sendGameResults(const StreamWriter& streamWriter, pplx::cancellation_token ct = pplx::cancellation_token::none());
 
 		pplx::task<std::string> P2PTokenRequest(pplx::cancellation_token ct);
 

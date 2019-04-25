@@ -38,12 +38,17 @@
 
 #endif // !defined(STORMANCER_DYNAMIC)
 
+// min / max definition check to give a clear error message instead of mysteriously failing later
+#if defined(min) || defined(max)
+#error "Stormancer will not build when min and/or max are defined as preprocessor macros. Please add NOMINMAX to your preprocessor definitions. If you can't, please #undef min/max before including any stormancer header file."
+#endif
+
 // If pplx was included before this point, it must be with the same settings than the ones required by stormancer.
 // Make sure this is the case
 #if defined(CPPREST_FORCE_PPLX)
 
 
-#if CPPREST_FORCE_PPLX != 1
+#if defined(_WIN32) && CPPREST_FORCE_PPLX != 1
 #error "CPPREST_FORCE_PPLX must be set to 1 on this platform. Make sure you included stormancer/Tasks.h instead of pplx/pplxtask.h"
 #endif
 #endif
@@ -83,6 +88,9 @@
 
 
 
+
+
+#if defined (_WIN32)
 #pragma comment(lib, "ws2_32.lib")
 
 #pragma comment(lib, "iphlpapi.lib") // Needed by libupnp
@@ -90,4 +98,4 @@
 #pragma comment(lib, "Crypt32.lib")
 
 #pragma comment(lib, "Bcrypt.lib")
-
+#endif // defined (_WIN32)

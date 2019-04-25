@@ -3,11 +3,6 @@
 #include <Ws2tcpip.h>
 #endif
 #include "stormancer/Helpers.h"
-#include "stormancer/Shutdown.h"
-
-// Needed for string/wstring conversion, not present on Vita.
-#include <codecvt>
-
 #include <iomanip>
 #include <sstream>
 
@@ -17,76 +12,6 @@ namespace Stormancer
 	{
 		return (statusCode >= 200 && statusCode < 300);
 	}
-
-	std::string vectorJoin(const std::vector<std::string>& vector, const std::string& glue)
-	{
-		std::stringstream ss;
-		for (size_t i = 0; i < vector.size(); ++i)
-		{
-			if (i != 0)
-			{
-				ss << glue;
-			}
-			ss << vector[i];
-		}
-		return ss.str();
-	}
-
-	std::vector<std::string> stringSplit(const std::string& str, char separator)
-	{
-		std::vector<std::string> tokens;
-		std::string token;
-		std::istringstream tokenStream(str);
-		while (std::getline(tokenStream, token, separator))
-		{
-			tokens.push_back(token);
-		}
-		return tokens;
-	}
-
-	std::string stringTrim(const std::string& str2, char ch)
-	{
-		auto str = str2;
-		std::function<int(int)> ischar = [=](int c) -> int {
-			if (c == ch)
-			{
-				return 1;
-			}
-			return 0;
-		};
-		str.erase(str.begin(), find_if(str.begin(), str.end(), not1(ischar)));
-		str.erase(find_if(str.rbegin(), str.rend(), not1(ischar)).base(), str.end());
-		return str;
-	};
-
-	std::vector<std::wstring> wstringSplit(const std::wstring& str, const std::wstring& separator)
-	{
-		std::vector<std::wstring> splitted;
-		size_t cursor = 0, lastCursor = 0;
-		while ((cursor = str.find(separator, cursor)) != std::wstring::npos)
-		{
-			splitted << str.substr(lastCursor, cursor - lastCursor);
-			lastCursor = cursor;
-			cursor++;
-		}
-		splitted << str.substr(lastCursor + 1, str.length() - lastCursor);
-		return splitted;
-	}
-
-	std::wstring wstringTrim(const std::wstring& str2, wchar_t ch)
-	{
-		auto str = str2;
-		std::function<int(int)> ischar = [=](int c) -> int {
-			if (c == ch)
-			{
-				return 1;
-			}
-			return 0;
-		};
-		str.erase(str.begin(), find_if(str.begin(), str.end(), not1(ischar)));
-		str.erase(find_if(str.rbegin(), str.rend(), not1(ischar)).base(), str.end());
-		return str;
-	};
 
 	std::time_t nowTime_t()
 	{
@@ -204,58 +129,6 @@ namespace Stormancer
 		return false;
 	}
 
-	pplx::cancellation_token_source create_linked_source(pplx::cancellation_token token1, pplx::cancellation_token token2)
-	{	
-		std::vector<pplx::cancellation_token> tokens;
-		if (token1.is_cancelable())
-		{
-			tokens.push_back(token1);
-		}
-		if (token2.is_cancelable())
-		{
-			tokens.push_back(token2);
-		}
-		return pplx::cancellation_token_source::create_linked_source(tokens.begin(), tokens.end());
-	}
-
-
-	pplx::cancellation_token_source create_linked_source(pplx::cancellation_token token1, pplx::cancellation_token token2, pplx::cancellation_token token3)
-	{
-		std::vector<pplx::cancellation_token> tokens;
-		if (token1.is_cancelable())
-		{
-			tokens.push_back(token1);
-		}
-		if (token2.is_cancelable())
-		{
-			tokens.push_back(token2);
-		}
-		if (token3.is_cancelable())
-		{
-			tokens.push_back(token3);
-		}
-		return pplx::cancellation_token_source::create_linked_source(tokens.begin(), tokens.end());
-	}
-
-	pplx::cancellation_token create_linked_shutdown_token(pplx::cancellation_token token)
-	{
-		return create_linked_source(token, Shutdown::instance().getShutdownToken()).get_token();
-	}
-
-
-	std::wstring utf8_to_wstring(const std::string& str)
-	{
-		std::wstring_convert<std::codecvt_utf8<wchar_t>> myconv;
-		return myconv.from_bytes(str);
-	}
-
-	std::string wstring_to_utf8(const std::wstring& str)
-	{
-		std::wstring_convert<std::codecvt_utf8<wchar_t>> myconv;
-		return myconv.to_bytes(str);
-	}
-
-
 
 	void setUnobservedExceptionHandler(std::function<bool(std::exception_ptr)> handler)
 	{
@@ -328,4 +201,4 @@ namespace Stormancer
 		//    if (colons>7) return false;
 		//    return true;
 	}
-};
+}

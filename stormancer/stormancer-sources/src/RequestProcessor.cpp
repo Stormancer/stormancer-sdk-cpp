@@ -50,13 +50,13 @@ namespace Stormancer
 			auto processor = LockOrThrow(wProcessor);
 
 			byte sysRequestId;
-			*(p->stream) >> sysRequestId;
+			p->stream >> sysRequestId;
 			std::shared_ptr<RequestContext> context = std::make_shared<RequestContext>(p);
 			auto it = processor->_handlers.find(sysRequestId);
 
 			if (it == processor->_handlers.end())
 			{
-				context->error([serializer](obytestream* stream)
+				context->error([serializer](obytestream& stream)
 				{
 					std::string message = "No system request handler found.";
 					serializer.serialize(stream, message);
@@ -76,7 +76,7 @@ namespace Stormancer
 				{
 					if (!context->isComplete())
 					{
-						context->error([serializer, ex](obytestream* stream)
+						context->error([serializer, ex](obytestream& stream)
 						{
 							std::string message = std::string() + "An error occured on the server. " + ex.what();
 							serializer.serialize(stream, message);
@@ -103,7 +103,7 @@ namespace Stormancer
 			auto processor = LockOrThrow(wProcessor);
 
 			uint16 id;
-			*(p->stream) >> id;
+			p->stream >> id;
 
 			SystemRequest_ptr request = processor->freeRequestSlot(id);
 
@@ -131,10 +131,10 @@ namespace Stormancer
 			auto processor = LockOrThrow(wProcessor);
 
 			uint16 id;
-			*(p->stream) >> id;
+			p->stream >> id;
 
 			byte hasValues;
-			*(p->stream) >> hasValues;
+			p->stream >> hasValues;
 
 			if (hasValues == 0)
 			{
@@ -151,7 +151,7 @@ namespace Stormancer
 				}
 				else
 				{
-					logger->log(LogLevel::Warn, "RequestProcessor/complete", "Unknow request id " + to_string(id));
+					logger->log(LogLevel::Warn, "RequestProcessor/complete", "Unknow request id " + std::to_string(id));
 				}
 			}
 
@@ -163,7 +163,7 @@ namespace Stormancer
 			auto processor = LockOrThrow(wProcessor);
 
 			uint16 id;
-			*(p->stream) >> id;
+			p->stream >> id;
 
 			SystemRequest_ptr request = processor->freeRequestSlot(id);
 
@@ -180,14 +180,14 @@ namespace Stormancer
 			}
 			else
 			{
-				logger->log(LogLevel::Warn, "RequestProcessor/error", "Unknown request id :" + to_string(id));
+				logger->log(LogLevel::Warn, "RequestProcessor/error", "Unknown request id :" + std::to_string(id));
 			}
 
 			return true;
 		}));
 	}
 
-	pplx::task<Packet_ptr> RequestProcessor::sendSystemRequest(IConnection* peer, byte msgId, const Writer& writer, PacketPriority priority, pplx::cancellation_token ct)
+	pplx::task<Packet_ptr> RequestProcessor::sendSystemRequest(IConnection* peer, byte msgId, const StreamWriter& streamWriter, PacketPriority priority, pplx::cancellation_token ct)
 	{
 		if (peer)
 		{
@@ -222,13 +222,13 @@ namespace Stormancer
 				{
 					metadata.dontEncrypt = true;// SET metadata contains the encryption key.
 				}
-				peer->send([=, &writer](obytestream* stream) {
-					(*stream) << (byte)MessageIDTypes::ID_SYSTEM_REQUEST;
-					(*stream) << msgId;
-					(*stream) << request->id;
-					if (writer)
+				peer->send([msgId, request, &streamWriter](obytestream& stream) {
+					stream << (byte)MessageIDTypes::ID_SYSTEM_REQUEST;
+					stream << msgId;
+					stream << request->id;
+					if (streamWriter)
 					{
-						writer(stream);
+						streamWriter(stream);
 					}
 				}, 0, priority, PacketReliability::RELIABLE, metadata);
 			}

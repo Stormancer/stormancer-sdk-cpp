@@ -16,13 +16,13 @@ namespace Stormancer
 	class Party_Impl : public ClientAPI<Party_Impl>, public Party
 	{
 	public:
+
 		Party_Impl(std::weak_ptr<AuthenticationService> auth, std::weak_ptr<ILogger> logger, std::weak_ptr<GameFinder> gameFinder);
 
 		pplx::task<std::shared_ptr<PartyContainer>> joinPartySceneByPlatformSessionId(const std::string uniqueOnlinePartyName) override;
 		pplx::task<std::shared_ptr<PartyContainer>> joinPartySceneByConnectionToken(const std::string& connectionToken) override;
 		pplx::task<void> leaveParty() override;
 		pplx::task<std::shared_ptr<PartyContainer>> getParty() override;
-
 
 		pplx::task<void> updatePlayerStatus(PartyUserStatus playerStatus) override;
 		pplx::task<void> updatePartySettings(PartySettingsDto partySettings) override;
@@ -40,12 +40,13 @@ namespace Stormancer
 		Event<void>::Subscription subscribeOnKickedFromParty(std::function<void()> callback) override;
 		Event<void>::Subscription subscribeOnLeftParty(std::function<void()> callback) override;
 
-		PartyInvitations& getPartyInvitation() override 
+		PartyInvitations& getPartyInvitation() override
 		{
 			return invitations;
 		}
-		
+
 		void initialize();
+
 	private:
 
 		PartyInvitations invitations;
@@ -61,17 +62,14 @@ namespace Stormancer
 		pplx::task<std::shared_ptr<PartyContainer>> getPartySceneByToken(const std::string& connectionToken);
 
 		std::shared_ptr<PartyContainer> initPartyFromScene(std::shared_ptr<Scene> scene);
-		
+
 		std::weak_ptr<ILogger> _logger;
 		std::weak_ptr<GameFinder> _gameFinder;
 		rxcpp::subscription _partySceneConnectionStateSubscription;
 
-		bool listened;
 		std::string _uniqueOnlinePartyName;
 		std::shared_ptr<pplx::task<std::shared_ptr<PartyContainer>>> _party;
 
 		pplx::task<std::shared_ptr<PartyManagementService>> getPartyManagementService();
-
-		
 	};
 }

@@ -57,7 +57,7 @@ namespace Stormancer
 			{
 				endpoints = transport->getAvailableEndpoints();
 			}
-			ctx->send([serializer, endpoints](obytestream* stream)
+			ctx->send([serializer, endpoints](obytestream& stream)
 			{
 				serializer->serialize(stream, endpoints);
 			});
@@ -93,7 +93,7 @@ namespace Stormancer
 			session.sceneId = sceneId;
 			session.remotePeer = peerId;
 			sessions->createSession(sessionId, session);
-			ctx->send(Writer());
+			ctx->send(StreamWriter());
 			return pplx::task_from_result();
 		});
 
@@ -104,7 +104,7 @@ namespace Stormancer
 			std::string sessionId(sessionIdVector.begin(), sessionIdVector.end());
 
 			sessions->closeSession(sessionId);
-			ctx->send(Writer());
+			ctx->send(StreamWriter());
 
 			return pplx::task_from_result();
 		});
@@ -118,7 +118,7 @@ namespace Stormancer
 			auto connection = connections->getConnection(candidate.listeningPeer);
 			if (connection && connection->getConnectionState() == ConnectionState::Connected)
 			{
-				ctx->send([serializer](obytestream* s)
+				ctx->send([serializer](obytestream& s)
 				{
 					serializer->serialize(s, 0);
 				});
@@ -128,7 +128,7 @@ namespace Stormancer
 			{
 				if (candidate.listeningEndpointCandidate.address.substr(0, 9) == "127.0.0.1")
 				{
-					ctx->send([serializer](obytestream* stream)
+					ctx->send([serializer](obytestream& stream)
 					{
 						serializer->serialize(stream, -1);
 					});
@@ -136,7 +136,7 @@ namespace Stormancer
 				}
 				else
 				{
-					ctx->send([serializer](obytestream* stream)
+					ctx->send([serializer](obytestream& stream)
 					{
 						serializer->serialize(stream, 1);
 					});
@@ -145,7 +145,7 @@ namespace Stormancer
 			}
 			else if (config->dedicatedServerEndpoint != "")
 			{
-				ctx->send([serializer](obytestream* stream)
+				ctx->send([serializer](obytestream& stream)
 				{
 					serializer->serialize(stream, -1);
 				});
@@ -157,7 +157,7 @@ namespace Stormancer
 					.then([logger, candidate, serializer, ctx](int latency)
 				{
 					logger->log(LogLevel::Debug, "p2p", "Connectivity test complete  ping : " + std::to_string(latency));
-					ctx->send([serializer, latency](obytestream* stream)
+					ctx->send([serializer, latency](obytestream& stream)
 					{
 						serializer->serialize(stream, latency);
 					});
@@ -174,14 +174,14 @@ namespace Stormancer
 			auto connection = connections->getConnection(candidate.clientPeer);
 			if (connection && connection->getConnectionState() == ConnectionState::Connected)
 			{
-				ctx->send(Writer());
+				ctx->send(StreamWriter());
 				return pplx::task_from_result();
 			}
 			if (config->dedicatedServerEndpoint == "" && config->enableNatPunchthrough)
 			{
 				transport->openNat(candidate.clientEndpointCandidate.address);
 			}
-			ctx->send(Writer());
+			ctx->send(StreamWriter());
 			return pplx::task_from_result();
 		});
 
@@ -195,7 +195,7 @@ namespace Stormancer
 			if (connection && connection->getConnectionState() == ConnectionState::Connected)
 			{
 				sessions->updateSessionState(sessionId, P2PSessionState::Connected);
-				ctx->send(Writer());
+				ctx->send(StreamWriter());
 				return pplx::task_from_result();
 			}
 
@@ -218,7 +218,7 @@ namespace Stormancer
 				}
 			});
 
-			ctx->send(Writer());
+			ctx->send(StreamWriter());
 			return pplx::task_from_result();
 		});
 
@@ -234,7 +234,7 @@ namespace Stormancer
 			if (connection && connection->getConnectionState() == ConnectionState::Connected)
 			{
 				sessions->updateSessionState(sessionId, P2PSessionState::Connected);
-				ctx->send([serializer](obytestream* stream)
+				ctx->send([serializer](obytestream& stream)
 				{
 					serializer->serialize(stream, true);
 				});
@@ -267,7 +267,7 @@ namespace Stormancer
 				{
 					auto connection = t.get();
 					logger->log(LogLevel::Trace, "p2p", "Successfully completed connection to " + std::to_string(connection->id()), "");
-					ctx->send([serializer, connection](obytestream* stream)
+					ctx->send([serializer, connection](obytestream& stream)
 					{
 						bool connected = connection && connection->getConnectionState() == ConnectionState::Connected;
 						serializer->serialize(stream, connected);
@@ -291,7 +291,7 @@ namespace Stormancer
 				auto strongTunnels = LockOrThrow(tunnels);
 				auto handle = strongTunnels->addClient(serverId, peerId);
 
-				ctx->send([serializer, handle](obytestream* stream)
+				ctx->send([serializer, handle](obytestream& stream)
 				{
 					OpenTunnelResult result;
 					result.useTunnel = true;
@@ -302,7 +302,7 @@ namespace Stormancer
 			else
 			{
 				std::string endpoint = config->getIp_Port();//Dedicated server IP:port
-				ctx->send([serializer, endpoint](obytestream* stream)
+				ctx->send([serializer, endpoint](obytestream& stream)
 				{
 					OpenTunnelResult result;
 					result.useTunnel = false;
@@ -325,10 +325,10 @@ namespace Stormancer
 		{
 			auto relay = serializer->deserializeOne<OpenRelayParameters>(ctx->inputStream());
 			std::string sessionId(relay.sessionId.begin(), relay.sessionId.end());
-			connections->newConnection(std::make_shared<RelayConnection>(connections->getConnection(0), relay.remotePeerAddress, relay.remotePeerId,sessionId, serializer));
+			connections->newConnection(std::make_shared<RelayConnection>(ctx->packet()->connection, relay.remotePeerAddress, relay.remotePeerId,sessionId, serializer));
 			
 			sessions->updateSessionState(sessionId, P2PSessionState::Connected);
-			ctx->send(Writer());
+			ctx->send(StreamWriter());
 			return pplx::task_from_result();
 		});
 
@@ -341,7 +341,7 @@ namespace Stormancer
 			{
 				connections->closeConnection(connection, "");
 			}
-			ctx->send([](obytestream*) {});
+			ctx->send([](obytestream&) {});
 			return pplx::task_from_result();
 		});
 	}

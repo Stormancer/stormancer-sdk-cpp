@@ -19,7 +19,7 @@ namespace Stormancer
 
 		std::vector<byte> bytes() override;
 
-		void encrypt(obytestream* stream);
+		void encrypt(obytestream& stream);
 
 #pragma endregion
 

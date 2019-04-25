@@ -21,7 +21,7 @@ namespace Stormancer
 
 		std::string getSceneId() const override;
 
-		void send(const std::string& route, const Writer& writer, PacketPriority packetPriority = PacketPriority::MEDIUM_PRIORITY, PacketReliability packetReliability = PacketReliability::RELIABLE_ORDERED) override;
+		void send(const std::string& route, const StreamWriter& streamWriter, PacketPriority packetPriority = PacketPriority::MEDIUM_PRIORITY, PacketReliability packetReliability = PacketReliability::RELIABLE_ORDERED) override;
 
 		uint64 id() override;
 		void disconnect() override;

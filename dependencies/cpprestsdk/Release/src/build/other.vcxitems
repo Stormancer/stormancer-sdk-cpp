@@ -15,15 +15,15 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\http\client\http_client_asio.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\http\client\http_client_curl.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\pplx\pplxlinux.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\pplx\threadpool.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\pplx\threadpool-std.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\pplx\pplxlinux.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\pplx\threadpool.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\pplx\threadpool-std.h" />
   </ItemGroup>
 </Project>

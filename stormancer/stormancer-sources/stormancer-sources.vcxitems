@@ -90,6 +90,17 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\DependencyResolver.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Event.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Exceptions.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\external\ctti\detail\algorithm.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\external\ctti\detail\cstring.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\external\ctti\detail\hash.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\external\ctti\detail\language_features.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\external\ctti\detail\meta.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\external\ctti\detail\name_filters.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\external\ctti\detail\pretty_function.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\external\ctti\nameof.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\external\ctti\static_value.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\external\ctti\type_id.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\external\ctti\type_tag.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Federation.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\IActionDispatcher.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\IClient.h" />
@@ -128,6 +139,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Tasks.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\TimerThread.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\TransformMetadata.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\MsgpackJsonAdaptor.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\StringUtilities.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\TaskUtilities.h" />
   </ItemGroup>
   <ItemGroup>
@@ -194,10 +207,11 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Streams\obytestream.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\SyncClock.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\SystemRequest.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\TaskUtilities.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\TimerThread.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\TokenHandler.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\TransformMetadata.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Utilities\StringUtilities.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Utilities\TaskUtilities.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Watch.cpp" />
   </ItemGroup>
 </Project>

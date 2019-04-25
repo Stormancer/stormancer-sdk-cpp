@@ -51,15 +51,15 @@ namespace Stormancer
 {
 	// Client
 
-	Client::Client(Configuration_ptr config) :
-		_initialized(false)
+	Client::Client(Configuration_ptr config)
+		: _dependencyResolver(std::make_shared<DependencyResolver>())
+		, _initialized(false)
 		, _accountId(config->account)
 		, _applicationName(config->application)
 		, _maxPeers(config->maxPeers)
 		, _metadata(config->_metadata)
 		, _plugins(config->plugins())
 		, _config(config)
-		, _dependencyResolver(std::make_shared<DependencyResolver>())
 		, _serverTimeout(config->defaultTimeout)
 	{
 	}
@@ -124,10 +124,12 @@ namespace Stormancer
 				plugin->transportStarted(transport);
 			}
 			_connections = _dependencyResolver->resolve< IConnectionManager>();
-
-
-
-
+#if !defined(_WIN32)
+			if (!_config->endpointRootCertificates.empty())
+			{
+				web::http::client::http_client_config::set_root_certificates(_config->endpointRootCertificates);
+			}
+#endif
 
 
 

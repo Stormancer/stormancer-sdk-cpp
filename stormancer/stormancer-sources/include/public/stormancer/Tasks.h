@@ -22,10 +22,12 @@
 
 
 
-#if defined(CPPREST_FORCE_PPLX) && CPPREST_FORCE_PPLX != 1
+#if defined(_WIN32) && defined(CPPREST_FORCE_PPLX) && CPPREST_FORCE_PPLX != 1
 #error "CPPREST_FORCE_PPLX must be defined to 1 on this platform"
 #endif
+#if !defined(CPPREST_FORCE_PPLX)
 #define CPPREST_FORCE_PPLX 1
+#endif
 #include "pplx/pplxtasks.h"
 
 

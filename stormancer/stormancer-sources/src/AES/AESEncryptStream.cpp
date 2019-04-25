@@ -18,13 +18,13 @@ namespace Stormancer
 		if (_aes)
 		{
 			obytestream stream;
-			encrypt(&stream);
+			encrypt(stream);
 			return stream.bytes();
 		}
 		return std::vector<byte>();
 	}
 
-	void AESEncryptStream::encrypt(obytestream* stream)
+	void AESEncryptStream::encrypt(obytestream& stream)
 	{
 		if (_aes)
 		{

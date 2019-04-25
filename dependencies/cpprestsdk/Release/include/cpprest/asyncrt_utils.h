@@ -42,9 +42,10 @@
 #include <chrono>
 #endif
 
-#if !defined(_WIN32) && !defined(__APPLE__)
-#include <boost/algorithm/string.hpp>
+#if !defined(_WIN32)
+#include <strings.h> // for strcasecmp
 #endif
+
 #if defined(__APPLE__) && !defined(ANDROID) && !defined(__ANDROID__) // CodePlex 269
 #include <xlocale.h>
 #endif
@@ -325,10 +326,8 @@ namespace utility
 		{
 #ifdef _WIN32
 			return _wcsicmp(left.c_str(), right.c_str()) == 0;
-#elif defined(__APPLE__)
-			return strcasecmp(left.c_str(), right.c_str()) == 0;
 #else
-			return boost::iequals(left, right);
+			return strcasecmp(left.c_str(), right.c_str()) == 0;
 #endif
 		}
 

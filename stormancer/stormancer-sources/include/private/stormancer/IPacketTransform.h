@@ -18,9 +18,9 @@ namespace Stormancer
 		{
 		}
 
-		virtual void onSend(Writer& writer, uint64 peerId, const TransformMetadata& transformMetadata = TransformMetadata()) = 0;
+		virtual void onSend(StreamWriter& streamWriter, uint64 peerId, const TransformMetadata& transformMetadata = TransformMetadata()) = 0;
 
-		virtual void onReceive(ibytestream* stream, uint64 peerId) = 0;
+		virtual void onReceive(ibytestream& stream, uint64 peerId) = 0;
 
 #pragma endregion
 	};

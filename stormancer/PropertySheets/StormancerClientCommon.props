@@ -10,15 +10,20 @@
 	
 	<StormancerDependenciesOutputDir>$(StormancerSdkRoot)binaries\$(Configuration)\$(Platform)\</StormancerDependenciesOutputDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Platform)'!='Win32' AND '$(Platform)'!='x64'">
+  <PropertyGroup Condition="'$(Platform)'!='Win32' AND '$(Platform)'!='x64' AND '$(TargetPlatformIdentifier)'!='Linux'">
 	<!-- Not building on Windows - toolset version is inapplicable or irrelevant -->
     <IntDir>$(StormancerSdkRoot)intermediate\$(ProjectName)\$(Configuration)\$(Platform)\</IntDir>
     <TargetName>Stormancer_$(Configuration)_$(Platform)</TargetName>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Platform)'=='Win32' OR '$(Platform)'=='x64'">
+  <PropertyGroup Condition="('$(Platform)'=='Win32' OR '$(Platform)'=='x64') AND '$(TargetPlatformIdentifier)'!='Linux'">
 	<!-- Building on Windows - toolset version matters -->
     <IntDir>$(StormancerSdkRoot)intermediate\$(ProjectName)\$(Configuration)\$(Platform)\$(PlatformToolsetVersion)\</IntDir>
     <TargetName>Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetPlatformIdentifier)'=='Linux'">
+	<IntDir>$(StormancerSdkRoot)intermediate\$(ProjectName)\$(Configuration)\$(Platform)\$(StormancerLinuxToolset)\</IntDir>
+    <TargetName>lib$(ProjectName)_$(Configuration)_$(Platform)-$(StormancerLinuxToolset)</TargetName>
+	<FinalLibName>libStormancer_$(Configuration)_Linux-$(Platform)-$(StormancerLinuxToolset).a</FinalLibName>
   </PropertyGroup>
   <PropertyGroup>
     <OutDir>$(StormancerOutputDir)libs\</OutDir>

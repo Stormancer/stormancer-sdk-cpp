@@ -37,6 +37,9 @@ namespace Stormancer
 	class Scene
 	{
 	public:
+
+		virtual ~Scene() = default;
+
 		/// Disconnect from the scene.
 		virtual pplx::task<void> disconnect() = 0;
 		
@@ -54,25 +57,25 @@ namespace Stormancer
 		/// Send a packet to a route.
 		/// \param peerFilter Peer receiver.
 		/// \param routeName Route name.
-		/// \param writer Function where we write the data in the byte stream.
+		/// \param streamWriter Function where we write the data in the byte stream.
 		/// \param priority Message priority on the network.
 		/// \param reliability Message reliability behavior.
 		virtual void send(
 			const PeerFilter& peerFilter, 
 			const std::string& routeName, 
-			const Writer& writer, 
+			const StreamWriter& streamWriter, 
 			PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, 
 			PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, 
 			const std::string& channelIdentifier = "") = 0;
 
 		/// Send a packet to a route.
 		/// \param routeName Route name.
-		/// \param writer Function where we write the data in the byte stream.
+		/// \param streamWriter Function where we write the data in the byte stream.
 		/// \param priority Message priority on the network.
 		/// \param reliability Message reliability behavior.
 		virtual void send(
 			const std::string& routeName, 
-			const Writer& writer, 
+			const StreamWriter& streamWriter, 
 			PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, 
 			PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, 
 			const std::string& channelIdentifier = "") = 0;
@@ -85,7 +88,7 @@ namespace Stormancer
 		/// Returns the scene id.
 		virtual std::string id() const = 0;
 
-		// Returns the detailed scene address, including cluster, account and app information
+		/// Returns the detailed scene address, including cluster, account and app information
 		virtual SceneAddress address() const = 0;
 
 		/// Returns the scene handle.

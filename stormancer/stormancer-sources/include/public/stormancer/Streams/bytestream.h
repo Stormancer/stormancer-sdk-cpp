@@ -8,8 +8,6 @@
 
 namespace Stormancer
 {
-	using Writer = std::function<void(obytestream*)>;
-
-	template<typename TOutput>
-	using Unwriter = std::function<TOutput(ibytestream*)>;
+	using StreamWriter = std::function<void(obytestream&)>;
+	using StreamReader = std::function<void(ibytestream&)>;
 };

@@ -8,10 +8,18 @@ namespace Stormancer
 	{
 	}
 
-	ibytestream::ibytestream(byte* data, std::streamsize sz)
+	ibytestream::ibytestream(byte* data, std::streamsize dataSize)
 		: std::basic_istream<byte>(&_buffer)
-		, _buffer(data, sz)
+		, _buffer(data, dataSize)
 	{
+	}
+
+	ibytestream::ibytestream(ibytestream&& other)
+		: std::basic_istream<byte>((std::basic_istream<byte>&&)other)
+	{
+		auto tmpbuf = rdbuf();
+		set_rdbuf(other.rdbuf());
+		other.set_rdbuf(tmpbuf);
 	}
 
 	ibytestream& ibytestream::operator>>(char& value)
@@ -108,7 +116,7 @@ namespace Stormancer
 
 	byte* ibytestream::startPtr()
 	{
-		auto bsb = dynamic_cast<bytestreambuf*>(rdbuf());
+		auto bsb = static_cast<bytestreambuf*>(rdbuf());
 		if (bsb)
 		{
 			return bsb->startReadPtr();
@@ -118,7 +126,7 @@ namespace Stormancer
 
 	byte* ibytestream::currentPtr()
 	{
-		auto bsb = dynamic_cast<bytestreambuf*>(rdbuf());
+		auto bsb = static_cast<bytestreambuf*>(rdbuf());
 		if (bsb)
 		{
 			return bsb->currentReadPtr();
@@ -128,7 +136,7 @@ namespace Stormancer
 
 	byte* ibytestream::endPtr()
 	{
-		auto bsb = dynamic_cast<bytestreambuf*>(rdbuf());
+		auto bsb = static_cast<bytestreambuf*>(rdbuf());
 		if (bsb)
 		{
 			return bsb->endReadPtr();
@@ -138,7 +146,7 @@ namespace Stormancer
 
 	std::streamsize ibytestream::totalSize()
 	{
-		auto bsb = dynamic_cast<bytestreambuf*>(rdbuf());
+		auto bsb = static_cast<bytestreambuf*>(rdbuf());
 		if (bsb)
 		{
 			return bsb->size();
@@ -148,7 +156,7 @@ namespace Stormancer
 
 	std::streamsize ibytestream::availableSize()
 	{
-		auto bsb = dynamic_cast<bytestreambuf*>(rdbuf());
+		auto bsb = static_cast<bytestreambuf*>(rdbuf());
 		if (bsb)
 		{
 			return bsb->in_avail();
@@ -158,7 +166,7 @@ namespace Stormancer
 
 	std::streamsize ibytestream::currentPosition()
 	{
-		auto bsb = dynamic_cast<bytestreambuf*>(rdbuf());
+		auto bsb = static_cast<bytestreambuf*>(rdbuf());
 		if (bsb)
 		{
 			return bsb->currentReadPosition();

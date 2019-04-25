@@ -1,7 +1,6 @@
 #pragma once
 
 #include "stormancer/BuildConfig.h"
-
 #include "stormancer/Streams/bytestream.h"
 #include "stormancer/TimerThread.h"
 #include "stormancer/Utilities/TaskUtilities.h"
@@ -13,6 +12,9 @@
 
 namespace Stormancer
 {
+
+#pragma region MEMORY UTILITIES
+
 	template<typename T>
 	struct deleter
 	{
@@ -30,6 +32,10 @@ namespace Stormancer
 			delete[] p;
 		}
 	};
+
+#pragma endregion
+
+#pragma region CONTAINER UTILITIES
 
 	// vector flux operators
 
@@ -52,26 +58,6 @@ namespace Stormancer
 	{
 		data = v.pop_back();
 		return v;
-	}
-
-	template<typename T>
-	std::string to_string(const T& t)
-	{
-		std::stringstream ss;
-		ss << t;
-		return ss.str();
-	}
-
-	template<typename T>
-	T* reverseByteOrder(T* data, uint64 n = 0)
-	{
-		char* tmp = (char*)data;
-		if (n == 0)
-		{
-			n = sizeof(T);
-		}
-		std::reverse(tmp, tmp + n);
-		return data;
 	}
 
 	template<typename TKey, typename TValue>
@@ -109,27 +95,9 @@ namespace Stormancer
 		return (map.find(key) != map.end()) ? true : false;
 	}
 
+#pragma endregion
 
-	/// Join a string vector by using a glue string.
-	/// \param vector The vector containing the strings to join.
-	/// \param glue A glue string. Default is an empty string.
-	std::string vectorJoin(const std::vector<std::string>& vector, const std::string& glue = "");
-
-	std::vector<std::string> stringSplit(const std::string& str, char separator);
-
-	std::string stringTrim(const std::string& str, char ch = ' ');
-
-	/// Split a string to a vector by using a separator string.
-	/// \param str The string to split.
-	/// \param separator the separator to detect in the string.
-	std::vector<std::wstring> wstringSplit(const std::wstring& str, const std::wstring& separator);
-
-	/// Trim a specific character from a string.
-	/// \param str The string to trim.
-	/// \param ch the character to remove from the string. Default is space.
-	std::wstring wstringTrim(const std::wstring& str, wchar_t ch = ' ');
-
-	
+#pragma region STREAM UTILITIES
 
 	template<typename T, typename U>
 	void streamCopy(T* fromStream, U* toStream)
@@ -141,6 +109,10 @@ namespace Stormancer
 		delete[] c;
 	}
 
+#pragma endregion
+
+#pragma region DATE UTILITIES
+
 	std::time_t nowTime_t();
 	std::string time_tToStr(std::time_t time, bool local = false);
 	std::string time_tToStr(std::time_t time, const char* format);
@@ -150,9 +122,33 @@ namespace Stormancer
 	std::string nowTimeStr(bool local = false);
 	void writetime(std::ostream &os, std::time_t tc, const char* format); // alternative to std::put_time (not in libstdc++4.9)
 
+#pragma endregion
+
+#pragma region HTTP UTILITIES
+
 	bool ensureSuccessStatusCode(int statusCode);
 
+#pragma endregion
+
+#pragma region BYTE UTILITIES
+
+	template<typename T>
+	T* reverseByteOrder(T* data, uint64 n = 0)
+	{
+		char* tmp = (char*)data;
+		if (n == 0)
+		{
+			n = sizeof(T);
+		}
+		std::reverse(tmp, tmp + n);
+		return data;
+	}
+
 	STORMANCER_DLL_API std::string stringifyBytesArray(const std::vector<byte>& bytes, bool hex = true, bool withSpaces = false);
+
+#pragma endregion
+
+#pragma region COMPARE EXCHANGE
 
 	/// Compares the value of var with expected. If those are equal, replaces var with desired and returns true. Otherwise returns false.
 	/// \param var Reference to the value to compare with expected.
@@ -241,82 +237,22 @@ namespace Stormancer
 	/// \return true if the exchange function was called, false otherwise.
 	bool compareExchange(std::mutex& mutex, std::function<bool()> const compare, std::function<void()> exchange);
 
+#pragma endregion
 
-
-	pplx::cancellation_token_source create_linked_source(pplx::cancellation_token token1, pplx::cancellation_token token2);
-	pplx::cancellation_token_source create_linked_source(pplx::cancellation_token token1, pplx::cancellation_token token2, pplx::cancellation_token token3);
-
-	pplx::cancellation_token create_linked_shutdown_token(pplx::cancellation_token token);
-
-	// Cancels the provided task after the specifed delay, if the task
-	// did not complete.
-	template<typename T>
-	pplx::task<T> cancel_after_timeout(pplx::task<T> t, unsigned int timeout)
-	{
-		// Create a task that returns true after the specified task completes.
-		pplx::task<void> completedTask = t.then([](pplx::task<T>) {});
-
-		// Create a task that returns false after the specified timeout.
-		pplx::task<void> timeoutTask = taskDelay(std::chrono::milliseconds(timeout));
-
-		// Create a continuation task that cancels the overall task 
-		// if the timeout task finishes first.
-		return (timeoutTask || completedTask).then([t]()
-		{
-			if (!t.is_done())
-			{
-				t.then([](pplx::task<T> innerT)
-				{
-					// We observe the timeouted task to prevent unobserved exceptions
-					try
-					{
-						innerT.get();
-					}
-					catch (...) {}
-				});
-
-				pplx::cancel_current_task();
-			}
-
-			return t;
-		});
-	}
-
-	// Cancels the provided task after the specifed delay, if the task
-	// did not complete.
-	template<typename T>
-	pplx::task<T> cancel_after_timeout(pplx::task<T> t, pplx::cancellation_token_source cts, unsigned int timeout)
-	{
-		return cancel_after_timeout(t, timeout)
-			.then([t, cts](pplx::task<T> innerT)
-		{
-			if (!t.is_done())
-			{
-				// Set the cancellation token. The task that is passed as the
-				// t parameter should respond to the cancellation and stop
-				// as soon as it can.
-				cts.cancel();
-			}
-
-			return innerT;
-		});
-	}
+#pragma region NETWORK UTILITIES
 
 	bool is_ipv4_address(const std::string& str);
 
 	bool is_ipv6_address(const std::string& str);
 
+#pragma endregion
 
-	// The PS Vita doesn't have the codecvt header, which is used by these functions.
-	std::wstring utf8_to_wstring(const std::string& str);
-	std::string wstring_to_utf8(const std::wstring& str);
-
-	// Convert a platform string to an std::string
-	inline std::string to_string(const std::string& str) { return str; }
-	inline std::string to_string(const std::wstring& str) { return wstring_to_utf8(str); }
-
+#pragma region EXCEPTION UTILITIES
 
 
 	STORMANCER_DLL_API void setUnobservedExceptionHandler(std::function<bool(std::exception_ptr)> handler);
 
-};
+
+#pragma endregion
+
+}

@@ -41,36 +41,13 @@ namespace Stormancer
 		pplx::task<void> updatePeerMetadata(pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
 		std::shared_ptr<DependencyResolver> dependencyResolver() override;
 		void close(std::string reason = "") override;
-		virtual void send(const Writer& writer, int channelUid, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const TransformMetadata& transformMetadata = TransformMetadata()) override;
+		virtual void send(const StreamWriter& streamWriter, int channelUid, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const TransformMetadata& transformMetadata = TransformMetadata()) override;
 		int ping() const override;
 		void setApplication(std::string account, std::string application) override;
 		
 		rxcpp::observable<ConnectionState> getConnectionStateChangedObservable() const override;
 
 		pplx::task<void> setTimeout(std::chrono::milliseconds timeout, pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
-
-		template<typename T>
-		void registerComponent(T* component)
-		{
-			_localData[typeid(T).hash_code()] = static_cast<void*>(component);
-		}
-
-		template<typename T>
-		bool getComponent(T* component = nullptr)
-		{
-			size_t hash_code = typeid(T).hash_code();
-			if (mapContains(_localData, hash_code))
-			{
-				if (component != nullptr)
-				{
-					component = static_cast<T*>(_localData[hash_code]);
-				}
-				return true;
-			}
-
-			component = nullptr;
-			return false;
-		}
 
 #pragma endregion
 
@@ -95,7 +72,6 @@ namespace Stormancer
 		std::weak_ptr<RakNet::RakPeerInterface> _peer;
 		RakNet::RakNetGUID _guid;
 		time_t _lastActivityDate = nowTime_t();
-		std::map<size_t, void*> _localData;
 		std::shared_ptr<DependencyResolver> _dependencyResolver;
 		ConnectionState _connectionState = ConnectionState::Disconnected;
 		rxcpp::subjects::subject<ConnectionState> _connectionStateObservable;

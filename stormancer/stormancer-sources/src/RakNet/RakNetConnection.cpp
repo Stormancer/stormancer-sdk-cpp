@@ -118,7 +118,7 @@ namespace Stormancer
 
 		ct = create_linked_shutdown_token(ct);
 
-		return requestProcessor->sendSystemRequest(this, (byte)SystemRequestIDTypes::ID_SET_METADATA, [this](obytestream* stream)
+		return requestProcessor->sendSystemRequest(this, (byte)SystemRequestIDTypes::ID_SET_METADATA, [this](obytestream& stream)
 		{
 			_dependencyResolver->resolve<Serializer>()->serialize(stream, metadata());
 		}, PacketPriority::MEDIUM_PRIORITY, ct)
@@ -157,7 +157,7 @@ namespace Stormancer
 		}
 	}
 
-	void RakNetConnection::send(const Writer& writer, int channelUid, PacketPriority priority, PacketReliability reliability, const TransformMetadata& transformMetadata)
+	void RakNetConnection::send(const StreamWriter& streamWriter, int channelUid, PacketPriority priority, PacketReliability reliability, const TransformMetadata& transformMetadata)
 	{
 		auto dependencyResolver = _dependencyResolver;
 		if (!dependencyResolver)
@@ -172,14 +172,14 @@ namespace Stormancer
 		{
 			packetTransforms.emplace_back(std::make_shared<AESPacketTransform>(dependencyResolver->resolve<IAES>(), dependencyResolver->resolve<Configuration>()));
 		}
-		Writer writer2 = writer;
+		StreamWriter writer2 = streamWriter;
 		for (auto& packetTransform : packetTransforms)
 		{
 			packetTransform->onSend(writer2, this->id(), transformMetadata);
 		}
 		if (writer2)
 		{
-			writer2(&stream);
+			writer2(stream);
 		}
 		stream.flush();
 		byte* dataPtr = stream.startPtr();

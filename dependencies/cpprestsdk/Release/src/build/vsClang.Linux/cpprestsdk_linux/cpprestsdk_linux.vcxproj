@@ -34,6 +34,9 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <PropertyGroup Label="UserMacros">
+    <StormancerSdkRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\..\..\..\..\..\'))</StormancerSdkRoot>
+  </PropertyGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{bf042260-99b1-4a39-b2bf-1ff0f19dcffa}</ProjectGuid>
     <Keyword>Linux</Keyword>
@@ -46,6 +49,10 @@
     <ProjectName>cpprestsdk_Linux</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(StormancerSdkRoot)stormancer/PropertySheets/LinuxCommon.props" />
+    <Import Project="$(StormancerSdkRoot)stormancer/PropertySheets/OutputDirs.props" />
+  </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -84,120 +91,119 @@
     <Import Project="..\..\common.vcxitems" Label="Shared" />
     <Import Project="..\..\other.vcxitems" Label="Shared" />
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
-    <IncludePath>$(SolutionDir)dependencies\cpprestsdk\Release\include;$(IncludePath)</IncludePath>
-    <RemoteCCompileToolExe>clang++-6.0</RemoteCCompileToolExe>
-    <RemoteCppCompileToolExe>clang++-6.0</RemoteCppCompileToolExe>
     <MultiProcNumber>6</MultiProcNumber>
+    <RemoteProjectDir>$(RemoteRootDir)/dependencies/cpprestsdk/Release/src/build/vsClang.Linux/cpprestsdk_linux</RemoteProjectDir>
+    <ProjectPublicIncludePath>include</ProjectPublicIncludePath>
+    <RemoteLinkLocalCopyOutput>false</RemoteLinkLocalCopyOutput>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
-    <IncludePath>$(SolutionDir)dependencies\cpprestsdk\Release\include;$(IncludePath)</IncludePath>
-    <RemoteCCompileToolExe>clang++-6.0</RemoteCCompileToolExe>
-    <RemoteCppCompileToolExe>clang++-6.0</RemoteCppCompileToolExe>
     <MultiProcNumber>6</MultiProcNumber>
+    <RemoteProjectDir>$(RemoteRootDir)/dependencies/cpprestsdk/Release/src/build/vsClang.Linux/cpprestsdk_linux</RemoteProjectDir>
+    <ProjectPublicIncludePath>include</ProjectPublicIncludePath>
+    <RemoteLinkLocalCopyOutput>false</RemoteLinkLocalCopyOutput>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
-    <IncludePath>$(SolutionDir)dependencies\cpprestsdk\Release\include;$(IncludePath)</IncludePath>
-    <RemoteCCompileToolExe>clang++-6.0</RemoteCCompileToolExe>
-    <RemoteCppCompileToolExe>clang++-6.0</RemoteCppCompileToolExe>
     <MultiProcNumber>6</MultiProcNumber>
+    <RemoteProjectDir>$(RemoteRootDir)/dependencies/cpprestsdk/Release/src/build/vsClang.Linux/cpprestsdk_linux</RemoteProjectDir>
+    <ProjectPublicIncludePath>include</ProjectPublicIncludePath>
+    <RemoteLinkLocalCopyOutput>false</RemoteLinkLocalCopyOutput>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
-    <IncludePath>$(SolutionDir)dependencies\cpprestsdk\Release\include;$(IncludePath)</IncludePath>
-    <RemoteCCompileToolExe>clang++-6.0</RemoteCCompileToolExe>
-    <RemoteCppCompileToolExe>clang++-6.0</RemoteCppCompileToolExe>
     <MultiProcNumber>6</MultiProcNumber>
+    <RemoteProjectDir>$(RemoteRootDir)/dependencies/cpprestsdk/Release/src/build/vsClang.Linux/cpprestsdk_linux</RemoteProjectDir>
+    <ProjectPublicIncludePath>include</ProjectPublicIncludePath>
+    <RemoteLinkLocalCopyOutput>false</RemoteLinkLocalCopyOutput>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(IncludePath)</IncludePath>
-    <RemoteCCompileToolExe>clang++-6.0</RemoteCCompileToolExe>
-    <RemoteCppCompileToolExe>clang++-6.0</RemoteCppCompileToolExe>
     <MultiProcNumber>6</MultiProcNumber>
+    <RemoteProjectDir>$(RemoteRootDir)/dependencies/cpprestsdk/Release/src/build/vsClang.Linux/cpprestsdk_linux</RemoteProjectDir>
+    <ProjectPublicIncludePath>include</ProjectPublicIncludePath>
+    <RemoteLinkLocalCopyOutput>false</RemoteLinkLocalCopyOutput>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)dependencies\cpprestsdk\Release\include;$(IncludePath)</IncludePath>
-    <RemoteCCompileToolExe>clang++-6.0</RemoteCCompileToolExe>
-    <RemoteCppCompileToolExe>clang++-6.0</RemoteCppCompileToolExe>
     <MultiProcNumber>6</MultiProcNumber>
+    <RemoteProjectDir>$(RemoteRootDir)/dependencies/cpprestsdk/Release/src/build/vsClang.Linux/cpprestsdk_linux</RemoteProjectDir>
+    <ProjectPublicIncludePath>include</ProjectPublicIncludePath>
+    <RemoteLinkLocalCopyOutput>false</RemoteLinkLocalCopyOutput>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
-    <IncludePath>$(SolutionDir)dependencies\cpprestsdk\Release\include;$(IncludePath)</IncludePath>
-    <RemoteCCompileToolExe>clang++-6.0</RemoteCCompileToolExe>
-    <RemoteCppCompileToolExe>clang++-6.0</RemoteCppCompileToolExe>
     <MultiProcNumber>6</MultiProcNumber>
+    <RemoteProjectDir>$(RemoteRootDir)/dependencies/cpprestsdk/Release/src/build/vsClang.Linux/cpprestsdk_linux</RemoteProjectDir>
+    <ProjectPublicIncludePath>include</ProjectPublicIncludePath>
+    <RemoteLinkLocalCopyOutput>false</RemoteLinkLocalCopyOutput>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
-    <IncludePath>$(SolutionDir)dependencies\cpprestsdk\Release\include;$(IncludePath)</IncludePath>
-    <RemoteCCompileToolExe>clang++-6.0</RemoteCCompileToolExe>
-    <RemoteCppCompileToolExe>clang++-6.0</RemoteCppCompileToolExe>
     <MultiProcNumber>6</MultiProcNumber>
+    <RemoteProjectDir>$(RemoteRootDir)/dependencies/cpprestsdk/Release/src/build/vsClang.Linux/cpprestsdk_linux</RemoteProjectDir>
+    <ProjectPublicIncludePath>include</ProjectPublicIncludePath>
+    <RemoteLinkLocalCopyOutput>false</RemoteLinkLocalCopyOutput>
   </PropertyGroup>
   <ItemGroup>
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../../openssl/opensslUE/;../../Boost/include/;$(SolutionDir)dependencies\cpprestsdk\Release\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(StormancerSdkRoot)dependencies\cpprestsdk\Release\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LINUX;_STORMANCERSDKCPP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>-Wno-unknown-pragmas -stdlib=libc++ %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <CppLanguageStandard>c++14</CppLanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
       <PreprocessorDefinitions>LINUX;_STORMANCERSDKCPP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>-Wno-unknown-pragmas -stdlib=libc++ %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <AdditionalIncludeDirectories>../../openssl/opensslUE/;../../Boost/include/;$(SolutionDir)dependencies\cpprestsdk\Release\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(StormancerSdkRoot)dependencies\cpprestsdk\Release\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <ClCompile>
       <PreprocessorDefinitions>LINUX;_STORMANCERSDKCPP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>-Wno-unknown-pragmas -stdlib=libc++ %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <AdditionalIncludeDirectories>../../openssl/opensslUE/;../../Boost/include/;$(SolutionDir)dependencies\cpprestsdk\Release\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(StormancerSdkRoot)dependencies\cpprestsdk\Release\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <ClCompile>
       <PreprocessorDefinitions>LINUX;_STORMANCERSDKCPP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>-Wno-unknown-pragmas -stdlib=libc++ %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <AdditionalIncludeDirectories>../../openssl/opensslUE/;../../Boost/include/;$(SolutionDir)dependencies\cpprestsdk\Release\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(StormancerSdkRoot)dependencies\cpprestsdk\Release\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <ClCompile>
       <PreprocessorDefinitions>LINUX;_STORMANCERSDKCPP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>-Wno-unknown-pragmas -stdlib=libc++ %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <AdditionalIncludeDirectories>../../openssl/opensslUE/;../../Boost/include/;$(SolutionDir)dependencies\cpprestsdk\Release\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(StormancerSdkRoot)dependencies\cpprestsdk\Release\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PreprocessorDefinitions>LINUX;_STORMANCERSDKCPP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>-Wno-unknown-pragmas -stdlib=libc++ %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <AdditionalIncludeDirectories>../../openssl/opensslUE/;../../Boost/include/;$(SolutionDir)dependencies\cpprestsdk\Release\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(StormancerSdkRoot)dependencies\cpprestsdk\Release\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
     <ClCompile>
       <PreprocessorDefinitions>LINUX;_STORMANCERSDKCPP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>-Wno-unknown-pragmas -stdlib=libc++ %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <AdditionalIncludeDirectories>../../openssl/opensslUE/;../../Boost/include/;$(SolutionDir)dependencies\cpprestsdk\Release\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(StormancerSdkRoot)dependencies\cpprestsdk\Release\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
     <ClCompile>
       <PreprocessorDefinitions>LINUX;_STORMANCERSDKCPP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>-Wno-unknown-pragmas -stdlib=libc++ %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <AdditionalIncludeDirectories>../../openssl/opensslUE/;../../Boost/include/;$(SolutionDir)dependencies\cpprestsdk\Release\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(StormancerSdkRoot)dependencies\cpprestsdk\Release\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -5,6 +5,7 @@
 #include "RakPeerInterface.h"
 #include "stormancer/StormancerTypes.h"
 #include "stormancer/RequestProcessor.h"
+#include "stormancer/StormancerTypes.h"
 
 namespace Stormancer
 {
@@ -32,7 +33,9 @@ namespace Stormancer
 		
 		P2PTunnelClient(std::function<void(P2PTunnelClient*, RakNet::RNS2RecvStruct*)> onMsgRecv,
 			std::shared_ptr<RequestProcessor> sysCall,
-			ILogger_ptr logger);
+			ILogger_ptr logger,
+			uint16 tunnelPort,
+			bool useIpv6);
 		~P2PTunnelClient();
 
 #pragma endregion

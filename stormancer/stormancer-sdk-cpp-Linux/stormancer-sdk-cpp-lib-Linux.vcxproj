@@ -34,6 +34,9 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <PropertyGroup Label="UserMacros">
+    <StormancerSdkRoot>../../</StormancerSdkRoot>
+  </PropertyGroup>
   <ItemGroup>
     <ClInclude Include="..\stormancer-sources\include\private\stormancer\Linux\AES\AES_Linux.h" />
   </ItemGroup>
@@ -63,6 +66,10 @@
     <LinuxProjectType>{2238F9CD-F817-4ECC-BD14-2524D2669B35}</LinuxProjectType>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="..\PropertySheets\LinuxCommon.props" />
+    <Import Project="..\PropertySheets\StormancerClientCommon.props" />
+  </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -102,128 +109,179 @@
     <Import Project="..\..\dependencies\rxcpp\rxcpp-sources\rxcpp-sources.vcxitems" Label="Shared" />
     <Import Project="..\..\dependencies\msgpack-c\msgpack-sources\msgpack-sources.vcxitems" Label="Shared" />
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" />
-  <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
-    <RemoteCCompileToolExe>clang++-6.0</RemoteCCompileToolExe>
-    <RemoteCppCompileToolExe>clang++-6.0</RemoteCppCompileToolExe>
     <MultiProcNumber>6</MultiProcNumber>
-    <TargetName>StormancerClangLinux_$(Configuration)_$(Platform)</TargetName>
-    <OutDir>..\..\output\libs\</OutDir>
+    <RemoteProjectDir>$(RemoteRootDir)/stormancer/stormancer-sdk-cpp-Linux</RemoteProjectDir>
+    <AdditionalSourcesToCopyMapping>@(EmbeddedPluginSources-&gt;Replace('\','/')-&gt;'%(FullPath):=$(RemoteProjectDir)/%(Identity)');@(EmbeddedPluginPrivateHeaders-&gt;Replace('\','/')-&gt;'%(FullPath):=$(RemoteProjectDir)/%(Identity)');@(EmbeddedPluginPublicHeaders-&gt;Replace('\','/')-&gt;'%(FullPath):=$(RemoteProjectDir)/%(Identity)')</AdditionalSourcesToCopyMapping>
+    <ProjectPublicIncludePath>stormancer/stormancer-sources/include/public;dependencies/rxcpp/Rx/v2/src;dependencies/msgpack-c/include</ProjectPublicIncludePath>
+    <RemoteLinkLocalCopyOutput>false</RemoteLinkLocalCopyOutput>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
-    <RemoteCCompileToolExe>clang++-6.0</RemoteCCompileToolExe>
-    <RemoteCppCompileToolExe>clang++-6.0</RemoteCppCompileToolExe>
     <MultiProcNumber>6</MultiProcNumber>
-    <TargetName>StormancerClangLinux_$(Configuration)_$(Platform)</TargetName>
-    <OutDir>..\..\output\libs\</OutDir>
+    <RemoteProjectDir>$(RemoteRootDir)/stormancer/stormancer-sdk-cpp-Linux</RemoteProjectDir>
+    <AdditionalSourcesToCopyMapping>@(EmbeddedPluginSources-&gt;Replace('\','/')-&gt;'%(FullPath):=$(RemoteProjectDir)/%(Identity)');@(EmbeddedPluginPrivateHeaders-&gt;Replace('\','/')-&gt;'%(FullPath):=$(RemoteProjectDir)/%(Identity)');@(EmbeddedPluginPublicHeaders-&gt;Replace('\','/')-&gt;'%(FullPath):=$(RemoteProjectDir)/%(Identity)')</AdditionalSourcesToCopyMapping>
+    <ProjectPublicIncludePath>stormancer/stormancer-sources/include/public;dependencies/rxcpp/Rx/v2/src;dependencies/msgpack-c/include</ProjectPublicIncludePath>
+    <RemoteLinkLocalCopyOutput>false</RemoteLinkLocalCopyOutput>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
-    <RemoteCCompileToolExe>clang++-6.0</RemoteCCompileToolExe>
-    <RemoteCppCompileToolExe>clang++-6.0</RemoteCppCompileToolExe>
     <MultiProcNumber>6</MultiProcNumber>
-    <TargetName>StormancerClangLinux_$(Configuration)_$(Platform)</TargetName>
-    <OutDir>..\..\output\libs\</OutDir>
+    <RemoteProjectDir>$(RemoteRootDir)/stormancer/stormancer-sdk-cpp-Linux</RemoteProjectDir>
+    <AdditionalSourcesToCopyMapping>@(EmbeddedPluginSources-&gt;Replace('\','/')-&gt;'%(FullPath):=$(RemoteProjectDir)/%(Identity)');@(EmbeddedPluginPrivateHeaders-&gt;Replace('\','/')-&gt;'%(FullPath):=$(RemoteProjectDir)/%(Identity)');@(EmbeddedPluginPublicHeaders-&gt;Replace('\','/')-&gt;'%(FullPath):=$(RemoteProjectDir)/%(Identity)')</AdditionalSourcesToCopyMapping>
+    <ProjectPublicIncludePath>stormancer/stormancer-sources/include/public;dependencies/rxcpp/Rx/v2/src;dependencies/msgpack-c/include</ProjectPublicIncludePath>
+    <RemoteLinkLocalCopyOutput>false</RemoteLinkLocalCopyOutput>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
-    <RemoteCCompileToolExe>clang++-6.0</RemoteCCompileToolExe>
-    <RemoteCppCompileToolExe>clang++-6.0</RemoteCppCompileToolExe>
     <MultiProcNumber>6</MultiProcNumber>
-    <TargetName>StormancerClangLinux_$(Configuration)_$(Platform)</TargetName>
-    <OutDir>..\..\output\libs\</OutDir>
+    <RemoteProjectDir>$(RemoteRootDir)/stormancer/stormancer-sdk-cpp-Linux</RemoteProjectDir>
+    <AdditionalSourcesToCopyMapping>@(EmbeddedPluginSources-&gt;Replace('\','/')-&gt;'%(FullPath):=$(RemoteProjectDir)/%(Identity)');@(EmbeddedPluginPrivateHeaders-&gt;Replace('\','/')-&gt;'%(FullPath):=$(RemoteProjectDir)/%(Identity)');@(EmbeddedPluginPublicHeaders-&gt;Replace('\','/')-&gt;'%(FullPath):=$(RemoteProjectDir)/%(Identity)')</AdditionalSourcesToCopyMapping>
+    <ProjectPublicIncludePath>stormancer/stormancer-sources/include/public;dependencies/rxcpp/Rx/v2/src;dependencies/msgpack-c/include</ProjectPublicIncludePath>
+    <RemoteLinkLocalCopyOutput>false</RemoteLinkLocalCopyOutput>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <RemoteCCompileToolExe>clang++-6.0</RemoteCCompileToolExe>
-    <RemoteCppCompileToolExe>clang++-6.0</RemoteCppCompileToolExe>
     <MultiProcNumber>6</MultiProcNumber>
-    <TargetName>StormancerClangLinux_$(Configuration)_$(Platform)</TargetName>
-    <OutDir>..\..\output\libs\</OutDir>
+    <RemoteProjectDir>$(RemoteRootDir)/stormancer/stormancer-sdk-cpp-Linux</RemoteProjectDir>
+    <AdditionalSourcesToCopyMapping>@(EmbeddedPluginSources-&gt;Replace('\','/')-&gt;'%(FullPath):=$(RemoteProjectDir)/%(Identity)');@(EmbeddedPluginPrivateHeaders-&gt;Replace('\','/')-&gt;'%(FullPath):=$(RemoteProjectDir)/%(Identity)');@(EmbeddedPluginPublicHeaders-&gt;Replace('\','/')-&gt;'%(FullPath):=$(RemoteProjectDir)/%(Identity)')</AdditionalSourcesToCopyMapping>
+    <ProjectPublicIncludePath>stormancer/stormancer-sources/include/public;dependencies/rxcpp/Rx/v2/src;dependencies/msgpack-c/include</ProjectPublicIncludePath>
+    <RemoteLinkLocalCopyOutput>false</RemoteLinkLocalCopyOutput>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <RemoteCCompileToolExe>clang++-6.0</RemoteCCompileToolExe>
-    <RemoteCppCompileToolExe>clang++-6.0</RemoteCppCompileToolExe>
     <MultiProcNumber>6</MultiProcNumber>
-    <TargetName>StormancerClangLinux_$(Configuration)_$(Platform)</TargetName>
-    <OutDir>..\..\output\libs\</OutDir>
+    <RemoteProjectDir>$(RemoteRootDir)/stormancer/stormancer-sdk-cpp-Linux</RemoteProjectDir>
+    <AdditionalSourcesToCopyMapping>@(EmbeddedPluginSources-&gt;Replace('\','/')-&gt;'%(FullPath):=$(RemoteProjectDir)/%(Identity)');@(EmbeddedPluginPrivateHeaders-&gt;Replace('\','/')-&gt;'%(FullPath):=$(RemoteProjectDir)/%(Identity)');@(EmbeddedPluginPublicHeaders-&gt;Replace('\','/')-&gt;'%(FullPath):=$(RemoteProjectDir)/%(Identity)')</AdditionalSourcesToCopyMapping>
+    <ProjectPublicIncludePath>stormancer/stormancer-sources/include/public;dependencies/rxcpp/Rx/v2/src;dependencies/msgpack-c/include</ProjectPublicIncludePath>
+    <RemoteLinkLocalCopyOutput>false</RemoteLinkLocalCopyOutput>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
-    <RemoteCCompileToolExe>clang++-6.0</RemoteCCompileToolExe>
-    <RemoteCppCompileToolExe>clang++-6.0</RemoteCppCompileToolExe>
     <MultiProcNumber>6</MultiProcNumber>
-    <TargetName>StormancerClangLinux_$(Configuration)_$(Platform)</TargetName>
-    <OutDir>..\..\output\libs\</OutDir>
+    <RemoteProjectDir>$(RemoteRootDir)/stormancer/stormancer-sdk-cpp-Linux</RemoteProjectDir>
+    <AdditionalSourcesToCopyMapping>@(EmbeddedPluginSources-&gt;Replace('\','/')-&gt;'%(FullPath):=$(RemoteProjectDir)/%(Identity)');@(EmbeddedPluginPrivateHeaders-&gt;Replace('\','/')-&gt;'%(FullPath):=$(RemoteProjectDir)/%(Identity)');@(EmbeddedPluginPublicHeaders-&gt;Replace('\','/')-&gt;'%(FullPath):=$(RemoteProjectDir)/%(Identity)')</AdditionalSourcesToCopyMapping>
+    <ProjectPublicIncludePath>stormancer/stormancer-sources/include/public;dependencies/rxcpp/Rx/v2/src;dependencies/msgpack-c/include</ProjectPublicIncludePath>
+    <RemoteLinkLocalCopyOutput>false</RemoteLinkLocalCopyOutput>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
-    <RemoteCCompileToolExe>clang++-6.0</RemoteCCompileToolExe>
-    <RemoteCppCompileToolExe>clang++-6.0</RemoteCppCompileToolExe>
     <MultiProcNumber>6</MultiProcNumber>
-    <TargetName>StormancerClangLinux_$(Configuration)_$(Platform)</TargetName>
-    <OutDir>..\..\output\libs\</OutDir>
+    <RemoteProjectDir>$(RemoteRootDir)/stormancer/stormancer-sdk-cpp-Linux</RemoteProjectDir>
+    <AdditionalSourcesToCopyMapping>@(EmbeddedPluginSources-&gt;Replace('\','/')-&gt;'%(FullPath):=$(RemoteProjectDir)/%(Identity)');@(EmbeddedPluginPrivateHeaders-&gt;Replace('\','/')-&gt;'%(FullPath):=$(RemoteProjectDir)/%(Identity)');@(EmbeddedPluginPublicHeaders-&gt;Replace('\','/')-&gt;'%(FullPath):=$(RemoteProjectDir)/%(Identity)')</AdditionalSourcesToCopyMapping>
+    <ProjectPublicIncludePath>stormancer/stormancer-sources/include/public;dependencies/rxcpp/Rx/v2/src;dependencies/msgpack-c/include</ProjectPublicIncludePath>
+    <RemoteLinkLocalCopyOutput>false</RemoteLinkLocalCopyOutput>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../../Boost/include/;stormancer/stormancer-sources/include/public/;stormancer/stormancer-sources/include/private/;stormancer/stormancer-sources/src/;../cpprestsdk_Linux/include/;../RakNet_Linux/;dependencies/rxcpp/Rx/v2/src/;dependencies/msgpack-c/include/;$(SolutionDir)dependencies\cpprestsdk\Release\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>stormancer/stormancer-sources/include/public/;stormancer/stormancer-sources/include/private/;dependencies/rxcpp/Rx/v2/src/;dependencies/msgpack-c/include/;../../Plugins/private;../../Plugins/public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LINUX;_STORMANCERSDKCPP;__PLATFORM__="$(Platform)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <AdditionalOptions>-Wno-unknown-pragmas -stdlib=libc++</AdditionalOptions>
+      <AdditionalOptions>-Wno-unknown-pragmas</AdditionalOptions>
+      <Verbose>true</Verbose>
     </ClCompile>
+    <RemotePostBuildEvent>
+      <Command>cd $(OutDir.Replace('\', '/')) &amp;&amp; echo -e 'create $(FinalLibName)\naddlib $(TargetFileName)\naddlib libRakNet_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\naddlib libcpprestsdk_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\nsave\nend' | ar -M &amp;&amp; cp -f $(FinalLibName) /tmp</Command>
+      <Message>Merge Libraries</Message>
+      <AdditionalSourcesToCopyMapping>/tmp/$(FinalLibName):=$(ProjectDir)$(OutDir)$(FinalLibName)</AdditionalSourcesToCopyMapping>
+    </RemotePostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../../Boost/include/;stormancer/stormancer-sources/include/public/;stormancer/stormancer-sources/include/private/;stormancer/stormancer-sources/src/;../cpprestsdk_Linux/include/;../RakNet_Linux/;dependencies/rxcpp/Rx/v2/src/;dependencies/msgpack-c/include/;$(SolutionDir)dependencies\cpprestsdk\Release\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>stormancer/stormancer-sources/include/public/;stormancer/stormancer-sources/include/private/;dependencies/rxcpp/Rx/v2/src/;dependencies/msgpack-c/include/;../../Plugins/private;../../Plugins/public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LINUX;_STORMANCERSDKCPP;__PLATFORM__="$(Platform)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <AdditionalOptions>-Wno-unknown-pragmas -stdlib=libc++</AdditionalOptions>
+      <AdditionalOptions>-Wno-unknown-pragmas</AdditionalOptions>
+      <Verbose>true</Verbose>
     </ClCompile>
+    <RemotePostBuildEvent>
+      <Command>cd $(OutDir.Replace('\', '/')) &amp;&amp; echo -e 'create $(FinalLibName)\naddlib $(TargetFileName)\naddlib libRakNet_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\naddlib libcpprestsdk_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\nsave\nend' | ar -M &amp;&amp; cp -f $(FinalLibName) /tmp</Command>
+      <Message>Merge Libraries</Message>
+      <AdditionalSourcesToCopyMapping>/tmp/$(FinalLibName):=$(ProjectDir)$(OutDir)$(FinalLibName)</AdditionalSourcesToCopyMapping>
+    </RemotePostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../../Boost/include/;stormancer/stormancer-sources/include/public/;stormancer/stormancer-sources/include/private/;stormancer/stormancer-sources/src/;../cpprestsdk_Linux/include/;../RakNet_Linux/;dependencies/rxcpp/Rx/v2/src/;dependencies/msgpack-c/include/;$(SolutionDir)dependencies\cpprestsdk\Release\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>stormancer/stormancer-sources/include/public/;stormancer/stormancer-sources/include/private/;dependencies/rxcpp/Rx/v2/src/;dependencies/msgpack-c/include/;../../Plugins/private;../../Plugins/public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LINUX;_STORMANCERSDKCPP;__PLATFORM__="$(Platform)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <AdditionalOptions>-Wno-unknown-pragmas -stdlib=libc++</AdditionalOptions>
+      <AdditionalOptions>-Wno-unknown-pragmas</AdditionalOptions>
+      <Verbose>true</Verbose>
     </ClCompile>
+    <RemotePostBuildEvent>
+      <Command>cd $(OutDir.Replace('\', '/')) &amp;&amp; echo -e 'create $(FinalLibName)\naddlib $(TargetFileName)\naddlib libRakNet_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\naddlib libcpprestsdk_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\nsave\nend' | ar -M &amp;&amp; cp -f $(FinalLibName) /tmp</Command>
+      <Message>Merge Libraries</Message>
+      <AdditionalSourcesToCopyMapping>/tmp/$(FinalLibName):=$(ProjectDir)$(OutDir)$(FinalLibName)</AdditionalSourcesToCopyMapping>
+    </RemotePostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../../Boost/include/;stormancer/stormancer-sources/include/public/;stormancer/stormancer-sources/include/private/;stormancer/stormancer-sources/src/;../cpprestsdk_Linux/include/;../RakNet_Linux/;dependencies/rxcpp/Rx/v2/src/;dependencies/msgpack-c/include/;$(SolutionDir)dependencies\cpprestsdk\Release\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>stormancer/stormancer-sources/include/public/;stormancer/stormancer-sources/include/private/;dependencies/rxcpp/Rx/v2/src/;dependencies/msgpack-c/include/;../../Plugins/private;../../Plugins/public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LINUX;_STORMANCERSDKCPP;__PLATFORM__="$(Platform)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <AdditionalOptions>-Wno-unknown-pragmas -stdlib=libc++</AdditionalOptions>
+      <AdditionalOptions>-Wno-unknown-pragmas</AdditionalOptions>
+      <Verbose>true</Verbose>
     </ClCompile>
+    <RemotePostBuildEvent>
+      <Command>cd $(OutDir.Replace('\', '/')) &amp;&amp; echo -e 'create $(FinalLibName)\naddlib $(TargetFileName)\naddlib libRakNet_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\naddlib libcpprestsdk_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\nsave\nend' | ar -M &amp;&amp; cp -f $(FinalLibName) /tmp</Command>
+      <Message>Merge Libraries</Message>
+      <AdditionalSourcesToCopyMapping>/tmp/$(FinalLibName):=$(ProjectDir)$(OutDir)$(FinalLibName)</AdditionalSourcesToCopyMapping>
+    </RemotePostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../../Boost/include/;stormancer/stormancer-sources/include/public/;stormancer/stormancer-sources/include/private/;stormancer/stormancer-sources/src/;../cpprestsdk_Linux/include/;../RakNet_Linux/;dependencies/rxcpp/Rx/v2/src/;dependencies/msgpack-c/include/;$(SolutionDir)dependencies\cpprestsdk\Release\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>stormancer/stormancer-sources/include/public/;stormancer/stormancer-sources/include/private/;dependencies/rxcpp/Rx/v2/src/;dependencies/msgpack-c/include/;../../Plugins/private;../../Plugins/public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LINUX;_STORMANCERSDKCPP;__PLATFORM__="$(Platform)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <AdditionalOptions>-Wno-unknown-pragmas -stdlib=libc++</AdditionalOptions>
+      <AdditionalOptions>-Wno-unknown-pragmas</AdditionalOptions>
+      <Verbose>true</Verbose>
     </ClCompile>
+    <RemotePostBuildEvent>
+      <Command>cd $(OutDir.Replace('\', '/')) &amp;&amp; echo -e 'create $(FinalLibName)\naddlib $(TargetFileName)\naddlib libRakNet_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\naddlib libcpprestsdk_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\nsave\nend' | ar -M &amp;&amp; cp -f $(FinalLibName) /tmp</Command>
+    </RemotePostBuildEvent>
+    <RemotePostBuildEvent>
+      <Message>Merge Libraries</Message>
+    </RemotePostBuildEvent>
+    <RemotePostBuildEvent>
+      <AdditionalSourcesToCopyMapping>/tmp/$(FinalLibName):=$(ProjectDir)$(OutDir)$(FinalLibName)</AdditionalSourcesToCopyMapping>
+    </RemotePostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../../Boost/include/;stormancer/stormancer-sources/include/public/;stormancer/stormancer-sources/include/private/;stormancer/stormancer-sources/src/;../cpprestsdk_Linux/include/;../RakNet_Linux/;dependencies/rxcpp/Rx/v2/src/;dependencies/msgpack-c/include/;$(SolutionDir)dependencies\cpprestsdk\Release\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>stormancer/stormancer-sources/include/public/;stormancer/stormancer-sources/include/private/;dependencies/rxcpp/Rx/v2/src/;dependencies/msgpack-c/include/;../../Plugins/private;../../Plugins/public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LINUX;_STORMANCERSDKCPP;__PLATFORM__="$(Platform)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <AdditionalOptions>-Wno-unknown-pragmas -stdlib=libc++</AdditionalOptions>
+      <AdditionalOptions>-Wno-unknown-pragmas</AdditionalOptions>
+      <Verbose>true</Verbose>
     </ClCompile>
+    <RemotePostBuildEvent>
+      <Command>cd $(OutDir.Replace('\', '/')) &amp;&amp; echo -e 'create $(FinalLibName)\naddlib $(TargetFileName)\naddlib libRakNet_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\naddlib libcpprestsdk_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\nsave\nend' | ar -M &amp;&amp; cp -f $(FinalLibName) /tmp</Command>
+      <Message>Merge Libraries</Message>
+      <AdditionalSourcesToCopyMapping>/tmp/$(FinalLibName):=$(ProjectDir)$(OutDir)$(FinalLibName)</AdditionalSourcesToCopyMapping>
+    </RemotePostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../../Boost/include/;stormancer/stormancer-sources/include/public/;stormancer/stormancer-sources/include/private/;stormancer/stormancer-sources/src/;../cpprestsdk_Linux/include/;../RakNet_Linux/;dependencies/rxcpp/Rx/v2/src/;dependencies/msgpack-c/include/;$(SolutionDir)dependencies\cpprestsdk\Release\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>stormancer/stormancer-sources/include/public/;stormancer/stormancer-sources/include/private/;dependencies/rxcpp/Rx/v2/src/;dependencies/msgpack-c/include/;../../Plugins/private;../../Plugins/public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LINUX;_STORMANCERSDKCPP;__PLATFORM__="$(Platform)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <AdditionalOptions>-Wno-unknown-pragmas -stdlib=libc++</AdditionalOptions>
+      <AdditionalOptions>-Wno-unknown-pragmas</AdditionalOptions>
+      <Verbose>true</Verbose>
     </ClCompile>
+    <RemotePostBuildEvent>
+      <Command>cd $(OutDir.Replace('\', '/')) &amp;&amp; echo -e 'create $(FinalLibName)\naddlib $(TargetFileName)\naddlib libRakNet_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\naddlib libcpprestsdk_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\nsave\nend' | ar -M &amp;&amp; cp -f $(FinalLibName) /tmp</Command>
+      <Message>Merge Libraries</Message>
+      <AdditionalSourcesToCopyMapping>/tmp/$(FinalLibName):=$(ProjectDir)$(OutDir)$(FinalLibName)</AdditionalSourcesToCopyMapping>
+    </RemotePostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../../Boost/include/;stormancer/stormancer-sources/include/public/;stormancer/stormancer-sources/include/private/;stormancer/stormancer-sources/src/;../cpprestsdk_Linux/include/;../RakNet_Linux/;dependencies/rxcpp/Rx/v2/src/;dependencies/msgpack-c/include/;$(SolutionDir)dependencies\cpprestsdk\Release\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>stormancer/stormancer-sources/include/public/;stormancer/stormancer-sources/include/private/;dependencies/rxcpp/Rx/v2/src/;dependencies/msgpack-c/include/;../../Plugins/private;../../Plugins/public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LINUX;_STORMANCERSDKCPP;__PLATFORM__="$(Platform)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <AdditionalOptions>-Wno-unknown-pragmas -stdlib=libc++</AdditionalOptions>
+      <AdditionalOptions>-Wno-unknown-pragmas</AdditionalOptions>
+      <Verbose>true</Verbose>
     </ClCompile>
+    <RemotePostBuildEvent>
+      <Command>cd $(OutDir.Replace('\', '/')) &amp;&amp; echo -e 'create $(FinalLibName)\naddlib $(TargetFileName)\naddlib libRakNet_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\naddlib libcpprestsdk_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\nsave\nend' | ar -M &amp;&amp; cp -f $(FinalLibName) /tmp</Command>
+      <Message>Merge Libraries</Message>
+      <AdditionalSourcesToCopyMapping>/tmp/$(FinalLibName):=$(ProjectDir)$(OutDir)$(FinalLibName)</AdditionalSourcesToCopyMapping>
+    </RemotePostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
+  <Import Project="..\PropertySheets\StormancerClientCommon.targets" />
 </Project>

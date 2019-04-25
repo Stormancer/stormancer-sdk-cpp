@@ -23,11 +23,19 @@ Stormancer::InvitationsService::InvitationsService(std::shared_ptr<Scene> scene,
 		this->onInvitationSucceded(result);
 	});
 
-	scene->dependencyResolver()->resolve<RpcService>()->addProcedure("invitations.onInviteRequest", [=](Stormancer::RpcRequestContext_ptr ctx) {
-		auto result = _serializer.deserializeOne<Invitation>(ctx->inputStream());
-		return this->onInvitationRequest(result).then([=](InvitationResponse response) {
-			ctx->sendValue([=, &response](Stormancer::obytestream* stream) {
-				_serializer.serialize(stream, response);
+	auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
+
+	auto serializer = _serializer;
+	auto onInvitationRequestCpy = onInvitationRequest;
+	rpcService->addProcedure("invitations.onInviteRequest", [serializer, onInvitationRequestCpy](Stormancer::RpcRequestContext_ptr ctx)
+	{
+		auto result = serializer.deserializeOne<Invitation>(ctx->inputStream());
+		return onInvitationRequestCpy(result)
+			.then([serializer, ctx](InvitationResponse response)
+		{
+			ctx->sendValue([serializer, &response](Stormancer::obytestream& stream)
+			{
+				serializer.serialize(stream, response);
 			});
 		});
 	});

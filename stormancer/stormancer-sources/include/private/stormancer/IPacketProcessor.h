@@ -12,6 +12,8 @@ namespace Stormancer
 	{
 	public:
 
+		virtual ~IPacketProcessor() = default;
+
 		virtual void registerProcessor(PacketProcessorConfig& config) = 0;
 	};
 };

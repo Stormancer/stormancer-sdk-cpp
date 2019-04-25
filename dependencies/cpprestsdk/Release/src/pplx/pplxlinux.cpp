@@ -25,7 +25,11 @@
 
 #include "stdafx.h"
 #include "pplx/pplx.h"
+#ifdef LINUX // Stormancer: no boost on linux
+#include "pplx/threadpool-std.h"
+#else
 #include "pplx/threadpool.h"
+#endif
 #include "sys/syscall.h"
 
 #ifdef _WIN32
@@ -46,13 +50,13 @@ namespace details {
 
         _PPLXIMP void YieldExecution()
         {
-            boost::this_thread::yield();
+            std::this_thread::yield();
         }
     }
 
     _PPLXIMP void linux_scheduler::schedule(TaskProc_t proc, void* param)
     {
-        crossplat::threadpool::shared_instance().schedule(boost::bind(proc, param));
+		crossplat::threadpool::shared_instance().schedule([proc, param] { proc(param); });
     }
 
 } // namespace details

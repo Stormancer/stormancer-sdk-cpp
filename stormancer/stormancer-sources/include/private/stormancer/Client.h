@@ -153,8 +153,6 @@ namespace Stormancer
 
 		std::shared_ptr<DependencyResolver> _dependencyResolver;
 
-
-
 		pplx::task<void> _currentTask = pplx::task_from_result();
 		bool _initialized = false;
 		std::string _accountId;

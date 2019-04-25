@@ -78,13 +78,11 @@ namespace web {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wconversion"
 #endif
-
+#if (defined(ANDROID) || defined(__ANDROID__))
 #include "boost/asio/ssl.hpp"
 
 
-
-
-
+#endif
 
 #if defined(__clang__)
 #pragma clang diagnostic pop
@@ -122,7 +120,7 @@ namespace web
 					, m_validate_certificates(true)
 #endif
 					, m_set_user_nativehandle_options([](native_handle)->void {})
-#if !defined(_WIN32) && !defined(__cplusplus_winrt)
+#if (defined(ANDROID) || defined(__ANDROID__))
 					, m_ssl_context_callback([](boost::asio::ssl::context&)->void {})
 					, m_tlsext_sni_enabled(true)
 #endif	
@@ -367,7 +365,7 @@ namespace web
 					m_set_user_nativehandle_options(handle);
 				}
 
-#if !defined(_WIN32) && !defined(__cplusplus_winrt)
+#if (defined(ANDROID) || defined(__ANDROID__))
 				/// <summary>
 				/// Sets a callback to enable custom setting of the ssl context, at construction time.
 				/// </summary>
@@ -403,19 +401,19 @@ namespace web
 				{
 					m_tlsext_sni_enabled = tlsext_sni_enabled;
 				}
+#endif // (defined(ANDROID) || defined(__ANDROID__))
+
+#if !defined(_WIN32)
+				static std::vector<std::string>& root_certificates()
+				{
+					return m_root_certificates;
+				}
+
+				static void set_root_certificates(std::vector<std::string> root_certificates)
+				{
+					m_root_certificates = root_certificates;
+				}
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 			private:
@@ -442,7 +440,7 @@ namespace web
 
 				std::function<void(native_handle)> m_set_user_nativehandle_options;
 
-#if !defined(_WIN32) && !defined(__cplusplus_winrt)
+#if (defined(ANDROID) || defined(__ANDROID__))
 				std::function<void(boost::asio::ssl::context&)> m_ssl_context_callback;
 				bool m_tlsext_sni_enabled;
 #endif

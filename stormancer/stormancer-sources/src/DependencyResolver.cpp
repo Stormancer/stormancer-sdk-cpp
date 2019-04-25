@@ -13,16 +13,16 @@ namespace Stormancer
 	{
 	}
 
-	void DependencyResolver::registerDependencyInternal(const std::type_info& t, Registration& registration, bool singleInstance)
+	void DependencyResolver::registerDependencyInternal(const ctti::type_id_t& t, Registration& registration, bool singleInstance)
 	{
-		auto h = t.hash_code();
+		auto h = static_cast<uint64>(t.hash());
 		registration.singleInstance = singleInstance;
 		_factories[h] = registration;
 	}
 
-	std::shared_ptr<void> DependencyResolver::resolveInternal(const std::type_info& t)
+	std::shared_ptr<void> DependencyResolver::resolveInternal(const ctti::type_id_t& t)
 	{
-		auto h = t.hash_code();
+		auto h = static_cast<uint64>(t.hash());
 		auto it = _factories.find(h);
 		if (it != _factories.end())
 		{

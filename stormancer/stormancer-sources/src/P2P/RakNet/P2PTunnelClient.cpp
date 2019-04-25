@@ -1,25 +1,24 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/P2P/RakNet/P2PTunnelClient.h"
+#include "stormancer/StormancerTypes.h"
 
 namespace Stormancer
 {
-	// Use this intermediate variable to avoid "string literal to char* conversion" warning
-	static char __address[] = "127.0.0.1";
-
 	P2PTunnelClient::P2PTunnelClient(std::function<void(P2PTunnelClient*, RakNet::RNS2RecvStruct*)> onMsgRecv,
 		std::shared_ptr<RequestProcessor> sysCall,
-		ILogger_ptr logger)
+		ILogger_ptr logger,
+		uint16 tunnelPort,
+		bool useIpv6)
 		: _sysCall(sysCall)
 		, _logger(logger)
 	{
 		_onMsgRecv = onMsgRecv;
-		hostPort = 0;
 		socket = RakNet::RakNetSocket2Allocator::AllocRNS2();
 		RakNet::RNS2_BerkleyBindParameters bbp;
 
-		bbp.port = 0;
-		bbp.hostAddress = __address;
-		bbp.addressFamily = AF_INET;
+		bbp.port = tunnelPort; // TODO set as param in config, only for client
+		bbp.hostAddress = useIpv6 ? (char*)"::1" : (char*)"127.0.0.1";
+		bbp.addressFamily = useIpv6 ? AF_INET6 : AF_INET;
 		bbp.type = SOCK_DGRAM;
 		bbp.protocol = 0;
 		bbp.nonBlockingSocket = true;

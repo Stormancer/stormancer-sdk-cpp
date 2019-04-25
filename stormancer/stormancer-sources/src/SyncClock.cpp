@@ -6,6 +6,7 @@
 #include "stormancer/SafeCapture.h"
 #include "stormancer/Helpers.h"
 #include <numeric>
+#include <cmath>
 
 namespace Stormancer
 {
@@ -145,8 +146,8 @@ namespace Stormancer
 			auto logger = _dependencyResolver.lock()->resolve<ILogger>();
 			auto cancellationToken = _cancellationToken;
 			auto wSyncClock = STRM_WEAK_FROM_THIS();
-			requestProcessor->sendSystemRequest(remoteConnection.get(), (byte)SystemRequestIDTypes::ID_PING, [&timeStart](obytestream* bs) {
-				(*bs) << timeStart;
+			requestProcessor->sendSystemRequest(remoteConnection.get(), (byte)SystemRequestIDTypes::ID_PING, [&timeStart](obytestream& bs) {
+				bs << timeStart;
 			}, PacketPriority::IMMEDIATE_PRIORITY, _cancellationToken)
 				.then([wSyncClock, timeStart](Packet_ptr packet)
 			{
@@ -159,7 +160,7 @@ namespace Stormancer
 				syncClock->_lastPingFinished = true;
 
 				uint64 timeServer;
-				*packet->stream >> timeServer;
+				packet->stream >> timeServer;
 
 				uint16 ping = (uint16)(timeEnd - timeStart);
 				syncClock->_lastPing = ping;

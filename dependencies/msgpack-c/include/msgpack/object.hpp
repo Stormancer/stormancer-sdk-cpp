@@ -15,7 +15,6 @@
 #include "msgpack/zone.hpp"
 #include "msgpack/adaptor/adaptor_base.hpp"
 #include "msgpack/adaptor/check_container_size.hpp"
-#include "cpprest/json.h"
 
 #include <cstring>
 #include <stdexcept>
@@ -24,6 +23,8 @@
 #include <ostream>
 #include <typeinfo>
 #include <iomanip>
+#include <locale>
+#include <codecvt>
 
 namespace msgpack {
 
@@ -199,69 +200,6 @@ namespace msgpack {
 
 		// Adaptor functor specialization to object
 		namespace adaptor {
-
-			template <>
-			struct convert<web::json::value> {
-				msgpack::object const& operator()(msgpack::object const& o, web::json::value& v) const {
-					utility::string_t str;
-					switch (o.type) {
-					case msgpack::type::STR:
-#ifdef _UTF16_STRINGS
-						str.assign(o.via.str.ptr, (o.via.str.ptr + o.via.str.size));
-#else
-						str.assign(o.via.str.ptr, o.via.str.size);
-#endif
-						v = web::json::value::parse(str);
-						break;
-					case msgpack::type::NIL:
-						v = web::json::value::Null;
-						break;
-					default:
-						throw msgpack::type_error();
-						break;
-					}
-					return o;
-				}
-			};
-
-			template <>
-			struct pack<web::json::value> {
-				template <typename Stream>
-				msgpack::packer<Stream>& operator()(msgpack::packer<Stream>& o, web::json::value const& v) const {
-					auto wstr = v.serialize();
-					auto str = std::string(wstr.begin(), wstr.end());
-					uint32_t size = checked_get_container_size(str.size());
-					o.pack_str(size);
-					o.pack_str_body(str.data(), size);
-					return o;
-				}
-			};
-
-			template <>
-			struct object<web::json::value> {
-				void operator()(msgpack::object& o, const web::json::value& j) const {
-					auto wstr = j.serialize();
-					auto v = std::string(wstr.begin(), wstr.end());
-					uint32_t size = checked_get_container_size(v.size());
-					o.type = msgpack::type::STR;
-					o.via.str.ptr = v.data();
-					o.via.str.size = size;
-				}
-			};
-
-			template <>
-			struct object_with_zone<web::json::value> {
-				void operator()(msgpack::object::with_zone& o, const web::json::value& j) const {
-					auto wstr = j.serialize();
-					auto v = std::string(wstr.begin(), wstr.end());
-					uint32_t size = checked_get_container_size(v.size());
-					o.type = msgpack::type::STR;
-					char* ptr = static_cast<char*>(o.zone.allocate_align(size));
-					o.via.str.ptr = ptr;
-					o.via.str.size = size;
-					std::memcpy(ptr, v.data(), v.size());
-				}
-			};
 
 			template <>
 			struct convert<msgpack::object> {

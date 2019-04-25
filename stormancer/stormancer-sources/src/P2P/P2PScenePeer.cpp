@@ -51,7 +51,7 @@ namespace Stormancer
 		}, options);
 	}
 
-	void P2PScenePeer::send(const std::string& routeName, const Writer& writer, PacketPriority packetPriority, PacketReliability packetReliability)
+	void P2PScenePeer::send(const std::string& routeName, const StreamWriter& streamWriter, PacketPriority packetPriority, PacketReliability packetReliability)
 	{
 		auto scene = _scene.lock();
 		if (!scene)
@@ -67,10 +67,14 @@ namespace Stormancer
 		std::stringstream ss;
 		ss << "P2PScenePeer_" << scene->id() << "_" << routeName;
 		int channelUid = _connection->dependencyResolver()->resolve<ChannelUidStore>()->getChannelUid(ss.str());
-		_connection->send([=, &writer](obytestream* stream) {
-			(*stream) << _handle;
-			// TODO: (*stream) << routeHandle;
-			writer(stream);
+		auto handle = _handle;
+		_connection->send([handle, &streamWriter](obytestream& stream) {
+			stream << handle;
+			// TODO: stream << routeHandle;
+			if (streamWriter)
+			{
+				streamWriter(stream);
+			}
 		}, channelUid, packetPriority, packetReliability);
 	}
 

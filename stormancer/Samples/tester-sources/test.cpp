@@ -89,7 +89,8 @@ namespace Stormancer
 		{
 			_logger->log(LogLevel::Debug, "test_rpc_client", "RPC CLIENT OK");
 			_logger->log(LogLevel::Debug, "test_rpc_client", "sending rpc response...");
-			rc->sendValue([=](obytestream* stream) {
+			rc->sendValue([serializer, message](obytestream& stream)
+			{
 				serializer.serialize(stream, message);
 			});
 			execNextTest();
@@ -104,7 +105,8 @@ namespace Stormancer
 
 	pplx::task<void> Tester::test_rpc_client_cancel_received(RpcRequestContext_ptr rc)
 	{
-		rc->cancellationToken().register_callback([this]() {
+		rc->cancellationToken().register_callback([this]()
+		{
 			_logger->log(LogLevel::Debug, "test_rpc_client", "RPC CLIENT CANCEL OK");
 			execNextTest();
 		});
@@ -154,10 +156,12 @@ namespace Stormancer
 		{
 			_logger->log(LogLevel::Debug, "test_connect", "Get scene");
 
-			_client->connectToPublicScene(_sceneName, [this](std::shared_ptr<Scene> scene) {
+			_client->connectToPublicScene(_sceneName, [this](std::shared_ptr<Scene> scene)
+			{
 				_logger->log(LogLevel::Debug, "test_connect", "Get scene OK");
 
-				auto onNext = [this, scene](ConnectionState state) {
+				auto onNext = [this, scene](ConnectionState state)
+				{
 					auto stateStr = connectionStateToString(state);
 					_logger->log(LogLevel::Debug, "test_connect", "Scene connection state changed: " + stateStr, state.reason);
 
@@ -175,7 +179,8 @@ namespace Stormancer
 					}
 				};
 
-				auto onError = [this](std::exception_ptr exptr) {
+				auto onError = [this](std::exception_ptr exptr)
+				{
 					// On error
 					try
 					{
@@ -191,22 +196,25 @@ namespace Stormancer
 
 				_logger->log(LogLevel::Debug, "test_connect", "Add route");
 				std::weak_ptr<Scene> wScene = scene;
-				scene->addRoute("echo.in", [this, wScene](Packetisp_ptr p) {
+				scene->addRoute("echo.in", [wScene](Packetisp_ptr p)
+				{
 					if (auto scene = wScene.lock())
 					{
-						scene->send("echo.out", [p](obytestream* stream)
+						scene->send("echo.out", [p](obytestream& stream)
 						{
-							if (p->stream->availableSize() > 0)
+							if (p->stream.availableSize() > 0)
 							{
-								stream->write(p->stream->currentPtr(), p->stream->availableSize());
+								stream.write(p->stream.currentPtr(), p->stream.availableSize());
 							}
 						});
 					}
 				});
-				scene->addRoute("echo.out", [this](Packetisp_ptr p) {
+				scene->addRoute("echo.out", [this](Packetisp_ptr p)
+				{
 					onEcho(p);
 				});
-				scene->addRoute("message", [this](Packetisp_ptr p) {
+				scene->addRoute("message", [this](Packetisp_ptr p)
+				{
 					onMessage(p);
 				});
 
@@ -220,7 +228,9 @@ namespace Stormancer
 				_logger->log(LogLevel::Debug, "test_connect", "Add procedure OK");
 
 				_logger->log(LogLevel::Debug, "test_connect", "Connect to scene");
-			}).then([this](pplx::task<std::shared_ptr<Scene>> task) {
+			})
+				.then([this](pplx::task<std::shared_ptr<Scene>> task)
+			{
 				try
 				{
 					auto scene = task.get();
@@ -264,7 +274,8 @@ namespace Stormancer
 
 			_logger->log(LogLevel::Debug, "test_echo", "Sending message...");
 			auto echoMessage = _echoMessage;
-			scene->send("echo.in", [&echoMessage](obytestream* stream) {
+			scene->send("echo.in", [&echoMessage](obytestream& stream)
+			{
 				Serializer serializer;
 				serializer.serialize(stream, echoMessage);
 			});
@@ -288,28 +299,6 @@ namespace Stormancer
 
 		// get the RPC service
 		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
-
-		//int i = 123;
-		//rpcService->rpc<void>("rpc2").then([]() { std::cout << "void 0" << std::endl; } );
-		//rpcService->rpc<void>("rpc2", i).then([]() { std::cout << "void 1" << std::endl; } );
-		//rpcService->rpc<void>("rpc2", i, i).then([]() { std::cout << "void 2" << std::endl; } );
-		//rpcService->rpc<void>("rpc2", i, i, i).then([]() { std::cout << "void 3" << std::endl; } );
-		//rpcService->rpc<int>("rpc2").then([](int j) { std::cout << "int 0" << j << std::endl; } );
-		//rpcService->rpc<int>("rpc2", i).then([](int j) { std::cout << "int 1" << j << std::endl; } );
-		//rpcService->rpc<int>("rpc2", i, i).then([](int j) { std::cout << "int 2" << j << std::endl; } );
-		//rpcService->rpc<int>("rpc2", i, i, i).then([](int j) { std::cout << "int 3" << j << std::endl; } );
-
-		//rpcService->rpcWriter("rpc2", [](bytestream* stream) {
-		//	msgpack(stream, 123);
-		//});
-
-		//rpcService->rpcWriter<int>("rpc2", [](bytestream* stream) {
-		//	(*stream) << 123;
-		//}, [](Packetisp_ptr p) {
-		//	int i;
-		//	*p->stream >> i;
-		//	return i;
-		//});
 
 		// We do an RPC on the server (by sending the string "stormancer") and get back a string response (that should be "stormancer" too)
 		rpcService->rpc<std::string>("rpc", "stormancer")
@@ -338,7 +327,9 @@ namespace Stormancer
 		});
 
 		// Test disconnecting while doing an RPC ! =)
-		//client->disconnect().then([](pplx::task<void> t) {
+		//client->disconnect()
+		//	.then([](pplx::task<void> t)
+		//{
 		//	try
 		//	{
 		//		t.get();
@@ -364,35 +355,44 @@ namespace Stormancer
 
 		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
 
-		auto observable = rpcService->rpc_observable("rpcCancel", [](obytestream* stream) {
+		auto observable = rpcService->rpcObservable("rpcCancel", [](obytestream& stream)
+		{
 			Serializer serializer;
 			serializer.serialize(stream, "stormancer2");
 		});
 
-		auto onNext = [this](Packetisp_ptr packet) {
+		auto onNext = [this](Packetisp_ptr packet)
+		{
 			_logger->log(LogLevel::Error, "test_rpc_server_cancel", "rpc response received, but this RPC should be cancelled.");
 		};
 
-		auto onError = [this](std::exception_ptr exptr) {
-			try {
+		auto onError = [this](std::exception_ptr exptr)
+		{
+			try
+			{
 				std::rethrow_exception(exptr);
 			}
-			catch (const std::exception& ex) {
+			catch (const std::exception& ex)
+			{
 				_logger->log(LogLevel::Debug, "test_rpc_server_cancel", "Rpc failed as expected", ex.what());
 			}
 		};
 
-		auto onComplete = [this]() {
+		auto onComplete = [this]()
+		{
 			_logger->log(LogLevel::Error, "test_rpc_server_cancel", "rpc complete received, but this RPC should be cancelled.");
 		};
 
 		auto subscription = observable.subscribe(onNext, onError, onComplete);
 
-		subscription.add([=]() {
+		subscription.add([=]()
+		{
 			_logger->log(LogLevel::Debug, "test_rpc_server_cancel", "RPC subscription unsubscribed");
 		});
 
-		taskDelay(30ms).then([this, subscription]() {
+		taskDelay(30ms)
+			.then([this, subscription]()
+		{
 			if (subscription.is_subscribed())
 			{
 				subscription.unsubscribe();
@@ -418,7 +418,9 @@ namespace Stormancer
 
 		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
 
-		rpcService->rpc<void>("rpcException").then([this](pplx::task<void> t) {
+		rpcService->rpc<void>("rpcException")
+			.then([this](pplx::task<void> t)
+		{
 			try
 			{
 				t.get();
@@ -445,7 +447,9 @@ namespace Stormancer
 
 		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
 
-		rpcService->rpc<void>("rpcClientException").then([this](pplx::task<void> t) {
+		rpcService->rpc<void>("rpcClientException")
+			.then([this](pplx::task<void> t)
+		{
 			try
 			{
 				t.get();
@@ -470,7 +474,8 @@ namespace Stormancer
 			return;
 		}
 
-		scene->send("message", [](obytestream* stream) {
+		scene->send("message", [](obytestream& stream)
+		{
 			Serializer serializer;
 			serializer.serialize(stream, "rpc");
 		});
@@ -487,7 +492,8 @@ namespace Stormancer
 			return;
 		}
 
-		scene->send("message", [](obytestream* stream) {
+		scene->send("message", [](obytestream& stream)
+		{
 			Serializer serializer;
 			serializer.serialize(stream, "rpcCancel");
 		});
@@ -504,7 +510,8 @@ namespace Stormancer
 			return;
 		}
 
-		scene->send("message", [](obytestream* stream) {
+		scene->send("message", [](obytestream& stream)
+		{
 			Serializer serializer;
 			serializer.serialize(stream, "rpcException");
 		});
@@ -582,7 +589,8 @@ namespace Stormancer
 
 		auto disconnectReason = _disconnectReason;
 
-		scene->send("message", [disconnectReason](obytestream* stream) {
+		scene->send("message", [disconnectReason](obytestream& stream)
+		{
 			Serializer serializer;
 			serializer.serialize(stream, "disconnectWithReason");
 			serializer.serialize(stream, disconnectReason);
@@ -605,12 +613,18 @@ namespace Stormancer
 	{
 		run_all_tests_nonblocking();
 
-		_stop = true;
+		while (!_testsDone)
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		}
 	}
 
 	void Tester::test_Ping_Cluster()
 	{
-		_client->getFederation().then([this](Federation fed) {
+		_logger->log(LogLevel::Info, "test_Ping_Cluster", "PING_CLUSTER");
+		_client->getFederation()
+			.then([this](Federation fed)
+		{
 
 			std::vector<pplx::task<int>> ping;
 			for (auto cluster : fed.clusters)
@@ -618,15 +632,19 @@ namespace Stormancer
 				ping.push_back(_client->pingCluster(cluster.id));
 			}
 			return pplx::when_all(ping.begin(), ping.end());
-		}).then([](pplx::task<std::vector<int>> task) {
+		})
+			.then([this](pplx::task<std::vector<int>> task)
+		{
 			try
-			{		
+			{
 				std::vector<int> test = task.get();
+				_logger->log(LogLevel::Debug, "test_Ping_Cluster", "Ping Cluster OK");
 			}
 			catch (std::exception ex)
 			{
-				std::string currentEx = ex.what();
+				_logger->log(LogLevel::Error, "test_Ping_Cluster", "Ping Cluster FAILED", ex.what());
 			}
+			execNextTest();
 		});
 	}
 
@@ -646,10 +664,9 @@ namespace Stormancer
 		_tests.push_back([this]() { test_rpc_client_exception(); });
 		_tests.push_back([this]() { test_syncClock(); });
 		_tests.push_back([this]() { test_setServerTimeout(); });
-		//_tests.push_back([this]() { test_disconnectwithreason(); });
 		_tests.push_back([this]() { test_disconnect(); });
-		_tests.push_back([this]() { test_clean(); });
 		_tests.push_back([this]() { test_Ping_Cluster(); });
+		_tests.push_back([this]() { test_clean(); });
 
 		// Some platforms require a Client to be created before using pplx::task
 		test_create();

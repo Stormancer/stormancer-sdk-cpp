@@ -25,9 +25,9 @@ namespace Stormancer
 
 	private:
 
-		std::shared_ptr<ILogger> _logger;
 		pplx::task<std::shared_ptr<InAppNotificationContainer>> _notificationContainerTask;
 		Event<InAppNotification> _onNotificationReceived;
 		std::weak_ptr<AuthenticationService> _auth;
+		std::shared_ptr<ILogger> _logger;
 	};
 }

@@ -12,10 +12,10 @@ namespace Stormancer
 	Configuration::Configuration(const std::string& endpoint, const std::string& account, const std::string& application)
 		: account(account)
 		, application(application)
-		, logger(std::make_shared<NullLogger>())
 		, actionDispatcher(std::make_shared<SameThreadActionDispatcher>())
-		, scheduler(std::make_shared<DefaultScheduler>())
+		, logger(std::make_shared<NullLogger>())
 		, transportFactory(_defaultTransportFactory)
+		, scheduler(std::make_shared<DefaultScheduler>())
 	{
 		dispatcher = [](std::weak_ptr<DependencyResolver> dr) {
 			return std::make_shared<DefaultPacketDispatcher>(dr.lock()->resolve<ILogger>());

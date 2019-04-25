@@ -11,6 +11,7 @@ namespace Stormancer
 	class IClient
 	{
 	public:
+
 		using SceneInitializer = std::function<void(std::shared_ptr<Scene>)>;
 
 		/// <summary>
@@ -19,6 +20,8 @@ namespace Stormancer
 		/// <param name="config"><c>Configuration</c> object containing parameters for the client to be created</param>
 		/// <returns></returns>
 		static std::shared_ptr<IClient> create(Configuration_ptr config);
+
+		virtual ~IClient() = default;
 
 		/// <summary>
 		/// Connect to an existing public scene on the server application.
@@ -60,8 +63,6 @@ namespace Stormancer
 		/// </summary>
 		/// <returns></returns>
 		virtual std::shared_ptr<DependencyResolver> dependencyResolver() = 0;
-
-
 
 		/// <summary>
 		/// Set connection metadata.

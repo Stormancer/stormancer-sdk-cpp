@@ -10,22 +10,23 @@ namespace Stormancer
 	////////////////////////////////////////////////////////////////////////////////////
 	/// Party
 	////////////////////////////////////////////////////////////////////////////////////
-	PartyContainer::PartyContainer(std::shared_ptr<Scene> scene,
+	PartyContainer::PartyContainer(
+		std::shared_ptr<Scene> scene,
 		Event<void>::Subscription JoinedPartySubscription,
 		Event<void>::Subscription LeftPartySubscription,
 		Event<void>::Subscription KickedFromPartySubscription,
 		Event<std::vector<PartyUserDto>>::Subscription UpdatedPartyMembersSubscription,
 		Event<PartyUserData>::Subscription UpdatedPartyUserDataSubscription,
-		Event<PartySettings>::Subscription UpdatedPartySettingsSubscription) 
-		:_partyScene(scene),
-		LeftPartySubscription(LeftPartySubscription),
-		UpdatedPartyMembersSubscription(UpdatedPartyMembersSubscription),
-		UpdatedPartyUserDataSubscription(UpdatedPartyUserDataSubscription),
-		UpdatedPartySettingsSubscription(UpdatedPartySettingsSubscription),
-		JoinedPartySubscription(JoinedPartySubscription),
-		KickedFromPartySubscription(KickedFromPartySubscription)
+		Event<PartySettings>::Subscription UpdatedPartySettingsSubscription
+	) 
+		: _partyScene(scene)
+		, LeftPartySubscription(LeftPartySubscription)
+		, JoinedPartySubscription(JoinedPartySubscription)
+		, KickedFromPartySubscription(KickedFromPartySubscription)
+		, UpdatedPartyMembersSubscription(UpdatedPartyMembersSubscription)
+		, UpdatedPartyUserDataSubscription(UpdatedPartyUserDataSubscription)
+		, UpdatedPartySettingsSubscription(UpdatedPartySettingsSubscription)
 	{
-
 	}
 
 	std::shared_ptr<Scene> PartyContainer::getScene()
@@ -35,6 +36,6 @@ namespace Stormancer
 
 	bool PartyContainer::isLeader()
 	{
-		return settings().leaderId == _partyScene->dependencyResolver()->resolve<AuthenticationService>()->userId();
+		return (settings().leaderId == _partyScene->dependencyResolver()->resolve<AuthenticationService>()->userId());
 	}
 }

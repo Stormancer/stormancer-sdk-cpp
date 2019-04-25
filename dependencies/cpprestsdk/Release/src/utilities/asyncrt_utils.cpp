@@ -42,6 +42,10 @@
 #include <codecvt>
 #endif
 
+#if defined(LINUX)
+#include <sys/time.h>
+#endif
+
 using namespace web;
 using namespace utility;
 using namespace utility::conversions;
@@ -283,7 +287,7 @@ namespace utility
 	{
 #if defined(CPPREST_STDLIB_UNICODE_CONVERSIONS)
 		std::wstring_convert<std::codecvt_utf8_utf16<utf16char>, utf16char> conversion;
-		return conversion.from_bytes(src);
+		return conversion.from_bytes(s);
 #else
 		utf16string dest;
 		// Save repeated heap allocations, use less than source string size assuming some

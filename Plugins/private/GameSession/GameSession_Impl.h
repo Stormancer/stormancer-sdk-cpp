@@ -18,14 +18,13 @@ namespace Stormancer
 
 		pplx::task<GameSessionConnectionParameters> ConnectToGameSession(std::string token, std::string mapName, pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
 		pplx::task<void> SetPlayerReady(std::string data, pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
-		pplx::task<GameSessionResult> PostResult(EndGameDto gameSessioResult, pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
+		pplx::task<Packetisp_ptr> PostResult(const StreamWriter& streamWriter, pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
 		pplx::task<std::string> GetUserFromBearerToken(std::string token) override;
 		pplx::task<void> DisconectFromGameSession() override;
 
 		Event<void>::Subscription subscibeOnAllPlayerReady(std::function<void()> callback) override;
 		Event<GameSessionConnectionParameters>::Subscription subscibeOnRoleRecieved(std::function<void(GameSessionConnectionParameters)> callback) override;
 		Event<GameSessionConnectionParameters>::Subscription subscibeOnTunnelOpened(std::function<void(GameSessionConnectionParameters)> callback) override;
-		Event<GameSessionResult>::Subscription subscribeOnPostedResultReceived(std::function<void(GameSessionResult)> callback) override;
 		Event<ConnectionState>::Subscription subscribeOnGameSessionConnectionChange(std::function<void(ConnectionState)> callback) override;
 		Event<void>::Subscription subscribeOnShutdownRecieved(std::function<void()> callback) override;
 	private:
@@ -41,7 +40,6 @@ namespace Stormancer
 		std::string _mapName;
 		std::weak_ptr<IClient> _wClient;
 		pplx::task<std::shared_ptr<GameSessionContainer>> _currentGameSession;
-		pplx::task_completion_event<GameSessionConnectionParameters> _gameSessionNegotiationTce;
 
 		pplx::task<std::shared_ptr<GameSessionContainer>> connectToGameSessionImpl(std::string token, pplx::cancellation_token ct);
 		pplx::task<std::shared_ptr<GameSessionContainer>> getCurrentGameSession(pplx::cancellation_token ct = pplx::cancellation_token::none());

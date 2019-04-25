@@ -25,10 +25,10 @@ namespace Stormancer
 		}
 
 		/// Sends a system msg to the remote peer.
-		/// \param writer A function to write in the stream.
+		/// \param streamWriter A function to write in the stream.
 		/// \param priority The priority of the message.
 		/// \param reliability The reliability of the message.
-		virtual void send(const Writer& writer, int channelUid, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const TransformMetadata& transformMetadata = TransformMetadata()) = 0;
+		virtual void send(const StreamWriter& streamWriter, int channelUid, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const TransformMetadata& transformMetadata = TransformMetadata()) = 0;
 		
 		/// Set the account id and the application name.
 		/// \param account The account id.

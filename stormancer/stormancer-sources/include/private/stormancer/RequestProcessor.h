@@ -35,9 +35,9 @@ namespace Stormancer
 		/// Sends a system request to the remote peer.
 		/// \param peer A target peer.
 		/// \param msgId The message id.
-		/// \param writer A procedure writing the request parameters.
+		/// \param streamWriter A procedure writing the request parameters.
 		/// \return An observable returning the request responses.
-		pplx::task<Packet_ptr> sendSystemRequest(IConnection* peer, byte msgId, const Writer& writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, pplx::cancellation_token ct = pplx::cancellation_token::none());
+		pplx::task<Packet_ptr> sendSystemRequest(IConnection* peer, byte msgId, const StreamWriter& streamWriter, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, pplx::cancellation_token ct = pplx::cancellation_token::none());
 
 		/// Register a new system request handlers for the specified message Id.
 		/// \param msgId The system message id.
@@ -47,20 +47,23 @@ namespace Stormancer
 		template<typename T1, typename T2>
 		pplx::task<T1> sendSystemRequest(IConnection* peer, byte id, const T2& parameter, pplx::cancellation_token ct = pplx::cancellation_token::none())
 		{
-			return sendSystemRequestInternal<T1>(peer, id, [=, &parameter](obytestream* stream) {
-				_serializer.serialize(stream, parameter);
+			auto serializer = _serializer;
+			return sendSystemRequestInternal<T1>(peer, id, [serializer, &parameter](obytestream& stream)
+			{
+				serializer.serialize(stream, parameter);
 			}, PacketPriority::MEDIUM_PRIORITY, ct);
 		}
 
 		template<typename T>
 		pplx::task<T> sendSystemRequest(IConnection* peer, byte id, pplx::cancellation_token ct = pplx::cancellation_token::none())
 		{
-			return sendSystemRequestInternal<T>(peer, id, [](obytestream*) {}, PacketPriority::MEDIUM_PRIORITY, ct);
+			return sendSystemRequestInternal<T>(peer, id, [](obytestream&) {}, PacketPriority::MEDIUM_PRIORITY, ct);
 		}
 
 		pplx::task<void> sendSystemRequest(IConnection* peer, byte id, pplx::cancellation_token ct = pplx::cancellation_token::none())
 		{
-			return sendSystemRequest(peer, id, [](obytestream*) {}, PacketPriority::MEDIUM_PRIORITY, ct).then([](Packet_ptr /*packet*/)
+			return sendSystemRequest(peer, id, [](obytestream&) {}, PacketPriority::MEDIUM_PRIORITY, ct)
+				.then([](Packet_ptr /*packet*/)
 			{
 				// Packet is null for system requests that have no return value.
 			}, ct);
@@ -69,10 +72,11 @@ namespace Stormancer
 		template<typename T>
 		pplx::task<void> sendSystemRequest(IConnection* peer, byte id, const T& parameter, pplx::cancellation_token ct = pplx::cancellation_token::none())
 		{
-			return sendSystemRequest(peer, id, [=, &parameter](obytestream* stream)
+			auto serializer = _serializer;
+			return sendSystemRequest(peer, id, [serializer, &parameter](obytestream& stream)
 			{
-				_serializer.serialize(stream, parameter);
-			}, PacketPriority::MEDIUM_PRIORITY, ct).then([](Packet_ptr /*packet*/)
+				serializer.serialize(stream, parameter);
+			}, PacketPriority::MEDIUM_PRIORITY, ct).then([](Packet_ptr)
 			{
 				// Packet is null for system requests that have no return value.
 			}, ct);
@@ -89,13 +93,13 @@ namespace Stormancer
 		SystemRequest_ptr freeRequestSlot(uint16 requestId);
 
 		template<typename TResult>
-		pplx::task<TResult> sendSystemRequestInternal(IConnection* peer, byte msgId, const Writer& writer, PacketPriority priority, pplx::cancellation_token ct)
+		pplx::task<TResult> sendSystemRequestInternal(IConnection* peer, byte msgId, const StreamWriter& streamWriter, PacketPriority priority, pplx::cancellation_token ct)
 		{
 			std::string Tname = typeid(TResult).name();
 			auto logger = _logger;
 			auto serializer = _serializer;
 
-			return sendSystemRequest(peer, msgId, writer, priority, ct).then([Tname, logger, serializer, msgId](Packet_ptr packet)
+			return sendSystemRequest(peer, msgId, streamWriter, priority, ct).then([Tname, logger, serializer, msgId](Packet_ptr packet)
 			{
 				if (!packet)
 				{

@@ -46,9 +46,14 @@
     <ProjectName>stormancer_cpp_tester_linux</ProjectName>
   </PropertyGroup>
   <PropertyGroup Label="UserMacros">
-    <StormancerSdkRoot>..\..\..\</StormancerSdkRoot>
+    <StormancerSdkRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\..\'))</StormancerSdkRoot>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="..\..\PropertySheets\LinuxCommon.props" />
+    <Import Project="..\..\PropertySheets\OutputDirs.props" />
+    <Import Project="..\tester-sources\samples.props" />
+  </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
   </PropertyGroup>
@@ -79,58 +84,63 @@
     <Import Project="..\..\..\Plugins\plugins-sources.vcxitems" Label="Shared" />
     <Import Project="..\tester-sources\tester-sources.vcxitems" Label="Shared" />
   </ImportGroup>
-  <ImportGroup Label="PropertySheets">
-    <Import Project="..\tester-sources\samples.props" />
-  </ImportGroup>
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
-    <RemoteCCompileToolExe>clang++-6.0</RemoteCCompileToolExe>
-    <RemoteCppCompileToolExe>clang++-6.0</RemoteCppCompileToolExe>
     <MultiProcNumber>6</MultiProcNumber>
-    <RemoteLdToolExe>clang++-6.0</RemoteLdToolExe>
+    <RemoteProjectDir>$(RemoteRootDir)/stormancer/Samples/stormancer_cpp_tester_linux</RemoteProjectDir>
+    <OutDir>$(StormancerDependenciesOutputDir)</OutDir>
+    <TargetName>$(ProjectName)_$(Configuration)_$(Platform)-$(StormancerLinuxToolset)</TargetName>
+    <TargetExt />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
-    <RemoteCCompileToolExe>clang++-6.0</RemoteCCompileToolExe>
-    <RemoteCppCompileToolExe>clang++-6.0</RemoteCppCompileToolExe>
     <MultiProcNumber>6</MultiProcNumber>
-    <RemoteLdToolExe>clang++-6.0</RemoteLdToolExe>
+    <RemoteProjectDir>$(RemoteRootDir)/stormancer/Samples/stormancer_cpp_tester_linux</RemoteProjectDir>
+    <OutDir>$(StormancerDependenciesOutputDir)</OutDir>
+    <TargetName>$(ProjectName)_$(Configuration)_$(Platform)-$(StormancerLinuxToolset)</TargetName>
+    <TargetExt />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
-    <RemoteCCompileToolExe>clang++-6.0</RemoteCCompileToolExe>
-    <RemoteCppCompileToolExe>clang++-6.0</RemoteCppCompileToolExe>
     <MultiProcNumber>6</MultiProcNumber>
-    <RemoteLdToolExe>clang++-6.0</RemoteLdToolExe>
+    <RemoteProjectDir>$(RemoteRootDir)/stormancer/Samples/stormancer_cpp_tester_linux</RemoteProjectDir>
+    <OutDir>$(StormancerDependenciesOutputDir)</OutDir>
+    <TargetName>$(ProjectName)_$(Configuration)_$(Platform)-$(StormancerLinuxToolset)</TargetName>
+    <TargetExt />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
-    <RemoteCCompileToolExe>clang++-6.0</RemoteCCompileToolExe>
-    <RemoteCppCompileToolExe>clang++-6.0</RemoteCppCompileToolExe>
     <MultiProcNumber>6</MultiProcNumber>
-    <RemoteLdToolExe>clang++-6.0</RemoteLdToolExe>
+    <RemoteProjectDir>$(RemoteRootDir)/stormancer/Samples/stormancer_cpp_tester_linux</RemoteProjectDir>
+    <OutDir>$(StormancerDependenciesOutputDir)</OutDir>
+    <TargetName>$(ProjectName)_$(Configuration)_$(Platform)-$(StormancerLinuxToolset)</TargetName>
+    <TargetExt />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <RemoteCCompileToolExe>clang++-6.0</RemoteCCompileToolExe>
-    <RemoteCppCompileToolExe>clang++-6.0</RemoteCppCompileToolExe>
     <MultiProcNumber>6</MultiProcNumber>
-    <RemoteLdToolExe>clang++-6.0</RemoteLdToolExe>
+    <RemoteProjectDir>$(RemoteRootDir)/stormancer/Samples/stormancer_cpp_tester_linux</RemoteProjectDir>
+    <OutDir>$(StormancerDependenciesOutputDir)</OutDir>
+    <TargetName>$(ProjectName)_$(Configuration)_$(Platform)-$(StormancerLinuxToolset)</TargetName>
+    <TargetExt />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <RemoteCCompileToolExe>clang++-6.0</RemoteCCompileToolExe>
-    <RemoteCppCompileToolExe>clang++-6.0</RemoteCppCompileToolExe>
     <MultiProcNumber>6</MultiProcNumber>
-    <RemoteLdToolExe>clang++-6.0</RemoteLdToolExe>
+    <RemoteProjectDir>$(RemoteRootDir)/stormancer/Samples/stormancer_cpp_tester_linux</RemoteProjectDir>
+    <OutDir>$(StormancerDependenciesOutputDir)</OutDir>
+    <TargetName>$(ProjectName)_$(Configuration)_$(Platform)-$(StormancerLinuxToolset)</TargetName>
+    <TargetExt />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
-    <RemoteCCompileToolExe>clang++-6.0</RemoteCCompileToolExe>
-    <RemoteCppCompileToolExe>clang++-6.0</RemoteCppCompileToolExe>
     <MultiProcNumber>6</MultiProcNumber>
-    <RemoteLdToolExe>clang++-6.0</RemoteLdToolExe>
+    <RemoteProjectDir>$(RemoteRootDir)/stormancer/Samples/stormancer_cpp_tester_linux</RemoteProjectDir>
+    <OutDir>$(StormancerDependenciesOutputDir)</OutDir>
+    <TargetName>$(ProjectName)_$(Configuration)_$(Platform)-$(StormancerLinuxToolset)</TargetName>
+    <TargetExt />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
-    <RemoteCCompileToolExe>clang++-6.0</RemoteCCompileToolExe>
-    <RemoteCppCompileToolExe>clang++-6.0</RemoteCppCompileToolExe>
     <MultiProcNumber>6</MultiProcNumber>
-    <RemoteLdToolExe>clang++-6.0</RemoteLdToolExe>
+    <RemoteProjectDir>$(RemoteRootDir)/stormancer/Samples/stormancer_cpp_tester_linux</RemoteProjectDir>
+    <OutDir>$(StormancerDependenciesOutputDir)</OutDir>
+    <TargetName>$(ProjectName)_$(Configuration)_$(Platform)-$(StormancerLinuxToolset)</TargetName>
+    <TargetExt />
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -143,97 +153,113 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <PreprocessorDefinitions>LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;__CLANG_STDINT_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../Boost/include/;stormancer/Samples/tester-sources/;../RakNet_Linux/;../includes/;Plugins/public/;Plugins/private/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>stormancer/Samples/tester-sources/;../RakNet_Linux/;../includes/;Plugins/public/;Plugins/private/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Wno-unknown-pragmas</AdditionalOptions>
+      <Verbose>true</Verbose>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
+    <Link />
     <Link>
-      <AdditionalLibraryDirectories>../libs/;cpprestsdk_Linux/bin/x64/Debug/;stormancer-sdk-cpp-lib-Linux/bin/x64/Debug/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>-pthread -lcrypto -lssl -lboost_thread -lboost_system;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>-no-pie %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <ClCompile>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <PreprocessorDefinitions>LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;__CLANG_STDINT_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../Boost/include/;stormancer/Samples/tester-sources/;../RakNet_Linux/;../includes/;Plugins/public/;Plugins/private/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>stormancer/Samples/tester-sources/;../RakNet_Linux/;../includes/;Plugins/public/;Plugins/private/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Wno-unknown-pragmas</AdditionalOptions>
+      <Verbose>true</Verbose>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
+    <Link />
     <Link>
-      <AdditionalLibraryDirectories>../libs/;cpprestsdk_Linux/bin/x64/Debug/;stormancer-sdk-cpp-lib-Linux/bin/x64/Debug/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>-pthread -lcrypto -lssl -lboost_thread -lboost_system;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>-no-pie %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <ClCompile>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <PreprocessorDefinitions>LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;__CLANG_STDINT_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../Boost/include/;stormancer/Samples/tester-sources/;../RakNet_Linux/;../includes/;Plugins/public/;Plugins/private/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>stormancer/Samples/tester-sources/;../RakNet_Linux/;../includes/;Plugins/public/;Plugins/private/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Wno-unknown-pragmas</AdditionalOptions>
+      <Verbose>true</Verbose>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
+    <Link />
     <Link>
-      <AdditionalLibraryDirectories>../libs/;cpprestsdk_Linux/bin/x64/Debug/;stormancer-sdk-cpp-lib-Linux/bin/x64/Debug/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>-pthread -lcrypto -lssl -lboost_thread -lboost_system;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>-no-pie %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <ClCompile>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <PreprocessorDefinitions>LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;__CLANG_STDINT_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../Boost/include/;stormancer/Samples/tester-sources/;../RakNet_Linux/;../includes/;Plugins/public/;Plugins/private/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>stormancer/Samples/tester-sources/;../RakNet_Linux/;../includes/;Plugins/public/;Plugins/private/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Wno-unknown-pragmas</AdditionalOptions>
+      <Verbose>true</Verbose>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
+    <Link />
     <Link>
-      <AdditionalLibraryDirectories>../libs/;cpprestsdk_Linux/bin/x64/Debug/;stormancer-sdk-cpp-lib-Linux/bin/x64/Debug/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>-pthread -lcrypto -lssl -lboost_thread -lboost_system;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>-no-pie %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <PreprocessorDefinitions>LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;__CLANG_STDINT_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../Boost/include/;stormancer/Samples/tester-sources/;../RakNet_Linux/;../includes/;Plugins/public/;Plugins/private/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>stormancer/Samples/tester-sources/;../RakNet_Linux/;../includes/;Plugins/public/;Plugins/private/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Wno-unknown-pragmas</AdditionalOptions>
+      <Verbose>true</Verbose>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
+    <Link />
     <Link>
-      <AdditionalLibraryDirectories>../libs/;cpprestsdk_Linux/bin/x64/Debug/;stormancer-sdk-cpp-lib-Linux/bin/x64/Debug/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>-pthread -lcrypto -lssl -lboost_thread -lboost_system;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>-no-pie %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <PreprocessorDefinitions>LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;__CLANG_STDINT_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../Boost/include/;stormancer/Samples/tester-sources/;../RakNet_Linux/;../includes/;Plugins/public/;Plugins/private/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>stormancer/Samples/tester-sources/;../RakNet_Linux/;../includes/;Plugins/public/;Plugins/private/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Wno-unknown-pragmas</AdditionalOptions>
+      <Verbose>true</Verbose>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
+    <Link />
     <Link>
-      <AdditionalLibraryDirectories>../libs/;cpprestsdk_Linux/bin/x64/Debug/;stormancer-sdk-cpp-lib-Linux/bin/x64/Debug/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>-pthread -lcrypto -lssl -lboost_thread -lboost_system;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>-no-pie %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
     <ClCompile>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <PreprocessorDefinitions>LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;__CLANG_STDINT_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../Boost/include/;stormancer/Samples/tester-sources/;../RakNet_Linux/;../includes/;Plugins/public/;Plugins/private/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>stormancer/Samples/tester-sources/;../RakNet_Linux/;../includes/;Plugins/public/;Plugins/private/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Wno-unknown-pragmas</AdditionalOptions>
+      <Verbose>true</Verbose>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
+    <Link />
     <Link>
-      <AdditionalLibraryDirectories>../libs/;cpprestsdk_Linux/bin/x64/Debug/;stormancer-sdk-cpp-lib-Linux/bin/x64/Debug/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>-pthread -lcrypto -lssl -lboost_thread -lboost_system;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>-no-pie %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
     <ClCompile>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <PreprocessorDefinitions>LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;__CLANG_STDINT_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../Boost/include/;stormancer/Samples/tester-sources/;../RakNet_Linux/;../includes/;Plugins/public/;Plugins/private/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>stormancer/Samples/tester-sources/;../RakNet_Linux/;../includes/;Plugins/public/;Plugins/private/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Wno-unknown-pragmas</AdditionalOptions>
+      <Verbose>true</Verbose>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
+    <Link />
     <Link>
-      <AdditionalLibraryDirectories>../libs/;cpprestsdk_Linux/bin/x64/Debug/;stormancer-sdk-cpp-lib-Linux/bin/x64/Debug/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>-pthread -lcrypto -lssl -lboost_thread -lboost_system;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>-no-pie %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -7,8 +7,8 @@
 namespace Stormancer
 {
 	AssetsStorageService::AssetsStorageService(std::weak_ptr<Scene> scene, ILogger_ptr logger)
-		: _logger(logger)
-		, _scene(scene)
+		: _scene(scene)
+		, _logger(logger)
 	{
 	}
 

@@ -69,13 +69,18 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
   </PropertyGroup>
+  <PropertyGroup Label="UserMacros">
+    <StormancerSdkRoot>..\..\..\..\..\</StormancerSdkRoot>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings" />
   <ImportGroup Label="Shared">
     <Import Project="..\..\libupnp-sources\libupnp-sources.vcxitems" Label="Shared" />
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" />
-  <PropertyGroup Label="UserMacros" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(StormancerSdkRoot)stormancer\PropertySheets\LinuxCommon.props" />
+    <Import Project="$(StormancerSdkRoot)stormancer\PropertySheets\OutputDirs.props" />
+  </ImportGroup>
   <ItemGroup>
   </ItemGroup>
   <ItemDefinitionGroup />

@@ -18,7 +18,7 @@ namespace Stormancer
 	{
 	}
 
-	rxcpp::observable<Packetisp_ptr> RpcService::rpc_observable(const std::string& route, const Writer& writer, PacketPriority priority)
+	rxcpp::observable<Packetisp_ptr> RpcService::rpcObservable(const std::string& route, const StreamWriter& streamWriter, PacketPriority priority)
 	{
 		auto scene = _scene.lock();
 
@@ -29,7 +29,7 @@ namespace Stormancer
 
 		auto logger = _logger;
 		auto wScene = _scene;
-		auto observable = rxcpp::observable<>::create<Packetisp_ptr>([this, logger, wScene, route, writer, priority](rxcpp::subscriber<Packetisp_ptr> subscriber)
+		auto observable = rxcpp::observable<>::create<Packetisp_ptr>([this, logger, wScene, route, streamWriter, priority](rxcpp::subscriber<Packetisp_ptr> subscriber)
 		{
 			auto scene = wScene.lock();
 
@@ -86,12 +86,12 @@ namespace Stormancer
 
 			try
 			{
-				scene->send(route, [id, writer](obytestream* stream)
+				scene->send(route, [id, streamWriter](obytestream& stream)
 				{
-					*stream << id;
-					if (writer)
+					stream << id;
+					if (streamWriter)
 					{
-						writer(stream);
+						streamWriter(stream);
 					}
 				}, priority, PacketReliability::RELIABLE_ORDERED, _rpcServerChannelIdentifier);
 			}
@@ -120,9 +120,9 @@ namespace Stormancer
 							{
 								try
 								{
-									scene->send(Stormancer::rpc::cancellationRouteName, [request](obytestream* stream)
+									scene->send(Stormancer::rpc::cancellationRouteName, [request](obytestream& stream)
 									{
-										(*stream) << request->id;
+										stream << request->id;
 									}, PacketPriority::IMMEDIATE_PRIORITY, PacketReliability::RELIABLE_ORDERED, _rpcServerChannelIdentifier);
 								}
 								catch (std::exception& e)
@@ -168,7 +168,7 @@ namespace Stormancer
 			scene->addRoute(route, [this, handler, ordered](Packetisp_ptr p)
 			{
 				uint16 id = 0;
-				*p->stream >> id;
+				p->stream >> id;
 				pplx::cancellation_token_source cts;
 				RpcRequestContext_ptr ctx;
 
@@ -251,7 +251,7 @@ namespace Stormancer
 	RpcRequest_ptr RpcService::getPendingRequest(Packetisp_ptr packet)
 	{
 		uint16 id = 0;
-		*packet->stream >> id;
+		packet->stream >> id;
 
 		RpcRequest_ptr request;
 
@@ -320,7 +320,7 @@ namespace Stormancer
 	void RpcService::complete(Packetisp_ptr packet)
 	{
 		byte b = 0;
-		*packet->stream >> b;
+		packet->stream >> b;
 		bool messageSent = (b != 0);
 
 		auto request = getPendingRequest(packet);
@@ -343,7 +343,7 @@ namespace Stormancer
 
 			std::weak_ptr<RpcRequest> wRequest = request;
 			waitingForDataTask
-				.then([this, wRequest](pplx::task<void> t)
+				.then([wRequest](pplx::task<void> t)
 			{
 				if (auto request = wRequest.lock())
 				{
@@ -365,7 +365,7 @@ namespace Stormancer
 	void RpcService::cancel(Packetisp_ptr packet)
 	{
 		uint16 id = 0;
-		*packet->stream >> id;
+		packet->stream >> id;
 
 #ifdef STORMANCER_LOG_RPC
 		auto idstr = std::to_string(id);
@@ -417,46 +417,37 @@ namespace Stormancer
 		return _dispatcher;
 	}
 
-	pplx::task<void> RpcService::rpcWriter(const std::string& procedure, pplx::cancellation_token ct, const Writer& writer)
+	template<>
+	pplx::task<Packetisp_ptr> RpcService::rpcImpl(rxcpp::observable<Packetisp_ptr> observable, const std::string& route, pplx::cancellation_token ct)
 	{
-		auto logger = _logger;
+		pplx::task_completion_event<Packetisp_ptr> tce;
 
+		auto onNext = [tce](Packetisp_ptr packet)
+		{
+			tce.set(packet);
+		};
+
+		auto onComplete = []()
+		{
+		};
+
+		return rpcInternal(observable, tce, route, onNext, onComplete, ct);
+	}
+
+	template<>
+	pplx::task<void> RpcService::rpcImpl(rxcpp::observable<Packetisp_ptr> observable, const std::string& route, pplx::cancellation_token ct)
+	{
 		pplx::task_completion_event<void> tce;
 
-		auto observable = rpc_observable(procedure, writer, PacketPriority::MEDIUM_PRIORITY);
-
-		auto onNext = [](Packetisp_ptr packet) {
+		auto onNext = [](Packetisp_ptr packet)
+		{
 		};
 
-		auto onError = [logger, tce, procedure](std::exception_ptr exptr) {
-			try
-			{
-				std::rethrow_exception(exptr);
-			}
-			catch (const std::exception& ex)
-			{
-				logger->log(LogLevel::Warn, "RpcHelpers", "An exception occurred during the rpc '" + procedure + "'", ex.what());
-				tce.set_exception(ex);
-			}
-		};
-
-		auto onComplete = [tce]() {
+		auto onComplete = [tce]()
+		{
 			tce.set();
 		};
-		
 
-		auto subscription = observable.subscribe(onNext, onError, onComplete);
-
-		if (ct.is_cancelable())
-		{
-			ct.register_callback([subscription]() {
-				if (subscription.is_subscribed())
-				{
-					subscription.unsubscribe();
-				}
-			});
-		}
-
-		return pplx::create_task(tce, getDispatcher());
+		return rpcInternal(observable, tce, route, onNext, onComplete, ct);
 	}
 };

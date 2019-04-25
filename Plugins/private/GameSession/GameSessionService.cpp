@@ -227,7 +227,7 @@ namespace Stormancer
 		}
 
 		auto rpc = scene->dependencyResolver()->resolve<RpcService>();
-		return rpc->rpcWriter("gamesession.reset", ct, [](obytestream*) {});
+		return rpc->rpc("gamesession.reset", ct);
 	}
 
 	pplx::task<void> GameSessionService::disconnect()
@@ -257,8 +257,21 @@ namespace Stormancer
 			return;
 		}
 
-		scene->send("player.ready", [data](obytestream* stream) {
+		scene->send("player.ready", [data](obytestream& stream)
+		{
 			msgpack::pack(stream, data);
 		});
+	}
+
+	pplx::task<Packetisp_ptr> GameSessionService::sendGameResults(const StreamWriter& streamWriter, pplx::cancellation_token ct)
+	{
+		auto scene = _scene.lock();
+		if (!scene)
+		{
+			return pplx::task_from_exception<Packetisp_ptr>(std::runtime_error("Scene deleted"));
+		}
+
+		auto rpc = scene->dependencyResolver()->resolve<RpcService>();
+		return rpc->rpc<Packetisp_ptr>("gamesession.postresults", ct, streamWriter);
 	}
 }

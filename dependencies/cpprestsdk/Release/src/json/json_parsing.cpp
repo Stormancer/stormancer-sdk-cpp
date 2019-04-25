@@ -25,6 +25,7 @@
 
 #include "stdafx.h"
 #include <cstdlib>
+#include <climits> // For ULLONG_MAX
 
 
 

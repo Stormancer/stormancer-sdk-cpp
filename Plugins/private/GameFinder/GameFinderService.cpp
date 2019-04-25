@@ -24,8 +24,6 @@ namespace Stormancer
 		: _scene(scene)
 		, _rpcService(scene->dependencyResolver()->resolve<RpcService>())
 	{
-
-		
 	}
 
 	GameFinderService::~GameFinderService()
@@ -34,9 +32,10 @@ namespace Stormancer
 	void GameFinderService::initialize()
 	{
 		std::weak_ptr<GameFinderService> wThat = this->shared_from_this();
-		_scene.lock()->addRoute("match.update", [wThat](Packetisp_ptr packet) {
+		_scene.lock()->addRoute("match.update", [wThat](Packetisp_ptr packet)
+		{
 			byte matchStateByte;
-			packet->stream->read((char*)&matchStateByte, 1);
+			packet->stream.read((char*)&matchStateByte, 1);
 			int32 matchState = matchStateByte;
 
 			if (auto that = wThat.lock())
@@ -51,13 +50,12 @@ namespace Stormancer
 				{
 				case GameFinderStatus::Success:
 				{
-					Serializer serializer;
-					auto dto = serializer.deserializeOne<GameFinderResponseDto>(packet->stream);
-					
+					auto dto = that->_serializer.deserializeOne<GameFinderResponseDto>(packet->stream);
+
 					GameFinderResponse response;
 					response.connectionToken = dto.gameToken;
 					response.optionalParameters = dto.optionalParameters;
-					
+
 					that->GameFound(response);
 					that->_currentState = GameFinderStatus::Idle;
 					that->GameFinderStatusUpdated(that->_currentState);
@@ -72,43 +70,49 @@ namespace Stormancer
 				case GameFinderStatus::Failed:
 				{
 					std::string reason;
-					if (packet->stream->good())
+					// There may or may not be a reason string supplied with the failure notification, so check if the stream has more data
+					if (packet->stream.good())
 					{
-						reason = Serializer().deserializeOne<std::string>(packet->stream);
+						reason = that->_serializer.deserializeOne<std::string>(packet->stream);
 					}
 					that->FindGameRequestFailed(reason);
 					that->_currentState = GameFinderStatus::Idle;
 					that->GameFinderStatusUpdated(that->_currentState);
 					break;
 				}
+				default:
+				// ignore
+				break;
 				}
 			}
 		});
 
-		_scene.lock()->addRoute("match.parameters.update", [wThat](Packetisp_ptr packet) {
-			Serializer serializer;
-			
-			std::string provider = serializer.deserializeOne<std::string>(packet->stream);
-
-			//_onMatchParametersUpdate();
-		});
-
-		_scene.lock()->addRoute("match.ready.update", [wThat](Packetisp_ptr packet) {
-			Serializer serializer;
-			Internal::ReadyVerificationRequest readyUpdateTmp = serializer.deserializeOne<Internal::ReadyVerificationRequest>(packet->stream);
-			ReadyVerificationRequest readyUpdate = readyUpdateTmp;
-			readyUpdate.membersCountReady = 0;
-
-			for (auto it : readyUpdateTmp.members)
+		_scene.lock()->addRoute("match.parameters.update", [wThat](Packetisp_ptr packet)
+		{
+			if (auto that = wThat.lock())
 			{
-				Readiness ready = (Readiness)it.second;
-				if (ready == Readiness::Ready)
+				std::string provider = that->_serializer.deserializeOne<std::string>(packet->stream);
+				//_onMatchParametersUpdate();
+			}
+		});
+
+		_scene.lock()->addRoute("match.ready.update", [wThat](Packetisp_ptr packet)
+		{
+			if (auto that = wThat.lock())
+			{
+				Internal::ReadyVerificationRequest readyUpdateTmp = that->_serializer.deserializeOne<Internal::ReadyVerificationRequest>(packet->stream);
+				ReadyVerificationRequest readyUpdate = readyUpdateTmp;
+				readyUpdate.membersCountReady = 0;
+
+				for (auto it : readyUpdateTmp.members)
 				{
-					readyUpdate.membersCountReady++;
+					Readiness ready = (Readiness)it.second;
+					if (ready == Readiness::Ready)
+					{
+						readyUpdate.membersCountReady++;
+					}
 				}
 			}
-
-			
 		});
 	}
 
@@ -165,8 +169,9 @@ namespace Stormancer
 	void GameFinderService::resolve(bool acceptMatch)
 	{
 		auto scene = _scene.lock();
-		scene->send("match.ready.resolve", [=](obytestream* stream) {
-			*stream << acceptMatch;
+		scene->send("match.ready.resolve", [=](obytestream& stream)
+		{
+			stream << acceptMatch;
 		}, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE_ORDERED);
 	}
 
@@ -176,7 +181,7 @@ namespace Stormancer
 		{
 			auto scene = _scene.lock();
 			_matchmakingCTS.cancel();
-			scene->send("match.cancel", [](obytestream*) {}, PacketPriority::IMMEDIATE_PRIORITY, PacketReliability::RELIABLE_ORDERED);
+			scene->send("match.cancel", [](obytestream&) {}, PacketPriority::IMMEDIATE_PRIORITY, PacketReliability::RELIABLE_ORDERED);
 		}
 	}
 };

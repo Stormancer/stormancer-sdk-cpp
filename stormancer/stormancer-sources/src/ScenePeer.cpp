@@ -16,7 +16,7 @@ namespace Stormancer
 	{
 	}
 
-	void ScenePeer::send(const std::string& routeName, const Writer& writer, PacketPriority priority, PacketReliability reliability)
+	void ScenePeer::send(const std::string& routeName, const StreamWriter& streamWriter, PacketPriority priority, PacketReliability reliability)
 	{
 		auto connection = _connection.lock();
 		if (!connection)
@@ -28,16 +28,17 @@ namespace Stormancer
 		{
 			throw std::invalid_argument(std::string("The routeName '") + routeName + "' is not declared on the server.");
 		}
-		Route_ptr r = _routeMapping[routeName];
+		Route_ptr route = _routeMapping[routeName];
 		std::stringstream ss;
 		ss << "ScenePeer_" << id() << "_" << routeName;
 		int channelUid = connection->dependencyResolver()->resolve<ChannelUidStore>()->getChannelUid(ss.str());
-		connection->send([=, &writer](obytestream* stream) {
-			(*stream) << _sceneHandle;
-			(*stream) << r->handle();
-			if (writer)
+		auto sceneHandle = _sceneHandle;
+		connection->send([sceneHandle, route, &streamWriter](obytestream& stream) {
+			stream << sceneHandle;
+			stream << route->handle();
+			if (streamWriter)
 			{
-				writer(stream);
+				streamWriter(stream);
 			}
 		}, channelUid, priority, reliability);
 	}

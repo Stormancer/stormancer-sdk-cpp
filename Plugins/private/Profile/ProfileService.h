@@ -21,9 +21,9 @@ namespace Stormancer
 		ProfileService(const ProfileService&& other) = delete;
 		ProfileService& operator=(const ProfileService&& other) = delete;
 
-		pplx::task<ProfilesResult> getProfiles(const std::list<std::string>& userIds);
+		pplx::task<ProfilesResult> getProfiles(const std::list<std::string>& userIds, const std::unordered_map<std::string, std::string>& displayOptions);
 		pplx::task<void> updateUserHandle(const std::string& userIds);
-		pplx::task<ProfilesResult> queryProfiles(const std::string& pseudoPrefix, const int& skip, const int& take);
+		pplx::task<ProfilesResult> queryProfiles(const std::string& pseudoPrefix, const int& skip, const int& take, const std::unordered_map<std::string, std::string>& displayOptions);
 
 	private:
 		std::weak_ptr<Scene> _scene;

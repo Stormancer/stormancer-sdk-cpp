@@ -136,6 +136,18 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)private\GameRecovery\GameRecovery_Impl.cpp">
       <Filter>private\GameRecovery</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)private\Servers\Servers_Impl.cpp">
+      <Filter>private\Servers</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)private\Servers\ServersPlugin.cpp">
+      <Filter>private\Servers</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)private\Servers\ServersService.cpp">
+      <Filter>private\Servers</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)private\Authentication\AuthenticationException.cpp">
+      <Filter>private\Authentication</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Leaderboard\Leaderboard_Impl.h">
@@ -282,7 +294,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Party\PartyService.h">
       <Filter>private\Party</Filter>
     </ClInclude>
-	<ClInclude Include="$(MSBuildThisFileDirectory)public\Party\PartyModels.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Party\PartyModels.h">
       <Filter>public\Party</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Party\Party.h">
@@ -332,12 +344,30 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameSession\GameSessionPlugin.h">
       <Filter>public\GameSession</Filter>
-    </ClInclude>   
+    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Profile\ProfileModels.h">
       <Filter>public\Profile</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameRecovery\GameRecoveryModels.h">
       <Filter>public\GameRecovery</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)private\Servers\Servers_Impl.h">
+      <Filter>private\Servers</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)private\Servers\ServersPlugin.h">
+      <Filter>private\Servers</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)private\Servers\ServersService.h">
+      <Filter>private\Servers</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Servers\Servers.h">
+      <Filter>public\Servers</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)private\Authentication\AuthenticationException.h">
+      <Filter>private\Authentication</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Servers\ServersModels.h">
+      <Filter>public\Servers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -448,6 +478,12 @@
     </Filter>
     <Filter Include="public\PlayerReport">
       <UniqueIdentifier>{e89bee14-00b1-4467-bd2f-cd54a0a4da0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="private\Servers">
+      <UniqueIdentifier>{32ee45c2-b997-42c7-bd27-1b2e192cc9e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="public\Servers">
+      <UniqueIdentifier>{539fb7ca-58cf-4a21-a7df-efcfc03ed117}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

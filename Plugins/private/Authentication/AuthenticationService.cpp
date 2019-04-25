@@ -1,6 +1,7 @@
 #include "Authentication/AuthenticationService.h"
 #include "stormancer/RPC/Service.h"
 #include "stormancer/Utilities/TaskUtilities.h"
+#include "AuthenticationException.h"
 
 namespace Stormancer
 {
@@ -152,6 +153,12 @@ namespace Stormancer
 			{
 				return pplx::task_from_result(t.get());
 			}
+			catch (GetCredentialException& ex)
+			{
+				that->_autoReconnect = false;
+				that->_currentConnectionState = GameConnectionState::Disconnected;
+				throw ex;
+			}
 			catch (std::exception& ex)
 			{
 				that->_logger->log(LogLevel::Error, "authentication", "An error occured while trying to connect to the server.", ex.what());
@@ -211,7 +218,7 @@ namespace Stormancer
 			auto t = *_authTask;
 			std::weak_ptr<AuthenticationService> wThat = this->shared_from_this();
 			pplx::task_completion_event<std::shared_ptr<Scene>> tce;
-			if (ct.is_cancelable())
+			if (ct != pplx::cancellation_token::none() && ct.is_cancelable())
 			{
 				ct.register_callback([tce]() {
 					tce.set_exception(pplx::task_canceled());
@@ -231,6 +238,14 @@ namespace Stormancer
 						throw std::runtime_error("Authentication failed");
 					}
 
+				}
+				catch (GetCredentialException& ex)
+				{
+					if (auto that = wThat.lock())
+					{
+						that->_authTask = nullptr;
+					}
+					tce.set_exception(ex);
 				}
 				catch (std::exception& ex)
 				{
@@ -405,7 +420,8 @@ namespace Stormancer
 	{
 		if (_currentConnectionState != state)
 		{
-			this->_logger->log(LogLevel::Info, "connection", "Connection state changed", std::to_string((int)state) + "reason " + state.reason);
+			std::string reason = state.reason.empty() ? "" : " reason: " + state.reason;
+			this->_logger->log(LogLevel::Info, "connection", "Game connection state changed", std::to_string((int)state) + reason);
 
 
 

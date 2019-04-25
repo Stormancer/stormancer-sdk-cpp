@@ -102,7 +102,7 @@ namespace Stormancer
 
 	byte* obytestream::startPtr()
 	{
-		auto bsb = dynamic_cast<bytestreambuf*>(rdbuf());
+		auto bsb = static_cast<bytestreambuf*>(rdbuf());
 		if (bsb)
 		{
 			return bsb->startWritePtr();
@@ -112,7 +112,7 @@ namespace Stormancer
 
 	byte* obytestream::currentPtr()
 	{
-		auto bsb = dynamic_cast<bytestreambuf*>(rdbuf());
+		auto bsb = static_cast<bytestreambuf*>(rdbuf());
 		if (bsb)
 		{
 			return bsb->currentWritePtr();
@@ -122,7 +122,7 @@ namespace Stormancer
 
 	byte* obytestream::endPtr()
 	{
-		auto bsb = dynamic_cast<bytestreambuf*>(rdbuf());
+		auto bsb = static_cast<bytestreambuf*>(rdbuf());
 		if (bsb)
 		{
 			return bsb->endWritePtr();
@@ -132,7 +132,7 @@ namespace Stormancer
 
 	std::streamsize obytestream::totalSize()
 	{
-		auto bsb = dynamic_cast<bytestreambuf*>(rdbuf());
+		auto bsb = static_cast<bytestreambuf*>(rdbuf());
 		if (bsb)
 		{
 			return bsb->size();
@@ -142,7 +142,7 @@ namespace Stormancer
 
 	std::streamsize obytestream::availableSize()
 	{
-		auto bsb = dynamic_cast<bytestreambuf*>(rdbuf());
+		auto bsb = static_cast<bytestreambuf*>(rdbuf());
 		if (bsb)
 		{
 			return bsb->in_avail();
@@ -152,7 +152,7 @@ namespace Stormancer
 
 	std::streamsize obytestream::currentPosition()
 	{
-		auto bsb = dynamic_cast<bytestreambuf*>(rdbuf());
+		auto bsb = static_cast<bytestreambuf*>(rdbuf());
 		if (bsb)
 		{
 			return bsb->currentWritePosition();
@@ -162,7 +162,7 @@ namespace Stormancer
 
 	void obytestream::dynamic(bool dyn)
 	{
-		auto bsb = dynamic_cast<bytestreambuf*>(rdbuf());
+		auto bsb = static_cast<bytestreambuf*>(rdbuf());
 		if (bsb)
 		{
 			bsb->dynamic(dyn);

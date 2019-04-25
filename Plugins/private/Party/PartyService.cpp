@@ -1,6 +1,3 @@
-#if defined(STORMANCER_CUSTOM_PCH)
-#include STORMANCER_CUSTOM_PCH
-#endif
 #include "PartyService.h"
 #include "stormancer/Logger/ILogger.h"
 #include "stormancer/Scene.h"
@@ -13,9 +10,9 @@ namespace Stormancer
 	/// PartyService
 	////////////////////////////////////////////////////////////////////////////////////
 	PartyService::PartyService(std::weak_ptr<Scene> scene)
-		: _scene(scene),
-		_rpcService(_scene.lock()->dependencyResolver()->resolve<RpcService>()),
-		_logger(scene.lock()->dependencyResolver()->resolve<ILogger>())
+		: _scene(scene)
+		, _logger(scene.lock()->dependencyResolver()->resolve<ILogger>())
+		, _rpcService(_scene.lock()->dependencyResolver()->resolve<RpcService>())
 	{
 		_clientReady = false;
 		_playerReady = false;

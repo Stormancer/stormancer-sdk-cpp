@@ -19,12 +19,11 @@ namespace Stormancer
 	{
 	}
 
-	pplx::task<ProfilesResult> ProfileService::getProfiles(const std::list<std::string>& userIds)
+	pplx::task<ProfilesResult> ProfileService::getProfiles(const std::list<std::string>& userIds, const std::unordered_map<std::string, std::string>& displayOptions)
 	{
-		std::unordered_map<std::string, std::string> displayOptions({
-			{ "character", "details"}
-		});
-		return _rpcService->rpc<std::unordered_map<std::string, ProfileDto>, std::list<std::string>, std::unordered_map<std::string, std::string>>("profile.getprofiles", userIds, displayOptions).then([](std::unordered_map<std::string, ProfileDto> result) {
+		return _rpcService->rpc<std::unordered_map<std::string, ProfileDto>, std::list<std::string>, std::unordered_map<std::string, std::string>>("profile.getprofiles", userIds, displayOptions)
+			.then([](std::unordered_map<std::string, ProfileDto> result)
+		{
 			ProfilesResult r;
 			r.profiles = result;
 			return r;
@@ -36,9 +35,11 @@ namespace Stormancer
 		return _rpcService->rpc<void, std::string>("Profile.UpdateUserHandle", newHandle);
 	}
 
-	pplx::task<ProfilesResult> ProfileService::queryProfiles(const std::string& pseudoPrefix, const int& skip, const int& take)
+	pplx::task<ProfilesResult> ProfileService::queryProfiles(const std::string& pseudoPrefix, const int& skip, const int& take, const std::unordered_map<std::string, std::string>& displayOptions)
 	{
-		return _rpcService->rpc<std::unordered_map<std::string, ProfileDto>, std::string, int, int>("Profile.QueryProfiles", pseudoPrefix, skip, take).then([](std::unordered_map<std::string, ProfileDto> result) {
+		return _rpcService->rpc<std::unordered_map<std::string, ProfileDto>, std::string, int, int, std::unordered_map<std::string, std::string>>("Profile.QueryProfiles", pseudoPrefix, skip, take, displayOptions)
+			.then([](std::unordered_map<std::string, ProfileDto> result)
+		{
 			ProfilesResult r;
 			r.profiles = result;
 			return r;

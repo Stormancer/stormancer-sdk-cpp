@@ -17,13 +17,13 @@ namespace Stormancer
 		// SERIALISE
 
 		template<typename T, typename... Args>
-		void serialize(obytestream* stream, const T& value, const Args&... args) const
+		void serialize(obytestream& stream, const T& value, const Args&... args) const
 		{
 			msgpack::pack(stream, value);
 			serialize(stream, args...);
 		}
 
-		void serialize(obytestream*) const;
+		void serialize(obytestream&) const;
 
 		// DESERIALISE
 
@@ -31,7 +31,7 @@ namespace Stormancer
 		/// \param s Source stream
 		/// \return the object deserialized from the stream.
 		template<typename TOutput>
-		TOutput deserializeOne(ibytestream* stream) const
+		TOutput deserializeOne(ibytestream& stream) const
 		{
 			TOutput result;
 			deserialize(stream, result);
@@ -53,18 +53,18 @@ namespace Stormancer
 		/// \param s Source stream
 		/// \return the object deserialized from the stream.
 		template<typename... Args>
-		void deserialize(ibytestream* stream, Args&... args) const
+		void deserialize(ibytestream& stream, Args&... args) const
 		{
-			auto g = stream->tellg();
+			auto g = stream.tellg();
 
 			std::vector<byte> buffer;
-			(*stream) >> buffer;
+			stream >> buffer;
 
 			uint64 readOffset = 0;
 			UnstackAndDeserialize<Args...>(buffer.data(), buffer.size(), &readOffset, args...);
 
 			g += readOffset;
-			stream->seekg(g);
+			stream.seekg(g);
 		}
 
 		/// Try to deserialize a type from the provided stream and advances the stream.
@@ -103,7 +103,7 @@ namespace Stormancer
 	};
 
 	template<>
-	void Serializer::deserializeOne(ibytestream*) const;
+	void Serializer::deserializeOne(ibytestream&) const;
 
 	template<>
 	void Serializer::deserializeOne(const byte*, const uint64, uint64*) const;

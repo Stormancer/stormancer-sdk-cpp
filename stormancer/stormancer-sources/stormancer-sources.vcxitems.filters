@@ -58,6 +58,24 @@
     <Filter Include="Source Files\Debug">
       <UniqueIdentifier>{e5488da8-a529-4c65-9b24-56e17db013a6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Utilities">
+      <UniqueIdentifier>{f7b712ff-809f-4793-b31c-edcf85a68d61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\public">
+      <UniqueIdentifier>{7ec61818-692c-48a5-96d6-27e831a64ef6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\public\external">
+      <UniqueIdentifier>{a6486894-c767-42f8-849e-a574e1a3a4e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\public\external\ctti">
+      <UniqueIdentifier>{f08bcb7d-5e6b-48e6-bbf0-9e624ce8c118}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\public\external\ctti\detail">
+      <UniqueIdentifier>{d10e28de-dd6c-448f-9372-c43e88590d1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\public\Utilities">
+      <UniqueIdentifier>{353099ae-976d-40ee-bdff-f2a08d8be21f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ApiClient.h">
@@ -387,9 +405,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\StormancerTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\TaskUtilities.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\TimerThread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -404,6 +419,48 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Tasks.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\TaskUtilities.h">
+      <Filter>Header Files\public\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\StringUtilities.h">
+      <Filter>Header Files\public\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\external\ctti\nameof.hpp">
+      <Filter>Header Files\public\external\ctti</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\external\ctti\static_value.hpp">
+      <Filter>Header Files\public\external\ctti</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\external\ctti\type_id.hpp">
+      <Filter>Header Files\public\external\ctti</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\external\ctti\type_tag.hpp">
+      <Filter>Header Files\public\external\ctti</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\external\ctti\detail\algorithm.hpp">
+      <Filter>Header Files\public\external\ctti\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\external\ctti\detail\cstring.hpp">
+      <Filter>Header Files\public\external\ctti\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\external\ctti\detail\hash.hpp">
+      <Filter>Header Files\public\external\ctti\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\external\ctti\detail\language_features.hpp">
+      <Filter>Header Files\public\external\ctti\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\external\ctti\detail\meta.hpp">
+      <Filter>Header Files\public\external\ctti\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\external\ctti\detail\name_filters.hpp">
+      <Filter>Header Files\public\external\ctti\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\external\ctti\detail\pretty_function.hpp">
+      <Filter>Header Files\public\external\ctti\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\MsgpackJsonAdaptor.h">
+      <Filter>Header Files\public\Utilities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -602,8 +659,11 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Shutdown.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\TaskUtilities.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Utilities\TaskUtilities.cpp">
+      <Filter>Source Files\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Utilities\StringUtilities.cpp">
+      <Filter>Source Files\Utilities</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

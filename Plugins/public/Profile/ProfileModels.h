@@ -5,25 +5,15 @@
 
 namespace Stormancer
 {
-	struct PlayerProfileDto
-	{
-		std::string Id;
-		std::string PlayerId;
-		std::string Pseudo;
-		std::string SteamId;
-		MSGPACK_DEFINE(Id, PlayerId, Pseudo, SteamId)
-	};
-
 	struct Profile
 	{
 		std::unordered_map<std::string, std::string> data;
-		
 	};
 
 	struct ProfileDto
 	{
-		std::unordered_map<std::string, std::string> Data;
-		MSGPACK_DEFINE(Data)
+		std::unordered_map<std::string, std::string> data;
+		MSGPACK_DEFINE(data);
 	};
 	
 	struct ProfilesResult

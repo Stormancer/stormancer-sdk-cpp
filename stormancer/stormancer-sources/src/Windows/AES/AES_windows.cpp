@@ -98,7 +98,7 @@ namespace Stormancer
 
 
 
-	void AESWindows::encrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream* outputStream, uint64 keyId)
+	void AESWindows::encrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream& outputStream, uint64 keyId)
 	{
 		initAES(keyId);
 		
@@ -146,21 +146,14 @@ namespace Stormancer
 		}
 
 		// Write the encrypted data in the output stream
-		if (outputStream)
-		{
-
-
-
-			outputStream->write(ivPtr, ivSize);
-			outputStream->write(encrypted.data(), encrypted.size());
-			outputStream->write(tag.data(), tag.size());
-		}
+		outputStream.write(ivPtr, ivSize);
+		outputStream.write(encrypted.data(), encrypted.size());
+		outputStream.write(tag.data(), tag.size());
 	}
 
-	void AESWindows::decrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream* outputStream, uint64 keyId)
+	void AESWindows::decrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream& outputStream, uint64 keyId)
 	{
 		NTSTATUS status = STATUS_UNSUCCESSFUL;
-
 
 		BCRYPT_AUTHENTICATED_CIPHER_MODE_INFO authInfo;
 		BCRYPT_INIT_AUTH_MODE_INFO(authInfo);
@@ -197,12 +190,7 @@ namespace Stormancer
 		}
 
 		// Write the decrypted data in the output stream
-		if (outputStream)
-		{
-			outputStream->write(&decrypted[0], bytesDone);
-		}
-
-
+		outputStream.write(&decrypted[0], bytesDone);
 	}
 
 	void AESWindows::generateRandomIV(std::vector<BYTE>& iv)
@@ -227,7 +215,6 @@ namespace Stormancer
 			return true;// already initialized
 		}
 		PBYTE key = _key->getKey(keyId).data();
-
 
 		// Open an algorithm handle.
 		if (!NT_SUCCESS(status = BCryptOpenAlgorithmProvider(
@@ -298,7 +285,6 @@ namespace Stormancer
 			throw std::runtime_error(ss.str().c_str());
 		}
 
-
 		// Generate the key from supplied input key bytes.
 		if (!NT_SUCCESS(status = BCryptGenerateSymmetricKey(
 			_hAesAlg,
@@ -314,7 +300,6 @@ namespace Stormancer
 			throw std::runtime_error(ss.str().c_str());
 		}
 		return true;
-
 	}
 
 	void AESWindows::cleanAES()

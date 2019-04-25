@@ -21,13 +21,13 @@ namespace Stormancer
 		if (_aes)
 		{
 			obytestream stream;
-			decrypt(&stream);
+			decrypt(stream);
 			return stream.bytes();
 		}
 		return std::vector<byte>();
 	}
 
-	void AESDecryptStream::decrypt(obytestream* stream)
+	void AESDecryptStream::decrypt(obytestream& stream)
 	{
 		if (_aes)
 		{

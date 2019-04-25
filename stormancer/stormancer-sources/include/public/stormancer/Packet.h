@@ -18,10 +18,9 @@ namespace Stormancer
 
 		/// Constructor
 		/// \param source Generic source of the packets.
-		/// \param stream Data stream attached to the packet.
-		Packet(std::shared_ptr<T> source, ibytestream* stream)
+		Packet(std::shared_ptr<T> source, const std::map<std::string, std::string>& metadata = std::map<std::string, std::string>())
 			: connection(source)
-			, stream(stream)
+			, metadata(metadata)
 		{
 		}
 
@@ -29,9 +28,9 @@ namespace Stormancer
 		/// \param source Generic source of the packets.
 		/// \param stream Data stream attached to the packet.
 		/// \param metadata Metadata attached to this packet.
-		Packet(std::shared_ptr<T> source, ibytestream* stream, const std::map<std::string, std::string>& metadata)
+		Packet(std::shared_ptr<T> source, byte* data, std::streamsize dataSize, const std::map<std::string, std::string>& metadata = std::map<std::string, std::string>())
 			: connection(source)
-			, stream(stream)
+			, stream(data, dataSize)
 			, metadata(metadata)
 		{
 		}
@@ -62,10 +61,10 @@ namespace Stormancer
 #pragma region public_members
 
 		/// Source
-		std::shared_ptr<T> connection = nullptr;
+		std::shared_ptr<T> connection;
 
 		/// Data stream
-		ibytestream* stream = nullptr;
+		ibytestream stream;
 
 		/// Metadata
 		std::map<std::string, std::string> metadata;

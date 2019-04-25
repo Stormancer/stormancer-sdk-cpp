@@ -8,21 +8,11 @@
  *
  */
 
-#if   defined(_WIN32)
+#if defined(_WIN32)
 #include "WindowsIncludes.h" // Sleep
-
-
-
-
-
-
-
 #else
-
 #include <chrono>
 #include <thread>
-
-
 #endif
 
 #include "RakSleep.h"
@@ -35,23 +25,18 @@ using namespace ThreadEmulation;
 
 void RakSleep(unsigned int ms)
 {
+
+
+
+
+
+
+
+
+
 #ifdef _WIN32
 	Sleep(ms);
-
-
-
-
-
-
-
 #else
-
-
-
-
-
-
-
 	std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 #endif
 }

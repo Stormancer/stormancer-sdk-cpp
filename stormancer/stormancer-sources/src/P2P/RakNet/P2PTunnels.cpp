@@ -8,6 +8,7 @@
 #include "stormancer/SafeCapture.h"
 #include "stormancer/P2P/OpenTunnelResult.h"
 #include "stormancer/ChannelUidStore.h"
+#include "stormancer/Utilities/StringUtilities.h"
 
 namespace Stormancer
 {
@@ -65,7 +66,12 @@ namespace Stormancer
 				{
 					auto p2pTunnels = LockOrThrow(wP2pTunnels);
 					p2pTunnels->onMsgReceived(client, msg);
-				}, p2pTunnels->_sysClient, p2pTunnels->_logger);
+				},
+					p2pTunnels->_sysClient,
+					p2pTunnels->_logger,
+					p2pTunnels->_config->tunnelPort,
+					p2pTunnels->_config->useIpv6Tunnel);
+
 				client->handle = result.handle;
 				client->peerId = connectionId;
 				client->serverId = serverId;
@@ -88,7 +94,7 @@ namespace Stormancer
 			}
 			else
 			{
-				auto tunnel = std::make_shared<P2PTunnel>([connectionId, result]() {});
+				auto tunnel = std::make_shared<P2PTunnel>([result]() {});
 				auto el = stringSplit(result.endpoint, ':');
 				tunnel->id = serverId;
 				tunnel->ip = el[0];
@@ -113,7 +119,13 @@ namespace Stormancer
 			peerHandle key(clientPeerId, handle);
 			if (_tunnels.find(key) == _tunnels.end())
 			{
-				auto client = std::make_shared<P2PTunnelClient>([=](P2PTunnelClient* client, RakNet::RNS2RecvStruct* msg) { this->onMsgReceived(client, msg); }, _sysClient, _logger);
+				auto client = std::make_shared<P2PTunnelClient>(
+					[=](P2PTunnelClient* client, RakNet::RNS2RecvStruct* msg) { this->onMsgReceived(client, msg); },
+					_sysClient,
+					_logger,
+					(uint16)0,
+					_config->useIpv6Tunnel);
+
 				client->handle = handle;
 				client->peerId = clientPeerId;
 				client->serverId = serverId;
@@ -199,14 +211,14 @@ namespace Stormancer
 		return pplx::task_from_result();
 	}
 
-	void P2PTunnels::receiveFrom(uint64 id, ibytestream* stream)
+	void P2PTunnels::receiveFrom(uint64 id, ibytestream& stream)
 	{
 		std::lock_guard<std::mutex> lg(_syncRoot);
 
 		byte handle;
-		stream->read(&handle, 1);
+		stream.read(&handle, 1);
 		byte buffer[1464];
-		auto read = stream->readsome(buffer, 1464);
+		auto read = stream.readsome(buffer, 1464);
 
 		auto itTunnel = _tunnels.find(std::make_tuple(id, handle));
 		if (itTunnel != _tunnels.end())
@@ -244,10 +256,10 @@ namespace Stormancer
 			std::stringstream ss;
 			ss << "P2PTunnels_" << connection->id();
 			int channelUid = connection->dependencyResolver()->resolve<ChannelUidStore>()->getChannelUid(ss.str());
-			connection->send([=](obytestream* stream) {
-				(*stream) << (byte)MessageIDTypes::ID_P2P_TUNNEL;
-				(*stream) << client->handle;
-				stream->write(recvStruct->data, recvStruct->bytesRead);
+			connection->send([=](obytestream& stream) {
+				stream << (byte)MessageIDTypes::ID_P2P_TUNNEL;
+				stream << client->handle;
+				stream.write(recvStruct->data, recvStruct->bytesRead);
 			}, channelUid, PacketPriority::IMMEDIATE_PRIORITY, PacketReliability::UNRELIABLE);
 		}
 	}

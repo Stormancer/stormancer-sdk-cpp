@@ -3,8 +3,8 @@
 namespace Stormancer
 {
 	BugReportService::BugReportService(std::shared_ptr<Scene> scene)
+		: _scene(scene)
 	{
-		_scene = scene;
 		_rpc = scene->dependencyResolver()->resolve<RpcService>();
 	}
 
@@ -22,11 +22,13 @@ namespace Stormancer
 			metadata.files.push_back(attachedFile);
 		}
 
-		return _rpc->rpcWriter( "bugreporting.report", pplx::cancellation_token::none(), [&](obytestream* stream) {
-			_serializer.serialize(stream, metadata);
+		auto& serializer = _serializer;
+		return _rpc->rpc("bugreporting.report", pplx::cancellation_token::none(), [&serializer, &metadata, &files](obytestream& stream)
+		{
+			serializer.serialize(stream, metadata);
 			for (const auto& f : files)
 			{
-				stream->write((char*)f.content, f.contentLength);
+				stream.write((char*)f.content, f.contentLength);
 			}
 		});
 	}

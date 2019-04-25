@@ -204,7 +204,7 @@ namespace pplx
 	// In debug builds, default to 10 frames, unless this is overridden prior to #includ'ing ppltasks.h.  In retail builds, default to only one frame.
 #ifndef PPL_TASK_SAVE_FRAME_COUNT
 #ifdef _DEBUG
-#define PPL_TASK_SAVE_FRAME_COUNT 10
+#define PPL_TASK_SAVE_FRAME_COUNT 30
 #else
 #define PPL_TASK_SAVE_FRAME_COUNT 1
 #endif

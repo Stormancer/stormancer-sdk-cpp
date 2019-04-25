@@ -26,7 +26,7 @@ public:
 		RakNet::RNS2_BerkleyBindParameters bbp;
 
 		bbp.port = port;
-		bbp.hostAddress = "UNASSIGNED_SYSTEM_ADDRESS";
+		bbp.hostAddress = (char*)"UNASSIGNED_SYSTEM_ADDRESS";
 		bbp.addressFamily = AF_INET;
 		bbp.type = SOCK_DGRAM;
 		bbp.protocol = 0;
@@ -69,7 +69,7 @@ public:
 	void Send(unsigned short port)
 	{
 		RakNet::RNS2_SendParameters sp;
-		sp.data = "blah";
+		sp.data = (char*)"blah";
 		sp.length = 5;
 		sp.systemAddress.FromStringExplicitPort("127.0.0.1", port);
 		socket->Send(&sp, _FILE_AND_LINE_);

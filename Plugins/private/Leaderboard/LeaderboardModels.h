@@ -3,11 +3,10 @@
 #include <string>
 #include <vector>
 #include "stormancer/msgpack_define.h"
+#include "stormancer/StormancerTypes.h"
 
 namespace Stormancer
 {
-	using int8 = signed char;
-	using int32 = int;
 
 	enum class ComparisonOperator : int8
 	{

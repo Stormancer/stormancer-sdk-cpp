@@ -31,7 +31,7 @@ namespace Stormancer
 			pplx::task_completion_event<void> tce;
 			auto subscription = invitation->onAnswer.subscribe([tce, ctx](bool /*answer*/)
 			{
-				ctx.request->sendValue([](obytestream*) {});
+				ctx.request->sendValue([](obytestream&) {});
 				tce.set();
 			});
 			ctx.request->cancellationToken().register_callback([wThat, senderId]()

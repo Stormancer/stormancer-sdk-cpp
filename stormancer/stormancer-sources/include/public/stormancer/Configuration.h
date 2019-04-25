@@ -205,16 +205,17 @@ namespace Stormancer
 		/// </summary>
 		std::chrono::milliseconds defaultTimeout = std::chrono::milliseconds(10000);
 
-
-
-
-
-
-
-
-
-
-
+#if !defined(_WIN32)
+		/// <summary>
+		/// Certificate chain to enable HTTPS connection to the stormancer server.
+		/// </summary>
+		/// <remarks>
+		/// Set this if you use certificates for your Stormancer server HTTPS setup
+		/// that are not trusted by default on your platform.
+		/// This feature is not supported on Windows and Xbox.
+		/// </remarks>
+		std::vector<std::string> endpointRootCertificates;
+#endif
 
 		/// <summary>
 		/// On platforms that need specific initialization for their network libraries,
@@ -230,6 +231,24 @@ namespace Stormancer
 		/// Set whether the connection to the Stormancer server should be encrypted.
 		/// </summary>
 		bool encryptionEnabled = false;
+
+		/// <summary>
+		/// If using the P2P tunnel, set the port the tunnel will be bound to for clients.
+		/// </summary>
+		/// <remarks>
+		/// This will have no effect on P2P hosts, as multiple clients can be connected to them.
+		/// </remarks>
+		uint16 tunnelPort = 0;
+
+		/// <summary>
+		/// Whether the tunnel's socket should use IPv4 or IPv6. NOTE: IPv6 support is experimental.
+		/// </summary>
+		/// <remarks>
+		/// This should match the IP version used by the game's socket when sending data to the tunnel.
+		/// Note that binding the tunnel's socket will fail if you set this to true on a platform that has no IPv6 support.
+		/// </remarks>
+		bool useIpv6Tunnel = false;
+
 #pragma endregion
 
 	private:

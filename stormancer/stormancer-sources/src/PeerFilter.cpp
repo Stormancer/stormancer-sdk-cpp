@@ -24,26 +24,26 @@ namespace Stormancer
 	{
 	}
 	
-	PeerFilter PeerFilter::readFilter(ibytestream* stream)
+	PeerFilter PeerFilter::readFilter(ibytestream& stream)
 	{
 		byte peerType;
-		(*stream) >> peerType;
+		stream >> peerType;
 		switch (peerType)
 		{
 			case 0:
 			{
 				int64 id;
-				*stream >> id;
+				stream >> id;
 				return PeerFilter(PeerFilterType::MatchPeerFilter, id);
 			}
 			case 1:
 			{
 				uint16 nbPeers;
-				*stream >> nbPeers;
+				stream >> nbPeers;
 				std::vector<int64> peers(nbPeers);
 				for (int i = 0; i < nbPeers; i++)
 				{
-					*stream >> peers[i];
+					stream >> peers[i];
 				}
 				return PeerFilter(PeerFilterType::MatchArrayFilter, peers);
 			}

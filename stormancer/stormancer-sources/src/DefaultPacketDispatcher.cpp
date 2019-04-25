@@ -58,7 +58,7 @@ namespace Stormancer
 		byte msgType = 0;
 		while (!processed && count < 40) // Max 40 layers
 		{
-			*(packet->stream) >> msgType;
+			packet->stream >> msgType;
 			auto it = _handlers.find(msgType);
 
 			if (it!= _handlers.end())

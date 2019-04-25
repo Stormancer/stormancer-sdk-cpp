@@ -23,9 +23,9 @@ namespace Stormancer
 
 		std::vector<byte> key() const;
 
-		void encrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream* outputStream, uint64 keyId) override;
+		void encrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream& outputStream, uint64 keyId) override;
 
-		void decrypt(byte* encryptedDataPtr, std::streamsize encryptedDataSize, byte* ivPtr, std::streamsize ivSize, obytestream* outputStream, uint64 keyId) override;
+		void decrypt(byte* encryptedDataPtr, std::streamsize encryptedDataSize, byte* ivPtr, std::streamsize ivSize, obytestream& outputStream, uint64 keyId) override;
 
 		void generateRandomIV(std::vector<byte> &iv) override;
 

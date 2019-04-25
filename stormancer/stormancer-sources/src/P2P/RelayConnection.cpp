@@ -5,30 +5,31 @@
 
 namespace Stormancer
 {
-	RelayConnection::RelayConnection(std::shared_ptr<IConnection> serverConnection, std::string address, uint64 id, std::string key, std::weak_ptr<Serializer> serializer)
+	RelayConnection::RelayConnection(std::shared_ptr<IConnection> serverConnection, std::string address, uint64 remotePeerId, std::string p2pSessionId, std::weak_ptr<Serializer> serializer)
 		: _serverConnection(serverConnection)
-		, _id(id)
+		, _p2pSessionId(p2pSessionId)
+		, _remotePeerId(remotePeerId)
 		, _ipAddress(address)
-		, _key(key)
-		,_serializer(serializer)
+		, _serializer(serializer)
 	{
 	}
 
-	void RelayConnection::send(const Writer& writer, int channelUid, PacketPriority priority, PacketReliability reliability, const TransformMetadata& /*transformMetadata*/)
+	void RelayConnection::send(const StreamWriter& streamWriter, int channelUid, PacketPriority priority, PacketReliability reliability, const TransformMetadata& /*transformMetadata*/)
 	{
 		auto wSerializer = _serializer;
-		auto cId = id();
-		_serverConnection->send([wSerializer,cId,priority,reliability,writer](obytestream* s) {
-			(*s) << (byte)MessageIDTypes::ID_P2P_RELAY;
+		auto p2pSessionId = _p2pSessionId;
+		_serverConnection->send([wSerializer, p2pSessionId, priority, reliability, streamWriter](obytestream& stream)
+		{
+			stream << (byte)MessageIDTypes::ID_P2P_RELAY;
 			if (auto serializer = wSerializer.lock())
 			{
-				serializer->serialize(s, cId);
-				serializer->serialize(s, (uint8)priority);
-				serializer->serialize(s, (uint8)reliability);
+				serializer->serialize(stream, p2pSessionId);
+				serializer->serialize(stream, (uint8)priority);
+				serializer->serialize(stream, (uint8)reliability);
 
-				if (writer)
+				if (streamWriter)
 				{
-					writer(s);
+					streamWriter(stream);
 				}
 			}
 		}, channelUid, priority, reliability);
@@ -55,12 +56,12 @@ namespace Stormancer
 
 	std::string RelayConnection::key() const
 	{
-		return _key;
+		return _p2pSessionId;
 	}
 
 	uint64 RelayConnection::id() const
 	{
-		return _id;
+		return _remotePeerId;
 	}
 
 	time_t RelayConnection::connectionDate() const

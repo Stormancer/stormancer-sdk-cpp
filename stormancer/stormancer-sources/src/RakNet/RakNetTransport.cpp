@@ -9,6 +9,7 @@
 #include "PacketFileLogger.h"
 #include "stormancer/Debug/StackWalker.h"
 #include "stormancer/Utilities/TaskUtilities.h"
+#include "stormancer/Utilities/StringUtilities.h"
 #include "stormancer/SceneImpl.h"
 
 #if defined(_WIN32)
@@ -200,10 +201,7 @@ namespace Stormancer
 								data.Write(rq.id.c_str());
 								data.Write(true);
 								_peer->Send(&data, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE, 0, rakNetPacket->guid, false);
-
-
 							}
-
 						}
 						else
 						{
@@ -246,12 +244,12 @@ namespace Stormancer
 					}
 					case DefaultMessageIDTypes::ID_NEW_INCOMING_CONNECTION:
 					{
-						/*_logger->log(LogLevel::Trace, "RakNetTransport", "Incoming connection", rakNetPacket->systemAddress.ToString(true, ':'));
-						RakNet::BitStream data;
-						data.Write((char)MessageIDTypes::ID_ADVERTISE_PEERID);
-						data.Write(_id);
-						data.Write(true);
-						_peer->Send(&data, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE, 0, rakNetPacket->guid, false);*/
+						//_logger->log(LogLevel::Trace, "RakNetTransport", "Incoming connection", rakNetPacket->systemAddress.ToString(true, ':'));
+						//RakNet::BitStream data;
+						//data.Write((char)MessageIDTypes::ID_ADVERTISE_PEERID);
+						//data.Write(_id);
+						//data.Write(true);
+						//_peer->Send(&data, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE, 0, rakNetPacket->guid, false);
 						break;
 					}
 					case DefaultMessageIDTypes::ID_DISCONNECTION_NOTIFICATION:
@@ -350,11 +348,8 @@ namespace Stormancer
 						std::string packetSystemAddressStr = rakNetPacket->systemAddress.ToString(true, ':');
 
 						{
-
-
 							RakNet::BitStream data(rakNetPacket->data + 1, rakNetPacket->length - 1, false);
 							data.Read(remotePeerId);
-
 							data.Read(buffer);
 							parentId = buffer;
 							delete[] buffer;
@@ -392,7 +387,6 @@ namespace Stormancer
 							data.Write(false);
 
 							_peer->Send(&data, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE, 0, rakNetPacket->guid, false);
-
 
 							onConnection(rakNetPacket->systemAddress, rakNetPacket->guid, (uint64)remotePeerId, id);
 						}
@@ -482,17 +476,15 @@ namespace Stormancer
 	std::vector<std::string> RakNetTransport::externalAddresses() const
 	{
 		throw std::runtime_error("not implemented");
-		/*std::vector<std::string> addrs;
-		addrs.push_back(_peer->GetSystemAddressFromGuid(_peer->GetMyGUID()).ToString(true, ':'));
+		//std::vector<std::string> addrs;
+		//addrs.push_back(_peer->GetSystemAddressFromGuid(_peer->GetMyGUID()).ToString(true, ':'));
 
-		if (isRunning())
-		{
-			addrs.push_back(_peer->GetExternalID(_peer->GetSystemAddressFromGuid(_serverRakNetGUID)).ToString(true, ':'));
-		}
-		return addrs;*/
+		//if (isRunning())
+		//{
+		//	addrs.push_back(_peer->GetExternalID(_peer->GetSystemAddressFromGuid(_serverRakNetGUID)).ToString(true, ':'));
+		//}
+		//return addrs;
 	}
-
-
 
 	pplx::task<std::shared_ptr<IConnection>> RakNetTransport::connect(std::string endpoint, std::string id, std::string parentId, pplx::cancellation_token ct)
 	{
@@ -578,7 +570,8 @@ namespace Stormancer
 		_handler->newConnection(connection);
 
 		auto tce = request.tce;
-		pplx::task<void>([connection, tce] {
+		pplx::task<void>([connection, tce]
+		{
 			// Start this asynchronously because we locked the mutex in run and the user can do something that tries to lock again this mutex
 			connection->setConnectionState(ConnectionState::Connecting); // we should set connecting state sooner (when the user call connect)
 			connection->setConnectionState(ConnectionState::Connected);
@@ -597,7 +590,8 @@ namespace Stormancer
 
 		_handler->newConnection(connection);
 
-		pplx::task<void>([connection] {
+		pplx::task<void>([connection]
+		{
 			// Start this asynchronously because we locked the mutex in run and the user can do something that tries to lock again this mutex
 			connection->setConnectionState(ConnectionState::Connecting); // we should set connecting state sooner (when the user call connect)
 			connection->setConnectionState(ConnectionState::Connected);
@@ -621,7 +615,6 @@ namespace Stormancer
 
 			connection->onClose(reason);
 
-
 			pplx::task<void>([connection, reason]()
 			{
 				// Start this asynchronously because we locked the mutex in run and the user can do something that tries to lock again this mutex
@@ -644,13 +637,12 @@ namespace Stormancer
 #endif
 
 		auto connection = getConnection(rakNetPacket->guid.g);
-		byte* data = new byte[rakNetPacket->length];
-		std::memcpy(data, rakNetPacket->data, rakNetPacket->length);
-		auto stream = new ibytestream(data, (std::streamsize)rakNetPacket->length);
+		std::streamsize dataSize = (std::streamsize)rakNetPacket->length;
+		byte* data = new byte[dataSize];
+		std::memcpy(data, rakNetPacket->data, dataSize);
 
-		Packet_ptr packet(new Packet<>(connection, stream), [data, stream](Packet<>* packetPtr) {
+		Packet_ptr packet(new Packet<>(connection, data, dataSize), [data](Packet<>* packetPtr) {
 			delete packetPtr;
-			delete stream;
 			delete[] data;
 		});
 

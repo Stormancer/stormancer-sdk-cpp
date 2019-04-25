@@ -3,7 +3,7 @@
 
 namespace Stormancer
 {
-	void Serializer::serialize(obytestream*) const
+	void Serializer::serialize(obytestream&) const
 	{
 		// do nothing
 	}
@@ -14,7 +14,7 @@ namespace Stormancer
 	}*/
 
 	template<>
-	void Serializer::deserializeOne(ibytestream*) const
+	void Serializer::deserializeOne(ibytestream&) const
 	{
 		// do nothing
 	}

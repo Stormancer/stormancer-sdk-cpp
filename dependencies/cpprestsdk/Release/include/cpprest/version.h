@@ -29,6 +29,8 @@
 #define CPPREST_PLATFORM WIN32
 #elif defined(ANDROID) || defined(__ANDROID__)
 #define CPPREST_PLATFORM ANDROID
+
+
 #else
 #define CPPREST_PLATFORM LINUX
 #endif

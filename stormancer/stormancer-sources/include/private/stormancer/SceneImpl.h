@@ -25,7 +25,7 @@ namespace Stormancer
 	
 	/// Communicates with the server scene.
 	/// Get a scene by calling Client::getPublicScene or Client::getScene.
-	class STORMANCER_DLL_API Scene_Impl : public std::enable_shared_from_this<Scene_Impl>,public Scene
+	class STORMANCER_DLL_API Scene_Impl : public std::enable_shared_from_this<Scene_Impl>, public Scene
 	{
 	public:
 
@@ -42,86 +42,86 @@ namespace Stormancer
 		pplx::task<void> connect(pplx::cancellation_token ct = pplx::cancellation_token::none());
 
 		/// Disconnect from the scene.
-		pplx::task<void> disconnect();
+		pplx::task<void> disconnect() override;
 
 		/// Add a route to the scene.
 		/// \param routeName Route name.
 		/// \param handler Function which handle the receiving messages from the server on the route.
 		/// \param metadata Metadatas about the Route.
 		/// Add a route for each different message type.
-		void addRoute(const std::string& routeName, std::function<void(Packetisp_ptr)> handler, MessageOriginFilter origin = MessageOriginFilter::Host, const std::map<std::string, std::string>& metadata = std::map<std::string, std::string>());
+		void addRoute(const std::string& routeName, std::function<void(Packetisp_ptr)> handler, MessageOriginFilter origin = MessageOriginFilter::Host, const std::map<std::string, std::string>& metadata = std::map<std::string, std::string>()) override;
 
 		/// Send a packet to a route.
 		/// \param peerFilter Peer receiver.
 		/// \param routeName Route name.
-		/// \param writer Function where we write the data in the byte stream.
+		/// \param streamWriter Function where we write the data in the byte stream.
 		/// \param priority Message priority on the network.
 		/// \param reliability Message reliability behavior.
-		void send(const PeerFilter& peerFilter, const std::string& routeName, const Writer& writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const std::string& channelIdentifier = "");
+		void send(const PeerFilter& peerFilter, const std::string& routeName, const StreamWriter& streamWriter, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const std::string& channelIdentifier = "") override;
 
 		/// Send a packet to a route.
 		/// \param routeName Route name.
-		/// \param writer Function where we write the data in the byte stream.
+		/// \param streamWriter Function where we write the data in the byte stream.
 		/// \param priority Message priority on the network.
 		/// \param reliability Message reliability behavior.
-		void send(const std::string& routeName, const Writer& writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const std::string& channelIdentifier = "");
+		void send(const std::string& routeName, const StreamWriter& streamWriter, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const std::string& channelIdentifier = "") override;
 
 		/// Returns the connection state to the the scene.
-		ConnectionState getCurrentConnectionState() const;
+		ConnectionState getCurrentConnectionState() const override;
 
-		rxcpp::observable<ConnectionState> getConnectionStateChangedObservable() const;
+		rxcpp::observable<ConnectionState> getConnectionStateChangedObservable() const override;
 
 		/// Returns the scene id.
-		std::string id() const;
+		std::string id() const override;
 		
 		// Returns the detailed scene address, including cluster, account and app information
-		SceneAddress address() const;
+		SceneAddress address() const override;
 
 		/// Returns the scene handle.
-		byte handle() const;
+		byte handle() const override;
 
 		/// Returns a host metadata value.
-		std::string getHostMetadata(const std::string& key) const;
+		std::string getHostMetadata(const std::string& key) const override;
 
 		/// Returns the host connection.
-		std::weak_ptr<IConnection> hostConnection() const;
+		std::weak_ptr<IConnection> hostConnection() const override;
 
 		/// Returns a copy of the local routes.
-		std::vector<Route_ptr> localRoutes() const;
+		std::vector<Route_ptr> localRoutes() const override;
 
 		/// Returns a copy of the remote routes.
-		std::vector<Route_ptr> remoteRoutes() const;
+		std::vector<Route_ptr> remoteRoutes() const override;
 
 		/// Creates an IObservable<Packet> instance that listen to events on the specified route.
 		/// \param A string containing the name of the route to listen to.
 		/// \return An IObservable<Packet> instance that fires each time a message is received on the route.
-		rxcpp::observable<Packetisp_ptr> onMessage(const std::string& routeName, MessageOriginFilter filter = MessageOriginFilter::Host, const std::map<std::string, std::string>& metadata = std::map<std::string, std::string>());
+		rxcpp::observable<Packetisp_ptr> onMessage(const std::string& routeName, MessageOriginFilter filter = MessageOriginFilter::Host, const std::map<std::string, std::string>& metadata = std::map<std::string, std::string>()) override;
 
 		/// Get a vector containing the scene host connections.
 		/// \return A vector containing the scene host connections.
-		std::vector<IScenePeer*> remotePeers() const;
+		std::vector<IScenePeer*> remotePeers() const override;
 
 		/// Returns the peer connection to the host.
-		IScenePeer* host() const;
+		IScenePeer* host() const override;
 
-		std::shared_ptr<DependencyResolver> dependencyResolver() const;
+		std::shared_ptr<DependencyResolver> dependencyResolver() const override;
 
 		/// Fire when a packet is received in the scene. 
-		Action2<Packet_ptr> onPacketReceived();
+		Action2<Packet_ptr> onPacketReceived() override;
 
 		
 
-		bool isHost() const;
+		bool isHost() const override;
 
 		std::unordered_map<uint64, std::shared_ptr<IScenePeer>> connectedPeers() const override;
 
-		rxcpp::observable<P2PConnectionStateChangedArgs> p2pConnectionStateChanged() const;
+		rxcpp::observable<P2PConnectionStateChangedArgs> p2pConnectionStateChanged() const override;
 
-		std::shared_ptr<P2PTunnel> registerP2PServer(const std::string& p2pServerId);
+		std::shared_ptr<P2PTunnel> registerP2PServer(const std::string& p2pServerId) override;
 
-		pplx::task<std::shared_ptr<IP2PScenePeer>> openP2PConnection(const std::string& p2pToken, pplx::cancellation_token ct = pplx::cancellation_token::none());
+		pplx::task<std::shared_ptr<IP2PScenePeer>> openP2PConnection(const std::string& p2pToken, pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
 
-		const std::map<std::string, std::string>& getSceneMetadata();
+		const std::map<std::string, std::string>& getSceneMetadata() override;
 #pragma endregion
 
 	private:

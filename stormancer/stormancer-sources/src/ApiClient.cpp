@@ -3,6 +3,7 @@
 #include "stormancer/SafeCapture.h"
 #include "stormancer/Helpers.h"
 #include "cpprest/http_client.h"
+#include "stormancer/Utilities/StringUtilities.h"
 
 namespace Stormancer
 {
@@ -175,7 +176,7 @@ namespace Stormancer
 
 	Federation ApiClient::readFederationFromJson(std::string str)
 	{
-		auto json = utility::string_t(str.begin(), str.end());
+		auto json = utility::conversions::to_string_t(str);
 		auto jFed = web::json::value::parse(json);
 
 		Federation f;
@@ -183,14 +184,14 @@ namespace Stormancer
 		for (auto jCluster : jFed[_XPLATSTR("clusters")].as_array())
 		{
 			Cluster cluster;
-			cluster.id = to_string(jCluster[_XPLATSTR("id")].as_string());
+			cluster.id = utility::conversions::to_utf8string(jCluster[_XPLATSTR("id")].as_string());
 			for (auto jEndpoint : jCluster[_XPLATSTR("endpoints")].as_array())
 			{
-				cluster.endpoints.push_back(to_string(jEndpoint.as_string()));
+				cluster.endpoints.push_back(utility::conversions::to_utf8string(jEndpoint.as_string()));
 			}
 			for (auto jTag : jCluster[_XPLATSTR("tags")].as_array())
 			{
-				cluster.tags.push_back(to_string(jTag.as_string()));
+				cluster.tags.push_back(utility::conversions::to_utf8string(jTag.as_string()));
 			}
 			f.clusters.push_back(cluster);
 		}
@@ -198,24 +199,24 @@ namespace Stormancer
 		//Load data about current cluster
 		Cluster current;
 		auto jCluster = jFed[_XPLATSTR("current")];
-		current.id = to_string(jCluster[_XPLATSTR("id")].as_string());
+		current.id = utility::conversions::to_utf8string(jCluster[_XPLATSTR("id")].as_string());
 		for (auto jEndpoint : jCluster[_XPLATSTR("endpoints")].as_array())
 		{
-			current.endpoints.push_back(to_string(jEndpoint.as_string()));
+			current.endpoints.push_back(utility::conversions::to_utf8string(jEndpoint.as_string()));
 		}
 		for (auto jTag : jCluster[_XPLATSTR("tags")].as_array())
 		{
-			current.tags.push_back(to_string(jTag.as_string()));
+			current.tags.push_back(utility::conversions::to_utf8string(jTag.as_string()));
 		}
 		f.current = current;
 		return f;
 	}
+
 	pplx::task<SceneEndpoint> ApiClient::getSceneEndpoint(std::vector<std::string> baseUris, std::string accountId, std::string applicationName, std::string sceneId, pplx::cancellation_token ct)
 	{
 		std::stringstream ss;
 		ss << accountId << ';' << applicationName << ';' << sceneId;
 		_logger->log(LogLevel::Trace, "ApiClient", "Scene endpoint data", ss.str());
-
 
 		auto errors = std::make_shared<std::vector<std::string>>();
 
@@ -423,8 +424,9 @@ namespace Stormancer
 				}
 				else
 				{
-					auto error = response.extract_string(true).get();
-					errors->push_back("An error occured while performing an http request to" + baseUri + " status code : '" + std::to_string(response.status_code()) + "', message : '" + std::string(error.begin(), error.end()));
+					auto werror = response.extract_string(true).get();
+					auto error = utility::conversions::to_utf8string(werror);
+					errors->push_back("An error occured while performing an http request to" + baseUri + " status code : '" + std::to_string(response.status_code()) + "', message : '" + error);
 				}
 			}
 			catch (std::exception &ex)

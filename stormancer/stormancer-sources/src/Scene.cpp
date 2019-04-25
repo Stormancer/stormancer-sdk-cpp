@@ -273,7 +273,8 @@ namespace Stormancer
 					if ((isOriginHost && ((int)route->filter() & (int)MessageOriginFilter::Host)) ||
 						((!isOriginHost) && ((int)route->filter() & (int)MessageOriginFilter::Peer))) //Filter packet
 					{
-						Packetisp_ptr packet(new Packet<IScenePeer>(origin, p->stream, p->metadata));
+						Packetisp_ptr packet(new Packet<IScenePeer>(origin, p->metadata));
+						packet->stream.rdbuf()->pubsetbuf(p->stream.currentPtr(), p->stream.availableSize());
 						subscriber.on_next(packet);
 					}
 				}
@@ -289,7 +290,7 @@ namespace Stormancer
 		return observable.as_dynamic();
 	}
 
-	void Scene_Impl::send(const PeerFilter&, const std::string& routeName, const Writer& writer, PacketPriority priority, PacketReliability reliability, const std::string& channelIdentifier)
+	void Scene_Impl::send(const PeerFilter&, const std::string& routeName, const StreamWriter& streamWriter, PacketPriority priority, PacketReliability reliability, const std::string& channelIdentifier)
 	{
 		auto client = _client.lock();
 		if (!client)
@@ -330,21 +331,22 @@ namespace Stormancer
 		{
 			channelUid = peer->dependencyResolver()->resolve<ChannelUidStore>()->getChannelUid(channelIdentifier);
 		}
-		auto writer2 = [=, &writer](obytestream* stream) {
-			(*stream) << _handle;
-			(*stream) << route->handle();
-			if (writer)
+		auto handle = _handle;
+		auto writer2 = [handle, route, &streamWriter](obytestream& stream) {
+			stream << handle;
+			stream << route->handle();
+			if (streamWriter)
 			{
-				writer(stream);
+				streamWriter(stream);
 			}
 		};
 		TransformMetadata transformMetadata{ shared_from_this() };
 		peer->send(writer2, channelUid, priority, reliability, transformMetadata);
 	}
 
-	void Scene_Impl::send(const std::string& routeName, const Writer& writer, PacketPriority priority, PacketReliability reliability, const std::string& channelIdentifier)
+	void Scene_Impl::send(const std::string& routeName, const StreamWriter& streamWriter, PacketPriority priority, PacketReliability reliability, const std::string& channelIdentifier)
 	{
-		send(MatchSceneHost(), routeName, writer, priority, reliability, channelIdentifier);
+		send(MatchSceneHost(), routeName, streamWriter, priority, reliability, channelIdentifier);
 	}
 
 	pplx::task<void> Scene_Impl::connect(pplx::cancellation_token ct)
@@ -445,8 +447,7 @@ namespace Stormancer
 		_onPacketReceived(packet);
 
 		uint16 routeHandle;
-		*packet->stream >> routeHandle;
-
+		packet->stream >> routeHandle;
 
 		if (mapContains(_handlers, routeHandle))
 		{

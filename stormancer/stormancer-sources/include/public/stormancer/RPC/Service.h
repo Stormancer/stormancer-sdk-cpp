@@ -45,122 +45,92 @@ namespace Stormancer
 		std::shared_ptr<IActionDispatcher> getDispatcher();
 
 		/// Send an RPC and returns an observable
-		rxcpp::observable<Packetisp_ptr> rpc_observable(const std::string& route, const Writer& writer, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY);
+		rxcpp::observable<Packetisp_ptr> rpcObservable(const std::string& route, const StreamWriter& streamWriter, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY);
 
-		/// RPC with writer and deserializer functions.
-		/// \param procedure The procedure name.
-		/// \param writer User function for serializing data to send. Use function (or lambda) of type Writer.
-		/// \param deserializer User function for deserializing data. Use function (or lambda) of type Unwriter.
-		/// Call an operation on the server and get the success and the response.
-		/// \return pplx::task<TOutput> A task which exposes the success of the operation and the server response.
-		template<typename TOutput>
-		pplx::task<TOutput> rpcWriter(const std::string& procedure, pplx::cancellation_token ct, const Writer& writer, const Unwriter<TOutput>& unwriter)
+		template<typename TOut = void, typename... TIn>
+		pplx::task<TOut> rpc(const std::string& route, pplx::cancellation_token ct, const TIn& ... args)
 		{
-			auto logger = _logger;
-
-			pplx::task_completion_event<TOutput> tce;
-
-			auto observable = rpc_observable(procedure, writer, PacketPriority::MEDIUM_PRIORITY);
-
-			auto onNext = [logger, tce, procedure, unwriter](Packetisp_ptr packet)
+			auto& serializer = _serializer;
+			auto streamWriter = [&serializer, &args...](obytestream& stream)
 			{
-				try
-				{
-					RpcService::internalOnNext<TOutput>(tce, packet, unwriter); // this is used for managing TOutput = void
-				}
-				catch (const std::exception& ex)
-				{
-					logger->log(LogLevel::Trace, "RpcHelpers", "An exception occurred during the rpc response deserialization " + procedure);
-					tce.set_exception(ex);
-				}
-			};
-
-			auto onError = [logger, tce, procedure](std::exception_ptr error)
-			{
-				logger->log(LogLevel::Trace, "RpcHelpers", "An exception occurred during the rpc " + procedure);
-				tce.set_exception(error);
-			};
-
-			auto onComplete = [tce]()
-			{
-				RpcService::internalOnComplete(tce); // this is used for managing TOutput = void
-			};
-
-			auto subscription = observable.subscribe(onNext, onError, onComplete);
-			
-			if (ct.is_cancelable())
-			{
-				ct.register_callback([subscription]() {
-					if (subscription.is_subscribed())
-					{
-						subscription.unsubscribe();
-					}
-				});
-			}
-			return pplx::create_task(tce, getDispatcher());
-		}
-
-		/// RPC with writer function.
-		/// \param procedure The procedure name.
-		/// \param writer User function for serializing data to send. Use function (or lambda) of type : Writer.
-		/// Call an operation on the server and get the success.
-		/// \return pplx::task<TOutput> A task which exposes the success of the operation.
-		virtual pplx::task<void> rpcWriter(const std::string& procedure, pplx::cancellation_token ct, const Writer& writer);
-
-		/// RPC with auto-serialization.
-		/// \param procedure The procedure name.
-		/// \param args Variable number of serializable arguments to send, or Writer and Unwriter<TOutput>.
-		/// Call an operation on the server and get the success and the response.
-		/// \return pplx::task<TOutput> A task which exposes the success of the operation and the server response.
-		template<typename TOutput, typename... TInputs>
-		pplx::task<TOutput> rpc(const std::string& procedure, TInputs const&... args)
-		{
-			auto serializer = _serializer;
-			return rpcWriter<TOutput>(procedure, pplx::cancellation_token::none(), [serializer, &args...](obytestream* stream) {
 				serializer.serialize(stream, args...);
-			}, [serializer](ibytestream* stream) {
-				return serializer.deserializeOne<TOutput>(stream);
-			});
+			};
+			return rpcImpl<TOut>(rpcObservable(route, streamWriter), route, ct);
 		}
-		
-		/// RPC with auto-serialization.
-		/// \param procedure The procedure name.
-		/// \param args Variable number of serializable arguments to send, or Writer and Unwriter<TOutput>.
-		/// Call an operation on the server and get the success and the response.
-		/// \return pplx::task<TOutput> A task which exposes the success of the operation and the server response.
-		template<typename TOutput, typename... TInputs>
-		pplx::task<TOutput> rpc(const std::string& procedure, pplx::cancellation_token ct, TInputs const&... args)
+
+		template<typename TOut = void, typename TStreamWriter>
+		std::enable_if_t<std::is_convertible<TStreamWriter, StreamWriter>::value, pplx::task<TOut>> rpc(const std::string& route, pplx::cancellation_token ct, const TStreamWriter& streamWriter)
 		{
-			auto serializer = _serializer;
-			return rpcWriter<TOutput>(procedure,ct, [serializer, &args...](obytestream* stream) {
-				serializer.serialize(stream, args...);
-			}, [serializer](ibytestream* stream) {
-				return serializer.deserializeOne<TOutput>(stream);
-			});
+			return rpcImpl<TOut>(rpcObservable(route, streamWriter), route);
 		}
+
+		template<typename TOut = void, typename... TIn>
+		pplx::task<TOut> rpc(const std::string& route, const TIn& ... args)
+		{
+			return rpc<TOut, TIn...>(route, pplx::cancellation_token::none(), args...);
+		}
+
+		template<typename TOut = void, typename TStreamWriter>
+		std::enable_if_t<std::is_convertible<TStreamWriter, StreamWriter>::value, pplx::task<TOut>> rpc(const std::string& route, const TStreamWriter& streamWriter)
+		{
+			return rpc<TOut, TStreamWriter>(route, pplx::cancellation_token::none(), streamWriter);
+		}
+
 #pragma endregion
 
 	private:
 
 #pragma region private_methods
 
+		template<typename TOut>
+		pplx::task<TOut> rpcImpl(rxcpp::observable<Packetisp_ptr> observable, const std::string& route, pplx::cancellation_token ct = pplx::cancellation_token::none())
+		{
+			pplx::task_completion_event<TOut> tce;
+
+			auto serializer = _serializer;
+			auto onNext = [serializer, tce](Packetisp_ptr packet)
+			{
+				TOut out = serializer.deserializeOne<TOut>(packet->stream);
+				tce.set(out);
+			};
+
+			auto onComplete = []()
+			{
+			};
+
+			return rpcInternal(observable, tce, route, onNext, onComplete, ct);
+		}
+
+		template<typename TOut>
+		pplx::task<TOut> rpcInternal(rxcpp::observable<Packetisp_ptr> observable, pplx::task_completion_event<TOut> tce, const std::string& route, const std::function<void(Packetisp_ptr)>& onNext, const std::function<void()>& onComplete, pplx::cancellation_token ct = pplx::cancellation_token::none())
+		{
+			auto logger = _logger;
+			auto onError = [logger, tce, route](std::exception_ptr error)
+			{
+				logger->log(LogLevel::Trace, "Rpc", "An exception occurred during the rpc '" + route + "'");
+				tce.set_exception(error);
+			};
+
+			auto subscription = observable.subscribe(onNext, onError, onComplete);
+
+			if (ct.is_cancelable())
+			{
+				ct.register_callback([subscription]()
+				{
+					if (subscription.is_subscribed())
+					{
+						subscription.unsubscribe();
+					}
+				});
+			}
+
+			return create_task(tce, getDispatcher());
+		}
+
 		void next(Packetisp_ptr packet);
 		void error(Packetisp_ptr packet);
 		void complete(Packetisp_ptr packet);
 		void cancel(Packetisp_ptr packet);
-
-		template<typename TOutput>
-		static void internalOnNext(pplx::task_completion_event<TOutput> tce, Packetisp_ptr packet, const Unwriter<TOutput>& unwriter)
-		{
-			TOutput data = unwriter(packet->stream);
-			tce.set(data);
-		}
-
-		template<typename TOutput>
-		static void internalOnComplete(pplx::task_completion_event<TOutput>)
-		{
-			// Do nothing
-		}
 
 		uint16 reserveId();
 		std::shared_ptr<RpcRequest> getPendingRequest(Packetisp_ptr packet);
@@ -183,17 +153,9 @@ namespace Stormancer
 #pragma endregion
 	};
 
-	// Specializations
+	template<>
+	pplx::task<Packetisp_ptr> RpcService::rpcImpl(rxcpp::observable<Packetisp_ptr> observable, const std::string& route, pplx::cancellation_token ct);
 
 	template<>
-	inline void RpcService::internalOnNext(pplx::task_completion_event<void>, Packetisp_ptr, const Unwriter<void>&)
-	{
-		// Do nothing
-	}
-
-	template<>
-	inline void RpcService::internalOnComplete(pplx::task_completion_event<void> tce)
-	{
-		tce.set();
-	}
+	pplx::task<void> RpcService::rpcImpl(rxcpp::observable<Packetisp_ptr> observable, const std::string& route, pplx::cancellation_token ct);
 };

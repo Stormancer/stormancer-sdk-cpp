@@ -16,7 +16,11 @@ namespace Stormancer
 
 		ibytestream();
 
-		ibytestream(byte* data, std::streamsize sz);
+		ibytestream(byte* data, std::streamsize dataSize);
+
+		ibytestream(const ibytestream& other) = delete;
+
+		ibytestream(ibytestream&& other);
 
 		ibytestream& operator>>(char& value);
 

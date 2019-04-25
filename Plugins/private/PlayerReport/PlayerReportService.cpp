@@ -27,11 +27,13 @@ namespace Stormancer
 			metadata.files.push_back(attachedFile);
 		}
 
-		return _rpcService->rpcWriter("playerreporting.report", pplx::cancellation_token::none(), [&](obytestream* stream) {
-			_serializer.serialize(stream, metadata);
+		auto& serializer = _serializer;
+		return _rpcService->rpc("playerreporting.report", pplx::cancellation_token::none(), [serializer, &metadata, &files](obytestream& stream)
+		{
+			serializer.serialize(stream, metadata);
 			for (const auto& f : files)
 			{
-				stream->write((char*)f.content, f.contentLength);
+				stream.write((char*)f.content, f.contentLength);
 			}
 		});
 	}

@@ -14,6 +14,7 @@ namespace Stormancer
 	class PartyService : public std::enable_shared_from_this<PartyService>
 	{
 	public:
+
 		PartyService(std::weak_ptr<Scene> scene);
 
 		///
@@ -32,7 +33,6 @@ namespace Stormancer
 		/// 
 		pplx::task<void> updatePlayerData(std::string data);
 
-
 		///
 		/// Promote player to leader of the party
 		/// \param playerId party userid will be promote
@@ -48,27 +48,28 @@ namespace Stormancer
 		///
 		Event<GameFinderStatus> PartyGameFinderStateUpdated;
 		Event<GameFinderResponse> onPartyMatchFound;
-
 		Event<void> LeftParty;
 		Event<void> JoinedParty;
 		Event<void> KickedFromParty;
-		Event<std::vector<PartyUserDto>> UpdatedPartyMembers;		
+		Event<std::vector<PartyUserDto>> UpdatedPartyMembers;
 		Event<PartyUserData> UpdatedPartyUserData;
 		Event<PartySettings> UpdatedPartySettings;
 
 		std::vector<PartyUserDto>& members() {
 			return _members;
 		}
-		
+
 		PartySettings& settings()
 		{
 			return _settings;
 		}
 
 		void initialize();
+
 	private:
 
 		PartySettings _settings;
+
 		///
 		/// Connect the client to gameFinder
 		///
@@ -81,14 +82,12 @@ namespace Stormancer
 
 		void setNewLocalSettings(const PartySettingsDto partySettings);
 
-		std::shared_ptr<ILogger> _logger;
 		std::weak_ptr<Scene> _scene;
+		std::shared_ptr<ILogger> _logger;
 		std::shared_ptr<RpcService> _rpcService;
-		
+
 		bool _playerReady;
 		bool _clientReady;
 		std::vector<PartyUserDto> _members;
 	};
-
-	
 }

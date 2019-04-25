@@ -3,6 +3,7 @@
 #include "stormancer/Helpers.h"
 #include "stormancer/Logger/ILogger.h"
 #include "stormancer/Serializer.h"
+#include "stormancer/Utilities/StringUtilities.h"
 #include "cpprest/json.h"
 
 namespace Stormancer
@@ -30,7 +31,6 @@ namespace Stormancer
 
 		ConnectionData cData = _serializer.deserializeOne<ConnectionData>((byte*)vectorData.data(), vectorData.size());
 
-
 		return SceneEndpoint(token, cData);
 	}
 
@@ -41,20 +41,20 @@ namespace Stormancer
 		
 		SceneEndpoint endpoint;
 		endpoint.version = 2;
-		endpoint.token = to_string(getTokenResponse[_XPLATSTR("token")].as_string());
+		endpoint.token = utility::conversions::to_utf8string(getTokenResponse[_XPLATSTR("token")].as_string());
 
-		endpoint.getTokenResponse.token = to_string(getTokenResponse[_XPLATSTR("token")].as_string());
+		endpoint.getTokenResponse.token = utility::conversions::to_utf8string(getTokenResponse[_XPLATSTR("token")].as_string());
 
-		endpoint.getTokenResponse.encryption.algorithm = to_string(getTokenResponse[_XPLATSTR("encryption")][_XPLATSTR("algorithm")].as_string());
-		endpoint.getTokenResponse.encryption.key = to_string(getTokenResponse[_XPLATSTR("encryption")][_XPLATSTR("key")].as_string());
-		endpoint.getTokenResponse.encryption.mode = to_string(getTokenResponse[_XPLATSTR("encryption")][_XPLATSTR("mode")].as_string());
-		endpoint.getTokenResponse.encryption.token = to_string(getTokenResponse[_XPLATSTR("encryption")][_XPLATSTR("token")].as_string());
+		endpoint.getTokenResponse.encryption.algorithm = utility::conversions::to_utf8string(getTokenResponse[_XPLATSTR("encryption")][_XPLATSTR("algorithm")].as_string());
+		endpoint.getTokenResponse.encryption.key = utility::conversions::to_utf8string(getTokenResponse[_XPLATSTR("encryption")][_XPLATSTR("key")].as_string());
+		endpoint.getTokenResponse.encryption.mode = utility::conversions::to_utf8string(getTokenResponse[_XPLATSTR("encryption")][_XPLATSTR("mode")].as_string());
+		endpoint.getTokenResponse.encryption.token = utility::conversions::to_utf8string(getTokenResponse[_XPLATSTR("encryption")][_XPLATSTR("token")].as_string());
 
 		for (auto transport : getTokenResponse[_XPLATSTR("endpoints")].as_object())
 		{
 			for (auto e : transport.second.as_array())
 			{
-				endpoint.getTokenResponse.endpoints[to_string(transport.first)].push_back(to_string(e.as_string()));
+				endpoint.getTokenResponse.endpoints[utility::conversions::to_utf8string(transport.first)].push_back(utility::conversions::to_utf8string(e.as_string()));
 			}
 		}
 		endpoint.tokenData = decodeToken(endpoint.token).tokenData;
@@ -75,5 +75,6 @@ namespace Stormancer
         public string mode { get; set; } = "GCM";
         public string key { get; set; }
         public string token { get; set; }
-    }*/
-};
+    }
+	*/
+}
