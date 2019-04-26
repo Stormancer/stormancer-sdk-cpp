@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+	This is a configuration file for the Linux build of the Stormancer C++ SDK.
+	If you want to customize the Linux build (change the compiler, or which third-party libraries are used),
+	make a copy of this file and name it CustomLinuxBuild.props
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<PropertyGroup Label="UserMacros">
+		<!-- Linux toolset friendly name ; if you change it, also change RemoteCCompileToolExe / RemoteCppCompileToolExe below if needed -->
+		<StormancerLinuxToolset>gcc</StormancerLinuxToolset>
+		<!-- If using non-system-provided Curl or OpenSSL, set these paths to your OpenSSL and Curl libs/include directories (please use absolute paths) -->
+		<OpenSSLIncludeDir></OpenSSLIncludeDir>
+		<OpenSSLLibDir></OpenSSLLibDir>
+		<CurlIncludeDir></CurlIncludeDir>
+		<CurlLibDir></CurlLibDir>
+	</PropertyGroup>
+	<PropertyGroup Label="Configuration">
+		<RemoteRootDir>$HOME/projects/stormancer-sdk-cpp</RemoteRootDir>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(TargetPlatformIdentifier)'=='Linux'">
+		<!-- Set these to the executable names of your compiler/linker on the target linux machine -->
+		<RemoteCCompileToolExe>g++</RemoteCCompileToolExe>
+		<RemoteCppCompileToolExe>g++</RemoteCppCompileToolExe>
+		<RemoteLdToolExe>g++</RemoteLdToolExe>
+	</PropertyGroup>
+	<ItemDefinitionGroup>
+		<ClCompile>
+			<AdditionalIncludeDirectories>$(OpenSSLIncludeDir);$(CurlIncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+		</ClCompile>
+		<Link>
+			<AdditionalLibraryDirectories>$(CurlLibDir);$(OpenSSLLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+			<AdditionalDependencies>-pthread;-lcurl;-lssl;-lcrypto;-ldl;%(AdditionalDependencies)</AdditionalDependencies>
+		</Link>
+	</ItemDefinitionGroup>
+	<PropertyGroup Label="StormancerInternal">
+		<!--
+			This number tracks the version of the build file format.
+			If DefaultLinuxBuild.props is updated, and you have a CustomLinuxBuild.props,
+			you will have to update it according to the changes in the DefaultLinuxBuild.props.
+			Once this is done, increase this number in your CustomLinuxBuild.props to match the one in the DefaultLinuxBuild.props.
+		-->
+		<StormancerLinuxPropsVersion>1</StormancerLinuxPropsVersion>
+	</PropertyGroup>
+</Project>

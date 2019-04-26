@@ -221,3 +221,5 @@ Release
 plugins.json
 # Doxygen-generated tag file
 stormancer.client.cpp.tag
+# Stormancer Linux build user config file
+CustomLinuxBuild.props
