@@ -15,6 +15,7 @@
 //#endif
 
 #if defined(_WIN32)
+// TODO fix ipv6 on Xbox One
 #define RAKNET_SUPPORT_IPV6 1
 #elif defined(__APPLE__)
 #define RAKNET_SUPPORT_IPV6 1

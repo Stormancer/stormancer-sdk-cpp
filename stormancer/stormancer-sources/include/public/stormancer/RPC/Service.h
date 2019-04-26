@@ -59,7 +59,7 @@ namespace Stormancer
 		}
 
 		template<typename TOut = void, typename TStreamWriter>
-		std::enable_if_t<std::is_convertible<TStreamWriter, StreamWriter>::value, pplx::task<TOut>> rpc(const std::string& route, pplx::cancellation_token ct, const TStreamWriter& streamWriter)
+		typename std::enable_if<std::is_convertible<TStreamWriter, StreamWriter>::value, pplx::task<TOut>>::type rpc(const std::string& route, pplx::cancellation_token ct, const TStreamWriter& streamWriter)
 		{
 			return rpcImpl<TOut>(rpcObservable(route, streamWriter), route);
 		}
@@ -71,7 +71,7 @@ namespace Stormancer
 		}
 
 		template<typename TOut = void, typename TStreamWriter>
-		std::enable_if_t<std::is_convertible<TStreamWriter, StreamWriter>::value, pplx::task<TOut>> rpc(const std::string& route, const TStreamWriter& streamWriter)
+		typename std::enable_if<std::is_convertible<TStreamWriter, StreamWriter>::value, pplx::task<TOut>>::type rpc(const std::string& route, const TStreamWriter& streamWriter)
 		{
 			return rpc<TOut, TStreamWriter>(route, pplx::cancellation_token::none(), streamWriter);
 		}
