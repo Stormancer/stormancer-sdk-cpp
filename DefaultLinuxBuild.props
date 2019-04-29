@@ -13,9 +13,9 @@
 		<OpenSSLLibDir></OpenSSLLibDir>
 		<CurlIncludeDir></CurlIncludeDir>
 		<CurlLibDir></CurlLibDir>
-	</PropertyGroup>
-	<PropertyGroup Label="Configuration">
-		<RemoteRootDir>$HOME/projects/stormancer-sdk-cpp</RemoteRootDir>
+		<!-- Custom command-line parameters for the compiler and linker -->
+		<CustomCompilerOptions></CustomCompilerOptions>
+		<CustomLinkerOptions></CustomLinkerOptions>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(TargetPlatformIdentifier)'=='Linux'">
 		<!-- Set these to the executable names of your compiler/linker on the target linux machine -->
@@ -23,15 +23,9 @@
 		<RemoteCppCompileToolExe>g++</RemoteCppCompileToolExe>
 		<RemoteLdToolExe>g++</RemoteLdToolExe>
 	</PropertyGroup>
-	<ItemDefinitionGroup>
-		<ClCompile>
-			<AdditionalIncludeDirectories>$(OpenSSLIncludeDir);$(CurlIncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-		</ClCompile>
-		<Link>
-			<AdditionalLibraryDirectories>$(CurlLibDir);$(OpenSSLLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-			<AdditionalDependencies>-pthread;-lcurl;-lssl;-lcrypto;-ldl;%(AdditionalDependencies)</AdditionalDependencies>
-		</Link>
-	</ItemDefinitionGroup>
+	<PropertyGroup Label="Configuration">
+		<RemoteRootDir>$HOME/projects/stormancer-sdk-cpp</RemoteRootDir>
+	</PropertyGroup>
 	<PropertyGroup Label="StormancerInternal">
 		<!--
 			This number tracks the version of the build file format.
@@ -39,6 +33,18 @@
 			you will have to update it according to the changes in the DefaultLinuxBuild.props.
 			Once this is done, increase this number in your CustomLinuxBuild.props to match the one in the DefaultLinuxBuild.props.
 		-->
-		<StormancerLinuxPropsVersion>1</StormancerLinuxPropsVersion>
+		<StormancerLinuxPropsVersion>2</StormancerLinuxPropsVersion>
 	</PropertyGroup>
+	
+	<ItemDefinitionGroup>
+		<ClCompile>
+			<AdditionalIncludeDirectories>$(OpenSSLIncludeDir);$(CurlIncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+			<AdditionalOptions>%(CustomCompilerOptions);%(AdditionalOptions)</AdditionalOptions>
+		</ClCompile>
+		<Link>
+			<AdditionalLibraryDirectories>$(CurlLibDir);$(OpenSSLLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+			<AdditionalDependencies>-pthread;-lcurl;-lssl;-lcrypto;-ldl;%(AdditionalDependencies)</AdditionalDependencies>
+			<AdditionalOptions>%(CustomLinkerOptions) %(AdditionalOptions)</AdditionalOptions>
+		</Link>
+	</ItemDefinitionGroup>
 </Project>
