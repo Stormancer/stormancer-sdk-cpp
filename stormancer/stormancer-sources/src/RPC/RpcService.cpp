@@ -111,7 +111,7 @@ namespace Stormancer
 					{
 #ifdef STORMANCER_LOG_RPC
 						auto idStr = std::to_string(request->id);
-						_logger->log(LogLevel::Trace, "RpcService", "Cancel RPC", "id: "+idStr+", route: "+request->route);
+						_logger->log(LogLevel::Trace, "RpcService", "Cancel pending RPC", "id: " + idStr + ", route: " + request->route);
 #endif
 
 						if (auto scene = wScene.lock())
@@ -127,7 +127,7 @@ namespace Stormancer
 								}
 								catch (std::exception& e)
 								{
-									logger->log(LogLevel::Error, "RpcService", "Failed to send rpc cancellation packet (route: "+request->route+")", e.what());
+									logger->log(LogLevel::Error, "RpcService", "Failed to send rpc cancellation packet (route: " + request->route + ")", e.what());
 								}
 							}
 						}
@@ -288,7 +288,7 @@ namespace Stormancer
 		if (request)
 		{
 #ifdef STORMANCER_LOG_RPC
-			auto idstr = std::to_string(request->id);
+			auto idStr = std::to_string(request->id);
 			_logger->log(LogLevel::Trace, "RpcService", "RPC next", "id: " + idStr + ", route: " + request->route);
 #endif
 			request->observer.on_next(packet);
@@ -302,7 +302,7 @@ namespace Stormancer
 		if (request)
 		{
 #ifdef STORMANCER_LOG_RPC
-			auto idstr = std::to_string(request->id);
+			auto idStr = std::to_string(request->id);
 			_logger->log(LogLevel::Trace, "RpcService", "RPC error", "id: " + idStr + ", route: " + request->route);
 #endif
 			request->hasCompleted = true;
@@ -327,10 +327,9 @@ namespace Stormancer
 		if (request)
 		{
 #ifdef STORMANCER_LOG_RPC
-			auto idstr = std::to_string(request->id);
-			_logger->log(LogLevel::Trace, "RpcService", "RPC complete", "id: " + idStr + ", route: " + request->route);
-			std::string messageSentStr = std::string() + "messageSent == " + (messageSent ? "true" : "false");
-			_logger->log(LogLevel::Trace, "RpcService", messageSentStr.c_str(), idstr.c_str());
+			auto idStr = std::to_string(request->id);
+			std::string messageSentStr = std::string() + "messageSent: " + (messageSent ? "true" : "false");
+			_logger->log(LogLevel::Trace, "RpcService", "RPC complete", "id: " + idStr + ", route: " + request->route + ", " + messageSentStr);
 #endif
 			request->hasCompleted = true;
 
@@ -368,9 +367,10 @@ namespace Stormancer
 		packet->stream >> id;
 
 #ifdef STORMANCER_LOG_RPC
-		auto idstr = std::to_string(id);
-		_logger->log(LogLevel::Trace, "RpcService", "cancel RPC", "id: " + idStr + ", route: " + request->route);
+		auto idStr = std::to_string(id);
+		_logger->log(LogLevel::Trace, "RpcService", "cancel running RPC", "id: " + idStr);
 #endif
+
 		{
 			std::lock_guard<std::mutex> lock(_runningRequestsMutex);
 			auto it = _runningRequests.find(id);
