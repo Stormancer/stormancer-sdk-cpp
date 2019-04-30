@@ -1,7 +1,6 @@
 #pragma once
-
 #include "stormancer/Tasks.h"
-#include "Profile/ProfileModels.h"
+#include "ProfilePrivateModels.h"
 #include "Profile/Profiles.h"
 #include <memory>
 #include <string>

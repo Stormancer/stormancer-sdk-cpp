@@ -366,6 +366,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\LeaderboardPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Profile\ProfilePlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\LeaderboardModels.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)private\Profile\ProfilePrivateModels.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="private">

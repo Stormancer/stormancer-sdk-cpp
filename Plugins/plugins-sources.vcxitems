@@ -71,6 +71,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameRecovery\GameRecoveryPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameRecovery\GameRecoveryService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameRecovery\GameRecovery_Impl.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)private\Profile\ProfilePrivateModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\LeaderboardModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\LeaderboardPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Profile\ProfilePlugin.h" />
