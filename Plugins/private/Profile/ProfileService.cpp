@@ -21,7 +21,7 @@ namespace Stormancer
 
 	pplx::task<ProfilesResult> ProfileService::getProfiles(const std::list<std::string>& userIds, const std::unordered_map<std::string, std::string>& displayOptions)
 	{
-		return _rpcService->rpc<std::unordered_map<std::string, ProfileDto>, std::list<std::string>, std::unordered_map<std::string, std::string>>("profile.getprofiles", userIds, displayOptions)
+		return _rpcService->rpc<std::unordered_map<std::string, ProfileDto>>("profile.getprofiles", userIds, displayOptions)
 			.then([](std::unordered_map<std::string, ProfileDto> result)
 		{
 			ProfilesResult r;
@@ -30,14 +30,30 @@ namespace Stormancer
 		});
 	}
 
+	pplx::task<ProfileDto> ProfileService::getProfile(const std::string& userId, const std::unordered_map<std::string, std::string>& displayOptions)
+	{
+		return getProfiles(std::list<std::string> { userId }, displayOptions)
+			.then([userId](ProfilesResult profiles)
+		{
+			if (profiles.profiles.size() == 1)
+			{
+				return profiles.profiles[userId];
+			}
+			else
+			{
+				throw std::runtime_error("No profile");
+			}
+		});
+	}
+
 	pplx::task<void> ProfileService::updateUserHandle(const std::string& newHandle)
 	{
-		return _rpcService->rpc<void, std::string>("Profile.UpdateUserHandle", newHandle);
+		return _rpcService->rpc("Profile.UpdateUserHandle", newHandle);
 	}
 
 	pplx::task<ProfilesResult> ProfileService::queryProfiles(const std::string& pseudoPrefix, const int& skip, const int& take, const std::unordered_map<std::string, std::string>& displayOptions)
 	{
-		return _rpcService->rpc<std::unordered_map<std::string, ProfileDto>, std::string, int, int, std::unordered_map<std::string, std::string>>("Profile.QueryProfiles", pseudoPrefix, skip, take, displayOptions)
+		return _rpcService->rpc<std::unordered_map<std::string, ProfileDto>>("Profile.QueryProfiles", pseudoPrefix, skip, take, displayOptions)
 			.then([](std::unordered_map<std::string, ProfileDto> result)
 		{
 			ProfilesResult r;

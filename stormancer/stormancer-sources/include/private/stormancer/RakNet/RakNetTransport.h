@@ -68,6 +68,7 @@ namespace Stormancer
 		std::shared_ptr<RakNetConnection> createNewConnection(RakNet::RakNetGUID raknetGuid, uint64 peerId, std::string key);
 		std::shared_ptr<RakNetConnection> removeConnection(uint64 guid);
 		pplx::task<int> sendPing(const std::string& address, pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
+		pplx::task<bool> sendPingImplTask(const std::string& address);
 		bool sendPingImpl(const std::string& address);
 		pplx::task<int> sendPing(const std::string& address, const int nb, pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
 		void openNat(const std::string& address) override;
@@ -81,6 +82,16 @@ namespace Stormancer
 		{
 			std::shared_ptr<RakNetConnection> connection;
 			Action2<std::string>::Subscription onCloseSubscription;
+		};
+		struct PendingPing
+		{
+			PendingPing(const std::string address, const pplx::task_completion_event<bool> tce)
+				: address(address),
+				tce(tce)
+			{};
+
+			const std::string address;
+			const pplx::task_completion_event<bool> tce;
 		};
 
 		bool _isRunning = false;
@@ -103,6 +114,9 @@ namespace Stormancer
 		
 		std::mutex _pendingPingsMutex;
 		std::unordered_map<std::string, pplx::task_completion_event<int>> _pendingPings;
+
+		std::mutex _pendingPingsQueueMutex;
+		std::queue<PendingPing> _pendingPingsQueue;
 
 #pragma endregion
 	};

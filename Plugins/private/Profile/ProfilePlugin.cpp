@@ -1,7 +1,7 @@
 #if defined(STORMANCER_CUSTOM_PCH)
 #include STORMANCER_CUSTOM_PCH
 #endif
-#include "ProfilePlugin.h"
+#include "Profile/ProfilePlugin.h"
 #include "ProfileService.h"
 #include "Profiles_Impl.h"
 #include "Authentication/AuthenticationService.h"

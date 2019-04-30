@@ -16,6 +16,7 @@
 //
 #else
 #include <unistd.h>
+#include "..\..\include\private\stormancer\RakNet\RakNetTransport.h"
 #endif
 
 namespace Stormancer
@@ -288,11 +289,14 @@ namespace Stormancer
 
 						data.Read<RakNet::TimeMS>(sentOn);
 
-						auto it = _pendingPings.find(address);
-
-						if (it != _pendingPings.end())
 						{
-							it->second.set(RakNet::GetTimeMS() - sentOn);
+							std::lock_guard<std::mutex> lg(_pendingPingsMutex);
+							auto it = _pendingPings.find(address);
+
+							if (it != _pendingPings.end())
+							{
+								it->second.set(RakNet::GetTimeMS() - sentOn);
+							}
 						}
 						break;
 					}
@@ -421,8 +425,18 @@ namespace Stormancer
 				}
 				catch (const std::exception& ex)
 				{
-					
+
 					_logger->log(LogLevel::Error, "RakNetTransport", "An error occured while handling a message", ex.what());
+				}
+			}
+
+			{
+				std::lock_guard<std::mutex> lg(_pendingPingsQueueMutex);
+				if (!_pendingPingsQueue.empty())
+				{
+					PendingPing& ping = _pendingPingsQueue.front();
+					ping.tce.set(sendPingImpl(ping.address));
+					_pendingPingsQueue.pop();
 				}
 			}
 		}
@@ -750,6 +764,16 @@ namespace Stormancer
 		return this->sendPing(address, 2, ct);
 	}
 
+	pplx::task<bool> RakNetTransport::sendPingImplTask(const std::string & address)
+	{
+		pplx::task_completion_event<bool> tce;
+
+		std::lock_guard<std::mutex> lg(_pendingPingsQueueMutex);
+		_pendingPingsQueue.emplace(address, tce);
+
+		return pplx::create_task(tce);
+	}
+
 	bool RakNetTransport::sendPingImpl(const std::string& address)
 	{
 		auto els = stringSplit(address, ':');
@@ -794,7 +818,7 @@ namespace Stormancer
 				.then([wTransport, address]()
 			{
 				auto transport = LockOrThrow(wTransport);
-				return transport->sendPingImpl(address);
+				return transport->sendPingImplTask(address);
 			}, cts.get_token());
 			tasks.push_back(pingImplTask);
 

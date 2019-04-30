@@ -1,7 +1,7 @@
 #if defined(STORMANCER_CUSTOM_PCH)
 #include STORMANCER_CUSTOM_PCH
 #endif
-#include "LeaderboardPlugin.h"
+#include "Leaderboard/LeaderboardPlugin.h"
 
 #include "LeaderboardService.h"
 #include "Leaderboard_Impl.h"
@@ -23,6 +23,7 @@ namespace Stormancer
 			}
 		}
 	}
+
 	void LeaderboardPlugin::clientCreated(std::shared_ptr<IClient> client)
 	{
 		if (client)

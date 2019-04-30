@@ -1,7 +1,7 @@
 #pragma once
 #include "Core/ClientAPI.h"
 #include "Leaderboard/Leaderboard.h"
-#include "LeaderboardModels.h"
+#include "Leaderboard/LeaderboardModels.h"
 
 namespace Stormancer
 {

@@ -1,6 +1,6 @@
 #pragma once
 #include "stormancer/RPC/Service.h"
-#include "LeaderboardModels.h"
+#include "Leaderboard/LeaderboardModels.h"
 
 namespace Stormancer
 {

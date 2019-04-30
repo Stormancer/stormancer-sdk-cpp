@@ -7,6 +7,8 @@
 
 namespace Stormancer
 {
+	const std::unordered_map<std::string, std::string> Profiles::defaultDisplayOptions = { { "character", "details" } };
+
 	Profiles_Impl::Profiles_Impl(std::weak_ptr<AuthenticationService> auth) :ClientAPI(auth) {}
 
 	pplx::task<std::unordered_map<std::string, Profile>> Profiles_Impl::getProfiles(const std::list<std::string>& userIds, const std::unordered_map<std::string, std::string>& displayOptions)
@@ -22,6 +24,21 @@ namespace Stormancer
 				result.emplace(dto.first, p);
 			}
 			return result;
+		});
+	}
+
+	pplx::task<Profile> Profiles_Impl::getProfile(const std::string& userId, const std::unordered_map<std::string, std::string>& displayOptions)
+	{
+		return getProfileService()
+			.then([userId, displayOptions](std::shared_ptr<ProfileService> gr)
+		{
+			return gr->getProfile(userId, displayOptions);
+		})
+			.then([](ProfileDto profile)
+		{
+			Profile p;
+			p.data = profile.data;
+			return p;
 		});
 	}
 

@@ -153,12 +153,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Leaderboard\Leaderboard_Impl.h">
       <Filter>private\Leaderboard</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Leaderboard\LeaderboardModels.h">
-      <Filter>private\Leaderboard</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Leaderboard\LeaderboardPlugin.h">
-      <Filter>private\Leaderboard</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Leaderboard\LeaderboardService.h">
       <Filter>private\Leaderboard</Filter>
     </ClInclude>
@@ -369,6 +363,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Servers\ServersModels.h">
       <Filter>public\Servers</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\LeaderboardPlugin.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Profile\ProfilePlugin.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\LeaderboardModels.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="private">
