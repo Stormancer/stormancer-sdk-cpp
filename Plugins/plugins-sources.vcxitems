@@ -33,6 +33,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)private\GameSession\GameSession_Impl.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\GameVersion\GameVersionPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\GameVersion\GameVersionService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)private\Helloworld\Hello.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)private\Helloworld\HelloService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)private\Helloworld\HelloworldPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\InAppNotification\InAppNotificationContainer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\InAppNotification\InAppNotificationPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\InAppNotification\InAppNotificationService.cpp" />
@@ -74,8 +77,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Profile\ProfilePrivateModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\LeaderboardModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\LeaderboardPlugin.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Profile\ProfilePlugin.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Servers\ServersModels.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Profile\ProfilePlugin.h" />	<ClInclude Include="$(MSBuildThisFileDirectory)private\Helloworld\HelloService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Helloworld\Hello.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Helloworld\HelloworldPlugin.h" />    <ClInclude Include="$(MSBuildThisFileDirectory)public\Servers\ServersModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Servers\ServersPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Servers\ServersService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Servers\Servers_Impl.h" />
