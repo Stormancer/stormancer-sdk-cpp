@@ -39,7 +39,7 @@ namespace Stormancer
 		void setMetadata(const std::map<std::string, std::string>& metadata) override;
 		void setMetadata(const std::string& key, const std::string& value) override;
 		pplx::task<void> updatePeerMetadata(pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
-		std::shared_ptr<DependencyResolver> dependencyResolver() override;
+		std::shared_ptr<DependencyResolver> dependencyResolver() const override;
 		void close(std::string reason = "") override;
 		virtual void send(const StreamWriter& streamWriter, int channelUid, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const TransformMetadata& transformMetadata = TransformMetadata()) override;
 		int ping() const override;

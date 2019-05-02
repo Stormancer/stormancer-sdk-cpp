@@ -24,6 +24,7 @@ namespace Stormancer
 		void registerProcessor(PacketProcessorConfig& config);
 		void addScene(std::shared_ptr<IConnection> connection, Scene_ptr scene);
 		void removeScene(std::shared_ptr<IConnection> connection, uint8 sceneHandle);
+		Scene_ptr getScene(std::shared_ptr<IConnection> connection,  uint8 sceneHandle);
 
 #pragma endregion
 
@@ -32,6 +33,9 @@ namespace Stormancer
 #pragma region private_methods
 
 		bool handler_impl(uint8 sceneHandle, Packet_ptr packet);
+		void resize(std::vector<std::weak_ptr<Scene_Impl>>&, uint8 sceneHandle);
+		uint8 getSceneIndex(uint8 sceneHandle);
+		std::shared_ptr<std::vector<std::weak_ptr<Scene_Impl>>> getHandles(const IConnection& connection);
 
 #pragma endregion
 

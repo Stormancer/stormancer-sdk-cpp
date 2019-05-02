@@ -128,7 +128,7 @@ namespace Stormancer
 		}, ct);
 	}
 
-	std::shared_ptr<DependencyResolver> RakNetConnection::dependencyResolver()
+	std::shared_ptr<DependencyResolver> RakNetConnection::dependencyResolver() const
 	{
 		return _dependencyResolver;
 	}

@@ -280,7 +280,7 @@ namespace Stormancer
 
 	pplx::task<std::shared_ptr<Scene>> Client::connectToPrivateScene(const std::string& sceneToken, const SceneInitializer& initializer, pplx::cancellation_token ct)
 	{
-		
+
 		Stormancer::SceneEndpoint sep;
 		auto tokenHandler = _dependencyResolver->resolve<ITokenHandler>();
 		if (sceneToken.substr(0, 1) == "{")
@@ -291,7 +291,7 @@ namespace Stormancer
 		else
 		{
 			sep = tokenHandler->decodeToken(sceneToken);
-			
+
 		}
 		auto sceneId = sep.tokenData.SceneId;
 
@@ -444,7 +444,7 @@ namespace Stormancer
 				{
 					try
 					{
-						auto scene= t.get();
+						auto scene = t.get();
 						if (auto that = wThat.lock())
 						{
 							auto it = that->_scenes.find(uSceneId);
@@ -497,7 +497,7 @@ namespace Stormancer
 		if (sceneToken.substr(0, 1) == "{")
 		{
 			sep = tokenHandler->getSceneEndpointInfo(sceneToken);
-			
+
 		}
 		else
 		{
@@ -579,7 +579,7 @@ namespace Stormancer
 
 				//Connect to server
 				std::srand((unsigned int)std::time(nullptr));
-				auto it= sceneEndpoint.getTokenResponse.endpoints.find(transport->name());
+				auto it = sceneEndpoint.getTokenResponse.endpoints.find(transport->name());
 				if (it == sceneEndpoint.getTokenResponse.endpoints.end())
 				{
 					throw std::runtime_error("No transport of type '" + transport->name() + "' available on this server");
@@ -832,6 +832,14 @@ namespace Stormancer
 				that->disconnect(scene, fromServer, reason);
 			}
 		});
+	}
+
+	pplx::task<void> Client::disconnect(std::shared_ptr<IConnection> connection, uint8 sceneHandle, bool fromServer, std::string reason)
+	{
+		auto sceneDispatcher = _dependencyResolver->resolve<SceneDispatcher>();
+		auto scene = sceneDispatcher->getScene(connection, sceneHandle);
+
+		return disconnect(scene, fromServer, reason);
 	}
 
 	pplx::task<void> Client::disconnect(Scene_ptr scene, bool initiatedByServer, std::string reason)
@@ -1112,7 +1120,7 @@ namespace Stormancer
 		{
 			task = requestProcessor->sendSystemRequest<std::string, std::string>(peer.get(), (byte)SystemRequestIDTypes::ID_JOIN_SESSION, _sessionToken, ct);
 		}
-		
+
 		return task.then([wClient, peer, numRetries, ct](pplx::task<std::string> sessionTokenTask)
 		{
 			auto client = LockOrThrow(wClient);
@@ -1124,7 +1132,7 @@ namespace Stormancer
 				{
 					client->_sessionToken = serverToken;
 				}
-				
+
 				return pplx::task_from_result(); // all control paths should return a value...
 			}
 			catch (const std::exception& ex)

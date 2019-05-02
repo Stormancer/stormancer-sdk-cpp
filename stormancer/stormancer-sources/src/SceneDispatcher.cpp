@@ -24,40 +24,60 @@ namespace Stormancer
 		config.addCatchAllProcessor(handler);
 	}
 
+	uint8 SceneDispatcher::getSceneIndex(uint8 sceneHandle)
+	{
+		return sceneHandle - (uint8)MessageIDTypes::ID_SCENES;
+	}
+
+	void SceneDispatcher::resize(std::vector<std::weak_ptr<Scene_Impl>>& handles, uint8 index)
+	{
+		if (handles.capacity() < index + 1)
+		{
+			auto newSize = (index + 1) * 2;
+			if (newSize < 8)
+			{
+				newSize = 8;
+			}
+			if (newSize > 150)
+			{
+				newSize = 150;
+			}
+			handles.resize(newSize);
+		}
+	}
+
+	std::shared_ptr<std::vector<std::weak_ptr<Scene_Impl>>> SceneDispatcher::getHandles(const IConnection& connection)
+	{
+
+		return connection.dependencyResolver()->resolve<std::vector<std::weak_ptr<Scene_Impl>>>();
+	}
+
 	void SceneDispatcher::addScene(std::shared_ptr<IConnection> connection, Scene_ptr scene)
 	{
 		if (scene && connection)
 		{
-			auto handles = connection->dependencyResolver()->resolve<std::vector<std::weak_ptr<Scene_Impl>>>();
-			uint8 index = scene->handle() - (uint8)MessageIDTypes::ID_SCENES;
-			auto& v = *handles;
-			if (v.capacity() < index + 1)
+			auto handles = getHandles(*connection);
+			if (handles)
 			{
-				auto newSize = (index + 1) * 2;
-				if (newSize < 8)
-				{
-					newSize = 8;
-				}
-				if (newSize > 150)
-				{
-					newSize = 150;
-				}
-				v.resize(newSize);
-				
+				auto index = getSceneIndex(scene->handle());
+				resize(*handles, index);
+				(*handles)[index] = scene;
 			}
-			v[index] = scene;
 		}
 	}
 
 	void SceneDispatcher::removeScene(std::shared_ptr<IConnection> connection,uint8 sceneHandle)
 	{
-		size_t index = sceneHandle - (uint8)MessageIDTypes::ID_SCENES;
-		auto handles = connection->dependencyResolver()->resolve<std::vector<std::weak_ptr<Scene_Impl>>>();
-		if (handles)
+		if (connection)
 		{
-			if (index < handles->size())
+			auto index = getSceneIndex(sceneHandle);
+			auto handles = getHandles(*connection);
+			if (handles)
 			{
-				(*handles)[index].reset();
+				if (index < handles->size())
+				{
+					(*handles)[index].reset();
+				}
 			}
 		}
 	}
@@ -72,7 +92,7 @@ namespace Stormancer
 		unsigned int sceneIndex = sceneHandle - (uint8)MessageIDTypes::ID_SCENES;
 
 		auto connection = packet->connection;
-		auto handles = connection->dependencyResolver()->resolve<std::vector<std::weak_ptr<Scene_Impl>>>();
+		auto handles = getHandles(*connection);
 		if (sceneIndex < handles->size())
 		{
 			auto scene_weak = (*handles)[sceneIndex];
@@ -90,5 +110,19 @@ namespace Stormancer
 			return true;
 		}
 		return false;
+	}
+
+	Scene_ptr Stormancer::SceneDispatcher::getScene(std::shared_ptr<IConnection> connection, uint8 sceneHandle)
+	{
+		auto handles = getHandles(*connection);
+		auto index = getSceneIndex(sceneHandle);
+		if (handles && index < handles->size())
+		{
+			return (*handles)[index].lock();
+		}
+		else
+		{
+			return nullptr;
+		}
 	}
 };

@@ -107,7 +107,7 @@ namespace Stormancer
 		_metadata[key] = value;
 	}
 
-	std::shared_ptr<DependencyResolver> RelayConnection::dependencyResolver()
+	std::shared_ptr<DependencyResolver> RelayConnection::dependencyResolver() const
 	{
 		return _dependencyResolver;
 	}

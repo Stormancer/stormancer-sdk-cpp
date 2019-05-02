@@ -115,6 +115,7 @@ namespace Stormancer
 		void initialize();
 		pplx::task<void> connectToScene(const Scene_ptr& sceneId, const std::string& sceneToken, const std::vector<Route_ptr>& localRoutes, pplx::cancellation_token ct = pplx::cancellation_token::none());
 		pplx::task<void> disconnect(std::string sceneId, bool fromServer, std::string reason = "");
+		pplx::task<void> disconnect(std::shared_ptr<IConnection> connection, uint8 sceneHandle, bool fromServer, std::string reason = "");
 		pplx::task<void> disconnect(Scene_ptr scene, bool fromServer = false, std::string reason = "");
 		pplx::task<void> disconnectAllScenes();
 		pplx::task<Scene_ptr> getSceneInternal(const SceneAddress& sceneId, const SceneEndpoint& sceneEndpoint, pplx::cancellation_token ct = pplx::cancellation_token::none());

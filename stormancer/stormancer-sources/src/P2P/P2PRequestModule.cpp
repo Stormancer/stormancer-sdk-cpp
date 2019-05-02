@@ -66,10 +66,11 @@ namespace Stormancer
 
 		builder->service((byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, [serializer, client](RequestContext* ctx) {
 			std::string sceneId, reason;
-			serializer->deserialize(ctx->inputStream(), sceneId, reason);
+			byte sceneHandle;
+			serializer->deserialize(ctx->inputStream(), sceneId, reason, sceneHandle);
 			if (auto c = client.lock())
 			{
-				return c->disconnect(sceneId, true, reason);
+				return c->disconnect(ctx->packet()->connection, sceneHandle, true, reason);
 			}
 			else
 			{

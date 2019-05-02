@@ -28,7 +28,7 @@ namespace Stormancer
 		std::string metadata(const std::string& key) const override;
 		void setMetadata(const std::map<std::string, std::string>& metadata) override;
 		void setMetadata(const std::string& key, const std::string & value) override;
-		std::shared_ptr<DependencyResolver> dependencyResolver() override;
+		std::shared_ptr<DependencyResolver> dependencyResolver() const override;
 		ConnectionState getConnectionState() const override;
 		rxcpp::observable<ConnectionState> getConnectionStateChangedObservable() const override;
 		void setConnectionState(ConnectionState connectionState) override;
