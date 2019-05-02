@@ -16,7 +16,6 @@
 //
 #else
 #include <unistd.h>
-#include "..\..\include\private\stormancer\RakNet\RakNetTransport.h"
 #endif
 
 namespace Stormancer

@@ -172,7 +172,7 @@
       ]
     },
     "System.Collections.Immutable/1.5.0": {
-      "sha512": "EXKiDFsChZW0RjrZ4FYHu9aW6+P4MCgEDCklsVseRfhoO0F+dXeMSsMRAlVXIo06kGJ/zv+2w1a2uc2+kxxSaQ==",
+      "sha512": "RGxi2aQoXgZ5ge0zxrKqI4PU9LrYYoLC+cnEnWXKsSduCOUhE1GEAAoTexUVT8RZOILQyy1B27HC8Xw/XLGzdQ==",
       "type": "package",
       "path": "system.collections.immutable/1.5.0",
       "files": [
@@ -236,7 +236,7 @@
     ]
   },
   "packageFolders": {
-    "C:\\Windows\\system32\\config\\systemprofile\\.nuget\\packages\\": {},
+    "C:\\Users\\hlabanca\\.nuget\\packages\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
@@ -245,14 +245,14 @@
       "projectUniqueName": "E:\\BuildAgent\\work\\942796f7257fc0aa\\src\\clients\\cpp\\Plugins\\PluginSelector\\PluginSelector.csproj",
       "projectName": "PluginSelector",
       "projectPath": "E:\\BuildAgent\\work\\942796f7257fc0aa\\src\\clients\\cpp\\Plugins\\PluginSelector\\PluginSelector.csproj",
-      "packagesPath": "C:\\Windows\\system32\\config\\systemprofile\\.nuget\\packages\\",
+      "packagesPath": "C:\\Users\\hlabanca\\.nuget\\packages\\",
       "outputPath": "E:\\BuildAgent\\work\\942796f7257fc0aa\\src\\clients\\cpp\\Plugins\\PluginSelector\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Windows\\system32\\config\\systemprofile\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\hlabanca\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
