@@ -77,9 +77,11 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Profile\ProfilePrivateModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\LeaderboardModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\LeaderboardPlugin.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Profile\ProfilePlugin.h" />	<ClInclude Include="$(MSBuildThisFileDirectory)private\Helloworld\HelloService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Profile\ProfilePlugin.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)private\Helloworld\HelloService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Helloworld\Hello.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Helloworld\HelloworldPlugin.h" />    <ClInclude Include="$(MSBuildThisFileDirectory)public\Servers\ServersModels.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Helloworld\HelloworldPlugin.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Servers\ServersModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Servers\ServersPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Servers\ServersService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Servers\Servers_Impl.h" />
@@ -107,7 +109,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Party\PartyPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Party\PartyService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Party\Party_Impl.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Profile\ProfilePlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Profile\ProfileService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Profile\Profiles_Impl.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\AssetsStorage\AssetsStorageDto.h" />

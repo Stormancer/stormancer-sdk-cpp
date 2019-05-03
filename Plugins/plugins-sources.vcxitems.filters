@@ -309,8 +309,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Profile\Profiles.h">
       <Filter>public\Profile</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Profile\ProfilePlugin.h">
-      <Filter>private\Profile</Filter>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Profile\ProfilePlugin.h">
+      <Filter>public\Profile</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Profile\Profiles_Impl.h">
       <Filter>private\Profile</Filter>
@@ -372,10 +372,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Servers\ServersModels.h">
       <Filter>public\Servers</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\LeaderboardPlugin.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Profile\ProfilePlugin.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\LeaderboardModels.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Profile\ProfilePrivateModels.h" />    <ClInclude Include="$(MSBuildThisFileDirectory)public\Helloworld\Hello.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Helloworld\Hello.h">
       <Filter>public\Helloworld</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Helloworld\HelloService.h">
@@ -383,7 +380,17 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Helloworld\HelloworldPlugin.h">
       <Filter>public\Helloworld</Filter>
-    </ClInclude>  </ItemGroup>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\LeaderboardModels.h">
+      <Filter>public\Leaderboard</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\LeaderboardPlugin.h">
+      <Filter>public\Leaderboard</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)private\Profile\ProfilePrivateModels.h">
+      <Filter>private\Profile</Filter>
+    </ClInclude>
+  </ItemGroup>
   <ItemGroup>
     <Filter Include="private">
       <UniqueIdentifier>{ea4ea9e0-275c-4f61-896e-c0e0f8d65914}</UniqueIdentifier>
