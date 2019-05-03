@@ -2,7 +2,7 @@
 
 #include "stormancer/BuildConfig.h"
 
-#if (defined(UE_EDITOR) || defined(UE_GAME)) && defined(_WIN32)
+#if (defined(UE_EDITOR) || defined(UE_GAME)) && defined(_WIN32) && !defined(STORM_UE_NO_WIN32_PLATFORM_TYPES)
 #if PLATFORM_XBOXONE
 #include "XboxOneAllowPlatformTypes.h" // Include mandatory to compile on Xbox one plateform.
 #else
@@ -31,7 +31,7 @@
 #include "pplx/pplxtasks.h"
 
 
-#if (defined(UE_EDITOR) || defined(UE_GAME)) && defined(_WIN32)
+#if (defined(UE_EDITOR) || defined(UE_GAME)) && defined(_WIN32) && !defined(STORM_UE_NO_WIN32_PLATFORM_TYPES)
 #if PLATFORM_XBOXONE
 #include "XboxOneHidePlatformTypes.h"
 #else

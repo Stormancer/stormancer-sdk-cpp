@@ -81,7 +81,7 @@ namespace Stormancer
 		struct ConnectionContainer
 		{
 			std::shared_ptr<RakNetConnection> connection;
-			Action2<std::string>::Subscription onCloseSubscription;
+			Event<std::string>::Subscription onCloseSubscription;
 		};
 		struct PendingPing
 		{

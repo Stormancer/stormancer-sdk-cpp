@@ -112,8 +112,7 @@ namespace Stormancer
 
 
 		GameConnectionState connectionState() const;
-		Action2<GameConnectionState> connectionStateChanged;
-
+		Event<GameConnectionState> connectionStateChanged;
 
 		std::function<pplx::task<AuthParameters>()> getCredentialsCallback;
 
@@ -151,7 +150,7 @@ namespace Stormancer
 		std::string _userId;
 		std::string _username;
 		std::weak_ptr<IClient> _client;
-		Action2<GameConnectionState> _connectionStateChanged;
+		Event<GameConnectionState> _connectionStateChanged;
 		GameConnectionState _currentConnectionState;
 		rxcpp::composite_subscription _connectionSubscription;
 		ILogger_ptr _logger;

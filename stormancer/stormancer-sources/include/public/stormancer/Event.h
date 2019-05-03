@@ -447,7 +447,4 @@ namespace Stormancer
 			_impl->clear();
 		}
 	};
-
-	template<typename TParam>
-	using Action2 = Event<TParam>;
 }

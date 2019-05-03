@@ -12,10 +12,10 @@
 
 namespace Stormancer
 {
-	
 	/// Interface of a network connection.
 	class IConnection
 	{
+
 	public:
 
 #pragma region public_methods
@@ -71,9 +71,7 @@ namespace Stormancer
 
 		virtual pplx::task<void> setTimeout(std::chrono::milliseconds /*timeout*/, pplx::cancellation_token /*ct*/ = pplx::cancellation_token::none()) { return pplx::task_from_result(); }
 
-		 Action2<std::string> onClose;
-
-		
+		 Event<std::string> onClose;
 
 #pragma endregion
 
@@ -85,10 +83,5 @@ namespace Stormancer
 
 #pragma endregion
 
-#pragma region protected_members
-
-		
-
-#pragma endregion
 	};
 };

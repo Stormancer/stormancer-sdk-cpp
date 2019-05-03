@@ -107,9 +107,7 @@ namespace Stormancer
 		std::shared_ptr<DependencyResolver> dependencyResolver() const override;
 
 		/// Fire when a packet is received in the scene. 
-		Action2<Packet_ptr> onPacketReceived() override;
-
-		
+		Event<Packet_ptr> onPacketReceived() override;
 
 		bool isHost() const override;
 
@@ -231,7 +229,7 @@ namespace Stormancer
 
 		std::mutex _disconnectMutex;
 
-		Action2<Packet_ptr> _onPacketReceived;
+		Event<Packet_ptr> _onPacketReceived;
 
 		/// Scene connected state.
 		ConnectionState _connectionState = ConnectionState::Disconnected;

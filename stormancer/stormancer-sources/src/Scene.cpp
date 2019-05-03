@@ -542,12 +542,10 @@ namespace Stormancer
 		return _metadata;
 	}
 
-	Action2<Packet_ptr> Scene_Impl::onPacketReceived()
+	Event<Packet_ptr> Scene_Impl::onPacketReceived()
 	{
 		return _onPacketReceived;
 	}
-
-	
 
 	void Scene_Impl::setConnectionState(ConnectionState state)
 	{

@@ -124,7 +124,7 @@ namespace Stormancer
 		virtual std::shared_ptr<DependencyResolver> dependencyResolver() const = 0;
 
 		/// Fire when a packet is received in the scene. 
-		virtual Action2<Packet_ptr> onPacketReceived() = 0;
+		virtual Event<Packet_ptr> onPacketReceived() = 0;
 
 		virtual bool isHost() const = 0;
 

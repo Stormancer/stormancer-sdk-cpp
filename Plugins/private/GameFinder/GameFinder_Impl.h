@@ -18,9 +18,9 @@ namespace Stormancer
 		pplx::task<void> findGame(std::string gameFinder,const std::string &provider, std::string json) override;
 		void cancel(std::string gameFinder) override;
 
-		Action2<GameFinderStatusChangedEvent> gameFinderStateChanged;
-		Action2<GameFoundEvent> gameFound;
-		Action2<FindGameFailedEvent> findGameFailed;
+		Event<GameFinderStatusChangedEvent> gameFinderStateChanged;
+		Event<GameFoundEvent> gameFound;
+		Event<FindGameFailedEvent> findGameFailed;
 
 		std::unordered_map<std::string, GameFinderStatusChangedEvent> getPendingFindGameStatus() override;
 		

@@ -110,7 +110,23 @@ namespace Stormancer
 				throw std::runtime_error("Auto recconnection is disable please login before");
 			}
 
-			return that->getCredentialsCallback().then([scene, wThat](AuthParameters ctx) {
+			return that->getCredentialsCallback().then([wThat](pplx::task<AuthParameters> task)
+			{
+				try
+				{
+					auto authParams = task.get();
+					return authParams;
+				}
+				catch (std::exception&)
+				{
+					if (auto that = wThat.lock())
+					{
+						that->_autoReconnect = false;
+						that->_currentConnectionState = GameConnectionState::Disconnected;
+					}
+					throw;
+				}
+			}).then([scene, wThat](AuthParameters ctx) {
 				auto that = wThat.lock();
 				if (!that)
 				{
@@ -144,23 +160,24 @@ namespace Stormancer
 			});
 
 		}, userActionDispatcher).then([wThat, retry](pplx::task<std::shared_ptr<Scene>> t) {
+
 			auto that = wThat.lock();
-			if (!that)
-			{
-				return pplx::task_from_result<std::shared_ptr<Scene>>(nullptr);
-			}
 			try
 			{
-				return pplx::task_from_result(t.get());
-			}
-			catch (GetCredentialException& ex)
-			{
-				that->_autoReconnect = false;
-				that->_currentConnectionState = GameConnectionState::Disconnected;
-				throw ex;
+				auto scene = t.get();
+				if (!that)
+				{
+					return pplx::task_from_result<std::shared_ptr<Scene>>(nullptr);
+				}
+
+				return pplx::task_from_result<std::shared_ptr<Scene>>(scene);
 			}
 			catch (std::exception& ex)
 			{
+				if (!that)
+				{
+					return pplx::task_from_result<std::shared_ptr<Scene>>(nullptr);
+				}
 				that->_logger->log(LogLevel::Error, "authentication", "An error occured while trying to connect to the server.", ex.what());
 				if (that->_autoReconnect && that->connectionState() != GameConnectionState::Disconnected)
 				{
@@ -237,18 +254,13 @@ namespace Stormancer
 					{
 						throw std::runtime_error("Authentication failed");
 					}
-
 				}
-				catch (GetCredentialException& ex)
+				catch (std::exception& ex)
 				{
 					if (auto that = wThat.lock())
 					{
 						that->_authTask = nullptr;
 					}
-					tce.set_exception(ex);
-				}
-				catch (std::exception& ex)
-				{
 					tce.set_exception(ex);
 				}
 

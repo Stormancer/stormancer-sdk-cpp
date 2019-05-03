@@ -36,7 +36,7 @@ namespace Stormancer
 		struct ConnectionContainer
 		{
 			std::shared_ptr<IConnection> connection;
-			Action2<std::string>::Subscription onCloseSubscription;
+			Event<std::string>::Subscription onCloseSubscription;
 		};
 		std::unordered_map<std::string, pplx::task<ConnectionContainer>> _connectionsByKey;
 		std::unordered_map<uint64, pplx::task<ConnectionContainer>> _connections;
