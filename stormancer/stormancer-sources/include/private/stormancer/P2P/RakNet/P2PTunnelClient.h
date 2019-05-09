@@ -48,7 +48,7 @@ namespace Stormancer
 		bool isRunning;
 		byte handle;
 		bool serverSide;
-		unsigned short hostPort;
+		unsigned short hostPort=0;
 
 #pragma endregion
 

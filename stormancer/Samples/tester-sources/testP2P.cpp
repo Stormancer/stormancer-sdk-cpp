@@ -179,6 +179,8 @@ void p2pConnect(std::shared_ptr<Stormancer::IClient> hostClient, std::shared_ptr
 	UdpSocket guestSocket(logger, 0, false);
 	guestSocket.Send(guestTunnel->port);
 
+	
+
 	hostScene->disconnect().wait();
 	guestScene->disconnect().wait();
 
