@@ -166,6 +166,7 @@ void p2pConnect(std::shared_ptr<Stormancer::IClient> hostClient, std::shared_ptr
 	logger->log(std::string("Got P2P token ") + p2pToken);
 
 	auto hostTunnel = hostScene->registerP2PServer("pingServer");
+	UdpSocket hostSocket(logger, hostTunnel->port, true);
 
 	logger->log(std::string("Retrieved host tunnel: ") + hostTunnel->ip + ":" + std::to_string(hostTunnel->port));
 
@@ -173,8 +174,10 @@ void p2pConnect(std::shared_ptr<Stormancer::IClient> hostClient, std::shared_ptr
 	logger->log("Retrieved guestPeer.");
 
 	auto guestTunnel = guestPeer->openP2PTunnel("pingServer").get();
-
+	
 	logger->log(std::string("Retrieved guest tunnel: ") + guestTunnel->ip + ":" + std::to_string(guestTunnel->port));
+	UdpSocket guestSocket(logger, 0, false);
+	guestSocket.Send(guestTunnel->port);
 
 	hostScene->disconnect().wait();
 	guestScene->disconnect().wait();
