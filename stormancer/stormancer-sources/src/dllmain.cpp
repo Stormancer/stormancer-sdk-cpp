@@ -1,8 +1,9 @@
 #include "stormancer/stdafx.h"
+#include "stormancer/BuildConfig.h"
 
 // dllmain.cpp : Defines the entry point for the DLL application.
 
-#if defined(_WIN32)
+#if defined(_WIN32) && defined(STORMANCER_DYNAMIC)
 
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN	// Exclude rarely-used stuff from Windows headers
@@ -24,4 +25,4 @@ BOOL APIENTRY DllMain(HMODULE, DWORD  ul_reason_for_call, LPVOID)
 	return TRUE;
 }
 
-#endif // defined(_WIN32)
+#endif // defined(_WIN32) && !defined(_XBOX_ONE) && defined(STORMANCER_DYNAMIC)
