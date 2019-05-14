@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include "stormancer/Event.h"
+#include "stormancer/Tasks.h"
 #include "Party/PartyModels.h"
 #include "GameFinder/GameFinderModels.h"
 
@@ -47,7 +48,7 @@ namespace Stormancer
 		/// Callback member
 		///
 		Event<GameFinderStatus> PartyGameFinderStateUpdated;
-		Event<GameFinderResponse> onPartyMatchFound;
+		Event<GameFinderResponse> onPartyGameFound;
 		Event<void> LeftParty;
 		Event<void> JoinedParty;
 		Event<void> KickedFromParty;

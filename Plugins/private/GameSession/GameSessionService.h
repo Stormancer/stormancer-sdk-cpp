@@ -18,65 +18,53 @@ namespace Stormancer
 
 	class GameSessionService : public std::enable_shared_from_this<GameSessionService>
 	{
-
-	private:
-		struct SessionPlayerUpdateArg
-		{
-		public:
-			SessionPlayerUpdateArg(SessionPlayer player, std::string data)
-				: sessionPlayer(player), data(data) {}
-
-			SessionPlayer sessionPlayer;
-			std::string data;
-		};
-
 	public:
+
 		GameSessionService(std::weak_ptr<Scene> scene);
 		~GameSessionService();
 
-		void Initialize();
-		pplx::task<void> InitializeTunnel(std::string p2pToken, pplx::cancellation_token ct);
+		void initialize();
+
+		pplx::task<void> initializeTunnel(std::string p2pToken, pplx::cancellation_token ct);
 
 		pplx::task<void> waitServerReady(pplx::cancellation_token);
 
-		std::vector<SessionPlayer> GetConnectedPlayers();
+		std::vector<SessionPlayer> getConnectedPlayers();
 
-		std::function<void()> OnConnectedPlayerChanged(std::function<void(SessionPlayer, std::string)> callback);
-
-		pplx::task<std::string> GetUserFromBearerToken(std::string token);
-
-		void OnP2PConnected(std::function<void(std::shared_ptr<Stormancer::IP2PScenePeer>)> callback);
-		void OnConnectionFailure(std::function<void(std::string)> callback);
-
-		Event<void> OnAllPlayerReady;
-		Event<std::string> OnRoleReceived;
-		Event<std::shared_ptr<Stormancer::P2PTunnel>> OnTunnelOpened;
-		Event<void> OnShutdownReceived;
+		pplx::task<std::string> getUserFromBearerToken(std::string token);
 
 		pplx::task<Packetisp_ptr> sendGameResults(const StreamWriter& streamWriter, pplx::cancellation_token ct = pplx::cancellation_token::none());
 
-		pplx::task<std::string> P2PTokenRequest(pplx::cancellation_token ct);
+		pplx::task<std::string> p2pTokenRequest(pplx::cancellation_token ct);
 
 		pplx::task<void> reset(pplx::cancellation_token ct);
+
 		pplx::task<void> disconnect();
 
 		bool shouldEstablishTunnel = true;
 
-		std::weak_ptr<Scene> GetScene();
+		std::weak_ptr<Scene> getScene();
 
 		void onDisconnecting();
 
 		void ready(std::string data);
 
+		void onP2PConnected(std::function<void(std::shared_ptr<Stormancer::IP2PScenePeer>)> callback);
+
+		void onConnectionFailure(std::function<void(std::string)> callback);
+
+		Event<void> onAllPlayerReady;
+		Event<std::string> onRoleReceived;
+		Event<std::shared_ptr<Stormancer::P2PTunnel>> onTunnelOpened;
+		Event<void> onShutdownReceived;
+		Event<SessionPlayer, std::string> onPlayerChanged;
+
 	private:
 
-		void unsubscribeConnectedPlayersChanged(Action<SessionPlayerUpdateArg>::TIterator handle);
-
 		pplx::cancellation_token linkTokenToDisconnection(pplx::cancellation_token tokenToLink);
-		
+
 		std::shared_ptr<P2PTunnel> _tunnel;
-		Action<SessionPlayerUpdateArg> _onConnectedPlayersChanged;
-		Action<std::string> _onConnectionFailure;		
+		Action<std::string> _onConnectionFailure;
 		std::function<void(std::shared_ptr<Stormancer::IP2PScenePeer>)> _onConnectionOpened;
 		pplx::task_completion_event<void> _waitServerTce;
 

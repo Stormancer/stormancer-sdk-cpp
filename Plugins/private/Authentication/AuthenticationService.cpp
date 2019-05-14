@@ -1,7 +1,6 @@
 #include "Authentication/AuthenticationService.h"
 #include "stormancer/RPC/Service.h"
 #include "stormancer/Utilities/TaskUtilities.h"
-#include "AuthenticationException.h"
 
 namespace Stormancer
 {
@@ -110,23 +109,7 @@ namespace Stormancer
 				throw std::runtime_error("Auto recconnection is disable please login before");
 			}
 
-			return that->getCredentialsCallback().then([wThat](pplx::task<AuthParameters> task)
-			{
-				try
-				{
-					auto authParams = task.get();
-					return authParams;
-				}
-				catch (std::exception&)
-				{
-					if (auto that = wThat.lock())
-					{
-						that->_autoReconnect = false;
-						that->_currentConnectionState = GameConnectionState::Disconnected;
-					}
-					throw;
-				}
-			}).then([scene, wThat](AuthParameters ctx) {
+			return that->getCredentialsCallback().then([scene, wThat](AuthParameters ctx) {
 				auto that = wThat.lock();
 				if (!that)
 				{
@@ -160,24 +143,17 @@ namespace Stormancer
 			});
 
 		}, userActionDispatcher).then([wThat, retry](pplx::task<std::shared_ptr<Scene>> t) {
-
 			auto that = wThat.lock();
+			if (!that)
+			{
+				return pplx::task_from_result<std::shared_ptr<Scene>>(nullptr);
+			}
 			try
 			{
-				auto scene = t.get();
-				if (!that)
-				{
-					return pplx::task_from_result<std::shared_ptr<Scene>>(nullptr);
-				}
-
-				return pplx::task_from_result<std::shared_ptr<Scene>>(scene);
+				return pplx::task_from_result(t.get());
 			}
 			catch (std::exception& ex)
 			{
-				if (!that)
-				{
-					return pplx::task_from_result<std::shared_ptr<Scene>>(nullptr);
-				}
 				that->_logger->log(LogLevel::Error, "authentication", "An error occured while trying to connect to the server.", ex.what());
 				if (that->_autoReconnect && that->connectionState() != GameConnectionState::Disconnected)
 				{
@@ -235,7 +211,7 @@ namespace Stormancer
 			auto t = *_authTask;
 			std::weak_ptr<AuthenticationService> wThat = this->shared_from_this();
 			pplx::task_completion_event<std::shared_ptr<Scene>> tce;
-			if (ct != pplx::cancellation_token::none() && ct.is_cancelable())
+			if (ct.is_cancelable())
 			{
 				ct.register_callback([tce]() {
 					tce.set_exception(pplx::task_canceled());
@@ -254,13 +230,10 @@ namespace Stormancer
 					{
 						throw std::runtime_error("Authentication failed");
 					}
+
 				}
 				catch (std::exception& ex)
 				{
-					if (auto that = wThat.lock())
-					{
-						that->_authTask = nullptr;
-					}
 					tce.set_exception(ex);
 				}
 
@@ -432,7 +405,7 @@ namespace Stormancer
 	{
 		if (_currentConnectionState != state)
 		{
-			std::string reason = state.reason.empty() ? "" : " reason: " + state.reason;
+			std::string reason = state.reason.empty() ? "" : ", reason : " + state.reason;
 			this->_logger->log(LogLevel::Info, "connection", "Game connection state changed", std::to_string((int)state) + reason);
 
 

@@ -4,12 +4,13 @@
 #include "GameFinderService.h"
 #include "stormancer/Logger/ILogger.h"
 #include "stormancer/RPC/Service.h"
+
 namespace Stormancer
 {
 	Internal::ReadyVerificationRequest::operator Stormancer::ReadyVerificationRequest()
 	{
 		Stormancer::ReadyVerificationRequest readyUpdate;
-		readyUpdate.matchId = matchId;
+		readyUpdate.gameId = gameId;
 		readyUpdate.timeout = timeout;
 		readyUpdate.membersCountTotal = (int32)members.size();
 		readyUpdate.membersCountReady = 0;
@@ -32,17 +33,17 @@ namespace Stormancer
 	void GameFinderService::initialize()
 	{
 		std::weak_ptr<GameFinderService> wThat = this->shared_from_this();
-		_scene.lock()->addRoute("match.update", [wThat](Packetisp_ptr packet)
+		_scene.lock()->addRoute("gamefinder.update", [wThat](Packetisp_ptr packet)
 		{
-			byte matchStateByte;
-			packet->stream.read((char*)&matchStateByte, 1);
-			int32 matchState = matchStateByte;
+			byte gameStateByte;
+			packet->stream.read((char*)&gameStateByte, 1);
+			int32 gameState = gameStateByte;
 
 			if (auto that = wThat.lock())
 			{
-				that->_currentState = (GameFinderStatus)matchState;
+				that->_currentState = (GameFinderStatus)gameState;
 
-				auto ms = std::to_string(matchState);
+				auto ms = std::to_string(gameState);
 
 				that->GameFinderStatusUpdated(that->_currentState);
 
@@ -53,8 +54,8 @@ namespace Stormancer
 					auto dto = that->_serializer.deserializeOne<GameFinderResponseDto>(packet->stream);
 
 					GameFinderResponse response;
-					response.connectionToken = dto.gameToken;
-					response.optionalParameters = dto.optionalParameters;
+					response.connectionToken = dto.connectionToken;
+					response.packet = packet;
 
 					that->GameFound(response);
 					that->_currentState = GameFinderStatus::Idle;
@@ -87,16 +88,16 @@ namespace Stormancer
 			}
 		});
 
-		_scene.lock()->addRoute("match.parameters.update", [wThat](Packetisp_ptr packet)
+		_scene.lock()->addRoute("gamefinder.parameters.update", [wThat](Packetisp_ptr packet)
 		{
 			if (auto that = wThat.lock())
 			{
 				std::string provider = that->_serializer.deserializeOne<std::string>(packet->stream);
-				//_onMatchParametersUpdate();
+				//_onGameParametersUpdate();
 			}
 		});
 
-		_scene.lock()->addRoute("match.ready.update", [wThat](Packetisp_ptr packet)
+		_scene.lock()->addRoute("gamefinder.ready.update", [wThat](Packetisp_ptr packet)
 		{
 			if (auto that = wThat.lock())
 			{
@@ -121,19 +122,27 @@ namespace Stormancer
 		return _currentState;
 	}
 
-	template<typename T>
-	pplx::task<void> GameFinderService::findMatchInternal(const std::string& provider, T data)
+	pplx::task<void> GameFinderService::findGameInternal(const std::string& provider, const StreamWriter& streamWriter)
 	{
 		if (currentState() != GameFinderStatus::Idle)
 		{
-			return pplx::task_from_exception<void>(std::runtime_error("Already matching !"));
+			return pplx::task_from_exception<void>(std::runtime_error("Already finding a game !"));
 		}
 
 		_currentState = GameFinderStatus::Searching;
-		_matchmakingCTS = pplx::cancellation_token_source();
+		_gameFinderCTS = pplx::cancellation_token_source();
+
+		StreamWriter streamWriter2 = [provider, streamWriter](obytestream& stream)
+		{
+			Serializer serializer;
+			serializer.serialize(stream, provider);
+			streamWriter(stream);
+		};
 
 		std::weak_ptr<GameFinderService> wThat = this->shared_from_this();
-		return _rpcService.lock()->rpc<void>("match.find", provider, data).then([wThat](pplx::task<void> res) {
+		return _rpcService.lock()->rpc("gamefinder.find", streamWriter2)
+			.then([wThat](pplx::task<void> res)
+		{
 			// If the RPC fails (e.g. because of a disconnection), we might not have received a failed/canceled status update.
 			// Make sure we go back to Idle state anyway.
 			try
@@ -156,22 +165,17 @@ namespace Stormancer
 		});
 	}
 
-	pplx::task<void> GameFinderService::findMatch(const std::string &provider, const GameFinderRequest &mmRequest)
+	pplx::task<void> GameFinderService::findGame(const std::string &provider, const StreamWriter& streamWriter)
 	{
-		return findMatchInternal<const GameFinderRequest&>(provider, mmRequest);
+		return findGameInternal(provider, streamWriter);
 	}
 
-	pplx::task<void> GameFinderService::findMatch(const std::string &provider, std::string json)
-	{
-		return findMatchInternal(provider, json);
-	}
-
-	void GameFinderService::resolve(bool acceptMatch)
+	void GameFinderService::resolve(bool acceptGame)
 	{
 		auto scene = _scene.lock();
-		scene->send("match.ready.resolve", [=](obytestream& stream)
+		scene->send("gamefinder.ready.resolve", [=](obytestream& stream)
 		{
-			stream << acceptMatch;
+			stream << acceptGame;
 		}, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE_ORDERED);
 	}
 
@@ -180,8 +184,8 @@ namespace Stormancer
 		if (currentState() != GameFinderStatus::Idle)
 		{
 			auto scene = _scene.lock();
-			_matchmakingCTS.cancel();
-			scene->send("match.cancel", [](obytestream&) {}, PacketPriority::IMMEDIATE_PRIORITY, PacketReliability::RELIABLE_ORDERED);
+			_gameFinderCTS.cancel();
+			scene->send("gamefinder.cancel", [](obytestream&) {}, PacketPriority::IMMEDIATE_PRIORITY, PacketReliability::RELIABLE_ORDERED);
 		}
 	}
-};
+}

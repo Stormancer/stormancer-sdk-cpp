@@ -6,7 +6,6 @@
 namespace Stormancer
 {
 	class InAppNotificationContainer;
-	class Subscription;
 
 	class InAppNotificationManager
 	{

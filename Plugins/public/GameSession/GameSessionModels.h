@@ -32,17 +32,17 @@ namespace Stormancer
 	struct MMRChanges
 	{
 	public:
-		std::string WinnerId;
-		int WinnerGain;
+		std::string winnerId;
+		int winnerGain;
 
 
-		std::string LoserId;
-		int LoserGain;
+		std::string loserId;
+		int loserGain;
 
 		std::string winnerNewLeague;
 		std::string loserNewLeague;
 
-		MSGPACK_DEFINE(WinnerId, WinnerGain, LoserId, LoserGain, winnerNewLeague, loserNewLeague);
+		MSGPACK_DEFINE(winnerId, winnerGain, loserId, loserGain, winnerNewLeague, loserNewLeague);
 	};
 
 	enum class PlayerStatus
@@ -57,10 +57,16 @@ namespace Stormancer
 	struct SessionPlayer
 	{
 	public:
-		SessionPlayer(std::string playerId, PlayerStatus status)
-			: PlayerId(playerId), Status(status) {}
-		std::string PlayerId;
-		PlayerStatus Status;
+		SessionPlayer(std::string playerId, PlayerStatus status, bool isHost = false)
+			: playerId(playerId)
+			, status(status)
+			, isHost(isHost)
+		{
+		}
+
+		std::string playerId;
+		PlayerStatus status;
+		bool isHost;
 	};
 
 	struct ServerStartedMessage
@@ -73,18 +79,19 @@ namespace Stormancer
 	struct PlayerUpdate
 	{
 	public:
-		std::string UserId;
-		int Status;
-		std::string Data;
+		std::string userId;
+		int status;
+		std::string data;
+		bool isHost;
 
-		MSGPACK_DEFINE(UserId, Status, Data);
+		MSGPACK_DEFINE(userId, status, data, isHost);
 	};
 
 	struct EndGameDto
 	{
 		Stormancer::uint64 score;
-		std::string LeaderboardName;
-		MSGPACK_DEFINE(score, LeaderboardName)
+		std::string leaderboardName;
+		MSGPACK_DEFINE(score, leaderboardName)
 	};
 
 	struct GameSessionResult
@@ -97,7 +104,7 @@ namespace Stormancer
 	{
 		bool isHost;
 		std::string hostMap;
-		std::string Endpoint;
-		std::string ErrorMessage;
+		std::string endpoint;
+		std::string errorMessage;
 	};
 }

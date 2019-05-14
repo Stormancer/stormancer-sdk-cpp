@@ -2,6 +2,7 @@
 
 #include "stormancer/Event.h"
 #include "GameFinder/GameFinderModels.h"
+#include "stormancer/Tasks.h"
 
 namespace Stormancer
 {
@@ -11,7 +12,7 @@ namespace Stormancer
 	class GameFinder
 	{
 	public:
-		virtual ~GameFinder() {}
+		virtual ~GameFinder() = default;
 
 		/// <summary>
 		/// Start a GameFinder query.
@@ -36,7 +37,18 @@ namespace Stormancer
 		/// * A game is found
 		/// * An error occurs on the server-side GameFinder
 		/// * The request is canceled with a call to <c>cancel()</c>.</returns>
-		virtual pplx::task<void> findGame(std::string gameFinder, const std::string &provider, std::string json) = 0;
+		virtual pplx::task<void> findGame(const std::string& gameFinder, const std::string& provider, const StreamWriter& streamWriter) = 0;
+
+		template<typename... TData>
+		pplx::task<void> findGame(const std::string& gameFinder, const std::string &provider, TData... tData)
+		{
+			StreamWriter streamWriter = [tData...](obytestream& stream)
+			{
+				Serializer serializer;
+				serializer.serialize(stream, tData...);
+			};
+			return findGame(gameFinder, provider, streamWriter);
+		}
 
 		/// <summary>
 		/// Cancel an ongoing <c>findGame</c> request.
@@ -46,7 +58,7 @@ namespace Stormancer
 		/// or else you might run into a race condition and the cancel request might not register.
 		/// </remarks>
 		/// <param name="gameFinder">Name of the GameFinder for which you want to cancel the search.</param>
-		virtual void cancel(std::string gameFinder) = 0;
+		virtual void cancel(const std::string& gameFinder) = 0;
 
 		/// <summary>
 		/// Retrieve the current status of ongoing <c>findGame</c> requests for each GameFinder.
@@ -60,14 +72,14 @@ namespace Stormancer
 		/// <remarks>This will use the server application's ServiceLocator configuration to determine which scene to connect to for the given <c>gameFinderName</c>.</remarks>
 		/// <param name="gameFinderName">Name of the GameFinder to connect to.</param>
 		/// <returns>A <c>pplx::task</c> that completes when the connection to the scene that contains <c>gameFinderName</c> has completed.</returns>
-		virtual pplx::task<void> connectToGameFinder(std::string gameFinderName) = 0;
+		virtual pplx::task<void> connectToGameFinder(const std::string& gameFinderName) = 0;
 
 		/// <summary>
 		/// Disconnect from the scene that contains the given GameFinder.
 		/// </summary>
 		/// <param name="gameFinderName">Name of the GameFinder which scene you want to disconnect from.</param>
 		/// <returns>A <c>pplx::task</c> that completes when the scene disconnection has completed.</returns>
-		virtual pplx::task<void> disconnectFromGameFinder(std::string gameFinderName) = 0;
+		virtual pplx::task<void> disconnectFromGameFinder(const std::string& gameFinderName) = 0;
 
 		/// <summary>
 		/// Subscribe to <c>findGame</c> status notifications.
@@ -75,7 +87,7 @@ namespace Stormancer
 		/// <param name="callback">Callable object to be called when a <c>findGame</c> request status update occurs.</param>
 		/// <returns>A reference-counted <c>Subscription</c> object that tracks the lifetime of the subscription.
 		/// When the reference count of this object drops to zero, the subscription will be canceled.</returns>
-		virtual Event<GameFinderStatusChangedEvent>::Subscription subsribeGameFinderStateChanged(std::function<void(GameFinderStatusChangedEvent)> callback) = 0;
+		virtual Subscription subsribeGameFinderStateChanged(std::function<void(GameFinderStatusChangedEvent)> callback) = 0;
 
 		/// <summary>
 		/// Subscribe to <c>GameFoundEvent</c> notifications.
@@ -85,7 +97,7 @@ namespace Stormancer
 		/// <param name="callback">Callable object to be called when a <c>GameFoundEvent</c> occurs.</param>
 		/// <returns>A reference-counted <c>Subscription</c> object that tracks the lifetime of the subscription.
 		/// When the reference count of this object drops to zero, the subscription will be canceled.</returns>
-		virtual Event<GameFoundEvent>::Subscription subsribeGameFound(std::function<void(GameFoundEvent)> callback) = 0;
+		virtual Subscription subsribeGameFound(std::function<void(GameFoundEvent)> callback) = 0;
 
 		/// <summary>
 		/// Be notified when a FindGame query fails.
@@ -97,6 +109,6 @@ namespace Stormancer
 		/// <param name="callback">Callable object to be called when a FindGame failure occurs.</param>
 		/// <returns>A reference-counted <c>Subscription</c> object that tracks the lifetime of the subscription.
 		/// When the reference count of this object drops to zero, the subscription will be canceled.</returns>
-		virtual Event<FindGameFailedEvent>::Subscription subscribeFindGameFailed(std::function<void(FindGameFailedEvent)> callback) = 0;
+		virtual Subscription subscribeFindGameFailed(std::function<void(FindGameFailedEvent)> callback) = 0;
 	};
 }

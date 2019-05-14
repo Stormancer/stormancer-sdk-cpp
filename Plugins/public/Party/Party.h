@@ -1,10 +1,11 @@
 #pragma once
 #include "Party/PartyModels.h"
+#include "stormancer/Event.h"
+#include "stormancer/Tasks.h"
 
 namespace Stormancer
 {
 	class PartyContainer;
-	class Subscription;
 	
 	class PartyInvitations;
 

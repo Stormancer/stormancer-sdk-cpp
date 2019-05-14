@@ -1,6 +1,7 @@
 #pragma once
 #include "stormancer/StormancerTypes.h"
 #include "stormancer/msgpack_define.h"
+#include "stormancer/Packet.h"
 #include <unordered_map>
 #include <string>
 #include <map>
@@ -17,9 +18,7 @@ namespace Stormancer
 
 	enum class GameFinderStatus
 	{
-		
 		Idle = -1,
-		
 		Searching = 0,
 		CandidateFound = 1,
 		WaitingPlayersReady = 2,
@@ -31,9 +30,23 @@ namespace Stormancer
 
 	struct GameFinderResponse
 	{
-
 		std::string connectionToken;
-		std::unordered_map<std::string, std::string> optionalParameters;
+
+		Packetisp_ptr packet;
+
+		template<typename TData>
+		TData readData()
+		{
+			Serializer serializer;
+			return serializer.deserializeOne<TData>(packet->stream);
+		}
+
+		template<typename... TData>
+		void readData(TData&... tData)
+		{
+			Serializer serializer;
+			return serializer.deserialize<TData>(packet->stream, tData...);
+		}
 	};
 	
 	struct GameFinderStatusChangedEvent
@@ -44,8 +57,8 @@ namespace Stormancer
 	
 	struct GameFoundEvent
 	{
-		GameFinderResponse data;
 		std::string gameFinder;
+		GameFinderResponse data;
 	};
 
 	struct FindGameFailedEvent
@@ -80,67 +93,15 @@ namespace Stormancer
 
 	struct GameFinderResponseDto
 	{
-		std::string gameToken;
-		std::unordered_map<std::string, std::string> optionalParameters;
+		std::string connectionToken;
 
-		MSGPACK_DEFINE(gameToken, optionalParameters);
-	};
-
-	struct PlayerProfile
-	{
-		std::string Id;
-		std::string PlayerId;
-		std::string Faction;
-		uint32 Elo;
-		uint32 League;
-		uint32 Rank;
-		uint32 MaxRank;
-		std::vector<uint32> UnlockedPortrait;
-		std::string SteamId;
-		uint32 CurrentXP;
-
-		MSGPACK_DEFINE(Id, PlayerId, Faction, Elo, League, Rank, MaxRank, UnlockedPortrait, SteamId, CurrentXP);
-	};
-
-	struct ProfileSummary
-	{
-		uint32 AdmiralLevel;
-		std::string ProfileName;
-		std::string Difficulty;
-		uint32 Elo;
-		std::string Faction;
-		std::string Id;
-		bool IsSolo;
-		uint32 Rank;
-		uint32 MaxRank;
-		std::string SubFaction;
-		bool IsElite;
-		bool IsRanked;
-		uint32 League;
-		uint32 EloBO3;
-
-		MSGPACK_DEFINE(
-			AdmiralLevel,
-			ProfileName,
-			Difficulty,
-			Elo,
-			Faction,
-			Id,
-			IsSolo,
-			Rank,
-			MaxRank,
-			SubFaction,
-			IsElite,
-			IsRanked,
-			League,
-			EloBO3
-		);
+		MSGPACK_DEFINE(connectionToken);
 	};
 
 	struct ReadyVerificationRequest
 	{
 		std::map<std::string, Readiness> members;
-		std::string matchId;
+		std::string gameId;
 		int32 timeout;
 		int32 membersCountReady;
 		int32 membersCountTotal;

@@ -15,10 +15,10 @@ namespace Stormancer
 		struct ReadyVerificationRequest
 		{
 			std::map<std::string, int32> members;
-			std::string matchId;
+			std::string gameId;
 			int32 timeout;
 
-			MSGPACK_DEFINE(members, matchId, timeout);
+			MSGPACK_DEFINE(members, gameId, timeout);
 
 			operator Stormancer::ReadyVerificationRequest();
 		};
@@ -35,12 +35,17 @@ namespace Stormancer
 		GameFinderService(const GameFinderService&& other) = delete;
 		GameFinderService& operator=(const GameFinderService&& other) = delete;
 		GameFinderStatus currentState() const;
-		pplx::task<void> findMatch(const std::string &provider, const GameFinderRequest &mmRequest);
-		pplx::task<void> findMatch(const std::string &provider, std::string json);
-		void resolve(bool acceptMatch);
-		// If cancel() is called very shortly after findMatch(), there might be a race condition.
-		// It can be prevented by waiting for the first GameFinderStatusUpdated event received after calling findMatch() before calling cancel().
+		pplx::task<void> findGame(const std::string &provider, const StreamWriter& streamWriter);
+		void resolve(bool acceptGame);
+		// If cancel() is called very shortly after findGame(), there might be a race condition.
+		// It can be prevented by waiting for the first GameFinderStatusUpdated event received after calling findGame() before calling cancel().
 		void cancel();
+
+		template<typename... TData>
+		pplx::task<void> findGame(const std::string &provider, const TData&... tData)
+		{
+			return findGameInternal(provider, tData...);
+		}
 
 		Event<GameFinderStatus> GameFinderStatusUpdated;
 		Event<GameFinderResponse> GameFound;
@@ -48,13 +53,23 @@ namespace Stormancer
 
 	private:
 
-		template<typename T>
-		pplx::task<void> findMatchInternal(const std::string& provider, T data);
+		pplx::task<void> findGameInternal(const std::string& provider, const StreamWriter& streamWriter);
+
+		template<typename... TData>
+		pplx::task<void> findGameInternal(const std::string& provider, TData... tData)
+		{
+			StreamWriter streamWriter = [tData...](obytestream* stream)
+			{
+				Serializer serializer;
+				serializer.serialize(stream, tData...);
+			};
+			return findGameInternal(provider, streamWriter);
+		}
 
 		std::weak_ptr<Scene> _scene;
 		std::weak_ptr<RpcService> _rpcService;
 
-		pplx::cancellation_token_source _matchmakingCTS;
+		pplx::cancellation_token_source _gameFinderCTS;
 
 		GameFinderStatus _currentState = GameFinderStatus::Idle;
 		Serializer _serializer;
