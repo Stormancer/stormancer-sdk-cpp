@@ -114,7 +114,7 @@ namespace Stormancer
 					}
 					else
 					{
-						return pplx::task_from_exception<void>(std::runtime_error("Service destroyed"), ct);
+						return pplx::task_from_exception<void>(std::runtime_error("Can't establish tunnel"), ct);
 					}
 				}
 				else

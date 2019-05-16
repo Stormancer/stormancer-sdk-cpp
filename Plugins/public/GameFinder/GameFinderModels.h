@@ -45,7 +45,7 @@ namespace Stormancer
 		void readData(TData&... tData)
 		{
 			Serializer serializer;
-			return serializer.deserialize<TData>(packet->stream, tData...);
+			return serializer.deserialize<TData...>(packet->stream, tData...);
 		}
 	};
 	

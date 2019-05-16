@@ -29,6 +29,7 @@ namespace Stormancer
 			{
 				Serializer serializer;
 				TServerResult serverResult = serializer.deserializeOne<TServerResult>(packet->stream);
+				return serverResult;
 			});
 		}
 
