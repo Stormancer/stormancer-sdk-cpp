@@ -11,6 +11,7 @@ namespace Stormancer
 		, _remotePeerId(remotePeerId)
 		, _ipAddress(address)
 		, _serializer(serializer)
+		, _dependencyResolver(std::make_shared<DependencyResolver>(serverConnection->dependencyResolver()))
 	{
 	}
 

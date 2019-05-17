@@ -30,6 +30,7 @@ namespace Stormancer
 #pragma region public_methods
 
 		DependencyResolver(std::weak_ptr<DependencyResolver> parent = std::weak_ptr<DependencyResolver>());
+		DependencyResolver(const DependencyResolver&) = delete;
 
 		virtual ~DependencyResolver();
 
