@@ -210,9 +210,16 @@ xcuserdata/
 /ARM/Release
 Release
 *.self
-
+*.prx
 *.a
 /RaknetDll/x64/Debug
 /SmokeTest/x64/Debug
 /x64/Debug
 /stormancer-sdk-cpp-20180714.7z
+
+# user-defined plugin list
+plugins.json
+# Doxygen-generated tag file
+stormancer.client.cpp.tag
+# Stormancer Linux build user config file
+CustomLinuxBuild.props

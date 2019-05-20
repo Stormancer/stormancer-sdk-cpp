@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<PropertyGroup>
+		<!-- See https://mnaoumov.wordpress.com/2015/07/13/msbuild-custom-task-and-assembly-locks/ -->
+		<TempFolder>$([System.IO.Path]::GetTempPath())storm$([System.Guid]::NewGuid())</TempFolder>
+	</PropertyGroup>
+  <ItemGroup>
+		<TaskAssembly Condition=" '$(MSBuildRuntimeType)' == 'Core'" Include="$(StormancerSdkRoot)intermediate\PluginSelector\*" />
+		<TaskAssembly Condition=" '$(MSBuildRuntimeType)' != 'Core'" Include="$(StormancerSdkRoot)intermediate\PluginSelector\*" />
+    <JsonPluginList Include="$(StormancerSdkRoot)plugins.json" />
+  </ItemGroup>
+	<Target Name="CopyTaskAssemblyToTempFolder">
+    <Copy SourceFiles="@(TaskAssembly)" DestinationFolder="$(TempFolder)" />
+ 	</Target>
+  <UsingTask TaskName="PluginSelectorTask" AssemblyFile="$(TempFolder)\PluginSelector.dll" />
+  <Target Name="SelectPlugins" BeforeTargets="PrepareForBuild" DependsOnTargets="CopyTaskAssemblyToTempFolder" Condition="Exists('@(JsonPluginList)')">
+    <PluginSelectorTask PluginsDirectory="$(StormancerSdkRoot)Plugins" PluginListFile="@(JsonPluginList)">
+      <Output TaskParameter="PluginSourceFiles" ItemName="EmbeddedPluginSources" />
+      <Output TaskParameter="PluginPublicHeaderFiles" ItemName="EmbeddedPluginPublicHeaders" />
+      <Output TaskParameter="PluginPrivateHeaderFiles" ItemName="EmbeddedPluginPrivateHeaders" />
+    </PluginSelectorTask>
+    <ItemGroup>
+      <ClCompile Include="@(EmbeddedPluginSources)">
+        <PrecompiledHeader>NotUsing</PrecompiledHeader> <!--TODO (maybe) Support pch in plugins ; STORMANCER_CUSTOM_PCH macro doesn't work-->
+      </ClCompile>
+      <ClInclude Include="@(EmbeddedPluginPrivateHeaders)" />
+      <ClInclude Include="@(EmbeddedPluginPublicHeaders)" />
+    </ItemGroup>
+  </Target>
+  <Target Name="AfterBuild">
+    <ItemGroup>
+      <RxcppIncludes Include="$(StormancerSdkRoot)dependencies\rxcpp\Rx\v2\src\rxcpp\**\*.*" />
+      <RestSdkIncludes Include="$(StormancerSdkRoot)dependencies\cpprestsdk\Release\include\**\*.*" />
+      <MsgpackIncludes Include="$(StormancerSdkRoot)dependencies\msgpack-c\include\**\*.*" />
+      <StormancerIncludes Include="$(StormancerSdkRoot)stormancer\stormancer-sources\include\public\**\*.*" />
+      <RaknetIncludes Include="$(StormancerSdkRoot)dependencies\RakNet\RakNet\Source\**\*.h" />
+      <BuildFiles Include="$(StormancerSdkRoot)Build\**\*.*" />
+    </ItemGroup>
+	<!-- Clean old includes -->
+	<RemoveDir Directories="$(StormancerOutputDir)include" />
+    <Copy SourceFiles="@(BuildFiles)" DestinationFiles="@(BuildFiles->'$(StormancerOutputDir)build\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <!--<Copy SourceFiles="@(RaknetIncludes)" DestinationFiles="@(RaknetIncludes->'$(StormancerOutputDir)include\%(RecursiveDir)%(Filename)%(Extension)')" />-->
+    <Copy SourceFiles="@(RxcppIncludes)" DestinationFiles="@(RxcppIncludes->'$(StormancerOutputDir)include\rxcpp\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(RestSdkIncludes)" DestinationFiles="@(RestSdkIncludes->'$(StormancerOutputDir)include\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Delete Files="$(StormancerOutputDir)include\stdafx.h" />
+    <Copy SourceFiles="@(MsgpackIncludes)" DestinationFiles="@(MsgpackIncludes->'$(StormancerOutputDir)include\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(StormancerIncludes)" DestinationFiles="@(StormancerIncludes->'$(StormancerOutputDir)include\%(RecursiveDir)%(Filename)%(Extension)')" />
+  </Target>
+  <Target Name="CopyPluginHeaders" AfterTargets="AfterBuild">
+    <Copy SourceFiles="@(EmbeddedPluginPublicHeaders)" DestinationFiles="@(EmbeddedPluginPublicHeaders->'$(StormancerOutputDir)include\%(PluginName)\%(Filename)%(Extension)')" />
+  </Target>
+</Project>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" InitialTargets="CheckLinuxBuildConfig">
+	<PropertyGroup Label="StormancerInternal">
+		<StormancerLinuxBuildVersion>2</StormancerLinuxBuildVersion>
+	</PropertyGroup>
+	<Target Name="CheckLinuxBuildConfig">
+		<Message
+			Condition="Exists('$(StormancerSdkRoot)CustomLinuxBuild.props')"
+			Text="Using CustomLinuxBuild.props"
+		/>
+		<Message
+			Condition="!Exists('$(StormancerSdkRoot)CustomLinuxBuild.props')"
+			Text="No CustomLinuxBuild.props file was found at the root of the project. Using DefaultLinuxBuild.props"
+		/>
+		<Error
+			Condition="$(StormancerLinuxPropsVersion) != $(StormancerLinuxBuildVersion)"
+			Text="DefaultLinuxBuild.props has been updated, and your CustomLinuxBuild.props is outdated. Please update it according to the changes in DefaultLinuxBuild.props, and then set the StormancerLinuxPropsVersion variable in your CustomLinuxBuild.props to the same value as the one in DefaultLinuxBuild.props."
+		/>
+	</Target>
+	<Import Condition="Exists('$(StormancerSdkRoot)CustomLinuxBuild.props')" Project="$(StormancerSdkRoot)CustomLinuxBuild.props" />
+	<Import Condition="!Exists('$(StormancerSdkRoot)CustomLinuxBuild.props')" Project="$(StormancerSdkRoot)DefaultLinuxBuild.props" />
+</Project>

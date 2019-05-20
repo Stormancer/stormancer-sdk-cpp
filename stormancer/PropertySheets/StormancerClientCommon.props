@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+	<!-- 
+		This is the destination directory for the stormancer client library and public header files.
+		Override it on the MSBuild command line with /p:StormancerOutputDir=<path> if needed
+	-->
+	<StormancerOutputDir>$(StormancerSdkRoot)output\</StormancerOutputDir>
+	
+	<StormancerDependenciesOutputDir>$(StormancerSdkRoot)binaries\$(Configuration)\$(Platform)\</StormancerDependenciesOutputDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Platform)'!='Win32' AND '$(Platform)'!='x64' AND '$(TargetPlatformIdentifier)'!='Linux'">
+	<!-- Not building on Windows - toolset version is inapplicable or irrelevant -->
+    <IntDir>$(StormancerSdkRoot)intermediate\$(ProjectName)\$(Configuration)\$(Platform)\</IntDir>
+    <TargetName>Stormancer_$(Configuration)_$(Platform)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="('$(Platform)'=='Win32' OR '$(Platform)'=='x64') AND '$(TargetPlatformIdentifier)'!='Linux'">
+	<!-- Building on Windows - toolset version matters -->
+    <IntDir>$(StormancerSdkRoot)intermediate\$(ProjectName)\$(Configuration)\$(Platform)\$(PlatformToolsetVersion)\</IntDir>
+    <TargetName>Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetPlatformIdentifier)'=='Linux'">
+	<IntDir>$(StormancerSdkRoot)intermediate\$(ProjectName)\$(Configuration)\$(Platform)\$(StormancerLinuxToolset)\</IntDir>
+    <TargetName>lib$(ProjectName)_$(Configuration)_$(Platform)-$(StormancerLinuxToolset)</TargetName>
+	<FinalLibName>libStormancer_$(Configuration)_Linux-$(Platform)-$(StormancerLinuxToolset).a</FinalLibName>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OutDir>$(StormancerOutputDir)libs\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>../stormancer-sources/include/private;../stormancer-sources/include/public;../../dependencies/msgpack-c/include;../../dependencies/RakNet/RakNet/Source;../../dependencies/rxcpp/Rx/v2/src;../../Plugins/private;../../Plugins/public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NOMINMAX;_STORMANCERSDKCPP;__PLATFORM__="$(Platform)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup />
+</Project>

@@ -1,44 +1,76 @@
 # Stormancer SDK C++
 
+## Building the C++ Client Library
 
-## Introduction
+Requirements
+------------
 
-A NuGet Package is available. Use it for a simpler setup.  
+- Microsoft Visual Studio 2017
+- Visual C++ v141 build tools
+- .Net framework 4.7.1 SDK (needed for our build process automation tools)
 
+How to Build
+------------
 
-## Unreal Engine 4
+There is a Visual Studio solution for each supported platform. Note that the open source version of the library currently only supports Windows and Android. If you need support for other platforms, please contact us.
 
-You can download the UE4 plugin in the Releases section of the github repository.  
-https://github.com/Stormancer/stormancer-sdk-cpp/releases
+Simply open and build the Visual Studio solution for your platform and configuration of choice.
 
+The build products are located in the `output` directory by default. `output/include` contains the header files, and `output/libs` the static libraries.
 
-## Documentation
+Plugins
+*******
 
-http://stormancer.github.io/stormancer-sdk-cpp/documentation/html/annotated.html
+Plugins can be added to the library on-demand.
+To do so, create a file named `plugins.json` under `src/clients/cpp`.
+It should have the following format :
 
+	{
+		"plugins": [
+			{ "name": "<name of a plugin>" },
+			...
+		]
+	}
 
-## Configure your project
+Note that plugin dependencies are not automatically handled. So for instance, if you want to include the `Authentication` plugin, you also need to explicitly include the `Core` plugin, which `Authentication` depends on.
 
-We will suppose you are using Visual Studio. The library uses C++11 features, so requires at least VS 2013. However, we recommand you to use VS 2015 if possible. Deployment bugs regarding the runtime version may subsist on VS 2013.  
+For instance, if you need plugins `Authentication` and `GameFinder`, you would write the following `plugins.json`:
 
-*Don't forget to adjust the paths. We assume your project is in a directory beside your local stormancer-sdk-cpp repository.*  
+	{
+		"plugins": [
+			{ "name": "Core" },
+			{ "name": "Authentication" },
+			{ "name": "GameFinder" }
+		]
+	}
 
-- Open and build the stormancer-sdk-cpp solution. This will build CppRestSDK, Raknet and the library itself as a single Windows static lib.  
-*We recently changed our build process and we add to temporarily remove dynamic library outputs, but please ask if you need other kind of build outputs.*
-- Create / open your project.  
-- Open the **project properties**  
+Note that the order in which the plugins are specified doesn't matter.
+
+## Using the Library in your Project
+
+Using the library should be as simple as adding the client static library (`Stormancer<platform toolset>_<configuration>_<platform>.lib`) to your linker inputs,
+and adding the `include` directory (the one that was produced by the build) to your compiler's list of additional include directories.
+
+Here is a more detailed step-by-step guide for Visual Studio:
+
+### Visual Studio Quick Start Guide
+
+- Create / open your project.
+- Create a new folder named `stormancer` next to your VS project file.
+- Copy the contents of the `output` folder into the `stormancer` folder.
+- Open the **project properties**  for your project.
 - Select **All Configurations** and **All Platforms** on top of the property window.  
-- Change the **Additional include directories**  
+- Add the following line to your **Additional include directories**  
 *(Configuration Properties > C/C++ > General > Additional include directories)*  
 ```
-$(SolutionDir)..\stormancer-sdk-cpp\output\include\
+stormancer\include\
 ```
-- Change the **Additional library directories**  
+- Add the following line to your **Additional library directories**  
 *(Configuration Properties > Linker > General > Additional library directories)*  
 ```
-$(SolutionDir)..\stormancer-sdk-cpp\output\libs\
+stormancer\libs\
 ```
-- Change the **Additional dependencies**  
+- Add the following line to your **Additional dependencies**  
 *(Configuration Properties > Linker > Input > Additional dependencies)*  
 ```
 Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform).lib
