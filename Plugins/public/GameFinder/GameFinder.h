@@ -100,7 +100,7 @@ namespace Stormancer
 		virtual Subscription subsribeGameFound(std::function<void(GameFoundEvent)> callback) = 0;
 
 		/// <summary>
-		/// Be notified when a FindGame query fails.
+		/// Subscribe to findGameFailed event.
 		/// </summary>
 		/// <remarks>
 		/// A FindGame failure could be caused by a variety of reasons, including but not limited to custom GameFinder logic.
@@ -110,5 +110,23 @@ namespace Stormancer
 		/// <returns>A reference-counted <c>Subscription</c> object that tracks the lifetime of the subscription.
 		/// When the reference count of this object drops to zero, the subscription will be canceled.</returns>
 		virtual Subscription subscribeFindGameFailed(std::function<void(FindGameFailedEvent)> callback) = 0;
+
+		/// <summary>
+		/// Returns a task that completes tje next time a game is found and fails when game finding fails.
+		/// </summary>
+		/// <returns>A task that completes </returns>
+		pplx::task<GameFoundEvent> waitGameFound()
+		{
+			pplx::task_completion_event<Stormancer::GameFoundEvent> tce;
+			auto foundSubscription = this->subsribeGameFound([tce](Stormancer::GameFoundEvent ev) {
+				tce.set(ev);
+			});
+			auto failedSubscription = this->subscribeFindGameFailed([tce](Stormancer::FindGameFailedEvent ev) {
+				tce.set_exception(std::runtime_error(ev.reason));
+			});
+
+			//The continuation is there only to make sure the subscriptions don't expire before task completion.
+			return pplx::create_task(tce).then([foundSubscription, failedSubscription](GameFoundEvent ev) {return ev; });
+		}
 	};
 }

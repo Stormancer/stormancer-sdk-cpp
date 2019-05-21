@@ -1,4 +1,4 @@
-#include "GameSession/GameSessionService.h"
+#include "GameSessionService.h"
 #include "stormancer/RPC/Service.h"
 
 namespace Stormancer

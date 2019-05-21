@@ -1,5 +1,5 @@
 #include "GameSession/GameSessionPlugin.h"
-#include "GameSession/GameSessionService.h"
+#include "GameSessionService.h"
 #include "GameSession_Impl.h"
 #include "stormancer/IClient.h"
 
