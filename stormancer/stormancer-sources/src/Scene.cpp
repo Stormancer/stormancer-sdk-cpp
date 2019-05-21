@@ -605,7 +605,7 @@ namespace Stormancer
 			connectToSceneMessage.connectionMetadata = p2pConnection->metadata();
 			connectToSceneMessage.sceneMetadata = scene->getSceneMetadata();
 
-			return p2pConnection->sendSystemRequest<P2PConnectToSceneMessage, P2PConnectToSceneMessage>((byte)SystemRequestIDTypes::ID_CONNECT_TO_SCENE, connectToSceneMessage, ct)
+			return scene->sendSystemRequest<P2PConnectToSceneMessage, P2PConnectToSceneMessage>(p2pConnection, (byte)SystemRequestIDTypes::ID_CONNECT_TO_SCENE, connectToSceneMessage, ct)
 				.then([wScene, p2pConnection, p2pService](P2PConnectToSceneMessage connectToSceneMessage)
 			{
 				auto scene = LockOrThrow(wScene);

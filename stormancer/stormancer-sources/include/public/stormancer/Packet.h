@@ -5,6 +5,7 @@
 #include "stormancer/IConnection.h"
 #include "stormancer/IScenePeer.h"
 #include "stormancer/Serializer.h"
+#include "rxcpp/rx.hpp"
 
 namespace Stormancer
 {

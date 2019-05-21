@@ -232,7 +232,7 @@ namespace Stormancer
 	{
 		std::weak_ptr<Client> wThat = this->shared_from_this();
 		return getPublicScene(sceneId, ct)
-			.then([initializer, ct, wThat, sceneId](Scene_ptr scene)
+			.then([initializer, ct, wThat, sceneId](std::shared_ptr<Scene_Impl> scene)
 		{
 			if (scene->getCurrentConnectionState() == ConnectionState::Disconnected)
 			{
@@ -255,7 +255,7 @@ namespace Stormancer
 				{
 					return scene;
 				}, ct)
-					.then([wThat, uSceneId](pplx::task<Scene_ptr> t)
+					.then([wThat, uSceneId](pplx::task<std::shared_ptr<Scene_Impl>> t)
 				{
 					try
 					{
@@ -276,7 +276,7 @@ namespace Stormancer
 				return pplx::task_from_result(scene);
 			}
 		}, ct)
-			.then([](Scene_ptr s)
+			.then([](std::shared_ptr<Scene_Impl> s)
 		{
 			return std::static_pointer_cast<Scene>(s);
 		});
@@ -302,7 +302,7 @@ namespace Stormancer
 		std::weak_ptr<Client> wThat = this->shared_from_this();
 
 		return getPrivateScene(sceneToken, ct)
-			.then([initializer, ct, wThat, sceneId](Scene_ptr scene)
+			.then([initializer, ct, wThat, sceneId](std::shared_ptr<Scene_Impl> scene)
 		{
 			if (scene->getCurrentConnectionState() == ConnectionState::Disconnected)
 			{
@@ -326,7 +326,7 @@ namespace Stormancer
 				{
 					return scene;
 				}, ct)
-					.then([wThat, uSceneId](pplx::task<Scene_ptr> t)
+					.then([wThat, uSceneId](pplx::task<std::shared_ptr<Scene_Impl>> t)
 				{
 
 					try
@@ -351,7 +351,7 @@ namespace Stormancer
 
 
 		}, ct)
-			.then([](Scene_ptr s)
+			.then([](std::shared_ptr<Scene_Impl> s)
 		{
 			return std::static_pointer_cast<Scene>(s);
 		});
@@ -372,7 +372,7 @@ namespace Stormancer
 		if (it != _scenes.end())
 		{
 			return it->second.task
-				.then([](Scene_ptr s)
+				.then([](std::shared_ptr<Scene_Impl> s)
 			{
 				return std::static_pointer_cast<Scene>(s);
 			});
@@ -394,12 +394,12 @@ namespace Stormancer
 		return sceneIds;
 	}
 
-	pplx::task<Scene_ptr> Client::getPublicScene(const std::string& sceneId, pplx::cancellation_token ct)
+	pplx::task<std::shared_ptr<Scene_Impl>> Client::getPublicScene(const std::string& sceneId, pplx::cancellation_token ct)
 	{
 		if (sceneId.empty())
 		{
 			logger()->log(LogLevel::Error, "Client", "Empty scene id.");
-			return pplx::task_from_exception<Scene_ptr>(std::runtime_error("Empty scene id."));
+			return pplx::task_from_exception<std::shared_ptr<Scene_Impl>>(std::runtime_error("Empty scene id."));
 		}
 
 		std::weak_ptr<Client> wThat = this->shared_from_this();
@@ -428,7 +428,7 @@ namespace Stormancer
 				else
 				{
 					that->logger()->log(LogLevel::Error, "Client", "The scene is private.");
-					return pplx::task_from_exception<Scene_ptr>(std::runtime_error("The scene is private."));
+					return pplx::task_from_exception<std::shared_ptr<Scene_Impl>>(std::runtime_error("The scene is private."));
 				}
 			}
 			else
@@ -453,7 +453,7 @@ namespace Stormancer
 					auto client = LockOrThrow(wThat);
 					return client->getSceneInternal(address, sep, ct);
 				}, ct)
-					.then([wThat, address, uSceneId](pplx::task<Scene_ptr> t)
+					.then([wThat, address, uSceneId](pplx::task<std::shared_ptr<Scene_Impl>> t)
 				{
 					try
 					{
@@ -493,7 +493,7 @@ namespace Stormancer
 		});
 	}
 
-	pplx::task<Scene_ptr> Client::getPrivateScene(const std::string& sceneToken, pplx::cancellation_token ct)
+	pplx::task<std::shared_ptr<Scene_Impl>> Client::getPrivateScene(const std::string& sceneToken, pplx::cancellation_token ct)
 	{
 		std::lock_guard<std::mutex> lg(this->_scenesMutex);
 		this->initialize();
@@ -502,7 +502,7 @@ namespace Stormancer
 		if (sceneToken.empty())
 		{
 			logger()->log(LogLevel::Error, "Client", "Empty scene token.");
-			return pplx::task_from_exception<Scene_ptr>(std::runtime_error("Empty scene token."));
+			return pplx::task_from_exception<std::shared_ptr<Scene_Impl>>(std::runtime_error("Empty scene token."));
 		}
 		Stormancer::SceneEndpoint sep;
 		auto tokenHandler = _dependencyResolver.resolve<ITokenHandler>();
@@ -534,7 +534,7 @@ namespace Stormancer
 				ClientScene cScene;
 				cScene.isPublic = true;
 				auto task = that->getSceneInternal(sceneAddress, sep, ct)
-					.then([wThat, uSceneId](pplx::task<Scene_ptr> t)
+					.then([wThat, uSceneId](pplx::task<std::shared_ptr<Scene_Impl>> t)
 				{
 					try
 					{
@@ -654,7 +654,7 @@ namespace Stormancer
 		});
 	}
 
-	pplx::task<Scene_ptr> Client::getSceneInternal(const SceneAddress& sceneAddress, const SceneEndpoint& sep, pplx::cancellation_token ct)
+	pplx::task<std::shared_ptr<Scene_Impl>> Client::getSceneInternal(const SceneAddress& sceneAddress, const SceneEndpoint& sep, pplx::cancellation_token ct)
 	{
 		ct = getLinkedCancellationToken(ct);
 
@@ -717,14 +717,14 @@ namespace Stormancer
 			auto sceneInfos = std::get<0>(tuple);
 			auto connection = std::get<1>(tuple);
 
-			Scene_ptr scene(new Scene_Impl(connection, wClient, sceneAddress, sep.token, sceneInfos, client->_dependencyResolver, client->_plugins), [](Scene_Impl* ptr) { delete ptr; });
+			std::shared_ptr<Scene_Impl> scene(new Scene_Impl(connection, wClient, sceneAddress, sep.token, sceneInfos, client->_dependencyResolver, client->_plugins), [](Scene_Impl* ptr) { delete ptr; });
 			scene->initialize(client->_dependencyResolver);
 
 			return scene;
 		}, ct);
 	}
 
-	pplx::task<void> Client::connectToScene(const Scene_ptr& scene, const std::string& sceneToken, const std::vector<Route_ptr>& localRoutes, pplx::cancellation_token ct)
+	pplx::task<void> Client::connectToScene(std::shared_ptr<Scene_Impl> scene, const std::string& sceneToken, const std::vector<Route_ptr>& localRoutes, pplx::cancellation_token ct)
 	{
 		ct = getLinkedCancellationToken(ct);
 
@@ -825,7 +825,7 @@ namespace Stormancer
 		}
 		std::weak_ptr<Client> wThat = this->shared_from_this();
 		return it->second.task
-			.then([wThat, fromServer, reason](Scene_ptr scene)
+			.then([wThat, fromServer, reason](std::shared_ptr<Scene_Impl> scene)
 		{
 			if (auto that = wThat.lock())
 			{
@@ -842,7 +842,7 @@ namespace Stormancer
 		return disconnect(scene, fromServer, reason);
 	}
 
-	pplx::task<void> Client::disconnect(Scene_ptr scene, bool initiatedByServer, std::string reason)
+	pplx::task<void> Client::disconnect(std::shared_ptr<Scene_Impl> scene, bool initiatedByServer, std::string reason)
 	{
 		if (!scene)
 		{
@@ -923,7 +923,7 @@ namespace Stormancer
 		for (auto it : scenesToDisconnect)
 		{
 			tasks.push_back(it.second.task
-				.then([weakSelf](Scene_ptr scene)
+				.then([weakSelf](std::shared_ptr<Scene_Impl> scene)
 			{
 				auto self = weakSelf.lock();
 				if (self)

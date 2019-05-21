@@ -47,7 +47,7 @@ namespace Stormancer
 		return connection.dependencyResolver().resolve<std::vector<std::weak_ptr<Scene_Impl>>>();
 	}
 
-	void SceneDispatcher::addScene(std::shared_ptr<IConnection> connection, Scene_ptr scene)
+	void SceneDispatcher::addScene(std::shared_ptr<IConnection> connection, std::shared_ptr<Scene_Impl> scene)
 	{
 		if (scene && connection)
 		{
@@ -108,7 +108,7 @@ namespace Stormancer
 		return false;
 	}
 
-	Scene_ptr Stormancer::SceneDispatcher::getScene(std::shared_ptr<IConnection> connection, uint8 sceneHandle)
+	std::shared_ptr<Scene_Impl> Stormancer::SceneDispatcher::getScene(std::shared_ptr<IConnection> connection, uint8 sceneHandle)
 	{
 		auto handles = getHandles(*connection);
 		auto index = getSceneIndex(sceneHandle);

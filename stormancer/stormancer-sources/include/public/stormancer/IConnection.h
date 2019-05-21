@@ -1,7 +1,6 @@
 #pragma once
 
 #include "stormancer/BuildConfig.h"
-
 #include "stormancer/Tasks.h"
 #include "stormancer/PacketPriority.h"
 #include "stormancer/ConnectionState.h"
@@ -28,17 +27,6 @@ namespace Stormancer
 		/// \param priority The priority of the message.
 		/// \param reliability The reliability of the message.
 		virtual void send(const StreamWriter& streamWriter, int channelUid, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const TransformMetadata& transformMetadata = TransformMetadata()) = 0;
-
-		/// Sends a system request to the remote peer.
-		/// \param id System request ID (SystemRequestIDTypes).
-		/// \param T2 Parameters to send to the remote peer.
-		/// \param ct Cancellation token (default to none).
-		template<typename T1, typename T2>
-		pplx::task<T1> sendSystemRequest(byte id, const T2& parameter, pplx::cancellation_token ct = pplx::cancellation_token::none())
-		{
-			auto requestProcessor = dependencyResolver().resolve<RequestProcessor>();
-			return requestProcessor->sendSystemRequest<T1, T2>(this, id, parameter, ct);
-		}
 
 		/// Set the account id and the application name.
 		/// \param account The account id.

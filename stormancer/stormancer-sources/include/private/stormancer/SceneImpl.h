@@ -20,7 +20,6 @@ namespace Stormancer
 	class Client;
 	class Scene_Impl;
 	class IPlugin;
-	using Scene_ptr = std::shared_ptr<Scene_Impl>;
 	
 	/// Communicates with the server scene.
 	/// Get a scene by calling Client::getPublicScene or Client::getScene.
@@ -171,7 +170,8 @@ namespace Stormancer
 		template<typename T1, typename T2>
 		pplx::task<T1> sendSystemRequest(std::shared_ptr<IConnection> connection, byte id, const T2& parameter, pplx::cancellation_token ct = pplx::cancellation_token::none())
 		{
-			return connection->sendSystemRequest<T1, T2>(id, parameter, ct);
+			auto requestProcessor = dependencyResolver().resolve<RequestProcessor>();
+			return requestProcessor->sendSystemRequest<T1, T2>(connection.get(), id, parameter, ct);
 		}
 
 		//initializes the scene after construction
