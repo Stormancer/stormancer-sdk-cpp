@@ -18,7 +18,6 @@ namespace Stormancer
 		{
 			it->second.Status = sessionState;
 		}
-
 	}
 
 	void P2PSessions::createSession(std::string sessionId, P2PSession session)
@@ -53,5 +52,4 @@ namespace Stormancer
 			return false;
 		}
 	}
-
-};
+}

@@ -13,7 +13,7 @@ namespace Stormancer
 	public:
 		virtual ~GameSession() = default;
 
-		virtual pplx::task<GameSessionConnectionParameters> connectToGameSession(std::string token, std::string mapName = "", pplx::cancellation_token ct = pplx::cancellation_token::none()) = 0;
+		virtual pplx::task<GameSessionConnectionParameters> connectToGameSession(std::string token, std::string mapName = "", bool openTunnel = true, pplx::cancellation_token ct = pplx::cancellation_token::none()) = 0;
 		virtual pplx::task<void> setPlayerReady(const std::string& data = "", pplx::cancellation_token ct = pplx::cancellation_token::none()) = 0;
 
 		template<typename TServerResult, typename TClientResult>

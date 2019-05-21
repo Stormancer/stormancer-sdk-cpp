@@ -96,7 +96,7 @@ namespace Stormancer
 		return (_id != other._id);
 	}
 
-	const std::map<std::string, std::string>& RakNetConnection::metadata() const
+	const std::unordered_map<std::string, std::string>& RakNetConnection::metadata() const
 	{
 		return _metadata;
 	}
@@ -110,7 +110,7 @@ namespace Stormancer
 		return std::string();
 	}
 
-	void RakNetConnection::setMetadata(const std::map<std::string, std::string>& metadata)
+	void RakNetConnection::setMetadata(const std::unordered_map<std::string, std::string>& metadata)
 	{
 		_metadata = metadata;
 	}
@@ -295,4 +295,4 @@ namespace Stormancer
 		}
 		return updatePeerMetadata(ct);
 	}
-};
+}

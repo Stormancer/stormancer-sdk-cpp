@@ -13,7 +13,7 @@ namespace Stormancer
 	{
 	public:
 		std::unordered_map<uint64, std::vector<byte>> keys;// byte key[256 / 8];
-	
+
 		std::vector<byte>& getKey(uint64 keyId)
 		{
 			auto it = keys.find(keyId);
@@ -31,6 +31,5 @@ namespace Stormancer
 		{
 			keys.erase(keyId);
 		}
-
 	};
 }

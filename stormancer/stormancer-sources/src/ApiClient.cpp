@@ -475,4 +475,4 @@ namespace Stormancer
 		}
 		throw std::runtime_error("Cluster '" + id + "' not found in federation.");
 	}
-};
+}

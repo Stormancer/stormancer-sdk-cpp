@@ -133,4 +133,4 @@ namespace Stormancer
 	};
 
 	using RpcRequestContext_ptr = std::shared_ptr<RpcRequestContext<IScenePeer>>;
-};
+}

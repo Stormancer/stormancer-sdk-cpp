@@ -37,4 +37,4 @@ namespace Stormancer
 		ConnectionData tokenData;
 		GetConnectionTokenResponse getTokenResponse;
 	};
-};
+}

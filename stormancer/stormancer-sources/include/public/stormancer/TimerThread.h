@@ -12,7 +12,6 @@
 
 namespace Stormancer
 {
-
 	class TimerThread
 	{
 	public:
@@ -73,7 +72,4 @@ namespace Stormancer
 
 #pragma endregion
 	};
-
-
-
 }

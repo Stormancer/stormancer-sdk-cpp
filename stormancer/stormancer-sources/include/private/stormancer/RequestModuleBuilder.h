@@ -1,8 +1,6 @@
 #pragma once
 
 #include "stormancer/BuildConfig.h"
-
-
 #include "stormancer/RequestContext.h"
 
 namespace Stormancer
@@ -12,12 +10,15 @@ namespace Stormancer
 	class RequestModuleBuilder
 	{
 	public:
-		RequestModuleBuilder(std::function<void(byte, std::function<pplx::task<void>(RequestContext*)>)> addHandler);
+
+		RequestModuleBuilder(std::function<void(byte, std::function<pplx::task<void>(std::shared_ptr<RequestContext>)>)> addHandler);
+
 		virtual ~RequestModuleBuilder();
 
-		void service(byte msgId, std::function<pplx::task<void>(RequestContext*)> handler);
+		void service(byte msgId, std::function<pplx::task<void>(std::shared_ptr<RequestContext>)> handler);
 
 	private:
-		std::function<void(byte, std::function<pplx::task<void>(RequestContext*)>)> _addHandler;
+
+		std::function<void(byte, std::function<pplx::task<void>(std::shared_ptr<RequestContext>)>)> _addHandler;
 	};
-};
+}

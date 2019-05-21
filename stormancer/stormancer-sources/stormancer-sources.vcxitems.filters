@@ -90,9 +90,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ConnectionResult.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ConnectToSceneMsg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\DefaultPacketDispatcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -136,9 +133,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\RequestProcessor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\RouteDto.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SceneDispatcher.h">
@@ -257,9 +251,6 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\AES\IAES.h">
       <Filter>Header Files\AES</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\P2PConnectToSceneMessage.h">
-      <Filter>Header Files\P2P</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SafeCapture.h">
       <Filter>Header Files</Filter>
@@ -458,6 +449,15 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\MsgpackJsonAdaptor.h">
       <Filter>Header Files\public\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ConnectToSceneMsg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\P2P\P2PConnectToSceneMessage.h">
+      <Filter>Header Files\P2P</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\RouteDto.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\DependencyInjection.h">
       <Filter>Header Files\public</Filter>

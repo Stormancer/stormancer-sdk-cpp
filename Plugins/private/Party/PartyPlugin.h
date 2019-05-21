@@ -2,10 +2,10 @@
 
 #include "stormancer/IPlugin.h"
 
-class Scene;
-
 namespace Stormancer
 {
+	class Scene;
+
 	class PartyPlugin : public IPlugin
 	{	
 	public:
@@ -13,4 +13,4 @@ namespace Stormancer
 		void sceneCreated(std::shared_ptr<Scene> scene) override;
 		void registerClientDependencies(ContainerBuilder& builder) override;
 	};
-};
+}

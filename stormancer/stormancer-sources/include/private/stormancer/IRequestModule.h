@@ -14,6 +14,6 @@ namespace Stormancer
 
 		virtual ~IRequestModule() = default;
 
-		virtual void registerModule(RequestModuleBuilder* builder) = 0;
+		virtual void registerModule(RequestModuleBuilder& builder) = 0;
 	};
-};
+}

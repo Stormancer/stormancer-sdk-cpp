@@ -24,4 +24,4 @@ namespace Stormancer
 	{
 		builder.registerDependency<Friends_Impl, AuthenticationService>().as<Friends>().singleInstance();
 	}
-};
+}

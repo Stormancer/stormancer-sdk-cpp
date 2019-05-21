@@ -65,4 +65,4 @@ namespace Stormancer
 	{
 		return format(LogLevel::Error, "exception", ex.what());
 	}
-};
+}

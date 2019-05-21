@@ -8,7 +8,6 @@ namespace Stormancer
 		: _client(client)
 		, _logger(client->dependencyResolver().resolve<ILogger>())
 	{
-
 	}
 
 	AuthenticationService::~AuthenticationService()
@@ -505,4 +504,4 @@ namespace Stormancer
 	{
 		return (int)state;
 	}
-};
+}

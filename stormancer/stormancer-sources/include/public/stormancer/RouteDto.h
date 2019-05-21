@@ -4,7 +4,7 @@
 
 #include "stormancer/StormancerTypes.h"
 #include "stormancer/msgpack_define.h"
-#include <map>
+#include <unordered_map>
 #include <string>
 
 namespace Stormancer
@@ -18,8 +18,8 @@ namespace Stormancer
 
 		uint16 Handle;
 
-		std::map<std::string, std::string> Metadata;
+		std::unordered_map<std::string, std::string> Metadata;
 
 		MSGPACK_DEFINE_MAP(Name, Handle, Metadata);
 	};
-};
+}

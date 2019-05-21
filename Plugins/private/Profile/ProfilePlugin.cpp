@@ -25,4 +25,4 @@ namespace Stormancer
 	{
 		builder.registerDependency<Profiles_Impl, AuthenticationService>().as<Profiles>().singleInstance();
 	}
-};
+}

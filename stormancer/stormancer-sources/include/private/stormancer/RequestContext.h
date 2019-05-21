@@ -20,8 +20,8 @@ namespace Stormancer
 		/// Destructor.
 		virtual ~RequestContext();
 
-	public:
 		Packet_ptr packet();
+
 		ibytestream& inputStream();
 		
 		/// Returns the request completed state.
@@ -41,6 +41,7 @@ namespace Stormancer
 		void error(const StreamWriter& streamWriter);
 
 	private:
+
 		uint16 _requestId;
 		
 		/// Packet that initiated the request
@@ -50,6 +51,7 @@ namespace Stormancer
 		ibytestream _stream;
 		
 		bool _didSendValues = false;
+
 		bool _isComplete = false;
 	};
-};
+}

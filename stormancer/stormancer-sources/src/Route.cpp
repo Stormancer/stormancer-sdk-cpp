@@ -8,7 +8,7 @@ namespace Stormancer
 	{
 	}
 
-	Route::Route(const std::string& routeName, uint16 handle, MessageOriginFilter filter, std::map<std::string, std::string> metadata)
+	Route::Route(const std::string& routeName, uint16 handle, MessageOriginFilter filter, std::unordered_map<std::string, std::string> metadata)
 		: _handle(handle)
 		, _filter(filter)
 		, _name(routeName)
@@ -16,7 +16,7 @@ namespace Stormancer
 	{
 	}
 
-	Route::Route(const std::string& routeName, std::map<std::string, std::string> metadata)
+	Route::Route(const std::string& routeName, std::unordered_map<std::string, std::string> metadata)
 		: Route(routeName, 0, MessageOriginFilter::Host, metadata)
 	{
 	}
@@ -35,7 +35,7 @@ namespace Stormancer
 		return _handle;
 	}
 
-	const std::map<std::string, std::string>& Route::metadata() const
+	const std::unordered_map<std::string, std::string>& Route::metadata() const
 	{
 		return _metadata;
 	}
@@ -49,4 +49,4 @@ namespace Stormancer
 	{
 		return _filter;
 	}
-};
+}

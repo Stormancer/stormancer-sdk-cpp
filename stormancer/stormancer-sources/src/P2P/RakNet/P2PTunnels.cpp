@@ -273,4 +273,4 @@ namespace Stormancer
 	{
 		return v0 == v1;
 	}
-};
+}

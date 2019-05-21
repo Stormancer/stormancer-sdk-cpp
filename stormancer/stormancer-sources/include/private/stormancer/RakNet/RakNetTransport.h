@@ -100,7 +100,7 @@ namespace Stormancer
 		std::shared_ptr<RakNet::RakPeerInterface> _peer;
 		std::shared_ptr<ILogger> _logger;
 		std::string _type;
-		std::map<uint64, ConnectionContainer> _connections;
+		std::unordered_map<uint64, ConnectionContainer> _connections;
 		std::mutex _pendingConnection_mtx;
 		std::queue<ConnectionRequest> _pendingConnections;
 		std::shared_ptr<IScheduler> _scheduler;
@@ -120,4 +120,4 @@ namespace Stormancer
 
 #pragma endregion
 	};
-};
+}

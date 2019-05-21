@@ -14,4 +14,4 @@ namespace Stormancer
 
 		void registerClientDependencies(ContainerBuilder& builder) override;
 	};
-};
+}

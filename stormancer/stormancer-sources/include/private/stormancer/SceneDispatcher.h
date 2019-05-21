@@ -19,7 +19,7 @@ namespace Stormancer
 #pragma region public_methods
 
 		SceneDispatcher(std::shared_ptr<IActionDispatcher> evDispatcher);
-		virtual ~SceneDispatcher();
+		virtual ~SceneDispatcher() = default;
 
 		void registerProcessor(PacketProcessorConfig& config);
 		void addScene(std::shared_ptr<IConnection> connection, Scene_ptr scene);
@@ -42,9 +42,8 @@ namespace Stormancer
 #pragma region private_members
 
 		std::shared_ptr<IActionDispatcher> _eventDispatcher;
-		processorFunction* handler = nullptr;
-
+		ProcessorFunction handler = nullptr;
 
 #pragma endregion
 	};
-};
+}

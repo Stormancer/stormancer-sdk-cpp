@@ -51,7 +51,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\OpenTunnelResult.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\P2PPacketDispatcher.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\P2PRequestModule.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\P2PConnectToSceneMessage.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\P2PScenePeer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\P2PService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\P2PSession.h" />
@@ -67,7 +66,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\RequestContext.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\RequestModuleBuilder.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\RequestProcessor.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\RouteDto.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\RPC\RpcRequest.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SafeCapture.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SceneImpl.h" />
@@ -118,12 +116,14 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\msgpack_define.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\P2P\IP2PScenePeer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\P2P\P2PConnectionStateChangedArgs.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\P2P\P2PConnectToSceneMessage.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\P2P\P2PEnums.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\P2P\P2PTunnel.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Packet.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\PacketPriority.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\PeerFilter.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Route.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\RouteDto.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\RPC\Constants.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\RPC\RpcPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\RPC\RpcRequestContext.h" />

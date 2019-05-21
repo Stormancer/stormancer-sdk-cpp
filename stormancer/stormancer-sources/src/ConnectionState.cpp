@@ -44,4 +44,4 @@ namespace Stormancer
 	{
 		return (int)state;
 	}
-};
+}

@@ -644,7 +644,8 @@ namespace Stormancer
 		byte* data = new byte[dataSize];
 		std::memcpy(data, rakNetPacket->data, dataSize);
 
-		Packet_ptr packet(new Packet<>(connection, data, dataSize), [data](Packet<>* packetPtr) {
+		Packet_ptr packet(new Packet<>(connection, data, dataSize), [data](Packet<>* packetPtr)
+		{
 			delete packetPtr;
 			delete[] data;
 		});
@@ -894,4 +895,4 @@ namespace Stormancer
 
 		return ips;
 	}
-};
+}

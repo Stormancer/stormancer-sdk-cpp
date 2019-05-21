@@ -45,7 +45,8 @@ namespace Stormancer
 
 	pplx::task<std::shared_ptr<FriendsService>> Friends_Impl::getFriendService()
 	{
-		auto initializer = [](auto that, auto friends, auto scene) {
+		auto initializer = [](auto that, auto friends, auto scene)
+		{
 			auto wThat = that->weak_from_this();
 			that->_friendListChangedSubscription = friends->friendListChanged.subscribe([wThat](FriendListUpdateEvent ev)
 			{

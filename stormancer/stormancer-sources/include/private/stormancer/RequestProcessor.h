@@ -26,7 +26,7 @@ namespace Stormancer
 		RequestProcessor(std::shared_ptr<ILogger> logger);
 
 		/// Destructor
-		virtual ~RequestProcessor();
+		virtual ~RequestProcessor() = default;
 
 		/// Registers the processor into the dispatcher.
 		/// \param config The configuration of the processor.
@@ -42,7 +42,7 @@ namespace Stormancer
 		/// Register a new system request handlers for the specified message Id.
 		/// \param msgId The system message id.
 		/// \param handler A function that handles message with the provided id.
-		std::function<void(byte, std::function<pplx::task<void>(RequestContext*)>)> addSystemRequestHandler;
+		void addSystemRequestHandler(byte msgId, std::function<pplx::task<void>(std::shared_ptr<RequestContext>)> handler);
 
 		template<typename T1, typename T2>
 		pplx::task<T1> sendSystemRequest(IConnection* peer, byte id, const T2& parameter, pplx::cancellation_token ct = pplx::cancellation_token::none())
@@ -99,7 +99,8 @@ namespace Stormancer
 			auto logger = _logger;
 			auto serializer = _serializer;
 
-			return sendSystemRequest(peer, msgId, streamWriter, priority, ct).then([Tname, logger, serializer, msgId](Packet_ptr packet)
+			return sendSystemRequest(peer, msgId, streamWriter, priority, ct)
+				.then([Tname, logger, serializer, msgId](Packet_ptr packet)
 			{
 				if (!packet)
 				{
@@ -118,13 +119,14 @@ namespace Stormancer
 
 #pragma region private_members
 
-		std::map<uint16, SystemRequest_ptr> _pendingRequests;
+		std::unordered_map<uint16, SystemRequest_ptr> _pendingRequests;
 		std::mutex _mutexPendingRequests;
 		std::shared_ptr<ILogger> _logger;
 		bool _isRegistered = false;
-		std::map<byte, std::function<pplx::task<void>(RequestContext*)>> _handlers;
+		std::unordered_map<byte, std::function<pplx::task<void>(std::shared_ptr<RequestContext>)>> _handlers;
 		Serializer _serializer;
+		int systemRequestChannelUid = 0;
 
 #pragma endregion
 	};
-};
+}

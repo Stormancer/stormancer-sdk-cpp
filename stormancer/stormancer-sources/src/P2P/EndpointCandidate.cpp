@@ -7,4 +7,4 @@ namespace Stormancer
 	{
 		return (EndpointCandidateType)_type;
 	}
-};
+}

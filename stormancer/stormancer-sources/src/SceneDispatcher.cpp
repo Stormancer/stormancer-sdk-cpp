@@ -8,15 +8,11 @@ namespace Stormancer
 {
 	SceneDispatcher::SceneDispatcher(std::shared_ptr<IActionDispatcher> evDispatcher)
 		: _eventDispatcher(evDispatcher)
-		/*, _scenes((uint32)0xff - (uint32)MessageIDTypes::ID_SCENES + 1)*/
 	{
-		handler = new processorFunction([=](uint8 sceneHandle, Packet_ptr packet) {
+		handler = [=](uint8 sceneHandle, Packet_ptr packet)
+		{
 			return handler_impl(sceneHandle, packet);
-		});
-	}
-
-	SceneDispatcher::~SceneDispatcher()
-	{
+		};
 	}
 
 	void SceneDispatcher::registerProcessor(PacketProcessorConfig& config)
@@ -48,7 +44,6 @@ namespace Stormancer
 
 	std::shared_ptr<std::vector<std::weak_ptr<Scene_Impl>>> SceneDispatcher::getHandles(const IConnection& connection)
 	{
-
 		return connection.dependencyResolver().resolve<std::vector<std::weak_ptr<Scene_Impl>>>();
 	}
 
@@ -100,7 +95,8 @@ namespace Stormancer
 			if (scene)
 			{
 				packet->metadata["scene"] = scene->id();
-				_eventDispatcher->post([=]() {
+				_eventDispatcher->post([=]()
+				{
 					if (auto scene = scene_weak.lock())
 					{
 						scene->handleMessage(packet);
@@ -125,4 +121,4 @@ namespace Stormancer
 			return nullptr;
 		}
 	}
-};
+}

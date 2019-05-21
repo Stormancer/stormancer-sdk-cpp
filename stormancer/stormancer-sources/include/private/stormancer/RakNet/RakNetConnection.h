@@ -42,9 +42,9 @@ namespace Stormancer
 		std::string ipAddress() const override;
 		bool operator==(RakNetConnection& other);
 		bool operator!=(RakNetConnection& other);
-		const std::map<std::string, std::string>& metadata() const override;
+		const std::unordered_map<std::string, std::string>& metadata() const override;
 		std::string metadata(const std::string& key) const override;
-		void setMetadata(const std::map<std::string, std::string>& metadata) override;
+		void setMetadata(const std::unordered_map<std::string, std::string>& metadata) override;
 		void setMetadata(const std::string& key, const std::string& value) override;
 		pplx::task<void> updatePeerMetadata(pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
 		const DependencyScope& dependencyResolver() const override;
@@ -71,7 +71,7 @@ namespace Stormancer
 
 #pragma region private_members
 
-		std::map<std::string, std::string> _metadata;
+		std::unordered_map<std::string, std::string> _metadata;
 		std::string _account;
 		std::string _application;
 		uint64 _id = 0;
@@ -89,4 +89,4 @@ namespace Stormancer
 		
 #pragma endregion
 	};
-};
+}

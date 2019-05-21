@@ -29,4 +29,4 @@ namespace Stormancer
 
 		std::shared_ptr<TimerThread> _timer = std::make_shared<TimerThread>();
 	};
-};
+}

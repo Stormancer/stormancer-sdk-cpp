@@ -15,8 +15,8 @@ namespace Stormancer
 		std::string Token;
 		
 		/// Connexion metadatas.
-		std::map<std::string, std::string> Metadata;
+		std::unordered_map<std::string, std::string> Metadata;
 
 		MSGPACK_DEFINE_MAP(Token, Metadata);
 	};
-};
+}

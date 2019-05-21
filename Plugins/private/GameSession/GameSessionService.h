@@ -21,11 +21,12 @@ namespace Stormancer
 	public:
 
 		GameSessionService(std::weak_ptr<Scene> scene);
-		~GameSessionService();
+
+		virtual ~GameSessionService();
 
 		void initialize();
 
-		pplx::task<void> initializeTunnel(std::string p2pToken, pplx::cancellation_token ct);
+		pplx::task<std::shared_ptr<Stormancer::IP2PScenePeer>> initializeP2P(std::string p2pToken, bool openTunnel = true, pplx::cancellation_token ct = pplx::cancellation_token::none());
 
 		pplx::task<void> waitServerReady(pplx::cancellation_token);
 
@@ -40,8 +41,6 @@ namespace Stormancer
 		pplx::task<void> reset(pplx::cancellation_token ct);
 
 		pplx::task<void> disconnect();
-
-		bool shouldEstablishTunnel = true;
 
 		std::weak_ptr<Scene> getScene();
 

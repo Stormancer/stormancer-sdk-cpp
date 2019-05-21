@@ -40,12 +40,12 @@ namespace Stormancer
 	}
 
 	template<typename T>
-	std::shared_ptr<T> LockOrThrow(std::weak_ptr<T> wPtr)
+	std::shared_ptr<T> LockOrThrow(std::weak_ptr<T> wPtr, const std::string& errorMessage = "")
 	{
 		auto sPtr = wPtr.lock();
 		if (!sPtr)
 		{
-			throw PointerDeletedException();
+			throw PointerDeletedException(errorMessage);
 		}
 		return sPtr;
 	}

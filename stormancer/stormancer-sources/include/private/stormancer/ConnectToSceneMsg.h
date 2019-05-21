@@ -2,13 +2,12 @@
 
 #include "stormancer/BuildConfig.h"
 
-
 #include "stormancer/RouteDto.h"
 
 namespace Stormancer
 {
 	/// Required parameters to connect to a scene.
-	class ConnectToSceneMsg
+	class ConnectToSceneMessage
 	{
 	public:
 
@@ -19,11 +18,11 @@ namespace Stormancer
 		std::vector<RouteDto> Routes;
 
 		/// Scene Metadatas.
-		std::map<std::string, std::string> SceneMetadata;
+		std::unordered_map<std::string, std::string> SceneMetadata;
 
 		/// Connection Metadatas.
-		std::map<std::string, std::string> ConnectionMetadata;
+		std::unordered_map<std::string, std::string> ConnectionMetadata;
 
 		MSGPACK_DEFINE_MAP(Token, Routes, SceneMetadata, ConnectionMetadata);
 	};
-};
+}

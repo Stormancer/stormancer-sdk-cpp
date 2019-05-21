@@ -10,4 +10,4 @@ namespace Stormancer
 {
 	using StreamWriter = std::function<void(obytestream&)>;
 	using StreamReader = std::function<void(ibytestream&)>;
-};
+}

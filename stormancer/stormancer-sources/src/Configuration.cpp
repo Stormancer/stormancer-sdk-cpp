@@ -17,13 +17,13 @@ namespace Stormancer
 		, transportFactory(_defaultTransportFactory)
 		, scheduler(std::make_shared<DefaultScheduler>())
 	{
-		dispatcher = [](const DependencyScope& dr) {
+		dispatcher = [](const DependencyScope& dr)
+		{
 			return std::make_shared<DefaultPacketDispatcher>(dr.resolve<ILogger>());
 		};
 
 		addServerEndpoint(endpoint);
 		_plugins.push_back(new RpcPlugin());
-
 
 
 
@@ -105,4 +105,4 @@ namespace Stormancer
 	{
 		return dedicatedServerEndpoint + ":" + std::to_string(serverGamePort);
 	}
-};
+}

@@ -49,4 +49,4 @@ namespace Stormancer
 		double _offset = 0;
 		ILogger_ptr _logger;
 	};
-};
+}

@@ -1,8 +1,6 @@
 #pragma once
 
 #include "stormancer/BuildConfig.h"
-
-
 #include "stormancer/Scene.h"
 #include "stormancer/Streams/bytestream.h"
 #include "stormancer/PacketPriority.h"
@@ -38,7 +36,6 @@ namespace Stormancer
 
 #pragma region public_methods
 
-
 		/// Connect to the scene.
 		pplx::task<void> connect(pplx::cancellation_token ct = pplx::cancellation_token::none());
 
@@ -50,7 +47,7 @@ namespace Stormancer
 		/// \param handler Function which handle the receiving messages from the server on the route.
 		/// \param metadata Metadatas about the Route.
 		/// Add a route for each different message type.
-		void addRoute(const std::string& routeName, std::function<void(Packetisp_ptr)> handler, MessageOriginFilter origin = MessageOriginFilter::Host, const std::map<std::string, std::string>& metadata = std::map<std::string, std::string>()) override;
+		void addRoute(const std::string& routeName, std::function<void(Packetisp_ptr)> handler, MessageOriginFilter origin = MessageOriginFilter::Host, const std::unordered_map<std::string, std::string>& metadata = std::unordered_map<std::string, std::string>()) override;
 
 		/// Send a packet to a route.
 		/// \param peerFilter Peer receiver.
@@ -96,14 +93,14 @@ namespace Stormancer
 		/// Creates an IObservable<Packet> instance that listen to events on the specified route.
 		/// \param A string containing the name of the route to listen to.
 		/// \return An IObservable<Packet> instance that fires each time a message is received on the route.
-		rxcpp::observable<Packetisp_ptr> onMessage(const std::string& routeName, MessageOriginFilter filter = MessageOriginFilter::Host, const std::map<std::string, std::string>& metadata = std::map<std::string, std::string>()) override;
+		rxcpp::observable<Packetisp_ptr> onMessage(const std::string& routeName, MessageOriginFilter filter = MessageOriginFilter::Host, const std::unordered_map<std::string, std::string>& metadata = std::unordered_map<std::string, std::string>()) override;
 
 		/// Get a vector containing the scene host connections.
 		/// \return A vector containing the scene host connections.
-		std::vector<IScenePeer*> remotePeers() const override;
+		std::vector<std::shared_ptr<IScenePeer>> remotePeers() const override;
 
 		/// Returns the peer connection to the host.
-		IScenePeer* host() const override;
+		std::shared_ptr<IScenePeer> host() const override;
 
 		const DependencyScope& dependencyResolver() const override;
 
@@ -112,7 +109,9 @@ namespace Stormancer
 
 		bool isHost() const override;
 
-		std::unordered_map<uint64, std::shared_ptr<IScenePeer>> connectedPeers() const override;
+		std::unordered_map<uint64, std::shared_ptr<IP2PScenePeer>> connectedPeers() const override;
+
+		Event<std::shared_ptr<IP2PScenePeer>> onPeerConnected() const override;
 
 		rxcpp::observable<P2PConnectionStateChangedArgs> p2pConnectionStateChanged() const override;
 
@@ -120,7 +119,10 @@ namespace Stormancer
 
 		pplx::task<std::shared_ptr<IP2PScenePeer>> openP2PConnection(const std::string& p2pToken, pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
 
-		const std::map<std::string, std::string>& getSceneMetadata() override;
+		const std::unordered_map<std::string, std::string>& getSceneMetadata() override;
+
+		std::shared_ptr<IP2PScenePeer> peerConnected(std::shared_ptr<IConnection> connection, std::shared_ptr<P2PService> P2P, P2PConnectToSceneMessage) override;
+
 #pragma endregion
 
 	private:
@@ -147,6 +149,8 @@ namespace Stormancer
 		/// Copy operator deleted.
 		Scene_Impl& operator=(const Scene_Impl& other) = delete;
 
+		void send(std::shared_ptr<IScenePeer> scenePeer, const std::string& routeName, const StreamWriter& streamWriter, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const std::string& channelIdentifier = "");
+
 		/// Creates an IObservable<Packet> instance that listen to events on the specified route.
 		/// \param route A pointer of the Route instance to listen to.
 		/// \return An IObservable<Packet> instance that fires each time a message is received on the route.
@@ -167,14 +171,12 @@ namespace Stormancer
 		template<typename T1, typename T2>
 		pplx::task<T1> sendSystemRequest(std::shared_ptr<IConnection> connection, byte id, const T2& parameter, pplx::cancellation_token ct = pplx::cancellation_token::none())
 		{
-			auto requestProcessor = _scope.resolve<RequestProcessor>();
-			return requestProcessor->sendSystemRequest<T1, T2>(connection.get(), id, parameter, ct);
+			return connection->sendSystemRequest<T1, T2>(id, parameter, ct);
 		}
 
 		//initializes the scene after construction
 		void initialize(DependencyScope& parentScope);
 	
-
 #pragma endregion
 
 #pragma region private_members
@@ -194,19 +196,19 @@ namespace Stormancer
 		byte _handle = 0;
 
 		/// Scene metadatas.
-		std::map<std::string, std::string> _metadata;
+		std::unordered_map<std::string, std::string> _metadata;
 
 		/// Scene address.
 		SceneAddress _address;
 
 		/// The local routes.
-		std::map<std::string, Route_ptr> _localRoutesMap;
+		std::unordered_map<std::string, Route_ptr> _localRoutes;
 
 		/// The remote routes.
-		std::map<std::string, Route_ptr> _remoteRoutesMap;
+		std::unordered_map<std::string, Route_ptr> _remoteRoutes;
 
 		/// Route handlers.
-		std::map<uint16, std::list<std::function<void(Packet_ptr)>>> _handlers;
+		std::unordered_map<uint16, std::list<std::function<void(Packet_ptr)>>> _handlers;
 
 		/// Owner client.
 		std::weak_ptr<Client> _client;
@@ -215,7 +217,7 @@ namespace Stormancer
 		std::vector<rxcpp::subscription> _subscriptions;
 
 		/// Scene peer connection
-		std::shared_ptr<IScenePeer> _host = nullptr;
+		std::shared_ptr<IScenePeer> _host;
 
 		/// Connection requested state (when not completed).
 		bool _connecting = false;
@@ -239,7 +241,8 @@ namespace Stormancer
 		rxcpp::subscription _hostConnectionStateSubscription;
 
 		rxcpp::subjects::subject<P2PConnectionStateChangedArgs> _p2pConnectionStateChangedObservable;
-		std::unordered_map<uint64, std::shared_ptr<IScenePeer>> _connectedPeers;
+		std::unordered_map<uint64, std::shared_ptr<IP2PScenePeer>> _connectedPeers;
+		Event<std::shared_ptr<IP2PScenePeer>> _onPeerConnected;
 
 		std::shared_ptr<P2PService> _p2p;
 
@@ -248,4 +251,4 @@ namespace Stormancer
 
 #pragma endregion
 	};
-};
+}

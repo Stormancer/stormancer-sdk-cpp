@@ -25,4 +25,4 @@ namespace Stormancer
 #else
 	using byte = uint8;
 #endif
-};
+}

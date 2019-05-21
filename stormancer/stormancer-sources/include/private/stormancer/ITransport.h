@@ -35,4 +35,4 @@ namespace Stormancer
 
 #pragma endregion
 	};
-};
+}

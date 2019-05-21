@@ -158,4 +158,4 @@ namespace Stormancer
 
 	template<>
 	pplx::task<void> RpcService::rpcImpl(rxcpp::observable<Packetisp_ptr> observable, const std::string& route, pplx::cancellation_token ct);
-};
+}

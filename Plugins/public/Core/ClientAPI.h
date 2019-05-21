@@ -10,8 +10,9 @@ namespace Stormancer
 	{
 	protected:
 
-		ClientAPI(std::weak_ptr<AuthenticationService> auth) :_auth(auth) {}
-
+		ClientAPI(std::weak_ptr<AuthenticationService> auth) : _auth(auth)
+		{
+		}
 
 		std::weak_ptr<TManager> weak_from_this()
 		{

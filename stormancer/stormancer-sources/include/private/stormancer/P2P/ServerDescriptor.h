@@ -2,8 +2,6 @@
 
 #include "stormancer/BuildConfig.h"
 
-
-
 namespace Stormancer
 {
 	class ServerDescriptor

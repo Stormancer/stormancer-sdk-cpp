@@ -20,4 +20,4 @@ namespace Stormancer
 		/// Schedule a single-shot task at a given time point
 		virtual void schedule(clock_type::time_point when, std::function<void()> work) = 0;
 	};
-};
+}

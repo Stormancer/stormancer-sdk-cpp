@@ -42,4 +42,4 @@ namespace Stormancer
 	{
 		builder.registerDependency<GameSession_Impl, IClient>().as<GameSession>().singleInstance();
 	}
-};
+}

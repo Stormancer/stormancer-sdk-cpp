@@ -21,58 +21,72 @@ namespace Stormancer
 
 #pragma region public_methods
 
-		virtual ~IConnection()
-		{
-		}
+		virtual ~IConnection() = default;
 
 		/// Sends a system msg to the remote peer.
 		/// \param streamWriter A function to write in the stream.
 		/// \param priority The priority of the message.
 		/// \param reliability The reliability of the message.
 		virtual void send(const StreamWriter& streamWriter, int channelUid, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const TransformMetadata& transformMetadata = TransformMetadata()) = 0;
-		
+
+		/// Sends a system request to the remote peer.
+		/// \param id System request ID (SystemRequestIDTypes).
+		/// \param T2 Parameters to send to the remote peer.
+		/// \param ct Cancellation token (default to none).
+		template<typename T1, typename T2>
+		pplx::task<T1> sendSystemRequest(byte id, const T2& parameter, pplx::cancellation_token ct = pplx::cancellation_token::none())
+		{
+			auto requestProcessor = dependencyResolver().resolve<RequestProcessor>();
+			return requestProcessor->sendSystemRequest<T1, T2>(this, id, parameter, ct);
+		}
+
 		/// Set the account id and the application name.
 		/// \param account The account id.
 		/// \param application The application name.
 		virtual void setApplication(std::string account, std::string application) = 0;
-		
+
 		/// Close the connection.
 		virtual void close(std::string reason = "") = 0;
-		
+
 		/// Returns the ip address of the remote peer.
 		virtual std::string ipAddress() const = 0;
-		
+
 		virtual int ping() const = 0;
-		
+
 		///Returns the unique id in the node for the connection.
 		virtual uint64 id() const = 0;
-		
+
 		virtual std::string key() const = 0;
 
 		/// Returns the connection date.
 		virtual time_t connectionDate() const = 0;
-		
+
 		/// Returns the account id of the application to which this connection is connected.
 		virtual const std::string& account() const = 0;
-		
+
 		/// Returns the id of the application to which this connection is connected.
 		virtual const std::string& application() const = 0;
 
-		virtual const std::map<std::string, std::string>& metadata() const = 0;
+		virtual const std::unordered_map<std::string, std::string>& metadata() const = 0;
+
 		virtual std::string metadata(const std::string& key) const = 0;
-		virtual void setMetadata(const std::map<std::string, std::string>& metadata) = 0;
+
+		virtual void setMetadata(const std::unordered_map<std::string, std::string>& metadata) = 0;
+
 		virtual void setMetadata(const std::string& key, const std::string& value) = 0;
+
 		virtual pplx::task<void> updatePeerMetadata(pplx::cancellation_token /*ct*/ = pplx::cancellation_token::none()) { return pplx::task_from_result(); }
-		
+
 		virtual const DependencyScope& dependencyResolver() const = 0;
 
 		/// Returns the connection state.
 		virtual ConnectionState getConnectionState() const = 0;
+
 		virtual rxcpp::observable<ConnectionState> getConnectionStateChangedObservable() const = 0;
 
 		virtual pplx::task<void> setTimeout(std::chrono::milliseconds /*timeout*/, pplx::cancellation_token /*ct*/ = pplx::cancellation_token::none()) { return pplx::task_from_result(); }
 
-		 Event<std::string> onClose;
+		Event<std::string> onClose;
 
 #pragma endregion
 
@@ -85,4 +99,4 @@ namespace Stormancer
 #pragma endregion
 
 	};
-};
+}

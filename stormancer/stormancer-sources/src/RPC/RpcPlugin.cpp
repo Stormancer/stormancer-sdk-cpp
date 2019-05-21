@@ -66,4 +66,4 @@ namespace Stormancer
 			rpcService->cancelAll("Scene disconnected");
 		}
 	}
-};
+}

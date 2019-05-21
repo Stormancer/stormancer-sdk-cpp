@@ -30,4 +30,4 @@ namespace Stormancer
 		ID_DISCONNECT_FROM_SCENE = 135,
 		ID_GET_SCENE_INFOS = 136
 	};
-};
+}

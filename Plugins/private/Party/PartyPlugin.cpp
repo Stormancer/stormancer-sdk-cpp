@@ -42,5 +42,4 @@ namespace Stormancer
 			return service;
 		}).singleInstance();
 	}
-
-};
+}

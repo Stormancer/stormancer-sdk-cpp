@@ -80,7 +80,7 @@ namespace Stormancer
 		return _serverConnection->application();
 	}
 
-	const std::map<std::string, std::string>& RelayConnection::metadata() const
+	const std::unordered_map<std::string, std::string>& RelayConnection::metadata() const
 	{
 		return _metadata;
 	}
@@ -98,7 +98,7 @@ namespace Stormancer
 		}
 	}
 
-	void RelayConnection::setMetadata(const std::map<std::string, std::string>& metadata)
+	void RelayConnection::setMetadata(const std::unordered_map<std::string, std::string>& metadata)
 	{
 		_metadata = metadata;
 	}

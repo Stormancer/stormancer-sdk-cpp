@@ -24,9 +24,9 @@ namespace Stormancer
 		time_t connectionDate() const override;
 		const std::string& account() const override;
 		const std::string& application() const override;
-		const std::map<std::string, std::string>& metadata() const override;
+		const std::unordered_map<std::string, std::string>& metadata() const override;
 		std::string metadata(const std::string& key) const override;
-		void setMetadata(const std::map<std::string, std::string>& metadata) override;
+		void setMetadata(const std::unordered_map<std::string, std::string>& metadata) override;
 		void setMetadata(const std::string& key, const std::string & value) override;
 		const DependencyScope& dependencyResolver() const override;
 		ConnectionState getConnectionState() const override;
@@ -38,7 +38,7 @@ namespace Stormancer
 	private:
 
 		std::shared_ptr<IConnection> _serverConnection;
-		std::map<std::string, std::string> _metadata;
+		std::unordered_map<std::string, std::string> _metadata;
 		std::string _p2pSessionId;
 		uint64 _remotePeerId;
 		std::string _ipAddress;

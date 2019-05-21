@@ -4,22 +4,27 @@
 #include "stormancer/P2P/P2PConnectToSceneMessage.h"
 #include "stormancer/IActionDispatcher.h"
 #include "stormancer/ChannelUidStore.h"
+#include "stormancer/SafeCapture.h"
 #include <sstream>
 
 namespace Stormancer
 {
-	P2PScenePeer::P2PScenePeer(std::weak_ptr<Scene> scene, std::shared_ptr<IConnection> connection, std::shared_ptr<P2PService> p2p, P2PConnectToSceneMessage message)
+	P2PScenePeer::P2PScenePeer(std::weak_ptr<Scene> scene, std::shared_ptr<IConnection> connection, std::shared_ptr<P2PService> p2pService, P2PConnectToSceneMessage message)
 		: _scene(scene)
 		, _connection(connection)
-		, _p2p(p2p)
+		, _p2pService(p2pService)
 		, _handle(message.sceneHandle)
-		, _metadata(message.metadata)
-
+		, _metadata(message.sceneMetadata)
 	{
 		if (!_connection)
 		{
 			throw std::runtime_error("Connection cannot be null");
 		}
+	}
+
+	uint64 P2PScenePeer::id() const
+	{
+		return _connection->id();
 	}
 
 	std::string P2PScenePeer::getSceneId() const
@@ -31,6 +36,27 @@ namespace Stormancer
 		}
 
 		return scene->id();
+	}
+
+	std::shared_ptr<IConnection> P2PScenePeer::connection() const
+	{
+		return _connection;
+	}
+
+	const std::unordered_map<std::string, Route_ptr>& P2PScenePeer::routes() const
+	{
+		return _routes;
+	}
+
+	void P2PScenePeer::send(const std::string& routeName, const StreamWriter& streamWriter, PacketPriority packetPriority, PacketReliability packetReliability, const std::string& channelIdentifier)
+	{
+		auto scene = LockOrThrow(_scene);
+		scene->send(routeName, streamWriter, packetPriority, packetReliability, channelIdentifier);
+	}
+
+	void P2PScenePeer::disconnect()
+	{
+		throw std::runtime_error("Not implemented");
 	}
 
 	pplx::task<std::shared_ptr<P2PTunnel>> P2PScenePeer::openP2PTunnel(const std::string& serverId, pplx::cancellation_token ct)
@@ -46,45 +72,11 @@ namespace Stormancer
 		{
 			options.set_cancellation_token(ct);
 		}
-		return _p2p->openTunnel((uint64)_connection->id(), scene->id() + "." + serverId, ct).then([](auto t) {
+
+		return _p2pService->openTunnel((uint64)_connection->id(), scene->id() + "." + serverId, ct)
+			.then([](pplx::task<std::shared_ptr<P2PTunnel>> t)
+		{
 			return t.get();
 		}, options);
 	}
-
-	void P2PScenePeer::send(const std::string& routeName, const StreamWriter& streamWriter, PacketPriority packetPriority, PacketReliability packetReliability)
-	{
-		auto scene = _scene.lock();
-		if (!scene)
-		{
-			throw std::runtime_error("Scene destroyed");
-		}
-		if (!mapContains(_remoteRoutesMap, routeName))
-		{
-			throw std::invalid_argument(std::string() + "The route '" + routeName + "' doesn't exist on the scene");
-		}
-
-		auto route = _remoteRoutesMap[routeName];
-		std::stringstream ss;
-		ss << "P2PScenePeer_" << scene->id() << "_" << routeName;
-		int channelUid = _connection->dependencyResolver().resolve<ChannelUidStore>()->getChannelUid(ss.str());
-		auto handle = _handle;
-		_connection->send([handle, &streamWriter](obytestream& stream) {
-			stream << handle;
-			// TODO: stream << routeHandle;
-			if (streamWriter)
-			{
-				streamWriter(stream);
-			}
-		}, channelUid, packetPriority, packetReliability);
-	}
-
-	uint64 P2PScenePeer::id()
-	{
-		return _connection->id();
-	}
-
-	void P2PScenePeer::disconnect()
-	{
-		throw std::runtime_error("Not implemented");
-	}
-};
+}

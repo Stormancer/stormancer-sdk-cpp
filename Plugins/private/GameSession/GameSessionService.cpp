@@ -59,38 +59,40 @@ namespace Stormancer
 		});
 	}
 
-	pplx::task<void> GameSessionService::initializeTunnel(std::string p2pToken, pplx::cancellation_token ct)
+	pplx::task<std::shared_ptr<Stormancer::IP2PScenePeer>> GameSessionService::initializeP2P(std::string p2pToken, bool openTunnel, pplx::cancellation_token ct)
 	{
 		ct = linkTokenToDisconnection(ct);
 		auto scene = _scene.lock();
 		if (!scene)
 		{
 			_logger->log(LogLevel::Error, "gamession.p2ptoken", "scene deleted");
-			return pplx::task_from_exception<void>(std::runtime_error("scene deleted"), ct);
+			return pplx::task_from_exception<std::shared_ptr<Stormancer::IP2PScenePeer>>(std::runtime_error("scene deleted"), ct);
 		}
 
 		_logger->log(LogLevel::Trace, "gamession.p2ptoken", "recieved p2p token");
 		if (_receivedP2PToken)
 		{
-			return pplx::task_from_result(pplx::task_options(ct));
+			return pplx::task_from_result<std::shared_ptr<Stormancer::IP2PScenePeer>>(nullptr, pplx::task_options(ct));
 		}
 
 		_receivedP2PToken = true;
 		_waitServerTce.set();
-		if (p2pToken.empty()) //host
+		if (p2pToken.empty()) // Host
 		{
 			_logger->log(LogLevel::Trace, "gamession.p2ptoken", "received empty p2p token: I'm the host.");
 			onRoleReceived("HOST");
 			_waitServerTce.set();
 			_tunnel = scene->registerP2PServer(GAMESESSION_P2P_SERVER_ID);
-			return pplx::task_from_result(pplx::task_options(ct));
+			return pplx::task_from_result<std::shared_ptr<IP2PScenePeer>>(nullptr, pplx::task_options(ct));
 		}
-		else //client
+		else // Client
 		{
 			_logger->log(LogLevel::Trace, "gamession.p2ptoken", "received valid p2p token: I'm a client.");
 
 			std::weak_ptr<GameSessionService> wThat = this->shared_from_this();
-			return scene->openP2PConnection(p2pToken, ct).then([wThat, ct](std::shared_ptr<Stormancer::IP2PScenePeer> p2pPeer) {
+			return scene->openP2PConnection(p2pToken, ct)
+				.then([wThat, ct, openTunnel](std::shared_ptr<IP2PScenePeer> p2pPeer)
+			{
 				auto that = wThat.lock();
 				if (that)
 				{
@@ -100,9 +102,10 @@ namespace Stormancer
 						that->_onConnectionOpened(p2pPeer);
 					}
 
-					if (that->shouldEstablishTunnel)
+					if (openTunnel)
 					{
-						return p2pPeer->openP2PTunnel(GAMESESSION_P2P_SERVER_ID, ct).then([wThat](std::shared_ptr<Stormancer::P2PTunnel> guestTunnel)
+						return p2pPeer->openP2PTunnel(GAMESESSION_P2P_SERVER_ID, ct)
+							.then([wThat, p2pPeer](std::shared_ptr<P2PTunnel> guestTunnel)
 						{
 							auto that = wThat.lock();
 							if (that)
@@ -110,22 +113,26 @@ namespace Stormancer
 								that->_tunnel = guestTunnel;
 								that->onTunnelOpened(guestTunnel);
 							}
+							return p2pPeer;
 						}, ct);
 					}
 					else
 					{
-						return pplx::task_from_exception<void>(std::runtime_error("Can't establish tunnel"), ct);
+						return pplx::task_from_result(p2pPeer, ct);
 					}
 				}
 				else
 				{
-					return pplx::task_from_exception<void>(std::runtime_error("Service destroyed"));
+					return pplx::task_from_exception<std::shared_ptr<IP2PScenePeer>>(std::runtime_error("Service destroyed"), ct);
 				}
-			}, ct).then([wThat](pplx::task<void> t) {
+			}, ct)
+				.then([wThat](pplx::task<std::shared_ptr<IP2PScenePeer>> t)
+			{
 				auto that = wThat.lock();
 				try
 				{
-					t.get();
+					auto p = t.get();
+					return p;
 				}
 				catch (const std::exception& ex)
 				{

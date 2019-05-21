@@ -44,4 +44,4 @@ namespace Stormancer
 		State state = ConnectionState::Disconnected;
 		std::string reason;
 	};
-};
+}

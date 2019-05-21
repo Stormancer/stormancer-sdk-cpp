@@ -27,15 +27,14 @@ namespace Stormancer
 	class STORMANCER_DLL_API Client : public IClient, public std::enable_shared_from_this<Client>
 	{
 		friend P2PRequestModule;
+
 	public:
 
 		/// The scene need to access some private methods of the client.
 		friend class Scene_Impl;
 		friend class IClient;
 
-
 #pragma region public_methods
-
 
 		pplx::task<std::shared_ptr<Scene>> connectToPublicScene(const std::string& sceneId, const SceneInitializer& initializer = SceneInitializer(), pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
 
@@ -64,8 +63,6 @@ namespace Stormancer
 		/// Get dependency resolver
 		DependencyScope& dependencyResolver() override;
 
-
-
 		/// Set a metadata
 		void setMedatata(const std::string& key, const std::string& value) override;
 
@@ -76,15 +73,10 @@ namespace Stormancer
 		pplx::task<void> setServerTimeout(std::chrono::milliseconds timeout, pplx::cancellation_token ct) override;
 
 		void clear();
+
 #pragma endregion
 
 	private:
-
-
-		pplx::task<Scene_ptr> getPublicScene(const std::string& sceneId, pplx::cancellation_token ct = pplx::cancellation_token::none());
-
-		pplx::task<Scene_ptr> getPrivateScene(const std::string& sceneToken, pplx::cancellation_token ct = pplx::cancellation_token::none());
-
 
 #pragma region private_classes
 
@@ -94,7 +86,8 @@ namespace Stormancer
 			bool connecting = false;
 			bool isPublic = true;
 			rxcpp::subscription stateChangedSubscription;
-			~ClientScene()
+
+			virtual ~ClientScene()
 			{
 				if (stateChangedSubscription.is_subscribed())
 				{
@@ -113,6 +106,8 @@ namespace Stormancer
 		Client& operator=(const Client& other) = delete;
 		~Client();
 		void initialize();
+		pplx::task<Scene_ptr> getPublicScene(const std::string& sceneId, pplx::cancellation_token ct = pplx::cancellation_token::none());
+		pplx::task<Scene_ptr> getPrivateScene(const std::string& sceneToken, pplx::cancellation_token ct = pplx::cancellation_token::none());
 		pplx::task<void> connectToScene(const Scene_ptr& sceneId, const std::string& sceneToken, const std::vector<Route_ptr>& localRoutes, pplx::cancellation_token ct = pplx::cancellation_token::none());
 		pplx::task<void> disconnect(std::string sceneId, bool fromServer, std::string reason = "");
 		pplx::task<void> disconnect(std::shared_ptr<IConnection> connection, uint8 sceneHandle, bool fromServer, std::string reason = "");
@@ -134,18 +129,13 @@ namespace Stormancer
 
 
 
+
 		pplx::task<void> ensureNetworkAvailable();
 
 		template<typename T1, typename T2>
-		pplx::task<T1> sendSystemRequest(std::shared_ptr<IConnection> peer, byte id, const T2& parameter, pplx::cancellation_token ct = pplx::cancellation_token::none())
+		pplx::task<T1> sendSystemRequest(std::shared_ptr<IConnection> connection, byte id, const T2& parameter, pplx::cancellation_token ct = pplx::cancellation_token::none())
 		{
-
-			if (!peer)
-			{
-				return pplx::task_from_exception<T1>(std::runtime_error("Peer disconnected"));
-			}
-			auto requestProcessor = _dependencyResolver.resolve<RequestProcessor>();
-			return requestProcessor->sendSystemRequest<T1, T2>(peer.get(), id, parameter, ct);
+			return connection->sendSystemRequest<T1, T2>(id, parameter, ct);
 		}
 
 #pragma endregion
@@ -161,7 +151,7 @@ namespace Stormancer
 
 		pplx::cancellation_token_source _cts;
 		uint16 _maxPeers = 0;
-		std::map<std::string, std::string> _metadata;
+		std::unordered_map<std::string, std::string> _metadata;
 		double _offset = 0;
 		std::unordered_map<std::string, ClientScene> _scenes;
 		std::mutex _scenesMutex;
@@ -183,4 +173,4 @@ namespace Stormancer
 
 #pragma endregion
 	};
-};
+}

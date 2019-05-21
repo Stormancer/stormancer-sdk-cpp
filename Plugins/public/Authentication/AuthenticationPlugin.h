@@ -12,4 +12,4 @@ namespace Stormancer
 		void registerClientDependencies(ContainerBuilder& builder) override;
 		void clientDisconnecting(std::shared_ptr<IClient> client) override;
 	};
-};
+}

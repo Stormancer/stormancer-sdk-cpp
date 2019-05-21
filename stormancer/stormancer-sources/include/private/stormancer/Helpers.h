@@ -5,7 +5,6 @@
 #include "stormancer/TimerThread.h"
 #include "stormancer/Utilities/TaskUtilities.h"
 #include <unordered_map>
-#include <map>
 #include <ctime>
 #include <vector>
 #include <sstream>
@@ -72,7 +71,29 @@ namespace Stormancer
 	}
 
 	template<typename TKey, typename TValue>
+	std::vector<TKey> mapKeys(const std::unordered_map<TKey, TValue>& map)
+	{
+		std::vector<TKey> container;
+		for (auto it = map.begin(); it != map.end(); ++it)
+		{
+			container.push_back(it->first);
+		}
+		return container;
+	}
+
+	template<typename TKey, typename TValue>
 	std::vector<TValue> mapValues(const std::map<TKey, TValue>& map)
+	{
+		std::vector<TValue> container;
+		for (auto it = map.begin(); it != map.end(); ++it)
+		{
+			container.push_back(it->second);
+		}
+		return container;
+	}
+
+	template<typename TKey, typename TValue>
+	std::vector<TValue> mapValues(const std::unordered_map<TKey, TValue>& map)
 	{
 		std::vector<TValue> container;
 		for (auto it = map.begin(); it != map.end(); ++it)

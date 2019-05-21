@@ -13,4 +13,4 @@ namespace Stormancer
 		auto auth = client->dependencyResolver().resolve<AuthenticationService>();
 		auth->logout();
 	}
-};
+}

@@ -7,21 +7,13 @@ namespace Stormancer
 	DefaultPacketDispatcher::DefaultPacketDispatcher(ILogger_ptr logger, bool asyncDispatch)
 		: _asyncDispatch(asyncDispatch)
 		, _logger(logger)
+		, _maxLayerCount(40)
 	{
 	}
 
 	DefaultPacketDispatcher::~DefaultPacketDispatcher()
 	{
-		for (auto pair : _handlers)
-		{
-			delete pair.second;
-		}
 		_handlers.clear();
-
-		for (auto processor : _defaultProcessors)
-		{
-			delete processor;
-		}
 		_defaultProcessors.clear();
 	}
 
@@ -29,7 +21,8 @@ namespace Stormancer
 	{
 		if (_asyncDispatch)
 		{
-			pplx::create_task([=]() {
+			pplx::create_task([this, packet]()
+			{
 				dispatchImpl(packet);
 			})
 				.then([this](pplx::task<void> t)
@@ -41,7 +34,6 @@ namespace Stormancer
 				catch (const std::exception& ex)
 				{
 					_logger->log(LogLevel::Error, "client.dispatchPacket", "Exception unhandled in dispatchPacketImpl :" + std::string(ex.what()));
-					
 				}
 			});
 		}
@@ -56,15 +48,15 @@ namespace Stormancer
 		bool processed = false;
 		int count = 0;
 		byte msgType = 0;
-		while (!processed && count < 40) // Max 40 layers
+
+		while (!processed && count < _maxLayerCount)
 		{
 			packet->stream >> msgType;
 			auto it = _handlers.find(msgType);
 
-			if (it!= _handlers.end())
+			if (it != _handlers.end())
 			{
-				
-				processed = (*(it->second))(packet);
+				processed = it->second(packet);
 				count++;
 			}
 			else
@@ -73,9 +65,9 @@ namespace Stormancer
 			}
 		}
 
-		for (auto processor : _defaultProcessors)
+		for (auto& processor : _defaultProcessors)
 		{
-			if ((*processor)(msgType, packet))
+			if (processor(msgType, packet))
 			{
 				processed = true;
 				break;
@@ -84,6 +76,7 @@ namespace Stormancer
 
 		if (!processed)
 		{
+			_logger->log(LogLevel::Warn, "Couldn't process message", "msgId: " + std::to_string(msgType));
 			//throw std::runtime_error((std::string("Couldn't process message. msgId: ") + std::to_string(msgType)).c_str());
 		}
 	}
@@ -93,4 +86,4 @@ namespace Stormancer
 		PacketProcessorConfig config(_handlers, _defaultProcessors);
 		processor->registerProcessor(config);
 	}
-};
+}

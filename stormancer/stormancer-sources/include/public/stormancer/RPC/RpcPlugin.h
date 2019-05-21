@@ -18,4 +18,4 @@ namespace Stormancer
 		void sceneDisconnected(std::shared_ptr<Scene> scene) override;
 
 	};
-};
+}

@@ -16,4 +16,4 @@ namespace Stormancer
 
 		virtual void registerProcessor(PacketProcessorConfig& config) = 0;
 	};
-};
+}

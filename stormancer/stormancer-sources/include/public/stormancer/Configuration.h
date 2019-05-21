@@ -5,8 +5,8 @@
 #include "stormancer/IPlugin.h"
 #include "stormancer/Logger/ILogger.h"
 #include "stormancer/StormancerTypes.h"
+#include <unordered_map>
 #include "stormancer/DependencyInjection.h"
-#include <map>
 #include <vector>
 #include <chrono>
 #include <string>
@@ -277,7 +277,7 @@ namespace Stormancer
 		/// Gets or sets the transport to be used by the client.
 		std::function<std::shared_ptr<ITransport>(const DependencyScope&)> transportFactory;
 
-		std::map<std::string, std::string> _metadata;
+		std::unordered_map<std::string, std::string> _metadata;
 
 		std::vector<IPlugin*> _plugins;
 
@@ -291,4 +291,4 @@ namespace Stormancer
 
 #pragma endregion
 	};
-};
+}

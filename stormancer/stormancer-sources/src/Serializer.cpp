@@ -24,4 +24,4 @@ namespace Stormancer
 	{
 		// do nothing
 	}
-};
+}

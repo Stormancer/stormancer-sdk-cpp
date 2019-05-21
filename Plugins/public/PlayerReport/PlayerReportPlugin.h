@@ -9,4 +9,4 @@ namespace Stormancer
 	public:
 		void registerSceneDependencies(ContainerBuilder& builder, std::shared_ptr<Scene> scene) override;
 	};
-};
+}

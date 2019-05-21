@@ -16,7 +16,7 @@ namespace Stormancer
 	public:
 		GameSession_Impl(std::weak_ptr<IClient> client);
 
-		pplx::task<GameSessionConnectionParameters> connectToGameSession(std::string token, std::string mapName = "", pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
+		pplx::task<GameSessionConnectionParameters> connectToGameSession(std::string token, std::string mapName = "", bool openTunnel = true, pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
 		pplx::task<void> setPlayerReady(const std::string& data, pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
 		pplx::task<Packetisp_ptr> postResult(const StreamWriter& streamWriter, pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
 		pplx::task<std::string> getUserFromBearerToken(const std::string& token) override;

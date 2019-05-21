@@ -22,6 +22,7 @@
 void Stormancer::Client::ConfigureContainer(ContainerBuilder& builder, Configuration_ptr config)
 {
 	std::weak_ptr<Stormancer::Client> weakThis = shared_from_this();
+
 	builder.registerDependency<Client>([weakThis](const DependencyScope&) { return weakThis.lock(); }).as<IClient>().asSelf().instancePerRequest();
 
 	builder.registerDependency<KeyStore>().singleInstance();
@@ -46,7 +47,8 @@ void Stormancer::Client::ConfigureContainer(ContainerBuilder& builder, Configura
 
 	builder.registerDependency<SceneDispatcher, IActionDispatcher>().singleInstance();
 
-	builder.registerDependency<SyncClock>([](const DependencyScope& scope) {
+	builder.registerDependency<SyncClock>([](const DependencyScope& scope)
+	{
 		return std::make_shared<SyncClock>(scope, scope.resolve<Configuration>()->synchronisedClockInterval);
 	}).singleInstance();
 
@@ -54,7 +56,8 @@ void Stormancer::Client::ConfigureContainer(ContainerBuilder& builder, Configura
 
 	builder.registerDependency<PacketTransformProcessor, AESPacketTransform>().singleInstance();
 
-	builder.registerDependency<IPacketDispatcher>([](const DependencyScope& scope) {
+	builder.registerDependency<IPacketDispatcher>([](const DependencyScope& scope)
+	{
 		auto dispatcher = scope.resolve<Configuration>()->dispatcher(scope);
 		dispatcher->addProcessor(scope.resolve<RequestProcessor>());
 		dispatcher->addProcessor(scope.resolve<SceneDispatcher>());
@@ -65,7 +68,8 @@ void Stormancer::Client::ConfigureContainer(ContainerBuilder& builder, Configura
 	
 	builder.registerDependency<AESPacketTransform, IAES, Configuration>();
 
-	builder.registerDependency<IAES>([](const DependencyScope& scope) {
+	builder.registerDependency<IAES>([](const DependencyScope& scope)
+	{
 
 
 #if defined(_WIN32)
@@ -80,7 +84,6 @@ void Stormancer::Client::ConfigureContainer(ContainerBuilder& builder, Configura
 #include "stormancer/Linux/AES/AES_Linux.h"
 		return std::make_shared<AESLinux>(scope.resolve<KeyStore>());
 #endif
-
 	}).singleInstance();
 
 	builder.registerDependency<ConnectionsRepository, ILogger>().as<IConnectionManager>().singleInstance();

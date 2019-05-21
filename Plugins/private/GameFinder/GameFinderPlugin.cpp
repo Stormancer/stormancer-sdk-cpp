@@ -30,4 +30,4 @@ namespace Stormancer
 	{
 		builder.registerDependency<GameFinder_Impl, AuthenticationService>().as<GameFinder>().singleInstance();
 	}
-};
+}

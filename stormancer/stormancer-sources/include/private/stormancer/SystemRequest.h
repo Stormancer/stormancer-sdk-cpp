@@ -40,4 +40,4 @@ namespace Stormancer
 	};
 
 	using SystemRequest_ptr = std::shared_ptr<SystemRequest>;
-};
+}
