@@ -13,7 +13,7 @@
 
 /// \file
 /// This is the dependency injection mechanism used by Stormancer.
-/// For a comprehensive, step-by-step guide, see (TODO sphinx page).
+/// For a comprehensive, step-by-step guide, see <a href="http://stormancer-docs.azurewebsites.net/cpp-client/dependency-injection.html">this page</a>.
 
 namespace Stormancer
 {
