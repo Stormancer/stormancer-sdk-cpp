@@ -19,76 +19,57 @@
 #include "stormancer/Client.h"
 #include "stormancer/IPacketDispatcher.h"
 
-void Stormancer::Client::ConfigureContainer(std::weak_ptr<DependencyResolver> wResolver, Configuration_ptr config)
+void Stormancer::Client::ConfigureContainer(ContainerBuilder& builder, Configuration_ptr config)
 {
-	auto resolver = wResolver.lock();
 	std::weak_ptr<Stormancer::Client> weakThis = shared_from_this();
+	builder.registerDependency<Client>([weakThis](const DependencyScope&) { return weakThis.lock(); }).as<IClient>().asSelf().instancePerRequest();
 
-	resolver->registerDependency<KeyStore>([](std::weak_ptr<DependencyResolver>) {
-		return std::make_shared<KeyStore>();
-	}, true);
+	builder.registerDependency<KeyStore>().singleInstance();
 
-	resolver->registerDependency<Configuration>(config);
+	builder.registerDependency<Configuration>(config);
 
-	resolver->registerDependency<ILogger>(config->logger);
+	builder.registerDependency<ILogger>(config->logger);
 
-	resolver->registerDependency<ITokenHandler>([](std::weak_ptr<DependencyResolver> resolver) {
-		return std::make_shared<TokenHandler>(resolver.lock()->resolve<ILogger>());
-	});
+	builder.registerDependency<TokenHandler, ILogger>().as<ITokenHandler>();
 
-	resolver->registerDependency<ApiClient>([=](std::weak_ptr<DependencyResolver> resolver) {
-		auto tokenHandler = resolver.lock()->resolve<ITokenHandler>();
-		return std::make_shared<ApiClient>(resolver.lock()->resolve<ILogger>(), config, tokenHandler);
-	}, true);
+	builder.registerDependency<ApiClient, ILogger, Configuration, ITokenHandler>().singleInstance();
 
-	resolver->registerDependency<Serializer>([](std::weak_ptr<DependencyResolver>) {
-		return std::make_shared<Serializer>();
-	}, true);
+	builder.registerDependency<Serializer>();
 
-	resolver->registerDependency<IScheduler>(config->scheduler);
+	builder.registerDependency<IScheduler>(config->scheduler);
 
-	resolver->registerDependency(config->transportFactory, true);
+	builder.registerDependency<ITransport>(config->transportFactory).singleInstance();
 
-	resolver->registerDependency<IActionDispatcher>(config->actionDispatcher);
+	builder.registerDependency<IActionDispatcher>(config->actionDispatcher);
 
-	resolver->registerDependency<P2PPacketDispatcher>([](std::weak_ptr<DependencyResolver> resolver) {
-		return std::make_shared<P2PPacketDispatcher>(resolver.lock()->resolve<P2PTunnels>(), resolver.lock()->resolve<IConnectionManager>(), resolver.lock()->resolve<ILogger>(), resolver.lock()->resolve<Serializer>());
-	}, true);
+	builder.registerDependency<P2PPacketDispatcher, P2PTunnels, IConnectionManager, ILogger, Serializer>().singleInstance();
 
-	resolver->registerDependency<SceneDispatcher>([](std::weak_ptr<DependencyResolver> resolver) {
-		return std::make_shared<SceneDispatcher>(resolver.lock()->resolve<IActionDispatcher>());
-	}, true);
+	builder.registerDependency<SceneDispatcher, IActionDispatcher>().singleInstance();
 
-	resolver->registerDependency<SyncClock>([=](std::weak_ptr<DependencyResolver> resolver) {
-		return std::make_shared<SyncClock>(resolver, config->synchronisedClockInterval);
-	}, true);
+	builder.registerDependency<SyncClock>([](const DependencyScope& scope) {
+		return std::make_shared<SyncClock>(scope, scope.resolve<Configuration>()->synchronisedClockInterval);
+	}).singleInstance();
 
-	resolver->registerDependency<RequestProcessor>([](std::weak_ptr<DependencyResolver> resolver) {
-		return std::make_shared<RequestProcessor>(resolver.lock()->resolve<ILogger>());
-	}, true);
+	builder.registerDependency<RequestProcessor, ILogger>().singleInstance();
 
-	resolver->registerDependency<PacketTransformProcessor>([](std::weak_ptr<DependencyResolver> resolver) {
-		return std::make_shared<PacketTransformProcessor>(resolver.lock()->resolve<AESPacketTransform>());
-	},true);
+	builder.registerDependency<PacketTransformProcessor, AESPacketTransform>().singleInstance();
 
-	resolver->registerDependency<IPacketDispatcher>([=](std::weak_ptr<DependencyResolver> resolver) {
-		auto dispatcher = config->dispatcher(resolver);
-		dispatcher->addProcessor(resolver.lock()->resolve<RequestProcessor>());
-		dispatcher->addProcessor(resolver.lock()->resolve<SceneDispatcher>());
-		dispatcher->addProcessor(resolver.lock()->resolve<P2PPacketDispatcher>());
-		dispatcher->addProcessor(resolver.lock()->resolve<PacketTransformProcessor>());
+	builder.registerDependency<IPacketDispatcher>([](const DependencyScope& scope) {
+		auto dispatcher = scope.resolve<Configuration>()->dispatcher(scope);
+		dispatcher->addProcessor(scope.resolve<RequestProcessor>());
+		dispatcher->addProcessor(scope.resolve<SceneDispatcher>());
+		dispatcher->addProcessor(scope.resolve<P2PPacketDispatcher>());
+		dispatcher->addProcessor(scope.resolve<PacketTransformProcessor>());
 		return dispatcher;
-	}, true);
+	}).singleInstance();
 	
-	resolver->registerDependency<AESPacketTransform>([](std::weak_ptr<DependencyResolver> resolver){
-		return std::make_shared<AESPacketTransform>(resolver.lock()->resolve<IAES>(), resolver.lock()->resolve<Configuration>());
-	}, false);
+	builder.registerDependency<AESPacketTransform, IAES, Configuration>();
 
-	resolver->registerDependency<IAES>([](std::weak_ptr<DependencyResolver> resolver) {
+	builder.registerDependency<IAES>([](const DependencyScope& scope) {
 
 
 #if defined(_WIN32)
-		return std::make_shared<AESWindows>(resolver.lock()->resolve<KeyStore>());
+		return std::make_shared<AESWindows>(scope.resolve<KeyStore>());
 
 
 
@@ -97,47 +78,18 @@ void Stormancer::Client::ConfigureContainer(std::weak_ptr<DependencyResolver> wR
 
 #else
 #include "stormancer/Linux/AES/AES_Linux.h"
-		return std::make_shared<AESLinux>(resolver.lock()->resolve<KeyStore>());
+		return std::make_shared<AESLinux>(scope.resolve<KeyStore>());
 #endif
 
-	}, true);
+	}).singleInstance();
 
-	resolver->registerDependency<IConnectionManager>([](std::weak_ptr<DependencyResolver> resolver) {
-		return std::make_shared<ConnectionsRepository>(resolver.lock()->resolve<ILogger>());
-	}, true);
+	builder.registerDependency<ConnectionsRepository, ILogger>().as<IConnectionManager>().singleInstance();
 
-	resolver->registerDependency<P2PSessions>([](std::weak_ptr<DependencyResolver> resolver) {
-		return std::make_shared<P2PSessions>(resolver.lock()->resolve<IConnectionManager>());
-	}, true);
+	builder.registerDependency<P2PSessions, IConnectionManager>().singleInstance();
 
-	resolver->registerDependency<P2PTunnels>([](std::weak_ptr<DependencyResolver> resolver) {
-		return std::make_shared<P2PTunnels>(
-			resolver.lock()->resolve<RequestProcessor>(),
-			resolver.lock()->resolve<IConnectionManager>(),
-			resolver.lock()->resolve<Serializer>(),
-			resolver.lock()->resolve<Configuration>(),
-			resolver.lock()->resolve<ILogger>());
-	}, true);
+	builder.registerDependency<P2PTunnels, RequestProcessor, IConnectionManager, Serializer, Configuration, ILogger>().singleInstance();
 
-	resolver->registerDependency<P2PService>([](std::weak_ptr<DependencyResolver> resolver) {
-		return std::make_shared<P2PService>(
-			resolver.lock()->resolve<IConnectionManager>(),
-			resolver.lock()->resolve<RequestProcessor>(),
-			resolver.lock()->resolve<ITransport>(),
-			resolver.lock()->resolve<Serializer>(),
-			resolver.lock()->resolve<P2PTunnels>()
-			);
-	}, true);
+	builder.registerDependency<P2PService, IConnectionManager, RequestProcessor, ITransport, Serializer, P2PTunnels>().singleInstance();
 
-	resolver->registerDependency<P2PRequestModule>([weakThis](std::weak_ptr<DependencyResolver> resolver) {
-		return std::make_shared<P2PRequestModule>(
-			resolver.lock()->resolve<ITransport>(),
-			resolver.lock()->resolve<IConnectionManager>(),
-			resolver.lock()->resolve<P2PSessions>(),
-			resolver.lock()->resolve<Serializer>(),
-			resolver.lock()->resolve<P2PTunnels>(),
-			resolver.lock()->resolve<ILogger>(),
-			resolver.lock()->resolve<Configuration>(),
-			weakThis);
-	}, true);
+	builder.registerDependency<P2PRequestModule, ITransport, IConnectionManager, P2PSessions, Serializer, P2PTunnels, ILogger, Configuration, Client>().singleInstance();
 }

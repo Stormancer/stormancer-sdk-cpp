@@ -10,7 +10,7 @@
 
 namespace Stormancer
 {
-	void LeaderboardPlugin::sceneCreated(std::shared_ptr<Scene> scene)
+	void LeaderboardPlugin::registerSceneDependencies(ContainerBuilder& builder, std::shared_ptr<Scene> scene)
 	{
 		if (scene)
 		{
@@ -18,18 +18,13 @@ namespace Stormancer
 
 			if (!name.empty())
 			{
-				auto service = std::make_shared<LeaderboardService>(scene);
-				scene->dependencyResolver()->registerDependency<LeaderboardService>(service);
+				builder.registerDependency<LeaderboardService, Scene>().singleInstance();
 			}
 		}
 	}
 
-	void LeaderboardPlugin::clientCreated(std::shared_ptr<IClient> client)
+	void LeaderboardPlugin::registerClientDependencies(ContainerBuilder& builder)
 	{
-		if (client)
-		{
-			client->dependencyResolver()->registerDependency<Leaderboard>([](std::weak_ptr<DependencyResolver> dr) {
-				return std::make_shared<Leaderboard_Impl>(dr.lock()->resolve<AuthenticationService>()); }, true);
-		}
+		builder.registerDependency<Leaderboard_Impl, AuthenticationService>().as<Leaderboard>().singleInstance();
 	}
 }

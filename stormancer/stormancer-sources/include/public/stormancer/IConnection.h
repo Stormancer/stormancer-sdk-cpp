@@ -6,7 +6,7 @@
 #include "stormancer/PacketPriority.h"
 #include "stormancer/ConnectionState.h"
 #include "stormancer/Streams/bytestream.h"
-#include "stormancer/DependencyResolver.h"
+#include "stormancer/DependencyInjection.h"
 #include "stormancer/Event.h"
 #include "stormancer/TransformMetadata.h"
 #include "rxcpp/rx.hpp"
@@ -64,7 +64,7 @@ namespace Stormancer
 		virtual void setMetadata(const std::string& key, const std::string& value) = 0;
 		virtual pplx::task<void> updatePeerMetadata(pplx::cancellation_token /*ct*/ = pplx::cancellation_token::none()) { return pplx::task_from_result(); }
 		
-		virtual std::shared_ptr<DependencyResolver> dependencyResolver() const= 0;
+		virtual const DependencyScope& dependencyResolver() const = 0;
 
 		/// Returns the connection state.
 		virtual ConnectionState getConnectionState() const = 0;

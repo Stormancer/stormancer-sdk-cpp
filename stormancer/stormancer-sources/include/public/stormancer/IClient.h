@@ -62,7 +62,7 @@ namespace Stormancer
 		/// Get the client's dependency resolver.
 		/// </summary>
 		/// <returns></returns>
-		virtual std::shared_ptr<DependencyResolver> dependencyResolver() = 0;
+		virtual DependencyScope& dependencyResolver() = 0;
 
 		/// <summary>
 		/// Set connection metadata.

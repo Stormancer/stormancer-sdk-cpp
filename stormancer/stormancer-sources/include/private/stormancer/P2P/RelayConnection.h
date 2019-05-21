@@ -28,7 +28,7 @@ namespace Stormancer
 		std::string metadata(const std::string& key) const override;
 		void setMetadata(const std::map<std::string, std::string>& metadata) override;
 		void setMetadata(const std::string& key, const std::string & value) override;
-		std::shared_ptr<DependencyResolver> dependencyResolver() const override;
+		const DependencyScope& dependencyResolver() const override;
 		ConnectionState getConnectionState() const override;
 		rxcpp::observable<ConnectionState> getConnectionStateChangedObservable() const override;
 		void setConnectionState(ConnectionState connectionState) override;
@@ -43,7 +43,7 @@ namespace Stormancer
 		uint64 _remotePeerId;
 		std::string _ipAddress;
 		time_t _connectionDate = nowTime_t();
-		std::shared_ptr<DependencyResolver> _dependencyResolver;
+		DependencyScope _dependencyResolver;
 		std::weak_ptr<Serializer> _serializer;
 	};
 }

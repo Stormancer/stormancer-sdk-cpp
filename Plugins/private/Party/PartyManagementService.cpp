@@ -11,12 +11,12 @@ namespace Stormancer
 	PartyManagementService::PartyManagementService(std::shared_ptr<Scene> scene)
 	{
 		_scene = scene;
-		_logger = scene->dependencyResolver()->resolve<ILogger>();
+		_logger = scene->dependencyResolver().resolve<ILogger>();
 	}
 
 	pplx::task<std::string> PartyManagementService::createParty(const PartyRequestDto& partyRequestDto)
 	{
-		auto rpc = _scene.lock()->dependencyResolver()->resolve<RpcService>();
+		auto rpc = _scene.lock()->dependencyResolver().resolve<RpcService>();
 		return rpc->rpc<std::string, PartyRequestDto>("partymanagement.createsession", partyRequestDto);
 	}
 

@@ -87,7 +87,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\BuildConfig.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Configuration.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\ConnectionState.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\DependencyResolver.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\DependencyInjection.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Event.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Exceptions.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\external\ctti\detail\algorithm.hpp" />
@@ -142,6 +142,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\MsgpackJsonAdaptor.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\StringUtilities.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\TaskUtilities.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\TypeReflection.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\AES\AESDecryptStream.cpp" />
@@ -158,7 +159,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Debug\StackWalker.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\DefaultPacketDispatcher.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\DefaultScheduler.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\DependencyResolver.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\DependencyInjection.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\dllmain.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Helpers.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\IActionDispatcher.cpp" />

@@ -10,7 +10,7 @@ namespace Stormancer
 	RpcService::RpcService(std::weak_ptr<Scene> scene, std::shared_ptr<IActionDispatcher> dispatcher)
 		: _dispatcher(dispatcher)
 		, _scene(scene)
-		, _logger(scene.lock()->dependencyResolver()->resolve<ILogger>())
+		, _logger(scene.lock()->dependencyResolver().resolve<ILogger>())
 	{
 	}
 

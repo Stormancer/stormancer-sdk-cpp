@@ -31,7 +31,7 @@ namespace Stormancer
 		Route_ptr route = _routeMapping[routeName];
 		std::stringstream ss;
 		ss << "ScenePeer_" << id() << "_" << routeName;
-		int channelUid = connection->dependencyResolver()->resolve<ChannelUidStore>()->getChannelUid(ss.str());
+		int channelUid = connection->dependencyResolver().resolve<ChannelUidStore>()->getChannelUid(ss.str());
 		auto sceneHandle = _sceneHandle;
 		connection->send([sceneHandle, route, &streamWriter](obytestream& stream) {
 			stream << sceneHandle;

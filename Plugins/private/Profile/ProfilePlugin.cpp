@@ -9,33 +9,20 @@
 
 namespace Stormancer
 {
-	ProfilePlugin::ProfilePlugin()
-	{
-	}
-
-	ProfilePlugin::~ProfilePlugin()
-	{
-	}
-
-	void ProfilePlugin::sceneCreated(std::shared_ptr<Scene> scene)
+	void ProfilePlugin::registerSceneDependencies(ContainerBuilder& builder, std::shared_ptr<Scene> scene)
 	{
 		if (scene)
 		{
 			auto name = scene->getHostMetadata("stormancer.profiles");
 			if (!name.empty())
 			{
-				std::shared_ptr<ProfileService> service = std::make_shared<ProfileService>(scene);
-				scene->dependencyResolver()->registerDependency<ProfileService>(service);
+				builder.registerDependency<ProfileService, Scene>().singleInstance();
 			}
 		}
 	}
 	
-	void ProfilePlugin::clientCreated(std::shared_ptr<IClient> client)
+	void ProfilePlugin::registerClientDependencies(ContainerBuilder& builder)
 	{
-		if (client)
-		{
-			client->dependencyResolver()->registerDependency<Profiles>([](std::weak_ptr<DependencyResolver> dr) {
-				return std::make_shared<Profiles_Impl>(dr.lock()->resolve<AuthenticationService>()); },true);
-		}
+		builder.registerDependency<Profiles_Impl, AuthenticationService>().as<Profiles>().singleInstance();
 	}
 };

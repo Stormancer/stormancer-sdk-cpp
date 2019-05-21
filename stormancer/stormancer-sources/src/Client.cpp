@@ -1,7 +1,7 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/Shutdown.h"
 #include "stormancer/Client.h"
-#include "stormancer/DependencyResolver.h"
+#include "stormancer/DependencyInjection.h"
 #include "stormancer/ApiClient.h"
 #include "stormancer/ITokenHandler.h"
 #include "stormancer/TokenHandler.h"
@@ -52,8 +52,7 @@ namespace Stormancer
 	// Client
 
 	Client::Client(Configuration_ptr config)
-		: _dependencyResolver(std::make_shared<DependencyResolver>())
-		, _initialized(false)
+		: _initialized(false)
 		, _accountId(config->account)
 		, _applicationName(config->application)
 		, _maxPeers(config->maxPeers)
@@ -103,12 +102,19 @@ namespace Stormancer
 		if (firstInit)
 		{
 			firstInit = false;
-			ConfigureContainer(_dependencyResolver, _config);
-			std::vector<std::shared_ptr<IRequestModule>> modules{ std::dynamic_pointer_cast<IRequestModule>(_dependencyResolver->resolve<P2PRequestModule>()) };
+			ContainerBuilder builder;
+			ConfigureContainer(builder, _config);
+			for (auto plugin : _plugins)
+			{
+				plugin->registerClientDependencies(builder);
+			}
+			_dependencyResolver = builder.build();
 
-			RequestProcessor::Initialize(_dependencyResolver->resolve<RequestProcessor>(), modules);
+			std::vector<std::shared_ptr<IRequestModule>> modules{ std::dynamic_pointer_cast<IRequestModule>(_dependencyResolver.resolve<P2PRequestModule>()) };
 
-			auto transport = _dependencyResolver->resolve<ITransport>();
+			RequestProcessor::Initialize(_dependencyResolver.resolve<RequestProcessor>(), modules);
+
+			auto transport = _dependencyResolver.resolve<ITransport>();
 			auto wClient = STRM_WEAK_FROM_THIS();
 			transport->onPacketReceived([wClient](Packet_ptr packet)
 			{
@@ -118,12 +124,12 @@ namespace Stormancer
 
 			logger()->log(LogLevel::Trace, "Client", "Starting transport", "port:" + std::to_string(_config->clientSDKPort) + "; maxPeers:" + std::to_string((uint16)_maxPeers + 1));
 
-			transport->start("client", _dependencyResolver->resolve<IConnectionManager>(), _cts.get_token(), _config->clientSDKPort, (uint16)_maxPeers + 1);
+			transport->start("client", _dependencyResolver.resolve<IConnectionManager>(), _dependencyResolver, _cts.get_token(), _config->clientSDKPort, (uint16)_maxPeers + 1);
 			for (auto plugin : _plugins)
 			{
 				plugin->transportStarted(transport);
 			}
-			_connections = _dependencyResolver->resolve< IConnectionManager>();
+			_connections = _dependencyResolver.resolve<IConnectionManager>();
 #if !defined(_WIN32)
 			if (!_config->endpointRootCertificates.empty())
 			{
@@ -177,7 +183,7 @@ namespace Stormancer
 			logger()->log(LogLevel::Trace, "Client", "Client created");
 
 			logger()->log(LogLevel::Trace, "Client", "Initializing client...");
-			auto transport = _dependencyResolver->resolve<ITransport>();
+			auto transport = _dependencyResolver.resolve<ITransport>();
 
 			_metadata["serializers"] = "msgpack/array";
 			_metadata["transport"] = transport->name();
@@ -190,11 +196,11 @@ namespace Stormancer
 			_metadata["protocol"] = "3";
 
 
-			auto actionDispatcher = _dependencyResolver->resolve<IActionDispatcher>();
+			auto actionDispatcher = _dependencyResolver.resolve<IActionDispatcher>();
 			actionDispatcher->start();
 			_disconnectionTce = pplx::task_completion_event<void>();
 			_initialized = true;
-			_dependencyResolver->resolve<IActionDispatcher>()->start();
+			_dependencyResolver.resolve<IActionDispatcher>()->start();
 
 			_cts = pplx::cancellation_token_source();
 			logger()->log(LogLevel::Trace, "Client", "Client initialized");
@@ -219,7 +225,7 @@ namespace Stormancer
 
 	ILogger_ptr Client::logger() const
 	{
-		auto result = _dependencyResolver->resolve<ILogger>();
+		auto result = _dependencyResolver.resolve<ILogger>();
 		if (result)
 		{
 			return result;
@@ -282,7 +288,7 @@ namespace Stormancer
 	{
 
 		Stormancer::SceneEndpoint sep;
-		auto tokenHandler = _dependencyResolver->resolve<ITokenHandler>();
+		auto tokenHandler = _dependencyResolver.resolve<ITokenHandler>();
 		if (sceneToken.substr(0, 1) == "{")
 		{
 			sep = tokenHandler->getSceneEndpointInfo(sceneToken);
@@ -433,7 +439,7 @@ namespace Stormancer
 					.then([wThat, address, ct](Federation fed)
 				{
 					auto client = LockOrThrow(wThat);
-					auto apiClient = client->_dependencyResolver->resolve<ApiClient>();
+					auto apiClient = client->_dependencyResolver.resolve<ApiClient>();
 					return apiClient->getSceneEndpoint(fed.getCluster(address.clusterId).endpoints, address.account, address.app, address.sceneId, ct);
 				}, ct)
 					.then([wThat, address, ct](SceneEndpoint sep)
@@ -493,7 +499,7 @@ namespace Stormancer
 			return pplx::task_from_exception<Scene_ptr>(std::runtime_error("Empty scene token."));
 		}
 		Stormancer::SceneEndpoint sep;
-		auto tokenHandler = _dependencyResolver->resolve<ITokenHandler>();
+		auto tokenHandler = _dependencyResolver.resolve<ITokenHandler>();
 		if (sceneToken.substr(0, 1) == "{")
 		{
 			sep = tokenHandler->getSceneEndpointInfo(sceneToken);
@@ -548,7 +554,7 @@ namespace Stormancer
 	pplx::task<std::shared_ptr<IConnection>> Client::ensureConnectedToServer(std::string clusterId, SceneEndpoint sceneEndpoint, pplx::cancellation_token ct)
 	{
 		ct = getLinkedCancellationToken(ct);
-		auto transport = _dependencyResolver->resolve<ITransport>();
+		auto transport = _dependencyResolver.resolve<ITransport>();
 		auto connections = _connections.lock();
 		if (!connections || !transport)
 		{
@@ -561,7 +567,7 @@ namespace Stormancer
 			/*return client->getFederation(ct).then([wClient, ct, id](Federation fed) {
 				auto cluster = fed.getCluster(id);
 				auto client = LockOrThrow(wClient);
-				auto api = client->dependencyResolver().lock()->resolve<ApiClient>();
+				auto api = client->dependencyResolver().resolve<ApiClient>();
 				return api->GetServerEndpoints(cluster.endpoints);
 			}).then([](ServerEndpoints endpoints) {
 
@@ -571,7 +577,7 @@ namespace Stormancer
 			try
 			{
 
-				auto transport = client->dependencyResolver()->resolve<ITransport>();
+				auto transport = client->dependencyResolver().resolve<ITransport>();
 				//Start transport and execute plugin event
 
 				//Protocol v1 is not supported anymore.
@@ -608,7 +614,7 @@ namespace Stormancer
 					if (client->_config->encryptionEnabled)
 					{
 						connection->setMetadata("encryption", sceneEndpoint.getTokenResponse.encryption.token);
-						auto keyStore = client->_dependencyResolver->resolve<KeyStore>();
+						auto keyStore = client->_dependencyResolver.resolve<KeyStore>();
 						auto key = utility::conversions::from_base64(utility::string_t(sceneEndpoint.getTokenResponse.encryption.key.begin(), sceneEndpoint.getTokenResponse.encryption.key.end()));
 						if (key.size() != 256 / 8)
 						{
@@ -633,7 +639,7 @@ namespace Stormancer
 					auto client = LockOrThrow(wClient);
 					if (client->_config->synchronisedClock)
 					{
-						client->_dependencyResolver->resolve<SyncClock>()->start(connection, client->_cts.get_token());
+						client->_dependencyResolver.resolve<SyncClock>()->start(connection, client->_cts.get_token());
 					}
 					return connection;
 				}, ct);
@@ -712,11 +718,8 @@ namespace Stormancer
 			auto sceneInfos = std::get<0>(tuple);
 			auto connection = std::get<1>(tuple);
 
-
 			Scene_ptr scene(new Scene_Impl(connection, wClient, sceneAddress, sep.token, sceneInfos, client->_dependencyResolver, client->_plugins), [](Scene_Impl* ptr) { delete ptr; });
-			scene->initialize();
-
-
+			scene->initialize(client->_dependencyResolver);
 			return scene;
 		}, ct);
 	}
@@ -770,7 +773,7 @@ namespace Stormancer
 		{
 			auto client = LockOrThrow(wClient);
 			scene->completeConnectionInitialization(result);
-			auto sceneDispatcher = client->_dependencyResolver->resolve<SceneDispatcher>();
+			auto sceneDispatcher = client->_dependencyResolver.resolve<SceneDispatcher>();
 			sceneDispatcher->addScene(serverConnection, scene);
 			scene->setConnectionState(ConnectionState::Connected);
 
@@ -836,7 +839,7 @@ namespace Stormancer
 
 	pplx::task<void> Client::disconnect(std::shared_ptr<IConnection> connection, uint8 sceneHandle, bool fromServer, std::string reason)
 	{
-		auto sceneDispatcher = _dependencyResolver->resolve<SceneDispatcher>();
+		auto sceneDispatcher = _dependencyResolver.resolve<SceneDispatcher>();
 		auto scene = sceneDispatcher->getScene(connection, sceneHandle);
 
 		return disconnect(scene, fromServer, reason);
@@ -864,7 +867,7 @@ namespace Stormancer
 
 		scene->setConnectionState(ConnectionState(ConnectionState::Disconnecting, reason));
 
-		auto sceneDispatcher = _dependencyResolver->resolve<SceneDispatcher>();
+		auto sceneDispatcher = _dependencyResolver.resolve<SceneDispatcher>();
 		auto connections = _connections.lock();
 
 		if (!sceneDispatcher || !connections)
@@ -967,20 +970,20 @@ namespace Stormancer
 			plugin->packetReceived(packet);
 		}
 
-		_dependencyResolver->resolve<IPacketDispatcher>()->dispatchPacket(packet);
+		_dependencyResolver.resolve<IPacketDispatcher>()->dispatchPacket(packet);
 	}
 
 	int64 Client::clock() const
 	{
-		return _dependencyResolver->resolve<SyncClock>()->clock();
+		return _dependencyResolver.resolve<SyncClock>()->clock();
 	}
 
 	int64 Client::lastPing() const
 	{
-		return _dependencyResolver->resolve<SyncClock>()->lastPing();
+		return _dependencyResolver.resolve<SyncClock>()->lastPing();
 	}
 
-	std::shared_ptr<DependencyResolver> Client::dependencyResolver()
+	DependencyScope& Client::dependencyResolver()
 	{
 		return _dependencyResolver;
 	}
@@ -995,7 +998,7 @@ namespace Stormancer
 
 	void Client::dispatchEvent(const std::function<void(void)>& ev)
 	{
-		auto actionDispatcher = _dependencyResolver->resolve<IActionDispatcher>();
+		auto actionDispatcher = _dependencyResolver.resolve<IActionDispatcher>();
 		if (!actionDispatcher->isRunning())
 		{
 			logger()->log(LogLevel::Error, "Client", "Trying to post an event while dispatcher isn't running");
@@ -1109,7 +1112,7 @@ namespace Stormancer
 		{
 			return pplx::task_from_exception<void>(std::runtime_error("Peer disconnected"));
 		}
-		auto requestProcessor = _dependencyResolver->resolve<RequestProcessor>();
+		auto requestProcessor = _dependencyResolver.resolve<RequestProcessor>();
 
 		pplx::task<std::string> task;
 		if (_sessionToken.empty())
@@ -1155,7 +1158,7 @@ namespace Stormancer
 	pplx::task<Federation> Client::getFederation(pplx::cancellation_token ct)
 	{
 		std::lock_guard<std::mutex> lg(_connectionMutex);
-		auto api = this->dependencyResolver()->resolve<ApiClient>();
+		auto api = this->dependencyResolver().resolve<ApiClient>();
 		return api->getFederation(_config->_serverEndpoints, ct);
 	}
 
@@ -1164,7 +1167,7 @@ namespace Stormancer
 		std::weak_ptr<Client> wClient = this->shared_from_this();
 		return getFederation(ct).then([clusterId, ct, wClient](Federation fed) {
 			auto client = LockOrThrow(wClient);
-			auto api = client->dependencyResolver()->resolve<ApiClient>();
+			auto api = client->dependencyResolver().resolve<ApiClient>();
 			auto cluster = fed.getCluster(clusterId);
 			return api->ping(cluster.endpoints.front(), ct);
 		});

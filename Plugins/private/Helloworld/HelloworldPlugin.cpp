@@ -3,7 +3,7 @@
 #include "Helloworld/Hello.h"
 #include "Helloworld/HelloService.h"
 
-void Helloworld::HelloworldPlugin::sceneCreated(std::shared_ptr<Stormancer::Scene> scene)
+void Helloworld::HelloworldPlugin::registerSceneDependencies(Stormancer::ContainerBuilder& builder, std::shared_ptr<Stormancer::Scene> scene)
 {
 	if (scene)
 	{
@@ -11,17 +11,12 @@ void Helloworld::HelloworldPlugin::sceneCreated(std::shared_ptr<Stormancer::Scen
 
 		if (!name.empty())
 		{
-			auto service = std::make_shared<Helloworld::HelloService>(scene);
-			scene->dependencyResolver()->registerDependency<Helloworld::HelloService>(service);
+			builder.registerDependency<Helloworld::HelloService, Stormancer::Scene>().singleInstance();
 		}
 	}
 }
 
-void Helloworld::HelloworldPlugin::clientCreated(std::shared_ptr<Stormancer::IClient> client)
+void Helloworld::HelloworldPlugin::registerClientDependencies(Stormancer::ContainerBuilder& builder)
 {
-	if (client)
-	{
-		client->dependencyResolver()->registerDependency<Helloworld::Hello>([](std::weak_ptr<Stormancer::DependencyResolver> dr) {
-			return std::make_shared<Helloworld::Hello>(dr.lock()->resolve<Stormancer::AuthenticationService>()); }, true);
-	}
+	builder.registerDependency<Helloworld::Hello, Stormancer::AuthenticationService>().singleInstance();
 }

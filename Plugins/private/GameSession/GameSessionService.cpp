@@ -5,7 +5,7 @@ namespace Stormancer
 {
 	GameSessionService::GameSessionService(std::weak_ptr<Scene> scene) :
 		_scene(scene),
-		_logger(scene.lock()->dependencyResolver()->resolve<ILogger>())
+		_logger(scene.lock()->dependencyResolver().resolve<ILogger>())
 	{
 	}
 
@@ -183,7 +183,7 @@ namespace Stormancer
 	{
 		if (auto scene = _scene.lock())
 		{
-			auto rpc = scene->dependencyResolver()->resolve<RpcService>();
+			auto rpc = scene->dependencyResolver().resolve<RpcService>();
 			return rpc->rpc<std::string, std::string>("GameSession.GetUserFromBearerToken", token);
 		}
 		else
@@ -197,7 +197,7 @@ namespace Stormancer
 		if (auto scene = _scene.lock())
 		{
 			ct = linkTokenToDisconnection(ct);
-			auto rpc = scene->dependencyResolver()->resolve<RpcService>();
+			auto rpc = scene->dependencyResolver().resolve<RpcService>();
 			return rpc->rpc<std::string, int>("GameSession.GetP2PToken", ct, 1);
 		}
 		else
@@ -215,7 +215,7 @@ namespace Stormancer
 			return pplx::task_from_exception<void>(std::runtime_error("Scene deleted"), ct);
 		}
 
-		auto rpc = scene->dependencyResolver()->resolve<RpcService>();
+		auto rpc = scene->dependencyResolver().resolve<RpcService>();
 		return rpc->rpc("gamesession.reset", ct);
 	}
 
@@ -260,7 +260,7 @@ namespace Stormancer
 			return pplx::task_from_exception<Packetisp_ptr>(std::runtime_error("Scene deleted"));
 		}
 
-		auto rpc = scene->dependencyResolver()->resolve<RpcService>();
+		auto rpc = scene->dependencyResolver().resolve<RpcService>();
 		return rpc->rpc<Packetisp_ptr>("gamesession.postresults", ct, streamWriter);
 	}
 }

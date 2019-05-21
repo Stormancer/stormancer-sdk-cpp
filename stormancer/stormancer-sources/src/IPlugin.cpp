@@ -10,6 +10,10 @@ namespace Stormancer
 	{
 	}
 
+	void IPlugin::registerClientDependencies(ContainerBuilder&)
+	{
+	}
+
 	void IPlugin::clientCreated(std::shared_ptr<IClient>)
 	{
 	}
@@ -18,7 +22,7 @@ namespace Stormancer
 	{
 	}
 
-	void IPlugin::registerSceneDependencies(std::shared_ptr<Scene>)
+	void IPlugin::registerSceneDependencies(ContainerBuilder&, std::shared_ptr<Scene>)
 	{
 	}
 

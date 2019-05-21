@@ -6,7 +6,7 @@ namespace Stormancer
 {
 	AuthenticationService::AuthenticationService(std::shared_ptr<IClient> client)
 		: _client(client)
-		, _logger(client->dependencyResolver()->resolve<ILogger>())
+		, _logger(client->dependencyResolver().resolve<ILogger>())
 	{
 
 	}
@@ -40,7 +40,7 @@ namespace Stormancer
 			setConnectionState(GameConnectionState::Disconnected);
 			return pplx::task_from_exception<std::shared_ptr<Scene>>(std::runtime_error("'Client destroyed."));
 		}
-		auto userActionDispatcher = client->dependencyResolver()->resolve<IActionDispatcher>();
+		auto userActionDispatcher = client->dependencyResolver().resolve<IActionDispatcher>();
 
 		return client->connectToPublicScene(SCENE_ID, [wThat](std::shared_ptr<Scene> scene) {
 
@@ -68,7 +68,7 @@ namespace Stormancer
 					}
 				});
 			}
-			scene->dependencyResolver()->resolve<RpcService>()->addProcedure("sendRequest", [wThat](RpcRequestContext_ptr ctx) {
+			scene->dependencyResolver().resolve<RpcService>()->addProcedure("sendRequest", [wThat](RpcRequestContext_ptr ctx) {
 				OperationCtx opCtx;
 				opCtx.request = ctx;
 				Serializer serializer;
@@ -115,7 +115,7 @@ namespace Stormancer
 				{
 					throw std::runtime_error("destroyed");
 				}
-				auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
+				auto rpcService = scene->dependencyResolver().resolve<RpcService>();
 				return rpcService->rpc<LoginResult>("Authentication.Login", ctx);
 
 			}).then([scene, wThat](LoginResult result) {
@@ -242,7 +242,7 @@ namespace Stormancer
 			{
 				if (auto client = _client.lock())
 				{
-					return pplx::create_task(tce, client->dependencyResolver()->resolve<IActionDispatcher>());
+					return pplx::create_task(tce, client->dependencyResolver().resolve<IActionDispatcher>());
 				}
 			}
 			return pplx::create_task(tce);
@@ -289,7 +289,7 @@ namespace Stormancer
 		return getAuthenticationScene()
 			.then([](std::shared_ptr<Scene> authScene)
 		{
-			auto rpcService = authScene->dependencyResolver()->resolve<RpcService>();
+			auto rpcService = authScene->dependencyResolver().resolve<RpcService>();
 			return rpcService->rpc<std::string>("sceneauthorization.getbearertoken");
 		});
 	}
@@ -299,7 +299,7 @@ namespace Stormancer
 		return getAuthenticationScene()
 			.then([token](std::shared_ptr<Scene> authScene)
 		{
-			auto rpcService = authScene->dependencyResolver()->resolve<RpcService>();
+			auto rpcService = authScene->dependencyResolver().resolve<RpcService>();
 			return rpcService->rpc<std::string, std::string>("sceneauthorization.getuserfrombearertoken", token);
 		});
 	}
@@ -319,7 +319,7 @@ namespace Stormancer
 		return getAuthenticationScene()
 			.then([pseudo](std::shared_ptr<Scene> authScene)
 		{
-			auto rpcService = authScene->dependencyResolver()->resolve<RpcService>();
+			auto rpcService = authScene->dependencyResolver().resolve<RpcService>();
 			return rpcService->rpc<std::string, std::string>("users.getuseridbypseudo", pseudo);
 		});
 	}
@@ -349,7 +349,7 @@ namespace Stormancer
 		return getAuthenticationScene()
 			.then([sceneId](std::shared_ptr<Scene> authScene)
 		{
-			auto rpcService = authScene->dependencyResolver()->resolve<RpcService>();
+			auto rpcService = authScene->dependencyResolver().resolve<RpcService>();
 			return rpcService->rpc<std::string, std::string>("sceneauthorization.gettoken", sceneId);
 		})
 			.then([wThat, builder](std::string token)
@@ -375,7 +375,7 @@ namespace Stormancer
 		return getAuthenticationScene(ct)
 			.then([serviceType, serviceName, ct](std::shared_ptr<Scene> authScene)
 		{
-			auto rpcService = authScene->dependencyResolver()->resolve<RpcService>();
+			auto rpcService = authScene->dependencyResolver().resolve<RpcService>();
 			return rpcService->rpc<std::string>("Locator.GetSceneConnectionToken", ct, serviceType, serviceName);
 		})
 			.then([wThat, ct](std::string token)

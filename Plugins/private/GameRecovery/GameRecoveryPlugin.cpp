@@ -9,7 +9,7 @@
 
 namespace Stormancer
 {
-	void GameRecoveryPlugin::sceneCreated(std::shared_ptr<Scene> scene)
+	void GameRecoveryPlugin::registerSceneDependencies(ContainerBuilder& builder, std::shared_ptr<Scene> scene)
 	{
 		if (scene)
 		{
@@ -17,18 +17,13 @@ namespace Stormancer
 
 			if (!name.empty())
 			{
-				auto service = std::make_shared<GameRecoveryService>(scene);
-				scene->dependencyResolver()->registerDependency<GameRecoveryService>(service);
+				builder.registerDependency<GameRecoveryService, Scene>().singleInstance();
 			}
 		}
 	}
 
-	void GameRecoveryPlugin::clientCreated(std::shared_ptr<IClient> client)
+	void GameRecoveryPlugin::registerClientDependencies(ContainerBuilder& builder)
 	{
-		if (client)
-		{
-			client->dependencyResolver()->registerDependency<GameRecovery>([](std::weak_ptr<DependencyResolver> dr) {
-				return std::make_shared<GameRecovery_Impl>(dr.lock()->resolve<AuthenticationService>()); },true);
-		}
+		builder.registerDependency<GameRecovery_Impl, AuthenticationService>().as<GameRecovery>().singleInstance();
 	}
 }

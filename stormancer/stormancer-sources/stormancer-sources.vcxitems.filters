@@ -315,9 +315,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\P2P\P2PTunnel.h">
       <Filter>Header Files\P2P</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\DependencyResolver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\RPC\RpcPlugin.h">
       <Filter>Header Files\RPC</Filter>
     </ClInclude>
@@ -462,6 +459,12 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\MsgpackJsonAdaptor.h">
       <Filter>Header Files\public\Utilities</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\DependencyInjection.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\TypeReflection.h">
+      <Filter>Header Files\public\Utilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Configuration.cpp">
@@ -471,9 +474,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\DefaultScheduler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\DependencyResolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\dllmain.cpp">
@@ -664,6 +664,9 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Utilities\StringUtilities.cpp">
       <Filter>Source Files\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\DependencyInjection.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

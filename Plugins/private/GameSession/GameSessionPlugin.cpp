@@ -5,18 +5,21 @@
 
 namespace Stormancer
 {
-	void GameSessionPlugin::sceneCreated(std::shared_ptr<Scene> scene)
+	void GameSessionPlugin::registerSceneDependencies(ContainerBuilder& builder, std::shared_ptr<Scene> scene)
 	{
 		if (scene)
 		{
 			auto name = scene->getHostMetadata("stormancer.gamesession");
 			if (name.length() > 0)
 			{
-				auto service = std::make_shared<GameSessionService>(scene);
-				service->initialize();
-				scene->dependencyResolver()->registerDependency<GameSessionService>(service);
+				builder.registerDependency<GameSessionService, Scene>().singleInstance();
 			}
 		}
+	}
+
+	void GameSessionPlugin::sceneCreated(std::shared_ptr<Scene> scene)
+	{
+		scene->dependencyResolver().resolve<GameSessionService>()->initialize();
 	}
 
 	void GameSessionPlugin::sceneDisconnecting(std::shared_ptr<Scene> scene)
@@ -26,7 +29,7 @@ namespace Stormancer
 			auto name = scene->getHostMetadata("stormancer.gamesession");
 			if (name.length() > 0)
 			{
-				auto gameSession = scene->dependencyResolver()->resolve<GameSessionService>();
+				auto gameSession = scene->dependencyResolver().resolve<GameSessionService>();
 				if (gameSession)
 				{
 					gameSession->onDisconnecting();
@@ -35,16 +38,8 @@ namespace Stormancer
 		}
 	}
 
-	void GameSessionPlugin::clientCreated(std::shared_ptr<IClient> client)
+	void GameSessionPlugin::registerClientDependencies(ContainerBuilder& builder)
 	{
-		if (client)
-		{
-			std::weak_ptr<IClient> wClient = client;
-			client->dependencyResolver()->registerDependency<GameSession>([wClient](std::weak_ptr<DependencyResolver> dr)
-			{
-				return std::make_shared<GameSession_Impl>(wClient);
-			}, true);
-
-		}
+		builder.registerDependency<GameSession_Impl, IClient>().as<GameSession>().singleInstance();
 	}
 };

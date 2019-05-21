@@ -49,7 +49,7 @@ namespace Stormancer
 	std::shared_ptr<std::vector<std::weak_ptr<Scene_Impl>>> SceneDispatcher::getHandles(const IConnection& connection)
 	{
 
-		return connection.dependencyResolver()->resolve<std::vector<std::weak_ptr<Scene_Impl>>>();
+		return connection.dependencyResolver().resolve<std::vector<std::weak_ptr<Scene_Impl>>>();
 	}
 
 	void SceneDispatcher::addScene(std::shared_ptr<IConnection> connection, Scene_ptr scene)

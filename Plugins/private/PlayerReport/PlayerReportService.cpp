@@ -9,7 +9,7 @@ namespace Stormancer
 	PlayerReportService::PlayerReportService(std::shared_ptr<Scene> scene)
 	{
 		_scene = scene;
-		_rpcService = scene->dependencyResolver()->resolve<RpcService>();
+		_rpcService = scene->dependencyResolver().resolve<RpcService>();
 	}
 
 	pplx::task<void> PlayerReportService::report(std::string type, std::string comments, std::string json, std::vector<AttachedFileDescriptor> files)

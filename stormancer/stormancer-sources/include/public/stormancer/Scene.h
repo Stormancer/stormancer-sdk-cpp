@@ -8,7 +8,7 @@
 #include "stormancer/P2P/IP2PScenePeer.h"
 #include "stormancer/ConnectionState.h"
 #include "stormancer/Packet.h"
-#include "stormancer/DependencyResolver.h"
+#include "stormancer/DependencyInjection.h"
 #include "rxcpp/rx.hpp"
 #include "stormancer/Tasks.h"
 #include "stormancer/Event.h"
@@ -121,7 +121,7 @@ namespace Stormancer
 		/// Returns the peer connection to the host.
 		virtual IScenePeer* host() const = 0;
 
-		virtual std::shared_ptr<DependencyResolver> dependencyResolver() const = 0;
+		virtual const DependencyScope& dependencyResolver() const = 0;
 
 		/// Fire when a packet is received in the scene. 
 		virtual Event<Packet_ptr> onPacketReceived() = 0;

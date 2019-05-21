@@ -7,7 +7,7 @@
 #include "stormancer/ITransport.h"
 #include "stormancer/Logger/ILogger.h"
 #include "stormancer/RakNet/RakNetConnection.h"
-#include "stormancer/DependencyResolver.h"
+#include "stormancer/DependencyInjection.h"
 #include "stormancer/IScheduler.h"
 
 namespace Stormancer
@@ -33,14 +33,14 @@ namespace Stormancer
 
 #pragma region public_methods
 
-		RakNetTransport(std::weak_ptr<DependencyResolver> resolver);
+		RakNetTransport(const DependencyScope& scope);
 		~RakNetTransport();
-		void start(std::string type, std::shared_ptr<IConnectionManager> handler, pplx::cancellation_token ct = pplx::cancellation_token::none(), uint16 maxConnections = 10, uint16 serverPort = 0) override;
+		void start(std::string type, std::shared_ptr<IConnectionManager> handler, const DependencyScope& parentScope, pplx::cancellation_token ct = pplx::cancellation_token::none(), uint16 maxConnections = 10, uint16 serverPort = 0) override;
 		pplx::task<std::shared_ptr<IConnection>> connect(std::string endpoint,std::string id, std::string parentId, pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
 		bool isRunning() const override;
 		std::string name() const override;
 		
-		std::weak_ptr<DependencyResolver> dependencyResolver() const override;
+		const DependencyScope& dependencyResolver() const override;
 		void onPacketReceived(std::function<void(Packet_ptr)> callback) override;
 		std::string host() const override;
 		uint16 port() const override;
@@ -56,7 +56,7 @@ namespace Stormancer
 #pragma region private_methods
 
 		void stop();
-		void initialize(uint16 maxConnections, uint16 serverPort = 0);
+		void initialize(uint16 maxConnections, uint16 serverPort, const DependencyScope& parentScope);
 		void run();
 		// This overload sets the request as completed after it has updated its ConnectionState.
 		std::shared_ptr<RakNetConnection> onConnection(RakNet::SystemAddress systemAddress, RakNet::RakNetGUID guid, uint64 peerId, const ConnectionRequest& request);
@@ -95,7 +95,7 @@ namespace Stormancer
 		};
 
 		bool _isRunning = false;
-		std::weak_ptr<DependencyResolver> _dependencyResolver;
+		DependencyScope _dependencyScope;
 		std::shared_ptr<IConnectionManager> _handler;
 		std::shared_ptr<RakNet::RakPeerInterface> _peer;
 		std::shared_ptr<ILogger> _logger;

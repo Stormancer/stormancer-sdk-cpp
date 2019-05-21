@@ -62,7 +62,7 @@ namespace Stormancer
 		int64 lastPing() const override;
 
 		/// Get dependency resolver
-		std::shared_ptr<DependencyResolver> dependencyResolver() override;
+		DependencyScope& dependencyResolver() override;
 
 
 
@@ -124,7 +124,7 @@ namespace Stormancer
 		void dispatchEvent(const std::function<void(void)>& ev);
 
 		pplx::cancellation_token getLinkedCancellationToken(pplx::cancellation_token ct);
-		void ConfigureContainer(std::weak_ptr<DependencyResolver> dr, Configuration_ptr config);
+		void ConfigureContainer(ContainerBuilder& builder, Configuration_ptr config);
 		// Request a session token from the server, or set it if we already have one (i.e in case of a reconnection)
 		// In case of failure, clear the session token and retry, at most numRetries times.
 		pplx::task<void> requestSessionToken(std::shared_ptr<IConnection> connection, int numRetries = 1, pplx::cancellation_token ct = pplx::cancellation_token::none());
@@ -144,7 +144,7 @@ namespace Stormancer
 			{
 				return pplx::task_from_exception<T1>(std::runtime_error("Peer disconnected"));
 			}
-			auto requestProcessor = _dependencyResolver->resolve<RequestProcessor>();
+			auto requestProcessor = _dependencyResolver.resolve<RequestProcessor>();
 			return requestProcessor->sendSystemRequest<T1, T2>(peer.get(), id, parameter, ct);
 		}
 
@@ -152,7 +152,7 @@ namespace Stormancer
 
 #pragma region private_members
 
-		std::shared_ptr<DependencyResolver> _dependencyResolver;
+		DependencyScope _dependencyResolver;
 
 		pplx::task<void> _currentTask = pplx::task_from_result();
 		bool _initialized = false;

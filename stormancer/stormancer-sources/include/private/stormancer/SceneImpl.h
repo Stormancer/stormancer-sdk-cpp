@@ -15,6 +15,7 @@
 #include "stormancer/P2P/P2PTunnel.h"
 #include "stormancer/P2P/P2PScenePeer.h"
 #include "stormancer/P2P/P2PConnectionStateChangedArgs.h"
+#include "stormancer/DependencyInjection.h"
 
 namespace Stormancer
 {
@@ -104,7 +105,7 @@ namespace Stormancer
 		/// Returns the peer connection to the host.
 		IScenePeer* host() const override;
 
-		std::shared_ptr<DependencyResolver> dependencyResolver() const override;
+		const DependencyScope& dependencyResolver() const override;
 
 		/// Fire when a packet is received in the scene. 
 		Event<Packet_ptr> onPacketReceived() override;
@@ -132,7 +133,7 @@ namespace Stormancer
 		/// \param id Scene id.
 		/// \param token Application token.
 		/// \param dto Scene informations.
-		Scene_Impl(std::weak_ptr<IConnection> connection, std::weak_ptr<Client> client, const SceneAddress& address, const std::string& token, const SceneInfosDto& dto, std::weak_ptr<DependencyResolver> parentDependencyResolver, std::vector<IPlugin*>& plugins);
+		Scene_Impl(std::weak_ptr<IConnection> connection, std::weak_ptr<Client> client, const SceneAddress& address, const std::string& token, const SceneInfosDto& dto, DependencyScope& parentScope, std::vector<IPlugin*>& plugins);
 
 		/// Copy constructor deleted.
 		Scene_Impl(const Scene& other) = delete;
@@ -166,19 +167,19 @@ namespace Stormancer
 		template<typename T1, typename T2>
 		pplx::task<T1> sendSystemRequest(std::shared_ptr<IConnection> connection, byte id, const T2& parameter, pplx::cancellation_token ct = pplx::cancellation_token::none())
 		{
-			auto requestProcessor = _dependencyResolver->resolve<RequestProcessor>();
+			auto requestProcessor = _scope.resolve<RequestProcessor>();
 			return requestProcessor->sendSystemRequest<T1, T2>(connection.get(), id, parameter, ct);
 		}
 
 		//initializes the scene after construction
-		void initialize();
+		void initialize(DependencyScope& parentScope);
 	
 
 #pragma endregion
 
 #pragma region private_members
 
-		std::shared_ptr<DependencyResolver> _dependencyResolver;
+		DependencyScope _scope;
 
 		/// Scene host
 		const bool _isHost = false;

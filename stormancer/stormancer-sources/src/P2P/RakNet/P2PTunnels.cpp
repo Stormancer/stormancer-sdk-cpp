@@ -255,7 +255,7 @@ namespace Stormancer
 			}
 			std::stringstream ss;
 			ss << "P2PTunnels_" << connection->id();
-			int channelUid = connection->dependencyResolver()->resolve<ChannelUidStore>()->getChannelUid(ss.str());
+			int channelUid = connection->dependencyResolver().resolve<ChannelUidStore>()->getChannelUid(ss.str());
 			connection->send([=](obytestream& stream) {
 				stream << (byte)MessageIDTypes::ID_P2P_TUNNEL;
 				stream << client->handle;

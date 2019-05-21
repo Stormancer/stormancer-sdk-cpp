@@ -8,7 +8,7 @@
 
 namespace Stormancer
 {
-	void OrganizationsPlugin::sceneCreated(std::shared_ptr<Scene> scene)
+	void OrganizationsPlugin::registerSceneDependencies(ContainerBuilder& builder, std::shared_ptr<Scene> scene)
 	{
 		if (scene)
 		{
@@ -16,20 +16,19 @@ namespace Stormancer
 
 			if (!name.empty())
 			{
-				auto service = std::make_shared<OrganizationsService>(scene);
-				scene->dependencyResolver()->registerDependency<OrganizationsService>(service);
+				builder.registerDependency<OrganizationsService, Scene>().singleInstance();
 			}
 		}
 	}
 
-	void OrganizationsPlugin::clientCreated(std::shared_ptr<IClient> client)
+	void OrganizationsPlugin::registerClientDependencies(ContainerBuilder& builder)
 	{
-		client->dependencyResolver()->registerDependency<Organizations>([](std::weak_ptr<DependencyResolver> dr)
+		builder.registerDependency<Organizations>([](const DependencyScope& scope)
 		{
-			auto authService = dr.lock()->resolve<AuthenticationService>();
+			auto authService = scope.resolve<AuthenticationService>();
 			auto organizations = std::make_shared<Organizations_Impl>(authService);
 			organizations->initialize();
 			return organizations;
-		}, true);
+		}).singleInstance();
 	}
 }

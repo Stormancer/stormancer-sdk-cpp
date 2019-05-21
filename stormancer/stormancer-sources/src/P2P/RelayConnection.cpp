@@ -11,7 +11,7 @@ namespace Stormancer
 		, _remotePeerId(remotePeerId)
 		, _ipAddress(address)
 		, _serializer(serializer)
-		, _dependencyResolver(std::make_shared<DependencyResolver>(serverConnection->dependencyResolver()))
+		, _dependencyResolver(serverConnection->dependencyResolver().beginLifetimeScope())
 	{
 	}
 
@@ -108,7 +108,7 @@ namespace Stormancer
 		_metadata[key] = value;
 	}
 
-	std::shared_ptr<DependencyResolver> RelayConnection::dependencyResolver() const
+	const DependencyScope& RelayConnection::dependencyResolver() const
 	{
 		return _dependencyResolver;
 	}

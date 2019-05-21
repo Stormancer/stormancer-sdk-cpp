@@ -68,6 +68,7 @@ namespace Stormancer
 		void test_disconnectWithReason();
 		void test_clean();
 		void test_Ping_Cluster();
+		void test_dependencyInjection();
 
 #pragma endregion
 

@@ -6,7 +6,7 @@
 
 namespace Stormancer
 {
-	void InAppNotificationPlugin::sceneCreated(std::shared_ptr<Scene> scene)
+	void InAppNotificationPlugin::registerSceneDependencies(ContainerBuilder& builder, std::shared_ptr<Scene> scene)
 	{
 		if (scene)
 		{
@@ -14,11 +14,11 @@ namespace Stormancer
 
 			if (!name.empty())
 			{
-				scene->dependencyResolver()->registerDependency<InAppNotificationService>([](auto dr) {
-					auto service = std::make_shared<InAppNotificationService>(dr.lock()->template resolve<Scene>());
+				builder.registerDependency<InAppNotificationService>([](const DependencyScope& dr) {
+					auto service = std::make_shared<InAppNotificationService>(dr.resolve<Scene>());
 					service->initialize();
 					return service;
-				}, true);
+				}).singleInstance();
 			}
 		}
 	}

@@ -8,6 +8,6 @@ namespace Stormancer
 	class AssetsStoragePlugin : public IPlugin
 	{
 	public:
-		void sceneCreated(std::shared_ptr<Scene> scene) override;
+		void registerSceneDependencies(ContainerBuilder& builder, std::shared_ptr<Scene> scene) override;
 	};
 };

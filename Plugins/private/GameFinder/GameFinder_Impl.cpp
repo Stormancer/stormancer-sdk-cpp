@@ -22,7 +22,7 @@ namespace Stormancer
 		std::shared_ptr<Scene> scene;
 		std::shared_ptr<GameFinderService> service()
 		{
-			return scene->dependencyResolver()->resolve<GameFinderService>();
+			return scene->dependencyResolver().resolve<GameFinderService>();
 		}
 
 		Subscription gameFoundSubscription;

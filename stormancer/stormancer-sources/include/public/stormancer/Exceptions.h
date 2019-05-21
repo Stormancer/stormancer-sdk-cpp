@@ -4,6 +4,7 @@
 
 #include <exception>
 #include <stdexcept>
+#include <string>
 
 namespace Stormancer
 {
@@ -20,5 +21,22 @@ namespace Stormancer
 			: std::runtime_error(message.c_str())
 		{
 		}
+	};
+
+	// This class does not inherit from runtime_error because of the issues we had with it on unreal and PS4
+	class DependencyResolutionException : public std::exception
+	{
+	public:
+		DependencyResolutionException(std::string message)
+			: _message(message)
+		{}
+
+		const char* what() const noexcept override
+		{
+			return _message.c_str();
+		}
+
+	private:
+		std::string _message;
 	};
 }

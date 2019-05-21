@@ -233,7 +233,7 @@ namespace Stormancer
 	{
 		return getParty().then([playerStatus](std::shared_ptr<PartyContainer> party)
 		{
-			auto partyService = party->getScene()->dependencyResolver()->resolve<PartyService>();
+			auto partyService = party->getScene()->dependencyResolver().resolve<PartyService>();
 			return partyService->updatePlayerStatus(playerStatus);
 		});
 	}
@@ -245,7 +245,7 @@ namespace Stormancer
 			partySettingsDto.customData = "{}";
 		}
 		return getParty().then([partySettingsDto](std::shared_ptr<PartyContainer> party) {
-			std::shared_ptr<PartyService> partyService = party->getScene()->dependencyResolver()->resolve<PartyService>();
+			std::shared_ptr<PartyService> partyService = party->getScene()->dependencyResolver().resolve<PartyService>();
 			return partyService->updatePartySettings(partySettingsDto);
 		});
 	}
@@ -253,7 +253,7 @@ namespace Stormancer
 	pplx::task<void> Party_Impl::updatePlayerData(std::string data)
 	{
 		return getParty().then([data](std::shared_ptr<PartyContainer> party) {
-			std::shared_ptr<PartyService> partyService = party->getScene()->dependencyResolver()->resolve<PartyService>();
+			std::shared_ptr<PartyService> partyService = party->getScene()->dependencyResolver().resolve<PartyService>();
 			partyService->updatePlayerData(data);
 		});
 	}
@@ -261,7 +261,7 @@ namespace Stormancer
 	pplx::task<bool> Party_Impl::PromoteLeader(std::string userId)
 	{
 		return getParty().then([userId](std::shared_ptr<PartyContainer> party) {
-			std::shared_ptr<PartyService> partyService = party->getScene()->dependencyResolver()->resolve<Stormancer::PartyService>();
+			std::shared_ptr<PartyService> partyService = party->getScene()->dependencyResolver().resolve<Stormancer::PartyService>();
 			return partyService->PromoteLeader(userId);
 		});
 	}
@@ -269,7 +269,7 @@ namespace Stormancer
 	pplx::task<bool> Party_Impl::kickPlayer(std::string userId)
 	{
 		return getParty().then([userId](std::shared_ptr<PartyContainer> party) {
-			std::shared_ptr<PartyService> partyService = party->getScene()->dependencyResolver()->resolve<Stormancer::PartyService>();
+			std::shared_ptr<PartyService> partyService = party->getScene()->dependencyResolver().resolve<Stormancer::PartyService>();
 			return partyService->KickPlayer(userId);
 		});
 	}
@@ -313,7 +313,7 @@ namespace Stormancer
 		try
 		{
 			std::weak_ptr<Party_Impl> wPartyManagement = this->shared_from_this();
-			auto partyService = scene->dependencyResolver()->resolve<PartyService>();
+			auto partyService = scene->dependencyResolver().resolve<PartyService>();
 			this->_partySceneConnectionStateSubscription = scene->getConnectionStateChangedObservable().subscribe([wPartyManagement](ConnectionState state) {
 				if (auto that = wPartyManagement.lock())
 				{

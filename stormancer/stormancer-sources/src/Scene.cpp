@@ -10,24 +10,21 @@
 
 namespace Stormancer
 {
-	Scene_Impl::Scene_Impl(std::weak_ptr<IConnection> connection, std::weak_ptr<Client> client, const SceneAddress& address, const std::string& token, const SceneInfosDto& dto, std::weak_ptr<DependencyResolver> parentDependencyResolver, std::vector<IPlugin*>& plugins)
-		: _dependencyResolver(std::make_shared<DependencyResolver>(parentDependencyResolver))
-		, _peer(connection)
+	Scene_Impl::Scene_Impl(std::weak_ptr<IConnection> connection, std::weak_ptr<Client> client, const SceneAddress& address, const std::string& token, const SceneInfosDto& dto, DependencyScope& parentScope, std::vector<IPlugin*>& plugins)
+		: _peer(connection)
 		, _token(token)
 		, _metadata(dto.Metadata)
 		, _address(address)
 		, _client(client)
-		, _logger(_dependencyResolver->resolve<ILogger>())
+		, _logger(parentScope.resolve<ILogger>())
 		, _plugins(plugins)
 	{
 		for (auto routeDto : dto.Routes)
 		{
 			_remoteRoutesMap[routeDto.Name] = std::make_shared<Route>(routeDto.Name, routeDto.Handle, MessageOriginFilter::Host, routeDto.Metadata);
 		}
-
-
 	}
-	void Scene_Impl::initialize()
+	void Scene_Impl::initialize(DependencyScope& parentScope)
 	{
 		_host = std::make_shared<ScenePeer>(_peer, _handle, _remoteRoutesMap, this->shared_from_this());
 		std::weak_ptr<Scene_Impl> wThat = this->shared_from_this();
@@ -58,7 +55,7 @@ namespace Stormancer
 			if (auto that = wThat.lock())
 			{
 				auto sceneState = that->getCurrentConnectionState();
-				auto actionDispatcher = that->dependencyResolver()->resolve<IActionDispatcher>();
+				auto actionDispatcher = that->dependencyResolver().resolve<IActionDispatcher>();
 				// We check the connection is disconnecting, and the scene is not already disconnecting or disconnected
 				if (state == ConnectionState::Disconnecting && sceneState != ConnectionState::Disconnecting && sceneState != ConnectionState::Disconnected)
 				{
@@ -107,12 +104,28 @@ namespace Stormancer
 
 				}
 			}
+		}, [](std::exception_ptr exptr) // on_error callback, added because the on_next above might throw
+		{
+			try
+			{
+				std::rethrow_exception(exptr);
+			}
+			catch (const std::exception&)
+			{
+				// Most likely invalidated DependencyScope because of dead Client...
+			}
 		});
 
-		for (auto plugin : this->_plugins)
+		_scope = parentScope.beginLifetimeScope([this](ContainerBuilder& builder)
 		{
-			plugin->registerSceneDependencies(this->shared_from_this());
-		}
+			auto weakThis = STRM_WEAK_FROM_THIS();
+			builder.registerDependency<Scene_Impl>([weakThis](const DependencyScope&) { return weakThis.lock(); }).as<Scene>().instancePerRequest();
+			for (auto plugin : this->_plugins)
+			{
+				plugin->registerSceneDependencies(builder, this->shared_from_this());
+			}
+		});
+
 		for (auto plugin : this->_plugins)
 		{
 			plugin->sceneCreated(this->shared_from_this());
@@ -325,11 +338,11 @@ namespace Stormancer
 		{
 			std::stringstream ss;
 			ss << "Scene_" << id() << "_" << routeName;
-			channelUid = peer->dependencyResolver()->resolve<ChannelUidStore>()->getChannelUid(ss.str());
+			channelUid = peer->dependencyResolver().resolve<ChannelUidStore>()->getChannelUid(ss.str());
 		}
 		else
 		{
-			channelUid = peer->dependencyResolver()->resolve<ChannelUidStore>()->getChannelUid(channelIdentifier);
+			channelUid = peer->dependencyResolver().resolve<ChannelUidStore>()->getChannelUid(channelIdentifier);
 		}
 		auto handle = _handle;
 		auto writer2 = [handle, route, &streamWriter](obytestream& stream) {
@@ -426,9 +439,9 @@ namespace Stormancer
 	}
 
 
-	std::shared_ptr<DependencyResolver> Scene_Impl::dependencyResolver() const
+	const DependencyScope& Scene_Impl::dependencyResolver() const
 	{
-		return _dependencyResolver;
+		return _scope;
 	}
 
 	void Scene_Impl::completeConnectionInitialization(ConnectionResult& cr)
@@ -509,15 +522,15 @@ namespace Stormancer
 
 	std::shared_ptr<P2PTunnel> Scene_Impl::registerP2PServer(const std::string & p2pServerId)
 	{
-		auto p2p = dependencyResolver()->resolve<P2PService>();
+		auto p2p = dependencyResolver().resolve<P2PService>();
 		return p2p->registerP2PServer(this->id() + "." + p2pServerId);
 	}
 
 	pplx::task<std::shared_ptr<IP2PScenePeer>> Scene_Impl::openP2PConnection(const std::string & p2pToken, pplx::cancellation_token ct)
 	{
-		auto p2pService = dependencyResolver()->resolve<P2PService>();
+		auto p2pService = dependencyResolver().resolve<P2PService>();
 		auto wScene = STRM_WEAK_FROM_THIS();
-		auto dispatcher = dependencyResolver()->resolve<IActionDispatcher>();
+		auto dispatcher = dependencyResolver().resolve<IActionDispatcher>();
 		auto options = pplx::task_options(dispatcher);
 		options.set_cancellation_token(ct);
 		return p2pService->openP2PConnection(_peer.lock(),p2pToken, ct)

@@ -3,22 +3,20 @@
 #include "stormancer/RPC/Service.h"
 #include "stormancer/IActionDispatcher.h"
 #include "stormancer/RPC/Constants.h"
+#include "stormancer/Helpers.h"
+#include "stormancer/SafeCapture.h"
+
 namespace Stormancer
 {
 	
 
-	void RpcPlugin::registerSceneDependencies(std::shared_ptr<Scene> scene)
+	void RpcPlugin::registerSceneDependencies(ContainerBuilder& sceneBuilder, std::shared_ptr<Scene> scene)
 	{
-		if (scene)
-		{
-			auto rpcParams = scene->getHostMetadata(Stormancer::rpc::pluginName);
+		auto rpcParams = scene->getHostMetadata(Stormancer::rpc::pluginName);
 
-			if (rpcParams == Stormancer::rpc::version)
-			{
-				scene->dependencyResolver()->registerDependency<RpcService>([=](std::weak_ptr<DependencyResolver> resolver) {
-					return std::make_shared<RpcService>(scene, resolver.lock()->resolve<IActionDispatcher>());
-				}, true);
-			}
+		if (rpcParams == Stormancer::rpc::version)
+		{
+			sceneBuilder.registerDependency<RpcService, Scene, IActionDispatcher>().singleInstance();
 		}
 	}
 
@@ -30,29 +28,29 @@ namespace Stormancer
 
 			if (rpcParams == Stormancer::rpc::version)
 			{
-				auto rpc = scene->dependencyResolver()->resolve<RpcService>();
+				std::weak_ptr<Scene> sceneWeak(scene);
 
-				scene->addRoute(Stormancer::rpc::nextRouteName, [scene](Packetisp_ptr p)
+				scene->addRoute(Stormancer::rpc::nextRouteName, [sceneWeak](Packetisp_ptr p)
 				{
-					auto rpcService = scene->dependencyResolver()->resolve<RpcService>().get();
+					auto rpcService = LockOrThrow(sceneWeak)->dependencyResolver().resolve<RpcService>().get();
 					rpcService->next(p);
 				});
 
-				scene->addRoute(Stormancer::rpc::cancellationRouteName, [scene](Packetisp_ptr p)
+				scene->addRoute(Stormancer::rpc::cancellationRouteName, [sceneWeak](Packetisp_ptr p)
 				{
-					auto rpcService = scene->dependencyResolver()->resolve<RpcService>().get();
+					auto rpcService = LockOrThrow(sceneWeak)->dependencyResolver().resolve<RpcService>().get();
 					rpcService->cancel(p);
 				});
 
-				scene->addRoute(Stormancer::rpc::errorRouteName, [scene](Packetisp_ptr p)
+				scene->addRoute(Stormancer::rpc::errorRouteName, [sceneWeak](Packetisp_ptr p)
 				{
-					auto rpcService = scene->dependencyResolver()->resolve<RpcService>().get();
+					auto rpcService = LockOrThrow(sceneWeak)->dependencyResolver().resolve<RpcService>().get();
 					rpcService->error(p);
 				});
 
-				scene->addRoute(Stormancer::rpc::completeRouteName, [scene](Packetisp_ptr p)
+				scene->addRoute(Stormancer::rpc::completeRouteName, [sceneWeak](Packetisp_ptr p)
 				{
-					auto rpcService = scene->dependencyResolver()->resolve<RpcService>().get();
+					auto rpcService = LockOrThrow(sceneWeak)->dependencyResolver().resolve<RpcService>().get();
 					rpcService->complete(p);
 				});
 			}
@@ -63,12 +61,9 @@ namespace Stormancer
 	{
 		if (scene)
 		{
-			auto dr = scene->dependencyResolver();
-			if (dr)
-			{
-				auto rpcService = dr->resolve<RpcService>();
-				rpcService->cancelAll("Scene disconnected");
-			}		
+			auto& dr = scene->dependencyResolver();
+			auto rpcService = dr.resolve<RpcService>();
+			rpcService->cancelAll("Scene disconnected");
 		}
 	}
 };

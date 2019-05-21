@@ -17,8 +17,8 @@ namespace Stormancer
 		, transportFactory(_defaultTransportFactory)
 		, scheduler(std::make_shared<DefaultScheduler>())
 	{
-		dispatcher = [](std::weak_ptr<DependencyResolver> dr) {
-			return std::make_shared<DefaultPacketDispatcher>(dr.lock()->resolve<ILogger>());
+		dispatcher = [](const DependencyScope& dr) {
+			return std::make_shared<DefaultPacketDispatcher>(dr.resolve<ILogger>());
 		};
 
 		addServerEndpoint(endpoint);
@@ -91,9 +91,9 @@ namespace Stormancer
 		return _serverEndpoints;
 	}
 
-	const std::function<std::shared_ptr<ITransport>(std::weak_ptr<DependencyResolver>)> Configuration::_defaultTransportFactory = [](std::weak_ptr<DependencyResolver> resolver)
+	const std::function<std::shared_ptr<ITransport>(const DependencyScope&)> Configuration::_defaultTransportFactory = [](const DependencyScope& scope)
 	{
-		return std::make_shared<RakNetTransport>(resolver);
+		return std::make_shared<RakNetTransport>(scope);
 	};
 
 	const bool Configuration::hasPublicIp()

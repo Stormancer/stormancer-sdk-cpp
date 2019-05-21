@@ -40,7 +40,7 @@ namespace Stormancer
 		{
 			return pplx::task_from_exception<std::shared_ptr<P2PTunnel>>(std::runtime_error("Unable to establish P2P tunnel: scene destroyed."), ct);
 		}
-		auto dispatcher = scene->dependencyResolver()->resolve<IActionDispatcher>();
+		auto dispatcher = scene->dependencyResolver().resolve<IActionDispatcher>();
 		pplx::task_options options(dispatcher);
 		if (ct.is_cancelable())
 		{
@@ -66,7 +66,7 @@ namespace Stormancer
 		auto route = _remoteRoutesMap[routeName];
 		std::stringstream ss;
 		ss << "P2PScenePeer_" << scene->id() << "_" << routeName;
-		int channelUid = _connection->dependencyResolver()->resolve<ChannelUidStore>()->getChannelUid(ss.str());
+		int channelUid = _connection->dependencyResolver().resolve<ChannelUidStore>()->getChannelUid(ss.str());
 		auto handle = _handle;
 		_connection->send([handle, &streamWriter](obytestream& stream) {
 			stream << handle;

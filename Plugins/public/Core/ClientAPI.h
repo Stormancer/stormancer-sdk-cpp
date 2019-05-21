@@ -98,7 +98,7 @@ namespace Stormancer
 
 			return _scene->then([wThat, initializer](std::shared_ptr<Scene> scene) {
 
-				auto service = scene->dependencyResolver()->resolve<TService>();
+				auto service = scene->dependencyResolver().resolve<TService>();
 				auto that = wThat.lock();
 				if (!that)
 				{
