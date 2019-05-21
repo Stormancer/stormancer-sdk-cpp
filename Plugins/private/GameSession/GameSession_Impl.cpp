@@ -325,6 +325,19 @@ namespace Stormancer
 		}, ct);
 	}
 
+
+	std::shared_ptr<Scene> GameSession_Impl::scene()
+	{
+		if (this->_currentGameSession.is_done())
+		{
+			return this->_currentGameSession.get()->scene;
+		}
+		else
+		{
+			return nullptr;
+		}
+	}
+
 	pplx::task<std::shared_ptr<GameSessionContainer>> GameSession_Impl::connectToGameSessionImpl(std::string token, pplx::cancellation_token ct)
 	{
 		std::weak_ptr<GameSession_Impl> wThat = this->shared_from_this();

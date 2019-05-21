@@ -44,5 +44,10 @@ namespace Stormancer
 		virtual Subscription subscribeOnGameSessionConnectionChange(std::function<void(ConnectionState)> callback) = 0;
 		virtual Subscription subscribeOnShutdownRecieved(std::function<void()> callback) = 0;
 		virtual Subscription subscribeOnPlayerChanged(std::function<void(SessionPlayer, std::string)> callback) = 0;
+
+		virtual std::shared_ptr<Scene> scene() = 0;
+
+		Event<std::shared_ptr<Scene>> onConnectingToScene;
+		Event<std::shared_ptr<Scene>> onDisconnectingFromScene;
 	};
 }

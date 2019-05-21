@@ -51,7 +51,7 @@ void Stormancer::Client::ConfigureContainer(ContainerBuilder& builder, Configura
 	{
 		return std::make_shared<SyncClock>(scope, scope.resolve<Configuration>()->synchronisedClockInterval);
 	}).singleInstance();
-
+	builder.registerDependency<std::vector<std::weak_ptr<Scene_Impl>>>().singleInstance();
 	builder.registerDependency<RequestProcessor, ILogger>().singleInstance();
 
 	builder.registerDependency<PacketTransformProcessor, AESPacketTransform>().singleInstance();

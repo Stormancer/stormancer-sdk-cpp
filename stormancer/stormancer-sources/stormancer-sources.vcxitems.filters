@@ -453,18 +453,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ConnectToSceneMsg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\P2P\P2PConnectToSceneMessage.h">
-      <Filter>Header Files\P2P</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\RouteDto.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\DependencyInjection.h">
-      <Filter>Header Files\public</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\TypeReflection.h">
-      <Filter>Header Files\public\Utilities</Filter>
-    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\P2PConnectToSceneMessage.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\RouteDto.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\DependencyResolver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Configuration.cpp">
@@ -665,8 +656,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Utilities\StringUtilities.cpp">
       <Filter>Source Files\Utilities</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\DependencyInjection.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\DependencyResolver.cpp" />
   </ItemGroup>
 </Project>

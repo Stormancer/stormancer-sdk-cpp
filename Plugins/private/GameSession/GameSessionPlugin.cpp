@@ -25,6 +25,7 @@ namespace Stormancer
 			if (name.length() > 0)
 			{
 				scene->dependencyResolver().resolve<GameSessionService>()->initialize();
+				scene->dependencyResolver().resolve<GameSession>()->onConnectingToScene(scene);
 			}
 		}
 	}
@@ -39,6 +40,7 @@ namespace Stormancer
 				auto gameSession = scene->dependencyResolver().resolve<GameSessionService>();
 				if (gameSession)
 				{
+					scene->dependencyResolver().resolve<GameSession>()->onDisconnectingFromScene(scene);
 					gameSession->onDisconnecting();
 				}
 			}
@@ -49,4 +51,4 @@ namespace Stormancer
 	{
 		builder.registerDependency<GameSession_Impl, IClient>().as<GameSession>().singleInstance();
 	}
-}
+};

@@ -29,6 +29,7 @@ namespace Stormancer
 		Subscription subscribeOnShutdownRecieved(std::function<void()> callback) override;
 		Subscription subscribeOnPlayerChanged(std::function<void(SessionPlayer, std::string)> callback) override;
 
+		std::shared_ptr<Scene> scene() override;
 	private:
 
 		//Events
