@@ -23,7 +23,14 @@ namespace Stormancer
 
 	void GameFinderPlugin::sceneCreated(std::shared_ptr<Scene> scene)
 	{
-		scene->dependencyResolver().resolve<GameFinderService>()->initialize();
+		if (scene)
+		{
+			auto name = scene->getHostMetadata("stormancer.plugins.gamefinder");
+			if (!name.empty())
+			{
+				scene->dependencyResolver().resolve<GameFinderService>()->initialize();
+			}
+		}
 	}
 
 	void GameFinderPlugin::registerClientDependencies(ContainerBuilder& builder)

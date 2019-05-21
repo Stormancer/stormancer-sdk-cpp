@@ -19,7 +19,14 @@ namespace Stormancer
 
 	void GameSessionPlugin::sceneCreated(std::shared_ptr<Scene> scene)
 	{
-		scene->dependencyResolver().resolve<GameSessionService>()->initialize();
+		if (scene)
+		{
+			auto name = scene->getHostMetadata("stormancer.gamesession");
+			if (name.length() > 0)
+			{
+				scene->dependencyResolver().resolve<GameSessionService>()->initialize();
+			}
+		}
 	}
 
 	void GameSessionPlugin::sceneDisconnecting(std::shared_ptr<Scene> scene)
