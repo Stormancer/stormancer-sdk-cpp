@@ -84,11 +84,14 @@ namespace Stormancer
 					connectToSceneResponse.sceneHandle = scene->handle();
 					for (auto r : scene->localRoutes())
 					{
-						RouteDto routeDto;
-						routeDto.Handle = r->handle();
-						routeDto.Name = r->name();
-						routeDto.Metadata = r->metadata();
-						connectToSceneResponse.routes << routeDto;
+						if ((byte)r->filter() & (byte)MessageOriginFilter::Peer)
+						{
+							RouteDto routeDto;
+							routeDto.Handle = r->handle();
+							routeDto.Name = r->name();
+							routeDto.Metadata = r->metadata();
+							connectToSceneResponse.routes << routeDto;
+						}
 					}
 					connectToSceneResponse.connectionMetadata = ctx->packet()->connection->metadata();
 					connectToSceneResponse.sceneMetadata = scene->getSceneMetadata();

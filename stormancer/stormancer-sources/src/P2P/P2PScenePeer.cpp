@@ -16,6 +16,11 @@ namespace Stormancer
 		, _handle(message.sceneHandle)
 		, _metadata(message.sceneMetadata)
 	{
+		for (auto r : message.routes)
+		{
+			_routes.insert({ r.Name, std::make_shared<Route>(r.Name, r.Handle, MessageOriginFilter::Peer, r.Metadata) });
+		}
+
 		if (!_connection)
 		{
 			throw std::runtime_error("Connection cannot be null");
