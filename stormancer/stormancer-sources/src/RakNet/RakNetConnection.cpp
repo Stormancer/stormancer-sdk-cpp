@@ -23,8 +23,7 @@ namespace Stormancer
 		std::string key,
 		std::weak_ptr<RakNet::RakPeerInterface> peer,
 		ILogger_ptr logger,
-		DependencyScope& parentScope,
-		std::function<void(ContainerBuilder& builder)> additionalDependencies
+		DependencyScope& parentScope
 	)
 		: _id(id)
 		, _key(key)
@@ -50,9 +49,8 @@ namespace Stormancer
 		
 		_connectionStateObservable.get_observable().subscribe(onNext, onError);
 
-		_dependencyScope = parentScope.beginLifetimeScope([&additionalDependencies](ContainerBuilder& builder)
+		_dependencyScope = parentScope.beginLifetimeScope([](ContainerBuilder& builder)
 		{
-			additionalDependencies(builder);
 			builder.registerDependency<ChannelUidStore>().singleInstance();
 		});
 	}

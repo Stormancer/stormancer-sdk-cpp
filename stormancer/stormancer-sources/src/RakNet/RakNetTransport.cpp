@@ -671,11 +671,7 @@ namespace Stormancer
 		if (_peer)
 		{
 			int64 cid = peerId;
-			auto dependencyRegistrar = [](ContainerBuilder& )
-			{
-				
-			};
-			auto connection = std::shared_ptr<RakNetConnection>(new RakNetConnection(raknetGuid, cid, key, _peer, _logger, _dependencyScope, dependencyRegistrar), deleter<RakNetConnection>());
+			auto connection = std::shared_ptr<RakNetConnection>(new RakNetConnection(raknetGuid, cid, key, _peer, _logger, _dependencyScope), deleter<RakNetConnection>());
 			RakNet::RakNetGUID guid(connection->guid());
 			auto logger = _logger;
 			std::weak_ptr<RakNet::RakPeerInterface> weakPeer = _peer;

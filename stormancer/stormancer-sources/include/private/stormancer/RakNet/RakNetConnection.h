@@ -26,8 +26,7 @@ namespace Stormancer
 			std::string key,
 			std::weak_ptr<RakNet::RakPeerInterface> peer,
 			ILogger_ptr logger,
-			DependencyScope& parentScope,
-			std::function<void(ContainerBuilder& builder)> additionalDependencies
+			DependencyScope& parentScope
 		);
 		~RakNetConnection();
 		uint64 id() const override;
