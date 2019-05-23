@@ -56,7 +56,7 @@ namespace Stormancer
 		_handler = handler;
 		initialize(maxConnections, serverPort, parentScope);
 
-		auto wTransport = STRM_WEAK_FROM_THIS();
+		auto wTransport = STORM_WEAK_FROM_THIS();
 
 		_scheduler->schedulePeriodic(15, [wTransport]()
 		{
@@ -89,7 +89,7 @@ namespace Stormancer
 			rakNetLogger->StartLog("packetLogs");
 #endif
 
-			auto wTransport = STRM_WEAK_FROM_THIS();
+			auto wTransport = STORM_WEAK_FROM_THIS();
 			_peer = std::shared_ptr<RakNet::RakPeerInterface>(RakNet::RakPeerInterface::GetInstance(), [wTransport](RakNet::RakPeerInterface* peer)
 			{
 				if (auto transport = wTransport.lock())
@@ -799,7 +799,7 @@ namespace Stormancer
 		std::vector<pplx::task<bool>> tasks;
 		for (int i = 0; i < nb; i++)
 		{
-			auto wTransport = STRM_WEAK_FROM_THIS();
+			auto wTransport = STORM_WEAK_FROM_THIS();
 			auto pingImplTask = taskDelay(std::chrono::milliseconds(300 * i), cts.get_token())
 				.then([wTransport, address]()
 			{
@@ -850,7 +850,7 @@ namespace Stormancer
 			}
 		});
 
-		auto wTransport = STRM_WEAK_FROM_THIS();
+		auto wTransport = STORM_WEAK_FROM_THIS();
 		return cancel_after_timeout(eventSetTask, cts, 1500)
 			.then([wTransport, address](pplx::task<int> t)
 		{

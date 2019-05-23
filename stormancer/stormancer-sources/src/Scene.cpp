@@ -119,7 +119,7 @@ namespace Stormancer
 
 		_scope = parentScope.beginLifetimeScope([this](ContainerBuilder& builder)
 		{
-			auto weakThis = STRM_WEAK_FROM_THIS();
+			auto weakThis = STORM_WEAK_FROM_THIS();
 			builder.registerDependency<Scene_Impl>([weakThis](const DependencyScope&) { return weakThis.lock(); }).as<Scene>().instancePerRequest();
 			for (auto plugin : this->_plugins)
 			{
@@ -299,11 +299,11 @@ namespace Stormancer
 				}
 			});
 			route->handlers.push_back(handler);
-			auto it = route->handlers.end();
-			it--;
-			subscriber.add([route, it]()
+			auto handlerIt = route->handlers.end();
+			handlerIt--;
+			subscriber.add([route, handlerIt]()
 			{
-				route->handlers.erase(it);
+				route->handlers.erase(handlerIt);
 			});
 		});
 
@@ -375,7 +375,7 @@ namespace Stormancer
 
 		if (routeIt == remoteRoutes.end())
 		{
-			throw std::invalid_argument(std::string() + "The route '" + routeName + "' doesn't exist on in the ScenePeer");
+			throw std::invalid_argument(std::string() + "The route '" + routeName + "' doesn't exist in the ScenePeer");
 		}
 
 		auto route = routeIt->second;
@@ -405,7 +405,7 @@ namespace Stormancer
 				streamWriter(stream);
 			}
 		};
-		TransformMetadata transformMetadata{ STRM_WEAK_FROM_THIS() };
+		TransformMetadata transformMetadata{ STORM_WEAK_FROM_THIS() };
 		connection->send(streamWriter2, channelUid, priority, reliability, transformMetadata);
 	}
 
@@ -512,11 +512,11 @@ namespace Stormancer
 		if (mapContains(_handlers, routeHandle))
 		{
 			Route_ptr route;
-			for (auto it = _localRoutes.begin(); it != _localRoutes.end(); ++it)
+			for (auto routeIt = _localRoutes.begin(); routeIt != _localRoutes.end(); ++routeIt)
 			{
-				if (it->second->handle() == routeHandle)
+				if (routeIt->second->handle() == routeHandle)
 				{
-					route = it->second;
+					route = routeIt->second;
 					break;
 				}
 			}
@@ -584,7 +584,7 @@ namespace Stormancer
 		options.set_cancellation_token(ct);
 
 		auto p2pService = dependencyResolver().resolve<P2PService>();
-		auto wScene = STRM_WEAK_FROM_THIS();
+		auto wScene = STORM_WEAK_FROM_THIS();
 		auto routes = _host->routes();
 
 		return p2pService->openP2PConnection(_host->connection(), p2pToken, ct)
@@ -630,7 +630,7 @@ namespace Stormancer
 			throw std::runtime_error("Peer already connected");
 		}
 
-		auto wScene = STRM_WEAK_FROM_THIS();
+		auto wScene = STORM_WEAK_FROM_THIS();
 		auto scenePeer = std::make_shared<P2PScenePeer>(wScene, connection, p2pService, connectToSceneMessace);
 
 		_connectedPeers[scenePeer->id()] = scenePeer;

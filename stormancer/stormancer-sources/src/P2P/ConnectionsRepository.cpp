@@ -34,7 +34,7 @@ namespace Stormancer
 		auto id = connection->id();
 		auto key = connection->key();
 
-		auto wThat = STRM_WEAK_FROM_THIS();
+		auto wThat = STORM_WEAK_FROM_THIS();
 
 		ConnectionContainer container;
 		container.connection = connection;

@@ -115,7 +115,7 @@ namespace Stormancer
 			RequestProcessor::Initialize(_dependencyResolver.resolve<RequestProcessor>(), modules);
 
 			auto transport = _dependencyResolver.resolve<ITransport>();
-			auto wClient = STRM_WEAK_FROM_THIS();
+			auto wClient = STORM_WEAK_FROM_THIS();
 			transport->onPacketReceived([wClient](Packet_ptr packet)
 			{
 				auto client = LockOrThrow(wClient);
@@ -714,7 +714,7 @@ namespace Stormancer
 	{
 		ct = getLinkedCancellationToken(ct);
 
-		auto wClient = STRM_WEAK_FROM_THIS();
+		auto wClient = STORM_WEAK_FROM_THIS();
 
 		return ensureConnectedToServer(sceneAddress.clusterId, sep, ct)
 			.then([wClient, sep, ct](std::shared_ptr<IConnection> connection)
@@ -786,7 +786,7 @@ namespace Stormancer
 
 		std::lock_guard<std::mutex> lg(_scenesMutex);
 
-		auto wClient = STRM_WEAK_FROM_THIS();
+		auto wClient = STORM_WEAK_FROM_THIS();
 
 		auto client = LockOrThrow(wClient);
 
@@ -937,7 +937,7 @@ namespace Stormancer
 			auto timeOutToken = timeout(std::chrono::milliseconds(5000));
 			if (!initiatedByServer)
 			{
-				auto wClient = STRM_WEAK_FROM_THIS();
+				auto wClient = STORM_WEAK_FROM_THIS();
 				return sendSystemRequest<void>(c, (byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, sceneHandle)
 					.then([wClient, scene, sceneId, reason]()
 				{
@@ -970,7 +970,7 @@ namespace Stormancer
 
 		auto scenesToDisconnect = _scenes;
 		std::lock_guard<std::mutex> lg(_scenesMutex);
-		auto weakSelf = STRM_WEAK_FROM_THIS();
+		auto weakSelf = STORM_WEAK_FROM_THIS();
 		auto self = weakSelf.lock();
 		if (!self)
 		{
@@ -1149,7 +1149,7 @@ namespace Stormancer
 
 	pplx::task<void> Client::requestSessionToken(std::shared_ptr<IConnection> peer, int numRetries, pplx::cancellation_token ct)
 	{
-		auto wClient = STRM_WEAK_FROM_THIS();
+		auto wClient = STORM_WEAK_FROM_THIS();
 
 		if (!peer)
 		{

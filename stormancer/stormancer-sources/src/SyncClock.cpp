@@ -49,7 +49,7 @@ namespace Stormancer
 			_cancellationToken = ct;
 
 			auto cts = pplx::cancellation_token_source::create_linked_source(_cancellationToken);
-			auto wSyncClock = STRM_WEAK_FROM_THIS();
+			auto wSyncClock = STORM_WEAK_FROM_THIS();
 
 			scheduler->schedulePeriodic(_interval, [wSyncClock, cts]()
 			{
@@ -145,7 +145,7 @@ namespace Stormancer
 			// Keep an active reference to the logger, in case the task is cancelled we cannot rely on this being valid
 			auto logger = _dependencyResolver.resolve<ILogger>();
 			auto cancellationToken = _cancellationToken;
-			auto wSyncClock = STRM_WEAK_FROM_THIS();
+			auto wSyncClock = STORM_WEAK_FROM_THIS();
 			requestProcessor->sendSystemRequest(remoteConnection.get(), (byte)SystemRequestIDTypes::ID_PING, [&timeStart](obytestream& bs) {
 				bs << timeStart;
 			}, PacketPriority::IMMEDIATE_PRIORITY, _cancellationToken)

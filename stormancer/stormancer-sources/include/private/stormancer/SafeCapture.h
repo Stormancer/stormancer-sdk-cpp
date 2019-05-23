@@ -6,9 +6,9 @@
 #include <memory>
 
 #if __cplusplus >= 201703L
-#define STRM_WEAK_FROM_THIS() this->weak_from_this()
+#define STORM_WEAK_FROM_THIS() this->weak_from_this()
 #else
-#define STRM_WEAK_FROM_THIS() Stormancer::GetWeakFromThis(this)
+#define STORM_WEAK_FROM_THIS() Stormancer::GetWeakFromThis(this)
 #endif
 
 namespace Stormancer

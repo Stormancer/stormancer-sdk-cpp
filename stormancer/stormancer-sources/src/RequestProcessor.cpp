@@ -46,7 +46,7 @@ namespace Stormancer
 		auto logger = _logger;
 		auto serializer = _serializer;
 
-		auto wProcessor = STRM_WEAK_FROM_THIS();
+		auto wProcessor = STORM_WEAK_FROM_THIS();
 
 		config.addProcessor((byte)MessageIDTypes::ID_SYSTEM_REQUEST, [wProcessor, logger, serializer](Packet_ptr p)
 		{
@@ -195,7 +195,7 @@ namespace Stormancer
 		{
 			pplx::task_completion_event<Packet_ptr> tce;
 			auto request = reserveRequestSlot(msgId, tce, ct);
-			auto wThat = STRM_WEAK_FROM_THIS();
+			auto wThat = STORM_WEAK_FROM_THIS();
 
 			request->ct = ct;
 			if (ct.is_cancelable())

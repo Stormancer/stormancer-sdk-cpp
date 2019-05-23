@@ -53,7 +53,7 @@ namespace Stormancer
 			throw std::runtime_error("No p2p connection established to the target peer");
 		}
 
-		auto wP2pTunnels = STRM_WEAK_FROM_THIS();
+		auto wP2pTunnels = STORM_WEAK_FROM_THIS();
 
 		return _sysClient->sendSystemRequest<OpenTunnelResult>(connection.get(), (byte)SystemRequestIDTypes::ID_P2P_OPEN_TUNNEL, serverId, ct)
 			.then([wP2pTunnels, connectionId, serverId](OpenTunnelResult result)

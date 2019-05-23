@@ -42,7 +42,7 @@ namespace Stormancer
 		request.headers().add(_XPLATSTR("Accept"), _XPLATSTR("application/json"));
 		request.headers().add(_XPLATSTR("x-version"), _XPLATSTR("3"));
 
-		auto wApiClient = STRM_WEAK_FROM_THIS();
+		auto wApiClient = STORM_WEAK_FROM_THIS();
 		auto start = std::chrono::high_resolution_clock::now();
 		return client.request(request, ct)
 			.then([start](web::http::http_response task)
@@ -119,7 +119,7 @@ namespace Stormancer
 		request.headers().add(_XPLATSTR("Accept"), _XPLATSTR("application/json"));
 		request.headers().add(_XPLATSTR("x-version"), _XPLATSTR("3"));
 
-		auto wApiClient = STRM_WEAK_FROM_THIS();
+		auto wApiClient = STORM_WEAK_FROM_THIS();
 
 		return client.request(request, ct)
 			.then([wApiClient, baseUri, errors, endpoints, ct](pplx::task<web::http::http_response> task)
@@ -281,7 +281,7 @@ namespace Stormancer
 		request.headers().add(_XPLATSTR("Accept"), _XPLATSTR("application/json"));
 		request.headers().add(_XPLATSTR("x-version"), _XPLATSTR("3"));
 
-		auto wApiClient = STRM_WEAK_FROM_THIS();
+		auto wApiClient = STORM_WEAK_FROM_THIS();
 
 		return client.request(request, ct)
 			.then([wApiClient, baseUri, errors, endpoints, accountId, applicationName, sceneId, ct](pplx::task<web::http::http_response> task)
@@ -406,7 +406,7 @@ namespace Stormancer
 		web::http::client::http_client client(baseUri, config);
 #endif
 
-		auto wApiClient = STRM_WEAK_FROM_THIS();
+		auto wApiClient = STORM_WEAK_FROM_THIS();
 
 		return client.request(rq, ct)
 			.then([wApiClient, baseUri, errors, requestFactory, endpoints, ct](pplx::task<web::http::http_response> t)

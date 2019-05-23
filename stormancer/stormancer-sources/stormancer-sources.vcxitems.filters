@@ -477,7 +477,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Subscription.h">
       <Filter>Header Files\public</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\Macros.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\Macros.h">
+      <Filter>Header Files\public\Utilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Configuration.cpp">
