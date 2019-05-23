@@ -390,6 +390,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Profile\ProfilePrivateModels.h">
       <Filter>private\Profile</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Helloworld\Helloworld.hpp">
+      <Filter>public\Helloworld</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="private">
