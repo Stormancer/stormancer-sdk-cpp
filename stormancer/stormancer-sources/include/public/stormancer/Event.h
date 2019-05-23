@@ -1,36 +1,15 @@
 #pragma once
 
 #include "stormancer/BuildConfig.h"
-
+#include "stormancer/Subscription.h"
+#include "stormancer/Utilities/Macros.h"
 #include <list>
 #include <memory>
 #include <functional>
 
 namespace Stormancer
 {
-	// Subscription (execute destroy when destructor is called)
-	class Subscription_impl
-	{
-	public:
-
-		Subscription_impl(std::function<void(void)> destroy)
-			: _destroy(destroy)
-		{
-		}
-
-		~Subscription_impl()
-		{
-			_destroy();
-		}
-
-	private:
-
-		std::function<void(void)> _destroy;
-	};
-
-	using Subscription = std::shared_ptr<Subscription_impl>;
-
-	/// Aggregates procedures to be run simultaneously.
+	/// Event on which we can subscribe
 	template<typename... TParams>
 	class Event
 	{
@@ -66,6 +45,9 @@ namespace Stormancer
 			return *this;
 		}
 
+		/// Trigger the Event and call the subscribed callbacks with the given parameters.
+		/// \param data Parameters to give to the subscribed callbacks.
+		/// \returns The Event.
 		TEvent& operator()(TParams... data)
 		{
 			auto functionsCopy = *_functions;
@@ -79,9 +61,14 @@ namespace Stormancer
 			return *this;
 		}
 
-		Subscription subscribe(TFunction f)
+		/// Calls the callback when the Event is triggered and returns a Subscription that will unsubscribe from the Event when it is deleted.
+		/// \warning Don't forget to keep the Subscription returned for keeping registered to the Event.
+		/// \param callback Callback that will be called when the Event is triggered.
+		/// \returns A Subscription that will unsubscribe from the Event when it is deleted.
+		STORM_NODISCARD
+		Subscription subscribe(TFunction callback)
 		{
-			auto it = _functions->insert(_functions->end(), std::make_shared<TFunction>(f));
+			auto it = _functions->insert(_functions->end(), std::make_shared<TFunction>(callback));
 			std::weak_ptr<TContainer> wFunctions = _functions;
 			return std::make_shared<Subscription_impl>([wFunctions, it]()
 			{
@@ -105,7 +92,7 @@ namespace Stormancer
 
 
 
-	/// Aggregates procedure pointers to be run simultaneously.
+	/// Event<void> specialization
 	template<>
 	class Event<void>
 	{
@@ -154,6 +141,11 @@ namespace Stormancer
 			return *this;
 		}
 
+		/// Calls the callback when the Event is triggered and returns a Subscription that will unsubscribe from the Event when it is deleted.
+		/// \warning Don't forget to keep the Subscription returned for keeping registered to the Event.
+		/// \param callback Callback that will be called when the Event is triggered.
+		/// \returns A Subscription that will unsubscribe from the Event when it is deleted.
+		STORM_NODISCARD
 		Subscription subscribe(TFunction f)
 		{
 			auto it = _functions->insert(_functions->end(), std::make_shared<TFunction>(f));

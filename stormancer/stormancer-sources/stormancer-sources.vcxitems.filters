@@ -474,6 +474,12 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\TypeReflection.h">
       <Filter>Header Files\public\Utilities</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Subscription.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\DEV\Stormancer\stormancer\src\clients\cpp\stormancer\stormancer-sources\include\public\stormancer\Utilities\Macros.h">
+      <Filter>Header Files\public\Utilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Configuration.cpp">
@@ -675,6 +681,9 @@
       <Filter>Source Files\Utilities</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\DependencyInjection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Subscription.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -136,9 +136,11 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Streams\bytestreambuf.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Streams\ibytestream.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Streams\obytestream.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Subscription.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Tasks.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\TimerThread.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\TransformMetadata.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\Macros.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\MsgpackJsonAdaptor.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\StringUtilities.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\TaskUtilities.h" />
@@ -206,6 +208,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Streams\bytestreambuf.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Streams\ibytestream.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Streams\obytestream.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Subscription.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\SyncClock.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\SystemRequest.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\TimerThread.cpp" />
