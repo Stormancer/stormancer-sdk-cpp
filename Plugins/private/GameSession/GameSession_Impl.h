@@ -36,7 +36,6 @@ namespace Stormancer
 		Event<void> _onAllPlayerReady;
 		Event<GameSessionConnectionParameters> _onRoleRecieved;
 		Event<GameSessionConnectionParameters> _onTunnelOpened;
-		Event<GameSessionResult> _onPostedResultsReceived;
 		Event<ConnectionState> _onGameSessionConnectionChange;
 		Event<void> _onShutdownReceived;
 		Event<SessionPlayer, std::string> _onPlayerChanged;
