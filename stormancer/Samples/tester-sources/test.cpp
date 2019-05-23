@@ -250,7 +250,7 @@ namespace Stormancer
 				}
 				catch (const std::exception& ex)
 				{
-					_logger->log(LogLevel::Error, "test_connect", "Failed to get and connect the scene.", ex.what());
+					_logger->log(LogLevel::Error, "test_connect", "Failed to get and connect to the scene.", ex.what());
 				}
 			});
 		}
@@ -673,7 +673,7 @@ namespace Stormancer
 		_testsDone = false;
 		_testsPassed = false;
 
-		_tests.push_back([this]() { test_connect(); });
+		_tests.push_back([this]() { test_connect(); test_connect(); test_connect(); });
 		_tests.push_back([this]() { test_echo(); });
 		_tests.push_back([this]() { test_rpc_server(); });
 		_tests.push_back([this]() { test_rpc_server_cancel(); });

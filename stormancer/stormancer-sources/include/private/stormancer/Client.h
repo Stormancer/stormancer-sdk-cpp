@@ -23,6 +23,11 @@ namespace Stormancer
 	class P2PRequestModule;
 	using Client_ptr = std::shared_ptr<Client>;
 
+	struct getSceneResult
+	{
+		bool created;
+		pplx::task<std::shared_ptr<Scene_Impl>> scene;
+	};
 	/// Manage the connection to the scenes of an application.
 	class STORMANCER_DLL_API Client : public IClient, public std::enable_shared_from_this<Client>
 	{
@@ -106,8 +111,8 @@ namespace Stormancer
 		Client& operator=(const Client& other) = delete;
 		~Client();
 		void initialize();
-		pplx::task<std::shared_ptr<Scene_Impl>> getPublicScene(const std::string& sceneId, pplx::cancellation_token ct = pplx::cancellation_token::none());
-		pplx::task<std::shared_ptr<Scene_Impl>> getPrivateScene(const std::string& sceneToken, pplx::cancellation_token ct = pplx::cancellation_token::none());
+		pplx::task<getSceneResult> getPublicScene(const std::string& sceneId, pplx::cancellation_token ct = pplx::cancellation_token::none());
+		pplx::task<getSceneResult> getPrivateScene(const std::string& sceneToken, pplx::cancellation_token ct = pplx::cancellation_token::none());
 		pplx::task<void> connectToScene(std::shared_ptr<Scene_Impl> sceneId, const std::string& sceneToken, const std::vector<Route_ptr>& localRoutes, pplx::cancellation_token ct = pplx::cancellation_token::none());
 		pplx::task<void> disconnect(std::string sceneId, bool fromServer, std::string reason = "");
 		pplx::task<void> disconnect(std::shared_ptr<IConnection> connection, uint8 sceneHandle, bool fromServer, std::string reason = "");
