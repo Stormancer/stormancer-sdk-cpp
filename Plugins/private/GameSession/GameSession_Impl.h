@@ -44,7 +44,7 @@ namespace Stormancer
 		std::weak_ptr<IClient> _wClient;
 		pplx::task<std::shared_ptr<GameSessionContainer>> _currentGameSession;
 
-		pplx::task<std::shared_ptr<GameSessionContainer>> connectToGameSessionImpl(std::string token, pplx::cancellation_token ct);
+		pplx::task<std::shared_ptr<GameSessionContainer>> connectToGameSessionImpl(std::string token, bool useTunnel, pplx::cancellation_token ct);
 		pplx::task<std::shared_ptr<GameSessionContainer>> getCurrentGameSession(pplx::cancellation_token ct = pplx::cancellation_token::none());
 		pplx::task<std::string> P2PTokenRequest(std::shared_ptr<GameSessionContainer> gameSessionContainer, pplx::cancellation_token ct);
 

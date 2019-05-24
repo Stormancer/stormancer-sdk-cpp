@@ -80,9 +80,12 @@ namespace Stormancer
 		if (p2pToken.empty()) // Host
 		{
 			_logger->log(LogLevel::Trace, "gamession.p2ptoken", "received empty p2p token: I'm the host.");
-			onRoleReceived("HOST");
+			onRoleReceived(P2PRole::Host);
 			_waitServerTce.set();
-			_tunnel = scene->registerP2PServer(GAMESESSION_P2P_SERVER_ID);
+			if (openTunnel)
+			{
+				_tunnel = scene->registerP2PServer(GAMESESSION_P2P_SERVER_ID);
+			}
 			return pplx::task_from_result<std::shared_ptr<IP2PScenePeer>>(nullptr, pplx::task_options(ct));
 		}
 		else // Client
@@ -96,7 +99,7 @@ namespace Stormancer
 				auto that = wThat.lock();
 				if (that)
 				{
-					that->onRoleReceived("CLIENT");
+					that->onRoleReceived(P2PRole::Client);
 					if (that->_onConnectionOpened)
 					{
 						that->_onConnectionOpened(p2pPeer);

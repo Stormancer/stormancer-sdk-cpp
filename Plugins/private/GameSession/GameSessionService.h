@@ -16,6 +16,12 @@ namespace Stormancer
 	class Scene;
 	class P2PTunnel;
 
+	enum class P2PRole
+	{
+		Host,
+		Client
+	};
+
 	class GameSessionService : public std::enable_shared_from_this<GameSessionService>
 	{
 	public:
@@ -53,7 +59,7 @@ namespace Stormancer
 		void onConnectionFailure(std::function<void(std::string)> callback);
 
 		Event<void> onAllPlayerReady;
-		Event<std::string> onRoleReceived;
+		Event<P2PRole> onRoleReceived;
 		Event<std::shared_ptr<Stormancer::P2PTunnel>> onTunnelOpened;
 		Event<void> onShutdownReceived;
 		Event<SessionPlayer, std::string> onPlayerChanged;

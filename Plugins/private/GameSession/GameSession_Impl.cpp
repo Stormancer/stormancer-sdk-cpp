@@ -81,11 +81,11 @@ namespace Stormancer
 
 		// Disconnect from gameSession if the current ct equal the pending CT.
 		_currentGameSession = disconectFromGameSession()
-			.then([wThat, token, ct]()
+			.then([wThat, token, ct, openTunnel]()
 		{
 			if (auto that = wThat.lock())
 			{
-				return that->connectToGameSessionImpl(token, ct);
+				return that->connectToGameSessionImpl(token, openTunnel, ct);
 			}
 			else
 			{
@@ -338,11 +338,11 @@ namespace Stormancer
 		}
 	}
 
-	pplx::task<std::shared_ptr<GameSessionContainer>> GameSession_Impl::connectToGameSessionImpl(std::string token, pplx::cancellation_token ct)
+	pplx::task<std::shared_ptr<GameSessionContainer>> GameSession_Impl::connectToGameSessionImpl(std::string token, bool useTunnel, pplx::cancellation_token ct)
 	{
 		std::weak_ptr<GameSession_Impl> wThat = this->shared_from_this();
 		return _wClient.lock()->connectToPrivateScene(token, IClient::SceneInitializer{}, ct)
-			.then([wThat](std::shared_ptr<Scene> scene)
+			.then([wThat, useTunnel](std::shared_ptr<Scene> scene)
 		{
 			if (auto that = wThat.lock())
 			{
@@ -354,7 +354,7 @@ namespace Stormancer
 				pplx::task_completion_event<GameSessionConnectionParameters> sessionReadyTce;
 				gameSessionContainer->gameSessionReadyTask = pplx::create_task(sessionReadyTce);
 
-				gameSessionContainer->sceneConnectionStateSubscription = scene->getConnectionStateChangedObservable().subscribe([wThat](ConnectionState state)
+				gameSessionContainer->sceneConnectionStateSubscription = scene->getConnectionStateChangedObservable().subscribe([wThat, useTunnel](ConnectionState state)
 				{
 					if (state == ConnectionState::Disconnected)
 					{
@@ -374,33 +374,35 @@ namespace Stormancer
 					}
 				});
 
-				gameSessionContainer->onRoleRecieved = gameSessionContainer->service()->onRoleReceived.subscribe([wThat, sessionReadyTce](std::string role)
+				gameSessionContainer->onRoleRecieved = gameSessionContainer->service()->onRoleReceived.subscribe([wThat, sessionReadyTce, useTunnel](P2PRole role)
 				{
 					if (auto that = wThat.lock())
 					{
-						if (role == "HOST")
+						if ((role == P2PRole::Host) || (role == P2PRole::Client && !useTunnel))
 						{
 							GameSessionConnectionParameters gameSessionParameters;
-							gameSessionParameters.isHost = role == "HOST" ? true : false;
 							gameSessionParameters.endpoint = that->_mapName;
+							gameSessionParameters.isHost = (role == P2PRole::Host);
 							that->_onRoleRecieved(gameSessionParameters);
 							sessionReadyTce.set(gameSessionParameters);
 						}
 					}
 				});
-
-				gameSessionContainer->onTunnelOpened = gameSessionContainer->service()->onTunnelOpened.subscribe([wThat, sessionReadyTce](std::shared_ptr<Stormancer::P2PTunnel> p2pTunnel)
+				if (useTunnel)
 				{
-					if (auto that = wThat.lock())
+					gameSessionContainer->onTunnelOpened = gameSessionContainer->service()->onTunnelOpened.subscribe([wThat, sessionReadyTce](std::shared_ptr<Stormancer::P2PTunnel> p2pTunnel)
 					{
-						GameSessionConnectionParameters gameSessionParameters;
-						gameSessionParameters.isHost = false;
-						gameSessionParameters.endpoint = p2pTunnel->ip + ":" + std::to_string(p2pTunnel->port);
+						if (auto that = wThat.lock())
+						{
+							GameSessionConnectionParameters gameSessionParameters;
+							gameSessionParameters.isHost = false;
+							gameSessionParameters.endpoint = p2pTunnel->ip + ":" + std::to_string(p2pTunnel->port);
 
-						that->_onTunnelOpened(gameSessionParameters);
-						sessionReadyTce.set(gameSessionParameters);
-					}
-				});
+							that->_onTunnelOpened(gameSessionParameters);
+							sessionReadyTce.set(gameSessionParameters);
+						}
+					});
+				}
 
 				gameSessionContainer->allPlayerReady = gameSessionContainer->service()->onAllPlayerReady.subscribe([wThat]()
 				{
