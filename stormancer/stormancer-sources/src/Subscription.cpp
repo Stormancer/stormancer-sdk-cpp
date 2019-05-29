@@ -5,14 +5,22 @@
 
 namespace Stormancer
 {
-	Subscription_impl::Subscription_impl(std::function<void(void)> destroy)
-		: _destroy(destroy)
+	Subscription_impl::Subscription_impl(std::function<void(void)> callback)
+		: _callback(callback)
 	{
 	}
 
-	/// Call the destroy callback when deleted
 	Subscription_impl::~Subscription_impl()
 	{
-		_destroy();
+		unsubscribe();
+	}
+
+	void Subscription_impl::unsubscribe()
+	{
+		if (_callback)
+		{
+			_callback();
+			_callback = nullptr;
+		}
 	}
 }

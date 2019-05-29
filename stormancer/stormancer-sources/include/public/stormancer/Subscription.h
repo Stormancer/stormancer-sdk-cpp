@@ -10,15 +10,19 @@ namespace Stormancer
 	{
 	public:
 
-		/// The destroy callback will be called when the Subscription is deleted.
-		Subscription_impl(std::function<void(void)> destroy);
+		/// The callback will be called when the Subscription is deleted.
+		Subscription_impl(std::function<void(void)> callback);
 
-		/// Call the destroy callback when deleted
+		/// Call the callback when deleted
 		~Subscription_impl();
+
+		/// Unsubscribe and reset the callback
+		void unsubscribe();
 
 	private:
 
-		std::function<void(void)> _destroy;
+		// internal callback
+		std::function<void(void)> _callback;
 	};
 
 	using Subscription = std::shared_ptr<Subscription_impl>;
