@@ -27,7 +27,7 @@ namespace Stormancer
 
 	void SceneDispatcher::resize(std::vector<std::weak_ptr<Scene_Impl>>& handles, uint8 index)
 	{
-		if (handles.capacity() < index + 1)
+		if ((uint8)handles.capacity() < index + 1)
 		{
 			auto newSize = (index + 1) * 2;
 			if (newSize < 8)

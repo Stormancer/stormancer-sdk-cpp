@@ -56,7 +56,7 @@ namespace Stormancer
 			return false;
 		}
 
-		for (int i = 0; i < ids.size(); i++)
+		for (size_t i = 0; i < ids.size(); i++)
 		{
 			if (std::find(other.ids.begin(), other.ids.end(), ids[i]) == other.ids.end())
 			{
@@ -64,7 +64,7 @@ namespace Stormancer
 			}
 		}
 
-		for (int i = 0; i < other.ids.size(); i++)
+		for (size_t i = 0; i < other.ids.size(); i++)
 		{
 			if (std::find(ids.begin(), ids.end(), other.ids[i]) == ids.end())
 			{

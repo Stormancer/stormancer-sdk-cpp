@@ -641,8 +641,8 @@ namespace Stormancer
 
 		auto connection = getConnection(rakNetPacket->guid.g);
 		std::streamsize dataSize = (std::streamsize)rakNetPacket->length;
-		byte* data = new byte[dataSize];
-		std::memcpy(data, rakNetPacket->data, dataSize);
+		byte* data = new byte[(unsigned int)dataSize];
+		std::memcpy(data, rakNetPacket->data, (size_t)dataSize);
 
 		Packet_ptr packet(new Packet<>(connection, data, dataSize), [data](Packet<>* packetPtr)
 		{
