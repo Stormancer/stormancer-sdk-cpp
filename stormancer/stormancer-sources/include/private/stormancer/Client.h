@@ -111,8 +111,8 @@ namespace Stormancer
 		Client& operator=(const Client& other) = delete;
 		~Client();
 		void initialize();
-		pplx::task<getSceneResult> getPublicScene(const std::string& sceneId, pplx::cancellation_token ct = pplx::cancellation_token::none());
-		pplx::task<getSceneResult> getPrivateScene(const std::string& sceneToken, pplx::cancellation_token ct = pplx::cancellation_token::none());
+		pplx::task<std::shared_ptr<Scene_Impl>> getPublicScene(const SceneAddress& address, const std::string& sceneId, pplx::cancellation_token ct = pplx::cancellation_token::none());
+		pplx::task<std::shared_ptr<Scene_Impl>> getPrivateScene(const SceneAddress& address, const std::string& sceneToken, pplx::cancellation_token ct = pplx::cancellation_token::none());
 		pplx::task<void> connectToScene(std::shared_ptr<Scene_Impl> sceneId, const std::string& sceneToken, const std::vector<Route_ptr>& localRoutes, pplx::cancellation_token ct = pplx::cancellation_token::none());
 		pplx::task<void> disconnect(std::string sceneId, bool fromServer, std::string reason = "");
 		pplx::task<void> disconnect(std::shared_ptr<IConnection> connection, uint8 sceneHandle, bool fromServer, std::string reason = "");
@@ -131,6 +131,7 @@ namespace Stormancer
 
 		pplx::task<SceneAddress> parseSceneUrl(std::string url, pplx::cancellation_token ct);
 
+		pplx::task<std::shared_ptr<Scene>> connectToScene(const SceneAddress& address, bool isPublic, std::function<pplx::task<std::shared_ptr<Scene_Impl>>(const SceneAddress& address)> factory);
 
 
 
