@@ -17,9 +17,9 @@ public:
 
 	static const ServiceOptions service_options;
 
-	bool GetPlayerData(const std::string& stormancerId, const std::string& dataKey, std::string& outData);
+	bool GetPlayerData(const std::string& stormancerId, const std::string& dataKey, std::vector<byte>& outData);
 
-	pplx::task<void> SetPlayerData(const std::string dataKey, const std::string& data);
+	pplx::task<void> SetPlayerData(const std::string dataKey, const std::vector<byte>& data);
 
 	void OnPlayerDataUpdated(std::function<void(const PlayerDataUpdate&)> callback)
 	{

@@ -1,13 +1,16 @@
 #pragma once
 
 #include "stormancer/msgpack_define.h"
+#include "stormancer/StormancerTypes.h"
 #include <string>
+#include <vector>
 
 namespace Stormancer
 {
 	struct PlayerDataEntry
 	{
-		std::string Data;
+		// msgpack has predefined adaptors for vector<char> and vector<unsigned char>, which treats them as "bin" format.
+		std::vector<byte> Data;
 
 		int Version = 0;
 

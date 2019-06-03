@@ -39,7 +39,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IPacketProcessor.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IPacketTransform.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IRequestModule.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IScheduler.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ITokenHandler.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ITransport.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\KeyStore.h" />
@@ -106,6 +105,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\IConnection.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\IPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\IScenePeer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\IScheduler.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\IService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Logger\ConsoleLogger.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Logger\ConsoleLoggerWindows.h" />

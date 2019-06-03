@@ -252,9 +252,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IRequestModule.h">
       <Filter>Header Files\private</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IScheduler.h">
-      <Filter>Header Files\private</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ITokenHandler.h">
       <Filter>Header Files\private</Filter>
     </ClInclude>
@@ -479,6 +476,9 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\Macros.h">
       <Filter>Header Files\public\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\IScheduler.h">
+      <Filter>Header Files\public</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

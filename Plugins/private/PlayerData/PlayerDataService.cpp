@@ -10,7 +10,7 @@ namespace Stormancer
 		"stormancer.playerdata"
 	};
 
-	bool PlayerDataService::GetPlayerData(const std::string& stormancerId, const std::string& dataKey, std::string& outData)
+	bool PlayerDataService::GetPlayerData(const std::string& stormancerId, const std::string& dataKey, std::vector<byte>& outData)
 	{
 		std::lock_guard<std::mutex> lg(_dataMutex);
 
@@ -24,7 +24,7 @@ namespace Stormancer
 		return true;
 	}
 
-	pplx::task<void> PlayerDataService::SetPlayerData(const std::string dataKey, const std::string& data)
+	pplx::task<void> PlayerDataService::SetPlayerData(const std::string dataKey, const std::vector<byte>& data)
 	{
 		auto scene = _scene.lock();
 		if (!scene)

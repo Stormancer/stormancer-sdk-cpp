@@ -7,6 +7,8 @@
 
 namespace Stormancer
 {
+	class IActionDispatcher;
+
 	/// A scheduler used to schedule network tasks
 	class IScheduler
 	{
@@ -17,7 +19,10 @@ namespace Stormancer
 		/// Schedule a cancellable periodic task on the scheculder
 		virtual void schedulePeriodic(int delay, std::function<void()> work, pplx::cancellation_token ct = pplx::cancellation_token::none()) = 0;
 
+		virtual void schedulePeriodic(int delay, std::function<void()> work, std::shared_ptr<IActionDispatcher> dispatcher, pplx::cancellation_token ct = pplx::cancellation_token::none()) = 0;
+
 		/// Schedule a single-shot task at a given time point
-		virtual void schedule(clock_type::time_point when, std::function<void()> work) = 0;
+		/// <param name="dispatcher">The dispatcher on which the <c>work</c> will be run. Leave it to <c>nullptr</c> to use the default dispatcher.</param>
+		virtual void schedule(clock_type::time_point when, std::function<void()> work, std::shared_ptr<IActionDispatcher> dispatcher = nullptr) = 0;
 	};
 }
