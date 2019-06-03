@@ -13,7 +13,7 @@ namespace Stormancer
 
 			class HelloService :public std::enable_shared_from_this<HelloService>
 			{
-				friend class HelloworldPlugin;
+				friend class Helloworld::HelloworldPlugin;
 			public:
 				HelloService(std::shared_ptr<Stormancer::RpcService> rpc) : _rpcService(rpc)
 				{

@@ -1,5 +1,3 @@
-#pragma once
-
 #include "stormancer/stdafx.h"
 #include "stormancer/Subscription.h"
 
