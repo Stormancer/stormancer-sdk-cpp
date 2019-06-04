@@ -621,6 +621,7 @@ namespace Stormancer
 			pplx::task<void>([connection, reason]()
 			{
 				// Start this asynchronously because we locked the mutex in run and the user can do something that tries to lock again this mutex
+				connection->setConnectionState(ConnectionState(ConnectionState::Disconnecting, reason));
 				connection->setConnectionState(ConnectionState(ConnectionState::Disconnected, reason));
 			});
 		}

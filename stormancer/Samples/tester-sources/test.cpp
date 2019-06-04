@@ -245,14 +245,16 @@ namespace Stormancer
 
 					_logger->log(LogLevel::Debug, "test_connect", "Connect to scene OK");
 					_logger->log(LogLevel::Debug, "test_connect", "External addresses: " + connection->metadata("externalAddrs"));
-
-					execNextTest();
+					
+					
 				}
 				catch (const std::exception& ex)
 				{
 					_logger->log(LogLevel::Error, "test_connect", "Failed to get and connect to the scene.", ex.what());
 				}
-			});
+					}).then([this]() {
+						this->execNextTest();
+						});
 		}
 		catch (const std::exception& ex)
 		{
@@ -673,7 +675,7 @@ namespace Stormancer
 		_testsDone = false;
 		_testsPassed = false;
 
-		_tests.push_back([this]() { test_connect(); test_connect(); test_connect(); });
+		_tests.push_back([this]() { test_connect(); });
 		_tests.push_back([this]() { test_echo(); });
 		_tests.push_back([this]() { test_rpc_server(); });
 		_tests.push_back([this]() { test_rpc_server_cancel(); });

@@ -11,7 +11,7 @@ namespace Stormancer
 {
 	void Stormancer::MessagingPlugin::registerClientDependencies(ContainerBuilder & clientBuilder)
 	{
-		clientBuilder.registerDependency<Messaging, ILogger>();
+		clientBuilder.registerDependency<Messaging_Impl, ILogger>().as<Messaging>();
 	}
 
 	void Stormancer::MessagingPlugin::registerSceneDependencies(ContainerBuilder & sceneBuilder, std::shared_ptr<Scene> scene)

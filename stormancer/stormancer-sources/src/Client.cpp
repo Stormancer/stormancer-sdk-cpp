@@ -363,6 +363,14 @@ namespace Stormancer
 										that->_scenes.erase(uri);
 									}
 								}
+								if (state == ConnectionState::Disconnected)
+								{
+									if (auto that = wThat.lock())
+									{
+										that->_scenes.erase(uri);
+									}
+								}
+								
 							});
 						}
 					}
@@ -830,7 +838,7 @@ namespace Stormancer
 					if (auto client = wClient.lock())
 					{
 						client->logger()->log(LogLevel::Debug, "client", "Scene disconnected", sceneId);
-
+						scene->setConnectionState(ConnectionState(ConnectionState::Disconnecting, reason));
 						scene->setConnectionState(ConnectionState(ConnectionState::Disconnected, reason));
 					}
 				}, timeOutToken);
@@ -838,7 +846,7 @@ namespace Stormancer
 			else
 			{
 				this->logger()->log(LogLevel::Debug, "client", "Scene disconnected", sceneId);
-
+				scene->setConnectionState(ConnectionState(ConnectionState::Disconnecting, reason));
 				scene->setConnectionState(ConnectionState(ConnectionState::Disconnected, reason));
 				return pplx::task_from_result();
 			}

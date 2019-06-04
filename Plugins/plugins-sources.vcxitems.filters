@@ -396,12 +396,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Profile\ProfilePrivateModels.h">
       <Filter>private\Profile</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Messaging\MessagingModels.h">
-      <Filter>public\Messaging</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Messaging\Messaging.h">
-      <Filter>public\Messaging</Filter>
-    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Helloworld\Helloworld.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Messaging\Messaging_Impl.h">
       <Filter>private\Messaging</Filter>
     </ClInclude>
@@ -410,6 +405,12 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Messaging\MessagingService.h">
       <Filter>private\Messaging</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Messaging\Messaging.h">
+      <Filter>public\Messaging</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Messaging\MessagingModels.h">
+      <Filter>public\Messaging</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
