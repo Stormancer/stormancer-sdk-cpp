@@ -157,6 +157,12 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Helloworld\HelloworldPlugin.cpp">
       <Filter>private\Helloworld</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)private\Messaging\MessagingPlugin.cpp">
+      <Filter>private\Messaging</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)private\Messaging\MessagingService.cpp">
+      <Filter>private\Messaging</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Leaderboard\Leaderboard_Impl.h">
@@ -390,8 +396,20 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Profile\ProfilePrivateModels.h">
       <Filter>private\Profile</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Helloworld\Helloworld.hpp">
-      <Filter>public\Helloworld</Filter>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Messaging\MessagingModels.h">
+      <Filter>public\Messaging</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Messaging\Messaging.h">
+      <Filter>public\Messaging</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)private\Messaging\Messaging_Impl.h">
+      <Filter>private\Messaging</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)private\Messaging\MessagingPlugin.h">
+      <Filter>private\Messaging</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)private\Messaging\MessagingService.h">
+      <Filter>private\Messaging</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -514,6 +532,12 @@
     </Filter>
     <Filter Include="private\Helloworld">
       <UniqueIdentifier>{fa9c0c66-59a3-4dca-9505-9caf87896fab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="private\Messaging">
+      <UniqueIdentifier>{8f83ceff-aca7-441b-8249-ce038db2b40d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="public\Messaging">
+      <UniqueIdentifier>{92063cb1-4cf6-4d71-a922-7fd42017ba58}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
