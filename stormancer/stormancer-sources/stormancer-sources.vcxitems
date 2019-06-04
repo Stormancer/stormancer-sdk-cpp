@@ -141,6 +141,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\TimerThread.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\TransformMetadata.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\Macros.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\MsgpackCArrayAdaptor.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\MsgpackJsonAdaptor.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\StringUtilities.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\TaskUtilities.h" />

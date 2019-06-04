@@ -170,7 +170,7 @@
       <AdditionalIncludeDirectories>stormancer/stormancer-sources/include/public/;stormancer/stormancer-sources/include/private/;dependencies/rxcpp/Rx/v2/src/;dependencies/msgpack-c/include/;../../Plugins/private;../../Plugins/public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LINUX;_STORMANCERSDKCPP;__PLATFORM__="$(Platform)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <AdditionalOptions>-Wno-unknown-pragmas</AdditionalOptions>
+      <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <Verbose>true</Verbose>
     </ClCompile>
     <RemotePostBuildEvent>
@@ -184,7 +184,7 @@
       <AdditionalIncludeDirectories>stormancer/stormancer-sources/include/public/;stormancer/stormancer-sources/include/private/;dependencies/rxcpp/Rx/v2/src/;dependencies/msgpack-c/include/;../../Plugins/private;../../Plugins/public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LINUX;_STORMANCERSDKCPP;__PLATFORM__="$(Platform)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <AdditionalOptions>-Wno-unknown-pragmas</AdditionalOptions>
+      <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <Verbose>true</Verbose>
     </ClCompile>
     <RemotePostBuildEvent>
@@ -198,7 +198,7 @@
       <AdditionalIncludeDirectories>stormancer/stormancer-sources/include/public/;stormancer/stormancer-sources/include/private/;dependencies/rxcpp/Rx/v2/src/;dependencies/msgpack-c/include/;../../Plugins/private;../../Plugins/public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LINUX;_STORMANCERSDKCPP;__PLATFORM__="$(Platform)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <AdditionalOptions>-Wno-unknown-pragmas</AdditionalOptions>
+      <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <Verbose>true</Verbose>
     </ClCompile>
     <RemotePostBuildEvent>
@@ -212,7 +212,7 @@
       <AdditionalIncludeDirectories>stormancer/stormancer-sources/include/public/;stormancer/stormancer-sources/include/private/;dependencies/rxcpp/Rx/v2/src/;dependencies/msgpack-c/include/;../../Plugins/private;../../Plugins/public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LINUX;_STORMANCERSDKCPP;__PLATFORM__="$(Platform)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <AdditionalOptions>-Wno-unknown-pragmas</AdditionalOptions>
+      <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <Verbose>true</Verbose>
     </ClCompile>
     <RemotePostBuildEvent>
@@ -226,7 +226,7 @@
       <AdditionalIncludeDirectories>stormancer/stormancer-sources/include/public/;stormancer/stormancer-sources/include/private/;dependencies/rxcpp/Rx/v2/src/;dependencies/msgpack-c/include/;../../Plugins/private;../../Plugins/public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LINUX;_STORMANCERSDKCPP;__PLATFORM__="$(Platform)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <AdditionalOptions>-Wno-unknown-pragmas</AdditionalOptions>
+      <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <Verbose>true</Verbose>
     </ClCompile>
     <RemotePostBuildEvent>
@@ -244,7 +244,7 @@
       <AdditionalIncludeDirectories>stormancer/stormancer-sources/include/public/;stormancer/stormancer-sources/include/private/;dependencies/rxcpp/Rx/v2/src/;dependencies/msgpack-c/include/;../../Plugins/private;../../Plugins/public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LINUX;_STORMANCERSDKCPP;__PLATFORM__="$(Platform)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <AdditionalOptions>-Wno-unknown-pragmas</AdditionalOptions>
+      <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <Verbose>true</Verbose>
     </ClCompile>
     <RemotePostBuildEvent>
@@ -258,7 +258,7 @@
       <AdditionalIncludeDirectories>stormancer/stormancer-sources/include/public/;stormancer/stormancer-sources/include/private/;dependencies/rxcpp/Rx/v2/src/;dependencies/msgpack-c/include/;../../Plugins/private;../../Plugins/public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LINUX;_STORMANCERSDKCPP;__PLATFORM__="$(Platform)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <AdditionalOptions>-Wno-unknown-pragmas</AdditionalOptions>
+      <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <Verbose>true</Verbose>
     </ClCompile>
     <RemotePostBuildEvent>
@@ -272,7 +272,7 @@
       <AdditionalIncludeDirectories>stormancer/stormancer-sources/include/public/;stormancer/stormancer-sources/include/private/;dependencies/rxcpp/Rx/v2/src/;dependencies/msgpack-c/include/;../../Plugins/private;../../Plugins/public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LINUX;_STORMANCERSDKCPP;__PLATFORM__="$(Platform)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <AdditionalOptions>-Wno-unknown-pragmas</AdditionalOptions>
+      <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <Verbose>true</Verbose>
     </ClCompile>
     <RemotePostBuildEvent>

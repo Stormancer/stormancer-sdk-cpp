@@ -33,18 +33,18 @@
 			you will have to update it according to the changes in the DefaultLinuxBuild.props.
 			Once this is done, increase this number in your CustomLinuxBuild.props to match the one in the DefaultLinuxBuild.props.
 		-->
-		<StormancerLinuxPropsVersion>2</StormancerLinuxPropsVersion>
+		<StormancerLinuxPropsVersion>3</StormancerLinuxPropsVersion>
 	</PropertyGroup>
 	
 	<ItemDefinitionGroup>
 		<ClCompile>
 			<AdditionalIncludeDirectories>$(OpenSSLIncludeDir);$(CurlIncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-			<AdditionalOptions>%(CustomCompilerOptions);%(AdditionalOptions)</AdditionalOptions>
+			<AdditionalOptions>$(CustomCompilerOptions) %(AdditionalOptions)</AdditionalOptions>
 		</ClCompile>
 		<Link>
 			<AdditionalLibraryDirectories>$(CurlLibDir);$(OpenSSLLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
 			<AdditionalDependencies>-pthread;-lcurl;-lssl;-lcrypto;-ldl;%(AdditionalDependencies)</AdditionalDependencies>
-			<AdditionalOptions>%(CustomLinkerOptions) %(AdditionalOptions)</AdditionalOptions>
+			<AdditionalOptions>$(CustomLinkerOptions) %(AdditionalOptions)</AdditionalOptions>
 		</Link>
 	</ItemDefinitionGroup>
 </Project>
