@@ -625,19 +625,25 @@ namespace Stormancer
 
 	std::shared_ptr<IP2PScenePeer> Scene_Impl::peerConnected(std::shared_ptr<IConnection> connection, std::shared_ptr<P2PService> p2pService, P2PConnectToSceneMessage connectToSceneMessace)
 	{
-		if (mapContains(_connectedPeers, connection->id()))
+		std::lock_guard<std::mutex> lg(this->_connectMutex);
+		auto it = _connectedPeers.find(connection->id());
+
+		if (it == _connectedPeers.end())
 		{
-			throw std::runtime_error("Peer already connected");
+			auto wScene = STORM_WEAK_FROM_THIS();
+			auto scenePeer = std::make_shared<P2PScenePeer>(wScene, connection, p2pService, connectToSceneMessace);
+
+			_connectedPeers.emplace(scenePeer->id(),scenePeer);
+
+			_onPeerConnected(scenePeer);
+
+			return scenePeer;
+		}
+		else
+		{
+			return it->second;
 		}
 
-		auto wScene = STORM_WEAK_FROM_THIS();
-		auto scenePeer = std::make_shared<P2PScenePeer>(wScene, connection, p2pService, connectToSceneMessace);
-
-		_connectedPeers[scenePeer->id()] = scenePeer;
-
-		_onPeerConnected(scenePeer);
-
-		return scenePeer;
 	}
 
 	Event<Packet_ptr> Scene_Impl::onPacketReceived()
