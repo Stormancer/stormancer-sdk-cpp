@@ -5,6 +5,7 @@
 #include <memory>
 #include "stormancer/msgpack_define.h"
 #include "stormancer/Streams/bytestream.h"
+#include "stormancer/Serializer.h"
 
 namespace Stormancer
 {
