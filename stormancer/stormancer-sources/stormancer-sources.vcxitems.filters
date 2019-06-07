@@ -477,7 +477,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\Macros.h">
       <Filter>Header Files\public\Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IScheduler.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\IScheduler.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\MsgpackCArrayAdaptor.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Configuration.cpp">
