@@ -1,8 +1,6 @@
 #pragma once
 
 #include "stormancer/BuildConfig.h"
-
-
 #include "stormancer/Packet.h"
 
 namespace Stormancer
@@ -13,14 +11,18 @@ namespace Stormancer
 	{
 	public:
 
-		PacketProcessorConfig(std::map<byte, handlerFunction*>& handlers, std::vector<processorFunction*>& defaultProcessors);
+		PacketProcessorConfig(std::unordered_map<byte, HandlerFunction>& handlers, std::vector<ProcessorFunction>& defaultProcessors);
+
 		virtual ~PacketProcessorConfig();
-		void addProcessor(byte msgId, handlerFunction* handler);     
-		void addCatchAllProcessor(processorFunction* processor);
+
+		void addProcessor(byte msgId, HandlerFunction handler);     
+
+		void addCatchAllProcessor(ProcessorFunction processor);
 
 	private:
 
-		std::map<byte, handlerFunction*>& _handlers;
-		std::vector<processorFunction*>& _defaultProcessors;
+		std::unordered_map<byte, HandlerFunction>& _handlers;
+
+		std::vector<ProcessorFunction>& _defaultProcessors;
 	};
-};
+}

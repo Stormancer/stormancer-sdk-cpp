@@ -10,8 +10,8 @@ namespace Stormancer
 {
 	ProfileService::ProfileService(std::shared_ptr<Scene> scene)
 		: _scene(scene)
-		, _rpcService(scene->dependencyResolver()->resolve<RpcService>())
-		, _logger(scene->dependencyResolver()->resolve<ILogger>())
+		, _rpcService(scene->dependencyResolver().resolve<RpcService>())
+		, _logger(scene->dependencyResolver().resolve<ILogger>())
 	{
 	}
 

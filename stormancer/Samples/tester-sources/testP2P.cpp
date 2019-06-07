@@ -41,20 +41,15 @@ public:
 
 		if (br == RakNet::BR_FAILED_TO_BIND_SOCKET)
 		{
-
 			RakNet::RakNetSocket2Allocator::DeallocRNS2(socket);
 			throw std::runtime_error("Failed to bind socket");
-
-
 		}
 		else if (br == RakNet::BR_FAILED_SEND_TEST)
 		{
-
 			RakNet::RakNetSocket2Allocator::DeallocRNS2(socket);
 			throw std::runtime_error("Failed to send test message");
-
-
 		}
+
 		((RakNet::RNS2_Berkley*)socket)->CreateRecvPollingThread(0);
 	}
 
@@ -66,6 +61,7 @@ public:
 			RakNet::RakNetSocket2Allocator::DeallocRNS2(socket);
 		}
 	}
+
 	void Send(unsigned short port)
 	{
 		RakNet::RNS2_SendParameters sp;
@@ -86,20 +82,24 @@ public:
 				Send(recvStruct->systemAddress.GetPort());
 			}
 		}
-
 	}
+
 	virtual void DeallocRNS2RecvStruct(RakNet::RNS2RecvStruct * s, const char * file, unsigned int line) override
 	{
 		RakNet::OP_DELETE(s, file, line);
 	}
+
 	virtual RakNet::RNS2RecvStruct * AllocRNS2RecvStruct(const char * file, unsigned int line) override
 	{
 		return RakNet::OP_NEW<RakNet::RNS2RecvStruct>(file, line);
 	}
 
 private:
+
 	std::shared_ptr<Stormancer::ILogger> _logger;
+
 	RakNet::RakNetSocket2* socket;
+
 	bool _server;
 };
 
@@ -109,13 +109,11 @@ void testP2P(std::string endpoint, std::string account, std::string application,
 {
 	auto logger = std::make_shared<Stormancer::ConsoleLogger>();
 
-
 	auto hostConfiguration = Stormancer::Configuration::create(endpoint, account, application);
 	hostConfiguration->logger = logger;
 	//hostConfiguration->encryptionEnabled = true;
 
 	auto hostClient = Stormancer::IClient::create(hostConfiguration);
-
 
 	auto guestConfiguration = Stormancer::Configuration::create(endpoint, account, application);
 	guestConfiguration->logger = logger;
@@ -133,6 +131,8 @@ void testP2P(std::string endpoint, std::string account, std::string application,
 		logger->log(e);
 	}
 }
+
+Stormancer::Subscription hostPeerConnectedSub, guestPeerConnectedSub;
 
 void p2pConnect(std::shared_ptr<Stormancer::IClient> hostClient, std::shared_ptr<Stormancer::IClient> guestClient, Stormancer::ILogger_ptr logger, std::string sceneId)
 {
@@ -159,8 +159,18 @@ void p2pConnect(std::shared_ptr<Stormancer::IClient> hostClient, std::shared_ptr
 		throw;
 	}
 
-	auto hostRpc = hostScene->dependencyResolver()->resolve<Stormancer::RpcService>();
-	auto guestRpc = guestScene->dependencyResolver()->resolve<Stormancer::RpcService>();
+	hostPeerConnectedSub = hostScene->onPeerConnected().subscribe([logger](std::shared_ptr<Stormancer::IP2PScenePeer> peer)
+	{
+		logger->log(Stormancer::LogLevel::Info, "P2P_test", "Peer connected on host scene", std::to_string(peer->id()));
+	});
+
+	guestPeerConnectedSub = guestScene->onPeerConnected().subscribe([logger](std::shared_ptr<Stormancer::IP2PScenePeer> peer)
+	{
+		logger->log(Stormancer::LogLevel::Info, "P2P_test", "Peer connected on guest scene", std::to_string(peer->id()));
+	});
+
+	auto hostRpc = hostScene->dependencyResolver().resolve<Stormancer::RpcService>();
+	auto guestRpc = guestScene->dependencyResolver().resolve<Stormancer::RpcService>();
 	std::string p2pToken = guestRpc->rpc<std::string>("getP2PToken", true).get();
 
 	logger->log(std::string("Got P2P token ") + p2pToken);
@@ -178,8 +188,6 @@ void p2pConnect(std::shared_ptr<Stormancer::IClient> hostClient, std::shared_ptr
 	logger->log(std::string("Retrieved guest tunnel: ") + guestTunnel->ip + ":" + std::to_string(guestTunnel->port));
 	UdpSocket guestSocket(logger, 0, false);
 	guestSocket.Send(guestTunnel->port);
-
-	
 
 	hostScene->disconnect().wait();
 	guestScene->disconnect().wait();
@@ -210,7 +218,7 @@ void p2pClient(std::string endpoint, std::string account, std::string applicatio
 		}
 	}).get();
 
-	auto rpc = scene->dependencyResolver()->resolve<Stormancer::RpcService>();
+	auto rpc = scene->dependencyResolver().resolve<Stormancer::RpcService>();
 	std::string p2pToken = rpc->rpc<std::string>("getP2PToken", true).get();
 	logger->log(std::string("Obtained P2P token: ") + p2pToken);
 	if (p2pToken.empty())

@@ -17,4 +17,4 @@ namespace Stormancer
 			hasCompleted = true;
 		}
 	}
-};
+}

@@ -5,6 +5,7 @@
 #include "stormancer/IConnection.h"
 #include "stormancer/IScenePeer.h"
 #include "stormancer/Serializer.h"
+#include "rxcpp/rx.hpp"
 
 namespace Stormancer
 {
@@ -18,7 +19,7 @@ namespace Stormancer
 
 		/// Constructor
 		/// \param source Generic source of the packets.
-		Packet(std::shared_ptr<T> source, const std::map<std::string, std::string>& metadata = std::map<std::string, std::string>())
+		Packet(std::shared_ptr<T> source, const std::unordered_map<std::string, std::string>& metadata = std::unordered_map<std::string, std::string>())
 			: connection(source)
 			, metadata(metadata)
 		{
@@ -28,7 +29,7 @@ namespace Stormancer
 		/// \param source Generic source of the packets.
 		/// \param stream Data stream attached to the packet.
 		/// \param metadata Metadata attached to this packet.
-		Packet(std::shared_ptr<T> source, byte* data, std::streamsize dataSize, const std::map<std::string, std::string>& metadata = std::map<std::string, std::string>())
+		Packet(std::shared_ptr<T> source, byte* data, std::streamsize dataSize, const std::unordered_map<std::string, std::string>& metadata = std::unordered_map<std::string, std::string>())
 			: connection(source)
 			, stream(data, dataSize)
 			, metadata(metadata)
@@ -67,7 +68,7 @@ namespace Stormancer
 		ibytestream stream;
 
 		/// Metadata
-		std::map<std::string, std::string> metadata;
+		std::unordered_map<std::string, std::string> metadata;
 
 #pragma endregion
 
@@ -87,6 +88,6 @@ namespace Stormancer
 	using Packet_ptr = std::shared_ptr<Packet<>>;
 	using Packetisp_ptr = std::shared_ptr<Packet<IScenePeer>>;
 	using PacketObservable = rxcpp::observable<Packet_ptr>;
-	using handlerFunction = std::function<bool(Packet_ptr)>;
-	using processorFunction = std::function<bool(byte, Packet_ptr)>;
-};
+	using HandlerFunction = std::function<bool(Packet_ptr)>;
+	using ProcessorFunction = std::function<bool(byte, Packet_ptr)>;
+}

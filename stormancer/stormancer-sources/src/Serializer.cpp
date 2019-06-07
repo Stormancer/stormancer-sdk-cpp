@@ -8,10 +8,10 @@ namespace Stormancer
 		// do nothing
 	}
 
-	/*void Serializer::UnstackAndDeserialize(const byte*, const uint64, uint64*) const
+	void Serializer::UnstackAndDeserialize(const byte*, const uint64, uint64*) const
 	{
 		// do nothing
-	}*/
+	}
 
 	template<>
 	void Serializer::deserializeOne(ibytestream&) const
@@ -24,4 +24,4 @@ namespace Stormancer
 	{
 		// do nothing
 	}
-};
+}

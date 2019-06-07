@@ -14,6 +14,6 @@ namespace Stormancer
 			throw PointerDeletedException("Scene deleted");
 		}
 
-		return scene->dependencyResolver()->resolve<OrganizationsService>();
+		return scene->dependencyResolver().resolve<OrganizationsService>();
 	}
 }

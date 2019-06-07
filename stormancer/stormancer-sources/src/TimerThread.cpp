@@ -1,6 +1,7 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/TimerThread.h"
 #include "stormancer/Tasks.h"
+#include "stormancer/IActionDispatcher.h"
 #include <cassert>
 
 namespace Stormancer
@@ -33,7 +34,7 @@ namespace Stormancer
 		_stop(true);
 	}
 
-	void TimerThread::schedule(std::function<void()> func, clock_type::time_point when)
+	void TimerThread::schedule(std::function<void()> func, clock_type::time_point when, std::shared_ptr<IActionDispatcher> dispatcher)
 	{
 		assert(func);
 
@@ -52,7 +53,7 @@ namespace Stormancer
 			notifyThread = false;
 		}
 
-		_taskQueue.emplace(when, func);
+		_taskQueue.emplace(when, func, dispatcher);
 		if (notifyThread)
 		{
 			_cond.notify_one();
@@ -83,6 +84,7 @@ namespace Stormancer
 		while (!(_stopRequested && _taskQueue.empty()))
 		{
 			std::function<void()> function;
+			pplx::scheduler_ptr dispatcher(pplx::get_ambient_scheduler());
 
 			// Retrieve the next function to be run
 			{
@@ -104,6 +106,10 @@ namespace Stormancer
 				else
 				{
 					function = _taskQueue.top().function;
+					if (_taskQueue.top().dispatcher)
+					{
+						dispatcher = pplx::scheduler_ptr(_taskQueue.top().dispatcher);
+					}
 					_taskQueue.pop();
 				}
 			}
@@ -111,7 +117,7 @@ namespace Stormancer
 			// Run the function on its own task
 			if (function)
 			{
-				pplx::task<void>(function).then([](pplx::task<void> result)
+				pplx::task<void>(function, dispatcher).then([](pplx::task<void> result)
 				{
 					// We do not want to crash if the function throws, so handle any exception
 					try

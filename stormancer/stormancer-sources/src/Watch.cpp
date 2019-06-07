@@ -33,4 +33,4 @@ namespace Stormancer
 		std::lock_guard<std::mutex> lock(_mutex);
 		_baseTime = baseTime;
 	}
-};
+}

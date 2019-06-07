@@ -10,7 +10,7 @@ namespace Stormancer
 		"stormancer.playerdata"
 	};
 
-	bool PlayerDataService::GetPlayerData(const std::string& stormancerId, const std::string& dataKey, std::string& outData)
+	bool PlayerDataService::GetPlayerData(const std::string& stormancerId, const std::string& dataKey, std::vector<byte>& outData)
 	{
 		std::lock_guard<std::mutex> lg(_dataMutex);
 
@@ -24,7 +24,7 @@ namespace Stormancer
 		return true;
 	}
 
-	pplx::task<void> PlayerDataService::SetPlayerData(const std::string dataKey, const std::string& data)
+	pplx::task<void> PlayerDataService::SetPlayerData(const std::string dataKey, const std::vector<byte>& data)
 	{
 		auto scene = _scene.lock();
 		if (!scene)
@@ -32,14 +32,14 @@ namespace Stormancer
 			return pplx::task_from_exception<void>(std::runtime_error("PlayerDataService::SetPlayerData: scene was deleted"));
 		}
 
-		auto rpc = scene->dependencyResolver()->resolve<RpcService>();
+		auto rpc = scene->dependencyResolver().resolve<RpcService>();
 		return rpc->rpc<void>(SET_PLAYERDATA_RPC, dataKey, data);
 	}
 
 	void PlayerDataService::setScene(std::shared_ptr<Scene> scene)
 	{
 		_scene = scene;
-		_logger = scene->dependencyResolver()->resolve<ILogger>();
+		_logger = scene->dependencyResolver().resolve<ILogger>();
 
 		std::weak_ptr<PlayerDataService> weakThis = shared_from_this();
 		scene->addRoute(PLAYERDATA_UPDATED_ROUTE, [weakThis](Packetisp_ptr packet)
@@ -73,12 +73,9 @@ namespace Stormancer
 			auto strongScene = _scene.lock();
 			if (_onDataUpdated && strongScene)
 			{
-				auto dr = strongScene->dependencyResolver();
-				if (dr)
-				{
-					auto callback = _onDataUpdated;
-					dr->resolve<IActionDispatcher>()->post([callback, update] { callback(update); });
-				}
+				auto& dr = strongScene->dependencyResolver();
+				auto callback = _onDataUpdated;
+				dr.resolve<IActionDispatcher>()->post([callback, update] { callback(update); });
 			}
 		}
 	}

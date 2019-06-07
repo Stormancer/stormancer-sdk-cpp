@@ -61,4 +61,4 @@ namespace Stormancer
 		/// immediate mode
 		bool _immediate = false;
 	};
-};
+}

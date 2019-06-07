@@ -12,7 +12,7 @@ namespace Helloworld
 	{
 	public:
 
-		void sceneCreated(std::shared_ptr<Stormancer::Scene> scene) override;
-		void clientCreated(std::shared_ptr<Stormancer::IClient> client) override;
+		void registerSceneDependencies(Stormancer::ContainerBuilder& builder, std::shared_ptr<Stormancer::Scene> scene) override;
+		void registerClientDependencies(Stormancer::ContainerBuilder& builder) override;
 	};
 }

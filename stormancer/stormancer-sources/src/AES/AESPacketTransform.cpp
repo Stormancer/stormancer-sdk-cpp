@@ -20,7 +20,8 @@ namespace Stormancer
 		if (_enabled && !metadata.dontEncrypt)
 		{
 			auto writerCopy = streamWriter;
-			streamWriter = [=](obytestream& stream) {
+			streamWriter = [=](obytestream& stream)
+			{
 				stream << (byte)MessageIDTypes::ID_ENCRYPTED;
 
 				AESEncryptStream aesStream(_aes, peerId);

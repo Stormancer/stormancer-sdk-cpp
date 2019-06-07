@@ -63,4 +63,4 @@ namespace Stormancer
 	};
 
 	using ILogger_ptr = std::shared_ptr<ILogger>;
-};
+}

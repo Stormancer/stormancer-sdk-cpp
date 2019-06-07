@@ -11,8 +11,8 @@ namespace Stormancer
 	////////////////////////////////////////////////////////////////////////////////////
 	PartyService::PartyService(std::weak_ptr<Scene> scene)
 		: _scene(scene)
-		, _logger(scene.lock()->dependencyResolver()->resolve<ILogger>())
-		, _rpcService(_scene.lock()->dependencyResolver()->resolve<RpcService>())
+		, _logger(scene.lock()->dependencyResolver().resolve<ILogger>())
+		, _rpcService(_scene.lock()->dependencyResolver().resolve<RpcService>())
 	{
 		_clientReady = false;
 		_playerReady = false;
@@ -132,7 +132,7 @@ namespace Stormancer
 		_clientReady = false;
 		if (gameFinderName != "")
 		{
-			auto gameFinderManager = _scene.lock()->dependencyResolver()->resolve<GameFinder>();
+			auto gameFinderManager = _scene.lock()->dependencyResolver().resolve<GameFinder>();
 			auto partyService = this->shared_from_this();
 			return gameFinderManager->connectToGameFinder(gameFinderName).then([partyService]()
 			{

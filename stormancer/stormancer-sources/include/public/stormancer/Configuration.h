@@ -5,7 +5,8 @@
 #include "stormancer/IPlugin.h"
 #include "stormancer/Logger/ILogger.h"
 #include "stormancer/StormancerTypes.h"
-#include <map>
+#include <unordered_map>
+#include "stormancer/DependencyInjection.h"
 #include <vector>
 #include <chrono>
 #include <string>
@@ -271,23 +272,23 @@ namespace Stormancer
 
 #pragma region private_members
 		/// Gets or Sets the dispatcher to be used by the client.
-		std::function<std::shared_ptr<IPacketDispatcher>(std::weak_ptr<DependencyResolver>)> dispatcher;
+		std::function<std::shared_ptr<IPacketDispatcher>(const DependencyScope&)> dispatcher;
 
 		/// Gets or sets the transport to be used by the client.
-		std::function<std::shared_ptr<ITransport>(std::weak_ptr<DependencyResolver>)> transportFactory;
+		std::function<std::shared_ptr<ITransport>(const DependencyScope&)> transportFactory;
 
-		std::map<std::string, std::string> _metadata;
+		std::unordered_map<std::string, std::string> _metadata;
 
 		std::vector<IPlugin*> _plugins;
 
 		/// A string containing the target server endpoint.
 		std::vector<std::string> _serverEndpoints;
 
-		static const std::function<std::shared_ptr<ITransport>(std::weak_ptr<DependencyResolver>)> _defaultTransportFactory;
+		static const std::function<std::shared_ptr<ITransport>(const DependencyScope&)> _defaultTransportFactory;
 
 		/// The scheduler used by the client to run the transport and other repeated tasks.
 		std::shared_ptr<IScheduler> scheduler;
 
 #pragma endregion
 	};
-};
+}

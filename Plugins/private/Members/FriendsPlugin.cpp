@@ -8,29 +8,20 @@
 
 namespace Stormancer
 {
-	void FriendsPlugin::sceneCreated(std::shared_ptr<Scene> scene)
+	void FriendsPlugin::registerSceneDependencies(ContainerBuilder& builder, std::shared_ptr<Scene> scene)
 	{
 		if (scene)
 		{
 			auto name = scene->getHostMetadata("stormancer.friends");
 			if (name.length() > 0)
 			{
-				
-				scene->dependencyResolver()->registerDependency<FriendsService>([scene](std::weak_ptr<DependencyResolver> dr) {
-					return std::make_shared<FriendsService>(scene, dr.lock()->resolve<ILogger>());
-				},true);
+				builder.registerDependency<FriendsService, Scene, ILogger>().singleInstance();
 			}
 		}
 	}
 
-	void FriendsPlugin::clientCreated(std::shared_ptr<IClient> client)
+	void FriendsPlugin::registerClientDependencies(ContainerBuilder& builder)
 	{
-		if (client)
-		{
-			client->dependencyResolver()->registerDependency<Friends>([](std::weak_ptr<DependencyResolver> dr) {
-				return std::make_shared<Friends_Impl>(dr.lock()->resolve<AuthenticationService>()); 
-			}, true);
-
-		}
+		builder.registerDependency<Friends_Impl, AuthenticationService>().as<Friends>().singleInstance();
 	}
-};
+}

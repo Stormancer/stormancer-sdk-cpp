@@ -12,6 +12,7 @@
 
 namespace Stormancer
 {
+	class IActionDispatcher;
 
 	class TimerThread
 	{
@@ -29,7 +30,13 @@ namespace Stormancer
 
 		TimerThread(const TimerThread&) = delete;
 
-		void schedule(std::function<void()> func, clock_type::time_point when);
+		/// <summary>
+		/// Set a function to be executed at the given time point.
+		/// </summary>
+		/// <param name="func">Function to be executed.</param>
+		/// <param name="when">Time point when the function will be executed. This is not guaranteed to be 100% precise.</param>
+		/// <param name="dispatcher">Dispatcher that <c>func</c> will be run on. Leave it to <c>nullptr</c> to use the default dispatcher.</param>
+		void schedule(std::function<void()> func, clock_type::time_point when, std::shared_ptr<IActionDispatcher> dispatcher = nullptr);
 
 #pragma endregion
 
@@ -39,10 +46,12 @@ namespace Stormancer
 		{
 			clock_type::time_point scheduledTime;
 			std::function<void()> function;
+			std::shared_ptr<IActionDispatcher> dispatcher;
 
-			QueueEntry(clock_type::time_point t, std::function<void()> f) :
-				scheduledTime(t),
-				function(f)
+			QueueEntry(clock_type::time_point t, std::function<void()> f, std::shared_ptr<IActionDispatcher> d)
+				: scheduledTime(t)
+				, function(f)
+				, dispatcher(d)
 			{}
 
 			friend bool operator>(const QueueEntry& lhs, const QueueEntry& rhs)
@@ -73,7 +82,4 @@ namespace Stormancer
 
 #pragma endregion
 	};
-
-
-
 }

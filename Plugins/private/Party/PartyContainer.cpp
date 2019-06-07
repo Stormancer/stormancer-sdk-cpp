@@ -36,6 +36,6 @@ namespace Stormancer
 
 	bool PartyContainer::isLeader()
 	{
-		return (settings().leaderId == _partyScene->dependencyResolver()->resolve<AuthenticationService>()->userId());
+		return (settings().leaderId == _partyScene->dependencyResolver().resolve<AuthenticationService>()->userId());
 	}
 }

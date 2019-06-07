@@ -21,6 +21,6 @@ namespace Stormancer
 	private:
 
 		std::weak_ptr<Scene> _scene;
-		std::shared_ptr<ILogger> _logger;		
+		std::shared_ptr<ILogger> _logger;
 	};
 }

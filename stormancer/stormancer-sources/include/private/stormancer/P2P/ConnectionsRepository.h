@@ -33,11 +33,13 @@ namespace Stormancer
 			uint64 id;
 			pplx::task_completion_event<std::shared_ptr<IConnection>> tce;
 		};
+
 		struct ConnectionContainer
 		{
 			std::shared_ptr<IConnection> connection;
 			Event<std::string>::Subscription onCloseSubscription;
 		};
+
 		std::unordered_map<std::string, pplx::task<ConnectionContainer>> _connectionsByKey;
 		std::unordered_map<uint64, pplx::task<ConnectionContainer>> _connections;
 		std::unordered_map<uint64, PendingConnection> _pendingP2PConnections;

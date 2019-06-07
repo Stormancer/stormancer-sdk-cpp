@@ -42,4 +42,4 @@ namespace Stormancer
 
 		Federation readFederationFromJson(std::string json);
 	};
-};
+}

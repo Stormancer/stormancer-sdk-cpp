@@ -4,7 +4,7 @@
 #include "stormancer/Exceptions.h"
 
 Helloworld::HelloService::HelloService(std::shared_ptr<Stormancer::Scene> scene)
-	: _rpcService(scene->dependencyResolver()->resolve<Stormancer::RpcService>())
+	: _rpcService(scene->dependencyResolver().resolve<Stormancer::RpcService>())
 {
 }
 

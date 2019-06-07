@@ -22,4 +22,4 @@ namespace Stormancer
 	void NullLogger::log(const std::exception&)
 	{
 	}
-};
+}

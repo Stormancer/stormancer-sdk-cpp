@@ -6,10 +6,16 @@
 #include "Servers_Impl.h"
 #include "Servers/Servers.h"
 #include "stormancer/IClient.h"
+#include "stormancer/DependencyInjection.h"
 
 namespace Stormancer
 {
-	void ServerPlugin::sceneCreated(std::shared_ptr<Scene> scene)
+	void registerClientDependencies(ContainerBuilder& builder)
+	{
+		builder.registerDependency<Servers_Impl, AuthenticationService>().as<Servers>().singleInstance();
+	}
+
+	void ServerPlugin::registerSceneDependencies(ContainerBuilder& builder, std::shared_ptr<Scene> scene)
 	{
 		if (scene)
 		{
@@ -17,17 +23,8 @@ namespace Stormancer
 
 			if (!name.empty())
 			{
-				auto service = std::make_shared<ServersService>(scene);
-				scene->dependencyResolver()->registerDependency<ServersService>(service);
+				builder.registerDependency<ServersService, Scene>().singleInstance();
 			}
-		}
-	}
-	void ServerPlugin::clientCreated(std::shared_ptr<IClient> client)
-	{
-		if (client)
-		{
-			client->dependencyResolver()->registerDependency<Servers>([](std::weak_ptr<DependencyResolver> dr) {
-				return std::make_shared<Servers_Impl>(dr.lock()->resolve<AuthenticationService>()); }, true);
 		}
 	}
 }

@@ -20,17 +20,10 @@
 
 namespace Stormancer
 {
-	RakNetTransport::RakNetTransport(std::weak_ptr<DependencyResolver> resolver)
-		: _dependencyResolver(resolver)
+	RakNetTransport::RakNetTransport(const DependencyScope& scope)
 	{
-		auto dependencyResolver = _dependencyResolver.lock();
-		if (!dependencyResolver)
-		{
-			throw std::runtime_error("Dependency resolver is invalid");
-		}
-
-		_logger = dependencyResolver->resolve<ILogger>();
-		_scheduler = dependencyResolver->resolve<IScheduler>();
+		_logger = scope.resolve<ILogger>();
+		_scheduler = scope.resolve<IScheduler>();
 	}
 
 	RakNetTransport::~RakNetTransport()
@@ -45,7 +38,7 @@ namespace Stormancer
 		_logger->log(LogLevel::Trace, "RakNetTransport", "RakNet transport deleted");
 	}
 
-	void RakNetTransport::start(std::string type, std::shared_ptr<IConnectionManager> handler, pplx::cancellation_token ct, uint16 serverPort, uint16 maxConnections)
+	void RakNetTransport::start(std::string type, std::shared_ptr<IConnectionManager> handler, const DependencyScope& parentScope, pplx::cancellation_token ct, uint16 serverPort, uint16 maxConnections)
 	{
 		_logger->log(LogLevel::Trace, "RakNetTransport", "Starting RakNet transport...");
 
@@ -61,9 +54,9 @@ namespace Stormancer
 
 		_type = type;
 		_handler = handler;
-		initialize(maxConnections, serverPort);
+		initialize(maxConnections, serverPort, parentScope);
 
-		auto wTransport = STRM_WEAK_FROM_THIS();
+		auto wTransport = STORM_WEAK_FROM_THIS();
 
 		_scheduler->schedulePeriodic(15, [wTransport]()
 		{
@@ -84,7 +77,7 @@ namespace Stormancer
 		_logger->log(LogLevel::Trace, "RakNetTransport", "RakNet transport started");
 	}
 
-	void RakNetTransport::initialize(uint16 maxConnections, uint16 serverPort)
+	void RakNetTransport::initialize(uint16 maxConnections, uint16 serverPort, const DependencyScope& parentScope)
 	{
 		try
 		{
@@ -96,7 +89,7 @@ namespace Stormancer
 			rakNetLogger->StartLog("packetLogs");
 #endif
 
-			auto wTransport = STRM_WEAK_FROM_THIS();
+			auto wTransport = STORM_WEAK_FROM_THIS();
 			_peer = std::shared_ptr<RakNet::RakPeerInterface>(RakNet::RakPeerInterface::GetInstance(), [wTransport](RakNet::RakPeerInterface* peer)
 			{
 				if (auto transport = wTransport.lock())
@@ -115,13 +108,10 @@ namespace Stormancer
 #ifdef STORMANCER_PACKETFILELOGGER
 			_peer->AttachPlugin(rakNetLogger);
 #endif
-			auto dependencyResolver = _dependencyResolver.lock();
-			if (!dependencyResolver)
+			_dependencyScope = parentScope.beginLifetimeScope([this](ContainerBuilder& builder)
 			{
-				throw std::runtime_error("Dependency resolver is invalid");
-			}
-
-			dependencyResolver->registerDependency(_peer);
+				builder.registerDependency(_peer);
+			});
 
 			if (serverPort != 0)
 			{
@@ -631,6 +621,7 @@ namespace Stormancer
 			pplx::task<void>([connection, reason]()
 			{
 				// Start this asynchronously because we locked the mutex in run and the user can do something that tries to lock again this mutex
+				connection->setConnectionState(ConnectionState(ConnectionState::Disconnecting, reason));
 				connection->setConnectionState(ConnectionState(ConnectionState::Disconnected, reason));
 			});
 		}
@@ -651,10 +642,11 @@ namespace Stormancer
 
 		auto connection = getConnection(rakNetPacket->guid.g);
 		std::streamsize dataSize = (std::streamsize)rakNetPacket->length;
-		byte* data = new byte[dataSize];
-		std::memcpy(data, rakNetPacket->data, dataSize);
+		byte* data = new byte[(unsigned int)dataSize];
+		std::memcpy(data, rakNetPacket->data, (size_t)dataSize);
 
-		Packet_ptr packet(new Packet<>(connection, data, dataSize), [data](Packet<>* packetPtr) {
+		Packet_ptr packet(new Packet<>(connection, data, dataSize), [data](Packet<>* packetPtr)
+		{
 			delete packetPtr;
 			delete[] data;
 		});
@@ -680,11 +672,7 @@ namespace Stormancer
 		if (_peer)
 		{
 			int64 cid = peerId;
-			auto dr = std::make_shared<DependencyResolver>(_dependencyResolver);
-			dr->registerDependency<std::vector<std::weak_ptr<Scene_Impl>>>([](auto dr) {
-				return std::make_shared<std::vector<std::weak_ptr<Scene_Impl>>>();
-			}, true);
-			auto connection = std::shared_ptr<RakNetConnection>(new RakNetConnection(raknetGuid, cid, key, _peer, _logger, dr), deleter<RakNetConnection>());
+			auto connection = std::shared_ptr<RakNetConnection>(new RakNetConnection(raknetGuid, cid, key, _peer, _logger, _dependencyScope), deleter<RakNetConnection>());
 			RakNet::RakNetGUID guid(connection->guid());
 			auto logger = _logger;
 			std::weak_ptr<RakNet::RakPeerInterface> weakPeer = _peer;
@@ -737,9 +725,9 @@ namespace Stormancer
 
 
 
-	std::weak_ptr<DependencyResolver> RakNetTransport::dependencyResolver() const
+	const DependencyScope& RakNetTransport::dependencyResolver() const
 	{
-		return _dependencyResolver;
+		return _dependencyScope;
 	}
 
 	void RakNetTransport::onPacketReceived(std::function<void(Packet_ptr)> callback)
@@ -812,7 +800,7 @@ namespace Stormancer
 		std::vector<pplx::task<bool>> tasks;
 		for (int i = 0; i < nb; i++)
 		{
-			auto wTransport = STRM_WEAK_FROM_THIS();
+			auto wTransport = STORM_WEAK_FROM_THIS();
 			auto pingImplTask = taskDelay(std::chrono::milliseconds(300 * i), cts.get_token())
 				.then([wTransport, address]()
 			{
@@ -863,7 +851,7 @@ namespace Stormancer
 			}
 		});
 
-		auto wTransport = STRM_WEAK_FROM_THIS();
+		auto wTransport = STORM_WEAK_FROM_THIS();
 		return cancel_after_timeout(eventSetTask, cts, 1500)
 			.then([wTransport, address](pplx::task<int> t)
 		{
@@ -904,4 +892,4 @@ namespace Stormancer
 
 		return ips;
 	}
-};
+}

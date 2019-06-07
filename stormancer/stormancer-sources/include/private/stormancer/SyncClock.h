@@ -3,7 +3,7 @@
 #include "stormancer/BuildConfig.h"
 
 
-#include "stormancer/DependencyResolver.h"
+#include "stormancer/DependencyInjection.h"
 #include "stormancer/IConnection.h"
 #include "stormancer/Watch.h"
 #include "stormancer/Logger/ILogger.h"
@@ -14,7 +14,7 @@ namespace Stormancer
 	{
 	public:
 
-		SyncClock(std::weak_ptr<DependencyResolver> resolver, int interval = 1000);
+		SyncClock(const DependencyScope& scope, int interval = 1000);
 		~SyncClock();
 		void start(std::weak_ptr<IConnection> connection, pplx::cancellation_token ct);
 		int lastPing();
@@ -34,7 +34,7 @@ namespace Stormancer
 
 		pplx::cancellation_token _cancellationToken = pplx::cancellation_token::none();
 		std::weak_ptr<IConnection> _remoteConnection;
-		std::weak_ptr<DependencyResolver> _dependencyResolver;
+		DependencyScope _dependencyResolver;
 		std::mutex _mutex;
 		std::deque<ClockValue> _clockValues;
 		Watch _watch;
@@ -49,4 +49,4 @@ namespace Stormancer
 		double _offset = 0;
 		ILogger_ptr _logger;
 	};
-};
+}

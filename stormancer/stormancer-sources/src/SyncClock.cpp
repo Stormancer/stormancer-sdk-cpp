@@ -10,10 +10,10 @@
 
 namespace Stormancer
 {
-	SyncClock::SyncClock(std::weak_ptr<DependencyResolver> dependencyResolver, int interval)
-		: _dependencyResolver(dependencyResolver)
+	SyncClock::SyncClock(const DependencyScope& scope, int interval)
+		: _dependencyResolver(scope.beginLifetimeScope())
 		, _interval(interval)
-		, _logger(dependencyResolver.lock()->resolve<ILogger>())
+		, _logger(scope.resolve<ILogger>())
 	{
 		_watch.reset();
 	}
@@ -28,7 +28,7 @@ namespace Stormancer
 
 	void SyncClock::start(std::weak_ptr<IConnection> connectionPtr, pplx::cancellation_token ct)
 	{
-		auto logger = _dependencyResolver.lock()->resolve<ILogger>();
+		auto logger = _dependencyResolver.resolve<ILogger>();
 		logger->log(LogLevel::Trace, "synchronizedClock", "Starting SyncClock...");
 
 		if (!compareExchange(_mutex, _isRunning, false, true))
@@ -43,13 +43,13 @@ namespace Stormancer
 		}
 		_remoteConnection = connection;
 
-		auto  scheduler = _dependencyResolver.lock()->resolve<IScheduler>();
+		auto  scheduler = _dependencyResolver.resolve<IScheduler>();
 		if (scheduler)
 		{
 			_cancellationToken = ct;
 
 			auto cts = pplx::cancellation_token_source::create_linked_source(_cancellationToken);
-			auto wSyncClock = STRM_WEAK_FROM_THIS();
+			auto wSyncClock = STORM_WEAK_FROM_THIS();
 
 			scheduler->schedulePeriodic(_interval, [wSyncClock, cts]()
 			{
@@ -135,7 +135,7 @@ namespace Stormancer
 		{
 			_lastPingFinished = false;
 			uint64 timeStart = _watch.getElapsedTime();
-			auto requestProcessor = _dependencyResolver.lock()->resolve<RequestProcessor>();
+			auto requestProcessor = _dependencyResolver.resolve<RequestProcessor>();
 			auto remoteConnection = _remoteConnection.lock();
 			if (!remoteConnection)
 			{
@@ -143,9 +143,9 @@ namespace Stormancer
 			}
 
 			// Keep an active reference to the logger, in case the task is cancelled we cannot rely on this being valid
-			auto logger = _dependencyResolver.lock()->resolve<ILogger>();
+			auto logger = _dependencyResolver.resolve<ILogger>();
 			auto cancellationToken = _cancellationToken;
-			auto wSyncClock = STRM_WEAK_FROM_THIS();
+			auto wSyncClock = STORM_WEAK_FROM_THIS();
 			requestProcessor->sendSystemRequest(remoteConnection.get(), (byte)SystemRequestIDTypes::ID_PING, [&timeStart](obytestream& bs) {
 				bs << timeStart;
 			}, PacketPriority::IMMEDIATE_PRIORITY, _cancellationToken)
@@ -222,7 +222,7 @@ namespace Stormancer
 		}
 		catch (const std::exception& ex)
 		{
-			auto logger = _dependencyResolver.lock()->resolve<ILogger>();
+			auto logger = _dependencyResolver.resolve<ILogger>();
 			logger->log(LogLevel::Error, "Client::syncClockImpl", "Failed to ping server.", ex.what());
 			throw std::runtime_error((std::string() + ex.what() + "\nFailed to ping server.").c_str());
 		}

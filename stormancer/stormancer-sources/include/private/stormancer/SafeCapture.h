@@ -6,9 +6,9 @@
 #include <memory>
 
 #if __cplusplus >= 201703L
-#define STRM_WEAK_FROM_THIS() this->weak_from_this()
+#define STORM_WEAK_FROM_THIS() this->weak_from_this()
 #else
-#define STRM_WEAK_FROM_THIS() Stormancer::GetWeakFromThis(this)
+#define STORM_WEAK_FROM_THIS() Stormancer::GetWeakFromThis(this)
 #endif
 
 namespace Stormancer
@@ -40,12 +40,12 @@ namespace Stormancer
 	}
 
 	template<typename T>
-	std::shared_ptr<T> LockOrThrow(std::weak_ptr<T> wPtr)
+	std::shared_ptr<T> LockOrThrow(std::weak_ptr<T> wPtr, const std::string& errorMessage = "")
 	{
 		auto sPtr = wPtr.lock();
 		if (!sPtr)
 		{
-			throw PointerDeletedException();
+			throw PointerDeletedException(errorMessage);
 		}
 		return sPtr;
 	}

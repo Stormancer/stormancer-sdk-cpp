@@ -4,7 +4,7 @@ namespace Stormancer
 {
 	ServersService::ServersService(std::weak_ptr<Scene> scene)
 		: _scene(scene),
-		_rpcService(_scene.lock()->dependencyResolver()->resolve<RpcService>())
+		_rpcService(_scene.lock()->dependencyResolver().resolve<RpcService>())
 	{		
 	}
 

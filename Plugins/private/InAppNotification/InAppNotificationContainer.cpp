@@ -22,6 +22,6 @@ namespace Stormancer
 			throw PointerDeletedException("Scene deleted");
 		}
 
-		return scene->dependencyResolver()->resolve<InAppNotificationService>();
+		return scene->dependencyResolver().resolve<InAppNotificationService>();
 	}
 }

@@ -120,7 +120,7 @@ namespace Stormancer
 		pplx::task<TResult> sendRequestToUser(const std::string& userId, const std::string& operation, pplx::cancellation_token ct, const TArgs&... args)
 		{
 			return getAuthenticationScene().then([ct, userId, operation, args...](std::shared_ptr<Scene> scene) {
-				auto rpc = scene->dependencyResolver()->resolve<RpcService>();
+				auto rpc = scene->dependencyResolver().resolve<RpcService>();
 				return rpc->rpc<TResult>("sendRequest", ct, userId, operation, args...);
 			});
 
@@ -162,7 +162,7 @@ namespace Stormancer
 
 #pragma endregion
 	};
-};
+}
 
 #ifdef __clang__
 #pragma clang diagnostic pop

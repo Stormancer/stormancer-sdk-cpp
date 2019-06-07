@@ -55,6 +55,20 @@ namespace Stormancer
 
 #pragma region public_method
 
+		void registerClientDependencies(ContainerBuilder& builder) override
+		{
+			bool enabledOnContext = (options.contextFlags & ServiceContextFlags::Client) != ServiceContextFlags::None;
+			if (enabledOnContext)
+			{
+				bool singleInstance = (options.contextFlags & ServiceContextFlags::SingleInstance) != ServiceContextFlags::None;
+				auto registration = builder.registerDependency<T>();
+				if (singleInstance)
+				{
+					registration.singleInstance();
+				}
+			}
+		}
+
 		void clientCreated(std::shared_ptr<IClient> client) override
 		{
 			if (!client)
@@ -62,21 +76,15 @@ namespace Stormancer
 				throw std::runtime_error("The client has been deleted.");
 			}
 
-			bool enabledOnContext = (options.contextFlags & ServiceContextFlags::Client) != ServiceContextFlags::None;
-			if (enabledOnContext)
-			{
-				bool singleInstance = (options.contextFlags & ServiceContextFlags::SingleInstance) != ServiceContextFlags::None;
-				client->dependencyResolver()->registerDependency<T>([](std::weak_ptr<DependencyResolver>) { return std::make_shared<T>(); }, singleInstance);
-			}
 			bool createWithClient = (options.contextFlags & ServiceContextFlags::CreateWithClient) != ServiceContextFlags::None;
 			if (createWithClient)
 			{
-				auto service = client->dependencyResolver()->resolve<T>();
+				auto service = client->dependencyResolver().resolve<T>();
 				service->setClient(client);
 			}
 		}
 
-		void registerSceneDependencies(std::shared_ptr<Scene> scene) override
+		void registerSceneDependencies(ContainerBuilder& sceneBuilder, std::shared_ptr<Scene> scene) override
 		{
 			if (!scene)
 			{
@@ -87,8 +95,11 @@ namespace Stormancer
 			bool enabledOnScene = SingleServicePlugin::isEnabled(scene, options.metadataKey);
 			if (enabledOnContext && enabledOnScene)
 			{
-				bool singleInstance = (options.contextFlags & ServiceContextFlags::SingleInstance) != ServiceContextFlags::None;
-				scene->dependencyResolver()->registerDependency<T>([](std::weak_ptr<DependencyResolver>) { return std::make_shared<T>(); }, singleInstance);
+				auto registration = sceneBuilder.registerDependency<T>();
+				if ((options.contextFlags & ServiceContextFlags::SingleInstance) != ServiceContextFlags::None)
+				{
+					registration.singleInstance();
+				}
 			}
 		}
 
@@ -103,7 +114,7 @@ namespace Stormancer
 			bool enabledOnScene = SingleServicePlugin::isEnabled(scene, options.metadataKey);
 			if (createWithScene && enabledOnScene)
 			{
-				auto service = scene->dependencyResolver()->resolve<T>();
+				auto service = scene->dependencyResolver().resolve<T>();
 				service->setScene(scene);
 			}
 		}
@@ -112,7 +123,7 @@ namespace Stormancer
 		{
 			if (SingleServicePlugin::isEnabled(scene, options.metadataKey))
 			{
-				auto service = scene->dependencyResolver()->resolve<T>();
+				auto service = scene->dependencyResolver().resolve<T>();
 				service->sceneConnected(scene);
 			}
 		}
@@ -134,4 +145,4 @@ namespace Stormancer
 
 #pragma endregion
 	};
-};
+}

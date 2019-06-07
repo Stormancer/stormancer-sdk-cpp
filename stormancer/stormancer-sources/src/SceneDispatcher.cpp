@@ -8,15 +8,11 @@ namespace Stormancer
 {
 	SceneDispatcher::SceneDispatcher(std::shared_ptr<IActionDispatcher> evDispatcher)
 		: _eventDispatcher(evDispatcher)
-		/*, _scenes((uint32)0xff - (uint32)MessageIDTypes::ID_SCENES + 1)*/
 	{
-		handler = new processorFunction([=](uint8 sceneHandle, Packet_ptr packet) {
+		handler = [=](uint8 sceneHandle, Packet_ptr packet)
+		{
 			return handler_impl(sceneHandle, packet);
-		});
-	}
-
-	SceneDispatcher::~SceneDispatcher()
-	{
+		};
 	}
 
 	void SceneDispatcher::registerProcessor(PacketProcessorConfig& config)
@@ -31,7 +27,7 @@ namespace Stormancer
 
 	void SceneDispatcher::resize(std::vector<std::weak_ptr<Scene_Impl>>& handles, uint8 index)
 	{
-		if (handles.capacity() < index + 1)
+		if ((uint8)handles.capacity() < index + 1)
 		{
 			auto newSize = (index + 1) * 2;
 			if (newSize < 8)
@@ -48,11 +44,10 @@ namespace Stormancer
 
 	std::shared_ptr<std::vector<std::weak_ptr<Scene_Impl>>> SceneDispatcher::getHandles(const IConnection& connection)
 	{
-
-		return connection.dependencyResolver()->resolve<std::vector<std::weak_ptr<Scene_Impl>>>();
+		return connection.dependencyResolver().resolve<std::vector<std::weak_ptr<Scene_Impl>>>();
 	}
 
-	void SceneDispatcher::addScene(std::shared_ptr<IConnection> connection, Scene_ptr scene)
+	void SceneDispatcher::addScene(std::shared_ptr<IConnection> connection, std::shared_ptr<Scene_Impl> scene)
 	{
 		if (scene && connection)
 		{
@@ -100,7 +95,8 @@ namespace Stormancer
 			if (scene)
 			{
 				packet->metadata["scene"] = scene->id();
-				_eventDispatcher->post([=]() {
+				_eventDispatcher->post([=]()
+				{
 					if (auto scene = scene_weak.lock())
 					{
 						scene->handleMessage(packet);
@@ -112,7 +108,7 @@ namespace Stormancer
 		return false;
 	}
 
-	Scene_ptr Stormancer::SceneDispatcher::getScene(std::shared_ptr<IConnection> connection, uint8 sceneHandle)
+	std::shared_ptr<Scene_Impl> Stormancer::SceneDispatcher::getScene(std::shared_ptr<IConnection> connection, uint8 sceneHandle)
 	{
 		auto handles = getHandles(*connection);
 		auto index = getSceneIndex(sceneHandle);
@@ -125,4 +121,4 @@ namespace Stormancer
 			return nullptr;
 		}
 	}
-};
+}

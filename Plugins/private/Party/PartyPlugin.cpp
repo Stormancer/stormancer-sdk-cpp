@@ -11,38 +11,35 @@
 
 namespace Stormancer
 {
-	void PartyPlugin::sceneCreated(std::shared_ptr<Scene> scene)
+	void PartyPlugin::registerSceneDependencies(ContainerBuilder& builder, std::shared_ptr<Scene> scene)
 	{
 		if (scene)
 		{
 			auto name = scene->getHostMetadata("stormancer.party");
 			if (name.length() > 0)
 			{
-				auto service = std::make_shared<PartyService>(scene);
-				service->initialize();
-				scene->dependencyResolver()->registerDependency<PartyService>(service);
+				builder.registerDependency<PartyService, Scene>().singleInstance();
 			}
 
 			name = scene->getHostMetadata("stormancer.partymanagement");
 			if (name.length() > 0)
 			{
-				auto service = std::make_shared<PartyManagementService>(scene);
-				scene->dependencyResolver()->registerDependency<PartyManagementService>(service);
+				builder.registerDependency<PartyManagementService, Scene>().singleInstance();
 			}
 		}
 	}
 
-
-	void PartyPlugin::clientCreated(std::shared_ptr<IClient> client)
+	void PartyPlugin::sceneCreated(std::shared_ptr<Scene> scene)
 	{
-		if (client)
-		{
-			client->dependencyResolver()->registerDependency<Party>([](std::weak_ptr<DependencyResolver> dr) {
-				auto service =  std::make_shared<Party_Impl>(dr.lock()->resolve<AuthenticationService>(), dr.lock()->resolve<ILogger>(), dr.lock()->resolve<GameFinder>());
-				service->initialize();
-				return service;
-			}, true);
-		}
+		scene->dependencyResolver().resolve<PartyService>()->initialize();
 	}
 
-};
+	void PartyPlugin::registerClientDependencies(ContainerBuilder& builder)
+	{
+		builder.registerDependency<Party>([](const DependencyScope& dr) {
+			auto service =  std::make_shared<Party_Impl>(dr.resolve<AuthenticationService>(), dr.resolve<ILogger>(), dr.resolve<GameFinder>());
+			service->initialize();
+			return service;
+		}).singleInstance();
+	}
+}

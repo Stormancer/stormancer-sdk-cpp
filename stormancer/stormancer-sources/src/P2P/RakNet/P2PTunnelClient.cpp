@@ -105,4 +105,4 @@ namespace Stormancer
 	{
 		return RakNet::OP_NEW<RakNet::RNS2RecvStruct>(file, line);
 	}
-};
+}

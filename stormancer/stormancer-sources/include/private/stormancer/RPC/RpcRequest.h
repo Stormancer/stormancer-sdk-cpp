@@ -23,4 +23,4 @@ namespace Stormancer
 	};
 
 	using RpcRequest_ptr = std::shared_ptr<RpcRequest>;
-};
+}

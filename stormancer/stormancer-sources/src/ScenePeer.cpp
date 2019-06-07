@@ -1,56 +1,23 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/ScenePeer.h"
 #include "stormancer/ChannelUidStore.h"
+#include "stormancer/SafeCapture.h"
 
 namespace Stormancer
 {
-	ScenePeer::ScenePeer(std::weak_ptr<IConnection> connection, byte sceneHandle, std::map<std::string, Route_ptr>& routeMapping, std::weak_ptr<Scene> scene)
-		: _connection(connection),
-		_sceneHandle(sceneHandle),
-		_routeMapping(routeMapping),
-		_scene(scene)
+	ScenePeer::ScenePeer(std::weak_ptr<IConnection> connection, byte sceneHandle, std::unordered_map<std::string, Route_ptr>& routes, std::weak_ptr<Scene> scene)
+		: _connection(connection)
+		, _sceneHandle(sceneHandle)
+		, _routes(routes)
+		, _scene(scene)
 	{
 	}
 
-	ScenePeer::~ScenePeer()
+	uint64 ScenePeer::id() const
 	{
+		return _connection->id();
 	}
 
-	void ScenePeer::send(const std::string& routeName, const StreamWriter& streamWriter, PacketPriority priority, PacketReliability reliability)
-	{
-		auto connection = _connection.lock();
-		if (!connection)
-		{
-			throw std::runtime_error("Connection deleted.");
-		}
-
-		if (!mapContains(_routeMapping, routeName))
-		{
-			throw std::invalid_argument(std::string("The routeName '") + routeName + "' is not declared on the server.");
-		}
-		Route_ptr route = _routeMapping[routeName];
-		std::stringstream ss;
-		ss << "ScenePeer_" << id() << "_" << routeName;
-		int channelUid = connection->dependencyResolver()->resolve<ChannelUidStore>()->getChannelUid(ss.str());
-		auto sceneHandle = _sceneHandle;
-		connection->send([sceneHandle, route, &streamWriter](obytestream& stream) {
-			stream << sceneHandle;
-			stream << route->handle();
-			if (streamWriter)
-			{
-				streamWriter(stream);
-			}
-		}, channelUid, priority, reliability);
-	}
-
-	void ScenePeer::disconnect()
-	{
-		auto scene = _scene.lock();
-		if (scene)
-		{
-			scene->disconnect();
-		}
-	}
 	std::string ScenePeer::getSceneId() const
 	{
 		auto scene = _scene.lock();
@@ -61,14 +28,29 @@ namespace Stormancer
 		}
 		return scene->id();
 	}
-	uint64 ScenePeer::id()
-	{
-		auto connection = _connection.lock();
-		if (!connection)
-		{
-			throw std::runtime_error("Connection deleted.");
-		}
 
-		return connection->id();
+	std::shared_ptr<IConnection> ScenePeer::connection() const
+	{
+		return _connection;
 	}
-};
+
+	const std::unordered_map<std::string, Route_ptr>& ScenePeer::routes() const
+	{
+		return _routes;
+	}
+
+	void ScenePeer::send(const std::string& routeName, const StreamWriter& streamWriter, PacketPriority priority, PacketReliability reliability, const std::string& channelIdentifier)
+	{
+		auto scene = LockOrThrow(_scene);
+		scene->send(routeName, streamWriter, priority, reliability, channelIdentifier);
+	}
+
+	void ScenePeer::disconnect()
+	{
+		auto scene = _scene.lock();
+		if (scene)
+		{
+			scene->disconnect();
+		}
+	}
+}

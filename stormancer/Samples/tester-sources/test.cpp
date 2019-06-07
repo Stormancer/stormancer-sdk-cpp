@@ -1,6 +1,7 @@
 #include "test.h"
 #include "stormancer/Utilities/TaskUtilities.h"
-
+#include "TestDependencyInjection.h"
+#include "Helloworld/Helloworld.hpp"
 
 using namespace std::literals;
 
@@ -221,7 +222,7 @@ namespace Stormancer
 				_logger->log(LogLevel::Debug, "test_connect", "Add route OK");
 
 				_logger->log(LogLevel::Debug, "test_connect", "Add procedure");
-				auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
+				auto rpcService = scene->dependencyResolver().resolve<RpcService>();
 				rpcService->addProcedure("rpc", [this](RpcRequestContext_ptr rc) { return test_rpc_client_received(rc); }, MessageOriginFilter::Host, true);
 				rpcService->addProcedure("rpcCancel", [this](RpcRequestContext_ptr rc) { return test_rpc_client_cancel_received(rc); }, MessageOriginFilter::Host, true);
 				rpcService->addProcedure("rpcException", [this](RpcRequestContext_ptr rc) { return test_rpc_client_exception_received(rc); }, MessageOriginFilter::Host, true);
@@ -244,14 +245,16 @@ namespace Stormancer
 
 					_logger->log(LogLevel::Debug, "test_connect", "Connect to scene OK");
 					_logger->log(LogLevel::Debug, "test_connect", "External addresses: " + connection->metadata("externalAddrs"));
-
-					execNextTest();
+					
+					
 				}
 				catch (const std::exception& ex)
 				{
-					_logger->log(LogLevel::Error, "test_connect", "Failed to get and connect the scene.", ex.what());
+					_logger->log(LogLevel::Error, "test_connect", "Failed to get and connect to the scene.", ex.what());
 				}
-			});
+					}).then([this]() {
+						this->execNextTest();
+						});
 		}
 		catch (const std::exception& ex)
 		{
@@ -298,7 +301,7 @@ namespace Stormancer
 		}
 
 		// get the RPC service
-		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
+		auto rpcService = scene->dependencyResolver().resolve<RpcService>();
 
 		// We do an RPC on the server (by sending the string "stormancer") and get back a string response (that should be "stormancer" too)
 		rpcService->rpc<std::string>("rpc", "stormancer")
@@ -353,7 +356,7 @@ namespace Stormancer
 			return;
 		}
 
-		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
+		auto rpcService = scene->dependencyResolver().resolve<RpcService>();
 
 		auto observable = rpcService->rpcObservable("rpcCancel", [](obytestream& stream)
 		{
@@ -416,7 +419,7 @@ namespace Stormancer
 			return;
 		}
 
-		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
+		auto rpcService = scene->dependencyResolver().resolve<RpcService>();
 
 		rpcService->rpc<void>("rpcException")
 			.then([this](pplx::task<void> t)
@@ -445,7 +448,7 @@ namespace Stormancer
 			return;
 		}
 
-		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
+		auto rpcService = scene->dependencyResolver().resolve<RpcService>();
 
 		rpcService->rpc<void>("rpcClientException")
 			.then([this](pplx::task<void> t)
@@ -643,10 +646,29 @@ namespace Stormancer
 			catch (std::exception ex)
 			{
 				_logger->log(LogLevel::Error, "test_Ping_Cluster", "Ping Cluster FAILED", ex.what());
+				return;
 			}
 			execNextTest();
 		});
 	}
+
+	void Tester::test_dependencyInjection()
+	{
+		_logger->log(LogLevel::Info, "test_dependencyInjection", "DEPENDENCY INJECTION");
+
+		try
+		{
+			TestDependencyInjection::runTests();
+		}
+		catch (const std::exception& ex)
+		{
+			_logger->log(LogLevel::Error, "test_dependencyInjection", "Dependency Injection FAILED", ex.what());
+			return;
+		}
+		_logger->log(LogLevel::Info, "test_dependencyInjection", "Dependency Injection OK");
+		execNextTest();
+	}
+
 
 	void Tester::run_all_tests_nonblocking()
 	{
@@ -666,6 +688,7 @@ namespace Stormancer
 		_tests.push_back([this]() { test_setServerTimeout(); });
 		_tests.push_back([this]() { test_disconnect(); });
 		_tests.push_back([this]() { test_Ping_Cluster(); });
+		_tests.push_back([this]() { test_dependencyInjection(); });
 		_tests.push_back([this]() { test_clean(); });
 
 		// Some platforms require a Client to be created before using pplx::task

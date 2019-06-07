@@ -23,7 +23,7 @@ namespace Stormancer
 
 	GameFinderService::GameFinderService(std::shared_ptr<Scene> scene)
 		: _scene(scene)
-		, _rpcService(scene->dependencyResolver()->resolve<RpcService>())
+		, _rpcService(scene->dependencyResolver().resolve<RpcService>())
 	{
 	}
 

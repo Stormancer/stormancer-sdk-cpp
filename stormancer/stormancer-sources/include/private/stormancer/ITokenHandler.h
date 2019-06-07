@@ -18,4 +18,4 @@ namespace Stormancer
 		//Protocol v2
 		virtual SceneEndpoint getSceneEndpointInfo(const std::string& token) = 0;
 	};
-};
+}

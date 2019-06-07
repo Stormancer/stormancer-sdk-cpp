@@ -7,24 +7,6 @@
     <Filter Include="Source Files">
       <UniqueIdentifier>{2f4fe04f-cb8e-4ee4-8921-c3683c56e3f9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Compatibility">
-      <UniqueIdentifier>{569fa282-667c-4c20-aa6d-12149788b0de}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Logger">
-      <UniqueIdentifier>{eb7bdae8-78d8-4d4e-a386-22f340c02180}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\P2P">
-      <UniqueIdentifier>{ea33c29b-a3fa-4bb8-957e-d6d3544a4c31}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\P2P\RakNet">
-      <UniqueIdentifier>{76fedf9a-c1bc-4d76-8200-8f6dbdc9e3c3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\RakNet">
-      <UniqueIdentifier>{d0dd9a28-a36e-4f17-bc6f-08e5ab841a7f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\RPC">
-      <UniqueIdentifier>{05aad83d-92b0-4544-ab64-f94ba5dbca02}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Logger">
       <UniqueIdentifier>{ec34b893-d6f1-4ab2-9054-d0dab3301f13}</UniqueIdentifier>
     </Filter>
@@ -40,20 +22,11 @@
     <Filter Include="Source Files\RPC">
       <UniqueIdentifier>{cf45ac12-9922-4096-b84a-5549f4e2d5ff}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Streams">
-      <UniqueIdentifier>{5534fc1d-c953-4fe1-941f-225069d5e0b5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Streams">
       <UniqueIdentifier>{9c0bdb90-cdbc-43a4-b15f-92eefa185f33}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\AES">
-      <UniqueIdentifier>{b71409f6-fc96-4248-86db-c2cbbf8bfb61}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\AES">
       <UniqueIdentifier>{f6b714b8-9eed-4953-b9aa-4508b544dea0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Debug">
-      <UniqueIdentifier>{161b30c2-ef9b-46a5-8fc3-3da65f8b9a5d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Debug">
       <UniqueIdentifier>{e5488da8-a529-4c65-9b24-56e17db013a6}</UniqueIdentifier>
@@ -76,349 +49,115 @@
     <Filter Include="Header Files\public\Utilities">
       <UniqueIdentifier>{353099ae-976d-40ee-bdff-f2a08d8be21f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\private">
+      <UniqueIdentifier>{90afca8d-32bd-4d9b-b706-fde5ebf0269e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\private\AES">
+      <UniqueIdentifier>{b71409f6-fc96-4248-86db-c2cbbf8bfb61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\private\Compatibility">
+      <UniqueIdentifier>{569fa282-667c-4c20-aa6d-12149788b0de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\private\Debug">
+      <UniqueIdentifier>{161b30c2-ef9b-46a5-8fc3-3da65f8b9a5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\private\P2P">
+      <UniqueIdentifier>{a5b4ba23-268c-43d6-ae02-b806616d118b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\private\P2P\RakNet">
+      <UniqueIdentifier>{76fedf9a-c1bc-4d76-8200-8f6dbdc9e3c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\private\RakNet">
+      <UniqueIdentifier>{d0dd9a28-a36e-4f17-bc6f-08e5ab841a7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\private\RPC">
+      <UniqueIdentifier>{65800b33-4e60-4234-b779-96c114b91f6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\public\Logger">
+      <UniqueIdentifier>{eb7bdae8-78d8-4d4e-a386-22f340c02180}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\public\P2P">
+      <UniqueIdentifier>{ea33c29b-a3fa-4bb8-957e-d6d3544a4c31}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\public\RPC">
+      <UniqueIdentifier>{05aad83d-92b0-4544-ab64-f94ba5dbca02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\public\Streams">
+      <UniqueIdentifier>{5534fc1d-c953-4fe1-941f-225069d5e0b5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ApiClient.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\Client.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ConnectionData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ConnectionResult.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ConnectToSceneMsg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\DefaultPacketDispatcher.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\DefaultScheduler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\Helpers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IConnectionManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IPacketDispatcher.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IPacketProcessor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IRequestModule.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IScheduler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ITokenHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ITransport.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\MessageIDTypes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\PacketProcessorConfig.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\RequestContext.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\RequestModuleBuilder.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\RequestProcessor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\RouteDto.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SceneDispatcher.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SceneEndpoint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SceneInfosDto.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SceneInfosRequestDto.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ScenePeer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SyncClock.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SystemRequest.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SystemRequestIDTypes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\TokenHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\Watch.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\Compatibility\IStormancerTask.h">
-      <Filter>Header Files\Compatibility</Filter>
+      <Filter>Header Files\private\Compatibility</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\Compatibility\pplxtasks_noexcept.h">
-      <Filter>Header Files\Compatibility</Filter>
+      <Filter>Header Files\private\Compatibility</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\Compatibility\StormancerResult.h">
-      <Filter>Header Files\Compatibility</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\ConnectionsRepository.h">
-      <Filter>Header Files\P2P</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\ConnectivityCandidate.h">
-      <Filter>Header Files\P2P</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\EndpointCandidate.h">
-      <Filter>Header Files\P2P</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\OpenRelayParameters.h">
-      <Filter>Header Files\P2P</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\P2PPacketDispatcher.h">
-      <Filter>Header Files\P2P</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\P2PRequestModule.h">
-      <Filter>Header Files\P2P</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\P2PScenePeer.h">
-      <Filter>Header Files\P2P</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\P2PService.h">
-      <Filter>Header Files\P2P</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\P2PSession.h">
-      <Filter>Header Files\P2P</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\P2PSessions.h">
-      <Filter>Header Files\P2P</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\RelayConnection.h">
-      <Filter>Header Files\P2P</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\ServerDescriptor.h">
-      <Filter>Header Files\P2P</Filter>
+      <Filter>Header Files\private\Compatibility</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\RakNet\P2PTunnels.h">
-      <Filter>Header Files\P2P\RakNet</Filter>
+      <Filter>Header Files\private\P2P\RakNet</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\RakNet\P2PTunnelClient.h">
-      <Filter>Header Files\P2P\RakNet</Filter>
+      <Filter>Header Files\private\P2P\RakNet</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\RakNet\RakNetConnection.h">
-      <Filter>Header Files\RakNet</Filter>
+      <Filter>Header Files\private\RakNet</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\RakNet\RakNetTransport.h">
-      <Filter>Header Files\RakNet</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\RPC\RpcRequest.h">
-      <Filter>Header Files\RPC</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ClientFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ChannelUidStore.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IPacketTransform.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\private\RakNet</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\AES\AESEncryptStream.h">
-      <Filter>Header Files\AES</Filter>
+      <Filter>Header Files\private\AES</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\AES\AESPacketTransform.h">
-      <Filter>Header Files\AES</Filter>
+      <Filter>Header Files\private\AES</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\AES\AESDecryptStream.h">
-      <Filter>Header Files\AES</Filter>
+      <Filter>Header Files\private\AES</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\AES\AES.h">
-      <Filter>Header Files\AES</Filter>
+      <Filter>Header Files\private\AES</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\AES\IAES.h">
-      <Filter>Header Files\AES</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\P2PConnectToSceneMessage.h">
-      <Filter>Header Files\P2P</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SafeCapture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\OpenTunnelResult.h">
-      <Filter>Header Files\P2P</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\KeyStore.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\PacketTransformProcessor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\Shutdown.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\private\AES</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\Debug\StackWalker.h">
-      <Filter>Header Files\Debug</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\IClient.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\IPlugin.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\private\Debug</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\P2P\IP2PScenePeer.h">
-      <Filter>Header Files\P2P</Filter>
+      <Filter>Header Files\public\P2P</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\RPC\RpcRequestContext.h">
-      <Filter>Header Files\RPC</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\IClientFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\IConnection.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\msgpack_define.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Packet.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\PacketPriority.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\MessageOriginFilter.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\public\RPC</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\P2P\P2PConnectionStateChangedArgs.h">
-      <Filter>Header Files\P2P</Filter>
+      <Filter>Header Files\public\P2P</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\P2P\P2PTunnel.h">
-      <Filter>Header Files\P2P</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\DependencyResolver.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\public\P2P</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\RPC\RpcPlugin.h">
-      <Filter>Header Files\RPC</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Serializer.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\public\RPC</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\RPC\Constants.h">
-      <Filter>Header Files\RPC</Filter>
+      <Filter>Header Files\public\RPC</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Streams\bytestream.h">
-      <Filter>Header Files\Streams</Filter>
+      <Filter>Header Files\public\Streams</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Streams\bytestreambuf.h">
-      <Filter>Header Files\Streams</Filter>
+      <Filter>Header Files\public\Streams</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Streams\ibytestream.h">
-      <Filter>Header Files\Streams</Filter>
+      <Filter>Header Files\public\Streams</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Streams\obytestream.h">
-      <Filter>Header Files\Streams</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Event.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SceneImpl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Scene.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\public\Streams</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\RPC\Service.h">
-      <Filter>Header Files\RPC</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Action.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Configuration.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\ConnectionState.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ContainerConfigurator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Exceptions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\IActionDispatcher.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\IScenePeer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\IService.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\PeerFilter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Route.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Logger\ConsoleLogger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Logger\ConsoleLoggerWindows.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Logger\FileLogger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Logger\ILogger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Logger\NullLogger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\P2P\P2PEnums.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\SingleServicePlugin.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\StormancerTypes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\TimerThread.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\TransformMetadata.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Federation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\BuildConfig.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Tasks.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\public\RPC</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\TaskUtilities.h">
       <Filter>Header Files\public\Utilities</Filter>
@@ -462,6 +201,284 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\MsgpackJsonAdaptor.h">
       <Filter>Header Files\public\Utilities</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\DependencyInjection.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ApiClient.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ChannelUidStore.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\Client.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ClientFactory.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ConnectionData.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ConnectionResult.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ConnectToSceneMsg.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ContainerConfigurator.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\DefaultPacketDispatcher.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\DefaultScheduler.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\Helpers.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IConnectionManager.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IPacketDispatcher.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IPacketProcessor.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IPacketTransform.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IRequestModule.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ITokenHandler.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ITransport.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\KeyStore.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\MessageIDTypes.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\PacketProcessorConfig.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\PacketTransformProcessor.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\RequestContext.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\RequestModuleBuilder.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\RequestProcessor.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SafeCapture.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SceneDispatcher.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SceneEndpoint.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SceneImpl.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SceneInfosDto.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SceneInfosRequestDto.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ScenePeer.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\Shutdown.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\stdafx.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SyncClock.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SystemRequest.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SystemRequestIDTypes.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\TokenHandler.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\Watch.h">
+      <Filter>Header Files\private</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\ConnectionsRepository.h">
+      <Filter>Header Files\private\P2P</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\ConnectivityCandidate.h">
+      <Filter>Header Files\private\P2P</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\EndpointCandidate.h">
+      <Filter>Header Files\private\P2P</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\OpenRelayParameters.h">
+      <Filter>Header Files\private\P2P</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\OpenTunnelResult.h">
+      <Filter>Header Files\private\P2P</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\P2PPacketDispatcher.h">
+      <Filter>Header Files\private\P2P</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\P2PRequestModule.h">
+      <Filter>Header Files\private\P2P</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\P2PScenePeer.h">
+      <Filter>Header Files\private\P2P</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\P2PService.h">
+      <Filter>Header Files\private\P2P</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\P2PSession.h">
+      <Filter>Header Files\private\P2P</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\P2PSessions.h">
+      <Filter>Header Files\private\P2P</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\RelayConnection.h">
+      <Filter>Header Files\private\P2P</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\P2P\ServerDescriptor.h">
+      <Filter>Header Files\private\P2P</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\RPC\RpcRequest.h">
+      <Filter>Header Files\private\RPC</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Action.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\BuildConfig.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Configuration.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\ConnectionState.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Event.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Exceptions.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Federation.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\IActionDispatcher.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\IClient.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\IClientFactory.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\IConnection.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\IPlugin.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\IScenePeer.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\IService.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\MessageOriginFilter.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\msgpack_define.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Packet.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\PacketPriority.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\PeerFilter.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Route.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\RouteDto.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Scene.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Serializer.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\SingleServicePlugin.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\StormancerTypes.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Tasks.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\TimerThread.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\TransformMetadata.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Logger\ConsoleLogger.h">
+      <Filter>Header Files\public\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Logger\ConsoleLoggerWindows.h">
+      <Filter>Header Files\public\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Logger\FileLogger.h">
+      <Filter>Header Files\public\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Logger\ILogger.h">
+      <Filter>Header Files\public\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Logger\NullLogger.h">
+      <Filter>Header Files\public\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\P2P\P2PConnectToSceneMessage.h">
+      <Filter>Header Files\public\P2P</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\P2P\P2PEnums.h">
+      <Filter>Header Files\public\P2P</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\TypeReflection.h">
+      <Filter>Header Files\public\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Subscription.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\Macros.h">
+      <Filter>Header Files\public\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\IScheduler.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\MsgpackCArrayAdaptor.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Configuration.cpp">
@@ -471,9 +488,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\DefaultScheduler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\DependencyResolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\dllmain.cpp">
@@ -664,6 +678,12 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Utilities\StringUtilities.cpp">
       <Filter>Source Files\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\DependencyInjection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Subscription.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

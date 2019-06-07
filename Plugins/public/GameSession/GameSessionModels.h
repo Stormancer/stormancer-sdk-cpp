@@ -94,17 +94,10 @@ namespace Stormancer
 		MSGPACK_DEFINE(score, leaderboardName)
 	};
 
-	struct GameSessionResult
-	{
-		std::map<std::string, std::string> usersScore;
-		MSGPACK_DEFINE(usersScore)
-	};
-
 	struct GameSessionConnectionParameters
 	{
 		bool isHost;
 		std::string hostMap;
 		std::string endpoint;
-		std::string errorMessage;
 	};
 }

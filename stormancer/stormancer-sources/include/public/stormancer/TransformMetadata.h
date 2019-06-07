@@ -4,7 +4,7 @@
 
 #include <memory>
 #include <string>
-#include <map>
+#include <unordered_map>
 
 namespace Stormancer
 {
@@ -14,7 +14,7 @@ namespace Stormancer
 		TransformMetadata();
 		TransformMetadata(std::weak_ptr<Scene> scene);
 
-		const std::map<std::string, std::string>& sceneMetadata();
+		const std::unordered_map<std::string, std::string>& sceneMetadata();
 		std::string sceneId;
 		std::string routeName;
 		int sceneHandle = 0;

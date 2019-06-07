@@ -29,4 +29,4 @@ namespace Stormancer
 		/// Empty implementation.
 		void log(const std::exception& ex);
 	};
-};
+}

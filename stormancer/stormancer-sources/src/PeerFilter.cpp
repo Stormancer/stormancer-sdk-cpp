@@ -1,8 +1,15 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/PeerFilter.h"
+#include "stormancer/Serializer.h"
+#include <algorithm>
 
 namespace Stormancer
 {
+	PeerFilter::PeerFilter()
+		: type(PeerFilterType::MatchSceneHost)
+	{
+	}
+
 	PeerFilter::PeerFilter(PeerFilterType type)
 		: type(type)
 	{
@@ -20,47 +27,57 @@ namespace Stormancer
 	{
 	}
 
-	PeerFilter::~PeerFilter()
-	{
-	}
-	
 	PeerFilter PeerFilter::readFilter(ibytestream& stream)
 	{
-		byte peerType;
-		stream >> peerType;
+		Serializer serializer;
+		PeerFilterType peerType = (PeerFilterType)serializer.deserializeOne<byte>(stream);
 		switch (peerType)
 		{
-			case 0:
-			{
-				int64 id;
-				stream >> id;
-				return PeerFilter(PeerFilterType::MatchPeerFilter, id);
-			}
-			case 1:
-			{
-				uint16 nbPeers;
-				stream >> nbPeers;
-				std::vector<int64> peers(nbPeers);
-				for (int i = 0; i < nbPeers; i++)
-				{
-					stream >> peers[i];
-				}
-				return PeerFilter(PeerFilterType::MatchArrayFilter, peers);
-			}
-			case 2:
-			{
-				return PeerFilter(PeerFilterType::MatchAllFilter);
-			}
-			default:
-			{
-				return PeerFilter(PeerFilterType::MatchSceneHost);
-			}
+		case PeerFilterType::MatchPeers:
+		{
+			std::vector<int64> peers = serializer.deserializeOne<std::vector<int64>>(stream);
+			return PeerFilter(PeerFilterType::MatchPeers, peers);
+		}
+		case PeerFilterType::MatchAllP2P:
+		{
+			return PeerFilter(PeerFilterType::MatchAllP2P);
+		}
+		default:
+		{
+			return PeerFilter(PeerFilterType::MatchSceneHost);
+		}
 		}
 	}
 
-	PeerFilter MatchAllFilter()
+	bool PeerFilter::operator==(const PeerFilter& other) const
 	{
-		return PeerFilter(PeerFilterType::MatchAllFilter);
+		if (type != other.type)
+		{
+			return false;
+		}
+
+		for (size_t i = 0; i < ids.size(); i++)
+		{
+			if (std::find(other.ids.begin(), other.ids.end(), ids[i]) == other.ids.end())
+			{
+				return false;
+			}
+		}
+
+		for (size_t i = 0; i < other.ids.size(); i++)
+		{
+			if (std::find(ids.begin(), ids.end(), other.ids[i]) == ids.end())
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	bool PeerFilter::operator==(PeerFilterType otherType) const
+	{
+		return (type == otherType);
 	}
 
 	PeerFilter MatchSceneHost()
@@ -68,13 +85,18 @@ namespace Stormancer
 		return PeerFilter(PeerFilterType::MatchSceneHost);
 	}
 
-	PeerFilter MatchPeerFilter(const int64 id)
+	PeerFilter MatchPeers(const int64 id)
 	{
-		return PeerFilter(PeerFilterType::MatchPeerFilter, id);
+		return PeerFilter(PeerFilterType::MatchPeers, id);
 	}
 
-	PeerFilter MatchArrayFilter(const std::vector<int64> ids)
+	PeerFilter MatchPeers(const std::vector<int64> ids)
 	{
-		return PeerFilter(PeerFilterType::MatchArrayFilter, ids);
+		return PeerFilter(PeerFilterType::MatchPeers, ids);
 	}
-};
+
+	PeerFilter MatchAllP2P()
+	{
+		return PeerFilter(PeerFilterType::MatchAllP2P);
+	}
+}

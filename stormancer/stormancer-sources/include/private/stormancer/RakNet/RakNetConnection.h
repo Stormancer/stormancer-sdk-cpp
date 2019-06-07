@@ -8,6 +8,7 @@
 #include "stormancer/PacketPriority.h"
 #include "stormancer/Logger/ILogger.h"
 #include "stormancer/Helpers.h"
+#include <functional>
 
 namespace Stormancer
 {
@@ -20,7 +21,13 @@ namespace Stormancer
 
 #pragma region public_methods
 
-		RakNetConnection(RakNet::RakNetGUID guid, int64 id, std::string key, std::weak_ptr<RakNet::RakPeerInterface> peer, ILogger_ptr logger, std::shared_ptr<DependencyResolver> resolver);
+		RakNetConnection(RakNet::RakNetGUID guid,
+			int64 id,
+			std::string key,
+			std::weak_ptr<RakNet::RakPeerInterface> peer,
+			ILogger_ptr logger,
+			DependencyScope& parentScope
+		);
 		~RakNetConnection();
 		uint64 id() const override;
 		std::string key() const override;
@@ -34,12 +41,12 @@ namespace Stormancer
 		std::string ipAddress() const override;
 		bool operator==(RakNetConnection& other);
 		bool operator!=(RakNetConnection& other);
-		const std::map<std::string, std::string>& metadata() const override;
+		const std::unordered_map<std::string, std::string>& metadata() const override;
 		std::string metadata(const std::string& key) const override;
-		void setMetadata(const std::map<std::string, std::string>& metadata) override;
+		void setMetadata(const std::unordered_map<std::string, std::string>& metadata) override;
 		void setMetadata(const std::string& key, const std::string& value) override;
 		pplx::task<void> updatePeerMetadata(pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
-		std::shared_ptr<DependencyResolver> dependencyResolver() const override;
+		const DependencyScope& dependencyResolver() const override;
 		void close(std::string reason = "") override;
 		virtual void send(const StreamWriter& streamWriter, int channelUid, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const TransformMetadata& transformMetadata = TransformMetadata()) override;
 		int ping() const override;
@@ -63,7 +70,7 @@ namespace Stormancer
 
 #pragma region private_members
 
-		std::map<std::string, std::string> _metadata;
+		std::unordered_map<std::string, std::string> _metadata;
 		std::string _account;
 		std::string _application;
 		uint64 _id = 0;
@@ -72,7 +79,7 @@ namespace Stormancer
 		std::weak_ptr<RakNet::RakPeerInterface> _peer;
 		RakNet::RakNetGUID _guid;
 		time_t _lastActivityDate = nowTime_t();
-		std::shared_ptr<DependencyResolver> _dependencyResolver;
+		DependencyScope _dependencyScope;
 		ConnectionState _connectionState = ConnectionState::Disconnected;
 		rxcpp::subjects::subject<ConnectionState> _connectionStateObservable;
 		
@@ -81,4 +88,4 @@ namespace Stormancer
 		
 #pragma endregion
 	};
-};
+}

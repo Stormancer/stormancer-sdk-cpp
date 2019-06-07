@@ -16,16 +16,23 @@ namespace Stormancer
 	class Scene;
 	class P2PTunnel;
 
+	enum class P2PRole
+	{
+		Host,
+		Client
+	};
+
 	class GameSessionService : public std::enable_shared_from_this<GameSessionService>
 	{
 	public:
 
 		GameSessionService(std::weak_ptr<Scene> scene);
-		~GameSessionService();
+
+		virtual ~GameSessionService();
 
 		void initialize();
 
-		pplx::task<void> initializeTunnel(std::string p2pToken, pplx::cancellation_token ct);
+		pplx::task<std::shared_ptr<Stormancer::IP2PScenePeer>> initializeP2P(std::string p2pToken, bool openTunnel = true, pplx::cancellation_token ct = pplx::cancellation_token::none());
 
 		pplx::task<void> waitServerReady(pplx::cancellation_token);
 
@@ -41,8 +48,6 @@ namespace Stormancer
 
 		pplx::task<void> disconnect();
 
-		bool shouldEstablishTunnel = true;
-
 		std::weak_ptr<Scene> getScene();
 
 		void onDisconnecting();
@@ -54,7 +59,7 @@ namespace Stormancer
 		void onConnectionFailure(std::function<void(std::string)> callback);
 
 		Event<void> onAllPlayerReady;
-		Event<std::string> onRoleReceived;
+		Event<P2PRole> onRoleReceived;
 		Event<std::shared_ptr<Stormancer::P2PTunnel>> onTunnelOpened;
 		Event<void> onShutdownReceived;
 		Event<SessionPlayer, std::string> onPlayerChanged;

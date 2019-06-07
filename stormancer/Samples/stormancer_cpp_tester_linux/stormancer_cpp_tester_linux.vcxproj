@@ -155,7 +155,7 @@
       <CppLanguageStandard>c++14</CppLanguageStandard>
       <PreprocessorDefinitions>LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>stormancer/Samples/tester-sources/;../RakNet_Linux/;../includes/;Plugins/public/;Plugins/private/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>-Wno-unknown-pragmas</AdditionalOptions>
+      <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <Verbose>true</Verbose>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
@@ -169,7 +169,7 @@
       <CppLanguageStandard>c++14</CppLanguageStandard>
       <PreprocessorDefinitions>LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>stormancer/Samples/tester-sources/;../RakNet_Linux/;../includes/;Plugins/public/;Plugins/private/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>-Wno-unknown-pragmas</AdditionalOptions>
+      <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <Verbose>true</Verbose>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
@@ -183,7 +183,7 @@
       <CppLanguageStandard>c++14</CppLanguageStandard>
       <PreprocessorDefinitions>LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>stormancer/Samples/tester-sources/;../RakNet_Linux/;../includes/;Plugins/public/;Plugins/private/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>-Wno-unknown-pragmas</AdditionalOptions>
+      <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <Verbose>true</Verbose>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
@@ -197,7 +197,7 @@
       <CppLanguageStandard>c++14</CppLanguageStandard>
       <PreprocessorDefinitions>LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>stormancer/Samples/tester-sources/;../RakNet_Linux/;../includes/;Plugins/public/;Plugins/private/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>-Wno-unknown-pragmas</AdditionalOptions>
+      <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <Verbose>true</Verbose>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
@@ -211,7 +211,7 @@
       <CppLanguageStandard>c++14</CppLanguageStandard>
       <PreprocessorDefinitions>LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>stormancer/Samples/tester-sources/;../RakNet_Linux/;../includes/;Plugins/public/;Plugins/private/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>-Wno-unknown-pragmas</AdditionalOptions>
+      <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <Verbose>true</Verbose>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
@@ -225,7 +225,7 @@
       <CppLanguageStandard>c++14</CppLanguageStandard>
       <PreprocessorDefinitions>LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>stormancer/Samples/tester-sources/;../RakNet_Linux/;../includes/;Plugins/public/;Plugins/private/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>-Wno-unknown-pragmas</AdditionalOptions>
+      <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <Verbose>true</Verbose>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
@@ -239,7 +239,7 @@
       <CppLanguageStandard>c++14</CppLanguageStandard>
       <PreprocessorDefinitions>LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>stormancer/Samples/tester-sources/;../RakNet_Linux/;../includes/;Plugins/public/;Plugins/private/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>-Wno-unknown-pragmas</AdditionalOptions>
+      <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <Verbose>true</Verbose>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
@@ -253,7 +253,7 @@
       <CppLanguageStandard>c++14</CppLanguageStandard>
       <PreprocessorDefinitions>LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>stormancer/Samples/tester-sources/;../RakNet_Linux/;../includes/;Plugins/public/;Plugins/private/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>-Wno-unknown-pragmas</AdditionalOptions>
+      <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <Verbose>true</Verbose>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>

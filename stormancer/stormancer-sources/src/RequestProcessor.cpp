@@ -11,29 +11,32 @@ namespace Stormancer
 {
 	void RequestProcessor::Initialize(std::shared_ptr<RequestProcessor> processor, std::vector<std::shared_ptr<IRequestModule>> modules)
 	{
-		RequestModuleBuilder builder(processor->addSystemRequestHandler);
+		std::weak_ptr<RequestProcessor> wProcessor = processor;
+		RequestModuleBuilder builder([wProcessor](byte msgId, std::function<pplx::task<void>(std::shared_ptr<RequestContext>)> handler)
+		{
+			auto processor = LockOrThrow(wProcessor);
+			processor->addSystemRequestHandler(msgId, handler);
+		});
+
 		for (size_t i = 0; i < modules.size(); i++)
 		{
 			auto module = modules[i];
-			module->registerModule(&builder);
+			module->registerModule(builder);
 		}
 	}
 
 	RequestProcessor::RequestProcessor(std::shared_ptr<ILogger> logger)
 		: _logger(logger)
 	{
-		addSystemRequestHandler = [this](byte msgId, std::function<pplx::task<void>(RequestContext*)> handler)
-		{
-			if (_isRegistered)
-			{
-				throw std::runtime_error("Can only add handler before 'RegisterProcessor' is called.");
-			}
-			_handlers.emplace(msgId, handler);
-		};
 	}
 
-	RequestProcessor::~RequestProcessor()
+	void RequestProcessor::addSystemRequestHandler(byte msgId, std::function<pplx::task<void>(std::shared_ptr<RequestContext>)> handler)
 	{
+		if (_isRegistered)
+		{
+			throw std::runtime_error("Can only add handler before 'RegisterProcessor' is called.");
+		}
+		_handlers.emplace(msgId, handler);
 	}
 
 	void RequestProcessor::registerProcessor(PacketProcessorConfig& config)
@@ -43,18 +46,18 @@ namespace Stormancer
 		auto logger = _logger;
 		auto serializer = _serializer;
 
-		auto wProcessor = STRM_WEAK_FROM_THIS();
+		auto wProcessor = STORM_WEAK_FROM_THIS();
 
-		config.addProcessor((byte)MessageIDTypes::ID_SYSTEM_REQUEST, new handlerFunction([wProcessor, logger, serializer](Packet_ptr p)
+		config.addProcessor((byte)MessageIDTypes::ID_SYSTEM_REQUEST, [wProcessor, logger, serializer](Packet_ptr p)
 		{
 			auto processor = LockOrThrow(wProcessor);
 
 			byte sysRequestId;
 			p->stream >> sysRequestId;
 			std::shared_ptr<RequestContext> context = std::make_shared<RequestContext>(p);
-			auto it = processor->_handlers.find(sysRequestId);
+			auto handlerIt = processor->_handlers.find(sysRequestId);
 
-			if (it == processor->_handlers.end())
+			if (handlerIt == processor->_handlers.end())
 			{
 				context->error([serializer](obytestream& stream)
 				{
@@ -63,9 +66,8 @@ namespace Stormancer
 				});
 				return true;
 			}
-			auto ctxPtr = context.get();
-			std::function<pplx::task<void>(RequestContext*)> handler = it->second;
-			invokeWrapping(handler, ctxPtr)
+
+			invokeWrapping(handlerIt->second, context)
 				.then([logger, serializer, context](pplx::task<void> t)
 			{
 				try
@@ -96,9 +98,9 @@ namespace Stormancer
 			});
 
 			return true;
-		}));
+		});
 
-		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG, new handlerFunction([wProcessor, logger](Packet_ptr p)
+		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG, [wProcessor, logger](Packet_ptr p)
 		{
 			auto processor = LockOrThrow(wProcessor);
 
@@ -124,9 +126,9 @@ namespace Stormancer
 			}
 
 			return true;
-		}));
+		});
 
-		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_COMPLETE, new handlerFunction([wProcessor, logger](Packet_ptr p)
+		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_COMPLETE, [wProcessor, logger](Packet_ptr p)
 		{
 			auto processor = LockOrThrow(wProcessor);
 
@@ -156,9 +158,9 @@ namespace Stormancer
 			}
 
 			return true;
-		}));
+		});
 
-		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_ERROR, new handlerFunction([wProcessor, serializer, logger](Packet_ptr p)
+		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_ERROR, [wProcessor, serializer, logger](Packet_ptr p)
 		{
 			auto processor = LockOrThrow(wProcessor);
 
@@ -184,7 +186,7 @@ namespace Stormancer
 			}
 
 			return true;
-		}));
+		});
 	}
 
 	pplx::task<Packet_ptr> RequestProcessor::sendSystemRequest(IConnection* peer, byte msgId, const StreamWriter& streamWriter, PacketPriority priority, pplx::cancellation_token ct)
@@ -193,13 +195,14 @@ namespace Stormancer
 		{
 			pplx::task_completion_event<Packet_ptr> tce;
 			auto request = reserveRequestSlot(msgId, tce, ct);
-			std::weak_ptr<RequestProcessor> wThat = this->shared_from_this();
+			auto wThat = STORM_WEAK_FROM_THIS();
 
 			request->ct = ct;
-			if (ct != pplx::cancellation_token::none())
+			if (ct.is_cancelable())
 			{
 				std::weak_ptr<SystemRequest> wRequest = request;
-				request->ct_registration = ct.register_callback([tce, wRequest, wThat]() {
+				request->ct_registration = ct.register_callback([tce, wRequest, wThat]()
+				{
 					if (auto that = wThat.lock())
 					{
 						if (auto request = wRequest.lock())
@@ -214,15 +217,15 @@ namespace Stormancer
 				});
 			}
 
-
 			try
 			{
 				TransformMetadata metadata;
 				if (msgId == (byte)SystemRequestIDTypes::ID_SET_METADATA)
 				{
-					metadata.dontEncrypt = true;// SET metadata contains the encryption key.
+					metadata.dontEncrypt = true; // SET metadata contains the encryption key
 				}
-				peer->send([msgId, request, &streamWriter](obytestream& stream) {
+				peer->send([msgId, request, &streamWriter](obytestream& stream)
+				{
 					stream << (byte)MessageIDTypes::ID_SYSTEM_REQUEST;
 					stream << msgId;
 					stream << request->id;
@@ -230,7 +233,7 @@ namespace Stormancer
 					{
 						streamWriter(stream);
 					}
-				}, 0, priority, PacketReliability::RELIABLE, metadata);
+				}, systemRequestChannelUid, priority, PacketReliability::RELIABLE, metadata);
 			}
 			catch (const std::exception& ex)
 			{
@@ -305,4 +308,4 @@ namespace Stormancer
 
 		return request;
 	}
-};
+}

@@ -17,13 +17,19 @@
 
 namespace Stormancer
 {
-	RakNetConnection::RakNetConnection(RakNet::RakNetGUID guid, int64 id,std::string key, std::weak_ptr<RakNet::RakPeerInterface> peer, ILogger_ptr logger, std::shared_ptr<DependencyResolver> resolver)
+	RakNetConnection::RakNetConnection(
+		RakNet::RakNetGUID guid,
+		int64 id,
+		std::string key,
+		std::weak_ptr<RakNet::RakPeerInterface> peer,
+		ILogger_ptr logger,
+		DependencyScope& parentScope
+	)
 		: _id(id)
 		, _key(key)
 		, _peer(peer)
 		, _guid(guid)
 		, _lastActivityDate(nowTime_t())
-		, _dependencyResolver(resolver)
 		, _logger(logger)
 	{
 		auto onNext = [=](ConnectionState state) {
@@ -43,9 +49,10 @@ namespace Stormancer
 		
 		_connectionStateObservable.get_observable().subscribe(onNext, onError);
 
-		_dependencyResolver->registerDependency<ChannelUidStore>([](auto dr) {
-			return std::make_shared<ChannelUidStore>();
-		},true);
+		_dependencyScope = parentScope.beginLifetimeScope([](ContainerBuilder& builder)
+		{
+			builder.registerDependency<ChannelUidStore>().singleInstance();
+		});
 	}
 
 	RakNetConnection::~RakNetConnection()
@@ -87,7 +94,7 @@ namespace Stormancer
 		return (_id != other._id);
 	}
 
-	const std::map<std::string, std::string>& RakNetConnection::metadata() const
+	const std::unordered_map<std::string, std::string>& RakNetConnection::metadata() const
 	{
 		return _metadata;
 	}
@@ -101,7 +108,7 @@ namespace Stormancer
 		return std::string();
 	}
 
-	void RakNetConnection::setMetadata(const std::map<std::string, std::string>& metadata)
+	void RakNetConnection::setMetadata(const std::unordered_map<std::string, std::string>& metadata)
 	{
 		_metadata = metadata;
 	}
@@ -113,14 +120,14 @@ namespace Stormancer
 
 	pplx::task<void> RakNetConnection::updatePeerMetadata(pplx::cancellation_token ct)
 	{
-		auto requestProcessor = _dependencyResolver->resolve<RequestProcessor>();
+		auto requestProcessor = _dependencyScope.resolve<RequestProcessor>();
 		auto logger = _logger;
 
 		ct = create_linked_shutdown_token(ct);
 
 		return requestProcessor->sendSystemRequest(this, (byte)SystemRequestIDTypes::ID_SET_METADATA, [this](obytestream& stream)
 		{
-			_dependencyResolver->resolve<Serializer>()->serialize(stream, metadata());
+			_dependencyScope.resolve<Serializer>()->serialize(stream, metadata());
 		}, PacketPriority::MEDIUM_PRIORITY, ct)
 			.then([logger](Packet_ptr)
 		{
@@ -128,9 +135,9 @@ namespace Stormancer
 		}, ct);
 	}
 
-	std::shared_ptr<DependencyResolver> RakNetConnection::dependencyResolver() const
+	const DependencyScope& RakNetConnection::dependencyResolver() const
 	{
-		return _dependencyResolver;
+		return _dependencyScope;
 	}
 
 	void RakNetConnection::close(std::string reason)
@@ -159,18 +166,12 @@ namespace Stormancer
 
 	void RakNetConnection::send(const StreamWriter& streamWriter, int channelUid, PacketPriority priority, PacketReliability reliability, const TransformMetadata& transformMetadata)
 	{
-		auto dependencyResolver = _dependencyResolver;
-		if (!dependencyResolver)
-		{
-			throw std::runtime_error("Dependency resolver not available");
-		}
-
 		obytestream stream;
 		std::vector<std::shared_ptr<IPacketTransform>> packetTransforms;
 		// TODO handle encryption for p2p connections
 		if (metadata("type") != "p2p")
 		{
-			packetTransforms.emplace_back(std::make_shared<AESPacketTransform>(dependencyResolver->resolve<IAES>(), dependencyResolver->resolve<Configuration>()));
+			packetTransforms.emplace_back(std::make_shared<AESPacketTransform>(_dependencyScope.resolve<IAES>(), _dependencyScope.resolve<Configuration>()));
 		}
 		StreamWriter writer2 = streamWriter;
 		for (auto& packetTransform : packetTransforms)
@@ -292,4 +293,4 @@ namespace Stormancer
 		}
 		return updatePeerMetadata(ct);
 	}
-};
+}

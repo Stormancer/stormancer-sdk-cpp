@@ -25,7 +25,7 @@ namespace Stormancer
 			return pplx::task_from_exception<MetafileDto>(std::runtime_error("scene deleted"));
 		}
 
-		auto rpcService = scene->dependencyResolver()->resolve<RpcService>();
+		auto rpcService = scene->dependencyResolver().resolve<RpcService>();
 		return rpcService->rpc<MetafileDto>("assetsstorage.getfile", branchName, path)
 			.then([](MetafileDto mfDto)
 		{

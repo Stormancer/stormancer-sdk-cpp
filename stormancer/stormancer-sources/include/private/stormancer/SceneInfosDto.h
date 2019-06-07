@@ -6,7 +6,7 @@
 #include "stormancer/RouteDto.h"
 #include "stormancer/msgpack_define.h"
 #include <string>
-#include <map>
+#include <unordered_map>
 
 namespace Stormancer
 {
@@ -19,7 +19,7 @@ namespace Stormancer
 		std::string SceneId;
 		
 		/// The scene metadatas.
-		std::map<std::string, std::string> Metadata;
+		std::unordered_map<std::string, std::string> Metadata;
 		
 		/// Vector of routes declared on the scene host.
 		std::vector<RouteDto> Routes;
@@ -29,4 +29,4 @@ namespace Stormancer
 
 		MSGPACK_DEFINE_MAP(SceneId, Metadata, Routes, SelectedSerializer);
 	};
-};
+}

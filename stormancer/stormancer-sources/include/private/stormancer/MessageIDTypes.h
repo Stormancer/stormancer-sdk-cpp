@@ -2,7 +2,6 @@
 
 #include "stormancer/BuildConfig.h"
 
-
 namespace Stormancer
 {
 	/// Used by the protocol for identifying the nature of the system messages
@@ -35,4 +34,4 @@ namespace Stormancer
 		/// First id for scene handles
 		ID_SCENES = 141,
 	};
-};
+}

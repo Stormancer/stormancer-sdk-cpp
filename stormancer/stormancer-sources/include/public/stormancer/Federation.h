@@ -12,6 +12,7 @@ namespace Stormancer
 		std::vector<std::string> endpoints;
 		std::vector<std::string> tags;
 	};
+
 	struct Federation
 	{
 		Cluster current;

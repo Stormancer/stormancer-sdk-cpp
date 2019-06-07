@@ -9,6 +9,18 @@
 
 namespace Stormancer
 {
+	void GameFinderPlugin::registerSceneDependencies(ContainerBuilder& builder, std::shared_ptr<Scene> scene)
+	{
+		if (scene)
+		{
+			auto name = scene->getHostMetadata("stormancer.plugins.gamefinder");
+			if (!name.empty())
+			{
+				builder.registerDependency<GameFinderService, Scene>().singleInstance();
+			}
+		}
+	}
+
 	void GameFinderPlugin::sceneCreated(std::shared_ptr<Scene> scene)
 	{
 		if (scene)
@@ -16,20 +28,13 @@ namespace Stormancer
 			auto name = scene->getHostMetadata("stormancer.plugins.gamefinder");
 			if (!name.empty())
 			{
-				auto service = std::make_shared<GameFinderService>(scene);
-				service->initialize();
-				scene->dependencyResolver()->registerDependency<GameFinderService>(service);
+				scene->dependencyResolver().resolve<GameFinderService>()->initialize();
 			}
 		}
 	}
-	void GameFinderPlugin::clientCreated(std::shared_ptr<IClient> client)
+
+	void GameFinderPlugin::registerClientDependencies(ContainerBuilder& builder)
 	{
-		if (client)
-		{
-			client->dependencyResolver()->registerDependency<GameFinder>([](std::weak_ptr<DependencyResolver> dr) {
-				return std::make_shared<GameFinder_Impl>(dr.lock()->resolve<AuthenticationService>()); },true);
-		}
+		builder.registerDependency<GameFinder_Impl, AuthenticationService>().as<GameFinder>().singleInstance();
 	}
-
-
-};
+}

@@ -4,13 +4,18 @@
 
 namespace Stormancer
 {
-	TransformMetadata::TransformMetadata() {}
+	const std::unordered_map<std::string, std::string> _defaultMetadata;
+
+	TransformMetadata::TransformMetadata()
+	{
+	}
 
 	TransformMetadata::TransformMetadata(std::weak_ptr<Scene> scene)
-		: _scene(scene) {}
+		: _scene(scene)
+	{
+	}
 
-	const std::map<std::string, std::string> _defaultMetadata;
-	const std::map<std::string, std::string>& TransformMetadata::sceneMetadata()
+	const std::unordered_map<std::string, std::string>& TransformMetadata::sceneMetadata()
 	{
 		auto scene = _scene.lock();
 		if (scene)

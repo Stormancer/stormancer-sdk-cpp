@@ -10,9 +10,9 @@ namespace Stormancer
 		_scene = scene;
 		if (scene)
 		{
-			_rpcService = scene->dependencyResolver()->resolve<RpcService>();
-			_dispatcher = scene->dependencyResolver()->resolve<IActionDispatcher>();
-			_logger = scene->dependencyResolver()->resolve<ILogger>();
+			_rpcService = scene->dependencyResolver().resolve<RpcService>();
+			_dispatcher = scene->dependencyResolver().resolve<IActionDispatcher>();
+			_logger = scene->dependencyResolver().resolve<ILogger>();
 		}
 	}
 	void InAppNotificationService::initialize()

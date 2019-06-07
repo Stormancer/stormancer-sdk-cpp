@@ -51,6 +51,8 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Members\OrganizationsPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Members\OrganizationsService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Members\Organizations_Impl.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)private\Messaging\MessagingPlugin.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)private\Messaging\MessagingService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Party\PartyContainer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Party\PartyManagementService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Party\PartyPlugin.cpp" />
@@ -74,9 +76,15 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameRecovery\GameRecoveryPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameRecovery\GameRecoveryService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameRecovery\GameRecovery_Impl.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)private\Messaging\MessagingPlugin.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)private\Messaging\MessagingService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)private\Messaging\Messaging_Impl.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Profile\ProfilePrivateModels.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Helloworld\Helloworld.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\LeaderboardModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\LeaderboardPlugin.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Messaging\Messaging.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Messaging\MessagingModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Profile\ProfilePlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Helloworld\HelloService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Helloworld\Hello.h" />

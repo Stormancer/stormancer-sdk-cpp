@@ -27,9 +27,10 @@ namespace Stormancer
 			std::shared_ptr<P2PTunnels> tunnels,
 			std::shared_ptr<ILogger> logger,
 			std::shared_ptr<Configuration> config,
-			std::weak_ptr<Client> client);
+			std::weak_ptr<Client> client
+		);
 
-		void registerModule(RequestModuleBuilder* builder);
+		void registerModule(RequestModuleBuilder& builder);
 
 	private:
 

@@ -10,7 +10,7 @@ namespace Stormancer
 	RpcService::RpcService(std::weak_ptr<Scene> scene, std::shared_ptr<IActionDispatcher> dispatcher)
 		: _dispatcher(dispatcher)
 		, _scene(scene)
-		, _logger(scene.lock()->dependencyResolver()->resolve<ILogger>())
+		, _logger(scene.lock()->dependencyResolver().resolve<ILogger>())
 	{
 	}
 
@@ -163,7 +163,7 @@ namespace Stormancer
 
 		try
 		{
-			std::map<std::string, std::string> rpcMetadatas{ { Stormancer::rpc::pluginName, Stormancer::rpc::version } };
+			std::unordered_map<std::string, std::string> rpcMetadatas{ { Stormancer::rpc::pluginName, Stormancer::rpc::version } };
 
 			scene->addRoute(route, [this, handler, ordered](Packetisp_ptr p)
 			{
@@ -450,4 +450,4 @@ namespace Stormancer
 
 		return rpcInternal(observable, tce, route, onNext, onComplete, ct);
 	}
-};
+}

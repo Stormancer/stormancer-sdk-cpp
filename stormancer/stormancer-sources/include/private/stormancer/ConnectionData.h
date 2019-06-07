@@ -6,7 +6,7 @@
 #include "stormancer/msgpack_define.h"
 #include <string>
 #include <memory>
-#include <map>
+#include <unordered_map>
 
 namespace Stormancer
 {
@@ -19,7 +19,7 @@ namespace Stormancer
 		std::string Application;
 		std::string ContentType;
 		std::string DeploymentId;
-		std::shared_ptr<std::map<std::string, std::string>> Endpoints;
+		std::shared_ptr<std::unordered_map<std::string, std::string>> Endpoints;
 		int64 Expiration;
 		int64 Issued;
 		std::string Routing;
@@ -29,4 +29,4 @@ namespace Stormancer
 
 		MSGPACK_DEFINE_MAP(AccountId, Application, ContentType, DeploymentId, Endpoints, Expiration, Issued, Routing, SceneId, UserData, Version);
 	};
-};
+}

@@ -21,4 +21,4 @@ namespace Stormancer
 		/// \param processor An 'IPacketProcessor' object.
 		virtual void addProcessor(std::shared_ptr<IPacketProcessor> processor) = 0;
 	};
-};
+}

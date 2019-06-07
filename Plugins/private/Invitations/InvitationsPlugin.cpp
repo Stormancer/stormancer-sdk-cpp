@@ -7,17 +7,17 @@
 #include "Invitations/Invitations.h"
 #include "stormancer/Logger/ILogger.h"
 
-void Stormancer::InvitationsPlugin::sceneCreated(std::shared_ptr<Scene> scene)
+namespace Stormancer
 {
-	if (scene)
+	void InvitationsPlugin::registerSceneDependencies(ContainerBuilder& builder, std::shared_ptr<Scene> scene)
 	{
-		auto name = scene->getHostMetadata("stormancer.invitations");
-		if (name.length() > 0)
+		if (scene)
 		{
-
-			scene->dependencyResolver()->registerDependency<InvitationsService>([scene](std::weak_ptr<DependencyResolver> dr) {
-				return std::make_shared<InvitationsService>(scene, dr.lock()->resolve<ILogger>());
-			}, true);
+			auto name = scene->getHostMetadata("stormancer.invitations");
+			if (name.length() > 0)
+			{
+				builder.registerDependency<InvitationsService, Scene, ILogger>().singleInstance();
+			}
 		}
 	}
 }

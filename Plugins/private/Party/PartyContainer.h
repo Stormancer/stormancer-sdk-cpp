@@ -21,17 +21,17 @@ namespace Stormancer
 
 		bool is_settings_valid() const
 		{
-			return (_partyScene != nullptr && _partyScene->dependencyResolver()->resolve<PartyService>());
+			return (_partyScene != nullptr && _partyScene->dependencyResolver().resolve<PartyService>());
 		}
 
 		PartySettings& settings()
 		{
-			return  _partyScene->dependencyResolver()->resolve<PartyService>()->settings();
+			return  _partyScene->dependencyResolver().resolve<PartyService>()->settings();
 		}
 
 		std::vector<PartyUserDto>& members()
 		{
-			return _partyScene->dependencyResolver()->resolve<PartyService>()->members();
+			return _partyScene->dependencyResolver().resolve<PartyService>()->members();
 		}
 
 		bool isLeader();
