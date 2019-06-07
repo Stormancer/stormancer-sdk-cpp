@@ -241,7 +241,7 @@ namespace Stormancer
 		if (scene)
 		{
 			auto rpc = scene->dependencyResolver().resolve<RpcService>();
-			rpc->rpc("messaging.send", [writer, userId](obytestream& stream)
+			rpc->rpc("Messaging.Send", [writer, userId](obytestream& stream)
 			{
 				Serializer serializer{};
 				serializer.serialize(stream, userId);
@@ -277,7 +277,7 @@ namespace Stormancer
 		if (scene)
 		{
 			auto rpc = scene->dependencyResolver().resolve<RpcService>();
-			rpc->rpc("messaging.broadcast", writer);
+			rpc->rpc("Messaging.Broadcast", writer);
 		}
 		else
 		{
@@ -308,7 +308,7 @@ namespace Stormancer
 		if (scene)
 		{
 			auto rpc = scene->dependencyResolver().resolve<RpcService>();
-			rpc->rpc("messaging.broadcastpersistent", [userMessage, key, writer](obytestream& stream)
+			rpc->rpc("Messaging.BroadcastPersistent", [userMessage, key, writer](obytestream& stream)
 			{
 				Serializer serializer{};
 				serializer.serialize(stream, userMessage, key);
@@ -327,7 +327,7 @@ namespace Stormancer
 		if (scene)
 		{
 			auto rpc = scene->dependencyResolver().resolve<RpcService>();
-			return rpc->rpc("messaging.deletepersistent", userMessage, key);
+			return rpc->rpc("Messaging.DeletePersistent", userMessage, key);
 		}
 		else
 		{
