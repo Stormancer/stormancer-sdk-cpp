@@ -1,6 +1,7 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/DefaultPacketDispatcher.h"
 #include "stormancer/Logger/ILogger.h"
+#include "stormancer/Helpers.h"
 
 namespace Stormancer
 {
@@ -33,13 +34,20 @@ namespace Stormancer
 				}
 				catch (const std::exception& ex)
 				{
-					_logger->log(LogLevel::Error, "client.dispatchPacket", "Exception unhandled in dispatchPacketImpl :" + std::string(ex.what()));
+					_logger->log(LogLevel::Error, "client.dispatchPacket", "Unhandled exception in dispatchPacketImpl" + std::string(ex.what()));
 				}
 			});
 		}
 		else
 		{
-			dispatchImpl(packet);
+			try
+			{
+				dispatchImpl(packet);
+			}
+			catch (const std::exception& ex)
+			{
+				_logger->log(LogLevel::Error, "client.dispatchPacket", "Unhandled exception in dispatchPacketImpl" + std::string(ex.what()));
+			}
 		}
 	}
 
@@ -76,8 +84,9 @@ namespace Stormancer
 
 		if (!processed)
 		{
-			_logger->log(LogLevel::Warn, "Couldn't process message", "msgId: " + std::to_string(msgType));
-			//throw std::runtime_error((std::string("Couldn't process message. msgId: ") + std::to_string(msgType)).c_str());
+			_logger->log(LogLevel::Warn, "DefaultPacketDispatcher", "Couldn't process message", "msgId: " + std::to_string(msgType));
+			auto bytes = stringifyBytesArray(packet->stream.bytes(), true, true);
+			_logger->log(LogLevel::Trace, "DefaultPacketDispatcher", "Message contents: ", bytes.c_str());
 		}
 	}
 
