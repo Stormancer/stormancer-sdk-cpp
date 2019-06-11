@@ -24,12 +24,14 @@ namespace Stormancer
 			auto serializer = wSerializer.lock();
 			if (!serializer)
 			{
-				return false;
+				assert(false);
+				throw std::runtime_error("ID_P2P_RELAY processor: Serializer was deleted (this is a bug!)");
 			}
 			auto connections = wConnections.lock();
 			if (!connections)
 			{
-				return false;
+				assert(false);
+				throw std::runtime_error("ID_P2P_RELAY processor: IConnectionManager was deleted (this is a bug!)");
 			}
 
 			serializer->deserialize(p->stream, peerId);
@@ -38,6 +40,10 @@ namespace Stormancer
 			if (connection)
 			{
 				p->connection = connection;
+			}
+			else
+			{
+				throw std::runtime_error(("ID_P2P_RELAY processor: Connection for peer Id " + std::to_string(peerId) + " was not found").c_str());
 			}
 
 			return false;

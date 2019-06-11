@@ -59,29 +59,6 @@ namespace msgpack {
 				}
 			};
 
-			template <std::size_t N>
-			struct pack<char[N]> {
-				template <typename Stream>
-				msgpack::packer<Stream>& operator()(msgpack::packer<Stream>& o, const char(&v)[N]) const {
-					char const* p = v;
-					uint32_t size = checked_get_container_size(std::strlen(p));
-					o.pack_str(size);
-					o.pack_str_body(p, size);
-					return o;
-				}
-			};
-
-			template <std::size_t N>
-			struct pack<const char[N]> {
-				template <typename Stream>
-				msgpack::packer<Stream>& operator()(msgpack::packer<Stream>& o, const char(&v)[N]) const {
-					uint32_t size = checked_get_container_size(std::strlen(v));
-					o.pack_str(size);
-					o.pack_str_body(v, size);
-					return o;
-				}
-			};
-
 		} // namespace adaptor
 	} // MSGPACK_API_VERSION_NAMESPACE(MSGPACK_DEFAULT_API_NS)
 } // namespace msgpack

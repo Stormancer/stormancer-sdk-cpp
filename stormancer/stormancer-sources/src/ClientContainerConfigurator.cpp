@@ -35,7 +35,7 @@ void Stormancer::Client::ConfigureContainer(ContainerBuilder& builder, Configura
 
 	builder.registerDependency<ApiClient, ILogger, Configuration, ITokenHandler>().singleInstance();
 
-	builder.registerDependency<Serializer>();
+	builder.registerDependency<Serializer>().singleInstance();
 
 	builder.registerDependency<IScheduler>(config->scheduler);
 
