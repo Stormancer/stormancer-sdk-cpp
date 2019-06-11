@@ -9,6 +9,7 @@
 #include "stormancer/Client.h"
 #include "stormancer/SafeCapture.h"
 #include "stormancer/P2P/P2PConnectToSceneMessage.h"
+#include "stormancer/MessageIDTypes.h"
 
 namespace Stormancer
 {
@@ -77,11 +78,32 @@ namespace Stormancer
 					.then([connection, connectToSceneMessage, ctx, serializer](std::shared_ptr<Scene> scene)
 				{
 					auto p2pService = scene->dependencyResolver().resolve<P2PService>();
-					auto scenePeer = scene->peerConnected(connection, p2pService, connectToSceneMessage);
+					auto handles = *connection->dependencyResolver().resolve<std::vector<std::weak_ptr<Scene_Impl>>>();
+					uint8 handle = 0;
+					bool success = false;
 
+					for (uint8 i = 0; i < 150; i++)
+					{
+						if (!handles[i].lock())
+						{
+							handle = i + (uint8)MessageIDTypes::ID_SCENES;
+							handles[i] = std::static_pointer_cast<Scene_Impl>(scene);
+							success = true;
+							break;
+						}
+					}
+					if (!success)
+					{
+						return pplx::task_from_exception<void>(std::runtime_error("Failed to generate handle for scene."));
+					}
+
+					auto scenePeer = std::static_pointer_cast<Scene_Impl>(scene)->peerConnected(connection, p2pService, connectToSceneMessage);
+					
+					
+					
 					P2PConnectToSceneMessage connectToSceneResponse;
 					connectToSceneResponse.sceneId = scene->address().toUri();
-					connectToSceneResponse.sceneHandle = scene->handle();
+					connectToSceneResponse.sceneHandle = handle;
 					for (auto r : scene->localRoutes())
 					{
 						if ((byte)r->filter() & (byte)MessageOriginFilter::Peer)
@@ -99,6 +121,7 @@ namespace Stormancer
 					{
 						serializer->serialize(stream, connectToSceneResponse);
 					});
+					return pplx::task_from_result();
 				});
 			}
 			else

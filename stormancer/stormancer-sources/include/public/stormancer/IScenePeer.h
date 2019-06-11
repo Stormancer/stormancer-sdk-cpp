@@ -17,8 +17,11 @@ namespace Stormancer
 #pragma region public_methods
 
 		virtual ~IScenePeer() = default;
-	
+
 		virtual uint64 id() const = 0;
+
+		/// Returns the scene handle.
+		virtual byte handle() const = 0;
 
 		virtual std::string getSceneId() const = 0;
 

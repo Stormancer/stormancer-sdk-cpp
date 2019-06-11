@@ -84,4 +84,11 @@ namespace Stormancer
 			return t.get();
 		}, options);
 	}
+
+	byte P2PScenePeer::handle() const
+	{
+		return _handle;
+	}
+
+		
 }

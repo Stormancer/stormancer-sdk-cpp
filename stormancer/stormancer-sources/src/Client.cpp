@@ -478,7 +478,7 @@ namespace Stormancer
 	{
 
 		this->initialize();
-		logger()->log(LogLevel::Trace, "Client", "Get private scene.");
+		logger()->log(LogLevel::Trace, "Client", "Get private scene.", address.toUri());
 
 		if (sceneToken.empty())
 		{
@@ -707,7 +707,7 @@ namespace Stormancer
 			throw PointerDeletedException("Client destroyed");
 		}
 
-		auto serverConnection = connections->getConnection(scene->host()->id());
+		auto serverConnection = connections->getConnection(scene->hostConnection().lock()->id());
 
 		if (!serverConnection)
 		{
@@ -805,7 +805,7 @@ namespace Stormancer
 		}
 
 		auto sceneId = scene->address().toUri();
-		auto sceneHandle = scene->handle();
+		auto sceneHandle = scene->host()->handle();
 
 		{
 			std::lock_guard<std::mutex> lg(_scenesMutex);

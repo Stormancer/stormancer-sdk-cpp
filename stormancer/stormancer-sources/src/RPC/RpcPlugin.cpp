@@ -32,26 +32,50 @@ namespace Stormancer
 
 				scene->addRoute(Stormancer::rpc::nextRouteName, [sceneWeak](Packetisp_ptr p)
 				{
-					auto rpcService = LockOrThrow(sceneWeak)->dependencyResolver().resolve<RpcService>().get();
-					rpcService->next(p);
+					auto scene = sceneWeak.lock();
+					if (scene)
+					{
+						auto rpcService = scene->dependencyResolver().resolve<RpcService>();
+						auto logger = scene->dependencyResolver().resolve<ILogger>();
+						logger->log(LogLevel::Trace, "Received rpc.next message on scene", scene->id());
+						rpcService->next(p);
+					}
 				});
 
 				scene->addRoute(Stormancer::rpc::cancellationRouteName, [sceneWeak](Packetisp_ptr p)
 				{
-					auto rpcService = LockOrThrow(sceneWeak)->dependencyResolver().resolve<RpcService>().get();
-					rpcService->cancel(p);
+					auto scene = sceneWeak.lock();
+					if (scene)
+					{
+						auto rpcService = scene->dependencyResolver().resolve<RpcService>();
+						auto logger = scene->dependencyResolver().resolve<ILogger>();
+						logger->log(LogLevel::Trace, "Received rpc.cancel message on scene", scene->id());
+						rpcService->cancel(p);
+					}
 				});
 
 				scene->addRoute(Stormancer::rpc::errorRouteName, [sceneWeak](Packetisp_ptr p)
 				{
-					auto rpcService = LockOrThrow(sceneWeak)->dependencyResolver().resolve<RpcService>().get();
-					rpcService->error(p);
+					auto scene = sceneWeak.lock();
+					if (scene)
+					{
+						auto rpcService = scene->dependencyResolver().resolve<RpcService>();
+						auto logger = scene->dependencyResolver().resolve<ILogger>();
+						logger->log(LogLevel::Trace, "Received rpc.error message on scene", scene->id());
+						rpcService->error(p);
+					}
 				});
 
 				scene->addRoute(Stormancer::rpc::completeRouteName, [sceneWeak](Packetisp_ptr p)
 				{
-					auto rpcService = LockOrThrow(sceneWeak)->dependencyResolver().resolve<RpcService>().get();
-					rpcService->complete(p);
+					auto scene = sceneWeak.lock();
+					if (scene)
+					{
+						auto rpcService = scene->dependencyResolver().resolve<RpcService>();
+						auto logger = scene->dependencyResolver().resolve<ILogger>();
+						logger->log(LogLevel::Trace, "Received rpc.complete message on scene", scene->id());
+						rpcService->complete(p);
+					}
 				});
 			}
 		}

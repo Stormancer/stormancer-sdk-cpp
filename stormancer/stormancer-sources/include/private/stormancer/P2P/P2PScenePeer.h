@@ -31,6 +31,7 @@ namespace Stormancer
 
 		pplx::task<std::shared_ptr<P2PTunnel>> openP2PTunnel(const std::string& serverId, pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
 
+		byte handle() const override;
 #pragma endregion
 
 	private:

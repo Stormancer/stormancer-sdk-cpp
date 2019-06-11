@@ -17,6 +17,7 @@
 
 namespace Stormancer
 {
+	class Scene_Impl;
 	RakNetConnection::RakNetConnection(
 		RakNet::RakNetGUID guid,
 		int64 id,
@@ -52,6 +53,7 @@ namespace Stormancer
 		_dependencyScope = parentScope.beginLifetimeScope([](ContainerBuilder& builder)
 		{
 			builder.registerDependency<ChannelUidStore>().singleInstance();
+			builder.registerDependency<std::vector<std::weak_ptr<Scene_Impl>>>().singleInstance();
 		});
 	}
 

@@ -31,6 +31,8 @@ namespace Stormancer
 
 		void disconnect() override;
 
+		byte handle() const override;
+
 #pragma endregion
 
 	private:

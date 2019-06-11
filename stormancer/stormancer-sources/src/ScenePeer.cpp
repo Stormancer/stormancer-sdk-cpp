@@ -53,4 +53,9 @@ namespace Stormancer
 			scene->disconnect();
 		}
 	}
+
+	byte ScenePeer::handle() const
+	{
+		return _sceneHandle;
+	}
 }

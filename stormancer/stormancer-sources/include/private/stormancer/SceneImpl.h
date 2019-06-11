@@ -74,8 +74,6 @@ namespace Stormancer
 		// Returns the detailed scene address, including cluster, account and app information
 		SceneAddress address() const override;
 
-		/// Returns the scene handle.
-		byte handle() const override;
 
 		/// Returns a host metadata value.
 		std::string getHostMetadata(const std::string& key) const override;
@@ -120,8 +118,12 @@ namespace Stormancer
 
 		const std::unordered_map<std::string, std::string>& getSceneMetadata() override;
 
-		std::shared_ptr<IP2PScenePeer> peerConnected(std::shared_ptr<IConnection> connection, std::shared_ptr<P2PService> P2P, P2PConnectToSceneMessage) override;
+		std::shared_ptr<IP2PScenePeer> peerConnected(std::shared_ptr<IConnection> connection, std::shared_ptr<P2PService> P2P, P2PConnectToSceneMessage);
 
+		std::weak_ptr<IConnection> hostConnection()
+		{
+			return _peer;
+		}
 #pragma endregion
 
 	private:
@@ -191,9 +193,6 @@ namespace Stormancer
 
 		/// Application token.
 		std::string _token;
-
-		/// Scene handle.
-		byte _handle = 0;
 
 		/// Scene metadatas.
 		std::unordered_map<std::string, std::string> _metadata;

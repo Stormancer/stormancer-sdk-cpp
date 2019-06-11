@@ -8,6 +8,7 @@
 #include "stormancer/ChannelUidStore.h"
 #include "stormancer/ConnectToSceneMsg.h"
 #include "stormancer/P2P/P2PService.h"
+#include "stormancer/MessageIDTypes.h"
 
 namespace Stormancer
 {
@@ -28,7 +29,7 @@ namespace Stormancer
 
 	void Scene_Impl::initialize(DependencyScope& parentScope)
 	{
-		_host = std::make_shared<ScenePeer>(_peer, _handle, _remoteRoutes, this->shared_from_this());
+		
 		std::weak_ptr<Scene_Impl> wThat = this->shared_from_this();
 		auto onNext = [wThat](ConnectionState state)
 		{
@@ -180,10 +181,7 @@ namespace Stormancer
 		return std::string();
 	}
 
-	byte Scene_Impl::handle() const
-	{
-		return _handle;
-	}
+
 
 	SceneAddress Scene_Impl::address() const
 	{
@@ -394,7 +392,7 @@ namespace Stormancer
 			channelUid = channelUidStore->getChannelUid(channelIdentifier);
 		}
 
-		auto sceneHandle = _handle;
+		auto sceneHandle = scenePeer->handle();
 		auto routeHandle = route->handle();
 		auto streamWriter2 = [sceneHandle, routeHandle, &streamWriter](obytestream& stream)
 		{
@@ -493,8 +491,8 @@ namespace Stormancer
 
 	void Scene_Impl::completeConnectionInitialization(ConnectionResult& cr)
 	{
-		_handle = cr.SceneHandle;
-
+		
+		_host = std::make_shared<ScenePeer>(_peer, cr.SceneHandle, _remoteRoutes, this->shared_from_this());
 		for (auto pair : _localRoutes)
 		{
 			pair.second->setHandle(cr.RouteMappings[pair.first]);
@@ -591,9 +589,29 @@ namespace Stormancer
 			.then([wScene, p2pService, routes, ct](std::shared_ptr<IConnection> p2pConnection)
 		{
 			auto scene = LockOrThrow(wScene);
+
+			auto handles = *p2pConnection->dependencyResolver().resolve<std::vector<std::weak_ptr<Scene_Impl>>>();
+			uint8 handle = 0;
+			bool success = false;
+
+			for (uint8 i = 0; i < 150; i++)
+			{
+				if (!handles[i].lock())
+				{
+					handle = i + (uint8)MessageIDTypes::ID_SCENES;
+					handles[i] = scene;
+					success = true;
+					break;
+				}
+			}
+			if (!success)
+			{
+				return pplx::task_from_exception<std::shared_ptr<IP2PScenePeer>>(std::runtime_error("Failed to generate handle for scene."));
+			}
+
 			P2PConnectToSceneMessage connectToSceneMessage;
 			connectToSceneMessage.sceneId = scene->address().toUri();
-			connectToSceneMessage.sceneHandle = scene->handle();
+			connectToSceneMessage.sceneHandle = handle;
 			for (auto r : scene->localRoutes())
 			{
 				if ((byte)r->filter() & (byte)MessageOriginFilter::Peer)
@@ -623,7 +641,7 @@ namespace Stormancer
 		return _metadata;
 	}
 
-	std::shared_ptr<IP2PScenePeer> Scene_Impl::peerConnected(std::shared_ptr<IConnection> connection, std::shared_ptr<P2PService> p2pService, P2PConnectToSceneMessage connectToSceneMessace)
+	std::shared_ptr<IP2PScenePeer> Scene_Impl::peerConnected(std::shared_ptr<IConnection> connection, std::shared_ptr<P2PService> p2pService, P2PConnectToSceneMessage connectToSceneMessage)
 	{
 		std::lock_guard<std::mutex> lg(this->_connectMutex);
 		auto it = _connectedPeers.find(connection->id());
@@ -631,7 +649,7 @@ namespace Stormancer
 		if (it == _connectedPeers.end())
 		{
 			auto wScene = STORM_WEAK_FROM_THIS();
-			auto scenePeer = std::make_shared<P2PScenePeer>(wScene, connection, p2pService, connectToSceneMessace);
+			auto scenePeer = std::make_shared<P2PScenePeer>(wScene, connection, p2pService, connectToSceneMessage);
 
 			_connectedPeers.emplace(scenePeer->id(),scenePeer);
 

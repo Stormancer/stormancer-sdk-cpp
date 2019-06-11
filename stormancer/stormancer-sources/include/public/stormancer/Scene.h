@@ -96,9 +96,6 @@ namespace Stormancer
 		/// Returns the detailed scene address, including cluster, account and app information
 		virtual SceneAddress address() const = 0;
 
-		/// Returns the scene handle.
-		virtual byte handle() const = 0;
-
 		/// Returns a host metadata value.
 		virtual std::string getHostMetadata(const std::string& key) const = 0;
 
@@ -120,9 +117,7 @@ namespace Stormancer
 		/// \return A vector containing the scene host connections.
 		virtual std::vector<std::shared_ptr<IScenePeer>> remotePeers() const = 0;
 
-		/// Used by stormancer to add a P2P scene peer to the connected peers (don't use it manually)
-		virtual std::shared_ptr<IP2PScenePeer> peerConnected(std::shared_ptr<IConnection> connection, std::shared_ptr<P2PService> P2P, P2PConnectToSceneMessage) = 0;
-
+		
 		/// Returns the peer connection to the host.
 		virtual std::shared_ptr<IScenePeer> host() const = 0;
 
