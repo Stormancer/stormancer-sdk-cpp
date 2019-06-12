@@ -707,7 +707,7 @@ namespace Stormancer
 			throw PointerDeletedException("Client destroyed");
 		}
 
-		auto serverConnection = connections->getConnection(scene->hostConnection().lock()->id());
+		auto serverConnection = scene->hostConnection().lock();
 
 		if (!serverConnection)
 		{

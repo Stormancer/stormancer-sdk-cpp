@@ -196,7 +196,7 @@ namespace Stormancer
 			pplx::task_completion_event<Packet_ptr> tce;
 			auto request = reserveRequestSlot(msgId, tce, ct);
 			auto wThat = STORM_WEAK_FROM_THIS();
-
+			_logger->log(LogLevel::Trace, "systemRequest", "Sending system request " + std::to_string(msgId) + " to " + std::to_string(peer->id()));
 			request->ct = ct;
 			if (ct.is_cancelable())
 			{
