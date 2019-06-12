@@ -291,7 +291,7 @@ namespace Stormancer
 						((!isOriginHost) && ((int)route->filter() & (int)MessageOriginFilter::Peer))) //Filter packet
 					{
 						Packetisp_ptr packet(new Packet<IScenePeer>(origin, p->metadata));
-						packet->stream.rdbuf()->pubsetbuf(p->stream.currentPtr(), p->stream.availableSize());
+						packet->stream.rdbuf()->pubsetbuf(reinterpret_cast<char*>(p->stream.currentPtr()), p->stream.availableSize());
 						subscriber.on_next(packet);
 					}
 				}

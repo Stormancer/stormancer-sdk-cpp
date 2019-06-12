@@ -52,7 +52,7 @@ namespace Stormancer
 			std::streamsize decryptedSize = os.currentPosition();
 
 			std::memcpy(dataPtr, decryptedPtr, (std::size_t)decryptedSize);
-			stream.rdbuf()->pubsetbuf(dataPtr, decryptedSize);
+			stream.rdbuf()->pubsetbuf(reinterpret_cast<char*>(dataPtr), decryptedSize);
 		}
 	}
 }

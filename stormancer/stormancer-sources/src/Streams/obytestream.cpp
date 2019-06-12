@@ -4,12 +4,12 @@
 namespace Stormancer
 {
 	obytestream::obytestream()
-		: std::basic_ostream<byte>(&_buffer)
+		: std::basic_ostream<char>(&_buffer)
 	{
 	}
 
 	obytestream::obytestream(byte* dataPtr, std::streamsize dataSize, bool allowExtend)
-		: std::basic_ostream<byte>(&_buffer)
+		: std::basic_ostream<char>(&_buffer)
 		, _buffer(dataPtr, dataSize, allowExtend)
 	{
 	}
@@ -171,14 +171,13 @@ namespace Stormancer
 
 	obytestream& obytestream::write(const byte* ptr, std::streamsize size)
 	{
-		std::basic_ostream<byte>::write(ptr, size);
+		std::basic_ostream<char>::write(reinterpret_cast<const char*>(ptr), size);
 		return (*this);
 	}
-#if !defined(_LIBCPP_VERSION)
+
 	obytestream& obytestream::write(const char* ptr, std::streamsize size)
 	{
-		std::basic_ostream<byte>::write((byte*)ptr, size);
+		std::basic_ostream<char>::write(ptr, size);
 		return (*this);
 	}
-#endif
 }

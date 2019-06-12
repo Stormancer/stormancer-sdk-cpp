@@ -20,9 +20,5 @@ namespace Stormancer
 	using float32 = float;
 	using float64 = double;
 
-#if defined(_LIBCPP_VERSION) /* _LIBCPP_VERSION Needed for libc++ compatibility ; defined if any libc++ std header is included */
-	using byte = char;
-#else
 	using byte = uint8;
-#endif
 }

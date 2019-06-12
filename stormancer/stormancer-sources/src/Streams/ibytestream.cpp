@@ -4,18 +4,18 @@
 namespace Stormancer
 {
 	ibytestream::ibytestream()
-		: std::basic_istream<byte>(&_buffer)
+		: std::basic_istream<char>(&_buffer)
 	{
 	}
 
 	ibytestream::ibytestream(byte* data, std::streamsize dataSize)
-		: std::basic_istream<byte>(&_buffer)
+		: std::basic_istream<char>(&_buffer)
 		, _buffer(data, dataSize)
 	{
 	}
 
 	ibytestream::ibytestream(ibytestream&& other)
-		: std::basic_istream<byte>((std::basic_istream<byte>&&)other)
+		: std::basic_istream<char>((std::basic_istream<char>&&)other)
 	{
 		auto tmpbuf = rdbuf();
 		set_rdbuf(other.rdbuf());
@@ -176,14 +176,13 @@ namespace Stormancer
 
 	ibytestream& ibytestream::read(byte* ptr, std::streamsize size)
 	{
-		std::basic_istream<byte>::read(ptr, size);
+		std::basic_istream<char>::read(reinterpret_cast<char*>(ptr), size);
 		return (*this);
 	}
-#if !defined(_LIBCPP_VERSION)
+
 	ibytestream& ibytestream::read(char* ptr, std::streamsize size)
 	{
-		std::basic_istream<byte>::read((byte*)ptr, size);
+		std::basic_istream<char>::read(ptr, size);
 		return (*this);
 	}
-#endif
 }

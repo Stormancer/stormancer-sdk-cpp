@@ -8,7 +8,7 @@
 
 namespace Stormancer
 {
-	class obytestream : public std::basic_ostream<byte>
+	class obytestream : public std::basic_ostream<char>
 	{
 	public:
 
@@ -63,9 +63,8 @@ namespace Stormancer
 		void dynamic(bool dyn);
 
 		obytestream& write(const byte* ptr, std::streamsize size);
-#if !defined(_LIBCPP_VERSION)
+
 		obytestream& write(const char* ptr, std::streamsize size);
-#endif
 
 #pragma endregion
 
@@ -78,7 +77,7 @@ namespace Stormancer
 		{
 			if (good())
 			{
-				write((const byte*)&value, sizeof(T));
+				write(reinterpret_cast<const char*>(&value), sizeof(T));
 			}
 			return (*this);
 		}
