@@ -122,7 +122,7 @@ namespace Stormancer
 		auto wApiClient = STORM_WEAK_FROM_THIS();
 
 		return client.request(request, ct)
-			.then([wApiClient, baseUri, errors, endpoints, ct](pplx::task<web::http::http_response> task)
+			.then([wApiClient, baseUri,relativeUri, errors, endpoints, ct](pplx::task<web::http::http_response> task)
 		{
 			auto apiClient = LockOrThrow(wApiClient);
 
@@ -134,7 +134,7 @@ namespace Stormancer
 			catch (const std::exception& ex)
 			{
 				auto msgStr = "Can't reach the server endpoint. " + baseUri;
-				apiClient->_logger->log(LogLevel::Warn, "ApiClient", msgStr, ex.what());
+				apiClient->_logger->log(LogLevel::Warn, "ApiClient.getFederation", msgStr, ex.what());
 				(*errors).push_back("[" + msgStr + ":" + ex.what() + "]");
 				return apiClient->getFederationImpl(endpoints, errors, ct);
 			}
@@ -142,8 +142,8 @@ namespace Stormancer
 			try
 			{
 				uint16 statusCode = response.status_code();
-				auto msgStr = "HTTP request on '" + baseUri + "' returned status code " + std::to_string(statusCode);
-				apiClient->_logger->log(LogLevel::Trace, "ApiClient", msgStr);
+				auto msgStr = "HTTP request on '" + baseUri + relativeUri+"' returned status code " + std::to_string(statusCode);
+				apiClient->_logger->log(LogLevel::Trace, "ApiClient.getFederation", msgStr);
 				concurrency::streams::stringstreambuf ss;
 				return response.body().read_to_end(ss)
 					.then([wApiClient, ss, statusCode, response, errors, msgStr, endpoints, ct](size_t)
@@ -151,12 +151,12 @@ namespace Stormancer
 					auto apiClient = LockOrThrow(wApiClient);
 
 					std::string responseText = ss.collection();
-					apiClient->_logger->log(LogLevel::Trace, "ApiClient", "Response", responseText);
+					apiClient->_logger->log(LogLevel::Trace, "ApiClient.getFederation", "Response", responseText);
 
 					if (ensureSuccessStatusCode(statusCode))
 					{
 
-						apiClient->_logger->log(LogLevel::Trace, "ApiClient", "Get token API version : 1");
+						apiClient->_logger->log(LogLevel::Trace, "ApiClient.getFederation", "Get token API version : 1");
 						return pplx::task_from_result(apiClient->readFederationFromJson(responseText));
 
 					}
@@ -296,7 +296,7 @@ namespace Stormancer
 			catch (const std::exception& ex)
 			{
 				auto msgStr = "Can't reach the server endpoint. " + baseUri;
-				apiClient->_logger->log(LogLevel::Warn, "ApiClient", msgStr, ex.what());
+				apiClient->_logger->log(LogLevel::Warn, "ApiClient.getToken", msgStr, ex.what());
 				(*errors).push_back("[" + msgStr + ":" + ex.what() + "]");
 				return apiClient->getSceneEndpointImpl(endpoints, errors, accountId, applicationName, sceneId, ct);
 			}
@@ -305,7 +305,7 @@ namespace Stormancer
 			{
 				uint16 statusCode = response.status_code();
 				auto msgStr = "HTTP request on '" + baseUri + "' returned status code " + std::to_string(statusCode);
-				apiClient->_logger->log(LogLevel::Trace, "ApiClient", msgStr);
+				apiClient->_logger->log(LogLevel::Trace, "ApiClient.getToken", msgStr);
 				concurrency::streams::stringstreambuf ss;
 				return response.body().read_to_end(ss)
 					.then([wApiClient, ss, statusCode, response, errors, msgStr, endpoints, accountId, applicationName, sceneId, ct](size_t)
@@ -313,7 +313,7 @@ namespace Stormancer
 					auto apiClient = LockOrThrow(wApiClient);
 
 					std::string responseText = ss.collection();
-					apiClient->_logger->log(LogLevel::Trace, "ApiClient", "Response", responseText);
+					apiClient->_logger->log(LogLevel::Trace, "ApiClient.getToken", "Response", responseText);
 
 					if (ensureSuccessStatusCode(statusCode))
 					{
@@ -321,12 +321,12 @@ namespace Stormancer
 						auto xVersion = headers[_XPLATSTR("x-version")];
 						if (xVersion == _XPLATSTR("2") || xVersion == _XPLATSTR("3"))
 						{
-							apiClient->_logger->log(LogLevel::Trace, "ApiClient", "Get token API version : 2");
+							apiClient->_logger->log(LogLevel::Trace, "ApiClient.getToken", "Get token API version : 2");
 							return pplx::task_from_result(apiClient->_tokenHandler->getSceneEndpointInfo(responseText));
 						}
 						else
 						{
-							apiClient->_logger->log(LogLevel::Trace, "ApiClient", "Get token API version : 1");
+							apiClient->_logger->log(LogLevel::Trace, "ApiClient.getToken", "Get token API version : 1");
 							return pplx::task_from_result(apiClient->_tokenHandler->decodeToken(responseText));
 						}
 					}
