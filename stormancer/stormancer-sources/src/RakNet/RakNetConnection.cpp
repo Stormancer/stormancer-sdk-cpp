@@ -53,7 +53,9 @@ namespace Stormancer
 		_dependencyScope = parentScope.beginLifetimeScope([](ContainerBuilder& builder)
 		{
 			builder.registerDependency<ChannelUidStore>().singleInstance();
-			builder.registerDependency<std::vector<std::weak_ptr<Scene_Impl>>>().singleInstance();
+			builder.registerDependency<std::vector<std::weak_ptr<Scene_Impl>>>([](const DependencyScope&) {
+				return std::make_shared<std::vector< std::weak_ptr<Scene_Impl>>>(150);
+				}).singleInstance();
 		});
 	}
 

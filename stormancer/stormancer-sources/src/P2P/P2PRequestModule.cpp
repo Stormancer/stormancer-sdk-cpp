@@ -78,7 +78,7 @@ namespace Stormancer
 					.then([connection, connectToSceneMessage, ctx, serializer](std::shared_ptr<Scene> scene)
 				{
 					auto p2pService = scene->dependencyResolver().resolve<P2PService>();
-					auto handles = *connection->dependencyResolver().resolve<std::vector<std::weak_ptr<Scene_Impl>>>();
+					auto& handles = *connection->dependencyResolver().resolve<std::vector<std::weak_ptr<Scene_Impl>>>();
 					uint8 handle = 0;
 					bool success = false;
 

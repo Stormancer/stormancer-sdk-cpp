@@ -590,7 +590,7 @@ namespace Stormancer
 		{
 			auto scene = LockOrThrow(wScene);
 
-			auto handles = *p2pConnection->dependencyResolver().resolve<std::vector<std::weak_ptr<Scene_Impl>>>();
+			auto& handles = *p2pConnection->dependencyResolver().resolve<std::vector<std::weak_ptr<Scene_Impl>>>();
 			uint8 handle = 0;
 			bool success = false;
 
