@@ -324,7 +324,7 @@ namespace Stormancer
 						if (auto connection = getConnection(rakNetPacket->guid.g))
 						{
 							Serializer serializer;
-							connection->_closeReason = serializer.deserializeOne<std::string>((byte*)(rakNetPacket->data + 1), (rakNetPacket->length - 1));
+							connection->_closeReason = serializer.deserializeOne<std::string>(reinterpret_cast<const byte*>(rakNetPacket->data + 1), (rakNetPacket->length - 1));
 						}
 						break;
 					}
@@ -641,8 +641,8 @@ namespace Stormancer
 #endif
 
 		auto connection = getConnection(rakNetPacket->guid.g);
-		std::streamsize dataSize = (std::streamsize)rakNetPacket->length;
-		byte* data = new byte[(unsigned int)dataSize];
+		uint32 dataSize = rakNetPacket->length;
+		byte* data = new byte[dataSize];
 		std::memcpy(data, rakNetPacket->data, (size_t)dataSize);
 
 		Packet_ptr packet(new Packet<>(connection, data, dataSize), [data](Packet<>* packetPtr)

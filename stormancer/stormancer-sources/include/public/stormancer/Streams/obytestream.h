@@ -8,7 +8,7 @@
 
 namespace Stormancer
 {
-	class obytestream : public std::basic_ostream<char>
+	class obytestream : public std::basic_ostream<byte>
 	{
 	public:
 
@@ -36,9 +36,9 @@ namespace Stormancer
 
 		virtual obytestream& operator<<(const uint64 value);
 
-		virtual obytestream& operator<<(const float32 value);
+		virtual obytestream& operator<<(const float value);
 
-		virtual obytestream& operator<<(const float64 value);
+		virtual obytestream& operator<<(const double value);
 
 		virtual obytestream& operator<<(const bool value);
 
@@ -77,7 +77,7 @@ namespace Stormancer
 		{
 			if (good())
 			{
-				write(reinterpret_cast<const char*>(&value), sizeof(T));
+				write((const byte*)&value, sizeof(T));
 			}
 			return (*this);
 		}

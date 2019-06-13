@@ -28,7 +28,7 @@ namespace Stormancer
 			serializer.serialize(stream, metadata);
 			for (const auto& f : files)
 			{
-				stream.write((char*)f.content, f.contentLength);
+				stream.write(reinterpret_cast<const byte*>(f.content), f.contentLength);
 			}
 		});
 	}

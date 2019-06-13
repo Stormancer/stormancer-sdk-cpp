@@ -29,7 +29,7 @@ namespace Stormancer
 		utility::string_t data2(data.begin(), data.end());
 		auto vectorData = utility::conversions::from_base64(data2);
 
-		ConnectionData cData = _serializer.deserializeOne<ConnectionData>((byte*)vectorData.data(), vectorData.size());
+		ConnectionData cData = _serializer.deserializeOne<ConnectionData>(reinterpret_cast<const byte*>(vectorData.data()), vectorData.size());
 
 		return SceneEndpoint(token, cData);
 	}

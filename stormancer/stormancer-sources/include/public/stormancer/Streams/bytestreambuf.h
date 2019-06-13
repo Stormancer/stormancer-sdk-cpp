@@ -5,10 +5,30 @@
 #include "stormancer/StormancerTypes.h"
 #include <streambuf>
 
+namespace std
+{
+	template<>
+	class ctype<Stormancer::byte> : public ctype<char>
+	{
+	public:
+
+		typedef ctype_base::mask mask;
+
+		explicit ctype(size_t refs)
+			: ctype<char>(0, false, refs)
+		{
+		}
+
+		explicit ctype(const mask* table = 0, bool del = false, size_t refs = 0)
+			: ctype<char>(table, del, refs)
+		{
+		}
+	};
+}
 
 namespace Stormancer
 {
-	class bytestreambuf : public std::basic_streambuf<char>
+	class bytestreambuf : public std::basic_streambuf<byte>
 	{
 	public:
 
@@ -55,7 +75,7 @@ namespace Stormancer
 
 #pragma region protected_methods
 
-		std::basic_streambuf<char>* setbuf(char* s, std::streamsize size) override;
+		std::basic_streambuf<byte>* setbuf(byte* s, std::streamsize size) override;
 
 		pos_type seekoff(off_type off, std::ios_base::seekdir way, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out) override;
 
@@ -63,7 +83,7 @@ namespace Stormancer
 
 		std::streamsize showmanyc() override;
 
-		std::streamsize xsgetn(char* s, std::streamsize n) override;
+		std::streamsize xsgetn(byte* s, std::streamsize n) override;
 
 		int_type underflow() override;
 
@@ -83,9 +103,9 @@ namespace Stormancer
 
 		void grow(std::streamsize minSize);
 
-		inline bool setgIfValid(char* first, char* next, char* last);
+		inline bool setgIfValid(byte* first, byte* next, byte* last);
 
-		inline bool setpIfValid(char* first, char* next, char* last);
+		inline bool setpIfValid(byte* first, byte* next, byte* last);
 
 		void updateReadAfterWrite();
 

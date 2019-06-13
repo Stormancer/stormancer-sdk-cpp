@@ -17,8 +17,5 @@ namespace Stormancer
 	using uint32 = std::uint32_t;
 	using uint64 = std::uint64_t;
 
-	using float32 = float;
-	using float64 = double;
-
 	using byte = uint8;
 }

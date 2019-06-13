@@ -218,7 +218,7 @@ namespace Stormancer
 		byte handle;
 		stream.read(&handle, 1);
 		byte buffer[1464];
-		auto read = stream.readsome(reinterpret_cast<char*>(buffer), 1464);
+		auto read = stream.readsome(buffer, 1464);
 
 		auto itTunnel = _tunnels.find(std::make_tuple(id, handle));
 		if (itTunnel != _tunnels.end())
@@ -230,7 +230,7 @@ namespace Stormancer
 				if (socket)
 				{
 					RakNet::RNS2_SendParameters bsp;
-					bsp.data = (char*)buffer;
+					bsp.data = reinterpret_cast<char*>(buffer);
 					bsp.length = (int)read;
 					bsp.systemAddress.FromStringExplicitPort("127.0.0.1", client->hostPort, socket->GetBoundAddress().GetIPVersion());
 
@@ -256,10 +256,11 @@ namespace Stormancer
 			std::stringstream ss;
 			ss << "P2PTunnels_" << connection->id();
 			int channelUid = connection->dependencyResolver().resolve<ChannelUidStore>()->getChannelUid(ss.str());
-			connection->send([=](obytestream& stream) {
+			connection->send([=](obytestream& stream)
+			{
 				stream << (byte)MessageIDTypes::ID_P2P_TUNNEL;
 				stream << client->handle;
-				stream.write(recvStruct->data, recvStruct->bytesRead);
+				stream.write(reinterpret_cast<const byte*>(recvStruct->data), static_cast<std::streamsize>(recvStruct->bytesRead));
 			}, channelUid, PacketPriority::IMMEDIATE_PRIORITY, PacketReliability::UNRELIABLE);
 		}
 	}

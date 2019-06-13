@@ -156,7 +156,7 @@ namespace Stormancer
 	template<typename T>
 	T* reverseByteOrder(T* data, uint64 n = 0)
 	{
-		char* tmp = (char*)data;
+		char* tmp = reinterpret_cast<char*>(data);
 		if (n == 0)
 		{
 			n = sizeof(T);

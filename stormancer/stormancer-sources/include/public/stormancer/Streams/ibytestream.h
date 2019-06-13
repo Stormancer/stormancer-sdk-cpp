@@ -8,7 +8,7 @@
 
 namespace Stormancer
 {
-	class ibytestream : public std::basic_istream<char>
+	class ibytestream : public std::basic_istream<byte>
 	{
 	public:
 
@@ -40,9 +40,9 @@ namespace Stormancer
 
 		ibytestream& operator>>(uint64& value);
 
-		ibytestream& operator>>(float32& value);
+		ibytestream& operator>>(float& value);
 
-		ibytestream& operator>>(float64& value);
+		ibytestream& operator>>(double& value);
 
 		ibytestream& operator>>(bool& value);
 
@@ -79,7 +79,7 @@ namespace Stormancer
 		{
 			if (good())
 			{
-				read(reinterpret_cast<char*>(&value), sizeof(T));
+				read(reinterpret_cast<byte*>(&value), sizeof(T));
 			}
 			return (*this);
 		}

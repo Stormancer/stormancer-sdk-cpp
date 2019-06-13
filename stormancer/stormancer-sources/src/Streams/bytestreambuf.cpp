@@ -19,7 +19,7 @@ namespace Stormancer
 		}
 		if (dataPtr != nullptr && dataSize > 0)
 		{
-			setbuf(reinterpret_cast<char*>(dataPtr), dataSize);
+			setbuf(dataPtr, dataSize);
 		}
 		dynamic(isDynamic);
 	}
@@ -31,40 +31,40 @@ namespace Stormancer
 
 	byte* bytestreambuf::startReadPtr()
 	{
-		return reinterpret_cast<byte*>(eback());
+		return eback();
 	}
 
 	byte* bytestreambuf::currentReadPtr()
 	{
-		return reinterpret_cast<byte*>(gptr());
+		return gptr();
 	}
 
 	byte* bytestreambuf::endReadPtr()
 	{
-		return reinterpret_cast<byte*>(egptr());
+		return egptr();
 	}
 
 	byte* bytestreambuf::startWritePtr()
 	{
-		return reinterpret_cast<byte*>(pbase());
+		return pbase();
 	}
 
 	byte* bytestreambuf::currentWritePtr()
 	{
-		return reinterpret_cast<byte*>(pptr());
+		return pptr();
 	}
 
 	byte* bytestreambuf::endWritePtr()
 	{
-		return reinterpret_cast<byte*>(epptr());
+		return epptr();
 	}
 
 	std::streamsize bytestreambuf::size()
 	{
 		if (_mode & Write)
 		{
-			char* first = eback();
-			char* last = egptr();
+			byte* first = eback();
+			byte* last = egptr();
 			if (first && last)
 			{
 				return (last - first);
@@ -72,8 +72,8 @@ namespace Stormancer
 		}
 		else if (_mode & Read)
 		{
-			char* first = pbase();
-			char* last = epptr();
+			byte* first = pbase();
+			byte* last = epptr();
 			if (first && last)
 			{
 				return (last - first);
@@ -84,8 +84,8 @@ namespace Stormancer
 
 	std::streamsize bytestreambuf::currentReadPosition()
 	{
-		char* first = eback();
-		char* next = gptr();
+		byte* first = eback();
+		byte* next = gptr();
 		if (first && next)
 		{
 			return (next - first);
@@ -95,8 +95,8 @@ namespace Stormancer
 
 	std::streamsize bytestreambuf::currentWritePosition()
 	{
-		char* first = pbase();
-		char* next = pptr();
+		byte* first = pbase();
+		byte* next = pptr();
 		if (first && next)
 		{
 			return (next - first);
@@ -118,7 +118,7 @@ namespace Stormancer
 		}
 	}
 
-	std::basic_streambuf<char>* bytestreambuf::setbuf(char* s, std::streamsize size)
+	std::basic_streambuf<byte>* bytestreambuf::setbuf(byte* s, std::streamsize size)
 	{
 		tidy();
 		setg(s, s, (s + size));
@@ -133,9 +133,9 @@ namespace Stormancer
 
 		if ((_mode & Read) && (which & std::ios_base::in))
 		{
-			char* first = eback();
-			char* next = gptr();
-			char* last = egptr();
+			byte* first = eback();
+			byte* next = gptr();
+			byte* last = egptr();
 
 			if (way == std::ios_base::beg)
 			{
@@ -158,9 +158,9 @@ namespace Stormancer
 
 		if ((_mode & Write) && (which & std::ios_base::out))
 		{
-			char* first = pbase();
-			char* next = pptr();
-			char* last = epptr();
+			byte* first = pbase();
+			byte* next = pptr();
+			byte* last = epptr();
 
 			if (way == std::ios_base::beg)
 			{
@@ -190,9 +190,9 @@ namespace Stormancer
 
 		if ((_mode & Read) && (which & std::ios_base::in))
 		{
-			char* first = eback();
-			char* next = first + (int)pos;
-			char* last = egptr();
+			byte* first = eback();
+			byte* next = first + (int)pos;
+			byte* last = egptr();
 
 			if (setgIfValid(first, next, last))
 			{
@@ -202,9 +202,9 @@ namespace Stormancer
 
 		if ((_mode & Write) && (which & std::ios_base::out))
 		{
-			char* first = pbase();
-			char* next = first + (int)pos;
-			char* last = epptr();
+			byte* first = pbase();
+			byte* next = first + (int)pos;
+			byte* last = epptr();
 
 			if (setpIfValid(first, next, last))
 			{
@@ -219,8 +219,8 @@ namespace Stormancer
 	{
 		if (_mode & Read)
 		{
-			char* next = gptr();
-			char* last = egptr();
+			byte* next = gptr();
+			byte* last = egptr();
 			if (next != last)
 			{
 				return last - next;
@@ -240,7 +240,7 @@ namespace Stormancer
 		}
 	}
 
-	std::streamsize bytestreambuf::xsgetn(char* s, std::streamsize n)
+	std::streamsize bytestreambuf::xsgetn(byte* s, std::streamsize n)
 	{
 		std::streamsize res = 0;
 
@@ -249,10 +249,10 @@ namespace Stormancer
 			if (_mode & Read)
 			{
 				std::streamsize size = std::min(showmanyc(), n);
-				char* first = eback();
-				char* next = gptr();
-				char* last = egptr();
-				std::memcpy(s, next, (std::size_t)size);
+				byte* first = eback();
+				byte* next = gptr();
+				byte* last = egptr();
+				std::memcpy(s, next, static_cast<std::size_t>(size));
 				next += size;
 				setg(first, next, last);
 				res += size;
@@ -266,8 +266,8 @@ namespace Stormancer
 	{
 		if (_mode & Read)
 		{
-			char* next = gptr();
-			char* last = egptr();
+			byte* next = gptr();
+			byte* last = egptr();
 			if (next != last)
 			{
 				return traits_type::to_int_type(gptr()[0]);
@@ -281,11 +281,11 @@ namespace Stormancer
 	{
 		if (_mode & Read)
 		{
-			char* next = gptr();
-			char* last = egptr();
+			byte* next = gptr();
+			byte* last = egptr();
 			if (next != last)
 			{
-				char* first = eback();
+				byte* first = eback();
 				int_type ch = traits_type::to_int_type(gptr()[0]);
 				next += 1;
 				setg(first, next, last);
@@ -300,11 +300,11 @@ namespace Stormancer
 	{
 		if (_mode & Read)
 		{
-			char* first = eback();
-			char* next = gptr();
+			byte* first = eback();
+			byte* next = gptr();
 			if (next > first)
 			{
-				char* last = egptr();
+				byte* last = egptr();
 				next--;
 				if (_mode & Write)
 				{
@@ -332,9 +332,9 @@ namespace Stormancer
 			// Check write mode
 			if (_mode & Write)
 			{
-				char* first = pbase();
-				char* next = pptr();
-				char* last = epptr();
+				byte* first = pbase();
+				byte* next = pptr();
+				byte* last = epptr();
 				std::streamsize avail = 0;
 				if (first && next && last)
 				{
@@ -361,7 +361,7 @@ namespace Stormancer
 				std::streamsize sz = std::min(avail, n);
 				if (sz > 0)
 				{
-					std::memcpy(next, s, (std::size_t)sz);
+					std::memcpy(next, s, static_cast<std::size_t>(sz));
 					next += sz;
 					setp(first, last);
 					pbump((int)(next - first));
@@ -378,8 +378,8 @@ namespace Stormancer
 	{
 		if (_mode & Write)
 		{
-			char* next = pptr();
-			char* last = epptr();
+			byte* next = pptr();
+			byte* last = epptr();
 			if (next && (next != last))
 			{
 				next[0] = (byte)c;
@@ -394,7 +394,7 @@ namespace Stormancer
 	{
 		if (_mode & Allocated)
 		{
-			char* ptr = pbase();
+			byte* ptr = pbase();
 
 			if (!ptr)
 			{
@@ -418,11 +418,11 @@ namespace Stormancer
 
 	void bytestreambuf::init(std::streamsize size)
 	{
-		char* ptr;
-		char* ptrWriteLast;
+		byte* ptr;
+		byte* ptrWriteLast;
 		if (size > 0)
 		{
-			ptr = new char[(unsigned int)size]();
+			ptr = new byte[(unsigned int)size]();
 			ptrWriteLast = ptr + size;
 		}
 		else
@@ -441,13 +441,13 @@ namespace Stormancer
 		{
 			Mode oldMode = _mode;
 
-			char* oldReadFirst = eback();
-			char* oldReadNext = gptr();
-			char* oldReadLast = egptr();
+			byte* oldReadFirst = eback();
+			byte* oldReadNext = gptr();
+			byte* oldReadLast = egptr();
 
-			char* oldWriteFirst = pbase();
-			char* oldWriteNext = pptr();
-			char* oldWriteLast = epptr();
+			byte* oldWriteFirst = pbase();
+			byte* oldWriteNext = pptr();
+			byte* oldWriteLast = epptr();
 
 			std::streamsize oldSize = 0;
 			if (oldWriteFirst && oldWriteLast)
@@ -467,20 +467,20 @@ namespace Stormancer
 
 			if (oldSize > 0)
 			{
-				char* writeFirst = pbase();
-				char* writeNext = pptr();
-				char* writeLast = epptr();
+				byte* writeFirst = pbase();
+				byte* writeNext = pptr();
+				byte* writeLast = epptr();
 
-				std::memcpy(writeFirst, oldWriteFirst, (std::size_t)oldSize);
+				std::memcpy(writeFirst, oldWriteFirst, static_cast<std::size_t>(oldSize));
 
 				writeNext = writeFirst + (oldWriteNext - oldWriteFirst);
 
 				setp(writeFirst, writeLast);
 				pbump((int)(oldWriteNext - oldWriteFirst));
 
-				char* readFirst = (oldReadFirst ? writeFirst : nullptr);
-				char* readNext = (oldReadNext ? writeFirst + (oldReadNext - oldReadFirst) : nullptr);
-				char* readLast = (oldReadLast ? writeLast : nullptr);
+				byte* readFirst = (oldReadFirst ? writeFirst : nullptr);
+				byte* readNext = (oldReadNext ? writeFirst + (oldReadNext - oldReadFirst) : nullptr);
+				byte* readLast = (oldReadLast ? writeLast : nullptr);
 
 				setg(readFirst, readNext, readLast);
 			}
@@ -492,7 +492,7 @@ namespace Stormancer
 		}
 	}
 
-	inline bool bytestreambuf::setgIfValid(char* first, char* next, char* last)
+	inline bool bytestreambuf::setgIfValid(byte* first, byte* next, byte* last)
 	{
 		if ((next >= first) && (next <= last))
 		{
@@ -502,7 +502,7 @@ namespace Stormancer
 		return false;
 	}
 
-	inline bool bytestreambuf::setpIfValid(char* first, char* next, char* last)
+	inline bool bytestreambuf::setpIfValid(byte* first, byte* next, byte* last)
 	{
 		if ((next >= first) && (next <= last))
 		{
@@ -517,11 +517,11 @@ namespace Stormancer
 	{
 		if ((_mode & Write) && (_mode & Read))
 		{
-			char* writeNext = pptr();
+			byte* writeNext = pptr();
 
-			char* readFirst = eback();
-			char* readNext = gptr();
-			char* readLast = writeNext;
+			byte* readFirst = eback();
+			byte* readNext = gptr();
+			byte* readLast = writeNext;
 
 			setg(readFirst, readNext, readLast);
 		}

@@ -74,7 +74,7 @@ namespace Stormancer
 		void deserialize(const byte* data, const uint64 dataSize, TOutput& value, uint64* readOffset = nullptr) const
 		{
 			msgpack::unpacked unp;
-			uint64 readOffset2 = msgpack::unpack(unp, (char*)data, (std::size_t)dataSize);
+			uint64 readOffset2 = msgpack::unpack(unp, reinterpret_cast<const char*>(data), static_cast<std::size_t>(dataSize));
 			if (readOffset)
 			{
 				(*readOffset) += readOffset2;

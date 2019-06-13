@@ -4,18 +4,18 @@
 namespace Stormancer
 {
 	ibytestream::ibytestream()
-		: std::basic_istream<char>(&_buffer)
+		: std::basic_istream<byte>(&_buffer)
 	{
 	}
 
 	ibytestream::ibytestream(byte* data, std::streamsize dataSize)
-		: std::basic_istream<char>(&_buffer)
+		: std::basic_istream<byte>(&_buffer)
 		, _buffer(data, dataSize)
 	{
 	}
 
 	ibytestream::ibytestream(ibytestream&& other)
-		: std::basic_istream<char>((std::basic_istream<char>&&)other)
+		: std::basic_istream<byte>((std::basic_istream<byte>&&)other)
 	{
 		auto tmpbuf = rdbuf();
 		set_rdbuf(other.rdbuf());
@@ -67,12 +67,12 @@ namespace Stormancer
 		return deserialize(value);
 	}
 
-	ibytestream& ibytestream::operator>>(float32& value)
+	ibytestream& ibytestream::operator>>(float& value)
 	{
 		return deserialize(value);
 	}
 
-	ibytestream& ibytestream::operator>>(float64& value)
+	ibytestream& ibytestream::operator>>(double& value)
 	{
 		return deserialize(value);
 	}
@@ -95,7 +95,7 @@ namespace Stormancer
 			std::streamsize sz = buf->in_avail();
 			if (sz > 0)
 			{
-				bytes.resize((std::size_t)sz);
+				bytes.resize(static_cast<std::size_t>(sz));
 				read(bytes.data(), sz);
 			}
 		}
@@ -176,13 +176,13 @@ namespace Stormancer
 
 	ibytestream& ibytestream::read(byte* ptr, std::streamsize size)
 	{
-		std::basic_istream<char>::read(reinterpret_cast<char*>(ptr), size);
+		std::basic_istream<byte>::read(ptr, size);
 		return (*this);
 	}
 
 	ibytestream& ibytestream::read(char* ptr, std::streamsize size)
 	{
-		std::basic_istream<char>::read(ptr, size);
+		std::basic_istream<byte>::read(reinterpret_cast<byte*>(ptr), size);
 		return (*this);
 	}
 }

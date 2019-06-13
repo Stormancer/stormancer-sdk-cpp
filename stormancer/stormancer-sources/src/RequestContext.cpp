@@ -10,7 +10,7 @@ namespace Stormancer
 		, _isComplete(false)
 	{
 		packet->stream >> _requestId;
-		_stream.rdbuf()->pubsetbuf(reinterpret_cast<char*>(packet->stream.currentPtr()), packet->stream.rdbuf()->in_avail());
+		_stream.rdbuf()->pubsetbuf(packet->stream.currentPtr(), packet->stream.rdbuf()->in_avail());
 	}
 
 	RequestContext::~RequestContext()
