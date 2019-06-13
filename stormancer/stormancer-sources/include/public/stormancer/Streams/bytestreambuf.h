@@ -4,6 +4,7 @@
 
 #include "stormancer/StormancerTypes.h"
 #include <streambuf>
+#include <locale>
 
 namespace std
 {
@@ -11,8 +12,6 @@ namespace std
 	class ctype<Stormancer::byte> : public ctype<char>
 	{
 	public:
-
-		typedef ctype_base::mask mask;
 
 		explicit ctype(size_t refs)
 			: ctype<char>(0, false, refs)

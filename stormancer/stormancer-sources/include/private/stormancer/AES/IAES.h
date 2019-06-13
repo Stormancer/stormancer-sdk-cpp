@@ -13,11 +13,7 @@ namespace Stormancer
 
 #pragma region public_methods
 	
-
-		virtual ~IAES()
-		{
-		}
-
+		virtual ~IAES() = default;
 		
 		virtual uint16 ivSize();
 

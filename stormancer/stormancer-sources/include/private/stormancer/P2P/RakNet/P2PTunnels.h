@@ -62,7 +62,7 @@ namespace Stormancer
 		std::shared_ptr<Configuration> _config;
 		std::unordered_map<std::string, ServerDescriptor> _servers;
 		//Tunnel targeting the key [remotePeerId,handle]
-		std::unordered_map < peerHandle, std::shared_ptr<P2PTunnelClient>,  PeerHandle_hash, PeerHandle_equal> _tunnels;
+		std::unordered_map<peerHandle, std::shared_ptr<P2PTunnelClient>, PeerHandle_hash, PeerHandle_equal> _tunnels;
 		std::mutex _syncRoot;
 
 #pragma endregion
