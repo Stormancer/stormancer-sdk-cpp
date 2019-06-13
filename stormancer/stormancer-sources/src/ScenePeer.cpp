@@ -6,9 +6,9 @@
 namespace Stormancer
 {
 	ScenePeer::ScenePeer(std::weak_ptr<IConnection> connection, byte sceneHandle, std::unordered_map<std::string, Route_ptr>& routes, std::weak_ptr<Scene> scene)
-		: _connection(connection)
-		, _sceneHandle(sceneHandle)
+		: _sceneHandle(sceneHandle)
 		, _routes(routes)
+		, _connection(connection)
 		, _scene(scene)
 	{
 	}

@@ -10,11 +10,11 @@
 namespace Stormancer
 {
 	P2PScenePeer::P2PScenePeer(std::weak_ptr<Scene> scene, std::shared_ptr<IConnection> connection, std::shared_ptr<P2PService> p2pService, P2PConnectToSceneMessage message)
-		: _scene(scene)
-		, _connection(connection)
-		, _p2pService(p2pService)
-		, _handle(message.sceneHandle)
+		: _handle(message.sceneHandle)
 		, _metadata(message.sceneMetadata)
+		, _connection(connection)
+		, _scene(scene)
+		, _p2pService(p2pService)
 	{
 		for (auto r : message.routes)
 		{

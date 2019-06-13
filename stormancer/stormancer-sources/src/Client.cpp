@@ -268,10 +268,10 @@ namespace Stormancer
 			});
 
 		});
-		
+
 	}
 
-	
+
 	pplx::task<std::shared_ptr<Scene>> Client::connectToPrivateScene(const std::string& sceneToken, const SceneInitializer& initializer, pplx::cancellation_token ct)
 	{
 
@@ -370,7 +370,7 @@ namespace Stormancer
 										that->_scenes.erase(uri);
 									}
 								}
-								
+
 							});
 						}
 					}
@@ -413,7 +413,7 @@ namespace Stormancer
 			return it->second.task.then([](std::shared_ptr<Scene_Impl> scene) {
 				return std::static_pointer_cast<Scene>(scene);
 			});;
-				
+
 		}
 
 		return pplx::task_from_result<std::shared_ptr<Scene>>(nullptr);
@@ -471,7 +471,7 @@ namespace Stormancer
 			auto client = LockOrThrow(wThat);
 			return client->getSceneInternal(address, sep, ct);
 		}, ct);
-		
+
 	}
 
 	pplx::task<std::shared_ptr<Scene_Impl>> Client::getPrivateScene(const SceneAddress& address, const std::string& sceneToken, pplx::cancellation_token ct)
@@ -1025,18 +1025,6 @@ namespace Stormancer
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 		return pplx::task_from_result();
 
 	}
@@ -1090,7 +1078,7 @@ namespace Stormancer
 				throw ex;
 			}
 		}, ct);
-						}
+	}
 
 	pplx::task<Federation> Client::getFederation(pplx::cancellation_token ct)
 	{
@@ -1181,4 +1169,4 @@ namespace Stormancer
 			return SceneAddress::parse(url, fed.current.id, config->account, config->application);
 		});
 	}
-					}
+}

@@ -8,29 +8,23 @@
 
 namespace Stormancer
 {
-	struct GameSessionContainer
+	class GameSessionContainer
 	{
-		GameSessionContainer() {};
+	public:
 
-		//Keep game finder scene alive
-		std::shared_ptr<Scene> scene;
+		GameSessionContainer()
+			: _logger(scene->dependencyResolver().resolve<ILogger>())
+		{
+		};
+
 		std::shared_ptr<GameSessionService> service()
 		{
 			return scene->dependencyResolver().resolve<GameSessionService>();
 		}
 
-		pplx::task<GameSessionConnectionParameters> gameSessionReadyTask;
-
-		Subscription allPlayerReady;
-		Subscription onRoleRecieved;
-		Subscription onTunnelOpened;
-		Subscription onShutdownRecieved;
-		Subscription onPlayerChanged;
-
-		rxcpp::subscription sceneConnectionStateSubscription;
 		~GameSessionContainer()
 		{
-			auto logger = scene->dependencyResolver().resolve<ILogger>();
+			auto logger = _logger;
 			auto sceneId = scene->id();
 			scene->disconnect().then([logger, sceneId](pplx::task<void> task)
 			{
@@ -51,11 +45,29 @@ namespace Stormancer
 				logger->log(LogLevel::Info, "GameSession", "Destroyed", sceneId);
 			}
 		}
+
+		//Keep game finder scene alive
+		std::shared_ptr<Scene> scene;
+
+		pplx::task<GameSessionConnectionParameters> gameSessionReadyTask;
+
+		Subscription allPlayerReady;
+		Subscription onRoleRecieved;
+		Subscription onTunnelOpened;
+		Subscription onShutdownRecieved;
+		Subscription onPlayerChanged;
+
+		rxcpp::subscription sceneConnectionStateSubscription;
+
+	private:
+
+		std::shared_ptr<ILogger> _logger;
 	};
 
-	GameSession_Impl::GameSession_Impl(std::weak_ptr<IClient> client)
-		: _wClient(client)
+	GameSession_Impl::GameSession_Impl(std::weak_ptr<IClient> wClient, std::shared_ptr<ILogger> logger)
+		: _wClient(wClient)
 		, _currentGameSession(pplx::task_from_result<std::shared_ptr<GameSessionContainer>>(nullptr))
+		, _logger(logger)
 	{
 	}
 
@@ -100,7 +112,6 @@ namespace Stormancer
 					.then([gameSessionContainer, openTunnel, ct](pplx::task<std::string> task)
 				{
 					auto service = gameSessionContainer->service();
-					auto logger = gameSessionContainer->scene->dependencyResolver().resolve<ILogger>();
 					try
 					{
 						auto token = task.get();
@@ -354,7 +365,7 @@ namespace Stormancer
 				pplx::task_completion_event<GameSessionConnectionParameters> sessionReadyTce;
 				gameSessionContainer->gameSessionReadyTask = pplx::create_task(sessionReadyTce);
 
-				gameSessionContainer->sceneConnectionStateSubscription = scene->getConnectionStateChangedObservable().subscribe([wThat, useTunnel](ConnectionState state)
+				gameSessionContainer->sceneConnectionStateSubscription = scene->getConnectionStateChangedObservable().subscribe([wThat](ConnectionState state)
 				{
 					if (state == ConnectionState::Disconnected)
 					{

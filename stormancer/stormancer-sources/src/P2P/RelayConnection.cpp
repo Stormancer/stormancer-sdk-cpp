@@ -10,8 +10,8 @@ namespace Stormancer
 		, _p2pSessionId(p2pSessionId)
 		, _remotePeerId(remotePeerId)
 		, _ipAddress(address)
-		, _serializer(serializer)
 		, _dependencyResolver(serverConnection->dependencyResolver().beginLifetimeScope())
+		, _serializer(serializer)
 	{
 	}
 

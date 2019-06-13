@@ -85,7 +85,7 @@ namespace Stormancer
 			return false;
 		}
 
-		logger->log(LogLevel::Trace, "Received message for sceneHandle " + sceneHandle, packet->connection->ipAddress());
+		logger->log(LogLevel::Trace, "SceneDispatcher", "Received message for sceneHandle " + std::to_string(sceneHandle), packet->connection->ipAddress());
 		unsigned int sceneIndex = sceneHandle - (uint8)MessageIDTypes::ID_SCENES;
 
 		auto connection = packet->connection;
