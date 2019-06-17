@@ -11,9 +11,7 @@
 #include "EmptyHeader.h"
 #ifdef RAKNET_SOCKET_2_INLINE_FUNCTIONS
 
-#if RAKNET_SUPPORT_IPV6==1
 #include "LinuxStrings.h"
-#endif
 
 #ifndef RAKNETSOCKET2_BERKLEY_CPP
 #define RAKNETSOCKET2_BERKLEY_CPP
@@ -201,7 +199,7 @@ RNS2BindResult RNS2_Berkley::BindSharedIPV4( RNS2_BerkleyBindParameters *bindPar
 
 
 
-	if (bindParameters->hostAddress && bindParameters->hostAddress[0])
+	if (bindParameters->hostAddress && bindParameters->hostAddress[0] && (_stricmp(bindParameters->hostAddress, "UNASSIGNED_SYSTEM_ADDRESS") != 0))
 	{
 
 
@@ -216,6 +214,11 @@ RNS2BindResult RNS2_Berkley::BindSharedIPV4( RNS2_BerkleyBindParameters *bindPar
 
 
 		boundAddress.address.addr4.sin_addr.s_addr = inet_addr__( bindParameters->hostAddress );
+		// -1 could mean both an error, and INADDR_BROADCAST. In either case, we want to fail, as binding to broadcast is undesirable.
+		if (boundAddress.address.addr4.sin_addr.s_addr == -1)
+		{
+			return BR_FAILED_TO_BIND_SOCKET;
+		}
 
 	}
 	else
