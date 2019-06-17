@@ -70,6 +70,10 @@ namespace Stormancer
 		/// Metadata
 		std::unordered_map<std::string, std::string> metadata;
 
+		/// Original packet
+		/// Used to keep the original packet alive (in case of async process)
+		std::shared_ptr<Packet<IConnection>> originalPacket;
+
 #pragma endregion
 
 	private:
@@ -79,13 +83,16 @@ namespace Stormancer
 		/// Copy constructor deleted.
 		Packet(const Packet<T>&) = delete;
 
+		/// Move constructor deleted.
+		Packet(Packet<T>&&) = delete;
+
 		/// Copy operator deleted.
 		Packet<T>& operator=(const Packet<T>&) = delete;
 
 #pragma endregion
 	};
 
-	using Packet_ptr = std::shared_ptr<Packet<>>;
+	using Packet_ptr = std::shared_ptr<Packet<IConnection>>;
 	using Packetisp_ptr = std::shared_ptr<Packet<IScenePeer>>;
 	using PacketObservable = rxcpp::observable<Packet_ptr>;
 	using HandlerFunction = std::function<bool(Packet_ptr)>;

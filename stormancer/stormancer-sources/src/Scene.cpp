@@ -288,10 +288,11 @@ namespace Stormancer
 				if (origin)
 				{
 					if ((isOriginHost && ((int)route->filter() & (int)MessageOriginFilter::Host)) ||
-						((!isOriginHost) && ((int)route->filter() & (int)MessageOriginFilter::Peer))) //Filter packet
+						((!isOriginHost) && ((int)route->filter() & (int)MessageOriginFilter::Peer))) // Filter packet
 					{
 						Packetisp_ptr packet(new Packet<IScenePeer>(origin, p->metadata));
 						packet->stream.rdbuf()->pubsetbuf(p->stream.currentPtr(), p->stream.availableSize());
+						packet->originalPacket = p; // The packetisp keeps alive the original packet
 						subscriber.on_next(packet);
 					}
 				}

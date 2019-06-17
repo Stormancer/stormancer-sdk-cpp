@@ -26,5 +26,8 @@
     <ClCompile Include="..\stormancer-sources\src\Windows\AES\AES_windows.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\stormancer-sources\src\Windows\RelyingPartyWindows.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

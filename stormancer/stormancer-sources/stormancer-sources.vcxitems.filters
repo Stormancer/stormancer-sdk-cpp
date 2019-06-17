@@ -85,6 +85,9 @@
     <Filter Include="Header Files\public\Streams">
       <UniqueIdentifier>{5534fc1d-c953-4fe1-941f-225069d5e0b5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\public\Windows">
+      <UniqueIdentifier>{7fc260a8-ca55-400b-ae18-8cfc8392d8b7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\Compatibility\IStormancerTask.h">
@@ -479,6 +482,9 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\IScheduler.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\MsgpackCArrayAdaptor.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Windows\RelyingPartyWindows.h">
+      <Filter>Header Files\public\Windows</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Configuration.cpp">

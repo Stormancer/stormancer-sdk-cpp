@@ -146,6 +146,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\StringUtilities.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\TaskUtilities.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\TypeReflection.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Windows\RelyingPartyWindows.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\AES\AESDecryptStream.cpp" />
