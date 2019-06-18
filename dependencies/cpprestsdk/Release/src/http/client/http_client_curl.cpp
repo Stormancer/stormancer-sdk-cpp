@@ -112,6 +112,11 @@ namespace web {
 				class curl_request_context : public request_context, public std::enable_shared_from_this < curl_request_context >
 				{
 					friend class curl_http_client;
+				private:
+					std::function<void(std::string)> logger()
+					{
+						return m_http_client->client_config().get_logger();
+					}
 				public:
 					curl_request_context(const std::shared_ptr<_http_client_communicator> &client,
 						http_request &request)
@@ -165,7 +170,16 @@ namespace web {
 						m_content_length = std::numeric_limits<int>().max();
 
 						AddRequestHeaders(this->m_request.headers());
+						
+						curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
 
+						/* the DEBUGFUNCTION has no effect until we enable VERBOSE */
+						curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+
+						/* example.com is redirected, so we tell libcurl to follow redirection */
+						curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+
+						curl_easy_setopt(curl, CURLOPT_DEBUGDATA, this);
 						curl_easy_setopt(curl, CURLOPT_HEADERDATA, this);
 						curl_easy_setopt(curl, CURLOPT_WRITEDATA, this);
 						curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, read_header_callback);
@@ -182,6 +196,9 @@ namespace web {
 					}
 
 				private:
+
+					
+
 					void write_without_body()
 					{
 						const auto &progress = m_request._get_impl()->_progress_handler();
@@ -204,6 +221,7 @@ namespace web {
 
 
 
+						this->logger()("sending web request without body: " + this->m_request.method() + ": " + this->m_request.absolute_uri().to_string());
 						auto res = curl_easy_perform(curl);
 						if (res != CURLE_OK)
 						{
@@ -234,6 +252,7 @@ namespace web {
 
 
 
+							this->logger()("sending web request with body: "+ this->m_request.method()+": "+ this->m_request.absolute_uri().to_string());
 							auto res = curl_easy_perform(curl);
 							if (res != CURLE_OK)
 							{
@@ -253,7 +272,9 @@ namespace web {
 
 					static size_t read_response_callback(char* ptr, size_t size, size_t n, void* userdata)
 					{
+						
 						curl_request_context* that = (curl_request_context*)userdata;
+						that->logger()("Received " + std::to_string(size) + "bytes for : " + that->m_request.method() + ": " + that->m_request.absolute_uri().to_string());
 
 						if (that->m_downloaded == 0)
 						{
@@ -319,12 +340,15 @@ namespace web {
 								return 0;
 							}
 						}
+						that->logger()("wrote "+std::to_string(readSize)+"bytes in body of : " + that->m_request.method() + ": " + that->m_request.absolute_uri().to_string());
 						return readSize;
 					}
 
 					static size_t read_header_callback(char *buffer, size_t size, size_t nitems, void *userdata)
 					{
+						
 						curl_request_context* that = (curl_request_context*)userdata;
+						
 						auto header = std::string(buffer, size * nitems);
 
 						static std::string contentLengthField = "Content-Length:";
@@ -334,7 +358,7 @@ namespace web {
 							auto contentLengthStr = header.substr(contentLengthField.size(), size);
 							that->m_content_length_response = std::stoi(contentLengthStr);
 						}
-
+						that->logger()("received header for web request: " + that->m_request.method() + ": " + that->m_request.absolute_uri().to_string() + "\n" + header);
 						if (!that->_statusLineRead)
 						{
 							that->_statusLineRead = true;
@@ -348,16 +372,23 @@ namespace web {
 
 							std::string status_message;
 							std::getline(headers_stream, status_message);
-
-							that->m_response.set_status_code(status_code);
-
-							::web::http::details::trim_whitespace(status_message);
-							that->m_response.set_reason_phrase(std::move(status_message));
-
-							if (!headers_stream || http_version.substr(0, 5) != "HTTP/")
+							if (status_code == 100)
 							{
-								that->report_exception("Invalid HTTP status line");
-								return 0;
+								that->_statusLineRead = false;
+								
+							}
+							else
+							{
+								that->m_response.set_status_code(status_code);
+
+								::web::http::details::trim_whitespace(status_message);
+								that->m_response.set_reason_phrase(std::move(status_message));
+
+								if (!headers_stream || http_version.substr(0, 5) != "HTTP/")
+								{
+									that->report_exception("Invalid HTTP status line");
+									return 0;
+								}
 							}
 						}
 
@@ -444,7 +475,44 @@ namespace web {
 						return rv;
 
 					}
+					static int my_trace(CURL*, curl_infotype type,
+							char *data, size_t size,
+							void *userp)
+					{
+						curl_request_context* that = (curl_request_context*)userp;
+						
+						
+						std::string text;
+						switch (type) {
+						case CURLINFO_TEXT:
 
+							text = "== Info: "+ std::string(data,size);
+						default: /* in case a new one is introduced to shock us */
+							return 0;
+
+						case CURLINFO_HEADER_OUT:
+							text = "=> Send header";
+							break;
+						case CURLINFO_DATA_OUT:
+							text = "=> Send data";
+							break;
+						case CURLINFO_SSL_DATA_OUT:
+							text = "=> Send SSL data";
+							break;
+						case CURLINFO_HEADER_IN:
+							text = "<= Recv header";
+							break;
+						case CURLINFO_DATA_IN:
+							text = "<= Recv data";
+							break;
+						case CURLINFO_SSL_DATA_IN:
+							text = "<= Recv SSL data";
+							break;
+						}
+						that->logger()("received debug log for web request: " + that->m_request.method() + ": " + that->m_request.absolute_uri().to_string() + " "+ text);
+						
+						return 0;
+					}
 
 					void AddRequestHeaders(web::http::http_headers headers)
 					{

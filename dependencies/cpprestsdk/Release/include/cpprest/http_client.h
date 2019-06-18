@@ -125,6 +125,7 @@ namespace web
 					, m_tlsext_sni_enabled(true)
 #endif	
 					, m_initHttpLib(true)
+					, m_logger([](std::string) {})
 
 #if defined(_WIN32) && !defined(__cplusplus_winrt)
 					, m_buffer_request(false)
@@ -134,46 +135,14 @@ namespace web
 
 
 				}
-
-//#if !defined(__ORBIS__) && !defined(__psp2__) && !defined(_XBOX_ONE) && !defined(__NX) && !defined(LINUX)
-//#if !defined(CPPREST_TARGET_XP)
-//				/// <summary>
-//				/// Get OAuth 1.0 configuration.
-//				/// </summary>
-//				/// <returns>Shared pointer to OAuth 1.0 configuration.</returns>
-//				const std::shared_ptr<oauth1::experimental::oauth1_config> oauth1() const
-//				{
-//					return m_oauth1;
-//				}
-//
-//				/// <summary>
-//				/// Set OAuth 1.0 configuration.
-//				/// </summary>
-//				/// <param name="config">OAuth 1.0 configuration to set.</param>
-//				void set_oauth1(oauth1::experimental::oauth1_config config)
-//				{
-//					m_oauth1 = std::make_shared<oauth1::experimental::oauth1_config>(std::move(config));
-//				}
-//#endif
-//
-//				/// <summary>
-//				/// Get OAuth 2.0 configuration.
-//				/// </summary>
-//				/// <returns>Shared pointer to OAuth 2.0 configuration.</returns>
-//				const std::shared_ptr<oauth2::experimental::oauth2_config> oauth2() const
-//				{
-//					return m_oauth2;
-//				}
-//
-//				/// <summary>
-//				/// Set OAuth 2.0 configuration.
-//				/// </summary>
-//				/// <param name="config">OAuth 2.0 configuration to set.</param>
-//				void set_oauth2(oauth2::experimental::oauth2_config config)
-//				{
-//					m_oauth2 = std::make_shared<oauth2::experimental::oauth2_config>(std::move(config));
-//				}
-//#endif
+				const std::function<void(std::string)>& get_logger() const
+				{
+					return m_logger;
+				}
+				void set_logger(std::function<void(std::string)> logger)
+				{
+					m_logger = logger;
+				}
 				/// <summary>
 				/// Get the web proxy object
 				/// </summary>
@@ -417,14 +386,14 @@ namespace web
 
 
 			private:
-//#if !defined(__ORBIS__) && !defined(__psp2__) && !defined(_XBOX_ONE) && !defined(__NX) && !defined(LINUX)
-//#if !defined(CPPREST_TARGET_XP)
-//				std::shared_ptr<oauth1::experimental::oauth1_config> m_oauth1;
-//#endif
-//
-//				std::shared_ptr<oauth2::experimental::oauth2_config> m_oauth2;
-//#endif
-
+				//#if !defined(__ORBIS__) && !defined(__psp2__) && !defined(_XBOX_ONE) && !defined(__NX) && !defined(LINUX)
+				//#if !defined(CPPREST_TARGET_XP)
+				//				std::shared_ptr<oauth1::experimental::oauth1_config> m_oauth1;
+				//#endif
+				//
+				//				std::shared_ptr<oauth2::experimental::oauth2_config> m_oauth2;
+				//#endif
+				std::function<void(std::string)> m_logger;
 				web_proxy m_proxy;
 				http::client::credentials m_credentials;
 				// Whether or not to guarantee ordering, i.e. only using one underlying TCP connection.
