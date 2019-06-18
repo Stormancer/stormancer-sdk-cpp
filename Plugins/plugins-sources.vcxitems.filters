@@ -414,6 +414,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Helloworld\Helloworld.hpp">
       <Filter>public\Helloworld</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Tunnels\Tunnels.hpp">
+      <Filter>public\Tunnels</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="private">
@@ -541,6 +544,9 @@
     </Filter>
     <Filter Include="public\Messaging">
       <UniqueIdentifier>{92063cb1-4cf6-4d71-a922-7fd42017ba58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="public\Tunnels">
+      <UniqueIdentifier>{381d17f9-09ec-4637-98ec-c593408ff7ef}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
