@@ -10,7 +10,7 @@ namespace Stormancer
 {
 	bool ensureSuccessStatusCode(int statusCode)
 	{
-		return (/*statusCode >= 200 &&*/ statusCode < 300);
+		return (statusCode >= 200 && statusCode < 300);
 	}
 
 	std::time_t nowTime_t()
