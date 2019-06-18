@@ -27,10 +27,10 @@ namespace Stormancer
 		auto config = web::http::client::http_client_config();
 		config.set_timeout(std::chrono::seconds(30));
 		auto logger = this->_logger;
+
 		config.set_logger([logger](std::string msg) {
 			logger->log(LogLevel::Trace, "httpclient", msg, "");
 			});
-
 		config.set_initHttpLib(_config->shoudInitializeNetworkLibraries);
 
 
@@ -107,10 +107,10 @@ namespace Stormancer
 		auto config = web::http::client::http_client_config();
 		config.set_timeout(std::chrono::seconds(30));
 		auto logger = this->_logger;
+
 		config.set_logger([logger](std::string msg) {
 			logger->log(LogLevel::Trace, "httpclient", msg, "");
 		});
-
 		config.set_initHttpLib(_config->shoudInitializeNetworkLibraries);
 
 
@@ -272,10 +272,10 @@ namespace Stormancer
 		auto config = web::http::client::http_client_config();
 		config.set_timeout(std::chrono::seconds(30));
 		auto logger = this->_logger;
+
 		config.set_logger([logger](std::string msg) {
 			logger->log(LogLevel::Trace, "httpclient", msg, "");
 			});
-
 		config.set_initHttpLib(_config->shoudInitializeNetworkLibraries);
 
 
@@ -409,14 +409,12 @@ namespace Stormancer
 		auto config = web::http::client::http_client_config();
 		config.set_timeout(std::chrono::seconds(10));
 		auto logger = this->_logger;
+
 		config.set_logger([logger](std::string msg) {
 			logger->log(LogLevel::Trace, "httpclient", msg, "");
 			});
-#if defined(_WIN32)
-		web::http::client::http_client client(std::wstring(baseUri.begin(), baseUri.end()), config);
-#else
-		web::http::client::http_client client(baseUri, config);
-#endif
+
+		web::http::client::http_client client(utility::conversions::to_string_t(baseUri), config);
 
 		auto wApiClient = STORM_WEAK_FROM_THIS();
 
