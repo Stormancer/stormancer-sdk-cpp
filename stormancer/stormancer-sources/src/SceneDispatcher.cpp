@@ -10,7 +10,7 @@ namespace Stormancer
 		: _eventDispatcher(evDispatcher),
 		logger(logger)
 	{
-		handler = [=](uint8 sceneHandle, Packet_ptr packet)
+		handler = [this](uint8 sceneHandle, Packet_ptr packet)
 		{
 			return handler_impl(sceneHandle, packet);
 		};
@@ -101,7 +101,7 @@ namespace Stormancer
 				{
 					if (auto scene = scene_weak.lock())
 					{
-						logger->log(LogLevel::Trace, "handling message for scene " + scene->id(), packet->connection->ipAddress());
+						logger->log(LogLevel::Trace, "SceneDispatcher", "handling message for scene " + scene->id(), packet->connection->ipAddress());
 						scene->handleMessage(packet);
 					}
 				});
