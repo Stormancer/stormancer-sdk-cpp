@@ -165,9 +165,17 @@ namespace web {
 						curl_easy_setopt(curl, CURLOPT_SSL_CTX_FUNCTION, ssl_ctx_callback);
 						curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, true);
 
-						// Check user specified transfer-encoding.
-						std::string transferencoding;
-						m_content_length = std::numeric_limits<int>().max();
+						m_content_length = m_request._get_impl()->_get_content_length();
+						if (m_content_length > 0)
+						{
+							if (m_request.method() == http::methods::GET || m_request.method() == http::methods::HEAD)
+							{
+								this->report_exception(http_exception("A GET or HEAD request should not have an entity body."));
+								return;
+							}
+							// TODO find out if we need more code to support chunked transfer encoding
+							// Having it in the headers should be enough, otherwise maybe use CURLOPT_TRANSFER_ENCODING
+						}
 
 						AddRequestHeaders(this->m_request.headers());
 						
@@ -185,13 +193,13 @@ namespace web {
 						curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, read_header_callback);
 						curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, read_response_callback);
 
-						if (!this->m_request.body())
+						if (m_content_length > 0)
 						{
-							write_without_body();
+							write_body();
 						}
 						else
 						{
-							write_body();
+							write_without_body();
 						}
 					}
 

@@ -112,21 +112,20 @@ namespace web
 			class http_client_config
 			{
 			public:
-				http_client_config() :
-					m_guarantee_order(false),
-					m_timeout(std::chrono::seconds(30)),
-					m_chunksize(0)
+				http_client_config()
+					: m_logger([](std::string) {})
+					, m_guarantee_order(false)
+					, m_timeout(std::chrono::seconds(30))
+					, m_chunksize(0)
 #if !defined(__cplusplus_winrt)
 					, m_validate_certificates(true)
 #endif
-					, m_set_user_nativehandle_options([](native_handle)->void {})
 #if (defined(ANDROID) || defined(__ANDROID__))
 					, m_ssl_context_callback([](boost::asio::ssl::context&)->void {})
 					, m_tlsext_sni_enabled(true)
 #endif	
+					, m_set_user_nativehandle_options([](native_handle)->void {})
 					, m_initHttpLib(true)
-					, m_logger([](std::string) {})
-
 #if defined(_WIN32) && !defined(__cplusplus_winrt)
 					, m_buffer_request(false)
 #endif
