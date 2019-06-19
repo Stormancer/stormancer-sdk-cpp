@@ -41,15 +41,15 @@ namespace Stormancer
 					}
 
 					std::weak_ptr<TunnelsService> wService = this->shared_from_this();
-					return rpc->rpc<std::string>("Tunnels.GetP2PToken")
-						.then([wService](std::string token)
+					return rpc->rpc<bool>("Tunnels.OpenP2PTunnel")
+						.then([wService](bool opened)
 					{
 						auto service = wService.lock();
 						if (!service)
 						{
 							throw Stormancer::PointerDeletedException("Service destroyed");
 						}
-						if (token.empty())
+						if (!opened)
 						{
 							return taskDelay(std::chrono::milliseconds(300)).then([wService]()
 							{
@@ -68,11 +68,14 @@ namespace Stormancer
 							{
 								throw Stormancer::PointerDeletedException("Scene destroyed");
 							}
-							return scene->openP2PConnection(token)
-								.then([](std::shared_ptr<IP2PScenePeer> p2pScenePeer)
+							if (scene->connectedPeers().count > 0)
 							{
-								return p2pScenePeer->openP2PTunnel(TUNNELS_P2P_SERVER_ID);
-							});
+								return scene->connectedPeers().begin()->second->openP2PTunnel(TUNNELS_P2P_SERVER_ID);
+							}
+							else
+							{
+								throw std::runtime_error("no remote peer is currently connected in p2p.");
+							}
 						}
 					});
 				}
@@ -84,7 +87,7 @@ namespace Stormancer
 				std::shared_ptr<P2PTunnel> _tunnel = nullptr;
 
 				//Initializes the service
-				void initialize(std::shared_ptr<Stormancer::Scene> scene)
+				void initialize()
 				{
 					auto rpcService = _rpcService.lock();
 					if (rpcService)
@@ -176,6 +179,18 @@ namespace Stormancer
 			{
 				builder.registerDependency<Tunnels>().singleInstance();
 			}
+
+			void sceneCreated(std::shared_ptr<Scene> scene) override
+			{
+				auto name = scene->getHostMetadata("bfg.tunnels");
+
+				if (!name.empty())
+				{
+					auto service = scene->dependencyResolver().resolve<details::TunnelsService>();
+					service->initialize();
+				}
+			}
+
 			void sceneConnecting(std::shared_ptr<Scene> scene) override
 			{
 				auto name = scene->getHostMetadata("bfg.tunnels");
