@@ -480,10 +480,14 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\Macros.h">
       <Filter>Header Files\public\Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\IScheduler.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\MsgpackCArrayAdaptor.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Windows\RelyingPartyWindows.h">
       <Filter>Header Files\public\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\IScheduler.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\MsgpackCArrayAdaptor.h">
+      <Filter>Header Files\public\Utilities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

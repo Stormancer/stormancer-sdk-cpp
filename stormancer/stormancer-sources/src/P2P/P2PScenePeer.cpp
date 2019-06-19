@@ -56,7 +56,7 @@ namespace Stormancer
 	void P2PScenePeer::send(const std::string& routeName, const StreamWriter& streamWriter, PacketPriority packetPriority, PacketReliability packetReliability, const std::string& channelIdentifier)
 	{
 		auto scene = LockOrThrow(_scene);
-		scene->send(routeName, streamWriter, packetPriority, packetReliability, channelIdentifier);
+		scene->send(Stormancer::MatchPeers(id()), routeName, streamWriter, packetPriority, packetReliability, channelIdentifier);
 	}
 
 	void P2PScenePeer::disconnect()

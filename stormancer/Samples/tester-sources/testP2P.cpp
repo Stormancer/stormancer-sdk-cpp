@@ -138,10 +138,24 @@ void p2pConnect(std::shared_ptr<Stormancer::IClient> hostClient, std::shared_ptr
 {
 	std::shared_ptr<Stormancer::Scene> hostScene;
 	std::shared_ptr<Stormancer::Scene> guestScene;
+	pplx::task_completion_event<std::shared_ptr<Stormancer::IP2PScenePeer>> hostPeerTce;
+	Stormancer::Subscription peerConnectedSubscription;
 
 	try
 	{
-		hostScene = hostClient->connectToPublicScene(sceneId).get();
+		hostScene = hostClient->connectToPublicScene(sceneId, [logger](std::shared_ptr<Stormancer::Scene> scene)
+		{
+			scene->addRoute("test", [logger](Stormancer::Packetisp_ptr packet)
+			{
+				logger->log(Stormancer::LogLevel::Info, "P2P_test", "host received a scene message from a peer", packet->readObject<std::string>());
+			}, Stormancer::MessageOriginFilter::Peer);
+		}).get();
+
+		peerConnectedSubscription = hostScene->onPeerConnected().subscribe([&peerConnectedSubscription, hostPeerTce](std::shared_ptr< Stormancer::IP2PScenePeer> peer)
+		{
+			hostPeerTce.set(peer);
+			peerConnectedSubscription->unsubscribe();
+		});
 	}
 	catch (const std::exception& ex)
 	{
@@ -151,7 +165,13 @@ void p2pConnect(std::shared_ptr<Stormancer::IClient> hostClient, std::shared_ptr
 
 	try
 	{
-		guestScene = guestClient->connectToPublicScene(sceneId).get();
+		guestScene = guestClient->connectToPublicScene(sceneId, [logger](std::shared_ptr<Stormancer::Scene> scene)
+		{
+			scene->addRoute("test", [logger](Stormancer::Packetisp_ptr packet)
+			{
+				logger->log(Stormancer::LogLevel::Info, "P2P_test", "guest received a scene message from a peer", packet->readObject<std::string>());
+			}, Stormancer::MessageOriginFilter::Peer);
+		}).get();
 	}
 	catch (const std::exception& ex)
 	{
@@ -173,6 +193,8 @@ void p2pConnect(std::shared_ptr<Stormancer::IClient> hostClient, std::shared_ptr
 	auto guestRpc = guestScene->dependencyResolver().resolve<Stormancer::RpcService>();
 	std::string p2pToken = guestRpc->rpc<std::string>("getP2PToken", true).get();
 
+
+
 	logger->log(std::string("Got P2P token ") + p2pToken);
 
 	auto hostTunnel = hostScene->registerP2PServer("pingServer");
@@ -183,14 +205,28 @@ void p2pConnect(std::shared_ptr<Stormancer::IClient> hostClient, std::shared_ptr
 	auto guestPeer = guestScene->openP2PConnection(p2pToken).get();
 	logger->log("Retrieved guestPeer.");
 
+	auto hostPeer = pplx::create_task(hostPeerTce).get();
+	guestPeer->send("test", [](Stormancer::obytestream& stream) {
+		Stormancer::Serializer{}.serialize(stream, std::string("message from guest!"));
+	});
+	hostPeer->send("test", [](Stormancer::obytestream& stream) {
+		Stormancer::Serializer{}.serialize(stream, std::string("message from host!"));
+	});
+
+
 	auto guestTunnel = guestPeer->openP2PTunnel("pingServer").get();
-	
+
 	logger->log(std::string("Retrieved guest tunnel: ") + guestTunnel->ip + ":" + std::to_string(guestTunnel->port));
 	UdpSocket guestSocket(logger, 0, false);
 	guestSocket.Send(guestTunnel->port);
 
+
+
+
 	hostScene->disconnect().wait();
 	guestScene->disconnect().wait();
+
+
 
 	logger->log("Disconnected host and guest scenes");
 }
