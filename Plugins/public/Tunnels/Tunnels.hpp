@@ -68,7 +68,7 @@ namespace Stormancer
 							{
 								throw Stormancer::PointerDeletedException("Scene destroyed");
 							}
-							if (scene->connectedPeers().count > 0)
+							if (scene->connectedPeers().size() > 0)
 							{
 								return scene->connectedPeers().begin()->second->openP2PTunnel(TUNNELS_P2P_SERVER_ID);
 							}
