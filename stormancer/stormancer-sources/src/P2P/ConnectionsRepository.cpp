@@ -67,6 +67,13 @@ namespace Stormancer
 		auto it = _connectionsByKey.find(id);
 		if (it == _connectionsByKey.end())
 		{
+			std::string connections;
+			for (auto c : _connectionsByKey)
+			{
+				connections += c.first;
+				connections += ", ";
+			}
+			_logger->log(LogLevel::Debug, "connections", "Connection not found "+id+" connections : ("+connections+")","");
 			return std::shared_ptr<IConnection>();
 		}
 		else
@@ -78,6 +85,13 @@ namespace Stormancer
 			}
 			else
 			{
+				std::string connections;
+				for (auto c : _connectionsByKey)
+				{
+					connections += c.first;
+					connections += ", ";
+				}
+				_logger->log(LogLevel::Debug, "connections", "Connection not complete " + id + " connections : (" + connections + ")", "");
 				return std::shared_ptr<IConnection>();
 			}
 		}

@@ -380,7 +380,7 @@ namespace web {
 
 							std::string status_message;
 							std::getline(headers_stream, status_message);
-							if (status_code == 100)
+							if (status_code == 100) //Ignore status code 100 : Continue
 							{
 								that->_statusLineRead = false;
 								
