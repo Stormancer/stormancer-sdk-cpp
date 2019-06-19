@@ -23,8 +23,8 @@ namespace Stormancer
 
 			class TunnelsService :public std::enable_shared_from_this<TunnelsService>
 			{
-				friend class TunnelsPlugin;
-				friend class Tunnels;
+				friend class Stormancer::Tunnels::TunnelsPlugin;
+				friend class Stormancer::Tunnels::Tunnels;
 			public:
 				TunnelsService(std::weak_ptr<Scene> scene, std::weak_ptr<RpcService> rpc)
 					: _scene(scene)
