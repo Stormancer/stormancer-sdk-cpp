@@ -34,49 +34,52 @@ namespace Stormancer
 
 				pplx::task<std::shared_ptr<P2PTunnel>> openTunnel()
 				{
-					auto rpc = _rpcService.lock();
-					if (!rpc)
-					{
-						throw Stormancer::PointerDeletedException("Scene destroyed");
-					}
-
 					std::weak_ptr<TunnelsService> wService = this->shared_from_this();
-					return rpc->rpc<bool>("Tunnels.OpenP2PTunnel")
-						.then([wService](bool opened)
+					return pplx::create_task(_peerTce)
+						.then([wService](std::weak_ptr<IP2PScenePeer> wPeer)
 					{
 						auto service = wService.lock();
 						if (!service)
 						{
 							throw Stormancer::PointerDeletedException("Service destroyed");
 						}
-						if (!opened)
+
+						auto rpc = service->_rpcService.lock();
+						if (!rpc)
 						{
-							return taskDelay(std::chrono::milliseconds(300)).then([wService]()
-							{
-								auto service = wService.lock();
-								if (!service)
-								{
-									throw Stormancer::PointerDeletedException("Service destroyed");
-								}
-								return service->openTunnel();
-							});
+							throw Stormancer::PointerDeletedException("Scene destroyed");
 						}
-						else
+
+						return rpc->rpc<bool>("Tunnels.OpenP2PTunnel")
+							.then([wService, wPeer](bool opened)
 						{
-							auto scene = service->_scene.lock();
-							if (!scene)
+							auto service = wService.lock();
+							if (!service)
 							{
-								throw Stormancer::PointerDeletedException("Scene destroyed");
+								throw Stormancer::PointerDeletedException("Service destroyed");
 							}
-							if (scene->connectedPeers().size() > 0)
+							if (!opened)
 							{
-								return scene->connectedPeers().begin()->second->openP2PTunnel(TUNNELS_P2P_SERVER_ID);
+								return taskDelay(std::chrono::milliseconds(300)).then([wService]()
+								{
+									auto service = wService.lock();
+									if (!service)
+									{
+										throw Stormancer::PointerDeletedException("Service destroyed");
+									}
+									return service->openTunnel();
+								});
 							}
 							else
-							{
-								throw std::runtime_error("no remote peer is currently connected in p2p.");
+							{								
+								auto peer = wPeer.lock();
+								if(!peer)
+								{
+									throw Stormancer::PointerDeletedException("peer destroyed");
+								}
+								return peer->openP2PTunnel(TUNNELS_P2P_SERVER_ID);								
 							}
-						}
+						});
 					});
 				}
 
@@ -85,18 +88,31 @@ namespace Stormancer
 				std::weak_ptr<Scene> _scene;
 				std::weak_ptr<RpcService> _rpcService;
 				std::shared_ptr<P2PTunnel> _tunnel = nullptr;
+				Subscription _onPeerConnectedSubscription = nullptr;
+				pplx::task_completion_event<std::weak_ptr<IP2PScenePeer>> _peerTce;
 
 				//Initializes the service
 				void initialize()
 				{
+					//Capture a weak pointer of this in the route handler to make sure that:
+					//* We don't prevent this from being destroyed (capturing a shared pointer)
+					//* If destroyed, we don't try to use it in the handler (capturing a this reference directly)
+					std::weak_ptr<TunnelsService> wService = this->shared_from_this();
+					auto scene = _scene.lock();
+					_onPeerConnectedSubscription = scene->onPeerConnected().subscribe([wService](std::shared_ptr<IP2PScenePeer> peer)
+					{
+						auto service = wService.lock();
+						if (service)
+						{
+							service->_onPeerConnectedSubscription->unsubscribe();
+							service->_peerTce.set(peer);
+						}
+					});
+
 					auto rpcService = _rpcService.lock();
 					if (rpcService)
 					{
 
-						//Capture a weak pointer of this in the route handler to make sure that:
-						//* We don't prevent this from being destroyed (capturing a shared pointer)
-						//* If destroyed, we don't try to use it in the handler (capturing a this reference directly)
-						std::weak_ptr<TunnelsService> wService = this->shared_from_this();
 						rpcService->addProcedure("Tunnels.OpenTunnel", [wService](RpcRequestContext_ptr ctx)
 						{
 							auto service = wService.lock();
