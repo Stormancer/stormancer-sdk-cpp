@@ -15,6 +15,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)test.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)TestHeaderOnlyPlugins.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)testP2P.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)TestRunner.cpp" />
   </ItemGroup>
