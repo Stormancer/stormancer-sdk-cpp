@@ -61,6 +61,12 @@ namespace Stormancer
 			return *this;
 		}
 
+		/// Returns true if any subscription is alive
+		bool hasSubscribers() const
+		{
+			return (_functions->size() > 0);
+		}
+
 		/// Calls the callback when the Event is triggered and returns a Subscription that will unsubscribe from the Event when it is deleted.
 		/// \warning Don't forget to keep the Subscription returned for keeping registered to the Event.
 		/// \param callback Callback that will be called when the Event is triggered.
@@ -139,6 +145,12 @@ namespace Stormancer
 				}
 			}
 			return *this;
+		}
+
+		/// Returns true if any subscription is alive
+		bool hasSubscribers() const
+		{
+			return (_functions->size() > 0);
 		}
 
 		/// Calls the callback when the Event is triggered and returns a Subscription that will unsubscribe from the Event when it is deleted.
