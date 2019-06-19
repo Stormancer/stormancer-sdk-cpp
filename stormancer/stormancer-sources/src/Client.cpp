@@ -183,7 +183,7 @@ namespace Stormancer
 
 			_metadata["serializers"] = "msgpack/array";
 			_metadata["transport"] = transport->name();
-			_metadata["version"] = "1.6.1.1";
+			_metadata["version"] = "1.6.1.2";
 
 
 
