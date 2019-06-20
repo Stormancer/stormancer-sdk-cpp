@@ -97,9 +97,6 @@ namespace Stormancer
 						return pplx::task_from_exception<void>(std::runtime_error("Failed to generate handle for scene."));
 					}
 
-					
-					
-					
 					P2PConnectToSceneMessage connectToSceneResponse;
 					connectToSceneResponse.sceneId = scene->address().toUri();
 					connectToSceneResponse.sceneHandle = handle;
@@ -120,8 +117,31 @@ namespace Stormancer
 					{
 						serializer->serialize(stream, connectToSceneResponse);
 					});
-					auto scenePeer = std::static_pointer_cast<Scene_Impl>(scene)->peerConnected(connection, p2pService, connectToSceneMessage);
+
+					std::static_pointer_cast<Scene_Impl>(scene)->peerConnected(connection, p2pService, connectToSceneMessage);
+
 					return pplx::task_from_result();
+				});
+			}
+			else
+			{
+				return pplx::task_from_result();
+			}
+		});
+
+		builder.service((byte)SystemRequestIDTypes::ID_CONNECTED_TO_SCENE, [wClient, serializer](std::shared_ptr<RequestContext> ctx) {
+			auto sceneId = serializer->deserializeOne<std::string>(ctx->inputStream());
+			if (auto client = wClient.lock())
+			{
+				ctx->send(StreamWriter{});
+
+				return client->getConnectedScene(sceneId)
+					.then([ctx](std::shared_ptr<Scene> scene)
+				{
+					if (scene)
+					{
+						std::static_pointer_cast<Scene_Impl>(scene)->raisePeerConnected(ctx->packet()->connection->key());
+					}
 				});
 			}
 			else

@@ -128,7 +128,7 @@ namespace Stormancer
 
 		virtual bool isHost() const = 0;
 
-		virtual std::unordered_map<uint64, std::shared_ptr<IP2PScenePeer>> connectedPeers() const = 0;
+		virtual std::unordered_map<std::string, std::shared_ptr<IP2PScenePeer>> connectedPeers() const = 0;
 
 		virtual Event<std::shared_ptr<IP2PScenePeer>> onPeerConnected() const = 0;
 

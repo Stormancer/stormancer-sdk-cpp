@@ -5,6 +5,7 @@
 #include "stormancer/Streams/bytestream.h"
 #include "stormancer/StormancerTypes.h"
 #include <vector>
+#include <string>
 
 namespace Stormancer
 {
@@ -19,26 +20,68 @@ namespace Stormancer
 	{
 	public:
 
+#pragma region static_functions
+
+		static PeerFilter matchSceneHost();
+
+		static PeerFilter matchAllP2P();
+
+		template<typename... TArgs>
+		static PeerFilter matchPeers(const TArgs&... ids)
+		{
+			std::vector<std::string> vectorIds;
+			return matchPeers(vectorIds, ids...);
+		}
+
+		static PeerFilter matchPeers(const std::vector<std::string>& ids);
+
 		static PeerFilter readFilter(ibytestream& stream);
 
+#pragma endregion
+
+#pragma region public_methods
+
 		PeerFilter();
+
 		PeerFilter(PeerFilterType type);
-		PeerFilter(PeerFilterType type, const int64 id);
-		PeerFilter(PeerFilterType type, const std::vector<int64> ids);
+
+		PeerFilter(const std::string& id);
+
+		PeerFilter(const std::vector<std::string>& ids);
+
 		virtual ~PeerFilter() = default;
 
 		bool operator==(const PeerFilter& other) const;
+
 		bool operator==(PeerFilterType type) const;
 
+#pragma endregion
+
+#pragma region public_members
+
 		const PeerFilterType type = PeerFilterType::MatchSceneHost;
-		const std::vector<int64> ids;
+
+		const std::vector<std::string> ids;
+
+#pragma endregion
+
+	private:
+
+#pragma region private_static_functions
+
+		template<typename... TArgs>
+		static PeerFilter matchPeers(std::vector<std::string>& vectorIds, const std::string& id, const TArgs&... ids)
+		{
+			vectorIds.emplace_back(id);
+			return matchPeers(vectorIds, ids...);
+		}
+
+		static PeerFilter matchPeers(std::vector<std::string>& vectorIds)
+		{
+			return PeerFilter(vectorIds);
+		}
+
+#pragma endregion
+
 	};
-	
-	PeerFilter MatchSceneHost();
-
-	PeerFilter MatchPeers(const int64 id);
-
-	PeerFilter MatchPeers(const std::vector<int64> ids);
-
-	PeerFilter MatchAllP2P();
 }

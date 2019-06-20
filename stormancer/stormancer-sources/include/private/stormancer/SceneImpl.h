@@ -74,7 +74,6 @@ namespace Stormancer
 		// Returns the detailed scene address, including cluster, account and app information
 		SceneAddress address() const override;
 
-
 		/// Returns a host metadata value.
 		std::string getHostMetadata(const std::string& key) const override;
 
@@ -106,7 +105,7 @@ namespace Stormancer
 
 		bool isHost() const override;
 
-		std::unordered_map<uint64, std::shared_ptr<IP2PScenePeer>> connectedPeers() const override;
+		std::unordered_map<std::string, std::shared_ptr<IP2PScenePeer>> connectedPeers() const override;
 
 		Event<std::shared_ptr<IP2PScenePeer>> onPeerConnected() const override;
 
@@ -120,10 +119,10 @@ namespace Stormancer
 
 		std::shared_ptr<IP2PScenePeer> peerConnected(std::shared_ptr<IConnection> connection, std::shared_ptr<P2PService> P2P, P2PConnectToSceneMessage);
 
-		std::weak_ptr<IConnection> hostConnection()
-		{
-			return _peer;
-		}
+		void raisePeerConnected(const std::string& P2PSessionId);
+
+		std::weak_ptr<IConnection> hostConnection();
+
 #pragma endregion
 
 	private:
@@ -240,7 +239,9 @@ namespace Stormancer
 		rxcpp::subscription _hostConnectionStateSubscription;
 
 		rxcpp::subjects::subject<P2PConnectionStateChangedArgs> _p2pConnectionStateChangedObservable;
-		std::unordered_map<uint64, std::shared_ptr<IP2PScenePeer>> _connectedPeers;
+
+		/// map[P2PSessionId] = P2PScenePeer
+		std::unordered_map<std::string, std::shared_ptr<IP2PScenePeer>> _connectedPeers;
 		Event<std::shared_ptr<IP2PScenePeer>> _onPeerConnected;
 
 		std::shared_ptr<P2PService> _p2p;

@@ -29,7 +29,6 @@ namespace Stormancer
 
 	void Scene_Impl::initialize(DependencyScope& parentScope)
 	{
-		
 		std::weak_ptr<Scene_Impl> wThat = this->shared_from_this();
 		auto onNext = [wThat](ConnectionState state)
 		{
@@ -222,7 +221,8 @@ namespace Stormancer
 	{
 		auto observable = onMessage(routeName, filter, metadata);
 
-		auto onError = [=](std::exception_ptr exptr)
+		auto logger = _logger;
+		auto onError = [logger, routeName](std::exception_ptr exptr)
 		{
 			try
 			{
@@ -230,7 +230,7 @@ namespace Stormancer
 			}
 			catch (const std::exception& ex)
 			{
-				_logger->log(LogLevel::Error, "Scene", "Error reading message on route '" + routeName + "'", ex.what());
+				logger->log(LogLevel::Error, "Scene", "Error reading message on route '" + routeName + "'", ex.what());
 			}
 		};
 
@@ -270,20 +270,33 @@ namespace Stormancer
 
 	rxcpp::observable<Packetisp_ptr> Scene_Impl::onMessage(Route_ptr route)
 	{
-		auto observable = rxcpp::observable<>::create<Packetisp_ptr>([=](rxcpp::subscriber<Packetisp_ptr> subscriber)
+		auto wScene = STORM_WEAK_FROM_THIS();
+		auto logger = _logger;
+		auto observable = rxcpp::observable<>::create<Packetisp_ptr>([wScene, route, logger](rxcpp::subscriber<Packetisp_ptr> subscriber)
 		{
-			auto handler = std::function<void(Packet_ptr)>([=](Packet_ptr p)
+			auto handler = std::function<void(Packet_ptr)>([wScene, route, subscriber, logger](Packet_ptr p)
 			{
+				auto scene = LockOrThrow(wScene);
+
 				std::shared_ptr<IScenePeer> origin = nullptr;
 				bool isOriginHost = false;
-				if (p->connection->id() == host()->id())
+				if (p->connection->id() == scene->host()->id())
 				{
 					isOriginHost = true;
-					origin = _host;
+					origin = scene->_host;
 				}
 				else
 				{
-					origin = _connectedPeers[p->connection->id()];
+					auto originIt = scene->_connectedPeers.find(p->connection->key());
+					if (originIt == scene->_connectedPeers.end())
+					{
+						logger->log(LogLevel::Warn, "Scene", "Peer (" + p->connection->key() + ") not found on scene '" + scene->address().toUri() + "'");
+						return;
+					}
+					else
+					{
+						origin = originIt->second;
+					}
 				}
 				if (origin)
 				{
@@ -347,7 +360,7 @@ namespace Stormancer
 					throw std::runtime_error("Need peer ids");
 				}
 
-				for (uint64 id : peerFilter.ids)
+				for (auto id : peerFilter.ids)
 				{
 					auto peerIt = _connectedPeers.find(id);
 
@@ -364,7 +377,7 @@ namespace Stormancer
 
 	void Scene_Impl::send(const std::string& routeName, const StreamWriter& streamWriter, PacketPriority priority, PacketReliability reliability, const std::string& channelIdentifier)
 	{
-		send(MatchSceneHost(), routeName, streamWriter, priority, reliability, channelIdentifier);
+		send(PeerFilter::matchSceneHost(), routeName, streamWriter, priority, reliability, channelIdentifier);
 	}
 
 	void Scene_Impl::send(std::shared_ptr<IScenePeer> scenePeer, const std::string& routeName, const StreamWriter& streamWriter, PacketPriority priority, PacketReliability reliability, const std::string& channelIdentifier)
@@ -492,7 +505,6 @@ namespace Stormancer
 
 	void Scene_Impl::completeConnectionInitialization(ConnectionResult& cr)
 	{
-		
 		_host = std::make_shared<ScenePeer>(_peer, cr.SceneHandle, _remoteRoutes, this->shared_from_this());
 		for (auto pair : _localRoutes)
 		{
@@ -555,7 +567,7 @@ namespace Stormancer
 		return _isHost;
 	}
 
-	std::unordered_map<uint64, std::shared_ptr<IP2PScenePeer>> Scene_Impl::connectedPeers() const
+	std::unordered_map<std::string, std::shared_ptr<IP2PScenePeer>> Scene_Impl::connectedPeers() const
 	{
 		return _connectedPeers;
 	}
@@ -627,13 +639,31 @@ namespace Stormancer
 			connectToSceneMessage.connectionMetadata = p2pConnection->metadata();
 			connectToSceneMessage.sceneMetadata = scene->getSceneMetadata();
 
-			return scene->sendSystemRequest<P2PConnectToSceneMessage, P2PConnectToSceneMessage>(p2pConnection, (byte)SystemRequestIDTypes::ID_CONNECT_TO_SCENE, connectToSceneMessage, ct)
+			auto result = scene->sendSystemRequest<P2PConnectToSceneMessage, P2PConnectToSceneMessage>(p2pConnection, (byte)SystemRequestIDTypes::ID_CONNECT_TO_SCENE, connectToSceneMessage, ct)
 				.then([wScene, p2pConnection, p2pService](P2PConnectToSceneMessage connectToSceneMessage)
 			{
 				auto scene = LockOrThrow(wScene);
 				auto scenePeer = scene->peerConnected(p2pConnection, p2pService, connectToSceneMessage);
 				return scenePeer;
 			}, ct);
+
+			result.then([wScene, p2pConnection, ct](std::shared_ptr<IP2PScenePeer> peer) {
+				if (auto scene = wScene.lock())
+				{
+					scene->sendSystemRequest<void>(p2pConnection, (byte)SystemRequestIDTypes::ID_CONNECTED_TO_SCENE, scene->address().toUri(), ct)
+						.then([](pplx::task<void> t) {
+						try
+						{
+							t.get();
+						}
+						catch (const std::exception&)
+						{
+						}
+					});
+				}
+			});
+
+			return result;
 		}, options);
 	}
 
@@ -645,16 +675,14 @@ namespace Stormancer
 	std::shared_ptr<IP2PScenePeer> Scene_Impl::peerConnected(std::shared_ptr<IConnection> connection, std::shared_ptr<P2PService> p2pService, P2PConnectToSceneMessage connectToSceneMessage)
 	{
 		std::lock_guard<std::mutex> lg(this->_connectMutex);
-		auto it = _connectedPeers.find(connection->id());
+		auto it = _connectedPeers.find(connection->key());
 
 		if (it == _connectedPeers.end())
 		{
 			auto wScene = STORM_WEAK_FROM_THIS();
 			auto scenePeer = std::make_shared<P2PScenePeer>(wScene, connection, p2pService, connectToSceneMessage);
 
-			_connectedPeers.emplace(scenePeer->id(),scenePeer);
-
-			_onPeerConnected(scenePeer);
+			_connectedPeers.emplace(scenePeer->connection()->key(), scenePeer);
 
 			return scenePeer;
 		}
@@ -662,7 +690,20 @@ namespace Stormancer
 		{
 			return it->second;
 		}
+	}
 
+	std::weak_ptr<IConnection> Scene_Impl::hostConnection()
+	{
+		return _peer;
+	}
+
+	void Stormancer::Scene_Impl::raisePeerConnected(const std::string& P2PSessionId)
+	{
+		auto it = _connectedPeers.find(P2PSessionId);
+		if (it != _connectedPeers.end())
+		{
+			_onPeerConnected(it->second);
+		}
 	}
 
 	Event<Packet_ptr> Scene_Impl::onPacketReceived()
