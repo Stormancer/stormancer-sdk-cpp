@@ -483,6 +483,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Windows\RelyingPartyWindows.h">
       <Filter>Header Files\public\Windows</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Version.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\IScheduler.h">
       <Filter>Header Files\public</Filter>
     </ClInclude>
@@ -693,6 +696,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Subscription.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Version.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

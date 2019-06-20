@@ -9,13 +9,14 @@
 
 namespace Stormancer
 {
-	Configuration::Configuration(const std::string& endpoint, const std::string& account, const std::string& application)
+	Configuration::Configuration(const std::string& endpoint, const std::string& account, const std::string& application, const char* headersVersion)
 		: account(account)
 		, application(application)
 		, actionDispatcher(std::make_shared<SameThreadActionDispatcher>())
 		, logger(std::make_shared<NullLogger>())
 		, transportFactory(_defaultTransportFactory)
 		, scheduler(std::make_shared<DefaultScheduler>())
+		, _headersVersion(headersVersion)
 	{
 		dispatcher = [](const DependencyScope& dr)
 		{
@@ -55,14 +56,14 @@ namespace Stormancer
 	{
 	}
 
-	std::shared_ptr<Configuration> Configuration::create(const std::string& endpoint, const std::string& account, const std::string& application)
+	std::shared_ptr<Configuration> Configuration::createInternal(const std::string& endpoint, const std::string& account, const std::string& application, const char* headersVersion)
 	{
 		if (account.empty() || application.empty() || endpoint.empty())
 		{
 			throw std::invalid_argument("Check your account and application parameters");
 		}
 
-		return std::shared_ptr<Configuration>(new Configuration(endpoint, account, application), [](Configuration* ptr) { delete ptr; });
+		return std::shared_ptr<Configuration>(new Configuration(endpoint, account, application, headersVersion), [](Configuration* ptr) { delete ptr; });
 	}
 
 	Configuration& Configuration::setMetadata(const std::string& key, const std::string& value)

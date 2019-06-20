@@ -697,9 +697,9 @@ namespace Stormancer
 		return _peer;
 	}
 
-	void Stormancer::Scene_Impl::raisePeerConnected(const std::string& P2PSessionId)
+	void Stormancer::Scene_Impl::raisePeerConnected(const std::string& sessionId)
 	{
-		auto it = _connectedPeers.find(P2PSessionId);
+		auto it = _connectedPeers.find(sessionId);
 		if (it != _connectedPeers.end())
 		{
 			_onPeerConnected(it->second);

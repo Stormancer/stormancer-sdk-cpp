@@ -146,6 +146,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\StringUtilities.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\TaskUtilities.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\TypeReflection.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Version.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Windows\RelyingPartyWindows.h" />
   </ItemGroup>
   <ItemGroup>
@@ -218,6 +219,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\TransformMetadata.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Utilities\StringUtilities.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Utilities\TaskUtilities.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Version.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Watch.cpp" />
   </ItemGroup>
 </Project>

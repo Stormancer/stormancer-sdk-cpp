@@ -14,6 +14,7 @@
 #include "stormancer/KeyStore.h"
 #include "stormancer/IConnectionManager.h"
 #include "stormancer/IPacketDispatcher.h"
+#include "stormancer/Version.h"
 
 
 
@@ -29,6 +30,8 @@
 
 
 
+
+#include <cstring>
 
 namespace
 {
@@ -174,16 +177,13 @@ namespace Stormancer
 
 		if (!_initialized)
 		{
-			logger()->log(LogLevel::Trace, "Client", "Creating the client...");
-
-			logger()->log(LogLevel::Trace, "Client", "Client created");
-
-			logger()->log(LogLevel::Trace, "Client", "Initializing client...");
+			std::string version(Version::getVersionString());
+			logger()->log(LogLevel::Trace, "Client", "Initializing client (version: "+version+")...");
 			auto transport = _dependencyResolver.resolve<ITransport>();
 
 			_metadata["serializers"] = "msgpack/array";
 			_metadata["transport"] = transport->name();
-			_metadata["version"] = "1.6.1.3";
+			_metadata["version"] = version;
 
 
 
@@ -198,6 +198,11 @@ namespace Stormancer
 			_dependencyResolver.resolve<IActionDispatcher>()->start();
 
 			_cts = pplx::cancellation_token_source();
+
+			if (std::strcmp(_config->_headersVersion, Version::getVersionString()) != 0)
+			{
+				logger()->log(LogLevel::Warn, "Client", "The version of the stormancer headers (" + std::string(_config->_headersVersion) + ") is different from the version of the library (" + Version::getVersionString() + "), this may cause issues.");
+			}
 			logger()->log(LogLevel::Trace, "Client", "Client initialized");
 		}
 	}

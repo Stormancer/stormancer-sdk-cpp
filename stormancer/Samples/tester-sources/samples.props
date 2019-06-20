@@ -5,6 +5,7 @@
 	<ItemDefinitionGroup>
 	<ClCompile>
 	  <AdditionalIncludeDirectories>$(StormancerSdkRoot)Plugins/private;$(StormancerSdkRoot)Plugins/public;$(StormancerOutputDir)include;$(StormancerSdkRoot)dependencies/RakNet/RakNet/Source;$(MSBuildThisFileDirectory);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+	  <PreprocessorDefinitions>STORM_CHECK_VERSION_LINKTIME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
 	</ClCompile>
 	</ItemDefinitionGroup>
   <ItemGroup />

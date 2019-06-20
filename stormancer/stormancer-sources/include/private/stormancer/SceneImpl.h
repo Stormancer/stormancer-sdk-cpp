@@ -119,7 +119,7 @@ namespace Stormancer
 
 		std::shared_ptr<IP2PScenePeer> peerConnected(std::shared_ptr<IConnection> connection, std::shared_ptr<P2PService> P2P, P2PConnectToSceneMessage);
 
-		void raisePeerConnected(const std::string& P2PSessionId);
+		void raisePeerConnected(const std::string& sessionId);
 
 		std::weak_ptr<IConnection> hostConnection();
 
@@ -240,7 +240,7 @@ namespace Stormancer
 
 		rxcpp::subjects::subject<P2PConnectionStateChangedArgs> _p2pConnectionStateChangedObservable;
 
-		/// map[P2PSessionId] = P2PScenePeer
+		/// map[sessionId] = P2PScenePeer
 		std::unordered_map<std::string, std::shared_ptr<IP2PScenePeer>> _connectedPeers;
 		Event<std::shared_ptr<IP2PScenePeer>> _onPeerConnected;
 

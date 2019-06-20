@@ -5,12 +5,14 @@
 #include "stormancer/IPlugin.h"
 #include "stormancer/Logger/ILogger.h"
 #include "stormancer/StormancerTypes.h"
-#include <unordered_map>
 #include "stormancer/DependencyInjection.h"
+#include "stormancer/Version.h"
+#include <unordered_map>
 #include <vector>
 #include <chrono>
 #include <string>
 #include <functional>
+
 
 namespace Stormancer
 {
@@ -53,7 +55,12 @@ namespace Stormancer
 		/// <param name="account">Stormancer account to use on the cluster.</param>
 		/// <param name="application">Name of the Stormancer application to connect to. It must belong to the chosen account.</param>
 		/// <returns>A <c>Configuration</c> <c>std::shared_ptr</c> with the supplied parameters.</returns>
-		static Configuration_ptr create(const std::string& endpoint, const std::string& account, const std::string& application);
+		static std::shared_ptr<Configuration> create(const std::string& endpoint, const std::string& account, const std::string& application)
+		{
+			Version::checkVersionLinkTime(); /* Causes linker error in case of header mismatch if STORM_CHECK_VERSION_LINKTIME is defined */
+			// CreateInternal is needed to keep the deleter of the shared_ptr inside the lib
+			return createInternal(endpoint, account, application, Version::getHeadersVersionString());
+		}
 
 		/// <summary>
 		/// Add a candidate server endpoint.
@@ -257,13 +264,15 @@ namespace Stormancer
 #pragma region private_methods
 
 		// Constructor.
-		Configuration(const std::string& endpoint, const std::string& account, const std::string& application);
+		Configuration(const std::string& endpoint, const std::string& account, const std::string& application, const char* headersVersion);
 
 		// Copy constructor deleted.
 		Configuration(const Configuration& other) = delete;
 
 		// Assignment operator deleted.
 		Configuration& operator=(const Configuration& other) = delete;
+
+		static std::shared_ptr<Configuration> createInternal(const std::string& endpoint, const std::string& account, const std::string& application, const char* headersVersion);
 
 		// Set a metadata
 		Configuration& setMetadata(const std::string& key, const std::string& value);
@@ -288,6 +297,10 @@ namespace Stormancer
 
 		/// The scheduler used by the client to run the transport and other repeated tasks.
 		std::shared_ptr<IScheduler> scheduler;
+
+		/// The version string in STORM_VERSION, that is set in the header files. Used to compare the headers version to the build version,
+		/// to signal a possible mismatch between the two. 
+		const char* _headersVersion;
 
 #pragma endregion
 	};
