@@ -17,6 +17,14 @@
 #define STORM_DO_CHECK_VERSION
 #endif
 
+/// \file
+/// Version checking functionality for the client library.
+/// Each library build has an embedded version string, in the standard git-describe format. To retrieve this version, call <c>Stormancer::Version::getVersionString()</c>.
+/// This version number is also added to the headers, which enables the client library to check if the version of the build and of the headers are the same.
+/// If there is a mismatch between the version in the header files and the version of the build, a warning log will be issued when creating a <c>Stormancer::IClient</c>.
+/// Version mismatch check can optionally be enabled at link time, triggering a link failure if a mismatch is detected.
+/// To enable this feature, add STORM_CHECK_VERSION_LINKTIME To your project's preprocessor definitions.
+
 namespace Stormancer
 {
 	class Version
