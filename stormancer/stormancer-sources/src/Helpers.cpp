@@ -87,22 +87,44 @@ namespace Stormancer
 		return time_tToStr(now, "%H:%M:%S");
 	}
 
-	std::string stringifyBytesArray(const std::vector<byte>& bytes, bool hex, bool withSpaces)
+	std::string stringifyBytesArray(const byte* data, std::size_t size, bool hex, bool withSpaces)
 	{
 		std::stringstream ss;
 		if (hex)
 		{
 			ss << std::setfill('0') << std::setw(2) << std::hex << std::uppercase;
 		}
-		for (std::size_t i = 0; i < bytes.size(); ++i)
+
+		for (std::size_t i = 0; i < size; i++)
 		{
+			const byte* b = data + i;
 			if (withSpaces && i)
 			{
 				ss << ' ';
 			}
-			ss << std::setw(2) << (int)bytes.at(i);
+			ss << std::setw(2) << (int)(*b);
 		}
 		return ss.str();
+	}
+
+	std::string stringifyBytesArray(const char* data, std::size_t size, bool hex, bool withSpaces)
+	{
+		return stringifyBytesArray(reinterpret_cast<const byte*>(data), size, hex, withSpaces);
+	}
+
+	std::string stringifyBytesArray(const std::vector<byte>& bytes, bool hex, bool withSpaces)
+	{
+		return stringifyBytesArray(bytes.data(), bytes.size(), hex, withSpaces);
+	}
+
+	std::string stringifyBytesArray(const std::vector<char>& bytes, bool hex, bool withSpaces)
+	{
+		return stringifyBytesArray(bytes.data(), bytes.size(), hex, withSpaces);
+	}
+
+	std::string stringifyBytesArray(const std::string& bytes, bool hex, bool withSpaces)
+	{
+		return stringifyBytesArray(bytes.data(), bytes.size(), hex, withSpaces);
 	}
 
 	bool compareExchange(std::function<bool()> const compare, std::function<void()> exchange)

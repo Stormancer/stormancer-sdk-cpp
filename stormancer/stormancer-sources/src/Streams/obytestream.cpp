@@ -92,10 +92,9 @@ namespace Stormancer
 	{
 		if (good())
 		{
-			auto sz = static_cast<std::size_t>(currentPosition());
-			std::vector<byte> bytes(sz);
-			std::memcpy(bytes.data(), startPtr(), sz);
-			return bytes;
+			const byte* first = startPtr();
+			const byte* last = first + currentPosition() - 1;
+			return std::vector<byte>(first, last);
 		}
 		return std::vector<byte>();
 	}

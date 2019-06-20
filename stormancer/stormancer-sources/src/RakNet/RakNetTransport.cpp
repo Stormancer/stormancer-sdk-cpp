@@ -157,9 +157,9 @@ namespace Stormancer
 
 				byte ID = rakNetPacket->data[0];
 				//_logger->log(LogLevel::Trace, "RakNetTransport", "RakNet packet received ", std::to_string(ID));
+
 #ifdef STORMANCER_LOG_RAKNET_PACKETS
-				std::vector<byte> receivedData(rakNetPacket->data, rakNetPacket->data + rakNetPacket->length);
-				auto bytes = stringifyBytesArray(receivedData, true);
+				auto bytes = stringifyBytesArray(rakNetPacket->data, rakNetPacket->length, true, true);
 				_logger->log(LogLevel::Trace, "RakNetTransport", "RakNet packet received", bytes.c_str());
 #endif
 
@@ -180,7 +180,7 @@ namespace Stormancer
 							{
 								_peer->CloseConnection(rakNetPacket->guid, false);
 							}
-							else if (rq.isP2P())// the connection is a P2P connection, 
+							else if (rq.isP2P()) // the connection is a P2P connection
 							{
 								auto parentConnection = _handler->getConnection(rq.parentId);
 
@@ -188,10 +188,10 @@ namespace Stormancer
 								data.Write((byte)MessageIDTypes::ID_ADVERTISE_PEERID);
 								data.Write(parentConnection->id());
 								data.Write(rq.parentId.c_str());
-								data.Write(rq.id.c_str());
+								data.Write(rq.id.data(), (unsigned int)rq.id.size());
 								data.Write(true);
 
-								_logger->log(LogLevel::Trace, "RakNetTransport", "sending Advertise peer request parentid=" + rq.parentId + " id=" + rq.id, "");
+								_logger->log(LogLevel::Trace, "RakNetTransport", "sending Advertise peer request parentid=" + rq.parentId + " id=" + stringifyBytesArray(rq.id));
 								_peer->Send(&data, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE, 0, rakNetPacket->guid, false);
 							}
 						}
@@ -349,15 +349,15 @@ namespace Stormancer
 							parentId = buffer;
 							delete[] buffer;
 							buffer = new char[512];
-							data.Read(buffer);
-							id = buffer;
+							data.Read(buffer, 16);
+							id.assign(buffer, 16);
 							delete[] buffer;
 							data.Read(requestResponse);
 						}
 
 						if (!requestResponse)
 						{
-							_logger->log(LogLevel::Trace, "RakNetTransport", "received Advertise peer response parentid=" + parentId + " id=" + id, "");
+							_logger->log(LogLevel::Trace, "RakNetTransport", "received Advertise peer response parentid=" + parentId + " id=" + stringifyBytesArray(id));
 							auto rq = _pendingConnections.front();
 							_pendingConnections.pop();
 							if (rq.cancellationToken.is_canceled())
@@ -373,16 +373,15 @@ namespace Stormancer
 						}
 						else
 						{
-							_logger->log(LogLevel::Trace, "RakNetTransport", "Received Advertise peer request parentid=" + parentId + " id=" + id, "");
+							_logger->log(LogLevel::Trace, "RakNetTransport", "Received Advertise peer request parentid=" + parentId + " id=" + stringifyBytesArray(id));
 							
 							auto parentConnection = _handler->getConnection(std::string(parentId));
-
 
 							RakNet::BitStream data;
 							data.Write((byte)MessageIDTypes::ID_ADVERTISE_PEERID);
 							data.Write(parentConnection->id());
 							data.Write(parentId.c_str());
-							data.Write(id.c_str());
+							data.Write(id.data(), (unsigned int)id.size());
 							data.Write(false);
 
 							_peer->Send(&data, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE, 0, rakNetPacket->guid, false);
@@ -641,8 +640,7 @@ namespace Stormancer
 	void RakNetTransport::onMessageReceived(RakNet::Packet* rakNetPacket)
 	{
 #if defined(STORMANCER_LOG_PACKETS) && !defined(STORMANCER_LOG_RAKNET_PACKETS)
-		std::vector<byte> tempBytes(rakNetPacket->data, rakNetPacket->data + rakNetPacket->length);
-		auto bytes = stringifyBytesArray(tempBytes, true, true);
+		auto bytes = stringifyBytesArray(rakNetPacket->data, rakNetPacket->length, true, true);
 		_logger->log(LogLevel::Trace, "RakNetTransport", "Packet received", bytes.c_str());
 #endif
 

@@ -104,14 +104,13 @@ namespace Stormancer
 
 	std::vector<byte> ibytestream::bytes()
 	{
-		std::vector<byte> bytes;
 		if (good())
 		{
-			int sz = (int)totalSize();
-			bytes.resize(sz);
-			std::memcpy(bytes.data(), startPtr(), sz);
+			const byte* first = startPtr();
+			const byte* last = first + totalSize() - 1;
+			return std::vector<byte>(first, last);
 		}
-		return bytes;
+		return std::vector<byte>();
 	}
 
 	byte* ibytestream::startPtr()

@@ -165,7 +165,15 @@ namespace Stormancer
 		return data;
 	}
 
+	STORMANCER_DLL_API std::string stringifyBytesArray(const byte* data, std::size_t size, bool hex = true, bool withSpaces = false);
+
+	STORMANCER_DLL_API std::string stringifyBytesArray(const char* data, std::size_t size, bool hex = true, bool withSpaces = false);
+
 	STORMANCER_DLL_API std::string stringifyBytesArray(const std::vector<byte>& bytes, bool hex = true, bool withSpaces = false);
+
+	STORMANCER_DLL_API std::string stringifyBytesArray(const std::vector<char>& bytes, bool hex = true, bool withSpaces = false);
+
+	STORMANCER_DLL_API std::string stringifyBytesArray(const std::string& bytes, bool hex = true, bool withSpaces = false);
 
 #pragma endregion
 
