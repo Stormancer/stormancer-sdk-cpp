@@ -105,7 +105,7 @@ namespace Stormancer
 
 		bool isHost() const override;
 
-		std::unordered_map<std::string, std::shared_ptr<IP2PScenePeer>> connectedPeers() const override;
+		const std::unordered_map<std::string, std::shared_ptr<IP2PScenePeer>>& connectedPeers() const override;
 
 		Event<std::shared_ptr<IP2PScenePeer>> onPeerConnected() const override;
 

@@ -128,7 +128,13 @@ namespace Stormancer
 
 		virtual bool isHost() const = 0;
 
-		virtual std::unordered_map<std::string, std::shared_ptr<IP2PScenePeer>> connectedPeers() const = 0;
+		/// <summary>
+		/// Obtain the list of peers that are connected directly to this client (through P2P) on this scene.
+		/// </summary>
+		/// <returns>
+		/// A map of connected peers that has the format [Session Id of the peer] -> [<c>IP2PScenePeer</c>].
+		/// </returns>
+		virtual const std::unordered_map<std::string, std::shared_ptr<IP2PScenePeer>>& connectedPeers() const = 0;
 
 		virtual Event<std::shared_ptr<IP2PScenePeer>> onPeerConnected() const = 0;
 

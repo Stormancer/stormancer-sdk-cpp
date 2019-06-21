@@ -215,6 +215,9 @@ void p2pConnect(std::shared_ptr<Stormancer::IClient> hostClient, std::shared_ptr
 		Stormancer::Serializer{}.serialize(stream, std::string("message from host!"));
 	});
 
+	// Test comparison operators
+	assert(guestPeer != hostPeer);
+	assert(!(guestPeer == hostPeer));
 
 	auto guestTunnel = guestPeer->openP2PTunnel("pingServer").get();
 	logger->log(std::string("Retrieved guest tunnel: ") + guestTunnel->ip + ":" + std::to_string(guestTunnel->port));

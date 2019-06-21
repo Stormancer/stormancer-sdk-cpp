@@ -2,6 +2,7 @@
 #include "stormancer/Utilities/TaskUtilities.h"
 #include "TestDependencyInjection.h"
 #include "Helloworld/Helloworld.hpp"
+#include "TestStreams.h"
 
 using namespace std::literals;
 
@@ -669,6 +670,23 @@ namespace Stormancer
 		execNextTest();
 	}
 
+	void Tester::test_streams()
+	{
+		_logger->log(LogLevel::Info, "test_streams", "STREAMS");
+
+		try
+		{
+			TestStreams::runTests();
+		}
+		catch (const std::exception& ex)
+		{
+			_logger->log(LogLevel::Error, "test_streams", "Streams FAILED", ex.what());
+			return;
+		}
+		_logger->log(LogLevel::Info, "test_streams", "Streams OK");
+		execNextTest();
+	}
+
 
 	void Tester::run_all_tests_nonblocking()
 	{
@@ -689,6 +707,7 @@ namespace Stormancer
 		_tests.push_back([this]() { test_disconnect(); });
 		_tests.push_back([this]() { test_Ping_Cluster(); });
 		_tests.push_back([this]() { test_dependencyInjection(); });
+		_tests.push_back([this]() { test_streams(); });
 		_tests.push_back([this]() { test_clean(); });
 
 		// Some platforms require a Client to be created before using pplx::task

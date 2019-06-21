@@ -90,5 +90,10 @@ namespace Stormancer
 		return _handle;
 	}
 
+	std::string P2PScenePeer::sessionId() const
+	{
+		return _connection->key();
+	}
+
 		
 }

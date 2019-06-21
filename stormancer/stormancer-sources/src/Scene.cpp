@@ -567,7 +567,7 @@ namespace Stormancer
 		return _isHost;
 	}
 
-	std::unordered_map<std::string, std::shared_ptr<IP2PScenePeer>> Scene_Impl::connectedPeers() const
+	const std::unordered_map<std::string, std::shared_ptr<IP2PScenePeer>>& Scene_Impl::connectedPeers() const
 	{
 		return _connectedPeers;
 	}

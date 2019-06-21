@@ -107,7 +107,7 @@ namespace Stormancer
 		if (good())
 		{
 			const byte* first = startPtr();
-			const byte* last = first + totalSize() - 1;
+			const byte* last = first + totalSize();
 			return std::vector<byte>(first, last);
 		}
 		return std::vector<byte>();

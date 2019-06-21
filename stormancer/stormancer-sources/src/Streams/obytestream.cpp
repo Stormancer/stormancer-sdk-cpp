@@ -1,5 +1,6 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/Streams/obytestream.h"
+#include "stormancer/Streams/ibytestream.h"
 
 namespace Stormancer
 {
@@ -88,12 +89,20 @@ namespace Stormancer
 		return (*this);
 	}
 
+	obytestream & obytestream::operator<<(ibytestream& inputStream)
+	{
+		write(inputStream.currentPtr(), inputStream.availableSize());
+		inputStream.seekg(inputStream.availableSize(), std::ios_base::cur);
+
+		return *this;
+	}
+
 	std::vector<byte> obytestream::bytes()
 	{
 		if (good())
 		{
 			const byte* first = startPtr();
-			const byte* last = first + currentPosition() - 1;
+			const byte* last = first + currentPosition();
 			return std::vector<byte>(first, last);
 		}
 		return std::vector<byte>();

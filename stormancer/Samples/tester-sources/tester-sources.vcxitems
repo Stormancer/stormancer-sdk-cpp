@@ -25,5 +25,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)TestDependencyInjection.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)testP2P.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)TestRunner.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)TestStreams.h" />
   </ItemGroup>
 </Project>

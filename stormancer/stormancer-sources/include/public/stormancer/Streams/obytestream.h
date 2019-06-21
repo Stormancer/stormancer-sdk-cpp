@@ -8,6 +8,8 @@
 
 namespace Stormancer
 {
+	class ibytestream;
+
 	class obytestream : public std::basic_ostream<byte>
 	{
 	public:
@@ -45,6 +47,8 @@ namespace Stormancer
 		virtual obytestream& operator<<(const void* value);
 
 		virtual obytestream& operator<<(const std::vector<byte>& bytes);
+
+		virtual obytestream& operator<<(ibytestream& inputStream);
 
 		virtual std::vector<byte> bytes();
 
