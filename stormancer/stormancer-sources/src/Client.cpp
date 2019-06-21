@@ -420,7 +420,13 @@ namespace Stormancer
 			});;
 
 		}
-
+		std::string scenelist;
+		for (auto& s : _scenes)
+		{
+			scenelist += s.first;
+			scenelist += ", ";
+		}
+		logger()->log(LogLevel::Trace, "Client", sceneId + " not found.", scenelist);
 		return pplx::task_from_result<std::shared_ptr<Scene>>(nullptr);
 	}
 

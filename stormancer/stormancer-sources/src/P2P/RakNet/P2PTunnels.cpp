@@ -233,7 +233,8 @@ namespace Stormancer
 					bsp.data = reinterpret_cast<char*>(buffer);
 					bsp.length = (int)read;
 					bsp.systemAddress.FromStringExplicitPort("127.0.0.1", client->hostPort, socket->GetBoundAddress().GetIPVersion());
-
+					std::string peerPort = std::to_string(client->hostPort);
+					//_logger->log(LogLevel::Trace, "p2p.tunnel","Sending data to game client");
 					(*itTunnel).second->socket->Send(&bsp, _FILE_AND_LINE_);
 				}
 			}
@@ -249,13 +250,15 @@ namespace Stormancer
 		auto connection = _connections->getConnection(client->peerId);
 		if (connection)
 		{
-			if (client->hostPort == 0)
+
+			if (client->hostPort != recvStruct->systemAddress.GetPort())
 			{
 				client->hostPort = recvStruct->systemAddress.GetPort();
 			}
 			std::stringstream ss;
 			ss << "P2PTunnels_" << connection->id();
 			int channelUid = connection->dependencyResolver().resolve<ChannelUidStore>()->getChannelUid(ss.str());
+			//_logger->log(LogLevel::Trace, "p2p.tunnel", "Sending data to tunnel");
 			connection->send([=](obytestream& stream)
 			{
 				stream << (byte)MessageIDTypes::ID_P2P_TUNNEL;

@@ -77,6 +77,10 @@ namespace Stormancer
 				return client->getConnectedScene(connectToSceneMessage.sceneId)
 					.then([connection, connectToSceneMessage, ctx, serializer](std::shared_ptr<Scene> scene)
 				{
+					if (!scene)
+					{
+						return pplx::task_from_exception<void>(std::runtime_error("Scene not found. Cannot connect to peer"));
+					}
 					auto p2pService = scene->dependencyResolver().resolve<P2PService>();
 					auto& handles = *connection->dependencyResolver().resolve<std::vector<std::weak_ptr<Scene_Impl>>>();
 					uint8 handle = 0;
