@@ -46,8 +46,10 @@ namespace Stormancer
 			}
 		}
 
-		//Keep game finder scene alive
-		std::shared_ptr<Scene> scene;
+		// Keep game finder scene alive
+		std::shared_ptr<Scene>			scene;
+
+		std::shared_ptr<IP2PScenePeer>	p2pHost;
 
 		pplx::task<GameSessionConnectionParameters> gameSessionReadyTask;
 
@@ -119,20 +121,18 @@ namespace Stormancer
 					}
 					catch (std::exception& e)
 					{
-						e.what();
-						throw std::runtime_error("Cannot get p2pToken");
+						throw std::runtime_error(("Cannot get p2pToken. Inner exception message: " + std::string(e.what())).c_str());
 					}
 				}, ct)
 					.then([gameSessionContainer](pplx::task<std::shared_ptr<IP2PScenePeer>> t)
 				{
 					try
 					{
-						auto p = t.get();
+						gameSessionContainer->p2pHost = t.get();
 						return gameSessionContainer;
 					}
-					catch (std::exception& e)
+					catch (...)
 					{
-						e.what();
 						throw;
 					}
 				}, ct);
@@ -324,6 +324,38 @@ namespace Stormancer
 		{
 			throw(std::runtime_error("GameSession doesn't exist"));
 		}
+	}
+
+	std::shared_ptr<IP2PScenePeer> GameSession_Impl::getSessionHost() const
+	{
+		// Copy the task to avoid a possible race condition with it being reassigned while we are inside this method
+		auto sessionTask = _currentGameSession;
+		if (!sessionTask.is_done())
+		{
+			return nullptr;
+		}
+		auto session = sessionTask.get();
+		if (session)
+		{
+			return session->p2pHost;
+		}
+		return nullptr;
+	}
+
+	bool GameSession_Impl::isSessionHost() const
+	{
+		auto sessionTask = _currentGameSession;
+		// Not yet connected -> false
+		if (!sessionTask.is_done())
+		{
+			return false;
+		}
+		auto session = sessionTask.get();
+		if (session)
+		{
+			return session->service()->getMyP2PRole() == P2PRole::Host;
+		}
+		return false;
 	}
 
 	pplx::task<std::shared_ptr<GameSessionContainer>> GameSession_Impl::getCurrentGameSession(pplx::cancellation_token ct)

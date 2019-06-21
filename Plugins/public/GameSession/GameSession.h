@@ -8,6 +8,8 @@
 
 namespace Stormancer
 {
+	class IP2PScenePeer;
+
 	class GameSession
 	{
 	public:
@@ -49,5 +51,35 @@ namespace Stormancer
 
 		Event<std::shared_ptr<Scene>> onConnectingToScene;
 		Event<std::shared_ptr<Scene>> onDisconnectingFromScene;
+
+		/// <summary>
+		/// Get the P2P Host peer for this Game Session.
+		/// </summary>
+		/// <remarks>
+		/// Players in a game session are connected together through a star topology centered on a single player, the Host.
+		/// The players who are not the Host are called Clients.
+		/// </remarks>
+		/// <returns>
+		/// The <c>IP2PScenePeer</c> for the host of the session.
+		/// If you are the host, or you are not yet connected to a game session, it will be nullptr.
+		/// </returns>
+		virtual std::shared_ptr<IP2PScenePeer> getSessionHost() const = 0;
+
+		/// <summary>
+		/// Check whether you are the P2P Host of the Game Session.
+		/// </summary>
+		/// <seealso cref="getSessionHost()"/>
+		/// <returns>
+		/// <c>true</c> if you are the host of the session ; <c>false</c> if you are a client, or if you are not connected to a game session.
+		/// </returns>
+		virtual bool isSessionHost() const = 0;
+
+		/// <summary>
+		/// Event that is triggered when a host migration happens.
+		/// </summary>
+		/// <remarks>
+		/// Host migration is not currently supported.
+		/// </remarks>
+		Event<std::shared_ptr<IP2PScenePeer>> onSessionHostChanged;
 	};
 }

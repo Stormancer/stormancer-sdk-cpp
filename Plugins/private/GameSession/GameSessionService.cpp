@@ -80,6 +80,7 @@ namespace Stormancer
 		if (p2pToken.empty()) // Host
 		{
 			_logger->log(LogLevel::Trace, "gamession.p2ptoken", "received empty p2p token: I'm the host.");
+			_myP2PRole = P2PRole::Host;
 			onRoleReceived(P2PRole::Host);
 			_waitServerTce.set();
 			if (openTunnel)
@@ -99,6 +100,7 @@ namespace Stormancer
 				auto that = wThat.lock();
 				if (that)
 				{
+					that->_myP2PRole = P2PRole::Client;
 					that->onRoleReceived(P2PRole::Client);
 					if (that->_onConnectionOpened)
 					{

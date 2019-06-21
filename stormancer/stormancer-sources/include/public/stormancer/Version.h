@@ -45,7 +45,6 @@ namespace Stormancer
 		friend class Configuration;
 		/// <summary>
 	#if defined STORM_DO_CHECK_VERSION || defined _STORMANCERSDKCPP
-		// Deckaration of the method defined in Version.cpp
 		static void STORM_VERSION_CHECK(STORM_VERSION_HASH)();
 	#endif
 

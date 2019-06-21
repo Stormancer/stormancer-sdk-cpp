@@ -33,6 +33,9 @@ namespace Stormancer
 
 		std::shared_ptr<Scene> scene() override;
 
+		std::shared_ptr<IP2PScenePeer>	getSessionHost() const override;
+		bool							isSessionHost() const override;
+
 	private:
 
 		//Events
