@@ -12,8 +12,9 @@ namespace Stormancer
 	{
 	public:
 
-		GameSessionContainer()
-			: _logger(scene->dependencyResolver().resolve<ILogger>())
+		GameSessionContainer(std::shared_ptr<Scene> scene)
+			: scene(scene)
+			, _logger(scene->dependencyResolver().resolve<ILogger>())
 		{
 		};
 
@@ -389,8 +390,7 @@ namespace Stormancer
 		{
 			if (auto that = wThat.lock())
 			{
-				auto gameSessionContainer = std::make_shared<GameSessionContainer>();
-				gameSessionContainer->scene = scene;
+				auto gameSessionContainer = std::make_shared<GameSessionContainer>(scene);
 
 				that->_onGameSessionConnectionChange(ConnectionState::Connected);
 

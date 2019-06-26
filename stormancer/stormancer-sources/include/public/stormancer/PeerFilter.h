@@ -30,7 +30,7 @@ namespace Stormancer
 		static PeerFilter matchPeers(const TArgs&... ids)
 		{
 			std::vector<std::string> vectorIds;
-			return matchPeers(vectorIds, ids...);
+			return matchPeersInternal(vectorIds, ids...);
 		}
 
 		static PeerFilter matchPeers(const std::vector<std::string>& ids);
@@ -70,13 +70,13 @@ namespace Stormancer
 #pragma region private_static_functions
 
 		template<typename... TArgs>
-		static PeerFilter matchPeers(std::vector<std::string>& vectorIds, const std::string& id, const TArgs&... ids)
+		static PeerFilter matchPeersInternal(std::vector<std::string>& vectorIds, const std::string& id, const TArgs&... ids)
 		{
 			vectorIds.emplace_back(id);
-			return matchPeers(vectorIds, ids...);
+			return matchPeersInternal(vectorIds, ids...);
 		}
 
-		static PeerFilter matchPeers(std::vector<std::string>& vectorIds)
+		static PeerFilter matchPeersInternal(std::vector<std::string>& vectorIds)
 		{
 			return PeerFilter(vectorIds);
 		}
