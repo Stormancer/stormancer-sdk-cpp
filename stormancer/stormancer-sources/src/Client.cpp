@@ -575,12 +575,12 @@ namespace Stormancer
 					{
 						connection->setMetadata("encryption", sceneEndpoint.getTokenResponse.encryption.token);
 						auto keyStore = client->_dependencyResolver.resolve<KeyStore>();
-						auto key = utility::conversions::from_base64(utility::string_t(sceneEndpoint.getTokenResponse.encryption.key.begin(), sceneEndpoint.getTokenResponse.encryption.key.end()));
+						auto key = utility::conversions::from_base64(utility::string_t(utility::conversions::to_string_t(sceneEndpoint.getTokenResponse.encryption.key)));
 						if (key.size() != 256 / 8)
 						{
 							throw std::runtime_error(("Unexpected key size. received " + std::to_string(key.size() * 8) + " bits expected 256 bits ").c_str());
 						}
-						keyStore->keys.emplace(connection->id(), std::vector<byte>(key.begin(), key.end()));
+						keyStore->keys.emplace(connection->id(), key);
 					}
 
 					return connection->setTimeout(client->_serverTimeout, ct).then([connection]() { return connection; });

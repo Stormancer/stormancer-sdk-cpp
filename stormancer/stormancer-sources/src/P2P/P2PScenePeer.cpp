@@ -94,6 +94,4 @@ namespace Stormancer
 	{
 		return _connection->key();
 	}
-
-		
 }

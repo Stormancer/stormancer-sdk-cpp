@@ -16,8 +16,8 @@ namespace Stormancer
 
 		EndpointCandidate listeningEndpointCandidate;
 		EndpointCandidate clientEndpointCandidate;
-		std::vector<char> sessionId;
-		std::vector<char> id;
+		std::vector<byte> sessionId;
+		std::vector<byte> id;
 		int ping;
 
 		MSGPACK_DEFINE(listeningPeer, clientPeer, listeningEndpointCandidate, clientEndpointCandidate, sessionId, id, ping)

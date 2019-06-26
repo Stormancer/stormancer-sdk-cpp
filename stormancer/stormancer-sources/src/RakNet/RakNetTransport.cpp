@@ -210,7 +210,7 @@ namespace Stormancer
 								char* dataPtr = reinterpret_cast<char*>(stream.startPtr());
 								int dataSize = static_cast<int>(stream.currentPosition());
 
-								_logger->log(LogLevel::Trace, "RakNetTransport", "sending Advertise peer request parentid=" + rq.parentId + " id=" + stringifyBytesArray(rq.id));
+								_logger->log(LogLevel::Trace, "RakNetTransport", "sending Advertise peer request parentid=" + rq.parentId + " id=" + rq.id);
 								_peer->Send(dataPtr, dataSize, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE, 0, rakNetPacket->guid, false);
 							}
 						}
@@ -363,7 +363,7 @@ namespace Stormancer
 
 						if (!p2pRemoteConnecInfos.isRequest)
 						{
-							_logger->log(LogLevel::Trace, "RakNetTransport", "received Advertise peer response parentid=" + p2pRemoteConnecInfos.parentId + " id=" + stringifyBytesArray(p2pRemoteConnecInfos.id));
+							_logger->log(LogLevel::Trace, "RakNetTransport", "received Advertise peer response parentid=" + p2pRemoteConnecInfos.parentId + " id=" + p2pRemoteConnecInfos.id);
 							auto rq = _pendingConnections.front();
 							_pendingConnections.pop();
 							if (rq.cancellationToken.is_canceled())
@@ -379,7 +379,7 @@ namespace Stormancer
 						}
 						else
 						{
-							_logger->log(LogLevel::Trace, "RakNetTransport", "Received Advertise peer request parentid=" + p2pRemoteConnecInfos.parentId + " id=" + stringifyBytesArray(p2pRemoteConnecInfos.id));
+							_logger->log(LogLevel::Trace, "RakNetTransport", "Received Advertise peer request parentid=" + p2pRemoteConnecInfos.parentId + " id=" + p2pRemoteConnecInfos.id);
 							
 							auto parentConnection = _handler->getConnection(std::string(p2pRemoteConnecInfos.parentId));
 
