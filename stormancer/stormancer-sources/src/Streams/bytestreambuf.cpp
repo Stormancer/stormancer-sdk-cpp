@@ -129,11 +129,6 @@ namespace Stormancer
 
 	bytestreambuf::pos_type bytestreambuf::seekoff(off_type off, std::ios_base::seekdir way, std::ios_base::openmode which)
 	{
-		if (off == 0)
-		{
-			return off;
-		}
-
 		if ((which & std::ios_base::in) && (which & std::ios_base::out) && (way != std::ios_base::beg) && (way != std::ios_base::end))
 		{
 			return pos_type(off_type(-1));
