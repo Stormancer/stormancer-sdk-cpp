@@ -25,6 +25,7 @@ namespace Stormancer
 
 		~GameSessionContainer()
 		{
+			sceneConnectionStateSubscription.unsubscribe();
 			auto logger = _logger;
 			auto sceneId = scene->id();
 			scene->disconnect().then([logger, sceneId](pplx::task<void> task)
