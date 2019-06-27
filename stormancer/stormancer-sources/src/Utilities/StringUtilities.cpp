@@ -7,7 +7,7 @@ namespace Stormancer
 	std::string vectorJoin(const std::vector<std::string>& vector, const std::string& glue)
 	{
 		std::stringstream ss;
-		for (size_t i = 0; i < vector.size(); ++i)
+		for (size_t i = 0; i < vector.size(); i++)
 		{
 			if (i != 0)
 			{
@@ -21,14 +21,14 @@ namespace Stormancer
 	std::vector<std::string> stringSplit(const std::string& str, const std::string& separator)
 	{
 		std::vector<std::string> splitted;
-		size_t cursor = 0, lastCursor = 0;
+		size_t cursor = 0, lastCursor = 0, separatorSize = separator.size();
 		while ((cursor = str.find(separator, cursor)) != std::string::npos)
 		{
 			splitted.emplace_back(str.substr(lastCursor, cursor - lastCursor));
+			cursor += separatorSize;
 			lastCursor = cursor;
-			cursor++;
 		}
-		splitted.emplace_back(str.substr(lastCursor + 1, str.length() - lastCursor));
+		splitted.emplace_back(str.substr(lastCursor, str.length() - lastCursor));
 		return splitted;
 	}
 
@@ -40,13 +40,7 @@ namespace Stormancer
 	std::string stringTrim(const std::string& str2, char ch)
 	{
 		auto str = str2;
-		std::function<int(int)> ischar = [=](int c) -> int {
-			if (c == ch)
-			{
-				return 1;
-			}
-			return 0;
-		};
+		std::function<int(int)> ischar = [ch](int c) { return ((c == ch) ? 1 : 0); };
 		str.erase(str.begin(), find_if(str.begin(), str.end(), not1(ischar)));
 		str.erase(find_if(str.rbegin(), str.rend(), not1(ischar)).base(), str.end());
 		return str;
@@ -55,14 +49,14 @@ namespace Stormancer
 	std::vector<std::wstring> wstringSplit(const std::wstring& str, const std::wstring& separator)
 	{
 		std::vector<std::wstring> splitted;
-		size_t cursor = 0, lastCursor = 0;
+		size_t cursor = 0, lastCursor = 0, separatorSize = separator.size();
 		while ((cursor = str.find(separator, cursor)) != std::wstring::npos)
 		{
 			splitted.emplace_back(str.substr(lastCursor, cursor - lastCursor));
+			cursor += separatorSize;
 			lastCursor = cursor;
-			cursor++;
 		}
-		splitted.emplace_back(str.substr(lastCursor + 1, str.length() - lastCursor));
+		splitted.emplace_back(str.substr(lastCursor, str.length() - lastCursor));
 		return splitted;
 	}
 
@@ -74,13 +68,7 @@ namespace Stormancer
 	std::wstring wstringTrim(const std::wstring& str2, wchar_t ch)
 	{
 		auto str = str2;
-		std::function<int(int)> ischar = [=](int c) -> int {
-			if (c == ch)
-			{
-				return 1;
-			}
-			return 0;
-		};
+		std::function<int(int)> ischar = [ch](int c) { return ((c == ch) ? 1 : 0); };
 		str.erase(str.begin(), find_if(str.begin(), str.end(), not1(ischar)));
 		str.erase(find_if(str.rbegin(), str.rend(), not1(ischar)).base(), str.end());
 		return str;
