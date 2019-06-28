@@ -647,17 +647,24 @@ namespace Stormancer
 				return scenePeer;
 			}, ct);
 
-			result.then([wScene, p2pConnection, ct](std::shared_ptr<IP2PScenePeer> peer) {
+			result.then([wScene, p2pConnection, ct](std::shared_ptr<IP2PScenePeer> peer)
+			{
 				if (auto scene = wScene.lock())
 				{
 					scene->sendSystemRequest<void>(p2pConnection, (byte)SystemRequestIDTypes::ID_CONNECTED_TO_SCENE, scene->address().toUri(), ct)
-						.then([](pplx::task<void> t) {
+						.then([wScene, peer](pplx::task<void> t)
+					{
 						try
 						{
 							t.get();
 						}
 						catch (const std::exception&)
 						{
+						}
+
+						if (auto scene = wScene.lock())
+						{
+							scene->raisePeerConnected(peer->sessionId());
 						}
 					});
 				}

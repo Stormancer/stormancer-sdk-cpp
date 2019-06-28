@@ -1,0 +1,58 @@
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<PropertyGroup>
+		<BuildSpecs>stormancer-sdk-cpp-141.sln:Platform=x64:Configuration=Debug;stormancer-sdk-cpp-141.sln:Platform=x64:Configuration=Release</BuildSpecs>
+		<!-- An identifier for the package, used when calling the Package target. Set this on the command line, for instance "Win64", or leave empty -->
+		<PackageName></PackageName>
+	</PropertyGroup>
+	<ItemGroup>
+		<BuildSpecsList Include="$(BuildSpecs)" />
+	</ItemGroup>
+	
+	<Target Name="ParseInputs">
+		<ItemGroup>
+			<!-- This item has to be declared in a target, because batching (the % thing) does not work outside of targets -->
+			<BuildSpecsParsed Include="$([System.String]::new('%(BuildSpecsList.Identity)').Split(':')[0])">
+				<AdditionalProperties>$([System.String]::new('%(Identity)').Substring($([System.String]::new('%(Identity)').IndexOf(":"))).Replace(":",";"))</AdditionalProperties>
+			</BuildSpecsParsed>
+		</ItemGroup>
+	</Target>
+
+    <Target Name="Build" DependsOnTargets="ParseInputs">
+        <MSBuild
+			Projects="@(BuildSpecsParsed)"
+			Targets="Restore;Build"
+		/>
+    </Target>
+    <Target Name="Rebuild" DependsOnTargets="ParseInputs">
+        <MSBuild
+			Projects="@(BuildSpecsParsed)"
+			Targets="Restore;Rebuild"
+		/>
+    </Target>
+    <Target Name="Package" DependsOnTargets="ParseInputs">
+		<Exec Command="git describe --dirty --match v[0-9].[0-9] --match v[0-9].[0-9].[0-9]" ConsoleToMsBuild="true" IgnoreExitCode="true">
+			<Output TaskParameter="ConsoleOutput" PropertyName="GitDescribeOutput" />
+			<Output TaskParameter="ExitCode" PropertyName="CmdExitCode" />
+		</Exec>
+		<Warning Condition="'$(CmdExitCode)' != 0" Text="Could not run git describe ; the library's version will not be set. Make sure git is installed and is in the PATH." />
+		<Message Condition="'$(CmdExitCode)' == 0" Text="Git Describe Output: $(GitDescribeOutput)" />
+		<PropertyGroup Condition="$(GitDescribeOutput)==''">
+			<GitDescribeOutput>unknown</GitDescribeOutput>
+		</PropertyGroup>
+		<PropertyGroup Condition="$(PackageName)!=''">
+			<PackageName>-$(PackageName)</PackageName>
+		</PropertyGroup>
+		<PropertyGroup>
+			<PackageDir>$(MSBuildThisFileDirectory)\StormancerSdkCpp$(PackageName)-$(GitDescribeOutput)</PackageDir>
+		</PropertyGroup>
+		<!-- Clean the directory if it exists -->
+		<RemoveDir Directories="$(PackageDir)" />
+		<MSBuild
+			Projects="@(BuildSpecsParsed)"
+			Targets="Restore;Build"
+			Properties="StormancerOutputDir=$(PackageDir)\"
+		/>
+		<ZipDirectory SourceDirectory="$(PackageDir)" DestinationFile="$(PackageDir).zip" Overwrite="true" />
+		<RemoveDir Directories="$(PackageDir)" />
+    </Target>
+</Project>

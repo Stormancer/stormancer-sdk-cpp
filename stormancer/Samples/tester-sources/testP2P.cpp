@@ -141,7 +141,6 @@ void p2pConnect(std::shared_ptr<Stormancer::IClient> hostClient, std::shared_ptr
 	std::shared_ptr<Stormancer::Scene> hostScene;
 	std::shared_ptr<Stormancer::Scene> guestScene;
 	pplx::task_completion_event<std::shared_ptr<Stormancer::IP2PScenePeer>> hostPeerTce;
-	Stormancer::Subscription peerConnectedSubscription;
 
 	try
 	{
@@ -152,12 +151,6 @@ void p2pConnect(std::shared_ptr<Stormancer::IClient> hostClient, std::shared_ptr
 				logger->log(Stormancer::LogLevel::Info, "P2P_test", "host received a scene message from a peer", packet->readObject<std::string>());
 			}, Stormancer::MessageOriginFilter::Peer);
 		}).get();
-
-		peerConnectedSubscription = hostScene->onPeerConnected().subscribe([&peerConnectedSubscription, hostPeerTce](std::shared_ptr< Stormancer::IP2PScenePeer> peer)
-		{
-			hostPeerTce.set(peer);
-			peerConnectedSubscription->unsubscribe();
-		});
 	}
 	catch (const std::exception& ex)
 	{
@@ -181,14 +174,15 @@ void p2pConnect(std::shared_ptr<Stormancer::IClient> hostClient, std::shared_ptr
 		throw;
 	}
 
-	hostPeerConnectedSub = hostScene->onPeerConnected().subscribe([logger](std::shared_ptr<Stormancer::IP2PScenePeer> peer)
+	hostPeerConnectedSub = hostScene->onPeerConnected().subscribe([logger, hostPeerTce](std::shared_ptr<Stormancer::IP2PScenePeer> peer)
 	{
-		logger->log(Stormancer::LogLevel::Info, "P2P_test", "Peer connected on host scene", std::to_string(peer->id()));
+		logger->log(Stormancer::LogLevel::Info, "P2P_test", "Peer connected on host scene", peer->sessionId());
+		hostPeerTce.set(peer);
 	});
 
 	guestPeerConnectedSub = guestScene->onPeerConnected().subscribe([logger](std::shared_ptr<Stormancer::IP2PScenePeer> peer)
 	{
-		logger->log(Stormancer::LogLevel::Info, "P2P_test", "Peer connected on guest scene", std::to_string(peer->id()));
+		logger->log(Stormancer::LogLevel::Info, "P2P_test", "Peer connected on guest scene", peer->sessionId());
 	});
 
 	auto hostRpc = hostScene->dependencyResolver().resolve<Stormancer::RpcService>();
