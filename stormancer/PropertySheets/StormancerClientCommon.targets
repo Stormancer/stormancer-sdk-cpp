@@ -34,10 +34,18 @@
 	</Exec>
 	<Warning Condition="'$(CmdExitCode)' != 0" Text="Could not run git describe ; the library's version will not be set. Make sure git is installed and is in the PATH." />
 	<Message Condition="'$(CmdExitCode)' == 0" Text="Git Describe Output: $(GitDescribeOutput)" />
-	<!-- Get the git hash, used for optional link-time version check. IgnoreExitCode="false" because if the previous command worked, this one should too -->
-	<Exec Command="git describe --match=NeVeRmAtCh --always --abbrev=40 --dirty=_dirty" ConsoleToMsBuild="true" IgnoreExitCode="false" Condition="'$(CmdExitCode)' == 0">
+	<!-- Do not keep the output if there was an error. This can happen if git is not installed, or if the git history is messed up somehow. -->
+	<PropertyGroup Condition="'$(CmdExitCode)' != 0">
+		<GitDescribeOutput></GitDescribeOutput>
+	</PropertyGroup>
+	<!-- Get the git hash, used for optional link-time version check. This one should work, even in case of a "broken" history -->
+	<Exec Command="git describe --match=NeVeRmAtCh --always --abbrev=40 --dirty=_dirty" ConsoleToMsBuild="true" IgnoreExitCode="true" >
 		<Output TaskParameter="ConsoleOutput" PropertyName="GitHash" />
+		<Output TaskParameter="ExitCode" PropertyName="CmdExitCode" />
 	</Exec>
+	<PropertyGroup Condition="'$(CmdExitCode)' != 0">
+		<GitHash>noversion</GitHash>
+	</PropertyGroup>
 	<ItemGroup>
 		<ClCompile>
 		  <PreprocessorDefinitions>STORM_VERSION="$(GitDescribeOutput)";STORM_VERSION_HASH=$(GitHash);%(PreprocessorDefinitions)</PreprocessorDefinitions>
