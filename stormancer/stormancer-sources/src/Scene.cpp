@@ -709,7 +709,18 @@ namespace Stormancer
 		auto it = _connectedPeers.find(sessionId);
 		if (it != _connectedPeers.end())
 		{
-			_onPeerConnected(it->second);
+			auto actionDispatcher = dependencyResolver().resolve<IActionDispatcher>();
+			if (actionDispatcher)
+			{
+				auto wScene = STORM_WEAK_FROM_THIS();
+				actionDispatcher->post([wScene, it]()
+				{
+					if (auto scene = wScene.lock())
+					{
+						scene->_onPeerConnected(it->second);
+					}
+				});
+			}
 		}
 	}
 
