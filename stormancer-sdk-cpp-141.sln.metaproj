@@ -26,7 +26,7 @@
     <AndroidTargetsPath>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\Microsoft\MDD\Android\V150\</AndroidTargetsPath>
     <iOSTargetsPath>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\Microsoft\MDD\iOS\V150\</iOSTargetsPath>
     <VisualStudioVersion>15.0</VisualStudioVersion>
-    <AspNetConfiguration>Release</AspNetConfiguration>
+    <AspNetConfiguration>Debug</AspNetConfiguration>
     <SolutionDir>D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\</SolutionDir>
     <SolutionExt>.sln</SolutionExt>
     <SolutionFileName>stormancer-sdk-cpp-141.sln</SolutionFileName>
@@ -35,21 +35,21 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <CurrentSolutionConfigurationContents>
       <SolutionConfiguration xmlns="">
-  <ProjectConfiguration Project="{D8CF547F-8B5B-4651-A48F-D6E56EE0B8C1}" AbsolutePath="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\stormancer-sdk-cpp-141\stormancer-sdk-cpp-141.vcxproj" BuildProjectInSolution="True">Release|x64<ProjectDependency Project="{6227F51A-1498-4C4A-B213-F6FDED605125}" /><ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /><ProjectDependency Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" /><ProjectDependency Project="{B4BF51E9-E541-4E5F-8AAB-93BEC498E619}" /></ProjectConfiguration>
-  <ProjectConfiguration Project="{DFB15956-69E5-4D05-89C2-E7390F884D50}" AbsolutePath="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\Samples\Tester\Tester-141.vcxproj" BuildProjectInSolution="True">Release|x64<ProjectDependency Project="{D8CF547F-8B5B-4651-A48F-D6E56EE0B8C1}" /></ProjectConfiguration>
-  <ProjectConfiguration Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" AbsolutePath="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\RakNet\RakNet\Lib\DLL\DLL_vc141.vcxproj" BuildProjectInSolution="True">Release|x64</ProjectConfiguration>
-  <ProjectConfiguration Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" AbsolutePath="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\cpprestsdk\Release\src\build\vs141\casablanca141.vcxproj" BuildProjectInSolution="True">Release|x64</ProjectConfiguration>
-  <ProjectConfiguration Project="{43D8B92C-4987-445B-84C7-C5224A98FFD6}" AbsolutePath="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\RakNet\RaknetAndroid\RaknetAndroid.vcxproj" BuildProjectInSolution="False">Release|ARM</ProjectConfiguration>
-  <ProjectConfiguration Project="{73703B65-9D12-4836-8C66-3FB48D3A721E}" AbsolutePath="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\RakNet\RaknetDll\RaknetDll-vc141.vcxproj" BuildProjectInSolution="True">Release|x64</ProjectConfiguration>
-  <ProjectConfiguration Project="{DA8EAA28-D2DF-46E8-937E-E061E31EC539}" AbsolutePath="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\SmokeTest\SmokeTest-vc141.vcxproj" BuildProjectInSolution="True">Release|x64</ProjectConfiguration>
-  <ProjectConfiguration Project="{CD827855-C824-4CBF-B736-B7FDA2ACD036}" AbsolutePath="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\Samples\RakNetIpv6\RakNetIpv6-vc141.vcxproj" BuildProjectInSolution="True">Release|x64<ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /><ProjectDependency Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" /></ProjectConfiguration>
-  <ProjectConfiguration Project="{6227F51A-1498-4C4A-B213-F6FDED605125}" AbsolutePath="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\libupnp\build\vc141\libupnp.vcxproj" BuildProjectInSolution="True">Release|x64</ProjectConfiguration>
-  <ProjectConfiguration Project="{B4BF51E9-E541-4E5F-8AAB-93BEC498E619}" AbsolutePath="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\Plugins\PluginSelector\PluginSelector.csproj" BuildProjectInSolution="True">Release|AnyCPU</ProjectConfiguration>
-  <ProjectConfiguration Project="{BF042260-99B1-4A39-B2BF-1FF0F19DCFFA}" AbsolutePath="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\cpprestsdk\Release\src\build\vsClang.Linux\cpprestsdk_linux\cpprestsdk_linux.vcxproj" BuildProjectInSolution="False">Release|x64</ProjectConfiguration>
-  <ProjectConfiguration Project="{EACD6568-2BFE-4611-8F75-3FB3C47A719F}" AbsolutePath="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\libupnp\build\vclinux\libupnp_linux\libupnp_linux.vcxproj" BuildProjectInSolution="False">Release|x64</ProjectConfiguration>
-  <ProjectConfiguration Project="{34D92434-8D57-44F9-A08C-9CA6F980E0B7}" AbsolutePath="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\RakNet\RakNet\RakNetLibStatic-Linux\RakNet_Linux\RakNet_Linux.vcxproj" BuildProjectInSolution="False">Release|x64</ProjectConfiguration>
-  <ProjectConfiguration Project="{204F5BFC-02D3-4177-9C9C-F3BFBCEA620A}" AbsolutePath="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\stormancer-sdk-cpp-Linux\stormancer-sdk-cpp-lib-Linux.vcxproj" BuildProjectInSolution="False">Release|x64</ProjectConfiguration>
-  <ProjectConfiguration Project="{1D397680-5605-4F9D-A8A2-042D09FBB22B}" AbsolutePath="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\Samples\stormancer_cpp_tester_linux\stormancer_cpp_tester_linux.vcxproj" BuildProjectInSolution="False">Release|x64</ProjectConfiguration>
+  <ProjectConfiguration Project="{D8CF547F-8B5B-4651-A48F-D6E56EE0B8C1}" AbsolutePath="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\stormancer-sdk-cpp-141\stormancer-sdk-cpp-141.vcxproj" BuildProjectInSolution="True">Debug|x64<ProjectDependency Project="{6227F51A-1498-4C4A-B213-F6FDED605125}" /><ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /><ProjectDependency Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" /><ProjectDependency Project="{B4BF51E9-E541-4E5F-8AAB-93BEC498E619}" /></ProjectConfiguration>
+  <ProjectConfiguration Project="{DFB15956-69E5-4D05-89C2-E7390F884D50}" AbsolutePath="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\Samples\Tester\Tester-141.vcxproj" BuildProjectInSolution="True">Debug|x64<ProjectDependency Project="{D8CF547F-8B5B-4651-A48F-D6E56EE0B8C1}" /></ProjectConfiguration>
+  <ProjectConfiguration Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" AbsolutePath="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\RakNet\RakNet\Lib\DLL\DLL_vc141.vcxproj" BuildProjectInSolution="True">Debug|x64</ProjectConfiguration>
+  <ProjectConfiguration Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" AbsolutePath="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\cpprestsdk\Release\src\build\vs141\casablanca141.vcxproj" BuildProjectInSolution="True">Debug|x64</ProjectConfiguration>
+  <ProjectConfiguration Project="{43D8B92C-4987-445B-84C7-C5224A98FFD6}" AbsolutePath="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\RakNet\RaknetAndroid\RaknetAndroid.vcxproj" BuildProjectInSolution="False">Debug|ARM</ProjectConfiguration>
+  <ProjectConfiguration Project="{73703B65-9D12-4836-8C66-3FB48D3A721E}" AbsolutePath="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\RakNet\RaknetDll\RaknetDll-vc141.vcxproj" BuildProjectInSolution="True">Debug|x64</ProjectConfiguration>
+  <ProjectConfiguration Project="{DA8EAA28-D2DF-46E8-937E-E061E31EC539}" AbsolutePath="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\SmokeTest\SmokeTest-vc141.vcxproj" BuildProjectInSolution="True">Debug|x64</ProjectConfiguration>
+  <ProjectConfiguration Project="{CD827855-C824-4CBF-B736-B7FDA2ACD036}" AbsolutePath="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\Samples\RakNetIpv6\RakNetIpv6-vc141.vcxproj" BuildProjectInSolution="True">Debug|x64<ProjectDependency Project="{1014C621-BC2D-4813-B8C1-6D83AD6F9249}" /><ProjectDependency Project="{BC75CD23-CB75-4233-A305-B7328825A9A5}" /></ProjectConfiguration>
+  <ProjectConfiguration Project="{6227F51A-1498-4C4A-B213-F6FDED605125}" AbsolutePath="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\libupnp\build\vc141\libupnp.vcxproj" BuildProjectInSolution="True">Debug|x64</ProjectConfiguration>
+  <ProjectConfiguration Project="{B4BF51E9-E541-4E5F-8AAB-93BEC498E619}" AbsolutePath="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\Plugins\PluginSelector\PluginSelector.csproj" BuildProjectInSolution="True">Debug|AnyCPU</ProjectConfiguration>
+  <ProjectConfiguration Project="{BF042260-99B1-4A39-B2BF-1FF0F19DCFFA}" AbsolutePath="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\cpprestsdk\Release\src\build\vsClang.Linux\cpprestsdk_linux\cpprestsdk_linux.vcxproj" BuildProjectInSolution="False">Debug|x64</ProjectConfiguration>
+  <ProjectConfiguration Project="{EACD6568-2BFE-4611-8F75-3FB3C47A719F}" AbsolutePath="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\libupnp\build\vclinux\libupnp_linux\libupnp_linux.vcxproj" BuildProjectInSolution="False">Debug|x64</ProjectConfiguration>
+  <ProjectConfiguration Project="{34D92434-8D57-44F9-A08C-9CA6F980E0B7}" AbsolutePath="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\RakNet\RakNet\RakNetLibStatic-Linux\RakNet_Linux\RakNet_Linux.vcxproj" BuildProjectInSolution="False">Debug|x64</ProjectConfiguration>
+  <ProjectConfiguration Project="{204F5BFC-02D3-4177-9C9C-F3BFBCEA620A}" AbsolutePath="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\stormancer-sdk-cpp-Linux\stormancer-sdk-cpp-lib-Linux.vcxproj" BuildProjectInSolution="False">Debug|x64</ProjectConfiguration>
+  <ProjectConfiguration Project="{1D397680-5605-4F9D-A8A2-042D09FBB22B}" AbsolutePath="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\Samples\stormancer_cpp_tester_linux\stormancer_cpp_tester_linux.vcxproj" BuildProjectInSolution="False">Debug|x64</ProjectConfiguration>
 </SolutionConfiguration>
     </CurrentSolutionConfigurationContents>
     <NuGetRestoreTargets>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\..\Common7\IDE\CommonExtensions\Microsoft\NuGet\NuGet.targets</NuGetRestoreTargets>
@@ -629,70 +629,70 @@
     <ProjectReference Include="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\stormancer-sdk-cpp-141\stormancer-sdk-cpp-141.vcxproj.metaproj">
       <ToolsVersion>15.0</ToolsVersion>
       <SkipNonexistentProjects>Build</SkipNonexistentProjects>
-      <AdditionalProperties>Configuration=Release; Platform=x64</AdditionalProperties>
-      <Configuration>Release</Configuration>
+      <AdditionalProperties>Configuration=Debug; Platform=x64</AdditionalProperties>
+      <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
     </ProjectReference>
     <ProjectReference Include="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\Samples\Tester\Tester-141.vcxproj.metaproj">
       <ToolsVersion>15.0</ToolsVersion>
       <SkipNonexistentProjects>Build</SkipNonexistentProjects>
-      <AdditionalProperties>Configuration=Release; Platform=x64</AdditionalProperties>
-      <Configuration>Release</Configuration>
+      <AdditionalProperties>Configuration=Debug; Platform=x64</AdditionalProperties>
+      <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
     </ProjectReference>
     <ProjectReference Include="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\RakNet\RakNet\Lib\DLL\DLL_vc141.vcxproj">
       <ToolsVersion>
       </ToolsVersion>
       <SkipNonexistentProjects>False</SkipNonexistentProjects>
-      <AdditionalProperties>Configuration=Release; Platform=x64</AdditionalProperties>
-      <Configuration>Release</Configuration>
+      <AdditionalProperties>Configuration=Debug; Platform=x64</AdditionalProperties>
+      <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
     </ProjectReference>
     <ProjectReference Include="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\cpprestsdk\Release\src\build\vs141\casablanca141.vcxproj">
       <ToolsVersion>
       </ToolsVersion>
       <SkipNonexistentProjects>False</SkipNonexistentProjects>
-      <AdditionalProperties>Configuration=Release; Platform=x64</AdditionalProperties>
-      <Configuration>Release</Configuration>
+      <AdditionalProperties>Configuration=Debug; Platform=x64</AdditionalProperties>
+      <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
     </ProjectReference>
     <ProjectReference Include="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\RakNet\RaknetDll\RaknetDll-vc141.vcxproj">
       <ToolsVersion>
       </ToolsVersion>
       <SkipNonexistentProjects>False</SkipNonexistentProjects>
-      <AdditionalProperties>Configuration=Release; Platform=x64</AdditionalProperties>
-      <Configuration>Release</Configuration>
+      <AdditionalProperties>Configuration=Debug; Platform=x64</AdditionalProperties>
+      <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
     </ProjectReference>
     <ProjectReference Include="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\SmokeTest\SmokeTest-vc141.vcxproj">
       <ToolsVersion>
       </ToolsVersion>
       <SkipNonexistentProjects>False</SkipNonexistentProjects>
-      <AdditionalProperties>Configuration=Release; Platform=x64</AdditionalProperties>
-      <Configuration>Release</Configuration>
+      <AdditionalProperties>Configuration=Debug; Platform=x64</AdditionalProperties>
+      <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
     </ProjectReference>
     <ProjectReference Include="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\Samples\RakNetIpv6\RakNetIpv6-vc141.vcxproj.metaproj">
       <ToolsVersion>15.0</ToolsVersion>
       <SkipNonexistentProjects>Build</SkipNonexistentProjects>
-      <AdditionalProperties>Configuration=Release; Platform=x64</AdditionalProperties>
-      <Configuration>Release</Configuration>
+      <AdditionalProperties>Configuration=Debug; Platform=x64</AdditionalProperties>
+      <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
     </ProjectReference>
     <ProjectReference Include="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\libupnp\build\vc141\libupnp.vcxproj">
       <ToolsVersion>
       </ToolsVersion>
       <SkipNonexistentProjects>False</SkipNonexistentProjects>
-      <AdditionalProperties>Configuration=Release; Platform=x64</AdditionalProperties>
-      <Configuration>Release</Configuration>
+      <AdditionalProperties>Configuration=Debug; Platform=x64</AdditionalProperties>
+      <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
     </ProjectReference>
     <ProjectReference Include="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\Plugins\PluginSelector\PluginSelector.csproj">
       <ToolsVersion>
       </ToolsVersion>
       <SkipNonexistentProjects>False</SkipNonexistentProjects>
-      <AdditionalProperties>Configuration=Release; Platform=AnyCPU</AdditionalProperties>
-      <Configuration>Release</Configuration>
+      <AdditionalProperties>Configuration=Debug; Platform=AnyCPU</AdditionalProperties>
+      <Configuration>Debug</Configuration>
       <Platform>AnyCPU</Platform>
     </ProjectReference>
   </ItemGroup>
@@ -1079,68 +1079,68 @@
     <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\Samples\Tester\Tester-141.vcxproj.metaproj'" Projects="@(ProjectReference)" Targets="Publish" BuildInParallel="True" ToolsVersion="15.0" Properties="BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" SkipNonexistentProjects="%(ProjectReference.SkipNonexistentProjects)" />
   </Target>
   <Target Name="libs\RakNet\RakNet" Outputs="@(libs_RakNet_RakNetBuildOutput)">
-    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\RakNet\RakNet\Lib\DLL\DLL_vc141.vcxproj'" Projects="@(ProjectReference)" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
+    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\RakNet\RakNet\Lib\DLL\DLL_vc141.vcxproj'" Projects="@(ProjectReference)" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Debug; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
       <Output TaskParameter="TargetOutputs" ItemName="libs_RakNet_RakNetBuildOutput" />
     </MSBuild>
   </Target>
   <Target Name="libs\RakNet\RakNet:Clean">
-    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\RakNet\RakNet\Lib\DLL\DLL_vc141.vcxproj'" Projects="@(ProjectReference)" Targets="Clean" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
+    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\RakNet\RakNet\Lib\DLL\DLL_vc141.vcxproj'" Projects="@(ProjectReference)" Targets="Clean" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Debug; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
   </Target>
   <Target Name="libs\RakNet\RakNet:Rebuild" Outputs="@(libs_RakNet_RakNetBuildOutput)">
-    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\RakNet\RakNet\Lib\DLL\DLL_vc141.vcxproj'" Projects="@(ProjectReference)" Targets="Rebuild" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
+    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\RakNet\RakNet\Lib\DLL\DLL_vc141.vcxproj'" Projects="@(ProjectReference)" Targets="Rebuild" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Debug; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
       <Output TaskParameter="TargetOutputs" ItemName="libs_RakNet_RakNetBuildOutput" />
     </MSBuild>
   </Target>
   <Target Name="libs\RakNet\RakNet:Publish">
-    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\RakNet\RakNet\Lib\DLL\DLL_vc141.vcxproj'" Projects="@(ProjectReference)" Targets="Publish" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
+    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\RakNet\RakNet\Lib\DLL\DLL_vc141.vcxproj'" Projects="@(ProjectReference)" Targets="Publish" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Debug; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
   </Target>
   <Target Name="libs\cpprestsdk\cpprestsdk" Outputs="@(libs_cpprestsdk_cpprestsdkBuildOutput)">
-    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\cpprestsdk\Release\src\build\vs141\casablanca141.vcxproj'" Projects="@(ProjectReference)" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
+    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\cpprestsdk\Release\src\build\vs141\casablanca141.vcxproj'" Projects="@(ProjectReference)" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Debug; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
       <Output TaskParameter="TargetOutputs" ItemName="libs_cpprestsdk_cpprestsdkBuildOutput" />
     </MSBuild>
   </Target>
   <Target Name="libs\cpprestsdk\cpprestsdk:Clean">
-    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\cpprestsdk\Release\src\build\vs141\casablanca141.vcxproj'" Projects="@(ProjectReference)" Targets="Clean" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
+    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\cpprestsdk\Release\src\build\vs141\casablanca141.vcxproj'" Projects="@(ProjectReference)" Targets="Clean" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Debug; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
   </Target>
   <Target Name="libs\cpprestsdk\cpprestsdk:Rebuild" Outputs="@(libs_cpprestsdk_cpprestsdkBuildOutput)">
-    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\cpprestsdk\Release\src\build\vs141\casablanca141.vcxproj'" Projects="@(ProjectReference)" Targets="Rebuild" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
+    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\cpprestsdk\Release\src\build\vs141\casablanca141.vcxproj'" Projects="@(ProjectReference)" Targets="Rebuild" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Debug; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
       <Output TaskParameter="TargetOutputs" ItemName="libs_cpprestsdk_cpprestsdkBuildOutput" />
     </MSBuild>
   </Target>
   <Target Name="libs\cpprestsdk\cpprestsdk:Publish">
-    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\cpprestsdk\Release\src\build\vs141\casablanca141.vcxproj'" Projects="@(ProjectReference)" Targets="Publish" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
+    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\cpprestsdk\Release\src\build\vs141\casablanca141.vcxproj'" Projects="@(ProjectReference)" Targets="Publish" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Debug; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
   </Target>
   <Target Name="RaknetDll" Outputs="@(RaknetDllBuildOutput)">
-    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\RakNet\RaknetDll\RaknetDll-vc141.vcxproj'" Projects="@(ProjectReference)" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
+    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\RakNet\RaknetDll\RaknetDll-vc141.vcxproj'" Projects="@(ProjectReference)" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Debug; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
       <Output TaskParameter="TargetOutputs" ItemName="RaknetDllBuildOutput" />
     </MSBuild>
   </Target>
   <Target Name="RaknetDll:Clean">
-    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\RakNet\RaknetDll\RaknetDll-vc141.vcxproj'" Projects="@(ProjectReference)" Targets="Clean" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
+    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\RakNet\RaknetDll\RaknetDll-vc141.vcxproj'" Projects="@(ProjectReference)" Targets="Clean" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Debug; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
   </Target>
   <Target Name="RaknetDll:Rebuild" Outputs="@(RaknetDllBuildOutput)">
-    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\RakNet\RaknetDll\RaknetDll-vc141.vcxproj'" Projects="@(ProjectReference)" Targets="Rebuild" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
+    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\RakNet\RaknetDll\RaknetDll-vc141.vcxproj'" Projects="@(ProjectReference)" Targets="Rebuild" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Debug; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
       <Output TaskParameter="TargetOutputs" ItemName="RaknetDllBuildOutput" />
     </MSBuild>
   </Target>
   <Target Name="RaknetDll:Publish">
-    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\RakNet\RaknetDll\RaknetDll-vc141.vcxproj'" Projects="@(ProjectReference)" Targets="Publish" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
+    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\RakNet\RaknetDll\RaknetDll-vc141.vcxproj'" Projects="@(ProjectReference)" Targets="Publish" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Debug; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
   </Target>
   <Target Name="Samples\SmokeTest-vc141" Outputs="@(Samples_SmokeTest-vc141BuildOutput)">
-    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\SmokeTest\SmokeTest-vc141.vcxproj'" Projects="@(ProjectReference)" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
+    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\SmokeTest\SmokeTest-vc141.vcxproj'" Projects="@(ProjectReference)" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Debug; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
       <Output TaskParameter="TargetOutputs" ItemName="Samples_SmokeTest-vc141BuildOutput" />
     </MSBuild>
   </Target>
   <Target Name="Samples\SmokeTest-vc141:Clean">
-    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\SmokeTest\SmokeTest-vc141.vcxproj'" Projects="@(ProjectReference)" Targets="Clean" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
+    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\SmokeTest\SmokeTest-vc141.vcxproj'" Projects="@(ProjectReference)" Targets="Clean" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Debug; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
   </Target>
   <Target Name="Samples\SmokeTest-vc141:Rebuild" Outputs="@(Samples_SmokeTest-vc141BuildOutput)">
-    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\SmokeTest\SmokeTest-vc141.vcxproj'" Projects="@(ProjectReference)" Targets="Rebuild" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
+    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\SmokeTest\SmokeTest-vc141.vcxproj'" Projects="@(ProjectReference)" Targets="Rebuild" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Debug; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
       <Output TaskParameter="TargetOutputs" ItemName="Samples_SmokeTest-vc141BuildOutput" />
     </MSBuild>
   </Target>
   <Target Name="Samples\SmokeTest-vc141:Publish">
-    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\SmokeTest\SmokeTest-vc141.vcxproj'" Projects="@(ProjectReference)" Targets="Publish" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
+    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\SmokeTest\SmokeTest-vc141.vcxproj'" Projects="@(ProjectReference)" Targets="Publish" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Debug; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
   </Target>
   <Target Name="Samples\RakNetIpv6-vc141" Outputs="@(Samples_RakNetIpv6-vc141BuildOutput)">
     <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\Samples\RakNetIpv6\RakNetIpv6-vc141.vcxproj.metaproj'" Projects="@(ProjectReference)" BuildInParallel="True" ToolsVersion="15.0" Properties="BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" SkipNonexistentProjects="%(ProjectReference.SkipNonexistentProjects)">
@@ -1159,35 +1159,35 @@
     <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\Samples\RakNetIpv6\RakNetIpv6-vc141.vcxproj.metaproj'" Projects="@(ProjectReference)" Targets="Publish" BuildInParallel="True" ToolsVersion="15.0" Properties="BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" SkipNonexistentProjects="%(ProjectReference.SkipNonexistentProjects)" />
   </Target>
   <Target Name="libs\libupnp\libupnp" Outputs="@(libs_libupnp_libupnpBuildOutput)">
-    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\libupnp\build\vc141\libupnp.vcxproj'" Projects="@(ProjectReference)" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
+    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\libupnp\build\vc141\libupnp.vcxproj'" Projects="@(ProjectReference)" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Debug; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
       <Output TaskParameter="TargetOutputs" ItemName="libs_libupnp_libupnpBuildOutput" />
     </MSBuild>
   </Target>
   <Target Name="libs\libupnp\libupnp:Clean">
-    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\libupnp\build\vc141\libupnp.vcxproj'" Projects="@(ProjectReference)" Targets="Clean" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
+    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\libupnp\build\vc141\libupnp.vcxproj'" Projects="@(ProjectReference)" Targets="Clean" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Debug; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
   </Target>
   <Target Name="libs\libupnp\libupnp:Rebuild" Outputs="@(libs_libupnp_libupnpBuildOutput)">
-    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\libupnp\build\vc141\libupnp.vcxproj'" Projects="@(ProjectReference)" Targets="Rebuild" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
+    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\libupnp\build\vc141\libupnp.vcxproj'" Projects="@(ProjectReference)" Targets="Rebuild" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Debug; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
       <Output TaskParameter="TargetOutputs" ItemName="libs_libupnp_libupnpBuildOutput" />
     </MSBuild>
   </Target>
   <Target Name="libs\libupnp\libupnp:Publish">
-    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\libupnp\build\vc141\libupnp.vcxproj'" Projects="@(ProjectReference)" Targets="Publish" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
+    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\libupnp\build\vc141\libupnp.vcxproj'" Projects="@(ProjectReference)" Targets="Publish" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Debug; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
   </Target>
   <Target Name="PluginSelector" Outputs="@(PluginSelectorBuildOutput)">
-    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\Plugins\PluginSelector\PluginSelector.csproj'" Projects="@(ProjectReference)" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=AnyCPU;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
+    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\Plugins\PluginSelector\PluginSelector.csproj'" Projects="@(ProjectReference)" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Debug; Platform=AnyCPU;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
       <Output TaskParameter="TargetOutputs" ItemName="PluginSelectorBuildOutput" />
     </MSBuild>
   </Target>
   <Target Name="PluginSelector:Clean">
-    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\Plugins\PluginSelector\PluginSelector.csproj'" Projects="@(ProjectReference)" Targets="Clean" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=AnyCPU;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
+    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\Plugins\PluginSelector\PluginSelector.csproj'" Projects="@(ProjectReference)" Targets="Clean" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Debug; Platform=AnyCPU;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
   </Target>
   <Target Name="PluginSelector:Rebuild" Outputs="@(PluginSelectorBuildOutput)">
-    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\Plugins\PluginSelector\PluginSelector.csproj'" Projects="@(ProjectReference)" Targets="Rebuild" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=AnyCPU;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
+    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\Plugins\PluginSelector\PluginSelector.csproj'" Projects="@(ProjectReference)" Targets="Rebuild" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Debug; Platform=AnyCPU;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
       <Output TaskParameter="TargetOutputs" ItemName="PluginSelectorBuildOutput" />
     </MSBuild>
   </Target>
   <Target Name="PluginSelector:Publish">
-    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\Plugins\PluginSelector\PluginSelector.csproj'" Projects="@(ProjectReference)" Targets="Publish" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=AnyCPU;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
+    <MSBuild Condition="'%(ProjectReference.Identity)' == 'D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\Plugins\PluginSelector\PluginSelector.csproj'" Projects="@(ProjectReference)" Targets="Publish" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Debug; Platform=AnyCPU;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
   </Target>
 </Project>
