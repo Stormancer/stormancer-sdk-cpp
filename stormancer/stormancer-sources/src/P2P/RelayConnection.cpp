@@ -2,6 +2,7 @@
 #include "stormancer/P2P/RelayConnection.h"
 #include "stormancer/MessageIDTypes.h"
 #include "stormancer/Serializer.h"
+#include <cpprest/asyncrt_utils.h>
 
 namespace Stormancer
 {
@@ -23,8 +24,8 @@ namespace Stormancer
 		{
 			stream << (byte)MessageIDTypes::ID_P2P_RELAY;
 			if (auto serializer = wSerializer.lock())
-			{
-				serializer->serialize(stream, p2pSessionId);
+			{				
+				serializer->serialize(stream, utility::conversions::from_base64(utility::conversions::to_string_t(p2pSessionId)));
 				serializer->serialize(stream, (uint8)priority);
 				serializer->serialize(stream, (uint8)reliability);
 
