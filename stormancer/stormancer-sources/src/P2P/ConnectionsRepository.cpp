@@ -42,6 +42,8 @@ namespace Stormancer
 		{
 			if (auto that = wThat.lock())
 			{
+				std::lock_guard<std::mutex> lg(that->_mutex);
+
 				that->_connections.erase(id);
 				that->_connectionsByKey.erase(key);
 			}

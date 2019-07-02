@@ -373,9 +373,10 @@ namespace Stormancer
 
 	std::shared_ptr<Scene> GameSession_Impl::scene()
 	{
-		if (this->_currentGameSession.is_done())
+		auto sessionTask = _currentGameSession;
+		if (sessionTask.is_done() && sessionTask.get() != nullptr)
 		{
-			return this->_currentGameSession.get()->scene;
+			return sessionTask.get()->scene;
 		}
 		else
 		{

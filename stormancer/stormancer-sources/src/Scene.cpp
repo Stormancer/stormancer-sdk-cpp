@@ -357,7 +357,7 @@ namespace Stormancer
 			{
 				if (peerFilter.ids.size() == 0)
 				{
-					throw std::runtime_error("Need peer ids");
+					throw std::invalid_argument("peerFilter: A MatchPeers filter needs to have at least one Peer Session Id");
 				}
 
 				for (auto id : peerFilter.ids)
