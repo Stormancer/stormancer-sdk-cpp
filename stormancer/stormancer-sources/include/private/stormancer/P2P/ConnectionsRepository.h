@@ -14,7 +14,7 @@ namespace Stormancer
 	public:
 
 		ConnectionsRepository(ILogger_ptr logger);
-		pplx::task<std::shared_ptr<IConnection>> addPendingConnection(uint64 id) override;
+		pplx::task<std::shared_ptr<IConnection>> addPendingConnection(uint64 id, std::string clientSessionId) override;
 		void newConnection(std::shared_ptr<IConnection> connection) override;
 		std::shared_ptr<IConnection> getConnection(uint64 id) override;
 		std::shared_ptr<IConnection> getConnection(std::string id) override;
@@ -31,6 +31,7 @@ namespace Stormancer
 		public:
 			
 			uint64 id;
+			std::string sessionId;
 			pplx::task_completion_event<std::shared_ptr<IConnection>> tce;
 		};
 

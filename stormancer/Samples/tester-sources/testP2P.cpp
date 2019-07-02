@@ -189,8 +189,6 @@ void p2pConnect(std::shared_ptr<Stormancer::IClient> hostClient, std::shared_ptr
 	auto guestRpc = guestScene->dependencyResolver().resolve<Stormancer::RpcService>();
 	std::string p2pToken = guestRpc->rpc<std::string>("getP2PToken", true).get();
 
-
-
 	logger->log(std::string("Got P2P token ") + p2pToken);
 
 	auto hostTunnel = hostScene->registerP2PServer("pingServer");

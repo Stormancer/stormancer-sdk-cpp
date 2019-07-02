@@ -12,11 +12,22 @@ namespace Stormancer
 {
 	struct P2PSession
 	{
-		std::vector<byte> sessionId;
-		uint64 remotePeer = 0;
-		std::string sceneId;
+		std::vector<byte> SessionId;
+		uint64 RemotePeerId = 0;
+		std::string SceneId;
+		std::string RemoteSessionId;
+		std::string OwningSessionId;
 		P2PSessionState Status = P2PSessionState::Unknown;
 
-		MSGPACK_DEFINE(sessionId, remotePeer, sceneId)
+		MSGPACK_DEFINE_MAP(SessionId, RemotePeerId, SceneId, RemoteSessionId, OwningSessionId, Status)
+	};
+
+	struct P2PSessionResult
+	{
+		std::vector<byte> SessionId;
+		uint64 RemoteSessionId = 0;
+		std::string SceneId;
+
+		MSGPACK_DEFINE(SessionId, RemoteSessionId, SceneId)
 	};
 }

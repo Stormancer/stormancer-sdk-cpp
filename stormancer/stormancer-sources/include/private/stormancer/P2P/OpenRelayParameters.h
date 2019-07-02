@@ -8,10 +8,10 @@ namespace Stormancer
 	{
 	public:
 
-		std::vector<byte> sessionId;
+		std::vector<byte> p2pSessionId;
 		uint64 remotePeerId;
 		std::string remotePeerAddress;
 
-		MSGPACK_DEFINE(sessionId, remotePeerId, remotePeerAddress);
+		MSGPACK_DEFINE(p2pSessionId, remotePeerId, remotePeerAddress);
 	};
 }

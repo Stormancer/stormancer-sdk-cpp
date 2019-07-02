@@ -287,10 +287,10 @@ namespace Stormancer
 				}
 				else
 				{
-					auto originIt = scene->_connectedPeers.find(p->connection->key());
+					auto originIt = scene->_connectedPeers.find(p->connection->sessionId());
 					if (originIt == scene->_connectedPeers.end())
 					{
-						logger->log(LogLevel::Warn, "Scene", "Peer (" + p->connection->key() + ") not found on scene '" + scene->address().toUri() + "'");
+						logger->log(LogLevel::Warn, "Scene", "Peer (" + p->connection->sessionId() + ") not found on scene '" + scene->address().toUri() + "'");
 						return;
 					}
 					else
@@ -682,14 +682,14 @@ namespace Stormancer
 	std::shared_ptr<IP2PScenePeer> Scene_Impl::peerConnected(std::shared_ptr<IConnection> connection, std::shared_ptr<P2PService> p2pService, P2PConnectToSceneMessage connectToSceneMessage)
 	{
 		std::lock_guard<std::mutex> lg(this->_connectMutex);
-		auto it = _connectedPeers.find(connection->key());
+		auto it = _connectedPeers.find(connection->sessionId());
 
 		if (it == _connectedPeers.end())
 		{
 			auto wScene = STORM_WEAK_FROM_THIS();
 			auto scenePeer = std::make_shared<P2PScenePeer>(wScene, connection, p2pService, connectToSceneMessage);
 
-			_connectedPeers.emplace(scenePeer->connection()->key(), scenePeer);
+			_connectedPeers.emplace(connection->sessionId(), scenePeer);
 
 			return scenePeer;
 		}

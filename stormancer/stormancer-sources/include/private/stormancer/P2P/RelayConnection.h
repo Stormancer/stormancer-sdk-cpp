@@ -13,6 +13,8 @@ namespace Stormancer
 	{
 	public:
 
+#pragma region public_methods
+
 		RelayConnection(std::shared_ptr<IConnection> serverConnection, std::string address, uint64 remotePeerId, std::string p2pSessionId, std::weak_ptr<Serializer> serializer);
 		virtual void send(const StreamWriter& streamWriter, int channelUid, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const TransformMetadata& transformMetadata = TransformMetadata()) override;
 		void setApplication(std::string account, std::string application) override;
@@ -32,10 +34,21 @@ namespace Stormancer
 		ConnectionState getConnectionState() const override;
 		rxcpp::observable<ConnectionState> getConnectionStateChangedObservable() const override;
 		void setConnectionState(ConnectionState connectionState) override;
-		
-		
+		std::string sessionId() const override;
+
+#pragma endregion
+
+	protected:
+
+#pragma region protected_methods
+
+		void setSessionId(const std::string& sessionId) override;
+
+#pragma endregion
 
 	private:
+
+#pragma region private_members
 
 		std::shared_ptr<IConnection> _serverConnection;
 		std::unordered_map<std::string, std::string> _metadata;
@@ -45,5 +58,8 @@ namespace Stormancer
 		time_t _connectionDate = nowTime_t();
 		DependencyScope _dependencyResolver;
 		std::weak_ptr<Serializer> _serializer;
+		std::string _sessionId;
+
+#pragma endregion
 	};
 }

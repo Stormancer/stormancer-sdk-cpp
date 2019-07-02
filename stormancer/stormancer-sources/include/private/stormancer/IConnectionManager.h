@@ -16,7 +16,7 @@ namespace Stormancer
 
 		virtual ~IConnectionManager() = default;
 
-		virtual pplx::task<std::shared_ptr<IConnection>> addPendingConnection(uint64 id) = 0;
+		virtual pplx::task<std::shared_ptr<IConnection>> addPendingConnection(uint64 id, std::string clientSessionId) = 0;
 		virtual void newConnection(std::shared_ptr<IConnection> connection) = 0;
 		virtual void closeConnection(std::shared_ptr<IConnection> connection, const std::string& reason) = 0;
 		virtual std::shared_ptr<IConnection> getConnection(uint64 id) = 0;

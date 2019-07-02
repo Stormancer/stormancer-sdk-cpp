@@ -686,7 +686,6 @@ namespace Stormancer
 
 	pplx::task<void> Client::connectToScene(std::shared_ptr<Scene_Impl> scene, const std::string& sceneToken, const std::vector<Route_ptr>& localRoutes, pplx::cancellation_token ct)
 	{
-
 		ct = getLinkedCancellationToken(ct);
 
 		std::lock_guard<std::mutex> lg(_scenesMutex);

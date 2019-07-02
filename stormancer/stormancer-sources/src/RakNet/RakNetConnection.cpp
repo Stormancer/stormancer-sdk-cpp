@@ -297,4 +297,14 @@ namespace Stormancer
 		}
 		return updatePeerMetadata(ct);
 	}
+
+	std::string RakNetConnection::sessionId() const
+	{
+		return _sessionId;
+	}
+
+	void RakNetConnection::setSessionId(const std::string& sessionId)
+	{
+		_sessionId = sessionId;
+	}
 }

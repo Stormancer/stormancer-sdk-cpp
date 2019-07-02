@@ -56,11 +56,15 @@ namespace Stormancer
 
 		pplx::task<void> setTimeout(std::chrono::milliseconds timeout, pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
 
+		std::string sessionId() const override;
+
 #pragma endregion
 
 	protected:
 
 #pragma region protected_methods
+
+		void setSessionId(const std::string& sessionId) override;
 
 		void setConnectionState(ConnectionState connectionState) override;
 
@@ -75,6 +79,7 @@ namespace Stormancer
 		std::string _application;
 		uint64 _id = 0;
 		std::string _key;
+		std::string _sessionId;
 		time_t _connectionDate = nowTime_t();
 		std::weak_ptr<RakNet::RakPeerInterface> _peer;
 		RakNet::RakNetGUID _guid;
@@ -82,7 +87,6 @@ namespace Stormancer
 		DependencyScope _dependencyScope;
 		ConnectionState _connectionState = ConnectionState::Disconnected;
 		rxcpp::subjects::subject<ConnectionState> _connectionStateObservable;
-		
 		ILogger_ptr _logger;
 		std::string _closeReason;
 		

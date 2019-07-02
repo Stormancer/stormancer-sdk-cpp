@@ -12,9 +12,14 @@
 
 namespace Stormancer
 {
+	class ConnectionsRepository;
+	class P2PRequestModule;
+
 	/// Interface of a network connection.
 	class IConnection
 	{
+		friend class ConnectionsRepository;
+		friend class P2PRequestModule;
 
 	public:
 
@@ -74,6 +79,8 @@ namespace Stormancer
 
 		virtual pplx::task<void> setTimeout(std::chrono::milliseconds /*timeout*/, pplx::cancellation_token /*ct*/ = pplx::cancellation_token::none()) { return pplx::task_from_result(); }
 
+		virtual std::string sessionId() const = 0;
+
 		Event<std::string> onClose;
 
 #pragma endregion
@@ -81,6 +88,8 @@ namespace Stormancer
 	protected:
 
 #pragma region protected_methods
+
+		virtual void setSessionId(const std::string& sessionId) = 0;
 
 		virtual void setConnectionState(ConnectionState connectionState) = 0;
 

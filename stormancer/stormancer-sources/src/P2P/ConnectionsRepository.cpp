@@ -10,21 +10,21 @@ namespace Stormancer
 	{
 	}
 
-	pplx::task<std::shared_ptr<IConnection>> Stormancer::ConnectionsRepository::addPendingConnection(uint64 id)
+	pplx::task<std::shared_ptr<IConnection>> Stormancer::ConnectionsRepository::addPendingConnection(uint64 id, std::string clientSessionId)
 	{
 		pplx::task_completion_event<std::shared_ptr<IConnection>> tce;
 		{
 			std::lock_guard<std::mutex> l(_mutex);
-			_pendingP2PConnections.emplace(id, PendingConnection{ id,tce });
+			_pendingP2PConnections.emplace(id, PendingConnection{ id, clientSessionId, tce });
 		}
-		_logger->log(LogLevel::Info, "P2P", "Added pending connection from id ", std::to_string(id));
+		_logger->log(LogLevel::Info, "P2P", "Added pending connection (id=" + std::to_string(id) + ", sessionId=" + clientSessionId + ")");
 		return pplx::create_task(tce);
 	}
 
 	void ConnectionsRepository::newConnection(std::shared_ptr<IConnection> connection)
 	{
 		std::lock_guard<std::mutex> l(_mutex);
-		_logger->log(LogLevel::Trace, "Connections", "Adding connection " + connection->ipAddress(), std::to_string(connection->id()));
+		_logger->log(LogLevel::Trace, "Connections", "Adding connection (pi=" + connection->ipAddress() + ", id=" + std::to_string(connection->id()) + ", sessionId=" + connection->sessionId() + ")");
 
 		if (!connection)
 		{
@@ -59,6 +59,7 @@ namespace Stormancer
 		{
 			auto pc = it->second;
 			_pendingP2PConnections.erase(it);
+			connection->setSessionId(pc.sessionId);
 			pc.tce.set(connection);
 		}
 	}
@@ -75,7 +76,7 @@ namespace Stormancer
 				connections += c.first;
 				connections += ", ";
 			}
-			_logger->log(LogLevel::Debug, "connections", "Connection not found "+id+" connections : ("+connections+")","");
+			_logger->log(LogLevel::Debug, "connections", "Connection not found (id=" + id + ", connections=" + connections + ")");
 			return std::shared_ptr<IConnection>();
 		}
 		else
@@ -93,7 +94,7 @@ namespace Stormancer
 					connections += c.first;
 					connections += ", ";
 				}
-				_logger->log(LogLevel::Debug, "connections", "Connection not complete " + id + " connections : (" + connections + ")", "");
+				_logger->log(LogLevel::Debug, "connections", "Connection not complete (id=" + id + ", connections=" + connections + ")");
 				return std::shared_ptr<IConnection>();
 			}
 		}
@@ -147,7 +148,8 @@ namespace Stormancer
 			auto t = connectionFactory(id);
 			std::weak_ptr<ConnectionsRepository> wThat = this->shared_from_this();
 
-			auto result = t.then([wThat, id](pplx::task<std::shared_ptr<IConnection>> tc) {
+			auto result = t.then([wThat, id](pplx::task<std::shared_ptr<IConnection>> tc)
+			{
 				try
 				{
 					auto connection = tc.get();
@@ -155,7 +157,8 @@ namespace Stormancer
 					auto key = connection->key();
 					ConnectionContainer container;
 					container.connection = connection;
-					container.onCloseSubscription = connection->onClose.subscribe([wThat, pId, key](std::string /*reason*/) {
+					container.onCloseSubscription = connection->onClose.subscribe([wThat, pId, key](std::string /*reason*/)
+					{
 						if (auto that = wThat.lock())
 						{
 							that->_connections.erase(pId);
@@ -190,7 +193,8 @@ namespace Stormancer
 		auto connections = _connections;
 		for (auto c : connections)
 		{
-			tasks.push_back(c.second.then([wThat, reason](pplx::task<ConnectionContainer> t) {
+			tasks.push_back(c.second.then([wThat, reason](pplx::task<ConnectionContainer> t)
+			{
 				try
 				{
 					t.get().connection->close(reason);

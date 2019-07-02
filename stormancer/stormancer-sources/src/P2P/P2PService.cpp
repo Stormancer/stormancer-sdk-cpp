@@ -34,8 +34,8 @@ namespace Stormancer
 		}
 
 		std::weak_ptr<P2PService> weakSelf = this->shared_from_this();
-		return _sysCall->sendSystemRequest<P2PSession>(server.get(), (byte)SystemRequestIDTypes::ID_P2P_CREATE_SESSION, p2pToken, ct)
-			.then([weakSelf](P2PSession session)
+		return _sysCall->sendSystemRequest<P2PSessionResult>(server.get(), (byte)SystemRequestIDTypes::ID_P2P_CREATE_SESSION, p2pToken, ct)
+			.then([weakSelf](P2PSessionResult sessionResult)
 		{
 			auto self = weakSelf.lock();
 			if (!self)
@@ -43,10 +43,10 @@ namespace Stormancer
 				throw PointerDeletedException();
 			}
 
-			auto connection = self->_connections->getConnection(session.remotePeer);
+			auto connection = self->_connections->getConnection(sessionResult.RemoteSessionId);
 			if (!connection)
 			{
-				throw std::runtime_error(("Failed to get P2P connection for peer " + std::to_string(session.remotePeer)).c_str());
+				throw std::runtime_error(("Failed to get P2P connection for peer " + std::to_string(sessionResult.RemoteSessionId)).c_str());
 			}
 			else
 			{

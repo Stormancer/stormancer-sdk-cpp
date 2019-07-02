@@ -129,7 +129,13 @@ namespace Stormancer
 		throw std::runtime_error("Not supported");
 	}
 
-	
+	std::string RelayConnection::sessionId() const
+	{
+		return _sessionId;
+	}
 
-	
+	void RelayConnection::setSessionId(const std::string& sessionId)
+	{
+		_sessionId = sessionId;
+	}
 }
