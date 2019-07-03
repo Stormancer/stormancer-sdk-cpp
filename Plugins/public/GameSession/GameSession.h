@@ -21,7 +21,7 @@ namespace Stormancer
 		template<typename TServerResult, typename TClientResult>
 		pplx::task<TServerResult> postResult(const TClientResult& clientResult, pplx::cancellation_token ct = pplx::cancellation_token::none())
 		{
-			StreamWriter streamWriter = [&clientResult](obytestream& stream)
+			StreamWriter streamWriter = [clientResult](obytestream& stream)
 			{
 				Serializer serializer;
 				serializer.serialize(stream, clientResult);
