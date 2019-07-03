@@ -688,55 +688,56 @@ namespace Stormancer
 	{
 		ct = getLinkedCancellationToken(ct);
 
-		std::lock_guard<std::mutex> lg(_scenesMutex);
-
 		auto wClient = STORM_WEAK_FROM_THIS();
-
-		auto client = LockOrThrow(wClient);
 
 		if (scene->getCurrentConnectionState() != ConnectionState::Disconnected)
 		{
 			throw std::runtime_error("The scene is not in disconnected state.");
 		}
 
-		scene->setConnectionState(ConnectionState::Connecting);
-
-		ConnectToSceneMessage parameter;
-		parameter.Token = sceneToken;
-		for (auto r : localRoutes)
+		return scene->setConnectionState(ConnectionState::Connecting).then([scene, sceneToken, localRoutes, ct, wClient]
 		{
-			RouteDto routeDto;
-			routeDto.Handle = r->handle();
-			routeDto.Name = r->name();
-			routeDto.Metadata = r->metadata();
-			parameter.Routes << routeDto;
-		}
-		auto connections = _connections.lock();
-		if (!connections)
-		{
-			throw PointerDeletedException("Client destroyed");
-		}
+			auto client = LockOrThrow(wClient);
 
-		auto serverConnection = scene->hostConnection().lock();
+			ConnectToSceneMessage parameter;
+			parameter.Token = sceneToken;
+			for (auto r : localRoutes)
+			{
+				RouteDto routeDto;
+				routeDto.Handle = r->handle();
+				routeDto.Name = r->name();
+				routeDto.Metadata = r->metadata();
+				parameter.Routes << routeDto;
+			}
+			auto connections = client->_connections.lock();
+			if (!connections)
+			{
+				throw PointerDeletedException("Client destroyed");
+			}
 
-		if (!serverConnection)
-		{
-			throw PointerDeletedException("Connection not available");
-		}
-		parameter.ConnectionMetadata = serverConnection->metadata();
-		parameter.SceneMetadata = scene->getSceneMetadata();
+			auto serverConnection = scene->hostConnection().lock();
 
-		return client->sendSystemRequest<ConnectionResult>(serverConnection, (byte)SystemRequestIDTypes::ID_CONNECT_TO_SCENE, parameter, ct)
-			.then([wClient, scene, serverConnection](ConnectionResult result)
+			if (!serverConnection)
+			{
+				throw PointerDeletedException("Connection not available");
+			}
+			parameter.ConnectionMetadata = serverConnection->metadata();
+			parameter.SceneMetadata = scene->getSceneMetadata();
+
+			return client->sendSystemRequest<ConnectionResult>(serverConnection, (byte)SystemRequestIDTypes::ID_CONNECT_TO_SCENE, parameter, ct);
+
+		}, pplx::get_ambient_scheduler())
+			.then([wClient, scene](ConnectionResult result)
 		{
 			auto client = LockOrThrow(wClient);
 			scene->completeConnectionInitialization(result);
 			auto sceneDispatcher = client->_dependencyResolver.resolve<SceneDispatcher>();
+			auto serverConnection = scene->hostConnection().lock();
 			sceneDispatcher->addScene(serverConnection, scene);
-			scene->setConnectionState(ConnectionState::Connected);
 
 			client->logger()->log(LogLevel::Debug, "client", "Connected to scene", scene->address().toUri());
 
+			return scene->setConnectionState(ConnectionState::Connected);
 		}, ct);
 	}
 
@@ -822,49 +823,52 @@ namespace Stormancer
 			_scenes.erase(sceneId);
 		}
 
-		scene->setConnectionState(ConnectionState(ConnectionState::Disconnecting, reason));
-
-		auto sceneDispatcher = _dependencyResolver.resolve<SceneDispatcher>();
-		auto connections = _connections.lock();
-
-		if (!sceneDispatcher || !connections)
+		auto wClient = STORM_WEAK_FROM_THIS();
+		return scene->setConnectionState(ConnectionState(ConnectionState::Disconnecting, reason)).then([wClient, sceneHandle, initiatedByServer, scene]
 		{
-			throw PointerDeletedException("Client destroyed");
-		}
+			auto client = LockOrThrow(wClient);
+			auto sceneDispatcher = client->_dependencyResolver.resolve<SceneDispatcher>();
+			auto connections = client->_connections.lock();
 
-		if (auto c = connections->getConnection(scene->host()->id()))
-		{
-			sceneDispatcher->removeScene(c, sceneHandle);
-
-			pplx::cancellation_token_source cts;
-
-			auto timeOutToken = timeout(std::chrono::milliseconds(5000));
-			if (!initiatedByServer)
+			if (!sceneDispatcher || !connections)
 			{
-				auto wClient = STORM_WEAK_FROM_THIS();
-				return sendSystemRequest<void>(c, (byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, sceneHandle)
-					.then([wClient, scene, sceneId, reason]()
+				throw PointerDeletedException("Client destroyed");
+			}
+
+			if (auto c = connections->getConnection(scene->host()->id()))
+			{
+				sceneDispatcher->removeScene(c, sceneHandle);
+
+				if (!initiatedByServer)
 				{
-					if (auto client = wClient.lock())
-					{
-						client->logger()->log(LogLevel::Debug, "client", "Scene disconnected", sceneId);
-						scene->setConnectionState(ConnectionState(ConnectionState::Disconnecting, reason));
-						scene->setConnectionState(ConnectionState(ConnectionState::Disconnected, reason));
-					}
-				}, timeOutToken);
+					auto timeOutToken = timeout(std::chrono::milliseconds(5000));
+					return client->sendSystemRequest<void>(c, (byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, sceneHandle, timeOutToken);
+				}
 			}
-			else
-			{
-				this->logger()->log(LogLevel::Debug, "client", "Scene disconnected", sceneId);
-				scene->setConnectionState(ConnectionState(ConnectionState::Disconnecting, reason));
-				scene->setConnectionState(ConnectionState(ConnectionState::Disconnected, reason));
-				return pplx::task_from_result();
-			}
-		}
-		else
-		{
 			return pplx::task_from_result();
-		}
+		}, pplx::get_ambient_scheduler())
+			.then([wClient, scene, sceneId, reason](pplx::task<void> task)
+		{
+			std::string error;
+			try
+			{
+				task.get();
+			}
+			catch (const std::exception& ex)
+			{
+				error = ex.what();
+			}
+			if (auto client = wClient.lock())
+			{
+				if (!error.empty())
+				{
+					client->logger()->log(LogLevel::Trace, "client", "Error while disconnecting scene " + sceneId, error);
+				}
+				client->logger()->log(LogLevel::Debug, "client", "Scene disconnected", sceneId);
+				return scene->setConnectionState(ConnectionState(ConnectionState::Disconnected, reason));
+			}
+			return pplx::task_from_result();
+		});
 	}
 
 	pplx::task<void> Client::disconnectAllScenes()

@@ -164,7 +164,8 @@ namespace Stormancer
 		/// \param packet Receivedpacket.
 		void handleMessage(Packet_ptr packet);
 
-		void setConnectionState(ConnectionState connectionState);
+		STORM_NODISCARD
+		pplx::task<void> setConnectionState(ConnectionState connectionState);
 
 		pplx::task<std::shared_ptr<P2PScenePeer>> createScenePeerFromP2PConnection(std::shared_ptr<IConnection> connection, pplx::cancellation_token ct = pplx::cancellation_token::none());
 

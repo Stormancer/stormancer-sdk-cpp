@@ -387,7 +387,13 @@ namespace Stormancer
 	pplx::task<std::shared_ptr<GameSessionContainer>> GameSession_Impl::connectToGameSessionImpl(std::string token, bool useTunnel, pplx::cancellation_token ct)
 	{
 		std::weak_ptr<GameSession_Impl> wThat = this->shared_from_this();
-		return _wClient.lock()->connectToPrivateScene(token, IClient::SceneInitializer{}, ct)
+		auto client = _wClient.lock();
+
+		auto dispatcher = client->dependencyResolver().resolve<IActionDispatcher>();
+		pplx::task_options opts(dispatcher);
+		opts.set_cancellation_token(ct);
+
+		return client->connectToPrivateScene(token, IClient::SceneInitializer{}, ct)
 			.then([wThat, useTunnel](std::shared_ptr<Scene> scene)
 		{
 			if (auto that = wThat.lock())
@@ -405,16 +411,8 @@ namespace Stormancer
 					{
 						if (auto that = wThat.lock())
 						{
-							if (auto client = that->_wClient.lock())
-							{
-								pplx::create_task([wThat, state]() {
-									if (auto that = wThat.lock())
-									{
-										that->_onGameSessionConnectionChange(state);
-									}
-								}, client->dependencyResolver().resolve<IActionDispatcher>());
-							}
 							that->_currentGameSession = pplx::task_from_result<std::shared_ptr<GameSessionContainer>>(nullptr);
+							that->_onGameSessionConnectionChange(state);
 						}
 					}
 				});
@@ -483,6 +481,6 @@ namespace Stormancer
 			{
 				throw std::runtime_error("Game session destroyed");
 			}
-		}, ct);
+		}, opts);
 	}
 }
