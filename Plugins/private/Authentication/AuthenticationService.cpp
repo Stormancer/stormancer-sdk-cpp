@@ -227,9 +227,12 @@ namespace Stormancer
 					}
 					else
 					{
+						if (auto that = wThat.lock())
+						{
+							that->_authTask = nullptr;
+						}
 						throw std::runtime_error("Authentication failed");
 					}
-
 				}
 				catch (std::exception& ex)
 				{
