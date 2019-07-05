@@ -48,14 +48,15 @@
 			<PackageName>-$(PackageName)</PackageName>
 		</PropertyGroup>
 		<PropertyGroup>
-			<PackageDir>$(MSBuildThisFileDirectory)\StormancerSdkCpp$(PackageName)-$(GitDescribeOutput)</PackageDir>
+			<RelativePackageDir>StormancerSdkCpp$(PackageName)-$(GitDescribeOutput)</RelativePackageDir>
+			<PackageDir>$(MSBuildThisFileDirectory)\$(RelativePackageDir)</PackageDir>
 		</PropertyGroup>
 		<!-- Clean the directory if it exists -->
 		<RemoveDir Directories="$(PackageDir)" />
 		<MSBuild
 			Projects="@(BuildSpecsParsed)"
 			Targets="Restore;Build"
-			Properties="StormancerOutputDir=$(PackageDir)\"
+			Properties="StormancerRelativeOutputDir=$(RelativePackageDir)"
 		/>
 		<ZipDirectory SourceDirectory="$(PackageDir)" DestinationFile="$(PackageDir).zip" Overwrite="true" />
 		<RemoveDir Directories="$(PackageDir)" />

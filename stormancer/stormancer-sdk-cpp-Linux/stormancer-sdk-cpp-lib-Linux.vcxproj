@@ -174,7 +174,7 @@
       <Verbose>true</Verbose>
     </ClCompile>
     <RemotePostBuildEvent>
-      <Command>cd $(OutDir.Replace('\', '/')) &amp;&amp; echo -e 'create $(FinalLibName)\naddlib $(TargetFileName)\naddlib libRakNet_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\naddlib libcpprestsdk_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\nsave\nend' | ar -M &amp;&amp; cp -f $(FinalLibName) /tmp</Command>
+      <Command>cd $(RemoteOutDir) &amp;&amp; echo -e 'create $(FinalLibName)\naddlib $(TargetFileName)\naddlib libRakNet_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\naddlib libcpprestsdk_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\nsave\nend' | ar -M &amp;&amp; cp -f $(FinalLibName) /tmp</Command>
       <Message>Merge Libraries</Message>
       <AdditionalSourcesToCopyMapping>/tmp/$(FinalLibName):=$(ProjectDir)$(OutDir)$(FinalLibName)</AdditionalSourcesToCopyMapping>
     </RemotePostBuildEvent>
@@ -188,7 +188,7 @@
       <Verbose>true</Verbose>
     </ClCompile>
     <RemotePostBuildEvent>
-      <Command>cd $(OutDir.Replace('\', '/')) &amp;&amp; echo -e 'create $(FinalLibName)\naddlib $(TargetFileName)\naddlib libRakNet_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\naddlib libcpprestsdk_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\nsave\nend' | ar -M &amp;&amp; cp -f $(FinalLibName) /tmp</Command>
+      <Command>cd $(RemoteOutDir) &amp;&amp; echo -e 'create $(FinalLibName)\naddlib $(TargetFileName)\naddlib libRakNet_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\naddlib libcpprestsdk_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\nsave\nend' | ar -M &amp;&amp; cp -f $(FinalLibName) /tmp</Command>
       <Message>Merge Libraries</Message>
       <AdditionalSourcesToCopyMapping>/tmp/$(FinalLibName):=$(ProjectDir)$(OutDir)$(FinalLibName)</AdditionalSourcesToCopyMapping>
     </RemotePostBuildEvent>
@@ -202,7 +202,7 @@
       <Verbose>true</Verbose>
     </ClCompile>
     <RemotePostBuildEvent>
-      <Command>cd $(OutDir.Replace('\', '/')) &amp;&amp; echo -e 'create $(FinalLibName)\naddlib $(TargetFileName)\naddlib libRakNet_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\naddlib libcpprestsdk_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\nsave\nend' | ar -M &amp;&amp; cp -f $(FinalLibName) /tmp</Command>
+      <Command>cd $(RemoteOutDir) &amp;&amp; echo -e 'create $(FinalLibName)\naddlib $(TargetFileName)\naddlib libRakNet_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\naddlib libcpprestsdk_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\nsave\nend' | ar -M &amp;&amp; cp -f $(FinalLibName) /tmp</Command>
       <Message>Merge Libraries</Message>
       <AdditionalSourcesToCopyMapping>/tmp/$(FinalLibName):=$(ProjectDir)$(OutDir)$(FinalLibName)</AdditionalSourcesToCopyMapping>
     </RemotePostBuildEvent>
@@ -216,7 +216,7 @@
       <Verbose>true</Verbose>
     </ClCompile>
     <RemotePostBuildEvent>
-      <Command>cd $(OutDir.Replace('\', '/')) &amp;&amp; echo -e 'create $(FinalLibName)\naddlib $(TargetFileName)\naddlib libRakNet_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\naddlib libcpprestsdk_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\nsave\nend' | ar -M &amp;&amp; cp -f $(FinalLibName) /tmp</Command>
+      <Command>cd $(RemoteOutDir) &amp;&amp; echo -e 'create $(FinalLibName)\naddlib $(TargetFileName)\naddlib libRakNet_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\naddlib libcpprestsdk_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\nsave\nend' | ar -M &amp;&amp; cp -f $(FinalLibName) /tmp</Command>
       <Message>Merge Libraries</Message>
       <AdditionalSourcesToCopyMapping>/tmp/$(FinalLibName):=$(ProjectDir)$(OutDir)$(FinalLibName)</AdditionalSourcesToCopyMapping>
     </RemotePostBuildEvent>
@@ -230,7 +230,7 @@
       <Verbose>true</Verbose>
     </ClCompile>
     <RemotePostBuildEvent>
-      <Command>cd $(OutDir.Replace('\', '/')) &amp;&amp; echo -e 'create $(FinalLibName)\naddlib $(TargetFileName)\naddlib libRakNet_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\naddlib libcpprestsdk_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\nsave\nend' | ar -M &amp;&amp; cp -f $(FinalLibName) /tmp</Command>
+      <Command>cd $(RemoteOutDir) &amp;&amp; echo -e 'create $(FinalLibName)\naddlib $(TargetFileName)\naddlib libRakNet_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\naddlib libcpprestsdk_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\nsave\nend' | ar -M &amp;&amp; cp -f $(FinalLibName) /tmp</Command>
     </RemotePostBuildEvent>
     <RemotePostBuildEvent>
       <Message>Merge Libraries</Message>
@@ -248,7 +248,7 @@
       <Verbose>true</Verbose>
     </ClCompile>
     <RemotePostBuildEvent>
-      <Command>cd $(OutDir.Replace('\', '/')) &amp;&amp; echo -e 'create $(FinalLibName)\naddlib $(TargetFileName)\naddlib libRakNet_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\naddlib libcpprestsdk_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\nsave\nend' | ar -M &amp;&amp; cp -f $(FinalLibName) /tmp</Command>
+      <Command>cd $(RemoteOutDir) &amp;&amp; echo -e 'create $(FinalLibName)\naddlib $(TargetFileName)\naddlib libRakNet_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\naddlib libcpprestsdk_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\nsave\nend' | ar -M &amp;&amp; cp -f $(FinalLibName) /tmp</Command>
       <Message>Merge Libraries</Message>
       <AdditionalSourcesToCopyMapping>/tmp/$(FinalLibName):=$(ProjectDir)$(OutDir)$(FinalLibName)</AdditionalSourcesToCopyMapping>
     </RemotePostBuildEvent>
@@ -262,7 +262,7 @@
       <Verbose>true</Verbose>
     </ClCompile>
     <RemotePostBuildEvent>
-      <Command>cd $(OutDir.Replace('\', '/')) &amp;&amp; echo -e 'create $(FinalLibName)\naddlib $(TargetFileName)\naddlib libRakNet_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\naddlib libcpprestsdk_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\nsave\nend' | ar -M &amp;&amp; cp -f $(FinalLibName) /tmp</Command>
+      <Command>cd $(RemoteOutDir) &amp;&amp; echo -e 'create $(FinalLibName)\naddlib $(TargetFileName)\naddlib libRakNet_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\naddlib libcpprestsdk_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\nsave\nend' | ar -M &amp;&amp; cp -f $(FinalLibName) /tmp</Command>
       <Message>Merge Libraries</Message>
       <AdditionalSourcesToCopyMapping>/tmp/$(FinalLibName):=$(ProjectDir)$(OutDir)$(FinalLibName)</AdditionalSourcesToCopyMapping>
     </RemotePostBuildEvent>
@@ -276,7 +276,7 @@
       <Verbose>true</Verbose>
     </ClCompile>
     <RemotePostBuildEvent>
-      <Command>cd $(OutDir.Replace('\', '/')) &amp;&amp; echo -e 'create $(FinalLibName)\naddlib $(TargetFileName)\naddlib libRakNet_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\naddlib libcpprestsdk_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\nsave\nend' | ar -M &amp;&amp; cp -f $(FinalLibName) /tmp</Command>
+      <Command>cd $(RemoteOutDir) &amp;&amp; echo -e 'create $(FinalLibName)\naddlib $(TargetFileName)\naddlib libRakNet_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\naddlib libcpprestsdk_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\nsave\nend' | ar -M &amp;&amp; cp -f $(FinalLibName) /tmp</Command>
       <Message>Merge Libraries</Message>
       <AdditionalSourcesToCopyMapping>/tmp/$(FinalLibName):=$(ProjectDir)$(OutDir)$(FinalLibName)</AdditionalSourcesToCopyMapping>
     </RemotePostBuildEvent>

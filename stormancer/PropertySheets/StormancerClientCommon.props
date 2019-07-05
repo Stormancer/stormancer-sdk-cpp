@@ -6,7 +6,8 @@
 		This is the destination directory for the stormancer client library and public header files.
 		Override it on the MSBuild command line with /p:StormancerOutputDir=<path> if needed
 	-->
-	<StormancerOutputDir>$(StormancerSdkRoot)output\</StormancerOutputDir>
+	<StormancerRelativeOutputDir>output</StormancerRelativeOutputDir>
+	<StormancerOutputDir>$(StormancerSdkRoot)\$(StormancerRelativeOutputDir)\</StormancerOutputDir>
 	
 	<StormancerDependenciesOutputDir>$(StormancerSdkRoot)binaries\$(Configuration)\$(Platform)\</StormancerDependenciesOutputDir>
   </PropertyGroup>
@@ -22,6 +23,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetPlatformIdentifier)'=='Linux'">
 	<IntDir>$(StormancerSdkRoot)intermediate\$(ProjectName)\$(Configuration)\$(Platform)\$(StormancerLinuxToolset)\</IntDir>
+	<RemoteOutDir>$(RemoteRootDir)/$(StormancerRelativeOutputDir.Replace('\', '/'))/libs/</RemoteOutDir>
     <TargetName>lib$(ProjectName)_$(Configuration)_$(Platform)-$(StormancerLinuxToolset)</TargetName>
 	<FinalLibName>libStormancer_$(Configuration)_Linux-$(Platform)-$(StormancerLinuxToolset).a</FinalLibName>
   </PropertyGroup>
