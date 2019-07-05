@@ -1,20 +1,25 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	
 	<PropertyGroup>
-		<BuildSpecs>stormancer-sdk-cpp-141.sln:Platform=x64:Configuration=Debug;stormancer-sdk-cpp-141.sln:Platform=x64:Configuration=Release</BuildSpecs>
+		<BuildSpecs>[{"stormancer-sdk-cpp-141.sln":{"Platform":"x64","Configuration":"Debug"}},{"stormancer-sdk-cpp-141.sln":{"Platform":"x64","Configuration":"Release"}}]</BuildSpecs>
 		<!-- An identifier for the package, used when calling the Package target. Set this on the command line, for instance "Win64", or leave empty -->
 		<PackageName></PackageName>
 	</PropertyGroup>
-	<ItemGroup>
-		<BuildSpecsList Include="$(BuildSpecs)" />
-	</ItemGroup>
 	
-	<Target Name="ParseInputs">
-		<ItemGroup>
-			<!-- This item has to be declared in a target, because batching (the % thing) does not work outside of targets -->
-			<BuildSpecsParsed Include="$([System.String]::new('%(BuildSpecsList.Identity)').Split(':')[0])">
-				<AdditionalProperties>$([System.String]::new('%(Identity)').Substring($([System.String]::new('%(Identity)').IndexOf(":"))).Replace(":",";"))</AdditionalProperties>
-			</BuildSpecsParsed>
-		</ItemGroup>
+	<Target Name="BuildTasks">
+		<MSBuild
+			Projects="build-utils\MSBuildTasks\MSBuildTasks.sln"
+			Targets="Restore;Build"
+			Properties="Configuration=Release"
+		/>
+	</Target>
+	
+	<UsingTask TaskName="ParseBuildSpecsTask" AssemblyFile="binaries\BuildSpecsParser\Release\netstandard2.0\BuildSpecsParser.dll" />
+	
+	<Target Name="ParseInputs" DependsOnTargets="BuildTasks">
+		<ParseBuildSpecsTask JsonBuildSpecs="$(BuildSpecs)">
+			<Output TaskParameter="ParsedBuildSpecs" ItemName="BuildSpecsParsed" />
+		</ParseBuildSpecsTask>
 	</Target>
 
     <Target Name="Build" DependsOnTargets="ParseInputs">
