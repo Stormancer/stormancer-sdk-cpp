@@ -23,23 +23,28 @@ namespace Stormancer
 		return _rpcService->rpc<LeaderboardResult, std::string>("leaderboard.cursor", cursor);
 	}
 
-
-
 	Leaderboard_Impl::Leaderboard_Impl(std::weak_ptr<AuthenticationService> auth) :ClientAPI(auth)
 	{
-
 	}
 
 	//Query a leaderboard
 	pplx::task<LeaderboardResult> Leaderboard_Impl::query(LeaderboardQuery query)
 	{
-		return getLeaderboardService().then([query](std::shared_ptr<LeaderboardService> service) {return service->query(query); });
+		return getLeaderboardService()
+			.then([query](std::shared_ptr<LeaderboardService> service)
+		{
+			return service->query(query);
+		});
 	}
 
 	//Query a leaderboard using a cursor obtained from a LeaderboardResult (result.next or result.previous)
 	pplx::task<LeaderboardResult> Leaderboard_Impl::query(const std::string& cursor)
 	{
-		return getLeaderboardService().then([cursor](std::shared_ptr<LeaderboardService> service) {return service->query(cursor); });
+		return getLeaderboardService()
+			.then([cursor](std::shared_ptr<LeaderboardService> service)
+		{
+			return service->query(cursor);
+		});
 	}
 
 	pplx::task<std::shared_ptr<LeaderboardService>> Leaderboard_Impl::getLeaderboardService()

@@ -52,7 +52,7 @@ namespace Stormancer
 		MSGPACK_DEFINE(startId, scoreFilters, fieldFilters, size, skip, leaderboardName, friendsIds, order);
 	};
 
-	struct ScoreRecord
+	struct Score
 	{
 		std::string getAttachmentUrl();
 
@@ -67,18 +67,20 @@ namespace Stormancer
 	struct LeaderboardRanking
 	{
 		int32 ranking = 0;
-		ScoreRecord scoreRecord;
+		Score document;
 
-		MSGPACK_DEFINE(ranking, scoreRecord);
+		MSGPACK_DEFINE(ranking, document);
 	};
 
 	struct LeaderboardResult
 	{
+		std::string leaderboardName;
 		std::vector<LeaderboardRanking> results;
 		std::string next;
 		std::string previous;
+		int64 total;
 
-		MSGPACK_DEFINE(results, next, previous);
+		MSGPACK_DEFINE(leaderboardName, results, next, previous, total);
 	};
 }
 
