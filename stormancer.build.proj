@@ -34,6 +34,19 @@
 			Targets="Restore;Rebuild"
 		/>
     </Target>
+	
+	<Target Name="CheckHas7zip">
+		<Exec Command="7z" IgnoreExitCode="true">
+			<Output TaskParameter="ExitCode" PropertyName="ExitCode7z" />
+		</Exec>
+		<PropertyGroup Condition="'$(ExitCode7z)'!='9009'">
+			<Has7z>True</Has7z>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(ExitCode7z)'=='9009'">
+			<Has7z>False</Has7z>
+		</PropertyGroup>
+	</Target>
+	
     <Target Name="Package" DependsOnTargets="ParseInputs">
 		<Exec Command="git describe --dirty --match v[0-9].[0-9] --match v[0-9].[0-9].[0-9]" ConsoleToMsBuild="true" IgnoreExitCode="true">
 			<Output TaskParameter="ConsoleOutput" PropertyName="GitDescribeOutput" />
@@ -51,14 +64,21 @@
 			<RelativePackageDir>StormancerSdkCpp$(PackageName)-$(GitDescribeOutput)</RelativePackageDir>
 			<PackageDir>$(MSBuildThisFileDirectory)\$(RelativePackageDir)</PackageDir>
 		</PropertyGroup>
-		<!-- Clean the directory if it exists -->
-		<RemoveDir Directories="$(PackageDir)" />
 		<MSBuild
 			Projects="@(BuildSpecsParsed)"
 			Targets="Restore;Build"
 			Properties="StormancerRelativeOutputDir=$(RelativePackageDir)"
 		/>
-		<ZipDirectory SourceDirectory="$(PackageDir)" DestinationFile="$(PackageDir).zip" Overwrite="true" />
-		<RemoveDir Directories="$(PackageDir)" />
     </Target>
+	
+	<Target Name="CompressPackage7zip" DependsOnTargets="CheckHas7zip" Condition="'$(Has7z)'=='True'">
+		<Exec Command="7z a $(PackageDir).7z $(PackageDir)" />
+	</Target>
+	
+	<Target Name="CompressPackageZip" DependsOnTargets="CheckHas7zip" Condition="'$(Has7z)'=='False'">
+		<ZipDirectory SourceDirectory="$(PackageDir)" DestinationFile="$(PackageDir).zip" Overwrite="true" />
+	</Target>
+	
+	<Target Name="CompressPackage" AfterTargets="Package" DependsOnTargets="CheckHas7zip;CompressPackage7zip;CompressPackageZip" />
+
 </Project>
