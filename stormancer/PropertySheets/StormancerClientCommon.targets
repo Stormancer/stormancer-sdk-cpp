@@ -27,6 +27,7 @@
       <ClInclude Include="@(EmbeddedPluginPublicHeaders)" />
     </ItemGroup>
   </Target>
+  
   <Target Name="GetGitVersion" BeforeTargets="PrepareForBuild">
 	<Exec Command="git describe --dirty --match v[0-9].[0-9] --match v[0-9].[0-9].[0-9]" ConsoleToMsBuild="true" IgnoreExitCode="true">
 		<Output TaskParameter="ConsoleOutput" PropertyName="GitDescribeOutput" />
@@ -52,34 +53,64 @@
 		</ClCompile>
 	</ItemGroup>
   </Target>
-  <Target Name="AfterBuild">
-    <ItemGroup>
+    
+  <ItemGroup>
       <RxcppIncludes Include="$(StormancerSdkRoot)dependencies\rxcpp\Rx\v2\src\rxcpp\**\*.*" />
-      <RestSdkIncludes Include="$(StormancerSdkRoot)dependencies\cpprestsdk\Release\include\**\*.*" />
+      <RestSdkIncludes
+		Include="$(StormancerSdkRoot)dependencies\cpprestsdk\Release\include\**\*.*"
+		Exclude="$(StormancerSdkRoot)dependencies\cpprestsdk\Release\include\stdafx.h"
+	  />
       <MsgpackIncludes Include="$(StormancerSdkRoot)dependencies\msgpack-c\include\**\*.*" />
-      <StormancerIncludes Include="$(StormancerSdkRoot)stormancer\stormancer-sources\include\public\**\*.*" />
-      <RaknetIncludes Include="$(StormancerSdkRoot)dependencies\RakNet\RakNet\Source\**\*.h" />
+      <StormancerIncludes
+		  Include="$(StormancerSdkRoot)stormancer\stormancer-sources\include\public\**\*.*"
+		  Exclude="$(StormancerSdkRoot)stormancer\stormancer-sources\include\public\stormancer\Version.h"
+	  />
       <BuildFiles Include="$(StormancerSdkRoot)Build\**\*.*" />
-    </ItemGroup>
-	<!-- Clean old includes -->
-	<RemoveDir Directories="$(StormancerOutputDir)include" />
-    <Copy SourceFiles="@(BuildFiles)" DestinationFiles="@(BuildFiles->'$(StormancerOutputDir)build\%(RecursiveDir)%(Filename)%(Extension)')" />
-    <!--<Copy SourceFiles="@(RaknetIncludes)" DestinationFiles="@(RaknetIncludes->'$(StormancerOutputDir)include\%(RecursiveDir)%(Filename)%(Extension)')" />-->
-    <Copy SourceFiles="@(RxcppIncludes)" DestinationFiles="@(RxcppIncludes->'$(StormancerOutputDir)include\rxcpp\%(RecursiveDir)%(Filename)%(Extension)')" />
-    <Copy SourceFiles="@(RestSdkIncludes)" DestinationFiles="@(RestSdkIncludes->'$(StormancerOutputDir)include\%(RecursiveDir)%(Filename)%(Extension)')" />
-    <Delete Files="$(StormancerOutputDir)include\stdafx.h" />
-    <Copy SourceFiles="@(MsgpackIncludes)" DestinationFiles="@(MsgpackIncludes->'$(StormancerOutputDir)include\%(RecursiveDir)%(Filename)%(Extension)')" />
-    <Copy SourceFiles="@(StormancerIncludes)" DestinationFiles="@(StormancerIncludes->'$(StormancerOutputDir)include\%(RecursiveDir)%(Filename)%(Extension)')" />
-	<!-- Hardcode the version number into Version.h -->
+	  <HeaderFilesToCopy Include="@(BuildFiles->'$(StormancerOutputDir)build\%(RecursiveDir)%(Filename)%(Extension)');
+		@(RxcppIncludes->'$(StormancerOutputDir)include\rxcpp\%(RecursiveDir)%(Filename)%(Extension)');
+		@(RestSdkIncludes->'$(StormancerOutputDir)include\%(RecursiveDir)%(Filename)%(Extension)');
+		@(MsgpackIncludes->'$(StormancerOutputDir)include\%(RecursiveDir)%(Filename)%(Extension)');
+		@(StormancerIncludes->'$(StormancerOutputDir)include\%(RecursiveDir)%(Filename)%(Extension)')"
+	  />
+  </ItemGroup>
+
+  <Target Name="AfterBuild">
+	<!-- Remove headers that have been deleted in the source dir from the output dir -->
+	<ItemGroup>
+		<HeadersToBeRemoved
+			Include="$(StormancerOutputDir)include\**\*.*"
+			Exclude="@(HeaderFilesToCopy);$(StormancerOutputDir)include\stormancer\Version.h;@(EmbeddedPluginPublicHeaders->'$(StormancerOutputDir)include\%(PluginName)\%(Filename)%(Extension)')"
+		/>
+	</ItemGroup>
+	<Delete Files="@(HeadersToBeRemoved)" />
+    <Copy SourceFiles="@(BuildFiles)" DestinationFiles="@(BuildFiles->'$(StormancerOutputDir)build\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(RxcppIncludes)" DestinationFiles="@(RxcppIncludes->'$(StormancerOutputDir)include\rxcpp\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(RestSdkIncludes)" DestinationFiles="@(RestSdkIncludes->'$(StormancerOutputDir)include\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(MsgpackIncludes)" DestinationFiles="@(MsgpackIncludes->'$(StormancerOutputDir)include\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(StormancerIncludes)" DestinationFiles="@(StormancerIncludes->'$(StormancerOutputDir)include\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
+  
+  <Target Name="MakeVersionHeader" AfterTargets="AfterBuild">
+  	<!-- Hardcode the version number into Version.h -->
 	<ItemGroup>
 		<!-- Use [System.IO.File]::ReadAllText() instead of the ReadLinesFromFile task, because the latter does not preserve whitespace. -->
-		<BuildConfigContents Include="$([System.IO.File]::ReadAllText('$(StormancerOutputDir)include\stormancer\Version.h'))" />
+		<BuildConfigContents Include="$([System.IO.File]::ReadAllText('$(StormancerSdkRoot)stormancer\stormancer-sources\include\public\stormancer\Version.h'))" />
 		<BuildConfigVersioned Include="@(BuildConfigContents->Replace('#define STORM_VERSION %22%22', '#define STORM_VERSION %22$(GitDescribeOutput)%22'))" />
 		<BuildConfigVersionedFinal Include="@(BuildConfigVersioned->Replace('#define STORM_VERSION_HASH noversion', '#define STORM_VERSION_HASH $(GitHash)'))" />
 	</ItemGroup>
-	<WriteLinesToFile File="$(StormancerOutputDir)include\stormancer\Version.h" Lines="@(BuildConfigVersionedFinal)" Overwrite="true" />
+	<WriteLinesToFile
+		File="$(StormancerOutputDir)include\stormancer\Version.h"
+		Lines="@(BuildConfigVersionedFinal)"
+		Overwrite="true"
+		WriteOnlyWhenDifferent="true"
+	/>
   </Target>
-  <Target Name="CopyPluginHeaders" AfterTargets="AfterBuild">
+  
+  <Target Name="CopyPluginHeaders" AfterTargets="AfterBuild"
+	Inputs="@(EmbeddedPluginPublicHeaders)"
+	Outputs="@(EmbeddedPluginPublicHeaders->'$(StormancerOutputDir)include\%(PluginName)\%(Filename)%(Extension)')"
+  >
     <Copy SourceFiles="@(EmbeddedPluginPublicHeaders)" DestinationFiles="@(EmbeddedPluginPublicHeaders->'$(StormancerOutputDir)include\%(PluginName)\%(Filename)%(Extension)')" />
   </Target>
+  
 </Project>
