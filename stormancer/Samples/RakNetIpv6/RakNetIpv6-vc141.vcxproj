@@ -81,7 +81,7 @@
   </PropertyGroup>
   <ImportGroup Label="PropertySheets">
     <Import Project="..\..\PropertySheets\OutputDirs.props" />
-    <Import Project="..\tester-sources\samples.props" />
+    <Import Project="..\..\PropertySheets\Samples.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />

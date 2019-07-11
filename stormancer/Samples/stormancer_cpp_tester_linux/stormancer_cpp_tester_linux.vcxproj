@@ -52,7 +52,7 @@
   <ImportGroup Label="PropertySheets">
     <Import Project="..\..\PropertySheets\LinuxCommon.props" />
     <Import Project="..\..\PropertySheets\OutputDirs.props" />
-    <Import Project="..\tester-sources\samples.props" />
+    <Import Project="..\..\PropertySheets\Samples.props" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
