@@ -18,6 +18,7 @@
 namespace Stormancer
 {
 	class DependencyScope;
+	class ContainerBuilder;
 	class DependencyScopeImpl;
 
 	enum class DependencyLifetime
@@ -156,139 +157,6 @@ namespace Stormancer
 		RegistrationData& _data;
 	};
 
-
-	/// <summary>
-	/// The ContainerBuilder is the primary element of the dependency injection mechanism.
-	/// Use it to set up the dependencies that you want to make available to consumer components.
-	/// </summary>
-	/// <remarks>
-	/// Objects of this class are not thread-safe.
-	/// </remarks>
-	/// <example>
-	/// <code>
-	/// ContainerBuilder builder;
-	/// builder.registerDependency&lt;Foo&gt;(fooFactory);
-	/// builder.registerDependency&lt;Bar&gt;(barFactory);
-	/// DependencyScope rootScope = builder.build();
-	/// </code>
-	/// </example>
-	class ContainerBuilder
-	{
-	public:
-
-		ContainerBuilder() : ContainerBuilder(0) {}
-
-		/// <summary>
-		/// Register a dependency into the container.
-		/// </summary>
-		/// <typeparam name="T">
-		/// Type of the dependency to be registered.
-		/// This is the concrete, actual type of the dependency.
-		/// If you want this dependency to be registered as one or more types different from <c>T</c>, use <c>RegistrationHandle::as()</c>.
-		/// </typeparam>
-		/// <param name="factory">
-		/// Factory function for the dependency.
-		/// This function will be called when an instance of the dependency needs to be created. It may be called from mutliple threads at the same time.
-		/// Dependencies are always instantiated lazily; that is, only when code that needs them directly or indirectly 
-		/// through a <c>DependencyScope::resolve()</c> or <c>DependencyScope::resolveAll()</c> call.
-		/// For details about the lifetime of dependency instances, see <c>RegistrationHandle</c>.
-		/// </param>
-		/// <returns>
-		/// A <c>RegistrationHandle</c> that can be used to configure the dependency. See the API documentation for <c>RegistrationHandle</c> for details.
-		/// </returns>
-		template<typename T>
-		RegistrationHandle<T> registerDependency(std::function<std::shared_ptr<T>(const DependencyScope&)> factory)
-		{
-			_registrations.emplace_back();
-			RegistrationData& data = _registrations.back();
-			data.factory = factory;
-			data.id = _registrationCounter;
-			data.actualType = getTypeHash<T>();
-			++_registrationCounter;
-			return RegistrationHandle<T>(data);
-		}
-
-		/// <summary>
-		/// Register an existing instance of type <c>T</c> as a dependency.
-		/// </summary>
-		/// <remarks>
-		/// This object will be registered with the "single instance" lifetime.
-		/// Choosing a different lifetime will have no observable effect.
-		/// </remarks>
-		/// <typeparam name="T">Type of the object pointed to by <c>instance</c>.</typeparam>
-		/// <param name="instance">Instance of type <c>T</c> to register.</param>
-		/// <returns>
-		/// A <c>RegistrationHandle</c> that can be used to configure the dependency. See the API documentation for <c>RegistrationHandle</c> for details.
-		/// </returns>
-		template<typename T>
-		RegistrationHandle<T> registerDependency(std::shared_ptr<T> instance)
-		{
-			return registerDependency<T>([instance](const DependencyScope&) { return instance; }).singleInstance();
-		}
-
-		/// <summary>
-		/// Register a dependency of type <c>T</c> with an automatically generated factory.
-		/// </summary>
-		/// <remarks>
-		/// <c>T</c> must have a public constructor that takes arguments of types <c>TCtorArgs</c> as <c>std::shared_ptr</c>s,
-		/// in the same order as they are supplied to this method.
-		/// When <c>T</c> is resolved in a given scope, dependencies of types <c>TCtorArgs</c> will also be resolved from this scope
-		/// and passed to <c>T</c>'s constructor.
-		/// If <c>T</c>'s constructor takes a vector of dependencies of a certain type <c>U</c> (<c>std::vector&lt;std::shared_ptr&lt;U&gt;&gt;</c>),
-		/// you should pass a <c>ContainerBuilder::All&lt;U&gt;</c> type argument.
-		/// </remarks>
-		/// <typeparam name="T">Concrete type of the dependency to be registered.</typeparam>
-		/// <typeparam name="TCtorArgs">Types of the arguments for <c>T</c>'s constructor.</typeparam>
-		/// <returns>
-		/// A <c>RegistrationHandle</c> that can be used to configure the dependency. See the API documentation for <c>RegistrationHandle</c> for details.
-		/// </returns>
-		template<typename T, typename... TCtorArgs>
-		RegistrationHandle<T> registerDependency();
-
-		/// <summary>
-		/// A "type tag" struct to be used as a type argument to <c>registerDependency()</c> when denoting a dependency on multiple instances of <c>T</c>.
-		/// </summary>
-		/// <seealso cref="registerDependency()"/>
-		template<typename T> struct All {};
-
-		/// <summary>
-		/// Build a <c>DependencyScope</c> from this container.
-		/// </summary>
-		/// <remarks>
-		/// Call this method when you are done registering and configuring dependencies.
-		/// </remarks>
-		/// <returns>
-		/// A <c>DependencyScope</c> containing the registrations that were added to this ContainerBuilder.
-		/// </returns>
-		DependencyScope build();
-
-	private:
-
-		friend class DependencyScopeImpl;
-
-		ContainerBuilder(RegistrationId baseId) : _registrationCounter(baseId) {}
-
-		template<typename T>
-		struct CtorResolver
-		{
-			static std::shared_ptr<T> resolve(const DependencyScope& scope)
-			{
-				return scope.resolve<T>();
-			}
-		};
-
-		template<typename T>
-		struct CtorResolver<All<T>>
-		{
-			static std::vector<std::shared_ptr<T>> resolve(const DependencyScope& scope)
-			{
-				return scope.resolveAll<T>();
-			}
-		};
-
-		RegistrationId _registrationCounter;
-		std::vector<RegistrationData> _registrations;
-	};
 
 	/// <summary>
 	/// An object from which dependencies can be retrieved.
@@ -430,6 +298,140 @@ namespace Stormancer
 		std::vector<std::shared_ptr<void>> resolveAllInternal(uint64 typeHash) const;
 
 		std::shared_ptr<DependencyScopeImpl> _impl;
+	};
+
+
+	/// <summary>
+	/// The ContainerBuilder is the primary element of the dependency injection mechanism.
+	/// Use it to set up the dependencies that you want to make available to consumer components.
+	/// </summary>
+	/// <remarks>
+	/// Objects of this class are not thread-safe.
+	/// </remarks>
+	/// <example>
+	/// <code>
+	/// ContainerBuilder builder;
+	/// builder.registerDependency&lt;Foo&gt;(fooFactory);
+	/// builder.registerDependency&lt;Bar&gt;(barFactory);
+	/// DependencyScope rootScope = builder.build();
+	/// </code>
+	/// </example>
+	class ContainerBuilder
+	{
+	public:
+
+		ContainerBuilder() : ContainerBuilder(0) {}
+
+		/// <summary>
+		/// Register a dependency into the container.
+		/// </summary>
+		/// <typeparam name="T">
+		/// Type of the dependency to be registered.
+		/// This is the concrete, actual type of the dependency.
+		/// If you want this dependency to be registered as one or more types different from <c>T</c>, use <c>RegistrationHandle::as()</c>.
+		/// </typeparam>
+		/// <param name="factory">
+		/// Factory function for the dependency.
+		/// This function will be called when an instance of the dependency needs to be created. It may be called from mutliple threads at the same time.
+		/// Dependencies are always instantiated lazily; that is, only when code that needs them directly or indirectly 
+		/// through a <c>DependencyScope::resolve()</c> or <c>DependencyScope::resolveAll()</c> call.
+		/// For details about the lifetime of dependency instances, see <c>RegistrationHandle</c>.
+		/// </param>
+		/// <returns>
+		/// A <c>RegistrationHandle</c> that can be used to configure the dependency. See the API documentation for <c>RegistrationHandle</c> for details.
+		/// </returns>
+		template<typename T>
+		RegistrationHandle<T> registerDependency(std::function<std::shared_ptr<T>(const DependencyScope&)> factory)
+		{
+			_registrations.emplace_back();
+			RegistrationData& data = _registrations.back();
+			data.factory = factory;
+			data.id = _registrationCounter;
+			data.actualType = getTypeHash<T>();
+			++_registrationCounter;
+			return RegistrationHandle<T>(data);
+		}
+
+		/// <summary>
+		/// Register an existing instance of type <c>T</c> as a dependency.
+		/// </summary>
+		/// <remarks>
+		/// This object will be registered with the "single instance" lifetime.
+		/// Choosing a different lifetime will have no observable effect.
+		/// </remarks>
+		/// <typeparam name="T">Type of the object pointed to by <c>instance</c>.</typeparam>
+		/// <param name="instance">Instance of type <c>T</c> to register.</param>
+		/// <returns>
+		/// A <c>RegistrationHandle</c> that can be used to configure the dependency. See the API documentation for <c>RegistrationHandle</c> for details.
+		/// </returns>
+		template<typename T>
+		RegistrationHandle<T> registerDependency(std::shared_ptr<T> instance)
+		{
+			return registerDependency<T>([instance](const DependencyScope&) { return instance; }).singleInstance();
+		}
+
+		/// <summary>
+		/// Register a dependency of type <c>T</c> with an automatically generated factory.
+		/// </summary>
+		/// <remarks>
+		/// <c>T</c> must have a public constructor that takes arguments of types <c>TCtorArgs</c> as <c>std::shared_ptr</c>s,
+		/// in the same order as they are supplied to this method.
+		/// When <c>T</c> is resolved in a given scope, dependencies of types <c>TCtorArgs</c> will also be resolved from this scope
+		/// and passed to <c>T</c>'s constructor.
+		/// If <c>T</c>'s constructor takes a vector of dependencies of a certain type <c>U</c> (<c>std::vector&lt;std::shared_ptr&lt;U&gt;&gt;</c>),
+		/// you should pass a <c>ContainerBuilder::All&lt;U&gt;</c> type argument.
+		/// </remarks>
+		/// <typeparam name="T">Concrete type of the dependency to be registered.</typeparam>
+		/// <typeparam name="TCtorArgs">Types of the arguments for <c>T</c>'s constructor.</typeparam>
+		/// <returns>
+		/// A <c>RegistrationHandle</c> that can be used to configure the dependency. See the API documentation for <c>RegistrationHandle</c> for details.
+		/// </returns>
+		template<typename T, typename... TCtorArgs>
+		RegistrationHandle<T> registerDependency();
+
+		/// <summary>
+		/// A "type tag" struct to be used as a type argument to <c>registerDependency()</c> when denoting a dependency on multiple instances of <c>T</c>.
+		/// </summary>
+		/// <seealso cref="registerDependency()"/>
+		template<typename T> struct All {};
+
+		/// <summary>
+		/// Build a <c>DependencyScope</c> from this container.
+		/// </summary>
+		/// <remarks>
+		/// Call this method when you are done registering and configuring dependencies.
+		/// </remarks>
+		/// <returns>
+		/// A <c>DependencyScope</c> containing the registrations that were added to this ContainerBuilder.
+		/// </returns>
+		DependencyScope build();
+
+	private:
+
+		friend class DependencyScopeImpl;
+
+		ContainerBuilder(RegistrationId baseId) : _registrationCounter(baseId) {}
+
+		template<typename T>
+		struct CtorResolver
+		{
+			static std::shared_ptr<T> resolve(const DependencyScope& scope)
+			{
+				return scope.resolve<T>();
+			}
+		};
+
+		template<typename T>
+		struct CtorResolver<All<T>>
+		{
+			static std::vector<std::shared_ptr<T>> resolve(const DependencyScope& scope)
+			{
+				return scope.resolveAll<T>();
+			}
+		};
+
+		RegistrationId _registrationCounter;
+		std::vector<RegistrationData> _registrations;
 	};
 
 	//-------------------------------------------------------------------------------
