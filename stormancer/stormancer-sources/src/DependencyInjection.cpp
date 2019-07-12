@@ -78,20 +78,6 @@ namespace Stormancer
 			return DependencyScope(scopeBuilder, tag, _outer->_impl);
 		}
 
-		bool isValid() const
-		{
-			if (!_hasParent)
-			{
-				return true;
-			}
-
-			if (auto parent = _parent.lock())
-			{
-				return parent->isValid();
-			}
-			return false;
-		}
-
 		// Used when moving DependencyScope
 		void changeOuter(DependencyScope* newOuter)
 		{
@@ -253,7 +239,7 @@ namespace Stormancer
 	{
 		if (_impl)
 		{
-			return _impl->isValid();
+			return true;
 		}
 		// Uninitialized (default-constructed)
 		return false;
@@ -264,10 +250,6 @@ namespace Stormancer
 		if (!_impl)
 		{
 			throw DependencyResolutionException("This DependencyScope is invalid because it was default-constructed.");
-		}
-		if (!_impl->isValid())
-		{
-			throw DependencyResolutionException("This DependencyScope is no longer valid because one or more of its parent scope(s) has been deleted.");
 		}
 	}
 

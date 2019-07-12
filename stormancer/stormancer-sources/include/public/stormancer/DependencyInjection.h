@@ -234,6 +234,8 @@ namespace Stormancer
 		/// in the same order as they are supplied to this method.
 		/// When <c>T</c> is resolved in a given scope, dependencies of types <c>TCtorArgs</c> will also be resolved from this scope
 		/// and passed to <c>T</c>'s constructor.
+		/// If <c>T</c>'s constructor takes a vector of dependencies of a certain type <c>U</c> (<c>std::vector&lt;std::shared_ptr&lt;U&gt;&gt;</c>),
+		/// you should pass a <c>ContainerBuilder::All&lt;U&gt;</c> type argument.
 		/// </remarks>
 		/// <typeparam name="T">Concrete type of the dependency to be registered.</typeparam>
 		/// <typeparam name="TCtorArgs">Types of the arguments for <c>T</c>'s constructor.</typeparam>
@@ -242,6 +244,12 @@ namespace Stormancer
 		/// </returns>
 		template<typename T, typename... TCtorArgs>
 		RegistrationHandle<T> registerDependency();
+
+		/// <summary>
+		/// A "type tag" struct to be used as a type argument to <c>registerDependency()</c> when denoting a dependency on multiple instances of <c>T</c>.
+		/// </summary>
+		/// <seealso cref="registerDependency()"/>
+		template<typename T> struct All {};
 
 		/// <summary>
 		/// Build a <c>DependencyScope</c> from this container.
@@ -259,6 +267,24 @@ namespace Stormancer
 		friend class DependencyScopeImpl;
 
 		ContainerBuilder(RegistrationId baseId) : _registrationCounter(baseId) {}
+
+		template<typename T>
+		struct CtorResolver
+		{
+			static std::shared_ptr<T> resolve(const DependencyScope& scope)
+			{
+				return scope.resolve<T>();
+			}
+		};
+
+		template<typename T>
+		struct CtorResolver<All<T>>
+		{
+			static std::vector<std::shared_ptr<T>> resolve(const DependencyScope& scope)
+			{
+				return scope.resolveAll<T>();
+			}
+		};
 
 		RegistrationId _registrationCounter;
 		std::vector<RegistrationData> _registrations;
@@ -415,7 +441,7 @@ namespace Stormancer
 		return registerDependency<T>([](const DependencyScope& scope)
 		{
 			(void)scope; // Suppress unused parameter warning when TCtorArgs is empty
-			return std::make_shared<T>(scope.resolve<TCtorArgs>()...);
+			return std::make_shared<T>(CtorResolver<TCtorArgs>::resolve(scope)...);
 		});
 	}
 }
