@@ -7,6 +7,7 @@
 #include "stormancer/Logger/ConsoleLogger.h"
 #include "stormancer/IClient.h"
 #include "stormancer/RPC/Service.h"
+#include "stormancer/Utilities/TaskUtilities.h"
 
 //static std::string endpoint = "http://api.stormancer.com:8081/";
 //static std::string account = "samples";
@@ -134,7 +135,7 @@ void testP2P(std::string endpoint, std::string account, std::string application,
 	}
 }
 
-Stormancer::Subscription hostPeerConnectedSub, guestPeerConnectedSub;
+Stormancer::Subscription hostPeerConnectedSub, hostPeerDisconnectedSub, guestPeerConnectedSub, guestPeerDisconnectedSub;
 
 void p2pConnect(std::shared_ptr<Stormancer::IClient> hostClient, std::shared_ptr<Stormancer::IClient> guestClient, Stormancer::ILogger_ptr logger, std::string sceneId)
 {
@@ -142,13 +143,17 @@ void p2pConnect(std::shared_ptr<Stormancer::IClient> hostClient, std::shared_ptr
 	std::shared_ptr<Stormancer::Scene> guestScene;
 	pplx::task_completion_event<std::shared_ptr<Stormancer::IP2PScenePeer>> hostPeerTce;
 
+	pplx::task_completion_event<void> hostReceivedMessage;
+	pplx::task_completion_event<void> guestReceivedMessage;
+
 	try
 	{
-		hostScene = hostClient->connectToPublicScene(sceneId, [logger](std::shared_ptr<Stormancer::Scene> scene)
+		hostScene = hostClient->connectToPublicScene(sceneId, [logger, hostReceivedMessage](std::shared_ptr<Stormancer::Scene> scene)
 		{
-			scene->addRoute("test", [logger](Stormancer::Packetisp_ptr packet)
+			scene->addRoute("test", [logger, hostReceivedMessage](Stormancer::Packetisp_ptr packet)
 			{
 				logger->log(Stormancer::LogLevel::Info, "P2P_test", "host received a scene message from a peer", packet->readObject<std::string>());
+				hostReceivedMessage.set();
 			}, Stormancer::MessageOriginFilter::Peer);
 		}).get();
 	}
@@ -160,11 +165,12 @@ void p2pConnect(std::shared_ptr<Stormancer::IClient> hostClient, std::shared_ptr
 
 	try
 	{
-		guestScene = guestClient->connectToPublicScene(sceneId, [logger](std::shared_ptr<Stormancer::Scene> scene)
+		guestScene = guestClient->connectToPublicScene(sceneId, [logger, guestReceivedMessage](std::shared_ptr<Stormancer::Scene> scene)
 		{
-			scene->addRoute("test", [logger](Stormancer::Packetisp_ptr packet)
+			scene->addRoute("test", [logger, guestReceivedMessage](Stormancer::Packetisp_ptr packet)
 			{
 				logger->log(Stormancer::LogLevel::Info, "P2P_test", "guest received a scene message from a peer", packet->readObject<std::string>());
+				guestReceivedMessage.set();
 			}, Stormancer::MessageOriginFilter::Peer);
 		}).get();
 	}
@@ -180,9 +186,19 @@ void p2pConnect(std::shared_ptr<Stormancer::IClient> hostClient, std::shared_ptr
 		hostPeerTce.set(peer);
 	});
 
+	hostPeerDisconnectedSub = hostScene->onPeerDisconnected().subscribe([logger](std::shared_ptr<Stormancer::IP2PScenePeer> peer)
+	{
+		logger->log(Stormancer::LogLevel::Info, "P2P_test", "Peer disconnected from host scene", peer->sessionId());
+	});
+
 	guestPeerConnectedSub = guestScene->onPeerConnected().subscribe([logger](std::shared_ptr<Stormancer::IP2PScenePeer> peer)
 	{
 		logger->log(Stormancer::LogLevel::Info, "P2P_test", "Peer connected on guest scene", peer->sessionId());
+	});
+
+	guestPeerDisconnectedSub = guestScene->onPeerDisconnected().subscribe([logger](std::shared_ptr<Stormancer::IP2PScenePeer> peer)
+	{
+		logger->log(Stormancer::LogLevel::Info, "P2P_test", "Peer disconnected from guest scene", peer->sessionId());
 	});
 
 	auto hostRpc = hostScene->dependencyResolver().resolve<Stormancer::RpcService>();
@@ -207,6 +223,11 @@ void p2pConnect(std::shared_ptr<Stormancer::IClient> hostClient, std::shared_ptr
 		Stormancer::Serializer{}.serialize(stream, std::string("message from host!"));
 	});
 
+	Stormancer::when_all(pplx::create_task(guestReceivedMessage), pplx::create_task(hostReceivedMessage)).get();
+	auto hostDisconnect = hostPeer->disconnect();
+	guestPeer->disconnect().get();
+	hostDisconnect.get();
+
 	// Test comparison operators
 	assert(guestPeer != hostPeer);
 	assert(!(guestPeer == hostPeer));
@@ -225,10 +246,19 @@ void p2pConnect(std::shared_ptr<Stormancer::IClient> hostClient, std::shared_ptr
 	UdpSocket reverseHostSocket(logger, 0, false);
 	reverseHostSocket.Send(reverseHostTunnel->port, "blih");
 
+	Stormancer::when_all(pplx::create_task(guestReceivedMessage), pplx::create_task(hostReceivedMessage)).get();
+	auto hostDisconnect2 = hostPeer->disconnect();
+	guestPeer->disconnect().get();
+	hostDisconnect2.get();
+
 	hostScene->disconnect().wait();
 	guestScene->disconnect().wait();
 
-
+	//std::vector<pplx::task<int>> v{ pplx::task_from_result<int>(1), pplx::task_from_result<int>(2) };
+	//pplx::when_all(v.begin(), v.end())
+	//	.then([](std::vector<int> res)
+	//{
+	//});
 
 	logger->log("Disconnected host and guest scenes");
 }

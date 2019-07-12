@@ -9,6 +9,7 @@
 #include "stormancer/Client.h"
 #include "stormancer/SafeCapture.h"
 #include "stormancer/P2P/P2PConnectToSceneMessage.h"
+#include "stormancer/P2P/P2PDisconnectFromSceneMessage.h"
 #include "stormancer/MessageIDTypes.h"
 #include <cpprest/asyncrt_utils.h>
 
@@ -155,16 +156,43 @@ namespace Stormancer
 			}
 		});
 
-		builder.service((byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, [serializer, wClient](std::shared_ptr<RequestContext> ctx) {
-			std::string sceneId, reason;
-			byte sceneHandle;
-			serializer->deserialize(ctx->inputStream(), sceneId, reason, sceneHandle);
+		builder.service((byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, [logger, serializer, wClient](std::shared_ptr<RequestContext> ctx) {
+			P2PDisconnectFromSceneMessage disconnectRequest;
+			serializer->deserialize(ctx->inputStream(), disconnectRequest);
+			
 			if (auto client = wClient.lock())
 			{
-				return client->disconnect(ctx->packet()->connection, sceneHandle, true, reason);
+				return client->getConnectedScene(disconnectRequest.sceneId)
+					.then([ctx, wClient, disconnectRequest, serializer, logger](pplx::task<std::shared_ptr<Scene>> task)
+				{
+					std::shared_ptr<Scene> scene;
+					try
+					{
+						scene = task.get();
+					}
+					catch (const std::exception& ex)
+					{
+						// Do nothing if the scene does not exist
+						logger->log(LogLevel::Warn, "P2PRequestModule", "Scene not found while remote peer requests disconnection", ex.what());
+					}
+
+					if (scene)
+					{
+						std::static_pointer_cast<Scene_Impl>(scene)->raisePeerDisconnected(ctx->packet()->connection->sessionId());
+					}
+
+					P2PDisconnectFromSceneMessage disconnectResponse;
+					disconnectResponse.sceneId = disconnectRequest.sceneId;
+					disconnectResponse.reason = "Requested by remote peer";
+					ctx->send([serializer, disconnectResponse](obytestream& stream)
+					{
+						serializer->serialize(stream, disconnectResponse);
+					});
+				});
 			}
 			else
 			{
+				// Do nothing if the client does not exist
 				return pplx::task_from_result();
 			}
 		});

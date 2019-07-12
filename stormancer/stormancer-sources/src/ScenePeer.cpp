@@ -45,12 +45,16 @@ namespace Stormancer
 		scene->send(routeName, streamWriter, priority, reliability, channelIdentifier);
 	}
 
-	void ScenePeer::disconnect()
+	pplx::task<void> ScenePeer::disconnect()
 	{
 		auto scene = _scene.lock();
 		if (scene)
 		{
-			scene->disconnect();
+			return scene->disconnect();
+		}
+		else
+		{
+			return pplx::task_from_result();
 		}
 	}
 

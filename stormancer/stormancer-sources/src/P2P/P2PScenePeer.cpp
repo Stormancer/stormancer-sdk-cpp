@@ -2,9 +2,11 @@
 #include "stormancer/SceneImpl.h"
 #include "stormancer/P2P/P2PScenePeer.h"
 #include "stormancer/P2P/P2PConnectToSceneMessage.h"
+#include "stormancer/P2P/P2PDisconnectFromSceneMessage.h"
 #include "stormancer/IActionDispatcher.h"
 #include "stormancer/ChannelUidStore.h"
 #include "stormancer/SafeCapture.h"
+#include "stormancer/SystemRequestIDTypes.h"
 #include <sstream>
 
 namespace Stormancer
@@ -25,6 +27,28 @@ namespace Stormancer
 		{
 			throw std::runtime_error("Connection cannot be null");
 		}
+
+		auto peerSessionId = sessionId();
+		auto wScene = _scene;
+		auto onNext = [peerSessionId, wScene](ConnectionState connectionState)
+		{
+			switch (connectionState)
+			{
+			case ConnectionState::Disconnected:
+			{
+				auto scene = wScene.lock();
+				if (scene)
+				{
+					std::static_pointer_cast<Scene_Impl>(scene)->raisePeerDisconnected(peerSessionId);
+				}
+			}
+				break;
+			default:
+				break;
+			}
+		};
+
+		_onConnectionStateChangedSub = connection->getConnectionStateChangedObservable().subscribe(onNext);
 	}
 
 	uint64 P2PScenePeer::id() const
@@ -59,9 +83,35 @@ namespace Stormancer
 		scene->send(Stormancer::PeerFilter::matchPeers(_connection->sessionId()), routeName, streamWriter, packetPriority, packetReliability, channelIdentifier);
 	}
 
-	void P2PScenePeer::disconnect()
+	pplx::task<void> P2PScenePeer::disconnect()
 	{
-		throw std::runtime_error("Not implemented");
+		if (auto scene = _scene.lock())
+		{
+			std::static_pointer_cast<Scene_Impl>(scene)->raisePeerDisconnected(sessionId());
+
+			auto logger = _connection->dependencyResolver().resolve<ILogger>();
+			P2PDisconnectFromSceneMessage disconnectRequest;
+			disconnectRequest.sceneId = scene->id();
+			disconnectRequest.reason = "Requested by peer";
+			auto wScene = _scene;
+			auto sceneId = scene->id();
+			return std::static_pointer_cast<Scene_Impl>(scene)->sendSystemRequest<P2PDisconnectFromSceneMessage>(_connection, (byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, disconnectRequest, timeout(std::chrono::milliseconds(5000)))
+				.then([wScene, sceneId, logger](pplx::task<P2PDisconnectFromSceneMessage> task)
+			{
+				try
+				{
+					auto disconnectResponse = task.get();
+				}
+				catch (const std::exception& ex)
+				{
+					logger->log(LogLevel::Error, "P2PScenePeer", "Peer scene disconnection failed", ex.what());
+				}
+			});
+		}
+		else
+		{
+			return pplx::task_from_result();
+		}
 	}
 
 	pplx::task<std::shared_ptr<P2PTunnel>> P2PScenePeer::openP2PTunnel(const std::string& serverId, pplx::cancellation_token ct)

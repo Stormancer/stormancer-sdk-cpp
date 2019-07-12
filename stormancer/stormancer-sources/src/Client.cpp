@@ -824,7 +824,8 @@ namespace Stormancer
 		}
 
 		auto wClient = STORM_WEAK_FROM_THIS();
-		return scene->setConnectionState(ConnectionState(ConnectionState::Disconnecting, reason)).then([wClient, sceneHandle, initiatedByServer, scene]
+		return scene->setConnectionState(ConnectionState(ConnectionState::Disconnecting, reason))
+			.then([wClient, sceneHandle, initiatedByServer, scene]
 		{
 			auto client = LockOrThrow(wClient);
 			auto sceneDispatcher = client->_dependencyResolver.resolve<SceneDispatcher>();
@@ -841,8 +842,7 @@ namespace Stormancer
 
 				if (!initiatedByServer)
 				{
-					auto timeOutToken = timeout(std::chrono::milliseconds(5000));
-					return client->sendSystemRequest<void>(c, (byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, sceneHandle, timeOutToken);
+					return client->sendSystemRequest<void>(c, (byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, sceneHandle, timeout(std::chrono::milliseconds(5000)));
 				}
 			}
 			return pplx::task_from_result();

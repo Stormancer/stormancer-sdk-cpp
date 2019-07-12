@@ -117,6 +117,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\P2P\IP2PScenePeer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\P2P\P2PConnectionStateChangedArgs.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\P2P\P2PConnectToSceneMessage.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\P2P\P2PDisconnectFromSceneMessage.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\P2P\P2PEnums.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\P2P\P2PTunnel.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Packet.h" />

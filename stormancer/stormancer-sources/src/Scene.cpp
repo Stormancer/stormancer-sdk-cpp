@@ -571,6 +571,11 @@ namespace Stormancer
 		return _onPeerConnected;
 	}
 
+	Event<std::shared_ptr<IP2PScenePeer>> Scene_Impl::onPeerDisconnected() const
+	{
+		return _onPeerDisconnected;
+	}
+
 	rxcpp::observable<P2PConnectionStateChangedArgs> Scene_Impl::p2pConnectionStateChanged() const
 	{
 		return _p2pConnectionStateChangedObservable.get_observable();
@@ -698,7 +703,7 @@ namespace Stormancer
 		return _peer;
 	}
 
-	void Stormancer::Scene_Impl::raisePeerConnected(const std::string& sessionId)
+	void Scene_Impl::raisePeerConnected(const std::string& sessionId)
 	{
 		auto it = _connectedPeers.find(sessionId);
 		if (it != _connectedPeers.end())
@@ -712,6 +717,26 @@ namespace Stormancer
 					if (auto scene = wScene.lock())
 					{
 						scene->_onPeerConnected(it->second);
+					}
+				});
+			}
+		}
+	}
+
+	void Scene_Impl::raisePeerDisconnected(const std::string& sessionId)
+	{
+		auto it = _connectedPeers.find(sessionId);
+		if (it != _connectedPeers.end())
+		{
+			auto actionDispatcher = dependencyResolver().resolve<IActionDispatcher>();
+			if (actionDispatcher)
+			{
+				auto wScene = STORM_WEAK_FROM_THIS();
+				actionDispatcher->post([wScene, it]()
+				{
+					if (auto scene = wScene.lock())
+					{
+						scene->_onPeerDisconnected(it->second);
 					}
 				});
 			}

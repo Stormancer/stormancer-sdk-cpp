@@ -63,7 +63,7 @@ namespace Stormancer
 		pplx::task<void> sendSystemRequest(IConnection* peer, byte id, pplx::cancellation_token ct = pplx::cancellation_token::none())
 		{
 			return sendSystemRequest(peer, id, [](obytestream&) {}, PacketPriority::MEDIUM_PRIORITY, ct)
-				.then([](Packet_ptr /*packet*/)
+				.then([](Packet_ptr)
 			{
 				// Packet is null for system requests that have no return value.
 			}, ct);
@@ -76,7 +76,8 @@ namespace Stormancer
 			return sendSystemRequest(peer, id, [serializer, &parameter](obytestream& stream)
 			{
 				serializer.serialize(stream, parameter);
-			}, PacketPriority::MEDIUM_PRIORITY, ct).then([](Packet_ptr)
+			}, PacketPriority::MEDIUM_PRIORITY, ct)
+				.then([](Packet_ptr)
 			{
 				// Packet is null for system requests that have no return value.
 			}, ct);

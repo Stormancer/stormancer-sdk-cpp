@@ -33,6 +33,12 @@ namespace Stormancer
 		/// The SceneDispatcher need to access some private members of the Scene.
 		friend class SceneDispatcher;
 
+		/// The P2PScenePeer has to access to raisePeerDisconnected
+		friend class P2PScenePeer;
+
+		/// The P2PRequestModule has to access to raisePeerConnected
+		friend class P2PRequestModule;
+
 #pragma region public_methods
 
 		/// Connect to the scene.
@@ -109,6 +115,8 @@ namespace Stormancer
 
 		Event<std::shared_ptr<IP2PScenePeer>> onPeerConnected() const override;
 
+		Event<std::shared_ptr<IP2PScenePeer>> onPeerDisconnected() const override;
+
 		rxcpp::observable<P2PConnectionStateChangedArgs> p2pConnectionStateChanged() const override;
 
 		std::shared_ptr<P2PTunnel> registerP2PServer(const std::string& p2pServerId) override;
@@ -118,8 +126,6 @@ namespace Stormancer
 		const std::unordered_map<std::string, std::string>& getSceneMetadata() override;
 
 		std::shared_ptr<IP2PScenePeer> peerConnected(std::shared_ptr<IConnection> connection, std::shared_ptr<P2PService> P2P, P2PConnectToSceneMessage);
-
-		void raisePeerConnected(const std::string& sessionId);
 
 		std::weak_ptr<IConnection> hostConnection();
 
@@ -179,6 +185,10 @@ namespace Stormancer
 		//initializes the scene after construction
 		void initialize(DependencyScope& parentScope);
 	
+		void raisePeerConnected(const std::string& sessionId);
+
+		void raisePeerDisconnected(const std::string& sessionId);
+
 #pragma endregion
 
 #pragma region private_members
@@ -244,6 +254,7 @@ namespace Stormancer
 		/// map[sessionId] = P2PScenePeer
 		std::unordered_map<std::string, std::shared_ptr<IP2PScenePeer>> _connectedPeers;
 		Event<std::shared_ptr<IP2PScenePeer>> _onPeerConnected;
+		Event<std::shared_ptr<IP2PScenePeer>> _onPeerDisconnected;
 
 		std::shared_ptr<P2PService> _p2p;
 

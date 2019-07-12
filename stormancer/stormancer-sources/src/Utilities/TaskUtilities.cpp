@@ -42,41 +42,17 @@ namespace Stormancer
 		}
 	}
 
-	pplx::cancellation_token_source create_linked_source(pplx::cancellation_token token1, pplx::cancellation_token token2)
-	{
-		std::vector<pplx::cancellation_token> tokens;
-		if (token1.is_cancelable())
-		{
-			tokens.push_back(token1);
-		}
-		if (token2.is_cancelable())
-		{
-			tokens.push_back(token2);
-		}
-		return pplx::cancellation_token_source::create_linked_source(tokens.begin(), tokens.end());
-	}
-
-	pplx::cancellation_token_source create_linked_source(pplx::cancellation_token token1, pplx::cancellation_token token2, pplx::cancellation_token token3)
-	{
-		std::vector<pplx::cancellation_token> tokens;
-		if (token1.is_cancelable())
-		{
-			tokens.push_back(token1);
-		}
-		if (token2.is_cancelable())
-		{
-			tokens.push_back(token2);
-		}
-		if (token3.is_cancelable())
-		{
-			tokens.push_back(token3);
-		}
-		return pplx::cancellation_token_source::create_linked_source(tokens.begin(), tokens.end());
-	}
-
 	pplx::cancellation_token create_linked_shutdown_token(pplx::cancellation_token token)
 	{
 		return create_linked_source(token, Shutdown::instance().getShutdownToken()).get_token();
+	}
+
+	namespace _TaskUtilitiesDetails
+	{
+		pplx::cancellation_token_source create_linked_source_impl(std::vector<pplx::cancellation_token>& tokensVector)
+		{
+			return pplx::cancellation_token_source::create_linked_source(tokensVector.begin(), tokensVector.end());
+		}
 	}
 }
 

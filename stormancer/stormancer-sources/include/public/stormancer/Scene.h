@@ -117,7 +117,6 @@ namespace Stormancer
 		/// \return A vector containing the scene host connections.
 		virtual std::vector<std::shared_ptr<IScenePeer>> remotePeers() const = 0;
 
-		
 		/// Returns the peer connection to the host.
 		virtual std::shared_ptr<IScenePeer> host() const = 0;
 
@@ -137,6 +136,8 @@ namespace Stormancer
 		virtual const std::unordered_map<std::string, std::shared_ptr<IP2PScenePeer>>& connectedPeers() const = 0;
 
 		virtual Event<std::shared_ptr<IP2PScenePeer>> onPeerConnected() const = 0;
+
+		virtual Event<std::shared_ptr<IP2PScenePeer>> onPeerDisconnected() const = 0;
 
 		virtual rxcpp::observable<P2PConnectionStateChangedArgs> p2pConnectionStateChanged() const = 0;
 
