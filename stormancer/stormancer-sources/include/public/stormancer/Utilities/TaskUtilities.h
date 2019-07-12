@@ -10,19 +10,19 @@ namespace Stormancer
 
 	namespace _TaskUtilitiesDetails
 	{
-		template<typename TNextTask, typename... TTasks>
-		auto when_all_impl(std::vector<TNextTask>& tasksVector, TNextTask nextTask, TTasks... tasks)
-			-> decltype(when_all_impl(tasksVector, tasks...))
-		{
-			tasksVector.push_back(nextTask);
-			return when_all_impl(tasksVector, tasks...);
-		}
-
 		template<typename TTask>
 		auto when_all_impl(std::vector<TTask>& tasksVector)
 			-> decltype(pplx::when_all(tasksVector.begin(), tasksVector.end()))
 		{
 			return pplx::when_all(tasksVector.begin(), tasksVector.end());
+		}
+
+		template<typename TNextTask, typename... TTasks>
+		auto when_all_impl(std::vector<TNextTask>& tasksVector, TNextTask nextTask, TTasks... tasks)
+			-> decltype(when_all_impl(tasksVector))
+		{
+			tasksVector.push_back(nextTask);
+			return when_all_impl(tasksVector, tasks...);
 		}
 
 		pplx::cancellation_token_source create_linked_source_impl(std::vector<pplx::cancellation_token>& tokensVector);
@@ -79,7 +79,7 @@ namespace Stormancer
 
 	template<typename TNextTask, typename... TTasks>
 	auto when_all(TNextTask nextTask, TTasks... tasks)
-		-> decltype(_TaskUtilitiesDetails::when_all_impl(std::vector<TNextTask>(), nextTask, tasks...))
+		-> decltype(_TaskUtilitiesDetails::when_all_impl(std::declval<typename std::add_lvalue_reference<std::vector<TNextTask>>::type>()))
 	{
 		std::vector<TNextTask> tasksVector;
 		return _TaskUtilitiesDetails::when_all_impl(tasksVector, nextTask, tasks...);

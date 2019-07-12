@@ -223,11 +223,6 @@ void p2pConnect(std::shared_ptr<Stormancer::IClient> hostClient, std::shared_ptr
 		Stormancer::Serializer{}.serialize(stream, std::string("message from host!"));
 	});
 
-	Stormancer::when_all(pplx::create_task(guestReceivedMessage), pplx::create_task(hostReceivedMessage)).get();
-	auto hostDisconnect = hostPeer->disconnect();
-	guestPeer->disconnect().get();
-	hostDisconnect.get();
-
 	// Test comparison operators
 	assert(guestPeer != hostPeer);
 	assert(!(guestPeer == hostPeer));
