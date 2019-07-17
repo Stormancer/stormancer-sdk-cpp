@@ -417,6 +417,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Tunnels\Tunnels.hpp">
       <Filter>public\Tunnels</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\GameSession\Gamesessions.hpp">
+      <Filter>public\GameSession</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="private">

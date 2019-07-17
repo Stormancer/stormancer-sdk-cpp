@@ -80,6 +80,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Messaging\MessagingService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Messaging\Messaging_Impl.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Profile\ProfilePrivateModels.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\GameSession\Gamesessions.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Helloworld\Helloworld.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\LeaderboardModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\LeaderboardPlugin.h" />

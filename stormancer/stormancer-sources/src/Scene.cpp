@@ -234,7 +234,7 @@ namespace Stormancer
 
 	rxcpp::observable<Packetisp_ptr> Scene_Impl::onMessage(const std::string& routeName, MessageOriginFilter filter, const std::unordered_map<std::string, std::string>& metadata)
 	{
-		std::lock_guard<std::mutex> lg(_connectMutex);
+		//std::lock_guard<std::mutex> lg(_connectMutex);
 
 		auto client = _client.lock();
 		if (!client)
@@ -242,7 +242,7 @@ namespace Stormancer
 			throw std::runtime_error("The client is deleted.");
 		}
 
-		if (_connectionState != ConnectionState::Disconnected)
+		if (_connectionState != ConnectionState::Disconnected && _connectionState != ConnectionState::Connecting)
 		{
 			throw std::runtime_error("A route cannot be added to a scene already connected.");
 		}
