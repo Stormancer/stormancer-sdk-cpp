@@ -1,7 +1,7 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/ScenePeer.h"
 #include "stormancer/ChannelUidStore.h"
-#include "stormancer/SafeCapture.h"
+#include "stormancer/Utilities/PointerUtilities.h"
 
 namespace Stormancer
 {
@@ -45,16 +45,16 @@ namespace Stormancer
 		scene->send(routeName, streamWriter, priority, reliability, channelIdentifier);
 	}
 
-	pplx::task<void> ScenePeer::disconnect()
+	pplx::task<void> ScenePeer::disconnect(pplx::cancellation_token ct)
 	{
 		auto scene = _scene.lock();
 		if (scene)
 		{
-			return scene->disconnect();
+			return scene->disconnect(ct);
 		}
 		else
 		{
-			return pplx::task_from_result();
+			return pplx::task_from_result(pplx::task_options(ct));
 		}
 	}
 

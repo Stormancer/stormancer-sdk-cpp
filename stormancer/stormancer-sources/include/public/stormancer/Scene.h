@@ -43,7 +43,9 @@ namespace Stormancer
 		virtual ~Scene() = default;
 
 		/// Disconnect from the scene.
-		virtual pplx::task<void> disconnect() = 0;
+		/// \param ct Cancellation token used as a timeout. The disconnection can't be cancelled, but some internal operations will be bypassed if the ct is cancelled.
+		/// \returns a completed task when the operation is finished or cancelled. It should never be cancelled or failed.
+		virtual pplx::task<void> disconnect(pplx::cancellation_token ct = pplx::cancellation_token::none()) = 0;
 
 		/// Add a route to the scene.
 		/// \param routeName Route name.

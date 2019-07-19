@@ -4,7 +4,7 @@
 #include "stormancer/IActionDispatcher.h"
 #include "stormancer/RPC/Constants.h"
 #include "stormancer/Helpers.h"
-#include "stormancer/SafeCapture.h"
+#include "stormancer/Utilities/PointerUtilities.h"
 
 namespace Stormancer
 {

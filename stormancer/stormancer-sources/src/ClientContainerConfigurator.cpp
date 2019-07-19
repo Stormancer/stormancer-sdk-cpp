@@ -94,5 +94,5 @@ void Stormancer::Client::ConfigureContainer(ContainerBuilder& builder, Configura
 
 	builder.registerDependency<P2PService, IConnectionManager, RequestProcessor, ITransport, Serializer, P2PTunnels>().singleInstance();
 
-	builder.registerDependency<P2PRequestModule, ITransport, IConnectionManager, P2PSessions, Serializer, P2PTunnels, ILogger, Configuration, Client>().singleInstance();
+	builder.registerDependency<P2PRequestModule, ITransport, IConnectionManager, P2PSessions, Serializer, P2PTunnels, ILogger, Configuration, RequestProcessor, Client>().singleInstance();
 }

@@ -5,6 +5,7 @@
 #include "stormancer/P2P/P2PEnums.h"
 #include "stormancer/StormancerTypes.h"
 #include "stormancer/msgpack_define.h"
+#include "stormancer/Subscription.h"
 #include <vector>
 #include <string>
 
@@ -18,6 +19,7 @@ namespace Stormancer
 		std::string RemoteSessionId;
 		std::string OwningSessionId;
 		P2PSessionState Status = P2PSessionState::Unknown;
+		Subscription onConnectionCloseSubscription;
 
 		MSGPACK_DEFINE_MAP(SessionId, RemotePeerId, SceneId, RemoteSessionId, OwningSessionId, Status)
 	};

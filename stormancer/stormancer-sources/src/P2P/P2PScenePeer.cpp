@@ -5,7 +5,7 @@
 #include "stormancer/P2P/P2PDisconnectFromSceneMessage.h"
 #include "stormancer/IActionDispatcher.h"
 #include "stormancer/ChannelUidStore.h"
-#include "stormancer/SafeCapture.h"
+#include "stormancer/Utilities/PointerUtilities.h"
 #include "stormancer/SystemRequestIDTypes.h"
 #include <sstream>
 
@@ -83,34 +83,21 @@ namespace Stormancer
 		scene->send(Stormancer::PeerFilter::matchPeers(_connection->sessionId()), routeName, streamWriter, packetPriority, packetReliability, channelIdentifier);
 	}
 
-	pplx::task<void> P2PScenePeer::disconnect()
+	pplx::task<void> P2PScenePeer::disconnect(pplx::cancellation_token ct)
 	{
 		if (auto scene = _scene.lock())
 		{
 			std::static_pointer_cast<Scene_Impl>(scene)->raisePeerDisconnected(sessionId());
 
-			auto logger = _connection->dependencyResolver().resolve<ILogger>();
 			P2PDisconnectFromSceneMessage disconnectRequest;
 			disconnectRequest.sceneId = scene->id();
 			disconnectRequest.reason = "Requested by peer";
-			auto wScene = _scene;
-			auto sceneId = scene->id();
-			return std::static_pointer_cast<Scene_Impl>(scene)->sendSystemRequest<P2PDisconnectFromSceneMessage>(_connection, (byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, disconnectRequest, timeout(std::chrono::milliseconds(5000)))
-				.then([wScene, sceneId, logger](pplx::task<P2PDisconnectFromSceneMessage> task)
-			{
-				try
-				{
-					auto disconnectResponse = task.get();
-				}
-				catch (const std::exception& ex)
-				{
-					logger->log(LogLevel::Error, "P2PScenePeer", "Peer scene disconnection failed", ex.what());
-				}
-			});
+			return std::static_pointer_cast<Scene_Impl>(scene)->sendSystemRequest<P2PDisconnectFromSceneMessage>(_connection, (byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, disconnectRequest, ct)
+				.then([](P2PDisconnectFromSceneMessage) {}, ct);
 		}
 		else
 		{
-			return pplx::task_from_result();
+			return pplx::task_from_result(pplx::task_options(ct));
 		}
 	}
 

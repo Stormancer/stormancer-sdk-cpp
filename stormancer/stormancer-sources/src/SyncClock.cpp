@@ -3,7 +3,7 @@
 #include "stormancer/IScheduler.h"
 #include "stormancer/RequestProcessor.h"
 #include "stormancer/SystemRequestIDTypes.h"
-#include "stormancer/SafeCapture.h"
+#include "stormancer/Utilities/PointerUtilities.h"
 #include "stormancer/Helpers.h"
 #include <numeric>
 #include <cmath>

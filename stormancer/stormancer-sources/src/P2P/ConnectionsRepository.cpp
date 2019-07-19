@@ -1,7 +1,7 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/P2P/ConnectionsRepository.h"
 #include "stormancer/Logger/ILogger.h"
-#include "stormancer/SafeCapture.h"
+#include "stormancer/Utilities/PointerUtilities.h"
 
 namespace Stormancer
 {

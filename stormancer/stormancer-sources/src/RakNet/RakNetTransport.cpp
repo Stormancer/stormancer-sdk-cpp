@@ -5,7 +5,7 @@
 #include "stormancer/IScheduler.h"
 #include "stormancer/MessageIDTypes.h"
 #include "MessageIdentifiers.h"
-#include "stormancer/SafeCapture.h"
+#include "stormancer/Utilities/PointerUtilities.h"
 #include "PacketFileLogger.h"
 #include "stormancer/Debug/StackWalker.h"
 #include "stormancer/Utilities/TaskUtilities.h"

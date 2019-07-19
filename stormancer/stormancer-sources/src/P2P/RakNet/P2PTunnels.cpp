@@ -5,7 +5,7 @@
 #include "stormancer/SystemRequestIDTypes.h"
 #include "stormancer/MessageIDTypes.h"
 #include "stormancer/SceneImpl.h"
-#include "stormancer/SafeCapture.h"
+#include "stormancer/Utilities/PointerUtilities.h"
 #include "stormancer/P2P/OpenTunnelResult.h"
 #include "stormancer/ChannelUidStore.h"
 #include "stormancer/Utilities/StringUtilities.h"

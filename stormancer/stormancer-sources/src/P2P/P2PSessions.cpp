@@ -11,7 +11,7 @@ namespace Stormancer
 	{
 	}
 
-	void P2PSessions::updateSessionState(const std::string& sessionId, P2PSessionState sessionState)
+	bool P2PSessions::updateSessionState(const std::string& sessionId, P2PSessionState sessionState)
 	{
 		std::lock_guard<std::mutex> lg(_sessionsMutex);
 
@@ -19,7 +19,9 @@ namespace Stormancer
 		if (it != _sessions.end())
 		{
 			it->second.Status = sessionState;
+			return true;
 		}
+		return false;
 	}
 
 	void P2PSessions::createSession(const std::string& sessionId, const P2PSession& session)
@@ -40,7 +42,7 @@ namespace Stormancer
 		auto it = _sessions.find(sessionId);
 		if (it == _sessions.end())
 		{
-			throw std::runtime_error("Session not found");
+			return false;
 		}
 
 		const auto& session = (*it).second;
@@ -57,16 +59,18 @@ namespace Stormancer
 		}
 	}
 
-	bool P2PSessions::tryGetSession(const std::string& sessionId, P2PSession& session)
+	P2PSession& P2PSessions::tryGetSession(const std::string& sessionId, bool& found)
 	{
+		found = false;
+
 		std::lock_guard<std::mutex> lg(_sessionsMutex);
 
 		auto sessionIt = _sessions.find(sessionId);
 		if (sessionIt != _sessions.end())
 		{
-			session = sessionIt->second;
-			return true;
+			found = true;
+			return sessionIt->second;
 		}
-		return false;
+		return _dummySession;
 	}
 }

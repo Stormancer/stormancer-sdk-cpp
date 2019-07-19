@@ -1,6 +1,6 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/ApiClient.h"
-#include "stormancer/SafeCapture.h"
+#include "stormancer/Utilities/PointerUtilities.h"
 #include "stormancer/Helpers.h"
 #include "cpprest/http_client.h"
 #include "stormancer/Utilities/StringUtilities.h"

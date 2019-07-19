@@ -282,9 +282,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\RequestProcessor.h">
       <Filter>Header Files\private</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SafeCapture.h">
-      <Filter>Header Files\private</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SceneDispatcher.h">
       <Filter>Header Files\private</Filter>
     </ClInclude>
@@ -494,6 +491,9 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\P2P\P2PDisconnectFromSceneMessage.h">
       <Filter>Header Files\public\P2P</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\PointerUtilities.h">
+      <Filter>Header Files\public\Utilities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

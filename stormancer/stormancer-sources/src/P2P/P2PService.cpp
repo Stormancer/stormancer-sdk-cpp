@@ -1,9 +1,12 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/P2P/P2PService.h"
 #include "stormancer/P2P/P2PSession.h"
+#include "stormancer/P2P/P2PSessions.h"
 #include "stormancer/SystemRequestIDTypes.h"
 #include "stormancer/P2P/RakNet/P2PTunnels.h"
 #include "stormancer/Exceptions.h"
+#include "cpprest/asyncrt_utils.h"
+#include "stormancer/Utilities/PointerUtilities.h"
 
 namespace Stormancer
 {
@@ -33,17 +36,16 @@ namespace Stormancer
 			return pplx::task_from_exception<std::shared_ptr<IConnection>>(std::runtime_error("Cannot establish P2P connection. The client must be connected to the server"));
 		}
 
-		std::weak_ptr<P2PService> weakSelf = this->shared_from_this();
+		auto wP2pService = STORM_WEAK_FROM_THIS();
 		return _sysCall->sendSystemRequest<P2PSessionResult>(server.get(), (byte)SystemRequestIDTypes::ID_P2P_CREATE_SESSION, p2pToken, ct)
-			.then([weakSelf](P2PSessionResult sessionResult)
+			.then([wP2pService](P2PSessionResult sessionResult)
 		{
-			auto self = weakSelf.lock();
-			if (!self)
+			auto p2pService = wP2pService.lock();
+			if (!p2pService)
 			{
-				throw PointerDeletedException();
+				throw PointerDeletedException("P2P service deleted");
 			}
-
-			auto connection = self->_connections->getConnection(sessionResult.RemoteSessionId);
+			auto connection = p2pService->_connections->getConnection(sessionResult.RemoteSessionId);
 			if (!connection)
 			{
 				throw std::runtime_error(("Failed to get P2P connection for peer " + std::to_string(sessionResult.RemoteSessionId)).c_str());

@@ -8,6 +8,32 @@ using namespace std::literals;
 
 namespace Stormancer
 {
+	void Tester::run_all_tests_nonblocking()
+	{
+		_testsDone = false;
+		_testsPassed = false;
+
+		_tests.push_back([this]() { test_connect(); });
+		_tests.push_back([this]() { test_echo(); });
+		_tests.push_back([this]() { test_rpc_server(); });
+		_tests.push_back([this]() { test_rpc_server_cancel(); });
+		_tests.push_back([this]() { test_rpc_server_exception(); });
+		_tests.push_back([this]() { test_rpc_server_clientException(); });
+		_tests.push_back([this]() { test_rpc_client(); });
+		_tests.push_back([this]() { test_rpc_client_cancel(); });
+		_tests.push_back([this]() { test_rpc_client_exception(); });
+		_tests.push_back([this]() { test_syncClock(); });
+		_tests.push_back([this]() { test_setServerTimeout(); });
+		_tests.push_back([this]() { test_disconnect(); });
+		_tests.push_back([this]() { test_Ping_Cluster(); });
+		_tests.push_back([this]() { test_dependencyInjection(); });
+		_tests.push_back([this]() { test_streams(); });
+		_tests.push_back([this]() { test_clean(); });
+
+		// Some platforms require a Client to be created before using pplx::task
+		test_create();
+	}
+
 	void Tester::execNextTest()
 	{
 		if (!_tests.empty())
@@ -685,33 +711,6 @@ namespace Stormancer
 		}
 		_logger->log(LogLevel::Info, "test_streams", "Streams OK");
 		execNextTest();
-	}
-
-
-	void Tester::run_all_tests_nonblocking()
-	{
-		_testsDone = false;
-		_testsPassed = false;
-
-		_tests.push_back([this]() { test_connect(); });
-		_tests.push_back([this]() { test_echo(); });
-		_tests.push_back([this]() { test_rpc_server(); });
-		_tests.push_back([this]() { test_rpc_server_cancel(); });
-		_tests.push_back([this]() { test_rpc_server_exception(); });
-		_tests.push_back([this]() { test_rpc_server_clientException(); });
-		_tests.push_back([this]() { test_rpc_client(); });
-		_tests.push_back([this]() { test_rpc_client_cancel(); });
-		_tests.push_back([this]() { test_rpc_client_exception(); });
-		_tests.push_back([this]() { test_syncClock(); });
-		_tests.push_back([this]() { test_setServerTimeout(); });
-		_tests.push_back([this]() { test_disconnect(); });
-		_tests.push_back([this]() { test_Ping_Cluster(); });
-		_tests.push_back([this]() { test_dependencyInjection(); });
-		_tests.push_back([this]() { test_streams(); });
-		_tests.push_back([this]() { test_clean(); });
-
-		// Some platforms require a Client to be created before using pplx::task
-		test_create();
 	}
 
 	bool Tester::tests_done()

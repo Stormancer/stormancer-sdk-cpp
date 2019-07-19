@@ -6,6 +6,8 @@
 
 namespace Stormancer
 {
+	using namespace std::chrono_literals;
+
 	// DETAILS (forward declarations)
 
 	namespace _TaskUtilitiesDetails

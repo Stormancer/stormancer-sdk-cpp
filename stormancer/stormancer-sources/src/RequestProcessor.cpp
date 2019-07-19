@@ -3,7 +3,7 @@
 #include "stormancer/MessageIDTypes.h"
 #include "stormancer/Serializer.h"
 #include "stormancer/SystemRequestIDTypes.h"
-#include "stormancer/SafeCapture.h"
+#include "stormancer/Utilities/PointerUtilities.h"
 #include "stormancer/Utilities/TaskUtilities.h"
 #include "stormancer/Helpers.h"
 

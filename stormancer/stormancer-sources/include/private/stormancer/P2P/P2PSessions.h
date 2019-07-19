@@ -13,18 +13,19 @@ namespace Stormancer
 
 		P2PSessions(std::shared_ptr<IConnectionManager> connections);
 
-		void updateSessionState(const std::string& sessionId, P2PSessionState sessionState);
+		bool updateSessionState(const std::string& sessionId, P2PSessionState sessionState);
 
 		void createSession(const std::string& sessionId, const P2PSession& session);
 
 		bool closeSession(const std::string& sessionId);
 
-		bool tryGetSession(const std::string& p2pSessionId, P2PSession& session);
+		P2PSession& tryGetSession(const std::string& p2pSessionId, bool& found);
 
 	private:
 
 		std::shared_ptr<IConnectionManager> _connections;
 		std::unordered_map<std::string, P2PSession> _sessions;
 		std::mutex _sessionsMutex;
+		P2PSession _dummySession;
 	};
 }

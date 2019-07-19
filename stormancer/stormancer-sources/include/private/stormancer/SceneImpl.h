@@ -45,7 +45,7 @@ namespace Stormancer
 		pplx::task<void> connect(pplx::cancellation_token ct = pplx::cancellation_token::none());
 
 		/// Disconnect from the scene.
-		pplx::task<void> disconnect() override;
+		pplx::task<void> disconnect(pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
 
 		/// Add a route to the scene.
 		/// \param routeName Route name.
@@ -189,6 +189,10 @@ namespace Stormancer
 
 		void raisePeerDisconnected(const std::string& sessionId);
 
+		pplx::task<void> disconnectAllPeers(pplx::cancellation_token ct = pplx::cancellation_token::none());
+
+		pplx::task<void> disconnectFromHost(pplx::cancellation_token ct = pplx::cancellation_token::none());
+
 #pragma endregion
 
 #pragma region private_members
@@ -234,12 +238,10 @@ namespace Stormancer
 		/// Disconnection task.
 		pplx::task<void> _connectTask;
 
-		std::mutex _connectMutex;
+		std::recursive_mutex _mutex;
 
 		/// Disconnection task.
 		pplx::task<void> _disconnectTask;
-
-		std::mutex _disconnectMutex;
 
 		Event<Packet_ptr> _onPacketReceived;
 
@@ -260,6 +262,9 @@ namespace Stormancer
 
 		ILogger_ptr _logger;
 		std::vector<IPlugin*> _plugins;
+
+		bool _disconnectRequested = false;
+		pplx::cancellation_token_source _connectionCts;
 
 #pragma endregion
 	};

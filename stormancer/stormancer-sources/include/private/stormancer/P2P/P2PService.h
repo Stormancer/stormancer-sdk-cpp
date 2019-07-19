@@ -1,13 +1,12 @@
 #pragma once
 
 #include "stormancer/BuildConfig.h"
-
-
 #include "stormancer/IConnectionManager.h"
 #include "stormancer/RequestProcessor.h"
 #include "stormancer/ITransport.h"
 #include "stormancer/Serializer.h"
 #include "stormancer/P2P/P2PTunnel.h"
+#include "stormancer/P2P/P2PSessions.h"
 
 namespace Stormancer
 {
@@ -38,5 +37,6 @@ namespace Stormancer
 		std::shared_ptr<ITransport> _transport;
 		std::shared_ptr<Serializer> _serializer;
 		std::shared_ptr<P2PTunnels> _tunnels;
+		std::shared_ptr<P2PSessions> _p2pSessions;
 	};
 }
