@@ -307,7 +307,7 @@ namespace Stormancer
 					}
 				}
 
-				pplx::task<void> GameSessionService::reset(pplx::cancellation_token ct)
+				pplx::task<void> reset(pplx::cancellation_token ct)
 				{
 					ct = linkTokenToDisconnection(ct);
 					auto scene = _scene.lock();
