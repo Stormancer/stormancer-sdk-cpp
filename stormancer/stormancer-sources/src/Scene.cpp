@@ -503,7 +503,8 @@ namespace Stormancer
 				return pplx::task_from_result(pplx::task_options(ct));
 			}
 
-			for (auto pair : _connectedPeers)
+			auto connectedPeers = _connectedPeers;
+			for (auto pair : connectedPeers)
 			{
 				auto peer = pair.second;
 				disconnectingPeers.push_back(peer->disconnect(ct));
