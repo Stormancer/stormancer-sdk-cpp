@@ -1,6 +1,6 @@
 #pragma once
-#include "Core/ClientAPI.h"
 
+#include "stormancer/ClientAPI.h"
 #include "stormancer/Event.h"
 #include "Party/Party.h"
 #include "Party/PartyModels.h"

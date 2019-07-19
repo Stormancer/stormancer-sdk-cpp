@@ -13,9 +13,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)private\AssetsStorage\AssetsStorageService.cpp">
       <Filter>private\AssetsStorage</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Core\ClientApi.cpp">
-      <Filter>private\Core</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)private\GameFinder\GameFinderPlugin.cpp">
       <Filter>private\GameFinder</Filter>
     </ClCompile>
@@ -191,9 +188,6 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\BugReport\BugReportService.h">
       <Filter>public\BugReport</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Core\ClientAPI.h">
-      <Filter>public\Core</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameVersion\GameVersionPlugin.h">
       <Filter>public\GameVersion</Filter>
@@ -437,9 +431,6 @@
     <Filter Include="public\BugReport">
       <UniqueIdentifier>{97f8aacc-ab39-4b42-9a78-eb59d706a6d5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="public\Core">
-      <UniqueIdentifier>{e68f0032-488a-4f9f-95da-92d03022a329}</UniqueIdentifier>
-    </Filter>
     <Filter Include="public\GameFinder">
       <UniqueIdentifier>{54e1b9c3-7817-4352-af28-39c566720e77}</UniqueIdentifier>
     </Filter>
@@ -484,9 +475,6 @@
     </Filter>
     <Filter Include="private\BugReport">
       <UniqueIdentifier>{d94d9d4e-a986-4e9c-a9fc-22b9b1e2ffeb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="private\Core">
-      <UniqueIdentifier>{ee1de03a-559f-4f00-a0e8-392963531eca}</UniqueIdentifier>
     </Filter>
     <Filter Include="private\GameFinder">
       <UniqueIdentifier>{fc06fcab-d3e6-49bf-b85d-a0aed9710c29}</UniqueIdentifier>

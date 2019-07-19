@@ -1,7 +1,7 @@
 #pragma once
 
 #include "stormancer/Event.h"
-#include "Core/ClientAPI.h"
+#include "stormancer/ClientAPI.h"
 #include "Members/Friends.h"
 #include "FriendsModels.h"
 

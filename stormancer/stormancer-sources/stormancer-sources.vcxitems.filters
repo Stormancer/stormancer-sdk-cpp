@@ -495,6 +495,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\PointerUtilities.h">
       <Filter>Header Files\public\Utilities</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\ClientAPI.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Configuration.cpp">

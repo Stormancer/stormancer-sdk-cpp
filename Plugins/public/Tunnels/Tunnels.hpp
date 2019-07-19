@@ -1,5 +1,6 @@
 #pragma once
-#include "Core/ClientAPI.h"
+
+#include "stormancer/ClientAPI.h"
 #include "Authentication/AuthenticationService.h"
 #include "stormancer/IPlugin.h"
 #include "stormancer/Utilities/TaskUtilities.h"

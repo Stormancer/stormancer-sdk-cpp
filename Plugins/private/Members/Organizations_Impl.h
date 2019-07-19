@@ -1,6 +1,7 @@
 #pragma once
+
 #include "Members/Organizations.h"
-#include "Core/ClientAPI.h"
+#include "stormancer/ClientAPI.h"
 #include "OrganizationsTypes.h"
 
 namespace Stormancer
