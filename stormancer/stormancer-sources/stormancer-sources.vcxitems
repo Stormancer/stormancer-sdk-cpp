@@ -26,7 +26,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\Compatibility\IStormancerTask.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\Compatibility\pplxtasks_noexcept.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\Compatibility\StormancerResult.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ConnectionData.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\ConnectionData.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ConnectionResult.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ConnectToSceneMsg.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ContainerConfigurator.h" />
@@ -39,7 +39,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IPacketProcessor.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IPacketTransform.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\IRequestModule.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ITokenHandler.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\ITokenHandler.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ITransport.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\KeyStore.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\MessageIDTypes.h" />
@@ -68,7 +68,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\RPC\RpcRequest.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SceneImpl.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SceneDispatcher.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SceneEndpoint.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\SceneEndpoint.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SceneInfosDto.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SceneInfosRequestDto.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\ScenePeer.h" />

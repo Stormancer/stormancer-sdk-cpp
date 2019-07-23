@@ -63,71 +63,71 @@ namespace Stormancer
 
 		_sceneConnectionStateObservable.get_observable().subscribe(onNext, onError);
 		_hostConnectionStateSubscription = peer->getConnectionStateChangedObservable().subscribe([wThat](ConnectionState state)
-		{
-			if (auto that = wThat.lock())
 			{
-				auto sceneState = that->getCurrentConnectionState();
-				pplx::task<void> setConnectionStateTask = pplx::task_from_result();
-				// We check the connection is disconnecting, and the scene is not already disconnecting or disconnected
-				if (state == ConnectionState::Disconnecting && sceneState != ConnectionState::Disconnecting && sceneState != ConnectionState::Disconnected)
+				if (auto that = wThat.lock())
 				{
-					// We are disconnecting the scene
-					setConnectionStateTask = that->setConnectionState(ConnectionState(ConnectionState::Disconnecting, state.reason));
-				}
-				// We check the connection is disconnected, and the scene is not already disconnected
-				else if (state == ConnectionState::Disconnected && sceneState != ConnectionState::Disconnected)
-				{
-					// We ensure the scene is disconnecting
-					if (sceneState != ConnectionState::Disconnecting)
+					auto sceneState = that->getCurrentConnectionState();
+					pplx::task<void> setConnectionStateTask = pplx::task_from_result();
+					// We check the connection is disconnecting, and the scene is not already disconnecting or disconnected
+					if (state == ConnectionState::Disconnecting && sceneState != ConnectionState::Disconnecting && sceneState != ConnectionState::Disconnected)
 					{
+						// We are disconnecting the scene
 						setConnectionStateTask = that->setConnectionState(ConnectionState(ConnectionState::Disconnecting, state.reason));
 					}
+					// We check the connection is disconnected, and the scene is not already disconnected
+					else if (state == ConnectionState::Disconnected && sceneState != ConnectionState::Disconnected)
+					{
+						// We ensure the scene is disconnecting
+						if (sceneState != ConnectionState::Disconnecting)
+						{
+							setConnectionStateTask = that->setConnectionState(ConnectionState(ConnectionState::Disconnecting, state.reason));
+						}
 
-					setConnectionStateTask = setConnectionStateTask.then([wThat, state]
-					{
-						if (auto that = wThat.lock())
+						setConnectionStateTask = setConnectionStateTask.then([wThat, state]
+							{
+								if (auto that = wThat.lock())
+								{
+									return that->setConnectionState(ConnectionState(ConnectionState::Disconnected, state.reason));
+								}
+								return pplx::task_from_result();
+							}, pplx::get_ambient_scheduler());
+					}
+					setConnectionStateTask.then([wThat](pplx::task<void> task)
 						{
-							return that->setConnectionState(ConnectionState(ConnectionState::Disconnected, state.reason));
-						}
-						return pplx::task_from_result();
-					}, pplx::get_ambient_scheduler());
+							try
+							{
+								task.get();
+							}
+							catch (const std::exception& ex)
+							{
+								if (auto that = wThat.lock())
+								{
+									that->_logger->log(LogLevel::Warn, "Scene::hostConnectionStateSubscription", "An error occurred while running ConnectionState event handlers", ex.what());
+								}
+							}
+						});
 				}
-				setConnectionStateTask.then([wThat](pplx::task<void> task)
+			}, [](std::exception_ptr exptr) // on_error callback, added because the on_next above might throw
+			{
+				try
 				{
-					try
-					{
-						task.get();
-					}
-					catch (const std::exception& ex)
-					{
-						if (auto that = wThat.lock())
-						{
-							that->_logger->log(LogLevel::Warn, "Scene::hostConnectionStateSubscription", "An error occurred while running ConnectionState event handlers", ex.what());
-						}
-					}
-				});
-			}
-		}, [](std::exception_ptr exptr) // on_error callback, added because the on_next above might throw
-		{
-			try
-			{
-				std::rethrow_exception(exptr);
-			}
-			catch (const std::exception&)
-			{
-				// Most likely invalidated DependencyScope because of dead Client...
-			}
-		});
+					std::rethrow_exception(exptr);
+				}
+				catch (const std::exception&)
+				{
+					// Most likely invalidated DependencyScope because of dead Client...
+				}
+			});
 
 		_scope = parentScope.beginLifetimeScope([this](ContainerBuilder& builder)
-		{
-			auto weakThis = STORM_WEAK_FROM_THIS();
-			builder.registerDependency<Scene_Impl>([weakThis](const DependencyScope&) { return weakThis.lock(); }).as<Scene>().instancePerRequest();
-			for (auto plugin : this->_plugins)
 			{
-				plugin->registerSceneDependencies(builder, this->shared_from_this());
-			}
-		});
+				auto weakThis = STORM_WEAK_FROM_THIS();
+				builder.registerDependency<Scene_Impl>([weakThis](const DependencyScope&) { return weakThis.lock(); }).as<Scene>().instancePerRequest();
+				for (auto plugin : this->_plugins)
+				{
+					plugin->registerSceneDependencies(builder, this->shared_from_this());
+				}
+			});
 
 		for (auto plugin : this->_plugins)
 		{
@@ -146,16 +146,16 @@ namespace Stormancer
 		auto logger = _logger;
 		disconnect(timeout(5s))
 			.then([logger](pplx::task<void> t)
-		{
-			try
-			{
-				t.get();
-			}
-			catch (const std::exception& ex)
-			{
-				logger->log(LogLevel::Trace, "Client", "Ignore scene disconnection failure", ex.what());
-			}
-		});
+				{
+					try
+					{
+						t.get();
+					}
+					catch (const std::exception& ex)
+					{
+						logger->log(LogLevel::Trace, "Client", "Ignore scene disconnection failure", ex.what());
+					}
+				});
 
 		for (auto weakSub : _subscriptions)
 		{
@@ -277,51 +277,51 @@ namespace Stormancer
 		auto wScene = STORM_WEAK_FROM_THIS();
 		auto logger = _logger;
 		auto observable = rxcpp::observable<>::create<Packetisp_ptr>([wScene, route, logger](rxcpp::subscriber<Packetisp_ptr> subscriber)
-		{
-			auto handler = std::function<void(Packet_ptr)>([wScene, route, subscriber, logger](Packet_ptr p)
 			{
-				auto scene = LockOrThrow(wScene);
+				auto handler = std::function<void(Packet_ptr)>([wScene, route, subscriber, logger](Packet_ptr p)
+					{
+						auto scene = LockOrThrow(wScene);
 
-				std::shared_ptr<IScenePeer> origin = nullptr;
-				bool isOriginHost = false;
-				if (p->connection->id() == scene->host()->id())
-				{
-					isOriginHost = true;
-					origin = scene->_host;
-				}
-				else
-				{
-					auto originIt = scene->_connectedPeers.find(p->connection->sessionId());
-					if (originIt == scene->_connectedPeers.end())
+						std::shared_ptr<IScenePeer> origin = nullptr;
+						bool isOriginHost = false;
+						if (p->connection->id() == scene->host()->id())
+						{
+							isOriginHost = true;
+							origin = scene->_host;
+						}
+						else
+						{
+							auto originIt = scene->_connectedPeers.find(p->connection->sessionId());
+							if (originIt == scene->_connectedPeers.end())
+							{
+								logger->log(LogLevel::Warn, "Scene", "Peer (" + p->connection->sessionId() + ") not found on scene '" + scene->address().toUri() + "'");
+								return;
+							}
+							else
+							{
+								origin = originIt->second;
+							}
+						}
+						if (origin)
+						{
+							if ((isOriginHost && ((int)route->filter() & (int)MessageOriginFilter::Host)) ||
+								((!isOriginHost) && ((int)route->filter() & (int)MessageOriginFilter::Peer))) // Filter packet
+							{
+								Packetisp_ptr packet(new Packet<IScenePeer>(origin, p->metadata));
+								packet->stream.rdbuf()->pubsetbuf(p->stream.currentPtr(), p->stream.availableSize());
+								packet->originalPacket = p; // The packetisp keeps alive the original packet
+								subscriber.on_next(packet);
+							}
+						}
+					});
+				route->handlers.push_back(handler);
+				auto handlerIt = route->handlers.end();
+				handlerIt--;
+				subscriber.add([route, handlerIt]()
 					{
-						logger->log(LogLevel::Warn, "Scene", "Peer (" + p->connection->sessionId() + ") not found on scene '" + scene->address().toUri() + "'");
-						return;
-					}
-					else
-					{
-						origin = originIt->second;
-					}
-				}
-				if (origin)
-				{
-					if ((isOriginHost && ((int)route->filter() & (int)MessageOriginFilter::Host)) ||
-						((!isOriginHost) && ((int)route->filter() & (int)MessageOriginFilter::Peer))) // Filter packet
-					{
-						Packetisp_ptr packet(new Packet<IScenePeer>(origin, p->metadata));
-						packet->stream.rdbuf()->pubsetbuf(p->stream.currentPtr(), p->stream.availableSize());
-						packet->originalPacket = p; // The packetisp keeps alive the original packet
-						subscriber.on_next(packet);
-					}
-				}
+						route->handlers.erase(handlerIt);
+					});
 			});
-			route->handlers.push_back(handler);
-			auto handlerIt = route->handlers.end();
-			handlerIt--;
-			subscriber.add([route, handlerIt]()
-			{
-				route->handlers.erase(handlerIt);
-			});
-		});
 
 		return observable.as_dynamic();
 	}
@@ -368,7 +368,7 @@ namespace Stormancer
 				for (auto id : peerFilter.ids)
 				{
 					std::unordered_map<std::string, std::shared_ptr<IP2PScenePeer>>::iterator scenePeerIt;
-					
+
 					{
 						std::lock_guard<std::recursive_mutex> lg(_mutex);
 						scenePeerIt = _connectedPeers.find(id);
@@ -466,26 +466,26 @@ namespace Stormancer
 			auto wScene = STORM_WEAK_FROM_THIS();
 			_disconnectTask = disconnectAllPeers(ct)
 				.then([ct, wScene]()
-			{
-				auto scene = LockOrThrow(wScene);
-				return scene->disconnectFromHost(ct);
-			})
+					{
+						auto scene = LockOrThrow(wScene);
+						return scene->disconnectFromHost(ct);
+					})
 				.then([](pplx::task<void> task)
-			{
-				// This continuation transforms a potentially cancelled task to a completed task
-				try
-				{
-					task.get();
-				}
-				catch (const pplx::task_canceled ex)
-				{
-					// Do nothing
-				}
-				catch (...)
-				{
-					throw;
-				}
-			});
+					{
+						// This continuation transforms a potentially cancelled task to a completed task
+						try
+						{
+							task.get();
+						}
+						catch (const pplx::task_canceled ex)
+						{
+							// Do nothing
+						}
+						catch (...)
+						{
+							throw;
+						}
+					});
 		}
 
 		return _disconnectTask;
@@ -516,37 +516,37 @@ namespace Stormancer
 
 		return pplx::when_all(disconnectingPeers.begin(), disconnectingPeers.end())
 			.then([ct, logger, disconnectingPeers, wScene](pplx::task<void> task)
-		{
-			try
-			{
-				task.get();
-			}
-			catch (const std::exception&)
-			{
-				// Errors will be displayed later
-				if (auto scene = wScene.lock())
-				{
-					std::lock_guard<std::recursive_mutex> lg(scene->_mutex);
-					scene->_connectedPeers.clear();
-				}
-			}
-
-			for (auto disconnectingPeerTask : disconnectingPeers)
-			{
-				disconnectingPeerTask.then([logger](pplx::task<void> continuation)
 				{
 					try
 					{
-						continuation.get();
+						task.get();
 					}
-					catch (const std::exception& ex)
+					catch (const std::exception&)
 					{
-						// Do nothing but display errors
-						logger->log(LogLevel::Error, "Scene", "Peer disconnection failed", ex.what());
+						// Errors will be displayed later
+						if (auto scene = wScene.lock())
+						{
+							std::lock_guard<std::recursive_mutex> lg(scene->_mutex);
+							scene->_connectedPeers.clear();
+						}
+					}
+
+					for (auto disconnectingPeerTask : disconnectingPeers)
+					{
+						disconnectingPeerTask.then([logger](pplx::task<void> continuation)
+							{
+								try
+								{
+									continuation.get();
+								}
+								catch (const std::exception& ex)
+								{
+									// Do nothing but display errors
+									logger->log(LogLevel::Error, "Scene", "Peer disconnection failed", ex.what());
+								}
+							});
 					}
 				});
-			}
-		});
 	}
 
 	pplx::task<void> Scene_Impl::disconnectFromHost(pplx::cancellation_token ct)
@@ -571,25 +571,25 @@ namespace Stormancer
 			auto wScene = STORM_WEAK_FROM_THIS();
 			std::lock_guard<std::recursive_mutex> lg(_mutex);
 			return _connectTask.then([wScene, ct](pplx::task<void> task)
-			{
-				try
 				{
-					task.get();
-				}
-				catch (const std::exception&)
-				{
-					// If the connection failed, we stop here
+					try
+					{
+						task.get();
+					}
+					catch (const std::exception&)
+					{
+						// If the connection failed, we stop here
+						return pplx::task_from_result(pplx::task_options(ct));
+					}
+
+					// If the connection finished successfully, we disconnect the scene
+					if (auto scene = wScene.lock())
+					{
+						return scene->disconnect(ct);
+					}
+
 					return pplx::task_from_result(pplx::task_options(ct));
-				}
-
-				// If the connection finished successfully, we disconnect the scene
-				if (auto scene = wScene.lock())
-				{
-					return scene->disconnect(ct);
-				}
-
-				return pplx::task_from_result(pplx::task_options(ct));
-			});
+				});
 		}
 		else
 		{
@@ -705,78 +705,78 @@ namespace Stormancer
 
 		return p2pService->openP2PConnection(_host->connection(), p2pToken, ct)
 			.then([wScene, p2pService, routes, ct](std::shared_ptr<IConnection> p2pConnection)
-		{
-			auto scene = LockOrThrow(wScene);
-
-			auto& handles = *p2pConnection->dependencyResolver().resolve<std::vector<std::weak_ptr<Scene_Impl>>>();
-			uint8 handle = 0;
-			bool success = false;
-
-			for (uint8 i = 0; i < 150; i++)
-			{
-				if (!handles[i].lock())
 				{
-					handle = i + (uint8)MessageIDTypes::ID_SCENES;
-					handles[i] = scene;
-					success = true;
-					break;
-				}
-			}
-			if (!success)
-			{
-				return pplx::task_from_exception<std::shared_ptr<IP2PScenePeer>>(std::runtime_error("Failed to generate handle for scene."));
-			}
+					auto scene = LockOrThrow(wScene);
 
-			P2PConnectToSceneMessage connectToSceneMessage;
-			connectToSceneMessage.sceneId = scene->address().toUri();
-			connectToSceneMessage.sceneHandle = handle;
-			for (auto r : scene->localRoutes())
-			{
-				if ((byte)r->filter() & (byte)MessageOriginFilter::Peer)
-				{
-					RouteDto routeDto;
-					routeDto.Handle = r->handle();
-					routeDto.Name = r->name();
-					routeDto.Metadata = r->metadata();
-					connectToSceneMessage.routes << routeDto;
-				}
-			}
-			connectToSceneMessage.connectionMetadata = p2pConnection->metadata();
-			connectToSceneMessage.sceneMetadata = scene->getSceneMetadata();
+					auto& handles = *p2pConnection->dependencyResolver().resolve<std::vector<std::weak_ptr<Scene_Impl>>>();
+					uint8 handle = 0;
+					bool success = false;
 
-			auto result = scene->sendSystemRequest<P2PConnectToSceneMessage, P2PConnectToSceneMessage>(p2pConnection, (byte)SystemRequestIDTypes::ID_CONNECT_TO_SCENE, connectToSceneMessage, ct)
-				.then([wScene, p2pConnection, p2pService](P2PConnectToSceneMessage connectToSceneMessage)
-			{
-				auto scene = LockOrThrow(wScene);
-				auto scenePeer = scene->peerConnected(p2pConnection, p2pService, connectToSceneMessage);
-				return scenePeer;
-			}, ct);
-
-			result.then([wScene, p2pConnection, ct](std::shared_ptr<IP2PScenePeer> peer)
-			{
-				if (auto scene = wScene.lock())
-				{
-					scene->sendSystemRequest<void>(p2pConnection, (byte)SystemRequestIDTypes::ID_CONNECTED_TO_SCENE, scene->address().toUri(), ct)
-						.then([wScene, peer](pplx::task<void> t)
+					for (uint8 i = 0; i < 150; i++)
 					{
-						try
+						if (!handles[i].lock())
 						{
-							t.get();
+							handle = i + (uint8)MessageIDTypes::ID_SCENES;
+							handles[i] = scene;
+							success = true;
+							break;
 						}
-						catch (const std::exception&)
-						{
-						}
+					}
+					if (!success)
+					{
+						return pplx::task_from_exception<std::shared_ptr<IP2PScenePeer>>(std::runtime_error("Failed to generate handle for scene."));
+					}
 
-						if (auto scene = wScene.lock())
+					P2PConnectToSceneMessage connectToSceneMessage;
+					connectToSceneMessage.sceneId = scene->address().toUri();
+					connectToSceneMessage.sceneHandle = handle;
+					for (auto r : scene->localRoutes())
+					{
+						if ((byte)r->filter() & (byte)MessageOriginFilter::Peer)
 						{
-							scene->raisePeerConnected(peer->sessionId());
+							RouteDto routeDto;
+							routeDto.Handle = r->handle();
+							routeDto.Name = r->name();
+							routeDto.Metadata = r->metadata();
+							connectToSceneMessage.routes << routeDto;
 						}
-					});
-				}
-			});
+					}
+					connectToSceneMessage.connectionMetadata = p2pConnection->metadata();
+					connectToSceneMessage.sceneMetadata = scene->getSceneMetadata();
 
-			return result;
-		}, options);
+					auto result = scene->sendSystemRequest<P2PConnectToSceneMessage, P2PConnectToSceneMessage>(p2pConnection, (byte)SystemRequestIDTypes::ID_CONNECT_TO_SCENE, connectToSceneMessage, ct)
+						.then([wScene, p2pConnection, p2pService](P2PConnectToSceneMessage connectToSceneMessage)
+							{
+								auto scene = LockOrThrow(wScene);
+								auto scenePeer = scene->peerConnected(p2pConnection, p2pService, connectToSceneMessage);
+								return scenePeer;
+							}, ct);
+
+					result.then([wScene, p2pConnection, ct](std::shared_ptr<IP2PScenePeer> peer)
+						{
+							if (auto scene = wScene.lock())
+							{
+								scene->sendSystemRequest<void>(p2pConnection, (byte)SystemRequestIDTypes::ID_CONNECTED_TO_SCENE, scene->address().toUri(), ct)
+									.then([wScene, peer](pplx::task<void> t)
+										{
+											try
+											{
+												t.get();
+											}
+											catch (const std::exception&)
+											{
+											}
+
+											if (auto scene = wScene.lock())
+											{
+												scene->raisePeerConnected(peer->sessionId());
+											}
+										});
+							}
+						});
+
+					return result;
+				}, options);
 	}
 
 	const std::unordered_map<std::string, std::string>& Scene_Impl::getSceneMetadata()
@@ -820,12 +820,12 @@ namespace Stormancer
 			{
 				auto wScene = STORM_WEAK_FROM_THIS();
 				actionDispatcher->post([wScene, it]()
-				{
-					if (auto scene = wScene.lock())
 					{
-						scene->_onPeerConnected(it->second);
-					}
-				});
+						if (auto scene = wScene.lock())
+						{
+							scene->_onPeerConnected(it->second);
+						}
+					});
 			}
 		}
 	}
@@ -843,12 +843,14 @@ namespace Stormancer
 			{
 				auto wScene = STORM_WEAK_FROM_THIS();
 				actionDispatcher->post([wScene, peer]()
-				{
-					if (auto scene = wScene.lock())
 					{
-						scene->_onPeerDisconnected(peer);
+						auto scene = wScene.lock();
+						if (scene)
+						{
+							scene->_onPeerDisconnected(peer);
+						}
 					}
-				});
+				);
 			}
 		}
 	}
@@ -861,56 +863,61 @@ namespace Stormancer
 	pplx::task<void> Scene_Impl::setConnectionState(ConnectionState state)
 	{
 		auto dispatcher = _scope.resolve<IActionDispatcher>();
-		auto weakScene = STORM_WEAK_FROM_THIS();
+		auto scene = this->shared_from_this();
 
 		// The connection state change and the event that signal it must be triggered synchronously on the game's dispatcher.
-		return pplx::create_task([weakScene, state]
-		{
-			auto scene = LockOrThrow(weakScene);
-			if (scene->_connectionState != state && !scene->_connectionStateObservableCompleted)
+		return pplx::create_task([scene, state]//capture this because we don't want the object to be destroyed BEFORE we run this method.
 			{
-				scene->_connectionState = state;
-				// on_next and on_completed handlers might delete this. Do not use this at all after calling the handlers.
-				scene->_connectionStateObservableCompleted = (state == ConnectionState::Disconnected);
-				auto subscriber = scene->_sceneConnectionStateObservable.get_subscriber();
 
-				switch (state.state)
+				if (scene)
 				{
-				case ConnectionState::Connecting:
-					for (auto plugin : scene->_plugins)
-					{
-						plugin->sceneConnecting(scene);
-					}
-					break;
-				case ConnectionState::Connected:
-					for (auto plugin : scene->_plugins)
-					{
-						plugin->sceneConnected(scene);
-					}
-					break;
-				case ConnectionState::Disconnecting:
-					for (auto plugin : scene->_plugins)
-					{
-						plugin->sceneDisconnecting(scene);
-					}
-					break;
-				case ConnectionState::Disconnected:
-					for (auto plugin : scene->_plugins)
-					{
-						plugin->sceneDisconnected(scene);
-					}
-					break;
-				default:
-					break;
-				}
 
-				subscriber.on_next(state);
-				if (state == ConnectionState::Disconnected)
-				{
-					subscriber.on_completed();
+
+					if (scene->_connectionState != state && !scene->_connectionStateObservableCompleted)
+					{
+						scene->_connectionState = state;
+						// on_next and on_completed handlers might delete this. Do not use this at all after calling the handlers.
+						scene->_connectionStateObservableCompleted = (state == ConnectionState::Disconnected);
+						auto subscriber = scene->_sceneConnectionStateObservable.get_subscriber();
+
+						switch (state.state)
+						{
+						case ConnectionState::Connecting:
+							for (auto plugin : scene->_plugins)
+							{
+								plugin->sceneConnecting(scene);
+							}
+							break;
+						case ConnectionState::Connected:
+							for (auto plugin : scene->_plugins)
+							{
+								plugin->sceneConnected(scene);
+							}
+							break;
+						case ConnectionState::Disconnecting:
+							for (auto plugin : scene->_plugins)
+							{
+								plugin->sceneDisconnecting(scene);
+							}
+							break;
+						case ConnectionState::Disconnected:
+							for (auto plugin : scene->_plugins)
+							{
+								plugin->sceneDisconnected(scene);
+							}
+							break;
+						default:
+							break;
+						}
+
+						subscriber.on_next(state);
+						if (state == ConnectionState::Disconnected)
+						{
+							subscriber.on_completed();
+						}
+					}
 				}
-			}
-		}, dispatcher);
+			}, dispatcher);
 	}
 
 	pplx::task<std::shared_ptr<P2PScenePeer>> Scene_Impl::createScenePeerFromP2PConnection(std::shared_ptr<IConnection> /*connection*/, pplx::cancellation_token /*ct*/)
