@@ -169,8 +169,6 @@ namespace Stormancer
 		//_config->synchronisedClock = false;
 		_client = IClient::create(_config);
 
-
-
 		_logger->log(LogLevel::Debug, "test_create", "TEST CREATE OK");
 
 		execNextTest();
@@ -186,9 +184,10 @@ namespace Stormancer
 
 			_client->connectToPublicScene(_sceneName, [this](std::shared_ptr<Scene> scene)
 			{
+				_sceneMain = scene;
 				_logger->log(LogLevel::Debug, "test_connect", "Get scene OK");
 
-				auto onNext = [this, scene](ConnectionState state)
+				auto onNext = [this](ConnectionState state)
 				{
 					auto stateStr = connectionStateToString(state);
 					_logger->log(LogLevel::Debug, "test_connect", "Scene connection state changed: " + stateStr, state.reason);

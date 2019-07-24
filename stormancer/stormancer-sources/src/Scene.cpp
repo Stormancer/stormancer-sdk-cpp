@@ -143,20 +143,6 @@ namespace Stormancer
 		}
 		_logger->log(LogLevel::Trace, "Scene", "destroying scene", _address.toUri());
 
-		auto logger = _logger;
-		disconnect(timeout(5s))
-			.then([logger](pplx::task<void> t)
-				{
-					try
-					{
-						t.get();
-					}
-					catch (const std::exception& ex)
-					{
-						logger->log(LogLevel::Trace, "Client", "Ignore scene disconnection failure", ex.what());
-					}
-				});
-
 		for (auto weakSub : _subscriptions)
 		{
 			auto sub = weakSub.get_weak().lock();
