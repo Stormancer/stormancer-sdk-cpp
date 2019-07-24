@@ -41,7 +41,7 @@ namespace Stormancer
 		auto sPtr = wPtr.lock();
 		if (!sPtr)
 		{
-			throw PointerDeletedException(errorMessage);
+			throw PointerDeletedException(errorMessage.c_str());
 		}
 		return sPtr;
 	}

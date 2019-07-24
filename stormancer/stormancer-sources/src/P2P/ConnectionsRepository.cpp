@@ -24,7 +24,7 @@ namespace Stormancer
 	void ConnectionsRepository::newConnection(std::shared_ptr<IConnection> connection)
 	{
 		std::lock_guard<std::mutex> l(_mutex);
-		_logger->log(LogLevel::Trace, "Connections", "Adding connection (pi=" + connection->ipAddress() + ", id=" + std::to_string(connection->id()) + ", sessionId=" + connection->sessionId() + ")");
+		_logger->log(LogLevel::Trace, "Connections", "Adding connection (ip=" + connection->ipAddress() + ", id=" + std::to_string(connection->id()) + ", sessionId=" + connection->sessionId() + ")");
 
 		if (!connection)
 		{

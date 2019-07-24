@@ -313,6 +313,7 @@ namespace Stormancer
 					if (hostConnection && requestProcessor)
 					{
 						auto p2pSessonIdVector = utility::conversions::from_base64(utility::conversions::to_string_t(p2pSessionId));
+						logger->log(LogLevel::Trace, "P2PRequestModule", "Closing P2P session", p2pSessionId);
 						requestProcessor->sendSystemRequest(hostConnection.get(), (byte)SystemRequestIDTypes::ID_P2P_CLOSE_SESSION, p2pSessonIdVector, timeout(5s))
 							.then([logger](pplx::task<void> task)
 						{
@@ -322,7 +323,7 @@ namespace Stormancer
 							}
 							catch (const std::exception& ex)
 							{
-								logger->log(LogLevel::Error, "P2PRequestModule", "Send P2P Close session failed", ex.what());
+								logger->log(LogLevel::Warn, "P2PRequestModule", "Send P2P Close session failed", ex.what());
 							}
 						});
 					}
@@ -383,7 +384,7 @@ namespace Stormancer
 			auto clientSessionId = utility::conversions::to_utf8string(utility::conversions::to_base64(candidate.listeningPeerSessionId));
 			auto parentId = ctx->packet()->connection->key();
 
-			logger->log(LogLevel::Debug, "p2p", "Starting P2P client connection client peer =" + std::to_string(candidate.clientPeer));
+			logger->log(LogLevel::Debug, "p2p", "Starting P2P client connection client peer", std::to_string(candidate.clientPeer));
 
 			auto connection = connections->getConnection(candidate.listeningPeer);
 			if (connection && connection->getConnectionState() == ConnectionState::Connected)

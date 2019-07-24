@@ -90,7 +90,7 @@ namespace Stormancer
 			std::static_pointer_cast<Scene_Impl>(scene)->raisePeerDisconnected(sessionId());
 
 			P2PDisconnectFromSceneMessage disconnectRequest;
-			disconnectRequest.sceneId = scene->id();
+			disconnectRequest.sceneId = scene->address().toUri();
 			disconnectRequest.reason = "Requested by peer";
 			return std::static_pointer_cast<Scene_Impl>(scene)->sendSystemRequest<P2PDisconnectFromSceneMessage>(_connection, (byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, disconnectRequest, ct)
 				.then([](P2PDisconnectFromSceneMessage) {}, ct);

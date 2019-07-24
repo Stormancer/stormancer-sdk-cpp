@@ -82,10 +82,13 @@ namespace Stormancer
 					p2pTunnels->_tunnels[std::make_tuple(connectionId, result.handle)] = client;
 				}
 
-				auto tunnel = std::make_shared<P2PTunnel>([wP2pTunnels, connectionId, result]()
+				byte tunnelHandle = result.handle;
+				auto tunnel = std::make_shared<P2PTunnel>([wP2pTunnels, connectionId, tunnelHandle]()
 				{
-					auto p2pTunnels = LockOrThrow(wP2pTunnels);
-					p2pTunnels->destroyTunnel(connectionId, result.handle);
+					if (auto p2pTunnels = wP2pTunnels.lock())
+					{
+						p2pTunnels->destroyTunnel(connectionId, tunnelHandle);
+					}
 				});
 				tunnel->id = serverId;
 				tunnel->ip = "127.0.0.1";
