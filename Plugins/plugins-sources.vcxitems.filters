@@ -160,7 +160,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Messaging\MessagingService.cpp">
       <Filter>private\Messaging</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Core\ClientApi.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Leaderboard\Leaderboard_Impl.h">
@@ -415,7 +414,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameSession\Gamesessions.hpp">
       <Filter>public\GameSession</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Core\ClientAPI.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="private">

@@ -483,10 +483,21 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\P2P\P2PDisconnectFromSceneMessage.h">
       <Filter>Header Files\public\P2P</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\ConnectionData.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\ITokenHandler.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\SafeCapture.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\SceneEndpoint.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\ClientAPI.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\ConnectionData.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\ITokenHandler.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\SceneEndpoint.h">
+      <Filter>Header Files\public</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Utilities\PointerUtilities.h">
+      <Filter>Header Files\public\Utilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Configuration.cpp">

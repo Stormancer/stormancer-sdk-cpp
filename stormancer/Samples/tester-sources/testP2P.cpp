@@ -35,12 +35,12 @@ public:
 		if (br == RakNet::BR_FAILED_TO_BIND_SOCKET)
 		{
 			RakNet::RakNetSocket2Allocator::DeallocRNS2(socket);
-			throw std::runtime_error("Failed to bind socket");
+			throw std::runtime_error("P2P test : Failed to bind socket");
 		}
 		else if (br == RakNet::BR_FAILED_SEND_TEST)
 		{
 			RakNet::RakNetSocket2Allocator::DeallocRNS2(socket);
-			throw std::runtime_error("Failed to send test message");
+			throw std::runtime_error("P2P test : Failed to send test message");
 		}
 
 		((RakNet::RNS2_Berkley*)socket)->CreateRecvPollingThread(0);
@@ -206,11 +206,13 @@ pplx::task<void> testP2P(std::string endpoint, std::string account, std::string 
 		std::vector<pplx::task<void>> testsTasks;
 
 		// Create guests and start p2pConnect
+		uint16 guestServerGamePort = 7778;
 		for (int i = 0; i < guestsCount; i++)
 		{
 			auto guestConfiguration = Configuration::create(endpoint, account, application);
 			guestConfiguration->logger = logger;
-			guestConfiguration->serverGamePort = 7778;
+			guestConfiguration->serverGamePort = guestServerGamePort;
+			guestServerGamePort++;
 			//guestConfiguration->encryptionEnabled = true;
 
 			auto guestContext = std::make_shared<GuestTestContext>();
@@ -222,8 +224,9 @@ pplx::task<void> testP2P(std::string endpoint, std::string account, std::string 
 			context->host = hostContext;
 			context->guest = guestContext;
 
-			auto task = p2pConnect(context, logger)
-				.then([context, logger](pplx::task<void> task)
+			auto task = p2pConnect(context, logger);
+
+			task.then([context, logger](pplx::task<void> task)
 			{
 				try
 				{
