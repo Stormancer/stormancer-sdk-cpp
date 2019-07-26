@@ -67,22 +67,28 @@ namespace Stormancer
 		initialize(maxConnections, serverPort, parentScope);
 
 		auto wTransport = STORM_WEAK_FROM_THIS();
-
-		_scheduler->schedulePeriodic(15, [wTransport]()
+		auto cts = create_linked_source(ct);
+		_scheduler->schedulePeriodic(15, [wTransport, cts]()
+		{
+			auto transport = wTransport.lock();
+			if (!transport)
 			{
-				auto transport = LockOrThrow(wTransport);
-				std::lock_guard<std::mutex> lock(transport->_mutex);
-				if (transport->_isRunning)
-				{
-					transport->run();
-				}
-			}, ct);
+				cts.cancel(); // if the transport is deleted, we stop schedulePeriodic
+				return;
+			}
+
+			std::lock_guard<std::mutex> lock(transport->_mutex);
+			if (transport->_isRunning)
+			{
+				transport->run();
+			}
+		}, cts.get_token());
 
 		ct.register_callback([wTransport]()
-			{
-				auto transport = LockOrThrow(wTransport);
-				transport->stop();
-			});
+		{
+			auto transport = LockOrThrow(wTransport);
+			transport->stop();
+		});
 
 		_logger->log(LogLevel::Trace, "RakNetTransport", "RakNet transport started");
 	}
@@ -101,27 +107,27 @@ namespace Stormancer
 
 			auto wTransport = STORM_WEAK_FROM_THIS();
 			_peer = std::shared_ptr<RakNet::RakPeerInterface>(RakNet::RakPeerInterface::GetInstance(), [wTransport](RakNet::RakPeerInterface* peer)
+			{
+				if (auto transport = wTransport.lock())
 				{
-					if (auto transport = wTransport.lock())
-					{
-						transport->_logger->log(LogLevel::Trace, "RakNetTransport", "Deleting RakPeerInterface...");
-					}
-					RakNet::RakPeerInterface::DestroyInstance(peer);
+					transport->_logger->log(LogLevel::Trace, "RakNetTransport", "Deleting RakPeerInterface...");
+				}
+				RakNet::RakPeerInterface::DestroyInstance(peer);
 #ifdef STORMANCER_PACKETFILELOGGER
-					if (rakNetLogger)
-					{
-						delete rakNetLogger;
-					}
+				if (rakNetLogger)
+				{
+					delete rakNetLogger;
+				}
 #endif
-				});
+			});
 
 #ifdef STORMANCER_PACKETFILELOGGER
 			_peer->AttachPlugin(rakNetLogger);
 #endif
 			_dependencyScope = parentScope.beginLifetimeScope([this](ContainerBuilder& builder)
-				{
-					builder.registerDependency(_peer);
-				});
+			{
+				builder.registerDependency(_peer);
+			});
 
 			if (serverPort != 0)
 			{
@@ -177,7 +183,7 @@ namespace Stormancer
 				{
 					switch (ID)
 					{
-						// RakNet messages types
+					// RakNet messages types
 					case DefaultMessageIDTypes::ID_CONNECTION_REQUEST_ACCEPTED:
 					{
 						std::lock_guard<std::mutex> lg(_pendingConnection_mtx);
@@ -380,7 +386,7 @@ namespace Stormancer
 						else
 						{
 							_logger->log(LogLevel::Trace, "RakNetTransport", "Received Advertise peer request parentid=" + p2pRemoteConnecInfos.parentId + " id=" + p2pRemoteConnecInfos.id);
-							
+
 							auto parentConnection = _handler->getConnection(std::string(p2pRemoteConnecInfos.parentId));
 
 							P2PConnectionInfosExchange p2pConnecInfos;
@@ -593,12 +599,12 @@ namespace Stormancer
 
 		auto tce = request.tce;
 		pplx::task<void>([connection, tce]
-			{
-				// Start this asynchronously because we locked the mutex in run and the user can do something that tries to lock again this mutex
-				connection->setConnectionState(ConnectionState::Connecting); // we should set connecting state sooner (when the user call connect)
-				connection->setConnectionState(ConnectionState::Connected);
-				tce.set(connection);
-			});
+		{
+			// Start this asynchronously because we locked the mutex in run and the user can do something that tries to lock again this mutex
+			connection->setConnectionState(ConnectionState::Connecting); // we should set connecting state sooner (when the user call connect)
+			connection->setConnectionState(ConnectionState::Connected);
+			tce.set(connection);
+		});
 
 		return connection;
 	}
@@ -613,11 +619,11 @@ namespace Stormancer
 		_handler->newConnection(connection);
 
 		pplx::task<void>([connection]
-			{
-				// Start this asynchronously because we locked the mutex in run and the user can do something that tries to lock again this mutex
-				connection->setConnectionState(ConnectionState::Connecting); // we should set connecting state sooner (when the user call connect)
-				connection->setConnectionState(ConnectionState::Connected);
-			});
+		{
+			// Start this asynchronously because we locked the mutex in run and the user can do something that tries to lock again this mutex
+			connection->setConnectionState(ConnectionState::Connecting); // we should set connecting state sooner (when the user call connect)
+			connection->setConnectionState(ConnectionState::Connected);
+		});
 
 		return connection;
 	}
@@ -638,11 +644,11 @@ namespace Stormancer
 			connection->onClose(reason);
 
 			pplx::task<void>([connection, reason]()
-				{
-					// Start this asynchronously because we locked the mutex in run and the user can do something that tries to lock again this mutex
-					connection->setConnectionState(ConnectionState(ConnectionState::Disconnecting, reason));
-					connection->setConnectionState(ConnectionState(ConnectionState::Disconnected, reason));
-				});
+			{
+				// Start this asynchronously because we locked the mutex in run and the user can do something that tries to lock again this mutex
+				connection->setConnectionState(ConnectionState(ConnectionState::Disconnecting, reason));
+				connection->setConnectionState(ConnectionState(ConnectionState::Disconnected, reason));
+			});
 		}
 		else
 		{
@@ -664,10 +670,10 @@ namespace Stormancer
 		std::memcpy(data, rakNetPacket->data, (size_t)dataSize);
 
 		Packet_ptr packet(new Packet<>(connection, data, dataSize), [data](Packet<>* packetPtr)
-			{
-				delete packetPtr;
-				delete[] data;
-			});
+		{
+			delete packetPtr;
+			delete[] data;
+		});
 
 		_onPacketReceived(packet);
 	}
@@ -709,7 +715,7 @@ namespace Stormancer
 					logger->log(LogLevel::Trace, "RakNetTransport", "RakNet connection onClose: " + reason, std::to_string(cid));
 					peer->CloseConnection(guid, true);
 				}
-				});
+			});
 			_connections[raknetGuid.g] = container;
 			return connection;
 		}
@@ -821,71 +827,71 @@ namespace Stormancer
 			auto wTransport = STORM_WEAK_FROM_THIS();
 			auto pingImplTask = taskDelay(std::chrono::milliseconds(300 * i), cts.get_token())
 				.then([wTransport, address]()
-					{
-						auto transport = LockOrThrow(wTransport);
-						return transport->sendPingImplTask(address);
-					}, cts.get_token());
+			{
+				auto transport = LockOrThrow(wTransport);
+				return transport->sendPingImplTask(address);
+			}, cts.get_token());
 			tasks.push_back(pingImplTask);
 
 			pingImplTask.then([](pplx::task<bool> t)
+			{
+				try
 				{
-					try
-					{
-						t.get();
-					}
-					catch (...) {}
-				});
+					t.get();
+				}
+				catch (...) {}
+			});
 		}
 
 		auto logger = _logger;
 		pplx::when_all(tasks.begin(), tasks.end())
 			.then([logger, tce, address](std::vector<bool> results)
+		{
+			bool sent = false;
+
+			for (bool result : results)
+			{
+				if (result)
 				{
-					bool sent = false;
+					sent = true;
+					break;
+				}
+			}
 
-					for (bool result : results)
-					{
-						if (result)
-						{
-							sent = true;
-							break;
-						}
-					}
-
-					if (!sent)
-					{
-						logger->log(LogLevel::Debug, "RakNetTransport", "Pings to " + address + " failed: unreachable address.");
-						tce.set(-1);
-					}
-				}, cts.get_token())
+			if (!sent)
+			{
+				logger->log(LogLevel::Debug, "RakNetTransport", "Pings to " + address + " failed: unreachable address.");
+				tce.set(-1);
+			}
+		}, cts.get_token())
 			.then([logger, address](pplx::task<void> t) {
-					try
-					{
-						t.get();
-					}
-					catch (const std::exception&)
-					{
-						logger->log(LogLevel::Debug, "RakNetTransport", "Pings to " + address + " failed: ping cancelled.");
-					}
-				});
+			try
+			{
+				t.get();
+			}
+			catch (const std::exception&)
+			{
+				logger->log(LogLevel::Debug, "RakNetTransport", "Pings to " + address + " failed: ping cancelled.");
+			}
+		});
 
-				auto wTransport = STORM_WEAK_FROM_THIS();
-				return cancel_after_timeout(eventSetTask, cts, 1500)
-					.then([wTransport, address](pplx::task<int> t)
-						{
-							auto transport = LockOrThrow(wTransport);
-							std::lock_guard<std::mutex> lg(transport->_pendingPingsMutex);
-							transport->_pendingPings.erase(address); // destroys the tce and cancels the task
-							try
-							{
-								return t.get();
-							}
-							catch (std::exception& ex)
-							{
-								transport->_logger->log(LogLevel::Debug, "RakNetTransport", "Ping to " + address + " failed", ex.what());
-								return -1;
-							}
-						});
+		auto wTransport = STORM_WEAK_FROM_THIS();
+		return cancel_after_timeout(eventSetTask, cts, 1500)
+			.then([wTransport, address](pplx::task<int> t)
+		{
+			auto transport = LockOrThrow(wTransport);
+			std::lock_guard<std::mutex> lg(transport->_pendingPingsMutex);
+			transport->_pendingPings.erase(address); // destroys the tce and cancels the task
+			try
+			{
+				return t.get();
+			}
+			catch (std::exception& ex)
+			{
+				transport->_logger->log(LogLevel::Debug, "RakNetTransport", "Ping to " + address + " failed", ex.what());
+				return -1;
+			}
+		});
 	}
 
 	void RakNetTransport::openNat(const std::string& address)

@@ -192,6 +192,8 @@ pplx::task<void> testP2P(std::string endpoint, std::string account, std::string 
 	// Create host
 	auto hostConfiguration = Configuration::create(endpoint, account, application);
 	hostConfiguration->logger = logger;
+	hostConfiguration->serverGamePort = 7777;
+	hostConfiguration->maxPeers = guestsCount + 1;
 	//hostConfiguration->encryptionEnabled = true;
 
 	auto hostClient = IClient::create(hostConfiguration);
@@ -213,6 +215,7 @@ pplx::task<void> testP2P(std::string endpoint, std::string account, std::string 
 			guestConfiguration->logger = logger;
 			guestConfiguration->serverGamePort = guestServerGamePort;
 			guestServerGamePort++;
+			guestConfiguration->maxPeers = 2;
 			//guestConfiguration->encryptionEnabled = true;
 
 			auto guestContext = std::make_shared<GuestTestContext>();
@@ -414,7 +417,7 @@ pplx::task<void> p2pConnect(std::shared_ptr<TestContext> context, std::shared_pt
 			}
 			catch (const std::exception& ex)
 			{
-				logger->log(LogLevel::Error, "P2P_test.tunnel", ex.what());
+				logger->log(LogLevel::Error, "P2P_test.tunnel", "Open P2P tunnel failed", ex.what());
 			}
 		});
 
