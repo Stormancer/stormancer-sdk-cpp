@@ -137,20 +137,6 @@ namespace Stormancer
 		return false;
 	}
 
-	bool compareExchange(std::mutex& mutex, std::function<bool()> const compare, std::function<void()> exchange)
-	{
-		if (compare())
-		{
-			std::lock_guard<std::mutex> lg(mutex);
-			if (compare())
-			{
-				exchange();
-				return true;
-			}
-		}
-		return false;
-	}
-
 
 	void setUnobservedExceptionHandler(std::function<bool(std::exception_ptr)> handler)
 	{

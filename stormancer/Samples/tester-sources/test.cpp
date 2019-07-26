@@ -13,6 +13,8 @@ namespace Stormancer
 		_testsDone = false;
 		_testsPassed = false;
 
+		_tests.push_back([this]() { test_dependencyInjection(); });
+		_tests.push_back([this]() { test_streams(); });
 		_tests.push_back([this]() { test_connect(); });
 		_tests.push_back([this]() { test_echo(); });
 		_tests.push_back([this]() { test_rpc_server(); });
@@ -26,8 +28,6 @@ namespace Stormancer
 		_tests.push_back([this]() { test_setServerTimeout(); });
 		_tests.push_back([this]() { test_disconnect(); });
 		_tests.push_back([this]() { test_Ping_Cluster(); });
-		_tests.push_back([this]() { test_dependencyInjection(); });
-		_tests.push_back([this]() { test_streams(); });
 		_tests.push_back([this]() { test_clean(); });
 
 		// Some platforms require a Client to be created before using pplx::task
