@@ -202,7 +202,7 @@ namespace Stormancer
 					.then([](pplx::task<void> t) {
 					try
 					{
-						t.get();
+						t.wait();
 					}
 					catch (...)
 					{

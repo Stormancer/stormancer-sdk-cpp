@@ -46,7 +46,7 @@ namespace Stormancer
 		/// Disconnect from the server application and from every scene this client is connected to.
 		/// </summary>
 		/// <returns></returns>
-		virtual pplx::task<void> disconnect() = 0;
+		virtual pplx::task<void> disconnect(pplx::cancellation_token ct = pplx::cancellation_token::none()) = 0;
 
 		/// <summary>
 		/// Get sync clock value.

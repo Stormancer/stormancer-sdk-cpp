@@ -741,11 +741,11 @@ namespace Stormancer
 		}, ct);
 	}
 
-	pplx::task<void> Client::disconnect()
+	pplx::task<void> Client::disconnect(pplx::cancellation_token ct)
 	{
 		if (_scenes.size() == 0)
 		{
-			return pplx::task_from_result();
+			return pplx::task_from_result(pplx::task_options(ct));
 		}
 
 		for (auto plugin : this->_plugins)
@@ -753,27 +753,25 @@ namespace Stormancer
 			plugin->clientDisconnecting(this->shared_from_this());
 		}
 
-		// Stops the synchronised clock, disconnect the scenes, closes the server connection then stops the underlying transports.
-
 		auto loggerPtr = logger();
-
 		auto wConnections = _connections;
 		return disconnectAllScenes()
-			.then([loggerPtr, wConnections](pplx::task<void> t)
+			.then([loggerPtr, wConnections, ct](pplx::task<void> t)
 		{
 			try
 			{
 				t.get();
-				if (auto c = wConnections.lock())
-				{
-					return c->closeAllConnections("Client disconnection requested by user");
-				}
 			}
 			catch (const std::exception& ex)
 			{
 				loggerPtr->log(LogLevel::Trace, "Client", "Ignore client disconnection failure", ex.what());
 			}
-			return pplx::task_from_result();
+
+			if (auto c = wConnections.lock())
+			{
+				return c->closeAllConnections("Client disconnection requested by user");
+			}
+			return pplx::task_from_result(pplx::task_options(ct));
 		});
 	}
 

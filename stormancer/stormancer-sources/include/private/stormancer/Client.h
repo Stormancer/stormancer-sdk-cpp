@@ -57,7 +57,7 @@ namespace Stormancer
 
 		/// Disconnect and close all connections.
 		/// this method returns nothing. So it's useful for application close.
-		pplx::task<void> disconnect() override;
+		pplx::task<void> disconnect(pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
 
 		/// Get sync clock value
 		int64 clock() const override;

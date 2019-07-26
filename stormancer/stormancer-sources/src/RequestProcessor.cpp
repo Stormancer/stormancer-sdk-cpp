@@ -48,13 +48,13 @@ namespace Stormancer
 
 		auto wProcessor = STORM_WEAK_FROM_THIS();
 
-		config.addProcessor((byte)MessageIDTypes::ID_SYSTEM_REQUEST, [wProcessor, logger, serializer](Packet_ptr p)
+		config.addProcessor((byte)MessageIDTypes::ID_SYSTEM_REQUEST, [wProcessor, logger, serializer](Packet_ptr packet)
 		{
 			auto processor = LockOrThrow(wProcessor);
 
 			byte sysRequestId;
-			p->stream >> sysRequestId;
-			std::shared_ptr<RequestContext> context = std::make_shared<RequestContext>(p);
+			packet->stream >> sysRequestId;
+			std::shared_ptr<RequestContext> context = std::make_shared<RequestContext>(packet);
 			auto handlerIt = processor->_handlers.find(sysRequestId);
 
 			if (handlerIt == processor->_handlers.end())
@@ -100,29 +100,29 @@ namespace Stormancer
 			return true;
 		});
 
-		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG, [wProcessor, logger](Packet_ptr p)
+		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG, [wProcessor, logger](Packet_ptr packet)
 		{
 			auto processor = LockOrThrow(wProcessor);
 
 			uint16 id;
-			p->stream >> id;
+			packet->stream >> id;
 
-			SystemRequest_ptr request = processor->freeRequestSlot(id);
+			auto request = processor->freeRequestSlot(id);
+
+			auto idStr = std::to_string(id);
 
 			if (request)
 			{
-				p->metadata["request"] = std::to_string(request->id);
-				time(&request->lastRefresh);
-				if (!request->complete)
+				packet->metadata["request"] = idStr;
+				request->setLastRefresh(std::chrono::system_clock::now());
+				if (!request->trySet(packet))
 				{
-					request->complete = true;
-					request->tce.set(p);
+					logger->log(LogLevel::Warn, "RequestProcessor/next", "Can't set the system request", idStr);
 				}
 			}
 			else
 			{
-				std::string idstr = std::to_string(id);
-				logger->log(LogLevel::Warn, "RequestProcessor/next", "Unknow request id. " + idstr);
+				logger->log(LogLevel::Warn, "RequestProcessor/next", "Unknown request id", idStr);
 			}
 
 			return true;
@@ -135,25 +135,27 @@ namespace Stormancer
 			uint16 id;
 			p->stream >> id;
 
-			byte hasValues;
-			p->stream >> hasValues;
+			byte hasValuesData;
+			p->stream >> hasValuesData;
+			bool hasValues = (hasValuesData != 0);
 
-			if (hasValues == 0)
+			if (!hasValues)
 			{
 				SystemRequest_ptr request = processor->freeRequestSlot(id);
 
+				auto idStr = std::to_string(id);
+
 				if (request)
 				{
-					p->metadata["request"] = std::to_string(request->id);
-					if (!request->complete)
+					p->metadata["request"] = idStr;
+					if (!request->trySet(Packet_ptr()))
 					{
-						request->complete = true;
-						request->tce.set(Packet_ptr());
+						logger->log(LogLevel::Warn, "RequestProcessor/complete", "Can't set the system request", idStr);
 					}
 				}
 				else
 				{
-					logger->log(LogLevel::Warn, "RequestProcessor/complete", "Unknow request id " + std::to_string(id));
+					logger->log(LogLevel::Warn, "RequestProcessor/complete", "Unknown request id", idStr);
 				}
 			}
 
@@ -169,20 +171,21 @@ namespace Stormancer
 
 			SystemRequest_ptr request = processor->freeRequestSlot(id);
 
+			auto idStr = std::to_string(id);
+
 			if (request)
 			{
-				p->metadata["request"] = std::to_string(request->id);
+				p->metadata["request"] = idStr;
 				std::string msg = serializer.deserializeOne<std::string>(p->stream);
-				if (!request->complete)
+				std::string message = msg + "(msgId:" + std::to_string(request->operation()) + ")";
+				if (!request->trySetException(std::runtime_error(message.c_str())))
 				{
-					request->complete = true;
-					std::string message = msg + "(msgId:" + std::to_string(request->operation()) + ")";
-					request->tce.set_exception(std::runtime_error(message.c_str()));
+					logger->log(LogLevel::Warn, "RequestProcessor/error", "Can't set the exception in the system request", idStr);
 				}
 			}
 			else
 			{
-				logger->log(LogLevel::Warn, "RequestProcessor/error", "Unknown request id :" + std::to_string(id));
+				logger->log(LogLevel::Warn, "RequestProcessor/error", "Unknown request id", idStr);
 			}
 
 			return true;
@@ -191,64 +194,54 @@ namespace Stormancer
 
 	pplx::task<Packet_ptr> RequestProcessor::sendSystemRequest(IConnection* peer, byte msgId, const StreamWriter& streamWriter, PacketPriority priority, pplx::cancellation_token ct)
 	{
-		if (peer)
-		{
-			pplx::task_completion_event<Packet_ptr> tce;
-			auto request = reserveRequestSlot(msgId, tce, ct);
-			auto wThat = STORM_WEAK_FROM_THIS();
-			_logger->log(LogLevel::Trace, "systemRequest", "Sending system request " + std::to_string(msgId) + " to " + std::to_string(peer->id()));
-			request->ct = ct;
-			if (ct.is_cancelable())
-			{
-				std::weak_ptr<SystemRequest> wRequest = request;
-				request->ct_registration = ct.register_callback([tce, wRequest, wThat]()
-				{
-					if (auto that = wThat.lock())
-					{
-						if (auto request = wRequest.lock())
-						{
-							if (!request->complete)
-							{
-								that->freeRequestSlot(request->id);
-								tce.set_exception(pplx::task_canceled());
-							}
-						}
-					}
-				});
-			}
-
-			try
-			{
-				TransformMetadata metadata;
-				if (msgId == (byte)SystemRequestIDTypes::ID_SET_METADATA)
-				{
-					metadata.dontEncrypt = true; // SET metadata contains the encryption key
-				}
-				peer->send([msgId, request, &streamWriter](obytestream& stream)
-				{
-					stream << (byte)MessageIDTypes::ID_SYSTEM_REQUEST;
-					stream << msgId;
-					stream << request->id;
-					if (streamWriter)
-					{
-						streamWriter(stream);
-					}
-				}, systemRequestChannelUid, priority, PacketReliability::RELIABLE, metadata);
-			}
-			catch (const std::exception& ex)
-			{
-				tce.set_exception(ex);
-			}
-
-			return pplx::create_task(tce, ct);
-		}
-		else
+		if (!peer)
 		{
 			return pplx::task_from_exception<Packet_ptr>(std::invalid_argument("peer should not be nullptr"));
 		}
+
+		auto request = reserveRequestSlot(msgId, ct);
+		auto requestId = request->getId();
+		auto wRequestProcessor = STORM_WEAK_FROM_THIS();
+		_logger->log(LogLevel::Trace, "RequestProcessor", "Sending system request " + std::to_string(msgId) + " to " + std::to_string(peer->id()));
+		if (ct.is_cancelable())
+		{
+			ct.register_callback([requestId, wRequestProcessor]()
+			{
+				if (auto requestProcessor = wRequestProcessor.lock())
+				{
+					requestProcessor->freeRequestSlot(requestId);
+					// don't try to cancel the tce, it will cancel the associated tasks on delete
+				}
+			});
+		}
+
+		try
+		{
+			TransformMetadata metadata;
+			if (msgId == (byte)SystemRequestIDTypes::ID_SET_METADATA)
+			{
+				metadata.dontEncrypt = true; // SET metadata contains the encryption key
+			}
+			peer->send([msgId, request, &streamWriter](obytestream& stream)
+			{
+				stream << (byte)MessageIDTypes::ID_SYSTEM_REQUEST;
+				stream << msgId;
+				stream << request->getId();
+				if (streamWriter)
+				{
+					streamWriter(stream);
+				}
+			}, systemRequestChannelUid, priority, PacketReliability::RELIABLE, metadata);
+		}
+		catch (const std::exception& ex)
+		{
+			request->trySetException(ex);
+		}
+
+		return request->getTask(ct);
 	}
 
-	SystemRequest_ptr RequestProcessor::reserveRequestSlot(byte msgId, pplx::task_completion_event<Packet_ptr> tce, pplx::cancellation_token ct)
+	SystemRequest_ptr RequestProcessor::reserveRequestSlot(byte msgId, pplx::cancellation_token ct)
 	{
 		SystemRequest_ptr request;
 
@@ -257,16 +250,13 @@ namespace Stormancer
 
 			static uint16 id = 0;
 			// i is used to know if we tested all uint16 available values, whatever the current value of id.
-			uint32 i = 0;
-			while (i <= 0xffff)
+			for (uint32 i = 0; i <= 0xffff; i++)
 			{
 				id++;
-				i++;
 
 				if (!mapContains(_pendingRequests, id))
 				{
-					request = std::make_shared<SystemRequest>(msgId, tce, ct);
-					request->id = id;
+					request = std::make_shared<SystemRequest>(msgId, id, ct);
 					_pendingRequests[id] = request;
 					break;
 				}
@@ -288,7 +278,7 @@ namespace Stormancer
 
 		if (request)
 		{
-			time(&request->lastRefresh);
+			request->setLastRefresh(std::chrono::system_clock::now());
 			return request;
 		}
 
@@ -297,13 +287,15 @@ namespace Stormancer
 
 	SystemRequest_ptr RequestProcessor::freeRequestSlot(uint16 requestId)
 	{
+		SystemRequest_ptr request;
+
 		std::lock_guard<std::mutex> lock(_mutexPendingRequests);
 
-		SystemRequest_ptr request;
-		if (mapContains(_pendingRequests, requestId))
+		auto it = _pendingRequests.find(requestId);
+		if (it != _pendingRequests.end())
 		{
-			request = _pendingRequests[requestId];
-			_pendingRequests.erase(requestId);
+			request = it->second;
+			_pendingRequests.erase(it);
 		}
 
 		return request;
