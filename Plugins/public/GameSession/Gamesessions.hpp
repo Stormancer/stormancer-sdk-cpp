@@ -502,10 +502,10 @@ namespace Stormancer
 				friend class ::Stormancer::GameSessions::GameSessionsPlugin;
 			public:
 				GameSession_Impl(std::weak_ptr<IClient> client, std::shared_ptr<ITokenHandler> tokens, std::shared_ptr<ILogger> logger)
-					: _wClient(client)
-					, _currentGameSession(nullptr)
-					, _logger(logger)
+					: _logger(logger)
 					, _tokens(tokens)
+					, _wClient(client)
+					, _currentGameSession(nullptr)
 				{
 				}
 
@@ -958,7 +958,7 @@ namespace Stormancer
 				}
 			}
 
-			void registerClientDependencies(ContainerBuilder& builder)
+			void registerClientDependencies(ContainerBuilder& builder) override
 			{
 				builder.registerDependency < details::GameSession_Impl, IClient, ITokenHandler, ILogger >().as<GameSession>().singleInstance();
 			}

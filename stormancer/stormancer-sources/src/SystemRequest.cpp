@@ -4,9 +4,9 @@
 namespace Stormancer
 {
 	SystemRequest::SystemRequest(byte msgId, uint16 id, pplx::cancellation_token ct)
-		: _ct(ct)
+		: _id(id)
 		, _msgId(msgId)
-		, _id(id)
+		, _ct(ct)
 	{
 	}
 

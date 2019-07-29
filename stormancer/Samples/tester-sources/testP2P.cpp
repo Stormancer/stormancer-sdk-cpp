@@ -447,7 +447,7 @@ pplx::task<void> p2pConnect(std::shared_ptr<TestContext> context, std::shared_pt
 			}
 		});
 
-		return when_all(pplx::create_task(context->guest->hostReceivedMessageTce), pplx::create_task(context->guest->guestReceivedMessageTce));
+		return Stormancer::when_all(pplx::create_task(context->guest->hostReceivedMessageTce), pplx::create_task(context->guest->guestReceivedMessageTce));
 	})
 		.then([context, logger]()
 	{
