@@ -2,6 +2,7 @@
 #include "stormancer/P2P/RelayConnection.h"
 #include "stormancer/MessageIDTypes.h"
 #include "stormancer/Serializer.h"
+#include <cpprest/asyncrt_utils.h>
 
 namespace Stormancer
 {
@@ -10,8 +11,8 @@ namespace Stormancer
 		, _p2pSessionId(p2pSessionId)
 		, _remotePeerId(remotePeerId)
 		, _ipAddress(address)
-		, _serializer(serializer)
 		, _dependencyResolver(serverConnection->dependencyResolver().beginLifetimeScope())
+		, _serializer(serializer)
 	{
 	}
 
@@ -23,8 +24,8 @@ namespace Stormancer
 		{
 			stream << (byte)MessageIDTypes::ID_P2P_RELAY;
 			if (auto serializer = wSerializer.lock())
-			{
-				serializer->serialize(stream, p2pSessionId);
+			{				
+				serializer->serialize(stream, utility::conversions::from_base64(utility::conversions::to_string_t(p2pSessionId)));
 				serializer->serialize(stream, (uint8)priority);
 				serializer->serialize(stream, (uint8)reliability);
 
@@ -128,7 +129,13 @@ namespace Stormancer
 		throw std::runtime_error("Not supported");
 	}
 
-	
+	std::string RelayConnection::sessionId() const
+	{
+		return _sessionId;
+	}
 
-	
+	void RelayConnection::setSessionId(const std::string& sessionId)
+	{
+		_sessionId = sessionId;
+	}
 }

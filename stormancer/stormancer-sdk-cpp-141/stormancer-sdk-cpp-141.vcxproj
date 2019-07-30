@@ -427,6 +427,7 @@
   <ItemGroup>
     <ClCompile Include="..\stormancer-sources\src\Logger\VisualStudioLogger.cpp" />
     <ClCompile Include="..\stormancer-sources\src\Windows\AES\AES_windows.cpp" />
+    <ClCompile Include="..\stormancer-sources\src\Windows\RelyingPartyWindows.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\dependencies\cpprestsdk\Release\src\build\vs141\casablanca141.vcxproj">

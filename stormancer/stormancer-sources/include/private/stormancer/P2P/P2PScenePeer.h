@@ -27,9 +27,13 @@ namespace Stormancer
 
 		void send(const std::string& route, const StreamWriter& streamWriter, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const std::string& channelIdentifier = "") override;
 
-		void disconnect() override;
+		pplx::task<void> disconnect(pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
 
 		pplx::task<std::shared_ptr<P2PTunnel>> openP2PTunnel(const std::string& serverId, pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
+
+		byte handle() const override;
+
+		std::string sessionId() const override;
 
 #pragma endregion
 
@@ -50,6 +54,10 @@ namespace Stormancer
 		std::weak_ptr<Scene> _scene;
 
 		std::shared_ptr<P2PService> _p2pService;
+
+		rxcpp::composite_subscription _onConnectionStateChangedSub;
+
+		std::mutex _mutex;
 
 #pragma endregion
 	};

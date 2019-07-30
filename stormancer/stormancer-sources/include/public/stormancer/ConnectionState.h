@@ -31,8 +31,8 @@ namespace Stormancer
 
 		ConnectionState& operator=(State state2);
 
-		bool operator==(ConnectionState& other) const;
-		bool operator!=(ConnectionState& other) const;
+		bool operator==(const ConnectionState& other) const;
+		bool operator!=(const ConnectionState& other) const;
 
 		bool operator==(State state2) const;
 		bool operator!=(State state2) const;

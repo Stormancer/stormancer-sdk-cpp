@@ -4,7 +4,26 @@
 
 #include "stormancer/StormancerTypes.h"
 #include <streambuf>
+#include <locale>
 
+namespace std
+{
+	template<>
+	class ctype<Stormancer::byte> : public ctype<char>
+	{
+	public:
+
+		explicit ctype(size_t refs)
+			: ctype<char>(0, false, refs)
+		{
+		}
+
+		explicit ctype(const mask* table = 0, bool del = false, size_t refs = 0)
+			: ctype<char>(table, del, refs)
+		{
+		}
+	};
+}
 
 namespace Stormancer
 {

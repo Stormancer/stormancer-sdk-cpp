@@ -2,11 +2,38 @@
 #include "stormancer/Utilities/TaskUtilities.h"
 #include "TestDependencyInjection.h"
 #include "Helloworld/Helloworld.hpp"
-
+#include "TestStreams.h"
+#include "GameSession/Gamesessions.hpp"
 using namespace std::literals;
 
 namespace Stormancer
 {
+	void Tester::run_all_tests_nonblocking()
+	{
+		_testsDone = false;
+		_testsPassed = false;
+
+		_tests.push_back([this]() { test_dependencyInjection(); });
+		_tests.push_back([this]() { test_streams(); });
+		_tests.push_back([this]() { test_connect(); });
+		_tests.push_back([this]() { test_echo(); });
+		_tests.push_back([this]() { test_rpc_server(); });
+		_tests.push_back([this]() { test_rpc_server_cancel(); });
+		_tests.push_back([this]() { test_rpc_server_exception(); });
+		_tests.push_back([this]() { test_rpc_server_clientException(); });
+		_tests.push_back([this]() { test_rpc_client(); });
+		_tests.push_back([this]() { test_rpc_client_cancel(); });
+		_tests.push_back([this]() { test_rpc_client_exception(); });
+		_tests.push_back([this]() { test_syncClock(); });
+		_tests.push_back([this]() { test_setServerTimeout(); });
+		_tests.push_back([this]() { test_disconnect(); });
+		_tests.push_back([this]() { test_Ping_Cluster(); });
+		_tests.push_back([this]() { test_clean(); });
+
+		// Some platforms require a Client to be created before using pplx::task
+		test_create();
+	}
+
 	void Tester::execNextTest()
 	{
 		if (!_tests.empty())
@@ -142,8 +169,6 @@ namespace Stormancer
 		//_config->synchronisedClock = false;
 		_client = IClient::create(_config);
 
-
-
 		_logger->log(LogLevel::Debug, "test_create", "TEST CREATE OK");
 
 		execNextTest();
@@ -159,9 +184,10 @@ namespace Stormancer
 
 			_client->connectToPublicScene(_sceneName, [this](std::shared_ptr<Scene> scene)
 			{
+				_sceneMain = scene;
 				_logger->log(LogLevel::Debug, "test_connect", "Get scene OK");
 
-				auto onNext = [this, scene](ConnectionState state)
+				auto onNext = [this](ConnectionState state)
 				{
 					auto stateStr = connectionStateToString(state);
 					_logger->log(LogLevel::Debug, "test_connect", "Scene connection state changed: " + stateStr, state.reason);
@@ -669,30 +695,21 @@ namespace Stormancer
 		execNextTest();
 	}
 
-
-	void Tester::run_all_tests_nonblocking()
+	void Tester::test_streams()
 	{
-		_testsDone = false;
-		_testsPassed = false;
+		_logger->log(LogLevel::Info, "test_streams", "STREAMS");
 
-		_tests.push_back([this]() { test_connect(); });
-		_tests.push_back([this]() { test_echo(); });
-		_tests.push_back([this]() { test_rpc_server(); });
-		_tests.push_back([this]() { test_rpc_server_cancel(); });
-		_tests.push_back([this]() { test_rpc_server_exception(); });
-		_tests.push_back([this]() { test_rpc_server_clientException(); });
-		_tests.push_back([this]() { test_rpc_client(); });
-		_tests.push_back([this]() { test_rpc_client_cancel(); });
-		_tests.push_back([this]() { test_rpc_client_exception(); });
-		_tests.push_back([this]() { test_syncClock(); });
-		_tests.push_back([this]() { test_setServerTimeout(); });
-		_tests.push_back([this]() { test_disconnect(); });
-		_tests.push_back([this]() { test_Ping_Cluster(); });
-		_tests.push_back([this]() { test_dependencyInjection(); });
-		_tests.push_back([this]() { test_clean(); });
-
-		// Some platforms require a Client to be created before using pplx::task
-		test_create();
+		try
+		{
+			TestStreams::runTests();
+		}
+		catch (const std::exception& ex)
+		{
+			_logger->log(LogLevel::Error, "test_streams", "Streams FAILED", ex.what());
+			return;
+		}
+		_logger->log(LogLevel::Info, "test_streams", "Streams OK");
+		execNextTest();
 	}
 
 	bool Tester::tests_done()

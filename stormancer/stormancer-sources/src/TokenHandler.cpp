@@ -26,17 +26,17 @@ namespace Stormancer
 
 		auto token = stringTrim(token2, '"');
 		auto data = stringSplit(token, '-')[0];
-		utility::string_t data2(data.begin(), data.end());
+		utility::string_t data2 = utility::conversions::to_string_t(data);
 		auto vectorData = utility::conversions::from_base64(data2);
 
-		ConnectionData cData = _serializer.deserializeOne<ConnectionData>((byte*)vectorData.data(), vectorData.size());
+		ConnectionData cData = _serializer.deserializeOne<ConnectionData>(reinterpret_cast<const byte*>(vectorData.data()), vectorData.size());
 
 		return SceneEndpoint(token, cData);
 	}
 
 	SceneEndpoint TokenHandler::getSceneEndpointInfo(const std::string& token)
 	{
-		auto json = utility::string_t(token.begin(), token.end());
+		auto json = utility::conversions::to_string_t(token);
 		auto getTokenResponse = web::json::value::parse(json);
 		
 		SceneEndpoint endpoint;

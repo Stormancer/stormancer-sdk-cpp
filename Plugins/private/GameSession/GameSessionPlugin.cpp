@@ -49,6 +49,6 @@ namespace Stormancer
 
 	void GameSessionPlugin::registerClientDependencies(ContainerBuilder& builder)
 	{
-		builder.registerDependency<GameSession_Impl, IClient>().as<GameSession>().singleInstance();
+		builder.registerDependency<GameSession_Impl, IClient, ILogger>().as<GameSession>().singleInstance();
 	}
 };

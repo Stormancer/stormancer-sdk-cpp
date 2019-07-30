@@ -23,11 +23,7 @@ namespace Stormancer
 
 		try
 		{
-#if __cplusplus >= 201703L
-			return t->weak_from_this();
-#else
 			return t->shared_from_this();
-#endif
 		}
 		catch (const std::bad_weak_ptr&)
 		{
@@ -45,7 +41,7 @@ namespace Stormancer
 		auto sPtr = wPtr.lock();
 		if (!sPtr)
 		{
-			throw PointerDeletedException(errorMessage);
+			throw PointerDeletedException(errorMessage.c_str());
 		}
 		return sPtr;
 	}

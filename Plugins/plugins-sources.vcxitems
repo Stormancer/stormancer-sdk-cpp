@@ -21,7 +21,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Authentication\AuthenticationService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\BugReport\BugReportPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\BugReport\BugReportService.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Core\ClientApi.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\GameFinder\GameFinderPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\GameFinder\GameFinderService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\GameFinder\GameFinder_Impl.cpp" />
@@ -80,6 +79,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Messaging\MessagingService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Messaging\Messaging_Impl.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Profile\ProfilePrivateModels.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\GameSession\Gamesessions.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Helloworld\Helloworld.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\LeaderboardModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\LeaderboardPlugin.h" />
@@ -126,7 +126,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Authentication\AuthenticationService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\BugReport\BugReportPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\BugReport\BugReportService.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Core\ClientAPI.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameFinder\GameFinder.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameFinder\GameFinderPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameFinder\GameFinderModels.h" />
@@ -153,5 +152,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Profile\ProfileModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Profile\Profiles.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Servers\Servers.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Tunnels\Tunnels.hpp" />
   </ItemGroup>
 </Project>

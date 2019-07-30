@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+	This is a configuration file for the Linux build of the Stormancer C++ SDK.
+	If you want to customize the Linux build (change the compiler, or which third-party libraries are used),
+	make a copy of this file and name it CustomLinuxBuild.props
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<PropertyGroup Label="UserMacros">
+		<!-- Linux toolset friendly name ; if you change it, also change RemoteCCompileToolExe / RemoteCppCompileToolExe below if needed -->
+		<StormancerLinuxToolset>clang</StormancerLinuxToolset>
+		<!-- Name of the compiler executable that you want to use for the build. Of course this executable needs to be available on the build machine. -->
+		<CompilerExecutable>clang++-7</CompilerExecutable>
+		<!-- If using non-system-provided Curl or OpenSSL, set these paths to your OpenSSL and Curl libs/include directories (please use absolute paths) -->
+		<OpenSSLIncludeDir>$HOME/ue422sdk/openssl/1_0_2h/include/Linux/x86_64-unknown-linux-gnu</OpenSSLIncludeDir>
+		<OpenSSLLibDir>$HOME/ue422sdk/openssl/1_0_2h/lib/Linux/x86_64-unknown-linux-gnu</OpenSSLLibDir>
+		<CurlIncludeDir>$HOME/ue422sdk/libcurl/7_48_0/include/Linux/x86_64-unknown-linux-gnu</CurlIncludeDir>
+		<CurlLibDir>$HOME/ue422sdk/libcurl/7_48_0/lib/Linux/x86_64-unknown-linux-gnu</CurlLibDir>
+		<!-- Additional libraries that you may require for your particular case (e.g Zlib) -->
+		<CustomIncludeDirs>$HOME/ue422sdk/zlib/v1.2.8/include/Linux/x86_64-unknown-linux-gnu</CustomIncludeDirs>
+		<CustomLibDirs>$HOME/ue422sdk/zlib/v1.2.8/lib/Linux/x86_64-unknown-linux-gnu</CustomLibDirs>
+		<CustomLibraries>-lz</CustomLibraries>
+		<!-- Custom command-line parameters for the compiler and linker -->
+		<CustomCompilerOptions>-stdlib=libc++</CustomCompilerOptions>
+		<CustomLinkerOptions>-stdlib=libc++</CustomLinkerOptions>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(TargetPlatformIdentifier)'=='Linux'">
+		<!-- Set these to the executable names of your compiler/linker on the target linux machine -->
+		<RemoteCCompileToolExe>$(CompilerExecutable)</RemoteCCompileToolExe>
+		<RemoteCppCompileToolExe>$(CompilerExecutable)</RemoteCppCompileToolExe>
+		<RemoteLdToolExe>$(CompilerExecutable)</RemoteLdToolExe>
+	</PropertyGroup>
+	<PropertyGroup Label="Configuration">
+		<RemoteRootDir>$HOME/projects/stormancer-sdk-cpp</RemoteRootDir>
+	</PropertyGroup>
+	<PropertyGroup Label="StormancerInternal">
+		<!--
+			This number tracks the version of the build file format.
+			If DefaultLinuxBuild.props is updated, and you have a CustomLinuxBuild.props,
+			you will have to update it according to the changes in the DefaultLinuxBuild.props.
+			Once this is done, increase this number in your CustomLinuxBuild.props to match the one in the DefaultLinuxBuild.props.
+		-->
+		<StormancerLinuxPropsVersion>3</StormancerLinuxPropsVersion>
+	</PropertyGroup>
+	
+	<ItemDefinitionGroup>
+		<ClCompile>
+			<AdditionalIncludeDirectories>$(OpenSSLIncludeDir);$(CurlIncludeDir);$(CustomIncludeDirs);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+			<AdditionalOptions>$(CustomCompilerOptions) %(AdditionalOptions)</AdditionalOptions>
+		</ClCompile>
+		<Link>
+			<AdditionalLibraryDirectories>$(CurlLibDir);$(OpenSSLLibDir);$(CustomLibDirs);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+			<AdditionalDependencies>-pthread;-lcurl;-lssl;-lcrypto;-ldl;$(CustomLibraries);%(AdditionalDependencies)</AdditionalDependencies>
+			<AdditionalOptions>$(CustomLinkerOptions) %(AdditionalOptions)</AdditionalOptions>
+		</Link>
+	</ItemDefinitionGroup>
+</Project>

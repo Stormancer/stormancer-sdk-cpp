@@ -8,6 +8,8 @@
 
 namespace Stormancer
 {
+	class ibytestream;
+
 	class obytestream : public std::basic_ostream<byte>
 	{
 	public:
@@ -36,15 +38,17 @@ namespace Stormancer
 
 		virtual obytestream& operator<<(const uint64 value);
 
-		virtual obytestream& operator<<(const float32 value);
+		virtual obytestream& operator<<(const float value);
 
-		virtual obytestream& operator<<(const float64 value);
+		virtual obytestream& operator<<(const double value);
 
 		virtual obytestream& operator<<(const bool value);
 
 		virtual obytestream& operator<<(const void* value);
 
 		virtual obytestream& operator<<(const std::vector<byte>& bytes);
+
+		virtual obytestream& operator<<(ibytestream& inputStream);
 
 		virtual std::vector<byte> bytes();
 
@@ -63,9 +67,8 @@ namespace Stormancer
 		void dynamic(bool dyn);
 
 		obytestream& write(const byte* ptr, std::streamsize size);
-#if !defined(_LIBCPP_VERSION)
+
 		obytestream& write(const char* ptr, std::streamsize size);
-#endif
 
 #pragma endregion
 

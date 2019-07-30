@@ -156,7 +156,7 @@ namespace Stormancer
 	template<typename T>
 	T* reverseByteOrder(T* data, uint64 n = 0)
 	{
-		char* tmp = (char*)data;
+		char* tmp = reinterpret_cast<char*>(data);
 		if (n == 0)
 		{
 			n = sizeof(T);
@@ -165,7 +165,15 @@ namespace Stormancer
 		return data;
 	}
 
+	STORMANCER_DLL_API std::string stringifyBytesArray(const byte* data, std::size_t size, bool hex = true, bool withSpaces = false);
+
+	STORMANCER_DLL_API std::string stringifyBytesArray(const char* data, std::size_t size, bool hex = true, bool withSpaces = false);
+
 	STORMANCER_DLL_API std::string stringifyBytesArray(const std::vector<byte>& bytes, bool hex = true, bool withSpaces = false);
+
+	STORMANCER_DLL_API std::string stringifyBytesArray(const std::vector<char>& bytes, bool hex = true, bool withSpaces = false);
+
+	STORMANCER_DLL_API std::string stringifyBytesArray(const std::string& bytes, bool hex = true, bool withSpaces = false);
 
 #pragma endregion
 
@@ -177,7 +185,7 @@ namespace Stormancer
 	/// \param desired Value to store in var if it is as expected.
 	/// \return true if var was successfully changed, false otherwise.
 	template<typename T>
-	bool compareExchange(T& var, T expected, T desired)
+	bool compareExchange(T& var, const T& expected, const T& desired)
 	{
 		if (var == expected)
 		{
@@ -193,7 +201,7 @@ namespace Stormancer
 	/// \param exchange Function to execute if var is as expected.
 	/// \return true if the exchange function was called, false otherwise.
 	template<typename T>
-	bool compareExchange(T& var, T expected, std::function<void()> exchange)
+	bool compareExchange(T& var, const T& expected, std::function<void()> exchange)
 	{
 		if (var == expected)
 		{
@@ -215,12 +223,12 @@ namespace Stormancer
 	/// \param expected Value expected to be found in var.
 	/// \param desired Value to store in var if it is as expected.
 	/// \return true if var was successfully changed, false otherwise.
-	template<typename T>
-	bool compareExchange(std::mutex& mutex, T& var, T expected, T desired)
+	template<typename TMutex, typename T>
+	bool compareExchange(TMutex& mutex, T& var, const T& expected, const T& desired)
 	{
 		if (var == expected)
 		{
-			std::lock_guard<std::mutex> lg(mutex);
+			std::lock_guard<TMutex> lg(mutex);
 			if (var == expected)
 			{
 				var = desired;
@@ -236,12 +244,12 @@ namespace Stormancer
 	/// \param expected Value expected to be found in var.
 	/// \param exchange Function to execute if var is as expected.
 	/// \return true if the exchange function was called, false otherwise.
-	template<typename T>
-	bool compareExchange(std::mutex& mutex, T& var, T expected, std::function<void()> exchange)
+	template<typename TMutex, typename T>
+	bool compareExchange(TMutex& mutex, T& var, const T& expected, std::function<void()> exchange)
 	{
 		if (var == expected)
 		{
-			std::lock_guard<std::mutex> lg(mutex);
+			std::lock_guard<TMutex> lg(mutex);
 			if (var == expected)
 			{
 				exchange();
@@ -256,7 +264,20 @@ namespace Stormancer
 	/// \param compare Function to call for comparing. If the first call to compare returns true, compare will be called another time after the mutex lock.
 	/// \param exchange Function to execute if the compare function returned true.
 	/// \return true if the exchange function was called, false otherwise.
-	bool compareExchange(std::mutex& mutex, std::function<bool()> const compare, std::function<void()> exchange);
+	template<typename TMutex>
+	bool compareExchange(TMutex& mutex, std::function<bool()> const compare, std::function<void()> exchange)
+	{
+		if (compare())
+		{
+			std::lock_guard<TMutex> lg(mutex);
+			if (compare())
+			{
+				exchange();
+				return true;
+			}
+		}
+		return false;
+	}
 
 #pragma endregion
 

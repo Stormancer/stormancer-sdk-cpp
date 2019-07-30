@@ -25,6 +25,7 @@ namespace Stormancer
 
 		void stop();
 		void syncClockImplAsync();
+		void processResult(uint64 timeStart, uint64 timeServer);
 
 		struct ClockValue
 		{
@@ -35,7 +36,7 @@ namespace Stormancer
 		pplx::cancellation_token _cancellationToken = pplx::cancellation_token::none();
 		std::weak_ptr<IConnection> _remoteConnection;
 		DependencyScope _dependencyResolver;
-		std::mutex _mutex;
+		std::recursive_mutex _mutex;
 		std::deque<ClockValue> _clockValues;
 		Watch _watch;
 		bool _isRunning = false;

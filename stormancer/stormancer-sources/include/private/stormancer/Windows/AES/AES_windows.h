@@ -9,6 +9,7 @@
 namespace Stormancer
 {
 	class KeyStore;
+
 	class AESWindows : public IAES
 	{
 	public:
@@ -19,13 +20,11 @@ namespace Stormancer
 
 		~AESWindows();
 
-		
-
 		void encrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream& outputStream, uint64 keyId) override;
 
 		void decrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream& outputStream, uint64 keyId) override;
 
-		void generateRandomIV(std::vector<BYTE>& iv) override;
+		void generateRandomIV(std::vector<byte>& iv) override;
 
 		virtual std::streamsize getBlockSize() override;
 
@@ -50,6 +49,7 @@ namespace Stormancer
 		
 		DWORD _cbBlockLen = 0;
 		BCRYPT_AUTH_TAG_LENGTHS_STRUCT authTagLengths;
+
 #pragma endregion
 	};
 }

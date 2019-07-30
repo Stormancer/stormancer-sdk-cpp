@@ -1,0 +1,84 @@
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	
+	<PropertyGroup>
+		<BuildSpecs>[{"stormancer-sdk-cpp-141.sln":{"Platform":"x64","Configuration":"Debug"}},{"stormancer-sdk-cpp-141.sln":{"Platform":"x64","Configuration":"Release"}}]</BuildSpecs>
+		<!-- An identifier for the package, used when calling the Package target. Set this on the command line, for instance "Win64", or leave empty -->
+		<PackageName></PackageName>
+	</PropertyGroup>
+	
+	<Target Name="BuildTasks">
+		<MSBuild
+			Projects="build-utils\MSBuildTasks\MSBuildTasks.sln"
+			Targets="Restore;Build"
+			Properties="Configuration=Release"
+		/>
+	</Target>
+	
+	<UsingTask TaskName="ParseBuildSpecsTask" AssemblyFile="binaries\BuildSpecsParser\Release\netstandard2.0\BuildSpecsParser.dll" />
+	
+	<Target Name="ParseInputs" DependsOnTargets="BuildTasks">
+		<ParseBuildSpecsTask JsonBuildSpecs="$(BuildSpecs)">
+			<Output TaskParameter="ParsedBuildSpecs" ItemName="BuildSpecsParsed" />
+		</ParseBuildSpecsTask>
+	</Target>
+
+    <Target Name="Build" DependsOnTargets="ParseInputs">
+        <MSBuild
+			Projects="@(BuildSpecsParsed)"
+			Targets="Restore;Build"
+		/>
+    </Target>
+    <Target Name="Rebuild" DependsOnTargets="ParseInputs">
+        <MSBuild
+			Projects="@(BuildSpecsParsed)"
+			Targets="Restore;Rebuild"
+		/>
+    </Target>
+	
+	<Target Name="CheckHas7zip">
+		<Exec Command="7z" IgnoreExitCode="true">
+			<Output TaskParameter="ExitCode" PropertyName="ExitCode7z" />
+		</Exec>
+		<PropertyGroup Condition="'$(ExitCode7z)'!='9009'">
+			<Has7z>True</Has7z>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(ExitCode7z)'=='9009'">
+			<Has7z>False</Has7z>
+		</PropertyGroup>
+	</Target>
+	
+    <Target Name="Package" DependsOnTargets="ParseInputs">
+		<Exec Command="git describe --dirty --match v[0-9].[0-9] --match v[0-9].[0-9].[0-9]" ConsoleToMsBuild="true" IgnoreExitCode="true">
+			<Output TaskParameter="ConsoleOutput" PropertyName="GitDescribeOutput" />
+			<Output TaskParameter="ExitCode" PropertyName="CmdExitCode" />
+		</Exec>
+		<Warning Condition="'$(CmdExitCode)' != 0" Text="Could not run git describe ; the library's version will not be set. Make sure git is installed and is in the PATH." />
+		<Message Condition="'$(CmdExitCode)' == 0" Text="Git Describe Output: $(GitDescribeOutput)" />
+		<PropertyGroup Condition="$(GitDescribeOutput)==''">
+			<GitDescribeOutput>unknown</GitDescribeOutput>
+		</PropertyGroup>
+		<PropertyGroup Condition="$(PackageName)!=''">
+			<PackageName>-$(PackageName)</PackageName>
+		</PropertyGroup>
+		<PropertyGroup>
+			<RelativePackageDir>StormancerSdkCpp$(PackageName)-$(GitDescribeOutput)</RelativePackageDir>
+			<PackageDir>$(MSBuildThisFileDirectory)\$(RelativePackageDir)</PackageDir>
+		</PropertyGroup>
+		<MSBuild
+			Projects="@(BuildSpecsParsed)"
+			Targets="Restore;Build"
+			Properties="StormancerRelativeOutputDir=$(RelativePackageDir)"
+		/>
+    </Target>
+	
+	<Target Name="CompressPackage7zip" DependsOnTargets="CheckHas7zip" Condition="'$(Has7z)'=='True'">
+		<Exec Command="7z a $(PackageDir).7z $(PackageDir)" />
+	</Target>
+	
+	<Target Name="CompressPackageZip" DependsOnTargets="CheckHas7zip" Condition="'$(Has7z)'=='False'">
+		<ZipDirectory SourceDirectory="$(PackageDir)" DestinationFile="$(PackageDir).zip" Overwrite="true" />
+	</Target>
+	
+	<Target Name="CompressPackage" AfterTargets="Package" DependsOnTargets="CheckHas7zip;CompressPackage7zip;CompressPackageZip" />
+
+</Project>

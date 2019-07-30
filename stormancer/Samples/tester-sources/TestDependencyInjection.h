@@ -4,6 +4,7 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 
 class A
@@ -29,6 +30,14 @@ class D
 {
 public:
 	D(std::shared_ptr<A> a, std::shared_ptr<B> b) {}
+};
+
+class E
+{
+public:
+	E(std::shared_ptr<D>, std::vector<std::shared_ptr<A>> allAs) : allAs(allAs) {}
+
+	std::vector<std::shared_ptr<A>> allAs;
 };
 
 class TestDependencyInjection
@@ -228,5 +237,14 @@ private:
 
 		auto scope = builder.build();
 		scope.resolve<D>();
+
+		auto child = scope.beginLifetimeScope([](ContainerBuilder& builder)
+		{
+			builder.registerDependency<B>().as<A>();
+			builder.registerDependency<E, D, ContainerBuilder::All<A>>();
+		});
+
+		auto e = child.resolve<E>();
+		assertex(e->allAs.size() == 2, "The E object should have been constructed with two instances of type A, but contains only " + std::to_string(e->allAs.size()));
 	}
 };

@@ -7,8 +7,8 @@ namespace Stormancer
 {
 	DefaultPacketDispatcher::DefaultPacketDispatcher(ILogger_ptr logger, bool asyncDispatch)
 		: _asyncDispatch(asyncDispatch)
-		, _logger(logger)
 		, _maxLayerCount(40)
+		, _logger(logger)
 	{
 	}
 

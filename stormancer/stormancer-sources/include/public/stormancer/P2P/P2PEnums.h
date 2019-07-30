@@ -1,6 +1,7 @@
 #pragma once
 
 #include "stormancer/BuildConfig.h"
+#include "stormancer/msgpack_define.h"
 
 namespace Stormancer
 {
@@ -13,7 +14,6 @@ namespace Stormancer
 
 	enum class P2PSessionState
 	{
-		
 		Connecting,
 		Connected,
 		Closing,
@@ -33,3 +33,5 @@ namespace Stormancer
 		Client
 	};
 }
+
+MSGPACK_ADD_ENUM(Stormancer::P2PSessionState)

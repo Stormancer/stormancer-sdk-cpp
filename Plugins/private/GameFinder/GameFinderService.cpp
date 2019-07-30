@@ -30,13 +30,14 @@ namespace Stormancer
 	GameFinderService::~GameFinderService()
 	{
 	}
+
 	void GameFinderService::initialize()
 	{
 		std::weak_ptr<GameFinderService> wThat = this->shared_from_this();
 		_scene.lock()->addRoute("gamefinder.update", [wThat](Packetisp_ptr packet)
 		{
 			byte gameStateByte;
-			packet->stream.read((char*)&gameStateByte, 1);
+			packet->stream.read(&gameStateByte, 1);
 			int32 gameState = gameStateByte;
 
 			if (auto that = wThat.lock())

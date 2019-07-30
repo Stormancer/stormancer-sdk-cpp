@@ -8,6 +8,7 @@
 	This file should not be directly included by client code.
 */
 
+
 #if !defined(STORMANCER_DYNAMIC)
 
 // Building a static lib (the default)

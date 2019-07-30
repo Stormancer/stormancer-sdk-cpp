@@ -1,40 +1,42 @@
 #pragma once
 
 #include "stormancer/BuildConfig.h"
-
-
 #include "stormancer/Packet.h"
 
 namespace Stormancer
 {
-	/// System request.
+	/// System request
+	/// It will be canceled on delete if the internal tce is not set (tce::set or tce::set_exception)
 	class SystemRequest
 	{
 	public:
 
 #pragma region public_methods
 
-		SystemRequest(byte msgId,pplx::task_completion_event<Packet_ptr> tce, pplx::cancellation_token ct);
-		virtual ~SystemRequest();
-		byte operation();
+		SystemRequest(byte msgId, uint16 id, pplx::cancellation_token ct);
+		uint16 getId() const;
+		byte operation() const;
+		bool completed() const;
+		bool trySet(Packet_ptr packet);
+		bool trySetException(const std::exception& ex);
+		pplx::task<Packet_ptr> getTask(pplx::task_options options) const;
+		pplx::cancellation_token getToken() const;
+		void setLastRefresh(std::chrono::system_clock::time_point lastRefresh);
+		std::chrono::system_clock::time_point getLastRefresh() const;
 
 #pragma endregion
 
-#pragma region public_members
-
-		uint16 id = 0;
-		time_t lastRefresh = time(NULL);
-		pplx::task_completion_event<Packet_ptr> tce;
-		bool complete = false;
-
-#pragma endregion
-		pplx::cancellation_token ct;
-		pplx::cancellation_token_registration ct_registration;
 	private:
 
 #pragma region private_members
 
-		byte _msgId;
+		uint16 _id = 0;
+		byte _msgId = 0;
+		bool _complete = false;
+		std::chrono::system_clock::time_point _lastRefresh;
+		std::recursive_mutex _mutex;
+		pplx::task_completion_event<Packet_ptr> _tce;
+		pplx::cancellation_token _ct;
 
 #pragma endregion
 	};

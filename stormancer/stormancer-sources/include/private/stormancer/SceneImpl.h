@@ -33,13 +33,19 @@ namespace Stormancer
 		/// The SceneDispatcher need to access some private members of the Scene.
 		friend class SceneDispatcher;
 
+		/// The P2PScenePeer has to access to raisePeerDisconnected
+		friend class P2PScenePeer;
+
+		/// The P2PRequestModule has to access to raisePeerConnected
+		friend class P2PRequestModule;
+
 #pragma region public_methods
 
 		/// Connect to the scene.
 		pplx::task<void> connect(pplx::cancellation_token ct = pplx::cancellation_token::none());
 
 		/// Disconnect from the scene.
-		pplx::task<void> disconnect() override;
+		pplx::task<void> disconnect(pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
 
 		/// Add a route to the scene.
 		/// \param routeName Route name.
@@ -74,9 +80,6 @@ namespace Stormancer
 		// Returns the detailed scene address, including cluster, account and app information
 		SceneAddress address() const override;
 
-		/// Returns the scene handle.
-		byte handle() const override;
-
 		/// Returns a host metadata value.
 		std::string getHostMetadata(const std::string& key) const override;
 
@@ -108,9 +111,11 @@ namespace Stormancer
 
 		bool isHost() const override;
 
-		std::unordered_map<uint64, std::shared_ptr<IP2PScenePeer>> connectedPeers() const override;
+		const std::unordered_map<std::string, std::shared_ptr<IP2PScenePeer>>& connectedPeers() const override;
 
 		Event<std::shared_ptr<IP2PScenePeer>> onPeerConnected() const override;
+
+		Event<std::shared_ptr<IP2PScenePeer>> onPeerDisconnected() const override;
 
 		rxcpp::observable<P2PConnectionStateChangedArgs> p2pConnectionStateChanged() const override;
 
@@ -120,7 +125,9 @@ namespace Stormancer
 
 		const std::unordered_map<std::string, std::string>& getSceneMetadata() override;
 
-		std::shared_ptr<IP2PScenePeer> peerConnected(std::shared_ptr<IConnection> connection, std::shared_ptr<P2PService> P2P, P2PConnectToSceneMessage) override;
+		std::shared_ptr<IP2PScenePeer> peerConnected(std::shared_ptr<IConnection> connection, std::shared_ptr<P2PService> P2P, P2PConnectToSceneMessage);
+
+		std::weak_ptr<IConnection> hostConnection();
 
 #pragma endregion
 
@@ -163,7 +170,8 @@ namespace Stormancer
 		/// \param packet Receivedpacket.
 		void handleMessage(Packet_ptr packet);
 
-		void setConnectionState(ConnectionState connectionState);
+		STORM_NODISCARD
+		pplx::task<void> setConnectionState(ConnectionState connectionState);
 
 		pplx::task<std::shared_ptr<P2PScenePeer>> createScenePeerFromP2PConnection(std::shared_ptr<IConnection> connection, pplx::cancellation_token ct = pplx::cancellation_token::none());
 
@@ -177,6 +185,14 @@ namespace Stormancer
 		//initializes the scene after construction
 		void initialize(DependencyScope& parentScope);
 	
+		void raisePeerConnected(const std::string& sessionId);
+
+		void raisePeerDisconnected(const std::string& sessionId);
+
+		pplx::task<void> disconnectAllPeers(pplx::cancellation_token ct = pplx::cancellation_token::none());
+
+		pplx::task<void> disconnectFromHost(pplx::cancellation_token ct = pplx::cancellation_token::none());
+
 #pragma endregion
 
 #pragma region private_members
@@ -191,9 +207,6 @@ namespace Stormancer
 
 		/// Application token.
 		std::string _token;
-
-		/// Scene handle.
-		byte _handle = 0;
 
 		/// Scene metadatas.
 		std::unordered_map<std::string, std::string> _metadata;
@@ -225,12 +238,10 @@ namespace Stormancer
 		/// Disconnection task.
 		pplx::task<void> _connectTask;
 
-		std::mutex _connectMutex;
+		std::recursive_mutex _mutex;
 
 		/// Disconnection task.
 		pplx::task<void> _disconnectTask;
-
-		std::mutex _disconnectMutex;
 
 		Event<Packet_ptr> _onPacketReceived;
 
@@ -241,13 +252,19 @@ namespace Stormancer
 		rxcpp::subscription _hostConnectionStateSubscription;
 
 		rxcpp::subjects::subject<P2PConnectionStateChangedArgs> _p2pConnectionStateChangedObservable;
-		std::unordered_map<uint64, std::shared_ptr<IP2PScenePeer>> _connectedPeers;
+
+		/// map[sessionId] = P2PScenePeer
+		std::unordered_map<std::string, std::shared_ptr<IP2PScenePeer>> _connectedPeers;
 		Event<std::shared_ptr<IP2PScenePeer>> _onPeerConnected;
+		Event<std::shared_ptr<IP2PScenePeer>> _onPeerDisconnected;
 
 		std::shared_ptr<P2PService> _p2p;
 
 		ILogger_ptr _logger;
 		std::vector<IPlugin*> _plugins;
+
+		bool _disconnectRequested = false;
+		pplx::cancellation_token_source _connectionCts;
 
 #pragma endregion
 	};

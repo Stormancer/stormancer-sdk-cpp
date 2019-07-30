@@ -2,19 +2,21 @@
 #include "stormancer/SceneImpl.h"
 #include "stormancer/P2P/P2PScenePeer.h"
 #include "stormancer/P2P/P2PConnectToSceneMessage.h"
+#include "stormancer/P2P/P2PDisconnectFromSceneMessage.h"
 #include "stormancer/IActionDispatcher.h"
 #include "stormancer/ChannelUidStore.h"
-#include "stormancer/SafeCapture.h"
+#include "stormancer/Utilities/PointerUtilities.h"
+#include "stormancer/SystemRequestIDTypes.h"
 #include <sstream>
 
 namespace Stormancer
 {
 	P2PScenePeer::P2PScenePeer(std::weak_ptr<Scene> scene, std::shared_ptr<IConnection> connection, std::shared_ptr<P2PService> p2pService, P2PConnectToSceneMessage message)
-		: _scene(scene)
-		, _connection(connection)
-		, _p2pService(p2pService)
-		, _handle(message.sceneHandle)
+		: _handle(message.sceneHandle)
 		, _metadata(message.sceneMetadata)
+		, _connection(connection)
+		, _scene(scene)
+		, _p2pService(p2pService)
 	{
 		for (auto r : message.routes)
 		{
@@ -25,6 +27,28 @@ namespace Stormancer
 		{
 			throw std::runtime_error("Connection cannot be null");
 		}
+
+		auto peerSessionId = sessionId();
+		auto wScene = _scene;
+		auto onNext = [peerSessionId, wScene](ConnectionState connectionState)
+		{
+			switch (connectionState)
+			{
+			case ConnectionState::Disconnected:
+			{
+				auto scene = wScene.lock();
+				if (scene)
+				{
+					std::static_pointer_cast<Scene_Impl>(scene)->raisePeerDisconnected(peerSessionId);
+				}
+			}
+				break;
+			default:
+				break;
+			}
+		};
+
+		_onConnectionStateChangedSub = connection->getConnectionStateChangedObservable().subscribe(onNext);
 	}
 
 	uint64 P2PScenePeer::id() const
@@ -56,12 +80,25 @@ namespace Stormancer
 	void P2PScenePeer::send(const std::string& routeName, const StreamWriter& streamWriter, PacketPriority packetPriority, PacketReliability packetReliability, const std::string& channelIdentifier)
 	{
 		auto scene = LockOrThrow(_scene);
-		scene->send(routeName, streamWriter, packetPriority, packetReliability, channelIdentifier);
+		scene->send(Stormancer::PeerFilter::matchPeers(_connection->sessionId()), routeName, streamWriter, packetPriority, packetReliability, channelIdentifier);
 	}
 
-	void P2PScenePeer::disconnect()
+	pplx::task<void> P2PScenePeer::disconnect(pplx::cancellation_token ct)
 	{
-		throw std::runtime_error("Not implemented");
+		if (auto scene = _scene.lock())
+		{
+			std::static_pointer_cast<Scene_Impl>(scene)->raisePeerDisconnected(sessionId());
+
+			P2PDisconnectFromSceneMessage disconnectRequest;
+			disconnectRequest.sceneId = scene->address().toUri();
+			disconnectRequest.reason = "Requested by peer";
+			return std::static_pointer_cast<Scene_Impl>(scene)->sendSystemRequest<P2PDisconnectFromSceneMessage>(_connection, (byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, disconnectRequest, ct)
+				.then([](P2PDisconnectFromSceneMessage) {}, ct);
+		}
+		else
+		{
+			return pplx::task_from_result(pplx::task_options(ct));
+		}
 	}
 
 	pplx::task<std::shared_ptr<P2PTunnel>> P2PScenePeer::openP2PTunnel(const std::string& serverId, pplx::cancellation_token ct)
@@ -83,5 +120,15 @@ namespace Stormancer
 		{
 			return t.get();
 		}, options);
+	}
+
+	byte P2PScenePeer::handle() const
+	{
+		return _handle;
+	}
+
+	std::string P2PScenePeer::sessionId() const
+	{
+		return _connection->sessionId();
 	}
 }

@@ -40,9 +40,9 @@ namespace Stormancer
 
 		ibytestream& operator>>(uint64& value);
 
-		ibytestream& operator>>(float32& value);
+		ibytestream& operator>>(float& value);
 
-		ibytestream& operator>>(float64& value);
+		ibytestream& operator>>(double& value);
 
 		ibytestream& operator>>(bool& value);
 
@@ -66,9 +66,7 @@ namespace Stormancer
 
 		ibytestream& read(byte* ptr, std::streamsize size);
 
-#if !defined(_LIBCPP_VERSION)
 		ibytestream& read(char* ptr, std::streamsize size);
-#endif
 
 #pragma endregion
 
@@ -81,7 +79,7 @@ namespace Stormancer
 		{
 			if (good())
 			{
-				read((byte*)&value, sizeof(T));
+				read(reinterpret_cast<byte*>(&value), sizeof(T));
 			}
 			return (*this);
 		}

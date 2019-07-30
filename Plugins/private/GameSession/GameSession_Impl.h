@@ -4,17 +4,19 @@
 #include "GameSession/GameSessionModels.h"
 #include "GameSession/GameSession.h"
 #include "stormancer/ConnectionState.h"
+#include "stormancer/Logger/ILogger.h"
 
 namespace Stormancer
 {
 	//Forward declare
 	class IClient;
-	struct GameSessionContainer;
+	class GameSessionContainer;
 
 	class GameSession_Impl : public std::enable_shared_from_this<GameSession_Impl>, public GameSession
 	{
 	public:
-		GameSession_Impl(std::weak_ptr<IClient> client);
+
+		GameSession_Impl(std::weak_ptr<IClient> client, std::shared_ptr<ILogger> logger);
 
 		pplx::task<GameSessionConnectionParameters> connectToGameSession(std::string token, std::string mapName = "", bool openTunnel = true, pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
 		pplx::task<void> setPlayerReady(const std::string& data, pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
@@ -30,6 +32,10 @@ namespace Stormancer
 		Subscription subscribeOnPlayerChanged(std::function<void(SessionPlayer, std::string)> callback) override;
 
 		std::shared_ptr<Scene> scene() override;
+
+		std::shared_ptr<IP2PScenePeer>	getSessionHost() const override;
+		bool							isSessionHost() const override;
+
 	private:
 
 		//Events
@@ -43,6 +49,7 @@ namespace Stormancer
 		std::string _mapName;
 		std::weak_ptr<IClient> _wClient;
 		pplx::task<std::shared_ptr<GameSessionContainer>> _currentGameSession;
+		std::shared_ptr<ILogger> _logger;
 
 		pplx::task<std::shared_ptr<GameSessionContainer>> connectToGameSessionImpl(std::string token, bool useTunnel, pplx::cancellation_token ct);
 		pplx::task<std::shared_ptr<GameSessionContainer>> getCurrentGameSession(pplx::cancellation_token ct = pplx::cancellation_token::none());

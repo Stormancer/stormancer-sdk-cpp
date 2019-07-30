@@ -57,7 +57,7 @@ namespace Stormancer
 
 		/// Disconnect and close all connections.
 		/// this method returns nothing. So it's useful for application close.
-		pplx::task<void> disconnect() override;
+		pplx::task<void> disconnect(pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
 
 		/// Get sync clock value
 		int64 clock() const override;
@@ -116,7 +116,7 @@ namespace Stormancer
 		pplx::task<void> connectToScene(std::shared_ptr<Scene_Impl> sceneId, const std::string& sceneToken, const std::vector<Route_ptr>& localRoutes, pplx::cancellation_token ct = pplx::cancellation_token::none());
 		pplx::task<void> disconnect(std::string sceneId, bool fromServer, std::string reason = "");
 		pplx::task<void> disconnect(std::shared_ptr<IConnection> connection, uint8 sceneHandle, bool fromServer, std::string reason = "");
-		pplx::task<void> disconnect(std::shared_ptr<Scene_Impl> scene, bool fromServer = false, std::string reason = "");
+		pplx::task<void> disconnect(std::shared_ptr<Scene_Impl> scene, bool fromServer = false, std::string reason = "", pplx::cancellation_token ct = pplx::cancellation_token::none());
 		pplx::task<void> disconnectAllScenes();
 		pplx::task<std::shared_ptr<Scene_Impl>> getSceneInternal(const SceneAddress& sceneId, const SceneEndpoint& sceneEndpoint, pplx::cancellation_token ct = pplx::cancellation_token::none());
 		void transport_packetReceived(Packet_ptr packet);

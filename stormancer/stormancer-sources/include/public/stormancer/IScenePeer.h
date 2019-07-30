@@ -6,6 +6,7 @@
 #include "stormancer/Streams/bytestream.h"
 #include "stormancer/PacketPriority.h"
 #include "stormancer/Route.h"
+#include "stormancer/Tasks.h"
 
 namespace Stormancer
 {
@@ -17,8 +18,11 @@ namespace Stormancer
 #pragma region public_methods
 
 		virtual ~IScenePeer() = default;
-	
+
 		virtual uint64 id() const = 0;
+
+		/// Returns the scene handle.
+		virtual byte handle() const = 0;
 
 		virtual std::string getSceneId() const = 0;
 
@@ -33,7 +37,7 @@ namespace Stormancer
 		/// \param reliability Reliability behavior of the message in the network.
 		virtual void send(const std::string& routeName, const StreamWriter& streamWriter, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const std::string& channelIdentifier = "") = 0;
 
-		virtual void disconnect() = 0;
+		virtual pplx::task<void> disconnect(pplx::cancellation_token ct = pplx::cancellation_token::none()) = 0;
 
 #pragma endregion
 	};

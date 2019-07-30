@@ -10,6 +10,7 @@
 #include "stormancer/Serializer.h"
 #include "stormancer/Logger/ILogger.h"
 #include "stormancer/Configuration.h"
+#include "stormancer/RequestProcessor.h"
 
 namespace Stormancer
 {
@@ -27,6 +28,7 @@ namespace Stormancer
 			std::shared_ptr<P2PTunnels> tunnels,
 			std::shared_ptr<ILogger> logger,
 			std::shared_ptr<Configuration> config,
+			std::shared_ptr<RequestProcessor> requestProcessor,
 			std::weak_ptr<Client> client
 		);
 
@@ -41,6 +43,7 @@ namespace Stormancer
 		std::shared_ptr<P2PTunnels> _tunnels;
 		std::shared_ptr<ILogger> _logger;
 		std::shared_ptr<Configuration> _config;
+		std::shared_ptr<RequestProcessor> _requestProcessor;
 		std::weak_ptr<Client> _client;
 	};
 }

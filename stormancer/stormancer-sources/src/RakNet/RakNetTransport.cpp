@@ -5,7 +5,7 @@
 #include "stormancer/IScheduler.h"
 #include "stormancer/MessageIDTypes.h"
 #include "MessageIdentifiers.h"
-#include "stormancer/SafeCapture.h"
+#include "stormancer/Utilities/PointerUtilities.h"
 #include "PacketFileLogger.h"
 #include "stormancer/Debug/StackWalker.h"
 #include "stormancer/Utilities/TaskUtilities.h"
@@ -20,6 +20,16 @@
 
 namespace Stormancer
 {
+	struct P2PConnectionInfosExchange
+	{
+		uint64 parentConnectionId = 0;
+		std::string parentId;
+		std::string id;
+		bool isRequest = false;
+
+		MSGPACK_DEFINE(parentConnectionId, parentId, id, isRequest)
+	};
+
 	RakNetTransport::RakNetTransport(const DependencyScope& scope)
 	{
 		_logger = scope.resolve<ILogger>();
@@ -57,16 +67,22 @@ namespace Stormancer
 		initialize(maxConnections, serverPort, parentScope);
 
 		auto wTransport = STORM_WEAK_FROM_THIS();
-
-		_scheduler->schedulePeriodic(15, [wTransport]()
+		auto cts = create_linked_source(ct);
+		_scheduler->schedulePeriodic(15, [wTransport, cts]()
 		{
-			auto transport = LockOrThrow(wTransport);
+			auto transport = wTransport.lock();
+			if (!transport)
+			{
+				cts.cancel(); // if the transport is deleted, we stop schedulePeriodic
+				return;
+			}
+
 			std::lock_guard<std::mutex> lock(transport->_mutex);
 			if (transport->_isRunning)
 			{
 				transport->run();
 			}
-		}, ct);
+		}, cts.get_token());
 
 		ct.register_callback([wTransport]()
 		{
@@ -157,9 +173,9 @@ namespace Stormancer
 
 				byte ID = rakNetPacket->data[0];
 				//_logger->log(LogLevel::Trace, "RakNetTransport", "RakNet packet received ", std::to_string(ID));
+
 #ifdef STORMANCER_LOG_RAKNET_PACKETS
-				std::vector<byte> receivedData(rakNetPacket->data, rakNetPacket->data + rakNetPacket->length);
-				auto bytes = stringifyBytesArray(receivedData, true);
+				auto bytes = stringifyBytesArray(rakNetPacket->data, rakNetPacket->length, true, true);
 				_logger->log(LogLevel::Trace, "RakNetTransport", "RakNet packet received", bytes.c_str());
 #endif
 
@@ -167,7 +183,7 @@ namespace Stormancer
 				{
 					switch (ID)
 					{
-						// RakNet messages types
+					// RakNet messages types
 					case DefaultMessageIDTypes::ID_CONNECTION_REQUEST_ACCEPTED:
 					{
 						std::lock_guard<std::mutex> lg(_pendingConnection_mtx);
@@ -180,17 +196,28 @@ namespace Stormancer
 							{
 								_peer->CloseConnection(rakNetPacket->guid, false);
 							}
-							else if (rq.isP2P())// the connection is a P2P connection, 
+							else if (rq.isP2P()) // the connection is a P2P connection
 							{
 								auto parentConnection = _handler->getConnection(rq.parentId);
 
-								RakNet::BitStream data;
-								data.Write((byte)MessageIDTypes::ID_ADVERTISE_PEERID);
-								data.Write(parentConnection->id());
-								data.Write(rq.parentId.c_str());
-								data.Write(rq.id.c_str());
-								data.Write(true);
-								_peer->Send(&data, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE, 0, rakNetPacket->guid, false);
+								P2PConnectionInfosExchange p2pConnecInfos;
+								p2pConnecInfos.parentConnectionId = parentConnection->id();
+								p2pConnecInfos.parentId = rq.parentId;
+								p2pConnecInfos.id = rq.id;
+								p2pConnecInfos.isRequest = true;
+
+								obytestream stream;
+								stream << (byte)MessageIDTypes::ID_ADVERTISE_PEERID;
+
+								Serializer serializer;
+								serializer.serialize(stream, p2pConnecInfos);
+
+								stream.flush();
+								char* dataPtr = reinterpret_cast<char*>(stream.startPtr());
+								int dataSize = static_cast<int>(stream.currentPosition());
+
+								_logger->log(LogLevel::Trace, "RakNetTransport", "sending Advertise peer request parentid=" + rq.parentId + " id=" + rq.id);
+								_peer->Send(dataPtr, dataSize, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE, 0, rakNetPacket->guid, false);
 							}
 						}
 						else
@@ -324,7 +351,7 @@ namespace Stormancer
 						if (auto connection = getConnection(rakNetPacket->guid.g))
 						{
 							Serializer serializer;
-							connection->_closeReason = serializer.deserializeOne<std::string>((byte*)(rakNetPacket->data + 1), (rakNetPacket->length - 1));
+							connection->_closeReason = serializer.deserializeOne<std::string>(reinterpret_cast<const byte*>(rakNetPacket->data + 1), (rakNetPacket->length - 1));
 						}
 						break;
 					}
@@ -333,28 +360,16 @@ namespace Stormancer
 					case (byte)MessageIDTypes::ID_ADVERTISE_PEERID:
 					{
 						std::lock_guard<std::mutex> lg(_pendingConnection_mtx);
-						char* buffer = new char[512];
-						std::string parentId;
-						std::string id;
-						bool requestResponse = false;
-						uint64 remotePeerId = 0;
 						std::string packetSystemAddressStr = rakNetPacket->systemAddress.ToString(true, ':');
 
-						{
-							RakNet::BitStream data(rakNetPacket->data + 1, rakNetPacket->length - 1, false);
-							data.Read(remotePeerId);
-							data.Read(buffer);
-							parentId = buffer;
-							delete[] buffer;
-							buffer = new char[512];
-							data.Read(buffer);
-							id = buffer;
-							delete[] buffer;
-							data.Read(requestResponse);
-						}
+						Serializer serializer;
 
-						if (!requestResponse)
+						ibytestream istream(rakNetPacket->data + 1, rakNetPacket->length - 1);
+						auto p2pRemoteConnecInfos = serializer.deserializeOne<P2PConnectionInfosExchange>(istream);
+
+						if (!p2pRemoteConnecInfos.isRequest)
 						{
+							_logger->log(LogLevel::Trace, "RakNetTransport", "received Advertise peer response parentid=" + p2pRemoteConnecInfos.parentId + " id=" + p2pRemoteConnecInfos.id);
 							auto rq = _pendingConnections.front();
 							_pendingConnections.pop();
 							if (rq.cancellationToken.is_canceled())
@@ -364,24 +379,34 @@ namespace Stormancer
 							else
 							{
 								_logger->log(LogLevel::Trace, "RakNetTransport", "Connection request accepted", packetSystemAddressStr.c_str());
-								auto connection = onConnection(rakNetPacket->systemAddress, rakNetPacket->guid, (uint64)remotePeerId, rq);
+								auto connection = onConnection(rakNetPacket->systemAddress, rakNetPacket->guid, (uint64)p2pRemoteConnecInfos.parentConnectionId, rq);
 							}
 							startNextPendingConnections();
 						}
 						else
 						{
-							auto parentConnection = _handler->getConnection(std::string(parentId));
+							_logger->log(LogLevel::Trace, "RakNetTransport", "Received Advertise peer request parentid=" + p2pRemoteConnecInfos.parentId + " id=" + p2pRemoteConnecInfos.id);
 
-							RakNet::BitStream data;
-							data.Write((byte)MessageIDTypes::ID_ADVERTISE_PEERID);
-							data.Write(parentConnection->id());
-							data.Write(parentId);
-							data.Write(id);
-							data.Write(false);
+							auto parentConnection = _handler->getConnection(std::string(p2pRemoteConnecInfos.parentId));
 
-							_peer->Send(&data, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE, 0, rakNetPacket->guid, false);
+							P2PConnectionInfosExchange p2pConnecInfos;
+							p2pConnecInfos.parentConnectionId = parentConnection->id();
+							p2pConnecInfos.parentId = p2pRemoteConnecInfos.parentId;
+							p2pConnecInfos.id = p2pRemoteConnecInfos.id;
+							p2pConnecInfos.isRequest = false;
 
-							onConnection(rakNetPacket->systemAddress, rakNetPacket->guid, (uint64)remotePeerId, id);
+							obytestream stream;
+							stream << (byte)MessageIDTypes::ID_ADVERTISE_PEERID;
+
+							serializer.serialize(stream, p2pConnecInfos);
+
+							stream.flush();
+							char* dataPtr = reinterpret_cast<char*>(stream.startPtr());
+							int dataSize = static_cast<int>(stream.currentPosition());
+
+							_peer->Send(dataPtr, dataSize, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE, 0, rakNetPacket->guid, false);
+
+							onConnection(rakNetPacket->systemAddress, rakNetPacket->guid, (uint64)p2pRemoteConnecInfos.parentConnectionId, p2pRemoteConnecInfos.id);
 						}
 						break;
 					}
@@ -635,14 +660,13 @@ namespace Stormancer
 	void RakNetTransport::onMessageReceived(RakNet::Packet* rakNetPacket)
 	{
 #if defined(STORMANCER_LOG_PACKETS) && !defined(STORMANCER_LOG_RAKNET_PACKETS)
-		std::vector<byte> tempBytes(rakNetPacket->data, rakNetPacket->data + rakNetPacket->length);
-		auto bytes = stringifyBytesArray(tempBytes, true, true);
+		auto bytes = stringifyBytesArray(rakNetPacket->data, rakNetPacket->length, true, true);
 		_logger->log(LogLevel::Trace, "RakNetTransport", "Packet received", bytes.c_str());
 #endif
 
 		auto connection = getConnection(rakNetPacket->guid.g);
-		std::streamsize dataSize = (std::streamsize)rakNetPacket->length;
-		byte* data = new byte[(unsigned int)dataSize];
+		uint32 dataSize = rakNetPacket->length;
+		byte* data = new byte[dataSize];
 		std::memcpy(data, rakNetPacket->data, (size_t)dataSize);
 
 		Packet_ptr packet(new Packet<>(connection, data, dataSize), [data](Packet<>* packetPtr)

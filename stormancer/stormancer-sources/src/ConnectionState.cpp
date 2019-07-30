@@ -20,12 +20,12 @@ namespace Stormancer
 		return *this;
 	}
 
-	bool ConnectionState::operator==(ConnectionState& other) const
+	bool ConnectionState::operator==(const ConnectionState& other) const
 	{
 		return state == other.state;
 	}
 
-	bool ConnectionState::operator!=(ConnectionState& other) const
+	bool ConnectionState::operator!=(const ConnectionState& other) const
 	{
 		return state != other.state;
 	}

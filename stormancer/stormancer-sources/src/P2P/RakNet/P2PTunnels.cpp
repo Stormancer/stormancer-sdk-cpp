@@ -5,7 +5,7 @@
 #include "stormancer/SystemRequestIDTypes.h"
 #include "stormancer/MessageIDTypes.h"
 #include "stormancer/SceneImpl.h"
-#include "stormancer/SafeCapture.h"
+#include "stormancer/Utilities/PointerUtilities.h"
 #include "stormancer/P2P/OpenTunnelResult.h"
 #include "stormancer/ChannelUidStore.h"
 #include "stormancer/Utilities/StringUtilities.h"
@@ -82,10 +82,13 @@ namespace Stormancer
 					p2pTunnels->_tunnels[std::make_tuple(connectionId, result.handle)] = client;
 				}
 
-				auto tunnel = std::make_shared<P2PTunnel>([wP2pTunnels, connectionId, result]()
+				byte tunnelHandle = result.handle;
+				auto tunnel = std::make_shared<P2PTunnel>([wP2pTunnels, connectionId, tunnelHandle]()
 				{
-					auto p2pTunnels = LockOrThrow(wP2pTunnels);
-					p2pTunnels->destroyTunnel(connectionId, result.handle);
+					if (auto p2pTunnels = wP2pTunnels.lock())
+					{
+						p2pTunnels->destroyTunnel(connectionId, tunnelHandle);
+					}
 				});
 				tunnel->id = serverId;
 				tunnel->ip = "127.0.0.1";
@@ -199,7 +202,7 @@ namespace Stormancer
 					.then([](pplx::task<void> t) {
 					try
 					{
-						t.get();
+						t.wait();
 					}
 					catch (...)
 					{
@@ -230,10 +233,11 @@ namespace Stormancer
 				if (socket)
 				{
 					RakNet::RNS2_SendParameters bsp;
-					bsp.data = (char*)buffer;
+					bsp.data = reinterpret_cast<char*>(buffer);
 					bsp.length = (int)read;
 					bsp.systemAddress.FromStringExplicitPort("127.0.0.1", client->hostPort, socket->GetBoundAddress().GetIPVersion());
-
+					std::string peerPort = std::to_string(client->hostPort);
+					//_logger->log(LogLevel::Trace, "p2p.tunnel","Sending data to game client");
 					(*itTunnel).second->socket->Send(&bsp, _FILE_AND_LINE_);
 				}
 			}
@@ -249,17 +253,20 @@ namespace Stormancer
 		auto connection = _connections->getConnection(client->peerId);
 		if (connection)
 		{
-			if (client->hostPort == 0)
+
+			if (client->hostPort != recvStruct->systemAddress.GetPort())
 			{
 				client->hostPort = recvStruct->systemAddress.GetPort();
 			}
 			std::stringstream ss;
 			ss << "P2PTunnels_" << connection->id();
 			int channelUid = connection->dependencyResolver().resolve<ChannelUidStore>()->getChannelUid(ss.str());
-			connection->send([=](obytestream& stream) {
+			//_logger->log(LogLevel::Trace, "p2p.tunnel", "Sending data to tunnel");
+			connection->send([=](obytestream& stream)
+			{
 				stream << (byte)MessageIDTypes::ID_P2P_TUNNEL;
 				stream << client->handle;
-				stream.write(recvStruct->data, recvStruct->bytesRead);
+				stream.write(reinterpret_cast<const byte*>(recvStruct->data), static_cast<std::streamsize>(recvStruct->bytesRead));
 			}, channelUid, PacketPriority::IMMEDIATE_PRIORITY, PacketReliability::UNRELIABLE);
 		}
 	}

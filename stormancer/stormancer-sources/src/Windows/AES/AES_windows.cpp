@@ -6,7 +6,7 @@
 #include <string>
 
 #ifndef STATUS_UNSUCCESSFUL
-#define STATUS_UNSUCCESSFUL         ((NTSTATUS)0xC0000001L)
+#define STATUS_UNSUCCESSFUL              ((NTSTATUS)0xC0000001L)
 #endif
 
 #ifndef STATUS_SUCCESS
@@ -41,7 +41,7 @@
 #define STATUS_DATA_ERROR                ((NTSTATUS)0xC000003E)
 #endif
 
-#define NT_SUCCESS(Status)          (((NTSTATUS)(Status)) >= 0)
+#define NT_SUCCESS(Status)               (((NTSTATUS)(Status)) >= 0)
 
 std::string getErrorString(NTSTATUS err)
 {
@@ -83,12 +83,9 @@ std::string getErrorString(NTSTATUS err)
 
 namespace Stormancer
 {
-
-
 	AESWindows::AESWindows(std::shared_ptr<KeyStore> keyStore)
 		: _key(keyStore)
 	{
-		
 	}
 
 	AESWindows::~AESWindows()
@@ -96,17 +93,11 @@ namespace Stormancer
 		cleanAES();
 	}
 
-
-
 	void AESWindows::encrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream& outputStream, uint64 keyId)
 	{
 		initAES(keyId);
 		
 		NTSTATUS status = STATUS_UNSUCCESSFUL;
-
-
-
-
 
 		BCRYPT_AUTHENTICATED_CIPHER_MODE_INFO authInfo;
 		BCRYPT_INIT_AUTH_MODE_INFO(authInfo);
@@ -115,28 +106,28 @@ namespace Stormancer
 		ULONG tagSize = 12;
 		std::vector<BYTE> tag(tagSize);
 
-		authInfo.pbNonce = ivPtr;
-		authInfo.cbNonce = (ULONG)ivSize;
+		authInfo.pbNonce = reinterpret_cast<PUCHAR>(ivPtr);
+		authInfo.cbNonce = static_cast<ULONG>(ivSize);
 		authInfo.pbTag = tag.data();
 		authInfo.cbTag = tagSize;
-		authInfo.pbMacContext = &macContext[0];
-		authInfo.cbMacContext = (ULONG)macContext.size();
+		authInfo.pbMacContext = macContext.data();
+		authInfo.cbMacContext = static_cast<ULONG>(macContext.size());
 
 		// IV value is ignored on first call to BCryptDecrypt.
 		// This buffer will be used to keep internal IV used for chaining.
 		std::vector<BYTE> contextIV(_cbBlockLen);
-		std::vector<BYTE> encrypted(((ULONG)dataSize));
+		std::vector<BYTE> encrypted((static_cast<ULONG>(dataSize)));
 
 		DWORD bytesProcessed;
 		// Use the key to encrypt the plaintext buffer.
 		// For block sized messages, block padding will add an extra block.
 		if (!NT_SUCCESS(status = BCryptEncrypt(
 			_keyHandles[keyId],
-			dataPtr,
-			(ULONG)dataSize,
+			reinterpret_cast<PUCHAR>(dataPtr),
+			static_cast<ULONG>(dataSize),
 			&authInfo,
-			&contextIV[0], (ULONG)contextIV.size(),
-			&encrypted[0], (ULONG)encrypted.size(),
+			contextIV.data(), static_cast<ULONG>(contextIV.size()),
+			encrypted.data(), static_cast<ULONG>(encrypted.size()),
 			&bytesProcessed,
 			0)))
 		{
@@ -147,8 +138,8 @@ namespace Stormancer
 
 		// Write the encrypted data in the output stream
 		outputStream.write(ivPtr, ivSize);
-		outputStream.write(encrypted.data(), encrypted.size());
-		outputStream.write(tag.data(), tag.size());
+		outputStream.write(reinterpret_cast<byte*>(encrypted.data()), encrypted.size());
+		outputStream.write(reinterpret_cast<byte*>(tag.data()), tag.size());
 	}
 
 	void AESWindows::decrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream& outputStream, uint64 keyId)
@@ -161,26 +152,26 @@ namespace Stormancer
 		std::vector<BYTE> macContext(authTagLengths.dwMaxLength);
 		ULONG tagSize = 12;
 
-		authInfo.pbNonce = ivPtr;
-		authInfo.cbNonce = (ULONG)ivSize;
-		authInfo.pbTag = dataPtr + dataSize - tagSize;
+		authInfo.pbNonce = reinterpret_cast<PUCHAR>(ivPtr);
+		authInfo.cbNonce = static_cast<ULONG>(ivSize);
+		authInfo.pbTag = reinterpret_cast<PUCHAR>(dataPtr + dataSize - tagSize);
 		authInfo.cbTag = tagSize;
-		authInfo.pbMacContext = &macContext[0];
-		authInfo.cbMacContext = (ULONG)macContext.size();
+		authInfo.pbMacContext = macContext.data();
+		authInfo.cbMacContext = static_cast<ULONG>(macContext.size());
 
 		// IV value is ignored on first call to BCryptDecrypt.
 		// This buffer will be used to keep internal IV used for chaining.
 		std::vector<BYTE> contextIV(_cbBlockLen);
-		std::vector<BYTE> decrypted(((ULONG)dataSize) - tagSize);
+		std::vector<BYTE> decrypted((static_cast<ULONG>(dataSize)) - tagSize);
 
 		DWORD bytesDone;
 		// Decrypt the data
 		if (!NT_SUCCESS(status = BCryptDecrypt(
 			_keyHandles[keyId],
-			dataPtr, (ULONG)dataSize - tagSize,
+			reinterpret_cast<PUCHAR>(dataPtr), static_cast<ULONG>(dataSize) - tagSize,
 			&authInfo,
-			&contextIV[0], (ULONG)contextIV.size(),
-			&decrypted[0], (ULONG)decrypted.size(),
+			contextIV.data(), static_cast<ULONG>(contextIV.size()),
+			decrypted.data(), static_cast<ULONG>(decrypted.size()),
 			&bytesDone,
 			0)))
 		{
@@ -190,15 +181,15 @@ namespace Stormancer
 		}
 
 		// Write the decrypted data in the output stream
-		outputStream.write(&decrypted[0], bytesDone);
+		outputStream.write(reinterpret_cast<const byte*>(decrypted.data()), bytesDone);
 	}
 
-	void AESWindows::generateRandomIV(std::vector<BYTE>& iv)
+	void AESWindows::generateRandomIV(std::vector<byte>& iv)
 	{
 		for (std::size_t i = 0; i < iv.size(); i++)
 		{
 			int32 r = std::rand();
-			iv.data()[i] = (byte)r;
+			iv.data()[i] = static_cast<byte>(r);
 		}
 	}
 
@@ -212,9 +203,9 @@ namespace Stormancer
 		NTSTATUS status = STATUS_UNSUCCESSFUL;
 		if (_keyHandles.find(keyId) != _keyHandles.end())
 		{
-			return true;// already initialized
+			return true; // already initialized
 		}
-		PBYTE key = _key->getKey(keyId).data();
+		PBYTE key = reinterpret_cast<PBYTE>(_key->getKey(keyId).data());
 
 		// Open an algorithm handle.
 		if (!NT_SUCCESS(status = BCryptOpenAlgorithmProvider(
@@ -230,7 +221,7 @@ namespace Stormancer
 		if (!NT_SUCCESS(status = BCryptSetProperty(
 			_hAesAlg,
 			BCRYPT_CHAINING_MODE,
-			(PBYTE)BCRYPT_CHAIN_MODE_GCM,
+			reinterpret_cast<PBYTE>(BCRYPT_CHAIN_MODE_GCM),
 			sizeof(BCRYPT_CHAIN_MODE_GCM),
 			0)))
 		{
@@ -246,7 +237,7 @@ namespace Stormancer
 		if (!NT_SUCCESS(status = BCryptGetProperty(
 			_hAesAlg,
 			BCRYPT_OBJECT_LENGTH,
-			(PBYTE)&cbKeyObject,
+			reinterpret_cast<PBYTE>(&cbKeyObject),
 			sizeof(DWORD),
 			&cbData,
 			0)))
@@ -257,7 +248,7 @@ namespace Stormancer
 		}
 
 		// Allocate the key object on the heap.
-		_keyPointers[keyId] = (PBYTE)HeapAlloc(GetProcessHeap(), 0, cbKeyObject);
+		_keyPointers[keyId] = reinterpret_cast<PBYTE>(HeapAlloc(GetProcessHeap(), 0, cbKeyObject));
 		if (NULL == _keyPointers[keyId])
 		{
 			throw std::runtime_error("memory allocation failed");
@@ -267,7 +258,7 @@ namespace Stormancer
 		if (!NT_SUCCESS(status = BCryptGetProperty(
 			_hAesAlg,
 			BCRYPT_BLOCK_LENGTH,
-			(PBYTE)&_cbBlockLen,
+			reinterpret_cast<PBYTE>(&_cbBlockLen),
 			sizeof(DWORD),
 			&cbData,
 			0)))
@@ -278,7 +269,7 @@ namespace Stormancer
 		}
 		DWORD bytesDone = 0;
 
-		if (!NT_SUCCESS(status = BCryptGetProperty(_hAesAlg, BCRYPT_AUTH_TAG_LENGTH, (BYTE*)&authTagLengths, sizeof(authTagLengths), &bytesDone, 0)))
+		if (!NT_SUCCESS(status = BCryptGetProperty(_hAesAlg, BCRYPT_AUTH_TAG_LENGTH, reinterpret_cast<PBYTE>(&authTagLengths), sizeof(authTagLengths), &bytesDone, 0)))
 		{
 			std::stringstream ss;
 			ss << "Error " << getErrorString(status) << " returned byBCryptGetProperty(BCRYPT_AUTH_TAG_LENGTH)";
@@ -292,7 +283,7 @@ namespace Stormancer
 			_keyPointers[keyId],
 			cbKeyObject,
 			key,
-			(ULONG)32,
+			static_cast<ULONG>(32),
 			0)))
 		{
 			std::stringstream ss;

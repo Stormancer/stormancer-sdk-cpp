@@ -1,5 +1,6 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/Streams/obytestream.h"
+#include "stormancer/Streams/ibytestream.h"
 
 namespace Stormancer
 {
@@ -59,12 +60,12 @@ namespace Stormancer
 		return serialize(value);
 	}
 
-	obytestream& obytestream::operator<<(const float32 value)
+	obytestream& obytestream::operator<<(const float value)
 	{
 		return serialize(value);
 	}
 
-	obytestream& obytestream::operator<<(const float64 value)
+	obytestream& obytestream::operator<<(const double value)
 	{
 		return serialize(value);
 	}
@@ -88,14 +89,21 @@ namespace Stormancer
 		return (*this);
 	}
 
+	obytestream & obytestream::operator<<(ibytestream& inputStream)
+	{
+		write(inputStream.currentPtr(), inputStream.availableSize());
+		inputStream.seekg(inputStream.availableSize(), std::ios_base::cur);
+
+		return *this;
+	}
+
 	std::vector<byte> obytestream::bytes()
 	{
 		if (good())
 		{
-			auto sz = static_cast<std::size_t>(currentPosition());
-			std::vector<byte> bytes(sz);
-			std::memcpy(bytes.data(), startPtr(), sz);
-			return bytes;
+			const byte* first = startPtr();
+			const byte* last = first + currentPosition();
+			return std::vector<byte>(first, last);
 		}
 		return std::vector<byte>();
 	}
@@ -174,11 +182,10 @@ namespace Stormancer
 		std::basic_ostream<byte>::write(ptr, size);
 		return (*this);
 	}
-#if !defined(_LIBCPP_VERSION)
+
 	obytestream& obytestream::write(const char* ptr, std::streamsize size)
 	{
-		std::basic_ostream<byte>::write((byte*)ptr, size);
+		std::basic_ostream<byte>::write(reinterpret_cast<const byte*>(ptr), size);
 		return (*this);
 	}
-#endif
 }

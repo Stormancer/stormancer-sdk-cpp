@@ -58,6 +58,8 @@ namespace Stormancer
 
 		void onConnectionFailure(std::function<void(std::string)> callback);
 
+		P2PRole getMyP2PRole() const { return _myP2PRole; }
+
 		Event<void> onAllPlayerReady;
 		Event<P2PRole> onRoleReceived;
 		Event<std::shared_ptr<Stormancer::P2PTunnel>> onTunnelOpened;
@@ -78,5 +80,6 @@ namespace Stormancer
 		std::shared_ptr<Stormancer::ILogger> _logger;
 		bool _receivedP2PToken = false;
 		pplx::cancellation_token_source _disconnectionCts;
+		P2PRole _myP2PRole = P2PRole::Client;
 	};
 }

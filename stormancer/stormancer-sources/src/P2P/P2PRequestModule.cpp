@@ -7,8 +7,11 @@
 #include "stormancer/P2P/RakNet/P2PTunnels.h"
 #include "stormancer/P2P/OpenTunnelResult.h"
 #include "stormancer/Client.h"
-#include "stormancer/SafeCapture.h"
+#include "stormancer/Utilities/PointerUtilities.h"
 #include "stormancer/P2P/P2PConnectToSceneMessage.h"
+#include "stormancer/P2P/P2PDisconnectFromSceneMessage.h"
+#include "stormancer/MessageIDTypes.h"
+#include <cpprest/asyncrt_utils.h>
 
 namespace Stormancer
 {
@@ -20,6 +23,7 @@ namespace Stormancer
 		std::shared_ptr<P2PTunnels> tunnels,
 		std::shared_ptr<ILogger> logger,
 		std::shared_ptr<Configuration> config,
+		std::shared_ptr<RequestProcessor> requestProcessor,
 		std::weak_ptr<Client> wClient
 	)
 		: _transport(transport)
@@ -29,6 +33,7 @@ namespace Stormancer
 		, _tunnels(tunnels)
 		, _logger(logger)
 		, _config(config)
+		, _requestProcessor(requestProcessor)
 		, _client(wClient)
 	{
 	}
@@ -42,6 +47,7 @@ namespace Stormancer
 		auto sessions = _sessions;
 		auto connections = _connections;
 		std::weak_ptr<P2PTunnels> tunnels = _tunnels;
+		std::weak_ptr<RequestProcessor> wRequestProcessor = _requestProcessor;
 		auto wClient = _client;
 
 		builder.service((byte)SystemRequestIDTypes::ID_P2P_GATHER_IP, [config, transport, serializer](std::shared_ptr<RequestContext> ctx)
@@ -76,12 +82,33 @@ namespace Stormancer
 				return client->getConnectedScene(connectToSceneMessage.sceneId)
 					.then([connection, connectToSceneMessage, ctx, serializer](std::shared_ptr<Scene> scene)
 				{
+					if (!scene)
+					{
+						return pplx::task_from_exception<void>(std::runtime_error("Scene not found. Cannot connect to peer"));
+					}
 					auto p2pService = scene->dependencyResolver().resolve<P2PService>();
-					auto scenePeer = scene->peerConnected(connection, p2pService, connectToSceneMessage);
+					auto& handles = *connection->dependencyResolver().resolve<std::vector<std::weak_ptr<Scene_Impl>>>();
+					uint8 handle = 0;
+					bool success = false;
+
+					for (uint8 i = 0; i < 150; i++)
+					{
+						if (!handles[i].lock())
+						{
+							handle = i + (uint8)MessageIDTypes::ID_SCENES;
+							handles[i] = std::static_pointer_cast<Scene_Impl>(scene);
+							success = true;
+							break;
+						}
+					}
+					if (!success)
+					{
+						return pplx::task_from_exception<void>(std::runtime_error("Failed to generate handle for scene."));
+					}
 
 					P2PConnectToSceneMessage connectToSceneResponse;
 					connectToSceneResponse.sceneId = scene->address().toUri();
-					connectToSceneResponse.sceneHandle = scene->handle();
+					connectToSceneResponse.sceneHandle = handle;
 					for (auto r : scene->localRoutes())
 					{
 						if ((byte)r->filter() & (byte)MessageOriginFilter::Peer)
@@ -99,6 +126,10 @@ namespace Stormancer
 					{
 						serializer->serialize(stream, connectToSceneResponse);
 					});
+
+					std::static_pointer_cast<Scene_Impl>(scene)->peerConnected(connection, p2pService, connectToSceneMessage);
+
+					return pplx::task_from_result();
 				});
 			}
 			else
@@ -107,13 +138,20 @@ namespace Stormancer
 			}
 		});
 
-		builder.service((byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, [serializer, wClient](std::shared_ptr<RequestContext> ctx) {
-			std::string sceneId, reason;
-			byte sceneHandle;
-			serializer->deserialize(ctx->inputStream(), sceneId, reason, sceneHandle);
+		builder.service((byte)SystemRequestIDTypes::ID_CONNECTED_TO_SCENE, [wClient, serializer](std::shared_ptr<RequestContext> ctx) {
+			auto sceneId = serializer->deserializeOne<std::string>(ctx->inputStream());
 			if (auto client = wClient.lock())
 			{
-				return client->disconnect(ctx->packet()->connection, sceneHandle, true, reason);
+				ctx->send(StreamWriter{});
+
+				return client->getConnectedScene(sceneId)
+					.then([ctx](std::shared_ptr<Scene> scene)
+				{
+					if (scene)
+					{
+						std::static_pointer_cast<Scene_Impl>(scene)->raisePeerConnected(ctx->packet()->connection->sessionId());
+					}
+				});
 			}
 			else
 			{
@@ -121,35 +159,65 @@ namespace Stormancer
 			}
 		});
 
+		builder.service((byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, [logger, serializer, wClient](std::shared_ptr<RequestContext> ctx) {
+			P2PDisconnectFromSceneMessage disconnectRequest;
+			serializer->deserialize(ctx->inputStream(), disconnectRequest);
+			
+			if (auto client = wClient.lock())
+			{
+				return client->getConnectedScene(disconnectRequest.sceneId)
+					.then([ctx, wClient, disconnectRequest, serializer, logger](pplx::task<std::shared_ptr<Scene>> task)
+				{
+					std::shared_ptr<Scene> scene;
+					try
+					{
+						scene = task.get();
+					}
+					catch (const std::exception& ex)
+					{
+						// Do nothing if the scene does not exist
+						logger->log(LogLevel::Warn, "P2PRequestModule", "Scene not found while remote peer requests disconnection", ex.what());
+					}
+
+					if (scene)
+					{
+						std::static_pointer_cast<Scene_Impl>(scene)->raisePeerDisconnected(ctx->packet()->connection->sessionId());
+					}
+
+					P2PDisconnectFromSceneMessage disconnectResponse;
+					disconnectResponse.sceneId = disconnectRequest.sceneId;
+					disconnectResponse.reason = "Requested by remote peer";
+					ctx->send([serializer, disconnectResponse](obytestream& stream)
+					{
+						serializer->serialize(stream, disconnectResponse);
+					});
+				});
+			}
+			else
+			{
+				// Do nothing if the client does not exist
+				return pplx::task_from_result();
+			}
+		});
+
 		builder.service((byte)SystemRequestIDTypes::ID_P2P_CREATE_SESSION, [serializer, sessions](std::shared_ptr<RequestContext> ctx)
 		{
-			auto sessionIdVector = serializer->deserializeOne<std::vector<char>>(ctx->inputStream());
-
-			std::string sessionId(sessionIdVector.begin(), sessionIdVector.end());
-
-			auto peerId = serializer->deserializeOne<uint64>(ctx->inputStream());
-
-			//TODO : use true scene id when it's available from the server
-			std::string sceneId = "";
-			//auto sceneId = _serializer->deserializeOne<std::string>(ctx->inputStream());			
-			P2PSession session;
-			session.sessionId = sessionIdVector;
-			session.sceneId = sceneId;
-			session.remotePeer = peerId;
-			sessions->createSession(sessionId, session);
+			serializer->deserializeOne<std::vector<byte>>(ctx->inputStream()); // DEPRECATED (backward compatibility)
+			serializer->deserializeOne<uint64>(ctx->inputStream()); // DEPRECATED (backward compatibility)
+			serializer->deserializeOne<std::string>(ctx->inputStream()); // DEPRECATED (backward compatibility)
+			P2PSession p2pSession = serializer->deserializeOne<P2PSession>(ctx->inputStream());
+			std::string p2pSessionId = utility::conversions::to_utf8string(utility::conversions::to_base64(p2pSession.SessionId));
+			sessions->createSession(p2pSessionId, p2pSession);
 			ctx->send(StreamWriter());
 			return pplx::task_from_result();
 		});
 
 		builder.service((byte)SystemRequestIDTypes::ID_P2P_CLOSE_SESSION, [serializer, sessions](std::shared_ptr<RequestContext> ctx)
 		{
-			auto sessionIdVector = serializer->deserializeOne<std::vector<byte>>(ctx->inputStream());
-
-			std::string sessionId(sessionIdVector.begin(), sessionIdVector.end());
-
-			sessions->closeSession(sessionId);
+			auto p2pSessionIdVector = serializer->deserializeOne<std::vector<byte>>(ctx->inputStream());
+			std::string p2pSessionId = utility::conversions::to_utf8string(utility::conversions::to_base64(p2pSessionIdVector));
+			sessions->closeSession(p2pSessionId);
 			ctx->send(StreamWriter());
-
 			return pplx::task_from_result();
 		});
 
@@ -229,26 +297,68 @@ namespace Stormancer
 			return pplx::task_from_result();
 		});
 
-		builder.service((byte)SystemRequestIDTypes::ID_P2P_CONNECT_HOST, [serializer, connections, sessions, logger](std::shared_ptr<RequestContext> ctx)
+		auto registerConnectionOnCloseSession = [connections, wRequestProcessor, logger](std::shared_ptr<P2PSessions> p2pSessions, std::shared_ptr<IConnection> connection, std::string p2pSessionId, std::string parentId)
+		{
+			std::weak_ptr<IConnection> wHostConnection = connections->getConnection(parentId);
+
+			bool p2pSessionFound = false;
+			auto& p2pSession = p2pSessions->tryGetSession(p2pSessionId, p2pSessionFound);
+			if (p2pSessionFound && !p2pSession.onConnectionCloseSubscription)
+			{
+				std::weak_ptr<P2PSessions> wP2pSessions = p2pSessions;
+				p2pSession.onConnectionCloseSubscription = connection->onClose.subscribe([wP2pSessions, p2pSessionId, wHostConnection, wRequestProcessor, logger](std::string reason)
+				{
+					auto hostConnection = wHostConnection.lock();
+					auto requestProcessor = wRequestProcessor.lock();
+					if (hostConnection && requestProcessor)
+					{
+						auto p2pSessonIdVector = utility::conversions::from_base64(utility::conversions::to_string_t(p2pSessionId));
+						logger->log(LogLevel::Trace, "P2PRequestModule", "Closing P2P session", p2pSessionId);
+						requestProcessor->sendSystemRequest(hostConnection.get(), (byte)SystemRequestIDTypes::ID_P2P_CLOSE_SESSION, p2pSessonIdVector, timeout(5s))
+							.then([logger](pplx::task<void> task)
+						{
+							try
+							{
+								task.get();
+							}
+							catch (const std::exception& ex)
+							{
+								logger->log(LogLevel::Warn, "P2PRequestModule", "Send P2P Close session failed", ex.what());
+							}
+						});
+					}
+					if (auto p2pSessions = wP2pSessions.lock())
+					{
+						p2pSessions->closeSession(p2pSessionId);
+					}
+				});
+			}
+		};
+
+		builder.service((byte)SystemRequestIDTypes::ID_P2P_CONNECT_HOST, [serializer, connections, sessions, logger, registerConnectionOnCloseSession](std::shared_ptr<RequestContext> ctx)
 		{
 			auto candidate = serializer->deserializeOne<ConnectivityCandidate>(ctx->inputStream());
 
-			std::string sessionId(candidate.sessionId.begin(), candidate.sessionId.end());
+			auto p2pSessionId = utility::conversions::to_utf8string(utility::conversions::to_base64(candidate.p2pSessionId));
+			auto clientSessionId = utility::conversions::to_utf8string(utility::conversions::to_base64(candidate.clientPeerSessionId));
+			auto parentId = ctx->packet()->connection->key();
 
 			auto connection = connections->getConnection(candidate.clientPeer);
 			if (connection && connection->getConnectionState() == ConnectionState::Connected)
 			{
-				sessions->updateSessionState(sessionId, P2PSessionState::Connected);
+				sessions->updateSessionState(p2pSessionId, P2PSessionState::Connected);
 				ctx->send(StreamWriter());
+				registerConnectionOnCloseSession(sessions, connection, p2pSessionId, parentId);
 				return pplx::task_from_result();
 			}
 
 			logger->log(LogLevel::Debug, "p2p", "Waiting connection ");
-			connections->addPendingConnection(candidate.clientPeer)
-				.then([sessions, sessionId](std::shared_ptr<IConnection> connection)
+			connections->addPendingConnection(candidate.clientPeer, clientSessionId)
+				.then([sessions, p2pSessionId, registerConnectionOnCloseSession, parentId](std::shared_ptr<IConnection> connection)
 			{
 				connection->setMetadata("type", "p2p");
-				sessions->updateSessionState(sessionId, P2PSessionState::Connected);
+				sessions->updateSessionState(p2pSessionId, P2PSessionState::Connected);
+				registerConnectionOnCloseSession(sessions, connection, p2pSessionId, parentId);
 			})
 				.then([logger](pplx::task<void> t)
 			{
@@ -266,31 +376,35 @@ namespace Stormancer
 			return pplx::task_from_result();
 		});
 
-		builder.service((byte)SystemRequestIDTypes::ID_P2P_CONNECT_CLIENT, [serializer, logger, connections, sessions, transport](std::shared_ptr<RequestContext> ctx)
+		builder.service((byte)SystemRequestIDTypes::ID_P2P_CONNECT_CLIENT, [serializer, logger, connections, sessions, transport, registerConnectionOnCloseSession](std::shared_ptr<RequestContext> ctx)
 		{
 			auto candidate = serializer->deserializeOne<ConnectivityCandidate>(ctx->inputStream());
 
-			std::string sessionId(candidate.sessionId.begin(), candidate.sessionId.end());
+			auto p2pSessionId = utility::conversions::to_utf8string(utility::conversions::to_base64(candidate.p2pSessionId));
+			auto clientSessionId = utility::conversions::to_utf8string(utility::conversions::to_base64(candidate.listeningPeerSessionId));
+			auto parentId = ctx->packet()->connection->key();
 
-			logger->log(LogLevel::Debug, "p2p", "Starting P2P client connection client peer =" + std::to_string(candidate.clientPeer));
+			logger->log(LogLevel::Debug, "p2p", "Starting P2P client connection client peer", std::to_string(candidate.clientPeer));
 
 			auto connection = connections->getConnection(candidate.listeningPeer);
 			if (connection && connection->getConnectionState() == ConnectionState::Connected)
 			{
-				sessions->updateSessionState(sessionId, P2PSessionState::Connected);
+				sessions->updateSessionState(p2pSessionId, P2PSessionState::Connected);
 				ctx->send([serializer](obytestream& stream)
 				{
 					serializer->serialize(stream, true);
 				});
+				registerConnectionOnCloseSession(sessions, connection, p2pSessionId, parentId);
 				return pplx::task_from_result();
 			}
 
 			logger->log(LogLevel::Debug, "p2p", "Connecting... ");
-			connections->addPendingConnection(candidate.listeningPeer)
-				.then([sessions, sessionId](std::shared_ptr<IConnection> connection)
+			connections->addPendingConnection(candidate.listeningPeer, clientSessionId)
+				.then([sessions, p2pSessionId, registerConnectionOnCloseSession, parentId](std::shared_ptr<IConnection> connection)
 			{
 				connection->setMetadata("type", "p2p");
-				sessions->updateSessionState(sessionId, P2PSessionState::Connected);
+				sessions->updateSessionState(p2pSessionId, P2PSessionState::Connected);
+				registerConnectionOnCloseSession(sessions, connection, p2pSessionId, parentId);
 			})
 				.then([logger](pplx::task<void> t)
 			{
@@ -304,7 +418,7 @@ namespace Stormancer
 				}
 			});
 
-			return transport->connect(candidate.listeningEndpointCandidate.address, sessionId, ctx->packet()->connection->key())
+			return transport->connect(candidate.listeningEndpointCandidate.address, p2pSessionId, parentId)
 				.then([logger, serializer, ctx](pplx::task<std::shared_ptr<IConnection>> t)
 			{
 				try
@@ -328,7 +442,6 @@ namespace Stormancer
 		builder.service((byte)SystemRequestIDTypes::ID_P2P_OPEN_TUNNEL, [serializer, config, tunnels](std::shared_ptr<RequestContext> ctx)
 		{
 			auto serverId = serializer->deserializeOne<std::string>(ctx->inputStream());
-
 			auto peerId = ctx->packet()->connection->id();
 			if (!config->hasPublicIp())
 			{
@@ -360,7 +473,6 @@ namespace Stormancer
 		builder.service((byte)SystemRequestIDTypes::ID_P2P_CLOSE_TUNNEL, [serializer, tunnels](std::shared_ptr<RequestContext> ctx)
 		{
 			auto handle = serializer->deserializeOne<byte>(ctx->inputStream());
-
 			LockOrThrow(tunnels)->closeTunnel(handle, ctx->packet()->connection->id());
 			return pplx::task_from_result();
 		});
@@ -368,10 +480,20 @@ namespace Stormancer
 		builder.service((byte)SystemRequestIDTypes::ID_P2P_RELAY_OPEN, [serializer, connections, sessions](std::shared_ptr<RequestContext> ctx)
 		{
 			auto relay = serializer->deserializeOne<OpenRelayParameters>(ctx->inputStream());
-			std::string sessionId(relay.sessionId.begin(), relay.sessionId.end());
-			connections->newConnection(std::make_shared<RelayConnection>(ctx->packet()->connection, relay.remotePeerAddress, relay.remotePeerId, sessionId, serializer));
+			auto p2pSessionId = utility::conversions::to_utf8string(utility::conversions::to_base64(relay.p2pSessionId));
 
-			sessions->updateSessionState(sessionId, P2PSessionState::Connected);
+			bool sessionFound = false;
+			auto& p2pSession = sessions->tryGetSession(p2pSessionId, sessionFound);
+			if (!sessionFound)
+			{
+				return pplx::task_from_exception<void>(std::runtime_error("P2PSession not found (" + p2pSessionId + ")"));
+			}
+
+			auto connection = std::make_shared<RelayConnection>(ctx->packet()->connection, relay.remotePeerAddress, relay.remotePeerId, p2pSessionId, serializer);
+			static_cast<std::shared_ptr<IConnection>>(connection)->setSessionId(p2pSession.RemoteSessionId);
+			connections->newConnection(connection);
+
+			sessions->updateSessionState(p2pSessionId, P2PSessionState::Connected);
 			ctx->send(StreamWriter());
 			return pplx::task_from_result();
 		});

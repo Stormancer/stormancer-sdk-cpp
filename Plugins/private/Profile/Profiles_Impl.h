@@ -1,5 +1,6 @@
 #pragma once
-#include "Core/ClientAPI.h"
+
+#include "stormancer/ClientAPI.h"
 #include "Profile/Profiles.h"
 
 namespace Stormancer

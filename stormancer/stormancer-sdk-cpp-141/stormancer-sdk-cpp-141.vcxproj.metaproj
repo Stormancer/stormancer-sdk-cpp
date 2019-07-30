@@ -8,10 +8,10 @@
     <MSBuildSDKsPath>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\Sdks</MSBuildSDKsPath>
     <FrameworkSDKRoot />
     <MSBuildRuntimeVersion>4.0.30319</MSBuildRuntimeVersion>
-    <MSBuildFrameworkToolsPath>C:\Windows\Microsoft.NET\Framework\v4.0.30319\</MSBuildFrameworkToolsPath>
-    <MSBuildFrameworkToolsPath32>C:\Windows\Microsoft.NET\Framework\v4.0.30319\</MSBuildFrameworkToolsPath32>
-    <MSBuildFrameworkToolsPath64>C:\Windows\Microsoft.NET\Framework64\v4.0.30319\</MSBuildFrameworkToolsPath64>
-    <MSBuildFrameworkToolsRoot>C:\Windows\Microsoft.NET\Framework\</MSBuildFrameworkToolsRoot>
+    <MSBuildFrameworkToolsPath>C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\</MSBuildFrameworkToolsPath>
+    <MSBuildFrameworkToolsPath32>C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\</MSBuildFrameworkToolsPath32>
+    <MSBuildFrameworkToolsPath64>C:\WINDOWS\Microsoft.NET\Framework64\v4.0.30319\</MSBuildFrameworkToolsPath64>
+    <MSBuildFrameworkToolsRoot>C:\WINDOWS\Microsoft.NET\Framework\</MSBuildFrameworkToolsRoot>
     <SDK35ToolsPath>C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\</SDK35ToolsPath>
     <SDK40ToolsPath>C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.6.1 Tools\</SDK40ToolsPath>
     <WindowsSDK80Path />
@@ -26,7 +26,7 @@
     <AndroidTargetsPath>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\Microsoft\MDD\Android\V150\</AndroidTargetsPath>
     <iOSTargetsPath>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\Microsoft\MDD\iOS\V150\</iOSTargetsPath>
     <VisualStudioVersion>15.0</VisualStudioVersion>
-    <AspNetConfiguration>Release</AspNetConfiguration>
+    <AspNetConfiguration>Debug</AspNetConfiguration>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <NuGetRestoreTargets>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\..\Common7\IDE\CommonExtensions\Microsoft\NuGet\NuGet.targets</NuGetRestoreTargets>
     <IsRestoreTargetsFileLoaded>true</IsRestoreTargetsFileLoaded>
@@ -42,67 +42,67 @@
     <_GenerateRestoreGraphProjectEntryInputProperties>
       ExcludeRestorePackageImports=true;
       _RestoreSolutionFileUsed=true;
-      SolutionDir=E:\BuildAgent\work\942796f7257fc0aa\src\clients\cpp\;
+      SolutionDir=D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\;
       SolutionName=stormancer-sdk-cpp-141;
     </_GenerateRestoreGraphProjectEntryInputProperties>
   </PropertyGroup>
   <ItemDefinitionGroup />
   <ItemGroup>
-    <ProjectReference Include="E:\BuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\libupnp\build\vc141\libupnp.vcxproj">
+    <ProjectReference Include="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\libupnp\build\vc141\libupnp.vcxproj">
       <ToolsVersion>
       </ToolsVersion>
       <SkipNonexistentProjects>False</SkipNonexistentProjects>
-      <AdditionalProperties>Configuration=Release; Platform=x64</AdditionalProperties>
-      <Configuration>Release</Configuration>
+      <AdditionalProperties>Configuration=Debug; Platform=x64</AdditionalProperties>
+      <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
     </ProjectReference>
-    <ProjectReference Include="E:\BuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\cpprestsdk\Release\src\build\vs141\casablanca141.vcxproj">
+    <ProjectReference Include="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\cpprestsdk\Release\src\build\vs141\casablanca141.vcxproj">
       <ToolsVersion>
       </ToolsVersion>
       <SkipNonexistentProjects>False</SkipNonexistentProjects>
-      <AdditionalProperties>Configuration=Release; Platform=x64</AdditionalProperties>
-      <Configuration>Release</Configuration>
+      <AdditionalProperties>Configuration=Debug; Platform=x64</AdditionalProperties>
+      <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
     </ProjectReference>
-    <ProjectReference Include="E:\BuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\RakNet\RakNet\Lib\DLL\DLL_vc141.vcxproj">
+    <ProjectReference Include="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\dependencies\RakNet\RakNet\Lib\DLL\DLL_vc141.vcxproj">
       <ToolsVersion>
       </ToolsVersion>
       <SkipNonexistentProjects>False</SkipNonexistentProjects>
-      <AdditionalProperties>Configuration=Release; Platform=x64</AdditionalProperties>
-      <Configuration>Release</Configuration>
+      <AdditionalProperties>Configuration=Debug; Platform=x64</AdditionalProperties>
+      <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
     </ProjectReference>
-    <ProjectReference Include="E:\BuildAgent\work\942796f7257fc0aa\src\clients\cpp\Plugins\PluginSelector\PluginSelector.csproj">
+    <ProjectReference Include="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\Plugins\PluginSelector\PluginSelector.csproj">
       <ToolsVersion>
       </ToolsVersion>
       <SkipNonexistentProjects>False</SkipNonexistentProjects>
-      <AdditionalProperties>Configuration=Release; Platform=AnyCPU</AdditionalProperties>
-      <Configuration>Release</Configuration>
+      <AdditionalProperties>Configuration=Debug; Platform=AnyCPU</AdditionalProperties>
+      <Configuration>Debug</Configuration>
       <Platform>AnyCPU</Platform>
     </ProjectReference>
   </ItemGroup>
   <Target Name="Clean">
     <MSBuild Projects="@(ProjectReference-&gt;Reverse())" Targets="Clean" BuildInParallel="True" Properties="BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" SkipNonexistentProjects="%(ProjectReference.SkipNonexistentProjects)" />
-    <MSBuild Projects="E:\BuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\stormancer-sdk-cpp-141\stormancer-sdk-cpp-141.vcxproj" Targets="Clean" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
+    <MSBuild Projects="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\stormancer-sdk-cpp-141\stormancer-sdk-cpp-141.vcxproj" Targets="Clean" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Debug; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
   </Target>
   <Target Name="Build" Outputs="@(stormancer-sdk-cpp-libBuildOutput)">
     <MSBuild Projects="@(ProjectReference)" BuildInParallel="True" Properties="BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" SkipNonexistentProjects="%(ProjectReference.SkipNonexistentProjects)" />
-    <MSBuild Projects="E:\BuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\stormancer-sdk-cpp-141\stormancer-sdk-cpp-141.vcxproj" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
+    <MSBuild Projects="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\stormancer-sdk-cpp-141\stormancer-sdk-cpp-141.vcxproj" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Debug; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
       <Output TaskParameter="TargetOutputs" ItemName="stormancer-sdk-cpp-libBuildOutput" />
     </MSBuild>
   </Target>
   <Target Name="Rebuild" Outputs="@(stormancer-sdk-cpp-libBuildOutput)">
     <MSBuild Projects="@(ProjectReference)" Targets="Rebuild" BuildInParallel="True" Properties="BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" SkipNonexistentProjects="%(ProjectReference.SkipNonexistentProjects)" />
-    <MSBuild Projects="E:\BuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\stormancer-sdk-cpp-141\stormancer-sdk-cpp-141.vcxproj" Targets="Rebuild" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
+    <MSBuild Projects="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\stormancer-sdk-cpp-141\stormancer-sdk-cpp-141.vcxproj" Targets="Rebuild" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Debug; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)">
       <Output TaskParameter="TargetOutputs" ItemName="stormancer-sdk-cpp-libBuildOutput" />
     </MSBuild>
   </Target>
   <Target Name="Publish">
     <MSBuild Projects="@(ProjectReference)" Targets="Publish" BuildInParallel="True" Properties="BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" SkipNonexistentProjects="%(ProjectReference.SkipNonexistentProjects)" />
-    <MSBuild Projects="E:\BuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\stormancer-sdk-cpp-141\stormancer-sdk-cpp-141.vcxproj" Targets="Publish" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
+    <MSBuild Projects="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\stormancer-sdk-cpp-141\stormancer-sdk-cpp-141.vcxproj" Targets="Publish" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Debug; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
   </Target>
   <Target Name="Restore">
     <MSBuild Projects="@(ProjectReference)" Targets="Restore" BuildInParallel="True" Properties="BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" SkipNonexistentProjects="%(ProjectReference.SkipNonexistentProjects)" />
-    <MSBuild Projects="E:\BuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\stormancer-sdk-cpp-141\stormancer-sdk-cpp-141.vcxproj" Targets="Restore" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
+    <MSBuild Projects="D:\TCBuildAgent\work\942796f7257fc0aa\src\clients\cpp\stormancer\stormancer-sdk-cpp-141\stormancer-sdk-cpp-141.vcxproj" Targets="Restore" BuildInParallel="True" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Debug; Platform=x64;BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" />
   </Target>
 </Project>

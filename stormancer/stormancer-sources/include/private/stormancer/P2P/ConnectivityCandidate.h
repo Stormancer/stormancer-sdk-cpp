@@ -13,13 +13,14 @@ namespace Stormancer
 
 		uint64 listeningPeer;
 		uint64 clientPeer;
-
 		EndpointCandidate listeningEndpointCandidate;
 		EndpointCandidate clientEndpointCandidate;
-		std::vector<char> sessionId;
-		std::vector<char> id;
+		std::vector<byte> p2pSessionId;
+		std::vector<byte> id;
 		int ping;
+		std::vector<byte> listeningPeerSessionId;
+		std::vector<byte> clientPeerSessionId;
 
-		MSGPACK_DEFINE(listeningPeer, clientPeer, listeningEndpointCandidate, clientEndpointCandidate, sessionId, id, ping)
+		MSGPACK_DEFINE(listeningPeer, clientPeer, listeningEndpointCandidate, clientEndpointCandidate, p2pSessionId, id, ping, listeningPeerSessionId, clientPeerSessionId)
 	};
 }

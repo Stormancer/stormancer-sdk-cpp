@@ -8,29 +8,25 @@
 
 namespace Stormancer
 {
-	struct GameSessionContainer
+	class GameSessionContainer
 	{
-		GameSessionContainer() {};
+	public:
 
-		//Keep game finder scene alive
-		std::shared_ptr<Scene> scene;
+		GameSessionContainer(std::shared_ptr<Scene> scene)
+			: scene(scene)
+			, _logger(scene->dependencyResolver().resolve<ILogger>())
+		{
+		};
+
 		std::shared_ptr<GameSessionService> service()
 		{
 			return scene->dependencyResolver().resolve<GameSessionService>();
 		}
 
-		pplx::task<GameSessionConnectionParameters> gameSessionReadyTask;
-
-		Subscription allPlayerReady;
-		Subscription onRoleRecieved;
-		Subscription onTunnelOpened;
-		Subscription onShutdownRecieved;
-		Subscription onPlayerChanged;
-
-		rxcpp::subscription sceneConnectionStateSubscription;
 		~GameSessionContainer()
 		{
-			auto logger = scene->dependencyResolver().resolve<ILogger>();
+			sceneConnectionStateSubscription.unsubscribe();
+			auto logger = _logger;
 			auto sceneId = scene->id();
 			scene->disconnect().then([logger, sceneId](pplx::task<void> task)
 			{
@@ -51,11 +47,31 @@ namespace Stormancer
 				logger->log(LogLevel::Info, "GameSession", "Destroyed", sceneId);
 			}
 		}
+
+		// Keep game finder scene alive
+		std::shared_ptr<Scene>			scene;
+
+		std::shared_ptr<IP2PScenePeer>	p2pHost;
+
+		pplx::task<GameSessionConnectionParameters> gameSessionReadyTask;
+
+		Subscription allPlayerReady;
+		Subscription onRoleRecieved;
+		Subscription onTunnelOpened;
+		Subscription onShutdownRecieved;
+		Subscription onPlayerChanged;
+
+		rxcpp::subscription sceneConnectionStateSubscription;
+
+	private:
+
+		std::shared_ptr<ILogger> _logger;
 	};
 
-	GameSession_Impl::GameSession_Impl(std::weak_ptr<IClient> client)
-		: _wClient(client)
+	GameSession_Impl::GameSession_Impl(std::weak_ptr<IClient> wClient, std::shared_ptr<ILogger> logger)
+		: _wClient(wClient)
 		, _currentGameSession(pplx::task_from_result<std::shared_ptr<GameSessionContainer>>(nullptr))
+		, _logger(logger)
 	{
 	}
 
@@ -100,7 +116,6 @@ namespace Stormancer
 					.then([gameSessionContainer, openTunnel, ct](pplx::task<std::string> task)
 				{
 					auto service = gameSessionContainer->service();
-					auto logger = gameSessionContainer->scene->dependencyResolver().resolve<ILogger>();
 					try
 					{
 						auto token = task.get();
@@ -108,20 +123,18 @@ namespace Stormancer
 					}
 					catch (std::exception& e)
 					{
-						e.what();
-						throw std::runtime_error("Cannot get p2pToken");
+						throw std::runtime_error(("Cannot get p2pToken. Inner exception message: " + std::string(e.what())).c_str());
 					}
 				}, ct)
 					.then([gameSessionContainer](pplx::task<std::shared_ptr<IP2PScenePeer>> t)
 				{
 					try
 					{
-						auto p = t.get();
+						gameSessionContainer->p2pHost = t.get();
 						return gameSessionContainer;
 					}
-					catch (std::exception& e)
+					catch (...)
 					{
-						e.what();
 						throw;
 					}
 				}, ct);
@@ -315,6 +328,38 @@ namespace Stormancer
 		}
 	}
 
+	std::shared_ptr<IP2PScenePeer> GameSession_Impl::getSessionHost() const
+	{
+		// Copy the task to avoid a possible race condition with it being reassigned while we are inside this method
+		auto sessionTask = _currentGameSession;
+		if (!sessionTask.is_done())
+		{
+			return nullptr;
+		}
+		auto session = sessionTask.get();
+		if (session)
+		{
+			return session->p2pHost;
+		}
+		return nullptr;
+	}
+
+	bool GameSession_Impl::isSessionHost() const
+	{
+		auto sessionTask = _currentGameSession;
+		// Not yet connected -> false
+		if (!sessionTask.is_done())
+		{
+			return false;
+		}
+		auto session = sessionTask.get();
+		if (session)
+		{
+			return session->service()->getMyP2PRole() == P2PRole::Host;
+		}
+		return false;
+	}
+
 	pplx::task<std::shared_ptr<GameSessionContainer>> GameSession_Impl::getCurrentGameSession(pplx::cancellation_token ct)
 	{
 		// Use a continuation to "inject" the ct
@@ -328,9 +373,10 @@ namespace Stormancer
 
 	std::shared_ptr<Scene> GameSession_Impl::scene()
 	{
-		if (this->_currentGameSession.is_done())
+		auto sessionTask = _currentGameSession;
+		if (sessionTask.is_done() && sessionTask.get() != nullptr)
 		{
-			return this->_currentGameSession.get()->scene;
+			return sessionTask.get()->scene;
 		}
 		else
 		{
@@ -341,35 +387,32 @@ namespace Stormancer
 	pplx::task<std::shared_ptr<GameSessionContainer>> GameSession_Impl::connectToGameSessionImpl(std::string token, bool useTunnel, pplx::cancellation_token ct)
 	{
 		std::weak_ptr<GameSession_Impl> wThat = this->shared_from_this();
-		return _wClient.lock()->connectToPrivateScene(token, IClient::SceneInitializer{}, ct)
+		auto client = _wClient.lock();
+
+		auto dispatcher = client->dependencyResolver().resolve<IActionDispatcher>();
+		pplx::task_options opts(dispatcher);
+		opts.set_cancellation_token(ct);
+
+		return client->connectToPrivateScene(token, IClient::SceneInitializer{}, ct)
 			.then([wThat, useTunnel](std::shared_ptr<Scene> scene)
 		{
 			if (auto that = wThat.lock())
 			{
-				auto gameSessionContainer = std::make_shared<GameSessionContainer>();
-				gameSessionContainer->scene = scene;
+				auto gameSessionContainer = std::make_shared<GameSessionContainer>(scene);
 
 				that->_onGameSessionConnectionChange(ConnectionState::Connected);
 
 				pplx::task_completion_event<GameSessionConnectionParameters> sessionReadyTce;
 				gameSessionContainer->gameSessionReadyTask = pplx::create_task(sessionReadyTce);
 
-				gameSessionContainer->sceneConnectionStateSubscription = scene->getConnectionStateChangedObservable().subscribe([wThat, useTunnel](ConnectionState state)
+				gameSessionContainer->sceneConnectionStateSubscription = scene->getConnectionStateChangedObservable().subscribe([wThat](ConnectionState state)
 				{
 					if (state == ConnectionState::Disconnected)
 					{
 						if (auto that = wThat.lock())
 						{
-							if (auto client = that->_wClient.lock())
-							{
-								pplx::create_task([wThat, state]() {
-									if (auto that = wThat.lock())
-									{
-										that->_onGameSessionConnectionChange(state);
-									}
-								}, client->dependencyResolver().resolve<IActionDispatcher>());
-							}
 							that->_currentGameSession = pplx::task_from_result<std::shared_ptr<GameSessionContainer>>(nullptr);
+							that->_onGameSessionConnectionChange(state);
 						}
 					}
 				});
@@ -438,6 +481,6 @@ namespace Stormancer
 			{
 				throw std::runtime_error("Game session destroyed");
 			}
-		}, ct);
+		}, opts);
 	}
 }

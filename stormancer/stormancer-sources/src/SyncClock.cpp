@@ -3,7 +3,7 @@
 #include "stormancer/IScheduler.h"
 #include "stormancer/RequestProcessor.h"
 #include "stormancer/SystemRequestIDTypes.h"
-#include "stormancer/SafeCapture.h"
+#include "stormancer/Utilities/PointerUtilities.h"
 #include "stormancer/Helpers.h"
 #include <numeric>
 #include <cmath>
@@ -28,10 +28,12 @@ namespace Stormancer
 
 	void SyncClock::start(std::weak_ptr<IConnection> connectionPtr, pplx::cancellation_token ct)
 	{
+		std::lock_guard<std::recursive_mutex> lg(_mutex);
+
 		auto logger = _dependencyResolver.resolve<ILogger>();
 		logger->log(LogLevel::Trace, "synchronizedClock", "Starting SyncClock...");
 
-		if (!compareExchange(_mutex, _isRunning, false, true))
+		if (!compareExchange(_isRunning, false, true))
 		{
 			return;
 		}
@@ -43,40 +45,42 @@ namespace Stormancer
 		}
 		_remoteConnection = connection;
 
-		auto  scheduler = _dependencyResolver.resolve<IScheduler>();
+		auto scheduler = _dependencyResolver.resolve<IScheduler>();
 		if (scheduler)
 		{
-			_cancellationToken = ct;
+			auto cts = pplx::cancellation_token_source::create_linked_source(ct);
+			_cancellationToken = cts.get_token();
 
-			auto cts = pplx::cancellation_token_source::create_linked_source(_cancellationToken);
 			auto wSyncClock = STORM_WEAK_FROM_THIS();
 
 			scheduler->schedulePeriodic(_interval, [wSyncClock, cts]()
 			{
-				auto syncClock = LockOrThrow(wSyncClock);
+				auto syncClock = wSyncClock.lock();
+				if (!syncClock)
+				{
+					cts.cancel();
+					return;
+				}
 
-				std::lock_guard<std::mutex> lg(syncClock->_mutex);
 				syncClock->syncClockImplAsync();
 			}, _cancellationToken);
 
 			// Do multiple pings at start
 			scheduler->schedulePeriodic(_intervalAtStart, [wSyncClock, cts]
 			{
-				auto syncClock = LockOrThrow(wSyncClock);
-
-				bool shouldCallSyncClockImpl = false;
+				auto syncClock = wSyncClock.lock();
+				if (!syncClock)
 				{
-					std::lock_guard<std::mutex> lg(syncClock->_mutex);
-					if (syncClock->_clockValues.size() >= syncClock->_maxValues)
-					{
-						cts.cancel();
-					}
-					else
-					{
-						shouldCallSyncClockImpl = true;
-					}
+					cts.cancel();
+					return;
 				}
-				if (shouldCallSyncClockImpl)
+
+				std::lock_guard<std::recursive_mutex> lg(syncClock->_mutex);
+				if (syncClock->_clockValues.size() >= syncClock->_maxValues)
+				{
+					cts.cancel();
+				}
+				else
 				{
 					syncClock->syncClockImplAsync();
 				}
@@ -84,8 +88,10 @@ namespace Stormancer
 
 			_cancellationToken.register_callback([wSyncClock]
 			{
-				auto syncClock = LockOrThrow(wSyncClock);
-				syncClock->stop();
+				if (auto syncClock = wSyncClock.lock())
+				{
+					syncClock->stop();
+				}
 			});
 
 			logger->log(LogLevel::Trace, "synchronizedClock", "SyncClock started");
@@ -98,10 +104,12 @@ namespace Stormancer
 
 	void SyncClock::stop()
 	{
+		std::lock_guard<std::recursive_mutex> lg(_mutex);
+
 		auto logger = _logger;
 		logger->log(LogLevel::Trace, "synchronizedClock", "Stopping SyncClock...");
 
-		if (!compareExchange(_mutex, _isRunning, true, false))
+		if (!compareExchange(_isRunning, true, false))
 		{
 			throw std::runtime_error("SyncClock is not started");
 		}
@@ -126,105 +134,100 @@ namespace Stormancer
 
 	void SyncClock::syncClockImplAsync()
 	{
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
+
 		if (!_isRunning || !_lastPingFinished)
 		{
 			return;
 		}
 
-		try
+		_lastPingFinished = false;
+		_watch.reset();
+		uint64 timeStart = _watch.getElapsedTime();
+		auto requestProcessor = _dependencyResolver.resolve<RequestProcessor>();
+		auto remoteConnection = _remoteConnection.lock();
+		if (!remoteConnection)
 		{
-			_lastPingFinished = false;
-			uint64 timeStart = _watch.getElapsedTime();
-			auto requestProcessor = _dependencyResolver.resolve<RequestProcessor>();
-			auto remoteConnection = _remoteConnection.lock();
-			if (!remoteConnection)
+			throw std::runtime_error("Remote connection pointer is invalid.");
+		}
+
+		auto logger = _dependencyResolver.resolve<ILogger>();
+		auto wSyncClock = STORM_WEAK_FROM_THIS();
+		requestProcessor->sendSystemRequest(remoteConnection.get(), (byte)SystemRequestIDTypes::ID_PING, [&timeStart](obytestream& bs)
+		{
+			bs << timeStart;
+		}, PacketPriority::IMMEDIATE_PRIORITY, _cancellationToken)
+			.then([wSyncClock, timeStart](Packet_ptr packet)
+		{
+			if (auto syncClock = wSyncClock.lock())
 			{
-				throw std::runtime_error("Remote connection pointer is invalid.");
-			}
-
-			// Keep an active reference to the logger, in case the task is cancelled we cannot rely on this being valid
-			auto logger = _dependencyResolver.resolve<ILogger>();
-			auto cancellationToken = _cancellationToken;
-			auto wSyncClock = STORM_WEAK_FROM_THIS();
-			requestProcessor->sendSystemRequest(remoteConnection.get(), (byte)SystemRequestIDTypes::ID_PING, [&timeStart](obytestream& bs) {
-				bs << timeStart;
-			}, PacketPriority::IMMEDIATE_PRIORITY, _cancellationToken)
-				.then([wSyncClock, timeStart](Packet_ptr packet)
-			{
-				auto syncClock = LockOrThrow(wSyncClock);
-
-				uint64 timeEnd = (uint64)syncClock->_watch.getElapsedTime();
-
-				std::lock_guard<std::mutex> lock(syncClock->_mutex);
-
-				syncClock->_lastPingFinished = true;
-
 				uint64 timeServer;
 				packet->stream >> timeServer;
-
-				uint16 ping = (uint16)(timeEnd - timeStart);
-				syncClock->_lastPing = ping;
-				double latency = ping / 2.0;
-
-				double offset = timeServer - timeEnd + latency;
-
-				syncClock->_clockValues.push_back(ClockValue{ latency, offset });
-				if (syncClock->_clockValues.size() > syncClock->_maxValues)
-				{
-					syncClock->_clockValues.pop_front();
-				}
-				auto len = syncClock->_clockValues.size();
-
-				std::vector<double> latencies(len);
-				for (std::size_t i = 0; i < len; i++)
-				{
-					latencies[i] = syncClock->_clockValues[i].latency;
-				}
-				std::sort(latencies.begin(), latencies.end());
-				syncClock->_medianLatency = latencies[len / 2];
-				double pingAvg = std::accumulate(latencies.begin(), latencies.end(), 0.0) / len;
-				double varianceLatency = 0;
-				for (auto v : latencies)
-				{
-					auto tmp = v - pingAvg;
-					varianceLatency += (tmp * tmp);
-				}
-				varianceLatency /= len;
-				syncClock->_standardDeviationLatency = std::sqrt(varianceLatency);
-
-				double offsetsAvg = 0;
-				uint32 lenOffsets = 0;
-				double latencyMax = syncClock->_medianLatency + syncClock->_standardDeviationLatency;
-				for (auto v : syncClock->_clockValues)
-				{
-					if (v.latency < latencyMax)
-					{
-						offsetsAvg += v.offset;
-						lenOffsets++;
-					}
-				}
-				syncClock->_offset = offsetsAvg / lenOffsets;
-			}, _cancellationToken)
-				.then([cancellationToken, logger](pplx::task<void> t)
-			{
-				try
-				{
-					t.get();
-				}
-				catch (const std::exception& ex)
-				{
-					if (!cancellationToken.is_canceled())
-					{
-						logger->log(LogLevel::Warn, "syncClock", "Failed to ping the server", ex.what());
-					}
-				}
-			});
-		}
-		catch (const std::exception& ex)
+				syncClock->processResult(timeStart, timeServer);
+			}
+		})
+			.then([logger](pplx::task<void> t)
 		{
-			auto logger = _dependencyResolver.resolve<ILogger>();
-			logger->log(LogLevel::Error, "Client::syncClockImpl", "Failed to ping server.", ex.what());
-			throw std::runtime_error((std::string() + ex.what() + "\nFailed to ping server.").c_str());
+			try
+			{
+				t.wait(); // wait because we want to ignore pplx::task_canceled
+			}
+			catch (const std::exception& ex)
+			{
+				logger->log(LogLevel::Warn, "syncClock", "Failed to ping the server", ex.what());
+			}
+		});
+	}
+
+	void SyncClock::processResult(uint64 timeStart, uint64 timeServer)
+	{
+		uint64 timeEnd = (uint64)_watch.getElapsedTime();
+
+		std::lock_guard<std::recursive_mutex> lock(_mutex);
+
+		_lastPingFinished = true;
+
+		uint16 ping = (uint16)(timeEnd - timeStart);
+		_lastPing = ping;
+		double latency = ping / 2.0;
+
+		double offset = timeServer - timeEnd + latency;
+
+		_clockValues.push_back(ClockValue{ latency, offset });
+		if (_clockValues.size() > _maxValues)
+		{
+			_clockValues.pop_front();
 		}
+		auto len = _clockValues.size();
+
+		std::vector<double> latencies(len);
+		for (std::size_t i = 0; i < len; i++)
+		{
+			latencies[i] = _clockValues[i].latency;
+		}
+		std::sort(latencies.begin(), latencies.end());
+		_medianLatency = latencies[len / 2];
+		double pingAvg = std::accumulate(latencies.begin(), latencies.end(), 0.0) / len;
+		double varianceLatency = 0;
+		for (auto v : latencies)
+		{
+			auto tmp = v - pingAvg;
+			varianceLatency += (tmp * tmp);
+		}
+		varianceLatency /= len;
+		_standardDeviationLatency = std::sqrt(varianceLatency);
+
+		double offsetsAvg = 0;
+		uint32 lenOffsets = 0;
+		double latencyMax = _medianLatency + _standardDeviationLatency;
+		for (auto v : _clockValues)
+		{
+			if (v.latency < latencyMax)
+			{
+				offsetsAvg += v.offset;
+				lenOffsets++;
+			}
+		}
+		_offset = offsetsAvg / lenOffsets;
 	}
 }

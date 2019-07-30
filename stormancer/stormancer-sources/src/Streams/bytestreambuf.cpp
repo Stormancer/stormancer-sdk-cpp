@@ -129,7 +129,12 @@ namespace Stormancer
 
 	bytestreambuf::pos_type bytestreambuf::seekoff(off_type off, std::ios_base::seekdir way, std::ios_base::openmode which)
 	{
-		pos_type pt = -1;
+		if ((which & std::ios_base::in) && (which & std::ios_base::out) && (way != std::ios_base::beg) && (way != std::ios_base::end))
+		{
+			return pos_type(off_type(-1));
+		}
+
+		off_type newoff = 0;
 
 		if ((_mode & Read) && (which & std::ios_base::in))
 		{
@@ -137,22 +142,46 @@ namespace Stormancer
 			byte* next = gptr();
 			byte* last = egptr();
 
+			if (next == nullptr)
+			{
+				return pos_type(off_type(-1));
+			}
+
 			if (way == std::ios_base::beg)
 			{
-				next = first + off;
+				if (first == nullptr)
+				{
+					return pos_type(off_type(-1));
+				}
+
+				newoff = 0;
 			}
 			else if (way == std::ios_base::cur)
 			{
-				next = next + off;
+				newoff = next - first;
 			}
 			else if (way == std::ios_base::end)
 			{
-				next = last - off;
+				if (last == nullptr)
+				{
+					return pos_type(off_type(-1));
+				}
+
+				newoff = last - first;
 			}
 
-			if (setgIfValid(first, next, last))
+			off_type finaloff = newoff + off;
+
+			if (finaloff < 0 || finaloff >(last - first))
 			{
-				pt = (next - first);
+				return pos_type(off_type(-1));
+			}
+
+			next = first + finaloff;
+
+			if (!setgIfValid(first, next, last))
+			{
+				return pos_type(off_type(-1));
 			}
 		}
 
@@ -162,57 +191,89 @@ namespace Stormancer
 			byte* next = pptr();
 			byte* last = epptr();
 
+			if (next == nullptr)
+			{
+				return pos_type(off_type(-1));
+			}
+
 			if (way == std::ios_base::beg)
 			{
-				next = first + off;
+				if (first == nullptr)
+				{
+					return pos_type(off_type(-1));
+				}
+
+				newoff = 0;
 			}
 			else if (way == std::ios_base::cur)
 			{
-				next = next + off;
+				newoff = next - first;
 			}
 			else if (way == std::ios_base::end)
 			{
-				next = last - off;
+				if (last == nullptr)
+				{
+					return pos_type(off_type(-1));
+				}
+
+				newoff = last - first;
 			}
 
-			if (setpIfValid(first, next, last))
+			off_type finaloff = newoff + off;
+
+			if (finaloff < 0 || finaloff >(last - first))
 			{
-				pt = (next - first);
+				return pos_type(off_type(-1));
+			}
+
+			next = first + finaloff;
+
+			if (!setpIfValid(first, next, last))
+			{
+				return pos_type(off_type(-1));
 			}
 		}
 
-		return pt;
+		return pos_type(newoff);
 	}
 
 	bytestreambuf::pos_type bytestreambuf::seekpos(pos_type pos, std::ios_base::openmode which)
 	{
-		pos_type pt = -1;
-
 		if ((_mode & Read) && (which & std::ios_base::in))
 		{
+			if (gptr() == nullptr || pos < 0)
+			{
+				return pos_type(off_type(-1));
+			}
+
 			byte* first = eback();
-			byte* next = first + (int)pos;
+			byte* next = first + pos;
 			byte* last = egptr();
 
-			if (setgIfValid(first, next, last))
+			if (!setgIfValid(first, next, last))
 			{
-				pt = pos;
+				return pos_type(off_type(-1));
 			}
 		}
 
 		if ((_mode & Write) && (which & std::ios_base::out))
 		{
+			if (pptr() == nullptr || pos < 0)
+			{
+				return pos_type(off_type(-1));
+			}
+
 			byte* first = pbase();
-			byte* next = first + (int)pos;
+			byte* next = first + pos;
 			byte* last = epptr();
 
-			if (setpIfValid(first, next, last))
+			if (!setpIfValid(first, next, last))
 			{
-				pt = pos;
+				return pos_type(off_type(-1));
 			}
 		}
 
-		return pt;
+		return pos;
 	}
 
 	std::streamsize bytestreambuf::showmanyc()
@@ -252,7 +313,7 @@ namespace Stormancer
 				byte* first = eback();
 				byte* next = gptr();
 				byte* last = egptr();
-				std::memcpy(s, next, (std::size_t)size);
+				std::memcpy(s, next, static_cast<std::size_t>(size));
 				next += size;
 				setg(first, next, last);
 				res += size;
@@ -361,7 +422,7 @@ namespace Stormancer
 				std::streamsize sz = std::min(avail, n);
 				if (sz > 0)
 				{
-					std::memcpy(next, s, (std::size_t)sz);
+					std::memcpy(next, s, static_cast<std::size_t>(sz));
 					next += sz;
 					setp(first, last);
 					pbump((int)(next - first));
@@ -471,7 +532,7 @@ namespace Stormancer
 				byte* writeNext = pptr();
 				byte* writeLast = epptr();
 
-				std::memcpy(writeFirst, oldWriteFirst, (std::size_t)oldSize);
+				std::memcpy(writeFirst, oldWriteFirst, static_cast<std::size_t>(oldSize));
 
 				writeNext = writeFirst + (oldWriteNext - oldWriteFirst);
 

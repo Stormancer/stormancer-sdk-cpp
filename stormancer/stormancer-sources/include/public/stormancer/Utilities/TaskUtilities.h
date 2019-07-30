@@ -6,6 +6,40 @@
 
 namespace Stormancer
 {
+	using namespace std::chrono_literals;
+
+	// DETAILS (forward declarations)
+
+	namespace _TaskUtilitiesDetails
+	{
+		template<typename TTask>
+		auto when_all_impl(std::vector<TTask>& tasksVector)
+			-> decltype(pplx::when_all(tasksVector.begin(), tasksVector.end()))
+		{
+			return pplx::when_all(tasksVector.begin(), tasksVector.end());
+		}
+
+		template<typename TNextTask, typename... TTasks>
+		auto when_all_impl(std::vector<TNextTask>& tasksVector, TNextTask nextTask, TTasks... tasks)
+			-> decltype(when_all_impl(tasksVector))
+		{
+			tasksVector.push_back(nextTask);
+			return when_all_impl(tasksVector, tasks...);
+		}
+
+		pplx::cancellation_token_source create_linked_source_impl(std::vector<pplx::cancellation_token>& tokensVector);
+
+		template<typename TNextCancellationToken, typename... TCancellationTokens>
+		pplx::cancellation_token_source create_linked_source_impl(std::vector<pplx::cancellation_token>& tokensVector, TNextCancellationToken nextToken, TCancellationTokens... tokens)
+		{
+			if (nextToken.is_cancelable())
+			{
+				tokensVector.push_back(nextToken);
+			}
+			return create_linked_source_impl(tokensVector, tokens...);
+		}
+	}
+
 	pplx::task<void> taskIf(bool condition, std::function<pplx::task<void>()> action);
 
 	pplx::task<void> taskDelay(std::chrono::milliseconds timeOffset, pplx::cancellation_token ct = pplx::cancellation_token::none());
@@ -36,11 +70,22 @@ namespace Stormancer
 		return cts.get_token();
 	}
 
-	pplx::cancellation_token_source create_linked_source(pplx::cancellation_token token1, pplx::cancellation_token token2);
-	
-	pplx::cancellation_token_source create_linked_source(pplx::cancellation_token token1, pplx::cancellation_token token2, pplx::cancellation_token token3);
+	template<typename... TCancellationTokens>
+	pplx::cancellation_token_source create_linked_source(TCancellationTokens... tokens)
+	{
+		std::vector<pplx::cancellation_token> tokensVector;
+		return _TaskUtilitiesDetails::create_linked_source_impl(tokensVector, tokens...);
+	}
 
 	pplx::cancellation_token create_linked_shutdown_token(pplx::cancellation_token token);
+
+	template<typename TNextTask, typename... TTasks>
+	auto when_all(TNextTask nextTask, TTasks... tasks)
+		-> decltype(_TaskUtilitiesDetails::when_all_impl(std::declval<typename std::add_lvalue_reference<std::vector<TNextTask>>::type>()))
+	{
+		std::vector<TNextTask> tasksVector;
+		return _TaskUtilitiesDetails::when_all_impl(tasksVector, nextTask, tasks...);
+	}
 
 	// Cancels the provided task after the specifed delay, if the task
 	// did not complete.

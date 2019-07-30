@@ -6,10 +6,11 @@
 
 namespace Stormancer
 {
-	SceneDispatcher::SceneDispatcher(std::shared_ptr<IActionDispatcher> evDispatcher)
-		: _eventDispatcher(evDispatcher)
+	SceneDispatcher::SceneDispatcher(std::shared_ptr<IActionDispatcher> evDispatcher, std::shared_ptr<ILogger> logger)
+		: _eventDispatcher(evDispatcher),
+		logger(logger)
 	{
-		handler = [=](uint8 sceneHandle, Packet_ptr packet)
+		handler = [this](uint8 sceneHandle, Packet_ptr packet)
 		{
 			return handler_impl(sceneHandle, packet);
 		};
@@ -54,7 +55,7 @@ namespace Stormancer
 			auto handles = getHandles(*connection);
 			if (handles)
 			{
-				auto index = getSceneIndex(scene->handle());
+				auto index = getSceneIndex(scene->host()->handle());
 				resize(*handles, index);
 				(*handles)[index] = scene;
 			}
@@ -84,6 +85,7 @@ namespace Stormancer
 			return false;
 		}
 
+		logger->log(LogLevel::Trace, "SceneDispatcher", "Received message for sceneHandle " + std::to_string(sceneHandle), packet->connection->ipAddress());
 		unsigned int sceneIndex = sceneHandle - (uint8)MessageIDTypes::ID_SCENES;
 
 		auto connection = packet->connection;
@@ -99,6 +101,7 @@ namespace Stormancer
 				{
 					if (auto scene = scene_weak.lock())
 					{
+						logger->log(LogLevel::Trace, "SceneDispatcher", "handling message for scene " + scene->id(), packet->connection->ipAddress());
 						scene->handleMessage(packet);
 					}
 				});

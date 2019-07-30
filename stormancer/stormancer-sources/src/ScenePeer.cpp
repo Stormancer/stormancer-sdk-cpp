@@ -1,14 +1,14 @@
 #include "stormancer/stdafx.h"
 #include "stormancer/ScenePeer.h"
 #include "stormancer/ChannelUidStore.h"
-#include "stormancer/SafeCapture.h"
+#include "stormancer/Utilities/PointerUtilities.h"
 
 namespace Stormancer
 {
 	ScenePeer::ScenePeer(std::weak_ptr<IConnection> connection, byte sceneHandle, std::unordered_map<std::string, Route_ptr>& routes, std::weak_ptr<Scene> scene)
-		: _connection(connection)
-		, _sceneHandle(sceneHandle)
+		: _sceneHandle(sceneHandle)
 		, _routes(routes)
+		, _connection(connection)
 		, _scene(scene)
 	{
 	}
@@ -45,12 +45,21 @@ namespace Stormancer
 		scene->send(routeName, streamWriter, priority, reliability, channelIdentifier);
 	}
 
-	void ScenePeer::disconnect()
+	pplx::task<void> ScenePeer::disconnect(pplx::cancellation_token ct)
 	{
 		auto scene = _scene.lock();
 		if (scene)
 		{
-			scene->disconnect();
+			return scene->disconnect(ct);
 		}
+		else
+		{
+			return pplx::task_from_result(pplx::task_options(ct));
+		}
+	}
+
+	byte ScenePeer::handle() const
+	{
+		return _sceneHandle;
 	}
 }

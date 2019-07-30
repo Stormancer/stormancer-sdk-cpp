@@ -67,12 +67,12 @@ namespace Stormancer
 		return deserialize(value);
 	}
 
-	ibytestream& ibytestream::operator>>(float32& value)
+	ibytestream& ibytestream::operator>>(float& value)
 	{
 		return deserialize(value);
 	}
 
-	ibytestream& ibytestream::operator>>(float64& value)
+	ibytestream& ibytestream::operator>>(double& value)
 	{
 		return deserialize(value);
 	}
@@ -95,7 +95,7 @@ namespace Stormancer
 			std::streamsize sz = buf->in_avail();
 			if (sz > 0)
 			{
-				bytes.resize((std::size_t)sz);
+				bytes.resize(static_cast<std::size_t>(sz));
 				read(bytes.data(), sz);
 			}
 		}
@@ -104,14 +104,13 @@ namespace Stormancer
 
 	std::vector<byte> ibytestream::bytes()
 	{
-		std::vector<byte> bytes;
 		if (good())
 		{
-			int sz = (int)totalSize();
-			bytes.resize(sz);
-			std::memcpy(bytes.data(), startPtr(), sz);
+			const byte* first = startPtr();
+			const byte* last = first + totalSize();
+			return std::vector<byte>(first, last);
 		}
-		return bytes;
+		return std::vector<byte>();
 	}
 
 	byte* ibytestream::startPtr()
@@ -179,11 +178,10 @@ namespace Stormancer
 		std::basic_istream<byte>::read(ptr, size);
 		return (*this);
 	}
-#if !defined(_LIBCPP_VERSION)
+
 	ibytestream& ibytestream::read(char* ptr, std::streamsize size)
 	{
-		std::basic_istream<byte>::read((byte*)ptr, size);
+		std::basic_istream<byte>::read(reinterpret_cast<byte*>(ptr), size);
 		return (*this);
 	}
-#endif
 }

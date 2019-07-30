@@ -17,6 +17,7 @@
 
 namespace Stormancer
 {
+	class Scene_Impl;
 	RakNetConnection::RakNetConnection(
 		RakNet::RakNetGUID guid,
 		int64 id,
@@ -52,6 +53,9 @@ namespace Stormancer
 		_dependencyScope = parentScope.beginLifetimeScope([](ContainerBuilder& builder)
 		{
 			builder.registerDependency<ChannelUidStore>().singleInstance();
+			builder.registerDependency<std::vector<std::weak_ptr<Scene_Impl>>>([](const DependencyScope&) {
+				return std::make_shared<std::vector< std::weak_ptr<Scene_Impl>>>(150);
+				}).singleInstance();
 		});
 	}
 
@@ -292,5 +296,15 @@ namespace Stormancer
 			return pplx::task_from_exception<void>(PointerDeletedException("peer"));
 		}
 		return updatePeerMetadata(ct);
+	}
+
+	std::string RakNetConnection::sessionId() const
+	{
+		return _sessionId;
+	}
+
+	void RakNetConnection::setSessionId(const std::string& sessionId)
+	{
+		_sessionId = sessionId;
 	}
 }

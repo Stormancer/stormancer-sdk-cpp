@@ -1,5 +1,5 @@
-#include "test.h"
 #include "testP2P.h"
+#include "test.h"
 #include <iostream>
 #include <string>
 
@@ -15,13 +15,21 @@ int main(int argc, char** argv)
 		std::cin.ignore();
 	}
 
-	try
 	{
-		testP2P(endpoint, account, application, "test-scene");
+		int guestsCount = 1;
+		testP2P(endpoint, account, application, "test-scene", guestsCount)
+			.then([](pplx::task<void> task)
+		{
+			try
+			{
+				task.get();
+			}
+			catch (const std::exception& ex)
+			{
+				std::clog << "P2P tests failed: " << ex.what() << std::endl;
+			}
+		});
 		std::cin.ignore();
-	}
-	catch (const std::exception&)
-	{
 	}
 
 	return 0;

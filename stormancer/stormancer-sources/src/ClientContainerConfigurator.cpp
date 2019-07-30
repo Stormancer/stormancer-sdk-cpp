@@ -45,13 +45,13 @@ void Stormancer::Client::ConfigureContainer(ContainerBuilder& builder, Configura
 
 	builder.registerDependency<P2PPacketDispatcher, P2PTunnels, IConnectionManager, ILogger, Serializer>().singleInstance();
 
-	builder.registerDependency<SceneDispatcher, IActionDispatcher>().singleInstance();
+	builder.registerDependency<SceneDispatcher, IActionDispatcher,ILogger>().singleInstance();
 
 	builder.registerDependency<SyncClock>([](const DependencyScope& scope)
 	{
 		return std::make_shared<SyncClock>(scope, scope.resolve<Configuration>()->synchronisedClockInterval);
 	}).singleInstance();
-	builder.registerDependency<std::vector<std::weak_ptr<Scene_Impl>>>().singleInstance();
+	
 	builder.registerDependency<RequestProcessor, ILogger>().singleInstance();
 
 	builder.registerDependency<PacketTransformProcessor, AESPacketTransform>().singleInstance();
@@ -94,5 +94,5 @@ void Stormancer::Client::ConfigureContainer(ContainerBuilder& builder, Configura
 
 	builder.registerDependency<P2PService, IConnectionManager, RequestProcessor, ITransport, Serializer, P2PTunnels>().singleInstance();
 
-	builder.registerDependency<P2PRequestModule, ITransport, IConnectionManager, P2PSessions, Serializer, P2PTunnels, ILogger, Configuration, Client>().singleInstance();
+	builder.registerDependency<P2PRequestModule, ITransport, IConnectionManager, P2PSessions, Serializer, P2PTunnels, ILogger, Configuration, RequestProcessor, Client>().singleInstance();
 }

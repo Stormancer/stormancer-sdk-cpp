@@ -63,6 +63,7 @@ dlldata.c
 *.pidb
 *.svclog
 *.scc
+*.metaproj
 
 
 # Chutzpah Test files
@@ -223,3 +224,5 @@ plugins.json
 stormancer.client.cpp.tag
 # Stormancer Linux build user config file
 CustomLinuxBuild.props
+# Stormancer package
+/StormancerSdkCpp-*

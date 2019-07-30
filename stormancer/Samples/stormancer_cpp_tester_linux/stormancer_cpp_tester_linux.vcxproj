@@ -52,7 +52,7 @@
   <ImportGroup Label="PropertySheets">
     <Import Project="..\..\PropertySheets\LinuxCommon.props" />
     <Import Project="..\..\PropertySheets\OutputDirs.props" />
-    <Import Project="..\tester-sources\samples.props" />
+    <Import Project="..\..\PropertySheets\Samples.props" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
@@ -146,6 +146,12 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\dependencies\cpprestsdk\Release\src\build\vsClang.Linux\cpprestsdk_linux\cpprestsdk_linux.vcxproj">
+      <Project>{bf042260-99b1-4a39-b2bf-1ff0f19dcffa}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\dependencies\RakNet\RakNet\RakNetLibStatic-Linux\RakNet_Linux\RakNet_Linux.vcxproj">
+      <Project>{34d92434-8d57-44f9-a08c-9ca6f980e0b7}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\stormancer-sdk-cpp-Linux\stormancer-sdk-cpp-lib-Linux.vcxproj">
       <Project>{204f5bfc-02d3-4177-9c9c-f3bfbcea620a}</Project>
     </ProjectReference>
@@ -153,7 +159,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <PreprocessorDefinitions>LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>STORM_DISABLE_CHECK_VERSION_LINKTIME;LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>stormancer/Samples/tester-sources/;../RakNet_Linux/;../includes/;Plugins/public/;Plugins/private/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <Verbose>true</Verbose>
@@ -167,7 +173,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <ClCompile>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <PreprocessorDefinitions>LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>STORM_DISABLE_CHECK_VERSION_LINKTIME;LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>stormancer/Samples/tester-sources/;../RakNet_Linux/;../includes/;Plugins/public/;Plugins/private/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <Verbose>true</Verbose>
@@ -181,7 +187,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <ClCompile>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <PreprocessorDefinitions>LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>STORM_DISABLE_CHECK_VERSION_LINKTIME;LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>stormancer/Samples/tester-sources/;../RakNet_Linux/;../includes/;Plugins/public/;Plugins/private/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <Verbose>true</Verbose>
@@ -195,7 +201,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <ClCompile>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <PreprocessorDefinitions>LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>STORM_DISABLE_CHECK_VERSION_LINKTIME;LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>stormancer/Samples/tester-sources/;../RakNet_Linux/;../includes/;Plugins/public/;Plugins/private/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <Verbose>true</Verbose>
@@ -209,7 +215,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <PreprocessorDefinitions>LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>STORM_DISABLE_CHECK_VERSION_LINKTIME;LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>stormancer/Samples/tester-sources/;../RakNet_Linux/;../includes/;Plugins/public/;Plugins/private/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <Verbose>true</Verbose>
@@ -223,7 +229,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <PreprocessorDefinitions>LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>STORM_DISABLE_CHECK_VERSION_LINKTIME;LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>stormancer/Samples/tester-sources/;../RakNet_Linux/;../includes/;Plugins/public/;Plugins/private/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <Verbose>true</Verbose>
@@ -237,7 +243,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
     <ClCompile>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <PreprocessorDefinitions>LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>STORM_DISABLE_CHECK_VERSION_LINKTIME;LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>stormancer/Samples/tester-sources/;../RakNet_Linux/;../includes/;Plugins/public/;Plugins/private/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <Verbose>true</Verbose>
@@ -251,7 +257,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
     <ClCompile>
       <CppLanguageStandard>c++14</CppLanguageStandard>
-      <PreprocessorDefinitions>LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>STORM_DISABLE_CHECK_VERSION_LINKTIME;LINUX;_CONSOLE;CPPREST_FORCE_PPLX=1;_NO_ASYNCRTIMP;_NO_PPLXIMP;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>stormancer/Samples/tester-sources/;../RakNet_Linux/;../includes/;Plugins/public/;Plugins/private/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <Verbose>true</Verbose>
