@@ -164,7 +164,6 @@ namespace Stormancer
 				}
 			}
 		});
-
 	}
 
 	pplx::task<std::shared_ptr<Scene>> AuthenticationService::reconnect(int retry)
@@ -227,15 +226,15 @@ namespace Stormancer
 					}
 					else
 					{
-						if (auto that = wThat.lock())
-						{
-							that->_authTask = nullptr;
-						}
 						throw std::runtime_error("Authentication failed");
 					}
 				}
 				catch (std::exception& ex)
 				{
+					if (auto that = wThat.lock())
+					{
+						that->_authTask = nullptr;
+					}
 					tce.set_exception(ex);
 				}
 
@@ -325,6 +324,34 @@ namespace Stormancer
 			return rpcService->rpc<std::string, std::string>("users.getuseridbypseudo", pseudo);
 		});
 	}
+
+	pplx::task<std::string> AuthenticationService::getSceneConnectionToken(const std::string& serviceType, const std::string& serviceName, pplx::cancellation_token ct)
+	{
+		auto logger = this->_logger;
+		return getAuthenticationScene(ct)
+			.then([serviceType, serviceName, ct,logger](std::shared_ptr<Scene> authScene)
+		{
+
+			auto rpcService = authScene->dependencyResolver().resolve<RpcService>();
+			logger->log(LogLevel::Info, "authentication", "Getting token for " + serviceType + " and name  " + serviceName);
+			return rpcService->rpc<std::string>("Locator.GetSceneConnectionToken", ct, serviceType, serviceName).then([logger,serviceType,serviceName](pplx::task<std::string> t) {
+
+				try
+				{
+					auto token = t.get();
+					logger->log(LogLevel::Info, "authentication", "Got token for " + serviceType + " and name  " + serviceName);
+					return token;
+				}
+				catch (std::exception& ex)
+				{
+					logger->log(LogLevel::Error, "authentication", "Failed getting token for " + serviceType + " and name  " + serviceName,ex.what());
+					throw;
+				}
+
+			});
+		});
+	}
+
 	pplx::task<std::shared_ptr<Scene>> AuthenticationService::connectToPrivateSceneByToken(const std::string& token, std::function<void(std::shared_ptr<Scene>)> builder)
 	{
 		std::weak_ptr<AuthenticationService> wThat = this->shared_from_this();
@@ -374,26 +401,35 @@ namespace Stormancer
 	pplx::task<std::shared_ptr<Scene>> AuthenticationService::getSceneForService(const std::string& serviceType, const std::string& serviceName, pplx::cancellation_token ct)
 	{
 		std::weak_ptr<AuthenticationService> wThat = this->shared_from_this();
-		return getAuthenticationScene(ct)
-			.then([serviceType, serviceName, ct](std::shared_ptr<Scene> authScene)
-		{
-			auto rpcService = authScene->dependencyResolver().resolve<RpcService>();
-			return rpcService->rpc<std::string>("Locator.GetSceneConnectionToken", ct, serviceType, serviceName);
-		})
-			.then([wThat, ct](std::string token)
-		{
-			auto that = wThat.lock();
 
-			if (that)
+		return getSceneConnectionToken(serviceType, serviceName, ct)
+			.then([wThat, ct, serviceType, serviceName](pplx::task<std::string> task)
+		{
+			try
 			{
-				if (auto client = that->_client.lock())
+				auto token = task.get();
+				auto that = wThat.lock();
+
+				if (that)
 				{
-					return client->connectToPrivateScene(token, Stormancer::IClient::SceneInitializer(), ct);
+					that->_logger->log(LogLevel::Info, "authentication", "Retrieved scene connection token for service type " + serviceType + " and name  " + serviceName);
+
+					if (auto client = that->_client.lock())
+					{
+						return client->connectToPrivateScene(token, Stormancer::IClient::SceneInitializer(), ct);
+					}
 				}
+
+				throw std::runtime_error("Client is invalid.");
 			}
-
-			throw std::runtime_error("Client is invalid.");
-
+			catch (std::exception& ex)
+			{
+				if (auto that = wThat.lock())
+				{
+					that->_logger->log(LogLevel::Error, "authentication", "Failed to get scene connection token for service type " + serviceType + " and name " + serviceName, ex.what());
+				}
+				throw;
+			}
 		});
 	}
 
@@ -465,6 +501,19 @@ namespace Stormancer
 		_operationHandlers[operation] = handler;
 	}
 
+	pplx::task<void> AuthenticationService::RegisterNewUser(std::unordered_map<std::string, std::string> data)
+	{
+		auto ctx = Stormancer::AuthParameters();
+		ctx.type = "playfab";
+		ctx.parameters = data;
+
+		return getAuthenticationScene()
+			.then([ctx](std::shared_ptr<Scene> scene)
+		{
+			auto rpcService = scene->dependencyResolver().resolve<RpcService>();
+			return rpcService->rpc<void>("Authentication.Register", ctx);
+		});
+	}
 
 	GameConnectionState::GameConnectionState(State state2)
 		: state(state2)

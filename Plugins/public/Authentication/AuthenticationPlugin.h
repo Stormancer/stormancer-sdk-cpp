@@ -6,6 +6,7 @@
 
 namespace Stormancer
 {
+	/// \deprecated Please use <c>Stormancer::Users::UsersPlugin</c> instead.
 	class AuthenticationPlugin : public IPlugin
 	{
 	public:

@@ -4,6 +4,8 @@
 #include "Helloworld/Helloworld.hpp"
 #include "TestStreams.h"
 #include "GameSession/Gamesessions.hpp"
+#include "TestUsersPlugin.h"
+
 using namespace std::literals;
 
 namespace Stormancer
@@ -29,6 +31,7 @@ namespace Stormancer
 		_tests.push_back([this]() { test_disconnect(); });
 		_tests.push_back([this]() { test_Ping_Cluster(); });
 		_tests.push_back([this]() { test_clean(); });
+		_tests.push_back([this]() { test_users(); });
 
 		// Some platforms require a Client to be created before using pplx::task
 		test_create();
@@ -711,6 +714,24 @@ namespace Stormancer
 		_logger->log(LogLevel::Info, "test_streams", "Streams OK");
 		execNextTest();
 	}
+
+	void Tester::test_users()
+	{
+		_logger->log(LogLevel::Info, "test_users", "USERS");
+
+		try
+		{
+			TestUsersPlugin::runTests(*this);
+		}
+		catch (const std::exception& ex)
+		{
+			_logger->log(LogLevel::Error, "test_users", "Users FAILED", ex.what());
+			return;
+		}
+		_logger->log(LogLevel::Info, "test_users", "Users OK");
+		execNextTest();
+	}
+
 
 	bool Tester::tests_done()
 	{

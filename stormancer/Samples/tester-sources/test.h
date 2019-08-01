@@ -6,6 +6,8 @@
 
 
 
+class TestUsersPlugin;
+
 namespace Stormancer
 {
 	class Tester
@@ -42,6 +44,8 @@ namespace Stormancer
 
 	private:
 
+		friend class ::TestUsersPlugin;
+
 #pragma region private_methods
 
 		void execNextTest();
@@ -70,6 +74,7 @@ namespace Stormancer
 		void test_Ping_Cluster();
 		void test_dependencyInjection();
 		void test_streams();
+		void test_users();
 
 #pragma endregion
 

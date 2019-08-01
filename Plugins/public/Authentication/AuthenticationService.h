@@ -77,7 +77,7 @@ namespace Stormancer
 		MSGPACK_DEFINE(type, parameters);
 	};
 
-
+	/// \deprecated <c>Stormancer::Users::UsersApi</c> should be used instead.
 	class AuthenticationService : public std::enable_shared_from_this<AuthenticationService>
 	{
 	public:
@@ -91,6 +91,7 @@ namespace Stormancer
 		pplx::task<void> login();
 		pplx::task<void> logout();
 
+		pplx::task<std::string> getSceneConnectionToken(const std::string& serviceType, const std::string& serviceName, pplx::cancellation_token ct);
 
 		pplx::task<std::shared_ptr<Scene>> connectToPrivateScene(const std::string& sceneId, std::function<void(std::shared_ptr<Scene>)> builder = [](std::shared_ptr<Scene>) {});
 		pplx::task<std::shared_ptr<Scene>> connectToPrivateSceneByToken(const std::string& token, std::function<void(std::shared_ptr<Scene>)> builder = [](std::shared_ptr<Scene>) {});
@@ -116,6 +117,70 @@ namespace Stormancer
 
 		std::function<pplx::task<AuthParameters>()> getCredentialsCallback;
 
+		//Returns the current authentication status of the user: The list of authentication providers that successfully 
+		pplx::task<std::unordered_map<std::string, std::string>> getAuthenticationStatus(pplx::cancellation_token ct = pplx::cancellation_token::none())
+		{
+			return getAuthenticationScene().then([ct](std::shared_ptr<Scene> scene) {
+
+				auto rpc = scene->dependencyResolver().resolve<RpcService>();
+				return rpc->rpc<std::unordered_map<std::string, std::string>>("Authentication.GetStatus", ct);
+			});
+		}
+
+		//Get the metadata for the authentication system, advertising what kind of authentication is available and which parameters it supports.
+		pplx::task<std::unordered_map<std::string, std::string>> getMetadata(pplx::cancellation_token ct = pplx::cancellation_token::none())
+		{
+			return getAuthenticationScene().then([ct](std::shared_ptr<Scene> scene) {
+
+				auto rpc = scene->dependencyResolver().resolve<RpcService>();
+				return rpc->rpc<std::unordered_map<std::string, std::string>>("Authentication.GetMetadata", ct);
+			});
+		}
+
+		//Perform an additionnal authentication on an already connected client (for instance to perform linking)
+		pplx::task<std::unordered_map<std::string, std::string>> authenticate(AuthParameters p, pplx::cancellation_token ct = pplx::cancellation_token::none())
+		{
+			std::weak_ptr<AuthenticationService> wThat = this->shared_from_this();
+			return getAuthenticationScene().then([ct, p](std::shared_ptr<Scene> scene) {
+
+
+				auto rpc = scene->dependencyResolver().resolve<RpcService>();
+				return rpc->rpc<LoginResult>("Authentication.Login", ct, p);
+
+			}).then([ct, wThat](LoginResult r) {
+
+				auto that = wThat.lock();
+				if (!that)
+				{
+					throw PointerDeletedException("client destroyed");
+				}
+
+				return that->getAuthenticationStatus(ct);
+			});
+		}
+
+		//Setups an authentication provider
+		pplx::task<void> setup(AuthParameters p, pplx::cancellation_token ct = pplx::cancellation_token::none())
+		{
+			return getAuthenticationScene().then([p, ct](std::shared_ptr<Scene> scene) {
+
+				auto rpc = scene->dependencyResolver().resolve<RpcService>();
+				return rpc->rpc<void>("Authentication.Register", ct, p);
+
+			});
+		}
+
+		//Unlink the authenticated user from auth provided by the specified provider
+		pplx::task<void> unlink(std::string type, pplx::cancellation_token ct = pplx::cancellation_token::none())
+		{
+			return getAuthenticationScene().then([ct, type](std::shared_ptr<Scene> scene) {
+
+				auto rpc = scene->dependencyResolver().resolve<RpcService>();
+				return rpc->rpc<void>("Authentication.Unlink", ct, type);
+
+			});
+		}
+
 		template<typename TResult, typename... TArgs >
 		pplx::task<TResult> sendRequestToUser(const std::string& userId, const std::string& operation, pplx::cancellation_token ct, const TArgs&... args)
 		{
@@ -127,6 +192,8 @@ namespace Stormancer
 		}
 
 		void SetOperationHandler(std::string operation, std::function<pplx::task<void>(OperationCtx&)> handler);
+
+		pplx::task<void> RegisterNewUser(std::unordered_map<std::string, std::string> data);
 
 #pragma endregion
 

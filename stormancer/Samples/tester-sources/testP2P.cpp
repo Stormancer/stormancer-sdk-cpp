@@ -193,7 +193,7 @@ pplx::task<void> testP2P(std::string endpoint, std::string account, std::string 
 	auto hostConfiguration = Configuration::create(endpoint, account, application);
 	hostConfiguration->logger = logger;
 	hostConfiguration->serverGamePort = 7777;
-	hostConfiguration->maxPeers = guestsCount + 1;
+	hostConfiguration->maxPeers = static_cast<uint16>(guestsCount + 1);
 	//hostConfiguration->encryptionEnabled = true;
 
 	auto hostClient = IClient::create(hostConfiguration);

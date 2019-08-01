@@ -414,6 +414,12 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameSession\Gamesessions.hpp">
       <Filter>public\GameSession</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Steam\SteamPlugin.hpp">
+      <Filter>public\Steam</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Users\Users.hpp">
+      <Filter>public\Users</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="private">
@@ -538,6 +544,12 @@
     </Filter>
     <Filter Include="public\Tunnels">
       <UniqueIdentifier>{381d17f9-09ec-4637-98ec-c593408ff7ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="public\Steam">
+      <UniqueIdentifier>{09572441-65be-4936-9098-7f29ec45dc7c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="public\Users">
+      <UniqueIdentifier>{7093c00a-886a-4bbf-8aa4-3000ff716050}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
