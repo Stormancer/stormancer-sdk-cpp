@@ -10,7 +10,7 @@
 
 namespace Stormancer
 {
-	void registerClientDependencies(ContainerBuilder& builder)
+	void ServerPlugin::registerClientDependencies(ContainerBuilder& builder)
 	{
 		builder.registerDependency<Servers_Impl, AuthenticationService>().as<Servers>().singleInstance();
 	}
