@@ -2,6 +2,7 @@
 #include "stormancer/Logger/NullLogger.h"
 #include "stormancer/Helpers.h"
 #include <sstream>
+#include <exception>
 
 namespace Stormancer
 {
@@ -64,5 +65,28 @@ namespace Stormancer
 	std::string ILogger::formatException(const std::exception& ex)
 	{
 		return format(LogLevel::Error, "exception", ex.what());
+	}
+
+	void ILogger::log(LogLevel level, const std::string& category, const std::string& message, const std::exception& exception)
+	{
+		std::string formattedException = "Exception:\n\t";
+		formatNestedExceptionRecursive(exception, formattedException);
+		log(level, category, message, formattedException);
+	}
+
+	void ILogger::formatNestedExceptionRecursive(const std::exception& ex, std::string& output)
+	{
+		output += std::string("[") + ex.what() + "]";
+		try
+		{
+			std::rethrow_if_nested(ex);
+		}
+		catch (const std::exception& ex)
+		{
+			// One more nested exception, increase indentation
+			output += "\n\t";
+			formatNestedExceptionRecursive(ex, output);
+		}
+		catch (...) {}
 	}
 }

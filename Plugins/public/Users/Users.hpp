@@ -296,12 +296,30 @@ namespace Stormancer
 			/// <seealso cref="setCurrentLocalUser()"/>
 			std::shared_ptr<PlatformUserId> getCurrentLocalUser() const { return _currentLocalUser; }
 
+			/// <summary>
+			/// Authenticate with the Stormancer server application.
+			/// </summary>
+			/// <remarks>
+			/// Authentication is required to access private scenes on the server application.
+			/// </remarks>
+			/// <returns>
+			/// A <c>pplx::task</c> that completes when the authentication is done.
+			/// If the authentication fails, the task will be faulted.
+			/// In case the authentication process fails when retrieving local credentals, the type of the exception embedded in the task will be <c>CredentialsException</c>.
+			/// </returns>
 			pplx::task<void> login()
 			{
 				_autoReconnect = true;
 				return getAuthenticationScene().then([](std::shared_ptr<Scene>) {});
 			}
 
+			/// <summary>
+			/// Log out of Stormancer.
+			/// </summary>
+			/// <remarks>
+			/// This will trigger a disconnection from every scene.
+			/// </remarks>
+			/// <returns>A <c>pplx::task</c> that completes when the disconnection process is done.</returns>
 			pplx::task<void> logout()
 			{
 				_autoReconnect = false;
@@ -663,6 +681,8 @@ namespace Stormancer
 
 		private:
 
+			static constexpr int RETRY_COUNTER_MAX = 100;
+
 #pragma region private_methods
 
 			void setConnectionState(GameConnectionState state)
@@ -697,15 +717,17 @@ namespace Stormancer
 					{
 						_currentConnectionState = state;
 						connectionStateChanged(state);
+						auto logger = _logger;
 						this->getAuthenticationScene()
-							.then([](pplx::task<std::shared_ptr<Scene>> t)
+							.then([logger](pplx::task<std::shared_ptr<Scene>> t)
 						{
 							try
 							{
 								t.get();
 							}
-							catch (std::exception)
+							catch (const std::exception& ex)
 							{
+								logger->log(LogLevel::Error, "connection", "Reconnection failed due to an unrecoverable error", ex);
 							}
 						});
 					}
@@ -857,12 +879,13 @@ namespace Stormancer
 					{
 						return pplx::task_from_result(t.get());
 					}
-					catch (...)
+					catch (const std::exception& ex)
 					{
 						auto that = wThat.lock();
 						if (that && that->_autoReconnect && that->connectionState() != GameConnectionState::Disconnected)
 						{
-							return that->reconnect(retry + 1);
+							that->_logger->log(LogLevel::Warn, "UsersApi::loginImpl", "Login failed with recoverable error, doing another attempt", ex);
+							return that->reconnect(std::min(retry + 1, RETRY_COUNTER_MAX));
 						}
 						else
 						{

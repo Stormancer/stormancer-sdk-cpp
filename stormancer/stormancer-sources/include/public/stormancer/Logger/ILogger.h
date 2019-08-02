@@ -42,6 +42,8 @@ namespace Stormancer
 		/// Logs an exception
 		virtual void log(const std::exception& e) = 0;
 
+		void log(LogLevel level, const std::string& category, const std::string& message, const std::exception& exception);
+
 		/// A basic format of the log message.
 		/// \param level The log level.
 		/// \param category The category of the log (the source).
@@ -60,6 +62,10 @@ namespace Stormancer
 		ILogger();
 
 		virtual ~ILogger();
+
+	private:
+
+		static void formatNestedExceptionRecursive(const std::exception& ex, std::string& output);
 	};
 
 	using ILogger_ptr = std::shared_ptr<ILogger>;
