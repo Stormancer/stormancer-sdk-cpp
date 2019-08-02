@@ -12,29 +12,32 @@
 #include <unordered_map>
 #include <memory>
 #include <stdexcept>
+#include <exception>
 #ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunknown-pragmas"	// warning : unknown pragma ignored [-Wunknown-pragmas]
 #endif
 
-/// \file Users Plugin
-/// \brief This plugin is a header-only replacement for the Authentication plugin.
-/// <example>
-/// <code>
-/// auto conf = Stormancer::Configuration::create(...);
-/// ...
-/// conf->addPlugin(new Stormancer::Users::UsersPlugin);
-/// ...
-/// auto client = Stormancer::IClient::create(conf);
-/// ...
-/// auto users = client->dependencyResolver().resolve&lt;Stormancer::Users::UsersApi&gt;();
-/// users->login().wait();
-/// ...
-/// </code>
-/// </example>
 
 namespace Stormancer
 {
+	/// <summary>
+	/// Manage user authentication and related functionality.
+	/// </summary>
+	/// This plugin is a header-only replacement for the Authentication plugin.
+	/// <example>
+	/// <code>
+	/// auto conf = Stormancer::Configuration::create(...);
+	/// ...
+	/// conf->addPlugin(new Stormancer::Users::UsersPlugin);
+	/// ...
+	/// auto client = Stormancer::IClient::create(conf);
+	/// ...
+	/// auto users = client->dependencyResolver().resolve&lt;Stormancer::Users::UsersApi&gt;();
+	/// users->login().wait();
+	/// ...
+	/// </code>
+	/// </example>
 	namespace Users
 	{
 		struct GameConnectionState
@@ -118,9 +121,44 @@ namespace Stormancer
 			MSGPACK_DEFINE(type, parameters);
 		};
 
+		/// <summary>
+		/// A platform-specific user Id.
+		/// </summary>
+		/// <remarks>
+		/// For exmaple, it could be a Steam Id, a PSN Account Id or an Xbox User Id.
+		/// This type is abstract. Only concrete subtypes implemented by platform support plugins (e.g Steam Plugin) can be instantiated.
+		/// </remarks>
+		struct PlatformUserId
+		{
+			/// <summary>
+			/// This identifies the platform that this Id is for.
+			/// </summary>
+			const std::string platform;
+			/// <summary>
+			/// This is the Id in string form.
+			/// </summary>
+			const std::string userId;
+
+			virtual ~PlatformUserId() = default;
+
+			bool operator==(const PlatformUserId& right)
+			{
+				return platform == right.platform && userId == right.userId;
+			}
+
+			bool operator!=(const PlatformUserId& right)
+			{
+				return !operator==(right);
+			}
+
+		protected:
+			PlatformUserId(std::string platform, std::string id) : platform(platform), userId(id) {}
+		};
+
 		struct CredientialsContext
 		{
 			std::shared_ptr<AuthParameters> authParameters;
+			std::shared_ptr<PlatformUserId> platformUserId;
 		};
 
 		/// <summary>
@@ -161,22 +199,33 @@ namespace Stormancer
 			virtual pplx::task<void> retrieveCredentials(const CredientialsContext& context) = 0;
 		};
 
-		class GetCredentialException : public std::runtime_error
+		/// <summary>
+		/// An exception denoting an error in retrieving 
+		/// </summary>
+		class CredentialsException : public std::runtime_error
 		{
 		public:
-			GetCredentialException(const char* message) : std::runtime_error(message) {}
+			CredentialsException(const char* message) : std::runtime_error(message) {}
 		};
 
+		/// <summary>
+		/// The main class to leverage Users functionality.
+		/// </summary>
 		class UsersApi : public std::enable_shared_from_this<UsersApi>
 		{
 		public:
 
 #pragma region public_methods
 
-			UsersApi(std::shared_ptr<IClient> client, std::vector<std::shared_ptr<IAuthenticationEventHandler>> authEventHandlers)
+			UsersApi(
+				std::shared_ptr<IClient> client,
+				std::vector<std::shared_ptr<IAuthenticationEventHandler>> authEventHandlers,
+				std::shared_ptr<IActionDispatcher> userDispatcher
+			)
 				: _client(client)
 				, _logger(client->dependencyResolver().resolve<ILogger>())
 				, _authenticationEventHandlers(authEventHandlers)
+				, _userDispatcher(userDispatcher)
 			{
 			}
 
@@ -184,6 +233,68 @@ namespace Stormancer
 			{
 				_connectionSubscription.unsubscribe();
 			}
+
+			/// <summary>
+			/// Set the platform-specific user that should be authenticated with Stormancer.
+			/// </summary>
+			/// <remarks>
+			/// When using Stormancer in tandem with one or more online platforms such as Steam or the PSN,
+			/// your game has to provide Stormancer with the Id of the current user.
+			/// This is what this method is here for.
+			/// If you do use such a platform, you should call this method before calling <c>login()</c>,
+			/// and every time the in-game user changes. In the latter case, this method will disconnect the previous user and authenticate the new one.
+			/// If you do not use the platform-specific functionality of Stormancer, you do not need to call this method.
+			/// </remarks>
+			/// <param name="userId">
+			/// The platform-specific Id of the user.
+			/// You should instantiate it using the factory method provided by the platform-specific plugin of your choice.
+			/// </param>
+			/// <returns>
+			/// A <c>pplx::task</c> that completes when the user change operation is done.
+			/// - If no user was logged in, it will complete immediately. You can then call <c>login()</c> to perform the authentication.
+			/// - If a different user was already logged in, it will complete when the previous user has been logged out and the new one (<c>userId</c>) has been authenticated.
+			/// </returns>
+			pplx::task<void> setCurrentLocalUser(std::shared_ptr<PlatformUserId> userId)
+			{
+				if (userId == nullptr)
+				{
+					_currentLocalUser = nullptr;
+					return logout();
+				}
+
+				if (_currentConnectionState == GameConnectionState::Disconnected || _currentConnectionState == GameConnectionState::Disconnecting)
+				{
+					_currentLocalUser = userId;
+					return pplx::task_from_result();
+				}
+
+				if (_currentLocalUser == nullptr || *_currentLocalUser != *userId)
+				{
+					_currentLocalUser = userId;
+					std::weak_ptr<UsersApi> weakThis = this->shared_from_this();
+					return logout().then([weakThis]
+					{
+						if (auto that = weakThis.lock())
+						{
+							return that->login();
+						}
+						return pplx::task_from_result();
+					});
+				}
+
+				// Last case: connected with _currentLocalUser == userId - do nothing
+				return pplx::task_from_result();
+			}
+
+			/// <summary>
+			/// Retrieve the current local user, as set by <c>setCurrentLocalUser()</c>.
+			/// </summary>
+			/// <remarks>
+			/// This will return an empty <c>std::shared_ptr</c> if no user has been set.
+			/// </remarks>
+			/// <returns>The platform-specific Id of the current user.</returns>
+			/// <seealso cref="setCurrentLocalUser()"/>
+			std::shared_ptr<PlatformUserId> getCurrentLocalUser() const { return _currentLocalUser; }
 
 			pplx::task<void> login()
 			{
@@ -337,66 +448,58 @@ namespace Stormancer
 			pplx::task<std::shared_ptr<Scene>> getAuthenticationScene(pplx::cancellation_token ct = pplx::cancellation_token::none())
 			{
 
-				if (!_client.expired())
-				{
-					if (!_authTask)
-					{
-						if (!_autoReconnect)
-						{
-							return pplx::task_from_exception<std::shared_ptr<Scene>>(std::runtime_error("Authenticator disconnected. Call login before using the UsersApi."));
-						}
-						else
-						{
-							_authTask = std::make_shared<pplx::task<std::shared_ptr<Scene>>>(loginImpl());
-						}
-					}
-
-					auto t = *_authTask;
-					std::weak_ptr<UsersApi> wThat = this->shared_from_this();
-					pplx::task_completion_event<std::shared_ptr<Scene>> tce;
-					if (ct.is_cancelable())
-					{
-						ct.register_callback([tce]()
-						{
-							tce.set_exception(pplx::task_canceled());
-						});
-					}
-					t.then([tce, wThat](pplx::task<std::shared_ptr<Scene>> t)
-					{
-						try
-						{
-							auto scene = t.get();
-							if (scene)
-							{
-								tce.set(scene);
-							}
-							else
-							{
-								throw std::runtime_error("Authentication failed");
-							}
-						}
-						catch (std::exception& ex)
-						{
-							if (auto that = wThat.lock())
-							{
-								that->_authTask = nullptr;
-							}
-							tce.set_exception(ex);
-						}
-					});
-					if (auto that = wThat.lock())
-					{
-						if (auto client = _client.lock())
-						{
-							return pplx::create_task(tce, client->dependencyResolver().resolve<IActionDispatcher>());
-						}
-					}
-					return pplx::create_task(tce);
-				}
-				else
+				if (_client.expired())
 				{
 					return pplx::task_from_exception<std::shared_ptr<Scene>>(std::runtime_error("Client is invalid."));
 				}
+
+				if (!_authTask)
+				{
+					if (!_autoReconnect)
+					{
+						return pplx::task_from_exception<std::shared_ptr<Scene>>(std::runtime_error("Authenticator disconnected. Call login before using the UsersApi."));
+					}
+					else
+					{
+						_authTask = std::make_shared<pplx::task<std::shared_ptr<Scene>>>(loginImpl());
+					}
+				}
+
+				auto t = *_authTask;
+				std::weak_ptr<UsersApi> wThat = this->shared_from_this();
+				pplx::task_completion_event<std::shared_ptr<Scene>> tce;
+				if (ct.is_cancelable())
+				{
+					ct.register_callback([tce]()
+					{
+						tce.set_exception(pplx::task_canceled());
+					});
+				}
+				t.then([tce, wThat](pplx::task<std::shared_ptr<Scene>> t)
+				{
+					try
+					{
+						auto scene = t.get();
+						if (scene)
+						{
+							tce.set(scene);
+						}
+						else
+						{
+							throw std::runtime_error("Authentication failed");
+						}
+					}
+					catch (...)
+					{
+						if (auto that = wThat.lock())
+						{
+							that->_authTask = nullptr;
+						}
+						tce.set_exception(std::current_exception());
+					}
+				});
+
+				return pplx::create_task(tce, _userDispatcher);
 			}
 
 			const std::string& userId() const
@@ -632,7 +735,6 @@ namespace Stormancer
 					setConnectionState(GameConnectionState::Disconnected);
 					return pplx::task_from_exception<std::shared_ptr<Scene>>(std::runtime_error("Client destroyed."));
 				}
-				auto userActionDispatcher = client->dependencyResolver().resolve<IActionDispatcher>();
 
 				return client->connectToPublicScene(SCENE_ID, [wThat](std::shared_ptr<Scene> scene)
 				{
@@ -700,9 +802,23 @@ namespace Stormancer
 					}
 
 					return that->runCredentialsEventHandlers()
-						.then([scene, wThat](AuthParameters ctx)
+						.then([scene, wThat](pplx::task<AuthParameters> ctxTask)
 					{
+						AuthParameters ctx;
 						auto that = wThat.lock();
+						try
+						{
+							ctx = ctxTask.get();
+						}
+						catch (...)
+						{
+							// if an exception was thrown by auth event handlers, do not try to reconnect
+							if (that)
+							{
+								that->_autoReconnect = false;
+							}
+							std::throw_with_nested(CredentialsException("An exception was thrown by an IAuthenticationEventHandler::retrieveCredentials() call"));
+						}
 						if (!that)
 						{
 							throw std::runtime_error("destroyed");
@@ -734,28 +850,23 @@ namespace Stormancer
 						return scene;
 					});
 
-				}, userActionDispatcher)
+				}, _userDispatcher)
 					.then([wThat, retry](pplx::task<std::shared_ptr<Scene>> t)
 				{
-					auto that = wThat.lock();
-					if (!that)
-					{
-						return pplx::task_from_result<std::shared_ptr<Scene>>(nullptr);
-					}
 					try
 					{
 						return pplx::task_from_result(t.get());
 					}
-					catch (std::exception& ex)
+					catch (...)
 					{
-						that->_logger->log(LogLevel::Error, "authentication", "An error occured while trying to connect to the server.", ex.what());
-						if (that->_autoReconnect && that->connectionState() != GameConnectionState::Disconnected)
+						auto that = wThat.lock();
+						if (that && that->_autoReconnect && that->connectionState() != GameConnectionState::Disconnected)
 						{
 							return that->reconnect(retry + 1);
 						}
 						else
 						{
-							return pplx::task_from_result<std::shared_ptr<Scene>>(nullptr);
+							throw;
 						}
 					}
 				});
@@ -794,24 +905,25 @@ namespace Stormancer
 					getCredsTask = getCredentialsCallback();
 				}
 
-				std::weak_ptr<UsersApi> wAuthService = this->shared_from_this();
-				return getCredsTask.then([wAuthService](AuthParameters authParameters)
+				std::weak_ptr<UsersApi> weakThis = this->shared_from_this();
+				return getCredsTask.then([weakThis](AuthParameters authParameters)
 				{
-					auto authService = wAuthService.lock();
-					if (!authService)
+					auto that = weakThis.lock();
+					if (!that)
 					{
 						throw std::runtime_error("UsersApi destroyed");
 					}
 
 					CredientialsContext credentialsContext;
 					credentialsContext.authParameters = std::make_shared<AuthParameters>(authParameters);
+					credentialsContext.platformUserId = that->_currentLocalUser;
 					pplx::task<void> eventHandlersTask = pplx::task_from_result();
-					for (auto evHandler : authService->_authenticationEventHandlers)
+					for (auto evHandler : that->_authenticationEventHandlers)
 					{
 						eventHandlersTask = eventHandlersTask.then([evHandler, credentialsContext]()
 						{
 							evHandler->retrieveCredentials(credentialsContext);
-						});
+						}, that->_userDispatcher);
 					}
 					return eventHandlersTask.then([credentialsContext]
 					{
@@ -842,6 +954,9 @@ namespace Stormancer
 
 			std::unordered_map<std::string, std::function<pplx::task<void>(OperationCtx&)>> _operationHandlers;
 			std::vector<std::shared_ptr<IAuthenticationEventHandler>> _authenticationEventHandlers;
+			std::shared_ptr<IActionDispatcher> _userDispatcher;
+			// The current platform-specific local user, set by the game using setCurrentLocalUser().
+			std::shared_ptr<PlatformUserId> _currentLocalUser;
 
 #pragma endregion
 		};
@@ -851,7 +966,11 @@ namespace Stormancer
 		public:
 			void registerClientDependencies(ContainerBuilder& builder) override
 			{
-				builder.registerDependency<UsersApi, IClient, ContainerBuilder::All<IAuthenticationEventHandler>>().singleInstance();
+				builder.registerDependency<UsersApi,
+					IClient,
+					ContainerBuilder::All<IAuthenticationEventHandler>,
+					IActionDispatcher
+				>().singleInstance();
 			}
 
 			void clientDisconnecting(std::shared_ptr<IClient> client) override

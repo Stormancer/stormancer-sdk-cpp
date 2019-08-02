@@ -47,6 +47,33 @@ private:
 		std::shared_ptr<TestAuthProvider2> prvd2 = std::make_shared<TestAuthProvider2>();
 	};
 
+	struct TestPlatformId : public Stormancer::Users::PlatformUserId
+	{
+		TestPlatformId(std::string id) : PlatformUserId("test", id) {}
+	};
+
+	class TestCurrentUserAuthProvider : public Stormancer::Users::IAuthenticationEventHandler
+	{
+		virtual pplx::task<void> retrieveCredentials(const Stormancer::Users::CredientialsContext & context) override
+		{
+			if (context.platformUserId == nullptr || context.platformUserId->platform != "test")
+			{
+				throw std::runtime_error("invalid platform user id");
+			}
+			context.authParameters->type = "test";
+			context.authParameters->parameters["testkey"] = "testvalue";
+			return pplx::task_from_result();
+		}
+	};
+
+	class TestPlatformIdPlugin : public Stormancer::IPlugin
+	{
+		void registerClientDependencies(Stormancer::ContainerBuilder& builder) override
+		{
+			builder.registerDependency<TestCurrentUserAuthProvider>().as<Stormancer::Users::IAuthenticationEventHandler>();
+		}
+	};
+
 public:
 	static void runTests(const Stormancer::Tester& tester)
 	{
@@ -54,6 +81,7 @@ public:
 		testEventHandlersWithCallback(tester);
 		testNoEventHandlers(tester);
 		testNoEventHandlersWithCallback(tester);
+		testCurrentLocalUser(tester);
 	}
 
 private:
@@ -176,6 +204,46 @@ private:
 		client->disconnect().wait();
 
 		tester._logger->log(LogLevel::Info, "TestUsersPlugin", "testEventHandlersWithCallback PASSED");
+	}
+
+	static void testCurrentLocalUser(const Stormancer::Tester& tester)
+	{
+		using namespace Stormancer;
+
+		tester._logger->log(LogLevel::Info, "TestUsersPlugin", "testCurrentLocalUser");
+
+		auto conf = Configuration::create(tester._endpoint, tester._accountId, tester._applicationName);
+		conf->logger = tester._logger;
+		conf->addPlugin(new Users::UsersPlugin);
+		conf->addPlugin(new TestPlatformIdPlugin);
+
+		auto client = IClient::create(conf);
+
+		auto users = client->dependencyResolver().resolve<Users::UsersApi>();
+
+		assertex(users->getCurrentLocalUser() == nullptr, "initial local user should be null");
+
+		try
+		{
+			users->login().get();
+			throw std::runtime_error("login() should have failed because TestCurrentUserAuthProvider should have thrown");
+		}
+		catch (const Users::CredentialsException&)
+		{
+			// expected
+		}
+
+		auto user = std::make_shared<TestPlatformId>("testId");
+		users->setCurrentLocalUser(user).get();
+		users->login().get();
+		assertex(users->getCurrentLocalUser() == user, "local user should be 'testId'");
+
+		auto user2 = std::make_shared<TestPlatformId>("testId2");
+		users->setCurrentLocalUser(user2).get();
+		assertex(users->getCurrentLocalUser() == user2, "local user should be 'testId2'");
+		assertex(users->connectionState() == Users::GameConnectionState::Authenticated, "new user should be authenticated after the local user change");
+
+		tester._logger->log(LogLevel::Info, "TestUsersPlugin", "testCurrentLocalUser PASSED");
 	}
 
 	static void assertex(bool condition, std::string message)
