@@ -50,7 +50,11 @@ namespace Stormancer
 
 		config.addProcessor((byte)MessageIDTypes::ID_SYSTEM_REQUEST, [wProcessor, logger, serializer](Packet_ptr packet)
 		{
-			auto processor = LockOrThrow(wProcessor);
+			auto processor = wProcessor.lock();
+			if (!processor)
+			{
+				return false;
+			}
 
 			byte sysRequestId;
 			packet->stream >> sysRequestId;
@@ -102,7 +106,11 @@ namespace Stormancer
 
 		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG, [wProcessor, logger](Packet_ptr packet)
 		{
-			auto processor = LockOrThrow(wProcessor);
+			auto processor = wProcessor.lock();
+			if (!processor)
+			{
+				return false;
+			}
 
 			uint16 id;
 			packet->stream >> id;
@@ -130,7 +138,11 @@ namespace Stormancer
 
 		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_COMPLETE, [wProcessor, logger](Packet_ptr p)
 		{
-			auto processor = LockOrThrow(wProcessor);
+			auto processor = wProcessor.lock();
+			if (!processor)
+			{
+				return false;
+			}
 
 			uint16 id;
 			p->stream >> id;
@@ -164,7 +176,11 @@ namespace Stormancer
 
 		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_ERROR, [wProcessor, serializer, logger](Packet_ptr p)
 		{
-			auto processor = LockOrThrow(wProcessor);
+			auto processor = wProcessor.lock();
+			if (!processor)
+			{
+				return false;
+			}
 
 			uint16 id;
 			p->stream >> id;
