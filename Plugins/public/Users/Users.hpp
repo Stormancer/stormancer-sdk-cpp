@@ -885,7 +885,7 @@ namespace Stormancer
 						if (that && that->_autoReconnect && that->connectionState() != GameConnectionState::Disconnected)
 						{
 							that->_logger->log(LogLevel::Warn, "UsersApi::loginImpl", "Login failed with recoverable error, doing another attempt", ex);
-							return that->reconnect(std::min(retry + 1, RETRY_COUNTER_MAX));
+							return that->reconnect(std::min(retry + 1, int(RETRY_COUNTER_MAX))); //temp value to work around compiler limitation with constexpr
 						}
 						else
 						{
