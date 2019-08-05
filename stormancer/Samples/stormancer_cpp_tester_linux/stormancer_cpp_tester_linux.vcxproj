@@ -143,6 +143,7 @@
     <TargetExt />
   </PropertyGroup>
   <ItemGroup>
+    <ClCompile Include="..\Tester\PCAuthenticationTester.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
