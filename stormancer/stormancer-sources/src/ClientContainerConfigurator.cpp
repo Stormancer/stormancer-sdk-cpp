@@ -37,9 +37,9 @@ void Stormancer::Client::ConfigureContainer(ContainerBuilder& builder, Configura
 
 	builder.registerDependency<Serializer>().singleInstance();
 
-	builder.registerDependency<IScheduler>(config->scheduler);
+	builder.registerDependency<IScheduler>(config->_scheduler);
 
-	builder.registerDependency<ITransport>(config->transportFactory).singleInstance();
+	builder.registerDependency<ITransport>(config->_transportFactory).singleInstance();
 
 	builder.registerDependency<IActionDispatcher>(config->actionDispatcher);
 
@@ -58,7 +58,7 @@ void Stormancer::Client::ConfigureContainer(ContainerBuilder& builder, Configura
 
 	builder.registerDependency<IPacketDispatcher>([](const DependencyScope& scope)
 	{
-		auto dispatcher = scope.resolve<Configuration>()->dispatcher(scope);
+		auto dispatcher = scope.resolve<Configuration>()->_dispatcher(scope);
 		dispatcher->addProcessor(scope.resolve<RequestProcessor>());
 		dispatcher->addProcessor(scope.resolve<SceneDispatcher>());
 		dispatcher->addProcessor(scope.resolve<P2PPacketDispatcher>());

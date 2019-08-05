@@ -273,20 +273,14 @@ namespace Stormancer
 		Configuration& operator=(const Configuration& other) = delete;
 
 		static std::shared_ptr<Configuration> createInternal(const std::string& endpoint, const std::string& account, const std::string& application, const char* headersVersion);
-
-		// Set a metadata
-		Configuration& setMetadata(const std::string& key, const std::string& value);
-
 #pragma endregion
 
 #pragma region private_members
 		/// Gets or Sets the dispatcher to be used by the client.
-		std::function<std::shared_ptr<IPacketDispatcher>(const DependencyScope&)> dispatcher;
+		std::function<std::shared_ptr<IPacketDispatcher>(const DependencyScope&)> _dispatcher;
 
 		/// Gets or sets the transport to be used by the client.
-		std::function<std::shared_ptr<ITransport>(const DependencyScope&)> transportFactory;
-
-		std::unordered_map<std::string, std::string> _metadata;
+		std::function<std::shared_ptr<ITransport>(const DependencyScope&)> _transportFactory;
 
 		std::vector<IPlugin*> _plugins;
 
@@ -296,7 +290,7 @@ namespace Stormancer
 		static const std::function<std::shared_ptr<ITransport>(const DependencyScope&)> _defaultTransportFactory;
 
 		/// The scheduler used by the client to run the transport and other repeated tasks.
-		std::shared_ptr<IScheduler> scheduler;
+		std::shared_ptr<IScheduler> _scheduler;
 
 		/// The version string in STORM_VERSION, that is set in the header files. Used to compare the headers version to the build version,
 		/// to signal a possible mismatch between the two. 

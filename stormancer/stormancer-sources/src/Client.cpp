@@ -59,7 +59,6 @@ namespace Stormancer
 		, _accountId(config->account)
 		, _applicationName(config->application)
 		, _maxPeers(config->maxPeers)
-		, _metadata(config->_metadata)
 		, _plugins(config->plugins())
 		, _config(config)
 		, _serverTimeout(config->defaultTimeout)
