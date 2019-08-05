@@ -40,6 +40,16 @@ namespace Stormancer
 		/// You need to check that the tests have finished running with tests_done() before calling this function.
 		bool tests_passed();
 
+		//-----------
+		// Accessors
+		//-----------
+
+		ILogger_ptr logger() const { return _logger; }
+
+		const std::string& endpoint() const { return _endpoint; }
+		const std::string& account() const { return _accountId; }
+		const std::string& application() const { return _applicationName; }
+
 #pragma endregion
 
 	private:

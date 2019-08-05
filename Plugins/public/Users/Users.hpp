@@ -197,6 +197,8 @@ namespace Stormancer
 			/// You must not modify <c>context</c> after this task has completed, or else you would run into a race condition.
 			/// </returns>
 			virtual pplx::task<void> retrieveCredentials(const CredientialsContext& context) = 0;
+
+			virtual ~IAuthenticationEventHandler() = default;
 		};
 
 		/// <summary>
@@ -582,6 +584,7 @@ namespace Stormancer
 
 			Event<GameConnectionState> connectionStateChanged;
 
+			/// \deprecated Use <c>IAuthenticationEventHandler</c> instead.
 			std::function<pplx::task<AuthParameters>()> getCredentialsCallback;
 
 			//Returns the current authentication status of the user: The list of authentication providers that successfully 

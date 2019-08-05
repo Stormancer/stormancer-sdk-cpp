@@ -5,6 +5,7 @@
 #include "stormancer/IPlugin.h"
 #include "Users/Users.hpp"
 #include "test.h"
+#include "IAuthenticationTester.h"
 #include <memory>
 
 class TestUsersPlugin
@@ -82,6 +83,9 @@ public:
 		testNoEventHandlers(tester);
 		testNoEventHandlersWithCallback(tester);
 		testCurrentLocalUser(tester);
+
+		auto authTester = IAuthenticationTester::create();
+		authTester->runTests(tester);
 	}
 
 private:
