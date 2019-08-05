@@ -151,6 +151,11 @@ namespace Stormancer
 				return !operator==(right);
 			}
 
+			std::string toString() const
+			{
+				return "[" + platform + "]" + userId;
+			}
+
 		protected:
 			PlatformUserId(std::string platform, std::string id) : platform(platform), userId(id) {}
 		};
@@ -668,7 +673,7 @@ namespace Stormancer
 
 			pplx::task<void> registerNewUser(std::string type, std::unordered_map<std::string, std::string> data)
 			{
-				auto ctx = Stormancer::AuthParameters();
+				auto ctx = AuthParameters();
 				ctx.type = type;
 				ctx.parameters = data;
 

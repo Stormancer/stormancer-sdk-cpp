@@ -420,6 +420,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Users\Users.hpp">
       <Filter>public\Users</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\PS4\PS4Plugin.hpp">
+      <Filter>public\PS4</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="private">
@@ -550,6 +553,9 @@
     </Filter>
     <Filter Include="public\Users">
       <UniqueIdentifier>{7093c00a-886a-4bbf-8aa4-3000ff716050}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="public\PS4">
+      <UniqueIdentifier>{9eea906d-031f-4e22-8f41-6ce218a633a9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -89,6 +89,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Helloworld\HelloService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Helloworld\Hello.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Helloworld\HelloworldPlugin.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\PS4\PS4Plugin.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Servers\ServersModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Servers\ServersPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Servers\ServersService.h" />

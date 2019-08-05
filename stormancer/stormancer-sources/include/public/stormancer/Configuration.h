@@ -257,6 +257,15 @@ namespace Stormancer
 		/// </remarks>
 		bool useIpv6Tunnel = false;
 
+		/// <summary>
+		/// Key => Value pair of parameters that can be used by plugins.
+		/// </summary>
+		/// <remarks>
+		/// This can hold any string-based value.
+		/// For instance, it could be used to hold parameters for platform-specific plugins.
+		/// </remarks>
+		std::unordered_map<std::string, std::string> additionalParameters;
+
 #pragma endregion
 
 	private:
