@@ -951,9 +951,9 @@ namespace Stormancer
 					pplx::task<void> eventHandlersTask = pplx::task_from_result();
 					for (auto evHandler : that->_authenticationEventHandlers)
 					{
-						eventHandlersTask = eventHandlersTask.then([evHandler, credentialsContext]()
+						eventHandlersTask = eventHandlersTask.then([evHandler, credentialsContext]
 						{
-							evHandler->retrieveCredentials(credentialsContext);
+							return evHandler->retrieveCredentials(credentialsContext);
 						}, that->_userDispatcher);
 					}
 					return eventHandlersTask.then([credentialsContext]
