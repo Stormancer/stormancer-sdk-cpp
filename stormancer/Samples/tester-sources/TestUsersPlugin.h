@@ -94,10 +94,10 @@ private:
 	{
 		using namespace Stormancer;
 
-		tester._logger->log(LogLevel::Info, "TestUsersPlugin", "testEventHandlers");
+		tester.logger()->log(LogLevel::Info, "TestUsersPlugin", "testEventHandlers");
 
-		auto conf = Configuration::create(tester._endpoint, tester._accountId, tester._applicationName);
-		conf->logger = tester._logger;
+		auto conf = Configuration::create(tester.endpoint(), tester.account(), tester.application());
+		conf->logger = tester.logger();
 		conf->addPlugin(new Users::UsersPlugin);
 		TestPlugin* plugin = new TestPlugin;
 		conf->addPlugin(plugin);
@@ -116,17 +116,17 @@ private:
 
 		client->disconnect().wait();
 
-		tester._logger->log(LogLevel::Info, "TestUsersPlugin", "testEventHandlers PASSED");
+		tester.logger()->log(LogLevel::Info, "TestUsersPlugin", "testEventHandlers PASSED");
 	}
 
 	static void testNoEventHandlers(const Stormancer::Tester& tester)
 	{
 		using namespace Stormancer;
 
-		tester._logger->log(LogLevel::Info, "TestUsersPlugin", "testNoEventHandlers");
+		tester.logger()->log(LogLevel::Info, "TestUsersPlugin", "testNoEventHandlers");
 
-		auto conf = Configuration::create(tester._endpoint, tester._accountId, tester._applicationName);
-		conf->logger = tester._logger;
+		auto conf = Configuration::create(tester.endpoint(), tester.account(), tester.application());
+		conf->logger = tester.logger();
 		conf->addPlugin(new Users::UsersPlugin);
 
 		auto client = IClient::create(conf);
@@ -141,7 +141,7 @@ private:
 		{
 			// OK
 			client->disconnect().wait();
-			tester._logger->log(LogLevel::Info, "TestUsersPlugin", "testNoEventHandlers PASSED");
+			tester.logger()->log(LogLevel::Info, "TestUsersPlugin", "testNoEventHandlers PASSED");
 			return;
 		}
 		throw std::runtime_error("login() should have failed because of no credentials");
@@ -151,10 +151,10 @@ private:
 	{
 		using namespace Stormancer;
 
-		tester._logger->log(LogLevel::Info, "TestUsersPlugin", "testNoEventHandlersWithCallback");
+		tester.logger()->log(LogLevel::Info, "TestUsersPlugin", "testNoEventHandlersWithCallback");
 
-		auto conf = Configuration::create(tester._endpoint, tester._accountId, tester._applicationName);
-		conf->logger = tester._logger;
+		auto conf = Configuration::create(tester.endpoint(), tester.account(), tester.application());
+		conf->logger = tester.logger();
 		conf->addPlugin(new Users::UsersPlugin);
 
 		auto client = IClient::create(conf);
@@ -175,17 +175,17 @@ private:
 		assertex(passed == true, "the credentials callback should have been called");
 		client->disconnect().wait();
 
-		tester._logger->log(LogLevel::Info, "TestUsersPlugin", "testNoEventHandlersWithCallback PASSED");
+		tester.logger()->log(LogLevel::Info, "TestUsersPlugin", "testNoEventHandlersWithCallback PASSED");
 	}
 
 	static void testEventHandlersWithCallback(const Stormancer::Tester& tester)
 	{
 		using namespace Stormancer;
 
-		tester._logger->log(LogLevel::Info, "TestUsersPlugin", "testEventHandlersWithCallback");
+		tester.logger()->log(LogLevel::Info, "TestUsersPlugin", "testEventHandlersWithCallback");
 
-		auto conf = Configuration::create(tester._endpoint, tester._accountId, tester._applicationName);
-		conf->logger = tester._logger;
+		auto conf = Configuration::create(tester.endpoint(), tester.account(), tester.application());
+		conf->logger = tester.logger();
 		conf->addPlugin(new Users::UsersPlugin);
 		TestPlugin* plugin = new TestPlugin;
 		conf->addPlugin(plugin);
@@ -207,17 +207,17 @@ private:
 		assertex(plugin->prvd2->passed == true, "event handler 2 should have been called");
 		client->disconnect().wait();
 
-		tester._logger->log(LogLevel::Info, "TestUsersPlugin", "testEventHandlersWithCallback PASSED");
+		tester.logger()->log(LogLevel::Info, "TestUsersPlugin", "testEventHandlersWithCallback PASSED");
 	}
 
 	static void testCurrentLocalUser(const Stormancer::Tester& tester)
 	{
 		using namespace Stormancer;
 
-		tester._logger->log(LogLevel::Info, "TestUsersPlugin", "testCurrentLocalUser");
+		tester.logger()->log(LogLevel::Info, "TestUsersPlugin", "testCurrentLocalUser");
 
-		auto conf = Configuration::create(tester._endpoint, tester._accountId, tester._applicationName);
-		conf->logger = tester._logger;
+		auto conf = Configuration::create(tester.endpoint(), tester.account(), tester.application());
+		conf->logger = tester.logger();
 		conf->addPlugin(new Users::UsersPlugin);
 		conf->addPlugin(new TestPlatformIdPlugin);
 
@@ -247,7 +247,7 @@ private:
 		assertex(users->getCurrentLocalUser() == user2, "local user should be 'testId2'");
 		assertex(users->connectionState() == Users::GameConnectionState::Authenticated, "new user should be authenticated after the local user change");
 
-		tester._logger->log(LogLevel::Info, "TestUsersPlugin", "testCurrentLocalUser PASSED");
+		tester.logger()->log(LogLevel::Info, "TestUsersPlugin", "testCurrentLocalUser PASSED");
 	}
 
 	static void assertex(bool condition, std::string message)

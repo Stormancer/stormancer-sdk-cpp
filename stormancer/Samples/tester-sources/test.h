@@ -6,7 +6,6 @@
 
 
 
-class TestUsersPlugin;
 
 namespace Stormancer
 {
@@ -53,8 +52,6 @@ namespace Stormancer
 #pragma endregion
 
 	private:
-
-		friend class ::TestUsersPlugin;
 
 #pragma region private_methods
 
