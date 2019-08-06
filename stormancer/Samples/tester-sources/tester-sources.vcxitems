@@ -20,6 +20,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)TestRunner.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)DummyAuthenticationTester.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IAuthenticationTester.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)test.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)TestCase.h" />
