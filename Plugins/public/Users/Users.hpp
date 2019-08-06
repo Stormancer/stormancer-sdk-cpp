@@ -133,7 +133,13 @@ namespace Stormancer
 			/// <summary>
 			/// This identifies the platform that this Id is for.
 			/// </summary>
-			const std::string platform;
+			/// <example>Steam, PSN...</example>
+			/// <remarks>
+			/// It should be unique across all subtypes of this class.
+			/// This isn't actually enforced because it would be complicated with header-only plugins.
+			/// </remarks>
+			virtual std::string type() const = 0;
+
 			/// <summary>
 			/// This is the Id in string form.
 			/// </summary>
@@ -143,7 +149,7 @@ namespace Stormancer
 
 			bool operator==(const PlatformUserId& right)
 			{
-				return platform == right.platform && userId == right.userId;
+				return type() == right.type() && userId == right.userId;
 			}
 
 			bool operator!=(const PlatformUserId& right)
@@ -153,11 +159,11 @@ namespace Stormancer
 
 			std::string toString() const
 			{
-				return "[" + platform + "]" + userId;
+				return "[" + this->type() + "]" + userId;
 			}
 
 		protected:
-			PlatformUserId(std::string platform, std::string id) : platform(platform), userId(id) {}
+			PlatformUserId(std::string id) : userId(id) {}
 		};
 
 		struct CredientialsContext

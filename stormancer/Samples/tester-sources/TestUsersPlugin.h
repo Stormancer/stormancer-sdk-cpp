@@ -50,14 +50,15 @@ private:
 
 	struct TestPlatformId : public Stormancer::Users::PlatformUserId
 	{
-		TestPlatformId(std::string id) : PlatformUserId("test", id) {}
+		std::string type() const override { return "test"; }
+		TestPlatformId(std::string id) : PlatformUserId(id) {}
 	};
 
 	class TestCurrentUserAuthProvider : public Stormancer::Users::IAuthenticationEventHandler
 	{
 		virtual pplx::task<void> retrieveCredentials(const Stormancer::Users::CredientialsContext & context) override
 		{
-			if (context.platformUserId == nullptr || context.platformUserId->platform != "test")
+			if (context.platformUserId == nullptr || context.platformUserId->type() != "test")
 			{
 				throw std::runtime_error("invalid platform user id");
 			}
