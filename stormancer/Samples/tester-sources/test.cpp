@@ -743,7 +743,7 @@ namespace Stormancer
 			{
 				throw std::runtime_error("nested");
 			}
-			catch (const std::exception& ex)
+			catch (const std::exception&)
 			{
 				std::throw_with_nested(std::runtime_error("outer"));
 			}
