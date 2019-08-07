@@ -112,7 +112,7 @@ namespace Stormancer
 			}
 			_dependencyResolver = builder.build();
 
-			std::vector<std::shared_ptr<IRequestModule>> modules{ std::dynamic_pointer_cast<IRequestModule>(_dependencyResolver.resolve<P2PRequestModule>()) };
+			std::vector<std::shared_ptr<IRequestModule>> modules{ std::static_pointer_cast<IRequestModule>(_dependencyResolver.resolve<P2PRequestModule>()) };
 
 			RequestProcessor::Initialize(_dependencyResolver.resolve<RequestProcessor>(), modules);
 

@@ -172,6 +172,7 @@
       <CppLanguageStandard>c++14</CppLanguageStandard>
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <Verbose>true</Verbose>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <RemotePostBuildEvent>
       <Command>cd $(RemoteOutDir) &amp;&amp; echo -e 'create $(FinalLibName)\naddlib $(TargetFileName)\naddlib libRakNet_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\naddlib libcpprestsdk_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\nsave\nend' | ar -M &amp;&amp; cp -f $(FinalLibName) /tmp</Command>
@@ -186,6 +187,7 @@
       <CppLanguageStandard>c++14</CppLanguageStandard>
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <Verbose>true</Verbose>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <RemotePostBuildEvent>
       <Command>cd $(RemoteOutDir) &amp;&amp; echo -e 'create $(FinalLibName)\naddlib $(TargetFileName)\naddlib libRakNet_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\naddlib libcpprestsdk_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\nsave\nend' | ar -M &amp;&amp; cp -f $(FinalLibName) /tmp</Command>
@@ -200,6 +202,7 @@
       <CppLanguageStandard>c++14</CppLanguageStandard>
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <Verbose>true</Verbose>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <RemotePostBuildEvent>
       <Command>cd $(RemoteOutDir) &amp;&amp; echo -e 'create $(FinalLibName)\naddlib $(TargetFileName)\naddlib libRakNet_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\naddlib libcpprestsdk_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\nsave\nend' | ar -M &amp;&amp; cp -f $(FinalLibName) /tmp</Command>
@@ -214,6 +217,7 @@
       <CppLanguageStandard>c++14</CppLanguageStandard>
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <Verbose>true</Verbose>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <RemotePostBuildEvent>
       <Command>cd $(RemoteOutDir) &amp;&amp; echo -e 'create $(FinalLibName)\naddlib $(TargetFileName)\naddlib libRakNet_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\naddlib libcpprestsdk_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\nsave\nend' | ar -M &amp;&amp; cp -f $(FinalLibName) /tmp</Command>
@@ -228,6 +232,7 @@
       <CppLanguageStandard>c++14</CppLanguageStandard>
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <Verbose>true</Verbose>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <RemotePostBuildEvent>
       <Command>cd $(RemoteOutDir) &amp;&amp; echo -e 'create $(FinalLibName)\naddlib $(TargetFileName)\naddlib libRakNet_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\naddlib libcpprestsdk_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\nsave\nend' | ar -M &amp;&amp; cp -f $(FinalLibName) /tmp</Command>
@@ -246,6 +251,7 @@
       <CppLanguageStandard>c++14</CppLanguageStandard>
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <Verbose>true</Verbose>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <RemotePostBuildEvent>
       <Command>cd $(RemoteOutDir) &amp;&amp; echo -e 'create $(FinalLibName)\naddlib $(TargetFileName)\naddlib libRakNet_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\naddlib libcpprestsdk_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\nsave\nend' | ar -M &amp;&amp; cp -f $(FinalLibName) /tmp</Command>
@@ -260,6 +266,7 @@
       <CppLanguageStandard>c++14</CppLanguageStandard>
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <Verbose>true</Verbose>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <RemotePostBuildEvent>
       <Command>cd $(RemoteOutDir) &amp;&amp; echo -e 'create $(FinalLibName)\naddlib $(TargetFileName)\naddlib libRakNet_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\naddlib libcpprestsdk_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\nsave\nend' | ar -M &amp;&amp; cp -f $(FinalLibName) /tmp</Command>
@@ -274,6 +281,7 @@
       <CppLanguageStandard>c++14</CppLanguageStandard>
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <Verbose>true</Verbose>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <RemotePostBuildEvent>
       <Command>cd $(RemoteOutDir) &amp;&amp; echo -e 'create $(FinalLibName)\naddlib $(TargetFileName)\naddlib libRakNet_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\naddlib libcpprestsdk_Linux_$(Configuration)_$(Platform)-$(StormancerLinuxToolset).a\nsave\nend' | ar -M &amp;&amp; cp -f $(FinalLibName) /tmp</Command>

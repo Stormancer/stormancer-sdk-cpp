@@ -15,6 +15,7 @@ namespace Stormancer
 		_testsDone = false;
 		_testsPassed = false;
 
+		_tests.push_back([this]() { test_nestedException(); });
 		_tests.push_back([this]() { test_dependencyInjection(); });
 		_tests.push_back([this]() { test_streams(); });
 		_tests.push_back([this]() { test_connect(); });
@@ -729,6 +730,29 @@ namespace Stormancer
 			return;
 		}
 		_logger->log(LogLevel::Info, "test_users", "Users OK");
+		execNextTest();
+	}
+
+	void Tester::test_nestedException()
+	{
+		_logger->log(LogLevel::Info, "test_nestedException", "NESTED EXCEPTION");
+
+		try
+		{
+			try
+			{
+				throw std::runtime_error("nested");
+			}
+			catch (const std::exception& ex)
+			{
+				std::throw_with_nested(std::runtime_error("outer"));
+			}
+		}
+		catch (const std::exception& ex)
+		{
+			_logger->log(LogLevel::Trace, "test_nestedException", "Caught exception with nested", ex);
+		}
+		_logger->log(LogLevel::Info, "test_nestedException", "Nested Exception OK");
 		execNextTest();
 	}
 

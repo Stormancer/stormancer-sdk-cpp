@@ -82,6 +82,7 @@ namespace Stormancer
 		void test_dependencyInjection();
 		void test_streams();
 		void test_users();
+		void test_nestedException();
 
 #pragma endregion
 

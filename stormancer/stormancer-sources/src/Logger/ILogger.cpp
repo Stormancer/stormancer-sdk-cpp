@@ -69,24 +69,7 @@ namespace Stormancer
 
 	void ILogger::log(LogLevel level, const std::string& category, const std::string& message, const std::exception& exception)
 	{
-		std::string formattedException = "Exception:\n\t";
-		formatNestedExceptionRecursive(exception, formattedException);
+		std::string formattedException = "Exception: " + std::string(exception.what());
 		log(level, category, message, formattedException);
-	}
-
-	void ILogger::formatNestedExceptionRecursive(const std::exception& ex, std::string& output)
-	{
-		output += std::string("[") + ex.what() + "]";
-		try
-		{
-			std::rethrow_if_nested(ex);
-		}
-		catch (const std::exception& ex)
-		{
-			// One more nested exception, increase indentation
-			output += "\n\t";
-			formatNestedExceptionRecursive(ex, output);
-		}
-		catch (...) {}
 	}
 }
