@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Users/Users.hpp"
+#include "Friends/Friends.hpp"
 #include "stormancer/StormancerTypes.h"
 #include "stormancer/IPlugin.h"
 #include "cpprest/asyncrt_utils.h"
@@ -82,8 +83,6 @@ namespace Stormancer
 
 		private:
 
-			void cancelSteam();
-
 			STEAM_CALLBACK(SteamAuthenticationEventHandler, onAuthSessionTicket, GetAuthSessionTicketResponse_t);
 
 			bool _forceTicket = false;
@@ -111,7 +110,14 @@ namespace Stormancer
 				_tce->set_exception(std::runtime_error("Steam : invalid user authentication ticket"));
 			}
 
-			_tce->set();
+			if (_tce)
+			{
+				_tce->set();
+			}
+			else
+			{
+				throw std::runtime_error("Steam auth callback: tce not available");
+			}
 		}
 	}
 }

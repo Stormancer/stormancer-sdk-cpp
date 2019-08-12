@@ -43,9 +43,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Invitations\InvitationsPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Leaderboard\LeaderboardPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Leaderboard\LeaderboardService.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Members\FriendsPlugin.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Members\FriendsService.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Members\Friends_Impl.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Members\OrganizationsContainer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Members\OrganizationsPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Members\OrganizationsService.cpp" />
@@ -79,6 +76,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Messaging\MessagingService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Messaging\Messaging_Impl.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Profile\ProfilePrivateModels.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Friends\Friends.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameSession\Gamesessions.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Helloworld\Helloworld.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\LeaderboardModels.h" />
@@ -104,10 +102,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)private\InAppNotification\InAppNotification_Impl.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Leaderboard\LeaderboardService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Leaderboard\Leaderboard_Impl.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Members\FriendsModels.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Members\FriendsPlugin.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Members\FriendsService.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Members\Friends_Impl.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Members\OrganizationsContainer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Members\OrganizationsPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Members\OrganizationsService.h" />
@@ -140,7 +134,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Invitations\Invitations.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Invitations\InvitationsPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\Leaderboard.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Members\Friends.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Members\Organizations.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Party\Party.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Party\PartyModels.h" />

@@ -82,15 +82,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)private\GameSession\GameSession_Impl.cpp">
       <Filter>private\GameSession</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Members\Friends_Impl.cpp">
-      <Filter>private\Members</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Members\FriendsPlugin.cpp">
-      <Filter>private\Members</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Members\FriendsService.cpp">
-      <Filter>private\Members</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Members\Organizations_Impl.cpp">
       <Filter>private\Members</Filter>
     </ClCompile>
@@ -252,23 +243,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameSession\GameSessionService.h">
       <Filter>private\GameSession</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Members\Friends.h">
-      <Filter>public\Members</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Members\Organizations.h">
       <Filter>public\Members</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Members\Friends_Impl.h">
-      <Filter>private\Members</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Members\FriendsModels.h">
-      <Filter>private\Members</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Members\FriendsPlugin.h">
-      <Filter>private\Members</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Members\FriendsService.h">
-      <Filter>private\Members</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Members\Organizations_Impl.h">
       <Filter>private\Members</Filter>
@@ -423,6 +399,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\PS4\PS4Plugin.hpp">
       <Filter>public\PS4</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Friends\Friends.hpp">
+      <Filter>public\Friends</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="private">
@@ -556,6 +535,9 @@
     </Filter>
     <Filter Include="public\PS4">
       <UniqueIdentifier>{9eea906d-031f-4e22-8f41-6ce218a633a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="public\Friends">
+      <UniqueIdentifier>{31f4e0f9-e083-4479-8d4e-6bd6cfcb331a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
