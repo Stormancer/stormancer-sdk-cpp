@@ -213,12 +213,25 @@ namespace Stormancer
 		};
 
 		/// <summary>
-		/// An exception denoting an error in retrieving 
+		/// An exception denoting an error in retrieving user credentials from an <c>IAuthenticationEventHandler</c> instance.
 		/// </summary>
-		class CredentialsException : public std::runtime_error
+		class CredentialsException : public std::exception
 		{
 		public:
-			CredentialsException(const char* message) : std::runtime_error(message) {}
+			CredentialsException(const char* message, const std::exception& innerException) : message(makeMessage(message, innerException)) {}
+
+			const char* what() const override
+			{
+				return message.c_str();
+			}
+
+		private:
+			static std::string makeMessage(const char* message, const std::exception& innerException)
+			{
+				return std::string(message) + " [Inner exception message: " + std::string(innerException.what()) + "]";
+			}
+
+			std::string message;
 		};
 
 		/// <summary>
@@ -846,14 +859,14 @@ namespace Stormancer
 						{
 							ctx = ctxTask.get();
 						}
-						catch (...)
+						catch (const std::exception& ex)
 						{
 							// if an exception was thrown by auth event handlers, do not try to reconnect
 							if (that)
 							{
 								that->_autoReconnect = false;
 							}
-							std::throw_with_nested(CredentialsException("An exception was thrown by an IAuthenticationEventHandler::retrieveCredentials() call"));
+							throw CredentialsException("An exception was thrown by an IAuthenticationEventHandler::retrieveCredentials() call", ex);
 						}
 						if (!that)
 						{

@@ -40,6 +40,8 @@ namespace Stormancer
 		// If cancel() is called very shortly after findGame(), there might be a race condition.
 		// It can be prevented by waiting for the first GameFinderStatusUpdated event received after calling findGame() before calling cancel().
 		void cancel();
+		// This should only be called by GameFinderPlugin.
+		void onSceneDisconnecting();
 
 		template<typename... TData>
 		pplx::task<void> findGame(const std::string &provider, const TData&... tData)

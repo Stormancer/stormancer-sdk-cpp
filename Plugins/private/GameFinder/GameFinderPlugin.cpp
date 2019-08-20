@@ -37,4 +37,13 @@ namespace Stormancer
 	{
 		builder.registerDependency<GameFinder_Impl, AuthenticationService>().as<GameFinder>().singleInstance();
 	}
+
+	void GameFinderPlugin::sceneDisconnecting(std::shared_ptr<Scene> scene)
+	{
+		auto name = scene->getHostMetadata("stormancer.plugins.gamefinder");
+		if (!name.empty())
+		{
+			scene->dependencyResolver().resolve<GameFinderService>()->onSceneDisconnecting();
+		}
+	}
 }
