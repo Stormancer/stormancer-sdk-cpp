@@ -128,7 +128,7 @@ namespace Stormancer
 					plugin->registerSceneDependencies(builder, this->shared_from_this());
 				}
 			});
-
+		_dispatcher = _scope.resolve<IActionDispatcher>();
 		for (auto plugin : this->_plugins)
 		{
 			plugin->sceneCreated(this->shared_from_this());
@@ -180,6 +180,12 @@ namespace Stormancer
 
 	ConnectionState Scene_Impl::getCurrentConnectionState() const
 	{
+		// This needs a lock because the client's destructor checks getCurrentConnectionState() != Disconnected before calling setConnectionState().
+		// If the check is performed while the connectionState is being set to Disconnected asynchronously, without the mutex, it could be false before the plugin handlers have been called.
+		// In this case, the client could destroy the plugins while the async operation of calling the handlers is taking place.
+		// Adding this lock prevents this possibility.
+		std::lock_guard<std::mutex> lg(_connectionStateMutex);
+
 		return _connectionState;
 	}
 
@@ -681,8 +687,7 @@ namespace Stormancer
 
 	pplx::task<std::shared_ptr<IP2PScenePeer>> Scene_Impl::openP2PConnection(const std::string& p2pToken, pplx::cancellation_token ct)
 	{
-		auto dispatcher = dependencyResolver().resolve<IActionDispatcher>();
-		pplx::task_options options(dispatcher);
+		pplx::task_options options(_dispatcher);
 		options.set_cancellation_token(ct);
 
 		auto p2pService = dependencyResolver().resolve<P2PService>();
@@ -801,18 +806,14 @@ namespace Stormancer
 		auto it = _connectedPeers.find(sessionId);
 		if (it != _connectedPeers.end())
 		{
-			auto actionDispatcher = dependencyResolver().resolve<IActionDispatcher>();
-			if (actionDispatcher)
-			{
-				auto wScene = STORM_WEAK_FROM_THIS();
-				actionDispatcher->post([wScene, it]()
+			auto wScene = STORM_WEAK_FROM_THIS();
+			_dispatcher->post([wScene, it]()
+				{
+					if (auto scene = wScene.lock())
 					{
-						if (auto scene = wScene.lock())
-						{
-							scene->_onPeerConnected(it->second);
-						}
-					});
-			}
+						scene->_onPeerConnected(it->second);
+					}
+				});
 		}
 	}
 
@@ -824,20 +825,16 @@ namespace Stormancer
 		{
 			auto peer = it->second;
 			_connectedPeers.erase(it);
-			auto actionDispatcher = dependencyResolver().resolve<IActionDispatcher>();
-			if (actionDispatcher)
-			{
-				auto wScene = STORM_WEAK_FROM_THIS();
-				actionDispatcher->post([wScene, peer]()
+			auto wScene = STORM_WEAK_FROM_THIS();
+			_dispatcher->post([wScene, peer]()
+				{
+					auto scene = wScene.lock();
+					if (scene)
 					{
-						auto scene = wScene.lock();
-						if (scene)
-						{
-							scene->_onPeerDisconnected(peer);
-						}
+						scene->_onPeerDisconnected(peer);
 					}
-				);
-			}
+				}
+			);
 		}
 	}
 
@@ -846,68 +843,76 @@ namespace Stormancer
 		return _onPacketReceived;
 	}
 
-	pplx::task<void> Scene_Impl::setConnectionState(ConnectionState state)
+	pplx::task<void> Scene_Impl::setConnectionState(ConnectionState state, bool async)
 	{
-		auto dispatcher = _scope.resolve<IActionDispatcher>();
-		auto scene = this->shared_from_this();
-
-		// The connection state change and the event that signal it must be triggered synchronously on the game's dispatcher.
-		return pplx::create_task([scene, state]//capture this because we don't want the object to be destroyed BEFORE we run this method.
+		if (async)
+		{
+			auto scene = this->shared_from_this();
+			// The connection state change and the event that signal it must be triggered synchronously on the game's dispatcher.
+			return pplx::create_task([scene, state]//capture this because we don't want the object to be destroyed BEFORE we run this method.
 			{
-
-				if (scene)
-				{
-
-
-					if (scene->_connectionState != state && !scene->_connectionStateObservableCompleted)
-					{
-						scene->_connectionState = state;
-						// on_next and on_completed handlers might delete this. Do not use this at all after calling the handlers.
-						scene->_connectionStateObservableCompleted = (state == ConnectionState::Disconnected);
-						auto subscriber = scene->_sceneConnectionStateObservable.get_subscriber();
-
-						switch (state.state)
-						{
-						case ConnectionState::Connecting:
-							for (auto plugin : scene->_plugins)
-							{
-								plugin->sceneConnecting(scene);
-							}
-							break;
-						case ConnectionState::Connected:
-							for (auto plugin : scene->_plugins)
-							{
-								plugin->sceneConnected(scene);
-							}
-							break;
-						case ConnectionState::Disconnecting:
-							for (auto plugin : scene->_plugins)
-							{
-								plugin->sceneDisconnecting(scene);
-							}
-							break;
-						case ConnectionState::Disconnected:
-							for (auto plugin : scene->_plugins)
-							{
-								plugin->sceneDisconnected(scene);
-							}
-							break;
-						default:
-							break;
-						}
-
-						subscriber.on_next(state);
-						if (state == ConnectionState::Disconnected)
-						{
-							subscriber.on_completed();
-						}
-					}
-				}
-			}, dispatcher);
+				scene->setConnectionStateInternal(state);
+			}, _dispatcher);
+		}
+		else
+		{
+			setConnectionStateInternal(state);
+			return pplx::task_from_result();
+		}
 	}
 
 	pplx::task<std::shared_ptr<P2PScenePeer>> Scene_Impl::createScenePeerFromP2PConnection(std::shared_ptr<IConnection> /*connection*/, pplx::cancellation_token /*ct*/)
 	{
 		throw std::runtime_error("Not implemented");
+	}
+
+	void Scene_Impl::setConnectionStateInternal(ConnectionState state)
+	{
+		std::lock_guard<std::mutex> lg(_connectionStateMutex);
+
+		if (_connectionState != state && !_connectionStateObservableCompleted)
+		{
+			_connectionState = state;
+			// on_next and on_completed handlers might delete this. Do not use this at all after calling the handlers.
+			_connectionStateObservableCompleted = (state == ConnectionState::Disconnected);
+			auto subscriber = _sceneConnectionStateObservable.get_subscriber();
+
+			auto scene = this->shared_from_this();
+			switch (state.state)
+			{
+			case ConnectionState::Connecting:
+				for (auto plugin : _plugins)
+				{
+					plugin->sceneConnecting(scene);
+				}
+				break;
+			case ConnectionState::Connected:
+				for (auto plugin : _plugins)
+				{
+					plugin->sceneConnected(scene);
+				}
+				break;
+			case ConnectionState::Disconnecting:
+				for (auto plugin : _plugins)
+				{
+					plugin->sceneDisconnecting(scene);
+				}
+				break;
+			case ConnectionState::Disconnected:
+				for (auto plugin : _plugins)
+				{
+					plugin->sceneDisconnected(scene);
+				}
+				break;
+			default:
+				break;
+			}
+
+			subscriber.on_next(state);
+			if (state == ConnectionState::Disconnected)
+			{
+				subscriber.on_completed();
+			}
+		}
 	}
 }

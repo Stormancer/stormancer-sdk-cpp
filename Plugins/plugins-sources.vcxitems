@@ -83,6 +83,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\LeaderboardPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Messaging\Messaging.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Messaging\MessagingModels.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Party\Party.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Profile\ProfilePlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Helloworld\HelloService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Helloworld\Hello.h" />

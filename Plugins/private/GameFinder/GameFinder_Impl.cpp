@@ -64,7 +64,7 @@ namespace Stormancer
 	{
 		std::weak_ptr<GameFinder_Impl> wThat = this->shared_from_this();
 		{
-			std::lock_guard<std::mutex> lg(_lock);
+			std::lock_guard<std::recursive_mutex> lg(_lock);
 
 			auto pendingRequest = _pendingFindGameRequests.find(gameFinder);
 			if (pendingRequest != _pendingFindGameRequests.end())
@@ -90,7 +90,7 @@ namespace Stormancer
 		{
 			if (auto that = wThat.lock())
 			{
-				std::lock_guard<std::mutex> lg(that->_lock);
+				std::lock_guard<std::recursive_mutex> lg(that->_lock);
 				that->_pendingFindGameRequests.erase(gameFinder);
 			}
 			return task;
@@ -99,7 +99,7 @@ namespace Stormancer
 
 	pplx::task<std::shared_ptr<GameFinderContainer>> GameFinder_Impl::getGameFinderContainer(std::string id)
 	{
-		std::lock_guard<std::mutex> lg(_lock);
+		std::lock_guard<std::recursive_mutex> lg(_lock);
 		auto it = _gameFinders.find(id);
 		if (it != _gameFinders.end())
 		{
@@ -142,7 +142,7 @@ namespace Stormancer
 					{
 						if (s == ConnectionState::Disconnecting)
 						{
-							std::lock_guard<std::mutex> lg(that->_lock);
+							std::lock_guard<std::recursive_mutex> lg(that->_lock);
 							auto it = that->_gameFinders.find(gameFinderName);
 							if (it != that->_gameFinders.end())
 							{
@@ -209,7 +209,7 @@ namespace Stormancer
 				auto that = wThat.lock();
 				if (that)
 				{
-					std::lock_guard<std::mutex> lg(that->_lock);
+					std::lock_guard<std::recursive_mutex> lg(that->_lock);
 					that->_gameFinders.erase(gameFinderName);
 				}
 				throw;
@@ -219,7 +219,7 @@ namespace Stormancer
 
 	pplx::task<void> GameFinder_Impl::disconnectFromGameFinder(const std::string& gameFinderName)
 	{
-		std::lock_guard<std::mutex> lg(this->_lock);
+		std::lock_guard<std::recursive_mutex> lg(this->_lock);
 		auto it = _gameFinders.find(gameFinderName);
 		if (it != _gameFinders.end())
 		{
@@ -251,7 +251,7 @@ namespace Stormancer
 
 	void GameFinder_Impl::cancel(const std::string& gameFinder)
 	{
-		std::lock_guard<std::mutex> lg(this->_lock);
+		std::lock_guard<std::recursive_mutex> lg(this->_lock);
 
 		auto findGameRequest = _pendingFindGameRequests.find(gameFinder);
 		if (findGameRequest != _pendingFindGameRequests.end())

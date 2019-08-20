@@ -77,7 +77,7 @@ namespace Stormancer
 				return;
 			}
 
-			std::lock_guard<std::mutex> lock(transport->_mutex);
+			std::lock_guard<std::recursive_mutex> lock(transport->_mutex);
 			if (transport->_isRunning)
 			{
 				transport->run();
@@ -597,14 +597,9 @@ namespace Stormancer
 
 		_handler->newConnection(connection);
 
-		auto tce = request.tce;
-		pplx::task<void>([connection, tce]
-		{
-			// Start this asynchronously because we locked the mutex in run and the user can do something that tries to lock again this mutex
-			connection->setConnectionState(ConnectionState::Connecting); // we should set connecting state sooner (when the user call connect)
-			connection->setConnectionState(ConnectionState::Connected);
-			tce.set(connection);
-		});
+		connection->setConnectionState(ConnectionState::Connecting); // we should set connecting state sooner (when the user call connect)
+		connection->setConnectionState(ConnectionState::Connected);
+		request.tce.set(connection);
 
 		return connection;
 	}
@@ -618,12 +613,8 @@ namespace Stormancer
 
 		_handler->newConnection(connection);
 
-		pplx::task<void>([connection]
-		{
-			// Start this asynchronously because we locked the mutex in run and the user can do something that tries to lock again this mutex
-			connection->setConnectionState(ConnectionState::Connecting); // we should set connecting state sooner (when the user call connect)
-			connection->setConnectionState(ConnectionState::Connected);
-		});
+		connection->setConnectionState(ConnectionState::Connecting); // we should set connecting state sooner (when the user call connect)
+		connection->setConnectionState(ConnectionState::Connected);
 
 		return connection;
 	}
@@ -643,12 +634,8 @@ namespace Stormancer
 
 			connection->onClose(reason);
 
-			pplx::task<void>([connection, reason]()
-			{
-				// Start this asynchronously because we locked the mutex in run and the user can do something that tries to lock again this mutex
-				connection->setConnectionState(ConnectionState(ConnectionState::Disconnecting, reason));
-				connection->setConnectionState(ConnectionState(ConnectionState::Disconnected, reason));
-			});
+			connection->setConnectionState(ConnectionState(ConnectionState::Disconnecting, reason));
+			connection->setConnectionState(ConnectionState(ConnectionState::Disconnected, reason));
 		}
 		else
 		{

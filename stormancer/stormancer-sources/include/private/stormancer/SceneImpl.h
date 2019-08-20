@@ -15,6 +15,8 @@
 #include "stormancer/P2P/P2PConnectionStateChangedArgs.h"
 #include "stormancer/DependencyInjection.h"
 
+#include <mutex>
+
 namespace Stormancer
 {
 	class Client;
@@ -170,8 +172,22 @@ namespace Stormancer
 		/// \param packet Receivedpacket.
 		void handleMessage(Packet_ptr packet);
 
+		/// <summary>
+		/// Change the scene's connection state.
+		/// </summary>
+		/// <remarks>
+		/// Trigger the relevant plugin handlers and notify the connection state observers.
+		/// No effect if <c>connectionState == getCurrentConnectionState()</c>.
+		/// </remarks>
+		/// <param name="connectionState">The new connection state.</param>
+		/// <param name="async">
+		/// Whether the connection state change, and the handlers, should be executed asynchronously on the user-specified action dispatcher.
+		/// Usually, this should be <c>true</c> to have a predictable behavior on the game's side.
+		/// The only case where it should be <c>false</c> is when calling this from the client's destructor.
+		/// </param>
+		/// <returns>A task that completes when the state change and the handlers have been executed.</returns>
 		STORM_NODISCARD
-		pplx::task<void> setConnectionState(ConnectionState connectionState);
+		pplx::task<void> setConnectionState(ConnectionState connectionState, bool async = true);
 
 		pplx::task<std::shared_ptr<P2PScenePeer>> createScenePeerFromP2PConnection(std::shared_ptr<IConnection> connection, pplx::cancellation_token ct = pplx::cancellation_token::none());
 
@@ -192,6 +208,8 @@ namespace Stormancer
 		pplx::task<void> disconnectAllPeers(pplx::cancellation_token ct = pplx::cancellation_token::none());
 
 		pplx::task<void> disconnectFromHost(pplx::cancellation_token ct = pplx::cancellation_token::none());
+
+		void setConnectionStateInternal(ConnectionState connectionState);
 
 #pragma endregion
 
@@ -265,6 +283,13 @@ namespace Stormancer
 
 		bool _disconnectRequested = false;
 		pplx::cancellation_token_source _connectionCts;
+
+		// Store this here because we need it for Disconnected handlers execution, and at this time the DependencyScope could be invalid.
+		std::shared_ptr<IActionDispatcher> _dispatcher;
+
+		// allows the mutex to be locked in getCurrentConnectionState().
+		// acceptable in this case because the mutex isn't really part of the scene's state.
+		mutable std::mutex _connectionStateMutex;
 
 #pragma endregion
 	};

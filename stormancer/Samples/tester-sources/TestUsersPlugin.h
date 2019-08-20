@@ -5,6 +5,7 @@
 #include "stormancer/IPlugin.h"
 #include "Users/Users.hpp"
 #include "test.h"
+#include "TestHelpers.h"
 #include "IAuthenticationTester.h"
 #include <memory>
 
@@ -84,6 +85,7 @@ public:
 		testNoEventHandlers(tester);
 		testNoEventHandlersWithCallback(tester);
 		testCurrentLocalUser(tester);
+		testSendRequest(tester);
 
 		auto authTester = IAuthenticationTester::create();
 		authTester->runTests(tester);
@@ -98,7 +100,7 @@ private:
 		tester.logger()->log(LogLevel::Info, "TestUsersPlugin", "testEventHandlers");
 
 		auto conf = Configuration::create(tester.endpoint(), tester.account(), tester.application());
-		conf->logger = tester.logger();
+		//conf->logger = tester.logger();
 		conf->addPlugin(new Users::UsersPlugin);
 		TestPlugin* plugin = new TestPlugin;
 		conf->addPlugin(plugin);
@@ -127,7 +129,7 @@ private:
 		tester.logger()->log(LogLevel::Info, "TestUsersPlugin", "testNoEventHandlers");
 
 		auto conf = Configuration::create(tester.endpoint(), tester.account(), tester.application());
-		conf->logger = tester.logger();
+		//conf->logger = tester.logger();
 		conf->addPlugin(new Users::UsersPlugin);
 
 		auto client = IClient::create(conf);
@@ -155,7 +157,7 @@ private:
 		tester.logger()->log(LogLevel::Info, "TestUsersPlugin", "testNoEventHandlersWithCallback");
 
 		auto conf = Configuration::create(tester.endpoint(), tester.account(), tester.application());
-		conf->logger = tester.logger();
+		//conf->logger = tester.logger();
 		conf->addPlugin(new Users::UsersPlugin);
 
 		auto client = IClient::create(conf);
@@ -186,7 +188,7 @@ private:
 		tester.logger()->log(LogLevel::Info, "TestUsersPlugin", "testEventHandlersWithCallback");
 
 		auto conf = Configuration::create(tester.endpoint(), tester.account(), tester.application());
-		conf->logger = tester.logger();
+		//conf->logger = tester.logger();
 		conf->addPlugin(new Users::UsersPlugin);
 		TestPlugin* plugin = new TestPlugin;
 		conf->addPlugin(plugin);
@@ -218,7 +220,7 @@ private:
 		tester.logger()->log(LogLevel::Info, "TestUsersPlugin", "testCurrentLocalUser");
 
 		auto conf = Configuration::create(tester.endpoint(), tester.account(), tester.application());
-		conf->logger = tester.logger();
+		//conf->logger = tester.logger();
 		conf->addPlugin(new Users::UsersPlugin);
 		conf->addPlugin(new TestPlatformIdPlugin);
 
@@ -251,6 +253,68 @@ private:
 		tester.logger()->log(LogLevel::Info, "TestUsersPlugin", "testCurrentLocalUser PASSED");
 	}
 
+	static std::shared_ptr<Stormancer::IClient> makeTestClient(const Stormancer::Tester& tester)
+	{
+		using namespace Stormancer;
+
+		auto conf = Configuration::create(tester.endpoint(), tester.account(), tester.application());
+		//conf->logger = tester.logger();
+		conf->addPlugin(new Users::UsersPlugin);
+		conf->addPlugin(new TestPlugin);
+
+		return IClient::create(conf);
+	}
+
+	static void testSendRequest(const Stormancer::Tester& tester)
+	{
+		using namespace Stormancer;
+		using namespace TestHelpers;
+
+		tester.logger()->log(LogLevel::Info, "TestUsersPlugin", "testSendRequest");
+
+		auto sender = makeTestClient(tester);
+		auto recipient = makeTestClient(tester);
+
+		auto usersSender = sender->dependencyResolver().resolve<Users::UsersApi>();
+		auto usersRcpt = recipient->dependencyResolver().resolve<Users::UsersApi>();
+		usersSender->login().get();
+		usersRcpt->login().get();
+
+		auto senderId = usersSender->userId();
+		std::string requestData = "testData";
+
+		pplx::task_completion_event<void> recipientHandledOp;
+		usersRcpt->setOperationHandler("testOp", [recipientHandledOp, senderId, requestData](Users::OperationCtx ctx)
+		{
+			assertextce(ctx.operation == "testOp", "ctx.operation name should be testOp, but is " + ctx.operation, recipientHandledOp);
+			assertextce(ctx.originId == senderId, "ctx.originId should be the sender's Id, but is " + ctx.originId, recipientHandledOp);
+			
+			try
+			{
+				Serializer s;
+				auto data = s.deserializeOne<std::string>(ctx.request->inputStream());
+				assertextce(data == requestData, "data received in the request should be the same as the data that was sent, but it is " + data, recipientHandledOp);
+			}
+			catch (const std::exception& e)
+			{
+				recipientHandledOp.set_exception("recipient could not deserialize data, error: " + std::string(e.what()));
+			}
+
+			recipientHandledOp.set();
+			return pplx::task_from_result();
+		});
+
+		SelfObservingTask<void> sendTask = usersSender->sendRequestToUser<void>(usersRcpt->userId(), "testOp", pplx::cancellation_token::none(), requestData);
+		
+		auto status = cancel_after_timeout(pplx::create_task(recipientHandledOp), 5000).wait();
+		assertex(status == pplx::completed, "reception of the request timed out");
+		
+		status = cancel_after_timeout(*sendTask, 5000).wait();
+		assertex(status == pplx::completed, "completion of the request on the sender's side timed out");
+
+		tester.logger()->log(LogLevel::Info, "TestUsersPlugin", "testSendRequest PASSED");
+	}
+
 	static void assertex(bool condition, std::string message)
 	{
 		if (!condition)
@@ -259,4 +323,12 @@ private:
 		}
 	}
 
+	template<typename T>
+	static void assertextce(bool condition, std::string message, pplx::task_completion_event<T> tce)
+	{
+		if (!condition)
+		{
+			tce.set_exception(std::runtime_error(message.c_str()));
+		}
+	}
 };

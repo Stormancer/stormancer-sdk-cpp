@@ -77,8 +77,6 @@ namespace Stormancer
 
 		pplx::task<void> setServerTimeout(std::chrono::milliseconds timeout, pplx::cancellation_token ct) override;
 
-		void clear();
-
 #pragma endregion
 
 	private:

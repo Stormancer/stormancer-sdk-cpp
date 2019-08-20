@@ -100,6 +100,6 @@ namespace Stormancer
 		std::string customData;
 
 		bool startOnlyIfPartyFull;
-	};	
+	};
 }
 MSGPACK_ADD_ENUM(Stormancer::PartyUserStatus)

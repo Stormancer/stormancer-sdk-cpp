@@ -172,7 +172,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <TreatWarningAsError>false</TreatWarningAsError>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
-      <AdditionalOptions>/w34265 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/w34265 /bigobj %(AdditionalOptions)</AdditionalOptions>
       <AdditionalIncludeDirectories>../../../dependencies/steamworks/sdk/public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -196,7 +196,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <TreatWarningAsError>false</TreatWarningAsError>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
-      <AdditionalOptions>/w34265 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/w34265 /bigobj %(AdditionalOptions)</AdditionalOptions>
       <AdditionalIncludeDirectories>../../../dependencies/steamworks/sdk/public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -220,7 +220,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <TreatWarningAsError>false</TreatWarningAsError>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
-      <AdditionalOptions>/w34265 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/w34265 /bigobj %(AdditionalOptions)</AdditionalOptions>
       <AdditionalIncludeDirectories>../../../dependencies/steamworks/sdk/public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -242,7 +242,7 @@
       <TreatWarningAsError>false</TreatWarningAsError>
       <ShowIncludes>false</ShowIncludes>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
-      <AdditionalOptions>/w34265 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/w34265 /bigobj %(AdditionalOptions)</AdditionalOptions>
       <AdditionalIncludeDirectories>../../../dependencies/steamworks/sdk/public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -265,7 +265,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <TreatWarningAsError>false</TreatWarningAsError>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
-      <AdditionalOptions>/w34265 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/w34265 /bigobj %(AdditionalOptions)</AdditionalOptions>
       <AdditionalIncludeDirectories>../../../dependencies/steamworks/sdk/public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -289,7 +289,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <TreatWarningAsError>false</TreatWarningAsError>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
-      <AdditionalOptions>/w34265 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/w34265 /bigobj %(AdditionalOptions)</AdditionalOptions>
       <AdditionalIncludeDirectories>../../../dependencies/steamworks/sdk/public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -313,7 +313,7 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <TreatWarningAsError>false</TreatWarningAsError>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
-      <AdditionalOptions>/w34265 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/w34265 /bigobj %(AdditionalOptions)</AdditionalOptions>
       <AdditionalIncludeDirectories>../../../dependencies/steamworks/sdk/public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -339,7 +339,7 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <TreatWarningAsError>false</TreatWarningAsError>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
-      <AdditionalOptions>/w34265 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/w34265 /bigobj %(AdditionalOptions)</AdditionalOptions>
       <AdditionalIncludeDirectories>../../../dependencies/steamworks/sdk/public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>

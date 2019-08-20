@@ -38,7 +38,8 @@ namespace Stormancer
 		pplx::task<std::shared_ptr<GameFinderContainer>> connectToGameFinderImpl(std::string gameFinderName);
 		pplx::task<std::shared_ptr<GameFinderContainer>> getGameFinderContainer(std::string id);
 		
-		std::mutex _lock;
+		// recursive_mutex needed because of some corner error cases where continuations are run synchronously
+		std::recursive_mutex _lock;
 		std::unordered_map<std::string, pplx::task<std::shared_ptr<GameFinderContainer>>> _gameFinders;
 		std::unordered_map<std::string, pplx::cancellation_token_source> _pendingFindGameRequests;
 		std::weak_ptr<AuthenticationService> _auth;

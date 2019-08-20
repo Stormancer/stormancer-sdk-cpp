@@ -5,6 +5,7 @@
 #include "TestStreams.h"
 #include "GameSession/Gamesessions.hpp"
 #include "TestUsersPlugin.h"
+#include "TestParty.h"
 
 using namespace std::literals;
 
@@ -15,7 +16,6 @@ namespace Stormancer
 		_testsDone = false;
 		_testsPassed = false;
 
-		_tests.push_back([this]() { test_nestedException(); });
 		_tests.push_back([this]() { test_dependencyInjection(); });
 		_tests.push_back([this]() { test_streams(); });
 		_tests.push_back([this]() { test_connect(); });
@@ -33,6 +33,7 @@ namespace Stormancer
 		_tests.push_back([this]() { test_Ping_Cluster(); });
 		_tests.push_back([this]() { test_clean(); });
 		_tests.push_back([this]() { test_users(); });
+		_tests.push_back([this]() { test_party(); });
 
 		// Some platforms require a Client to be created before using pplx::task
 		test_create();
@@ -733,29 +734,22 @@ namespace Stormancer
 		execNextTest();
 	}
 
-	void Tester::test_nestedException()
+	void Tester::test_party()
 	{
-		_logger->log(LogLevel::Info, "test_nestedException", "NESTED EXCEPTION");
+		_logger->log(LogLevel::Info, "test_party", "PARTY");
 
 		try
 		{
-			try
-			{
-				throw std::runtime_error("nested");
-			}
-			catch (const std::exception&)
-			{
-				std::throw_with_nested(std::runtime_error("outer"));
-			}
+			TestParty::runTests(*this);
 		}
 		catch (const std::exception& ex)
 		{
-			_logger->log(LogLevel::Trace, "test_nestedException", "Caught exception with nested", ex);
+			_logger->log(LogLevel::Error, "test_party", "Party FAILED", ex.what());
+			return;
 		}
-		_logger->log(LogLevel::Info, "test_nestedException", "Nested Exception OK");
+		_logger->log(LogLevel::Info, "test_party", "Party OK");
 		execNextTest();
 	}
-
 
 	bool Tester::tests_done()
 	{

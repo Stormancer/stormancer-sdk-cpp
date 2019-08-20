@@ -399,6 +399,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\PS4\PS4Plugin.hpp">
       <Filter>public\PS4</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Party\Party.hpp">
+      <Filter>public\Party</Filter>
+    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Friends\Friends.hpp">
       <Filter>public\Friends</Filter>
     </ClInclude>

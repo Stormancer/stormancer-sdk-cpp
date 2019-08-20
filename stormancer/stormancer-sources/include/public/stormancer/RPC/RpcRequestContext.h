@@ -124,7 +124,7 @@ namespace Stormancer
 		ibytestream& _inputStream;
 		uint16 _id;
 		bool _ordered;
-		byte _msgSent;
+		byte _msgSent = 0;
 		pplx::cancellation_token _cancellationToken;
 		Serializer _serializer;
 		const std::string _rpcClientChannelIdentifier = "RPC_client";

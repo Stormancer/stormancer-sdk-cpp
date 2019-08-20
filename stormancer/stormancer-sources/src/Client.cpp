@@ -75,16 +75,33 @@ namespace Stormancer
 		{
 			_connectionSubscription.unsubscribe();
 		}
+
+		{
+			std::lock_guard<std::mutex> lg(_scenesMutex);
+			for (const auto& scenePair : _scenes)
+			{
+				if (scenePair.second.task.is_done())
+				{
+					try
+					{
+						auto scene = scenePair.second.task.get();
+						if (scene->getCurrentConnectionState() != ConnectionState::Disconnected)
+						{
+							scene->setConnectionState(ConnectionState::Disconnecting, false).get();
+							scene->setConnectionState(ConnectionState::Disconnected, false).get();
+						}
+					}
+					catch (...) {}
+				}
+			}
+			_scenes.clear();
+		}
+
 		for (auto plugin : _plugins)
 		{
 			delete plugin;
 		}
 		_plugins.clear();
-
-		{
-			std::lock_guard<std::mutex> lg(_scenesMutex);
-			_scenes.clear();
-		}
 	}
 
 	std::shared_ptr<IClient> IClient::create(Configuration_ptr config)
@@ -101,9 +118,8 @@ namespace Stormancer
 
 	void Client::initialize()
 	{
-		if (firstInit)
+		if (!_initialized)
 		{
-			firstInit = false;
 			ContainerBuilder builder;
 			ConfigureContainer(builder, _config);
 			for (auto plugin : _plugins)
@@ -172,13 +188,9 @@ namespace Stormancer
 			{
 				plugin->clientCreated(this->shared_from_this());
 			}
-		}
 
-		if (!_initialized)
-		{
 			std::string version(Version::getVersionString());
 			logger()->log(LogLevel::Trace, "Client", "Initializing client (version: " + version + ")...");
-			auto transport = _dependencyResolver.resolve<ITransport>();
 
 			_metadata["serializers"] = "msgpack/array";
 			_metadata["transport"] = transport->name();
@@ -196,22 +208,12 @@ namespace Stormancer
 			_initialized = true;
 			_dependencyResolver.resolve<IActionDispatcher>()->start();
 
-			_cts = pplx::cancellation_token_source();
-
 			if (std::strcmp(_config->_headersVersion, Version::getVersionString()) != 0)
 			{
 				logger()->log(LogLevel::Warn, "Client", "The version of the stormancer headers (" + std::string(_config->_headersVersion) + ") is different from the version of the library (" + Version::getVersionString() + "), this may cause issues.");
 			}
 			logger()->log(LogLevel::Trace, "Client", "Client initialized");
 		}
-	}
-
-	void Client::clear()
-	{
-		std::lock_guard<std::mutex> lg(_scenesMutex);
-		_initialized = false;
-		_metadata.clear();
-		_initialized = false;
 	}
 
 	const std::string& Client::applicationName() const

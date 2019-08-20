@@ -805,7 +805,7 @@ namespace Stormancer
 						OperationCtx opCtx;
 						opCtx.request = ctx;
 						Serializer serializer;
-						serializer.deserialize(ctx->inputStream(), opCtx.operation, opCtx.originId);
+						serializer.deserialize(ctx->inputStream(), opCtx.originId, opCtx.operation);
 
 						auto that = wThat.lock();
 						if (!that)
