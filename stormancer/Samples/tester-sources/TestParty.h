@@ -17,16 +17,6 @@ public:
 
 private:
 
-	class AutoCanceler
-	{
-	public:
-		pplx::cancellation_token getToken() { return cts.get_token(); }
-
-		~AutoCanceler() { cts.cancel(); }
-	private:
-		pplx::cancellation_token_source cts;
-	};
-
 	static pplx::task<std::shared_ptr<Stormancer::IClient>> makeClient(const Stormancer::Tester& tester)
 	{
 		using namespace Stormancer;
@@ -72,16 +62,12 @@ private:
 		});
 	}
 
-	static void failAfterTimeout(pplx::task_completion_event<void> tce, std::string msg, pplx::cancellation_token ct, std::chrono::milliseconds timeout = std::chrono::milliseconds(1000))
+	static void failAfterTimeout(pplx::task_completion_event<void> tce, std::string msg, std::chrono::milliseconds timeout = std::chrono::milliseconds(1000))
 	{
 		auto timeoutCt = Stormancer::timeout(timeout);
-		auto registration = timeoutCt.register_callback([tce, msg]
+		timeoutCt.register_callback([tce, msg]
 		{
 			tce.set_exception(std::runtime_error(msg));
-		});
-		ct.register_callback([registration, timeoutCt]
-		{
-			timeoutCt.deregister_callback(registration);
 		});
 	}
 
@@ -132,10 +118,6 @@ private:
 		auto party = client->dependencyResolver().resolve<Party::PartyApi>();
 		auto users = client->dependencyResolver().resolve<AuthenticationService>();
 
-		// If the tester throws, this will cancel any pending task that could also throw
-		// (avoids unobserved exceptions with concurrent testing tasks)
-		AutoCanceler canceler;
-
 		Party::PartyRequestDto request = {};
 		request.platformSessionId = ""; // This will make a guid
 		request.GameFinderName = "testGameFinder";
@@ -146,15 +128,15 @@ private:
 		{
 			joinedSubTce.set();
 		});
-		SelfObservingTask<void> checkSettingsTask(testSettingsValidityOnPartyJoined(party, users, request, canceler.getToken()));
-		SelfObservingTask<void> checkMembersTask(testMembersValidityOnPartyJoined(party, users, canceler.getToken()));
+		SelfObservingTask<void> checkSettingsTask(testSettingsValidityOnPartyJoined(party, users, request));
+		SelfObservingTask<void> checkMembersTask(testMembersValidityOnPartyJoined(party, users));
 
 		party->createParty(request).get();
 
 		assertex(party->isInParty(), "I should be in a party after a successful createParty");
 		assertex(party->getPendingInvitations().empty(), "Pending invitations should be empty");
 		
-		failAfterTimeout(joinedSubTce, "OnJoinedParty subscription was not triggered in time", canceler.getToken());
+		failAfterTimeout(joinedSubTce, "OnJoinedParty subscription was not triggered in time");
 		SelfObservingTask<void> joinedSubTask(pplx::create_task(joinedSubTce));
 		auto creationCheckTasks = { joinedSubTask.task, checkSettingsTask.task, checkMembersTask.task };
 		pplx::when_all(creationCheckTasks.begin(), creationCheckTasks.end()).get();
@@ -178,13 +160,13 @@ private:
 
 		SelfObservingTask<void> inviteTask(party->invitePlayer(client2->dependencyResolver().resolve<AuthenticationService>()->userId()));
 
-		failAfterTimeout(inviteReceivedTce, "invite was not received on time", canceler.getToken());
+		failAfterTimeout(inviteReceivedTce, "invite was not received on time");
 		pplx::create_task(inviteReceivedTce).get();
 
 		auto invites = party2->getPendingInvitations();
 		assertex(invites.size() == 1, "User 2 should have only 1 invite");
 
-		SelfObservingTask<void> countUpdateTest = testMemberCountUpdate({ party, party2 }, 2, canceler.getToken());
+		SelfObservingTask<void> countUpdateTest = testMemberCountUpdate({ party, party2 }, 2);
 		
 		party2->joinParty(invites[0]).get();
 		tester.logger()->log(LogLevel::Info, "TestParty", "Waiting for invite completion...");
@@ -194,8 +176,8 @@ private:
 
 	static pplx::task<void> testSettingsValidityOnPartyJoined(std::shared_ptr<Stormancer::Party::PartyApi> party,
 		std::shared_ptr<Stormancer::AuthenticationService> users,
-		const Stormancer::Party::PartyRequestDto& request,
-		pplx::cancellation_token ct)
+		const Stormancer::Party::PartyRequestDto& request
+	)
 	{
 		using namespace Stormancer;
 
@@ -209,13 +191,13 @@ private:
 			tce.set();
 		});
 
-		failAfterTimeout(tce, "PartySettings update was not received in time", ct, std::chrono::seconds(5));
+		failAfterTimeout(tce, "PartySettings update was not received in time", std::chrono::seconds(5));
 		return pplx::create_task(tce).then([sub] {});
 	}
 
 	static pplx::task<void> testMembersValidityOnPartyJoined(std::shared_ptr<Stormancer::Party::PartyApi> party,
-		std::shared_ptr<Stormancer::AuthenticationService> users,
-		pplx::cancellation_token ct)
+		std::shared_ptr<Stormancer::AuthenticationService> users
+	)
 	{
 		using namespace Stormancer;
 
@@ -230,12 +212,11 @@ private:
 			tce.set();
 		});
 
-		failAfterTimeout(tce, "PartyMembers update was not received in time", ct, std::chrono::seconds(5));
+		failAfterTimeout(tce, "PartyMembers update was not received in time", std::chrono::seconds(5));
 		return pplx::create_task(tce).then([sub] {});
 	}
 
-	static pplx::task<void> testMemberCountUpdate(std::vector<std::shared_ptr<Stormancer::Party::PartyApi>> parties, int expectedCount,
-		pplx::cancellation_token ct)
+	static pplx::task<void> testMemberCountUpdate(std::vector<std::shared_ptr<Stormancer::Party::PartyApi>> parties, int expectedCount)
 	{
 		using namespace Stormancer;
 
@@ -256,7 +237,7 @@ private:
 					tce.set_exception(std::runtime_error("Bad member count: got " + std::to_string(members.size()) + ", should be " + std::to_string(expectedCount)));
 				}
 			}));
-			failAfterTimeout(tce, "did not get member count update in time", ct, std::chrono::seconds(2));
+			failAfterTimeout(tce, "did not get member count update in time", std::chrono::seconds(2));
 		}
 
 		return pplx::when_all(tasks.begin(), tasks.end())

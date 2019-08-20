@@ -18,6 +18,7 @@ namespace Stormancer
 		struct PartyUserDto;
 		struct PartyUserData;
 		struct PartySettings;
+		struct PartySettingsUpdate;
 		struct PartyInvitation;
 		struct PartyRequestDto;
 
@@ -140,7 +141,7 @@ namespace Stormancer
 			/// </remarks>
 			/// <param name="partySettings"></param>
 			/// <returns></returns>
-			virtual pplx::task<void> updatePartySettings(PartySettings partySettings) = 0;
+			virtual pplx::task<void> updatePartySettings(PartySettingsUpdate partySettings) = 0;
 
 			/// <summary>
 			/// Update the data associated with the player
@@ -236,10 +237,12 @@ namespace Stormancer
 		struct PartyUserDto
 		{
 			std::string userId;
-			bool isLeader;
 			PartyUserStatus partyUserStatus;
 			std::string userData;
-			MSGPACK_DEFINE(userId, isLeader, partyUserStatus, userData)
+
+			bool isLeader = false; // Computed locally
+
+			MSGPACK_DEFINE(userId, partyUserStatus, userData)
 		};
 
 		struct PartyUserData
@@ -266,6 +269,14 @@ namespace Stormancer
 			MSGPACK_DEFINE(gameFinderName, leaderId, customData)
 		};
 
+		struct PartySettingsUpdate
+		{
+			std::string gameFinderName;
+			std::string customData;
+
+			MSGPACK_DEFINE(gameFinderName, customData)
+		};
+
 
 		namespace details
 		{
@@ -285,7 +296,7 @@ namespace Stormancer
 				///
 				/// Sent to server the new party status
 				///
-				pplx::task<void> updatePartySettings(const PartySettings newPartySettings)
+				pplx::task<void> updatePartySettings(const PartySettingsUpdate& newPartySettings)
 				{
 					return _rpcService->rpc<void>("party.updatepartysettings", newPartySettings);
 				}
@@ -340,12 +351,12 @@ namespace Stormancer
 				Event<PartyUserData> UpdatedPartyUserData;
 				Event<PartySettings> UpdatedPartySettings;
 
-				std::vector<PartyUserDto>& members()
+				const std::vector<PartyUserDto>& members() const
 				{
 					return _members;
 				}
 
-				PartySettings& settings()
+				const PartySettings& settings() const
 				{
 					return _settings;
 				}
@@ -398,8 +409,7 @@ namespace Stormancer
 						if (auto that = wThat.lock())
 						{
 							auto members = data->readObject<std::vector<PartyUserDto>>();
-							that->_members = members;
-							that->UpdatedPartyMembers(members);
+							that->updatePartyMembers(members);
 						}
 					});
 
@@ -479,11 +489,41 @@ namespace Stormancer
 
 				void setNewLocalSettings(const PartySettings partySettingsDto)
 				{
+					std::lock_guard<std::recursive_mutex> lg(_leaderMutex);
+
+					bool updatedLeader = _settings.leaderId != partySettingsDto.leaderId;
+					
 					_settings.gameFinderName = partySettingsDto.gameFinderName;
 					_settings.leaderId = partySettingsDto.leaderId;
 					_settings.customData = partySettingsDto.customData;
 
+					if (updatedLeader && _members.size() > 0)
+					{
+						updatePartyMembers(_members);
+					}
+
 					this->UpdatedPartySettings(_settings);
+				}
+
+				void updatePartyMembers(std::vector<PartyUserDto> members)
+				{
+					// Lock the mutex to prevent the leader from changing while we are iterating on the members.
+					std::lock_guard<std::recursive_mutex> lg(_leaderMutex);
+
+					for (auto& member : members)
+					{
+						if (member.userId == _settings.leaderId)
+						{
+							member.isLeader = true;
+						}
+					}
+					_members = members;
+
+					// Wait until the first settings update has been received to trigger the event
+					if (!_settings.leaderId.empty())
+					{
+						this->UpdatedPartyMembers(_members);
+					}
 				}
 
 				std::weak_ptr<Scene> _scene;
@@ -494,6 +534,7 @@ namespace Stormancer
 				bool _playerReady;
 				bool _clientReady;
 				std::vector<PartyUserDto> _members;
+				std::recursive_mutex _leaderMutex;
 			};
 
 			class PartyContainer
@@ -518,18 +559,12 @@ namespace Stormancer
 				{
 				}
 
-
-				bool is_settings_valid() const
-				{
-					return (_partyScene != nullptr && _partyScene->dependencyResolver().resolve<details::PartyService>());
-				}
-
-				PartySettings& settings() const
+				const PartySettings& settings() const
 				{
 					return  _partyScene->dependencyResolver().resolve<details::PartyService>()->settings();
 				}
 
-				std::vector<PartyUserDto>& members() const
+				const std::vector<PartyUserDto>& members() const
 				{
 					return _partyScene->dependencyResolver().resolve<details::PartyService>()->members();
 				}
@@ -815,7 +850,7 @@ namespace Stormancer
 					});
 				}
 
-				pplx::task<void> updatePartySettings(PartySettings partySettingsDto) override
+				pplx::task<void> updatePartySettings(PartySettingsUpdate partySettingsDto) override
 				{
 					if (!isInParty())
 					{
@@ -1129,13 +1164,13 @@ namespace Stormancer
 		{
 			void registerSceneDependencies(ContainerBuilder& builder, std::shared_ptr<Scene> scene)
 			{
-				auto name = scene->getHostMetadata("stormancer.party");
+				auto name = scene->getHostMetadata("stormancer.party.v2");
 				if (name.length() > 0)
 				{
 					builder.registerDependency<details::PartyService, Scene>().singleInstance();
 				}
 
-				name = scene->getHostMetadata("stormancer.partymanagement");
+				name = scene->getHostMetadata("stormancer.partymanagement.v2");
 				if (name.length() > 0)
 				{
 					builder.registerDependency<details::PartyManagementService, Scene>().singleInstance();
@@ -1144,7 +1179,7 @@ namespace Stormancer
 
 			void sceneCreated(std::shared_ptr<Scene> scene)
 			{
-				if (!scene->getHostMetadata("stormancer.party").empty())
+				if (!scene->getHostMetadata("stormancer.party.v2").empty())
 				{
 					scene->dependencyResolver().resolve<details::PartyService>()->initialize();
 				}
