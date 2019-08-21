@@ -220,7 +220,7 @@ namespace Stormancer
 		public:
 			CredentialsException(const char* message, const std::exception& innerException) : message(makeMessage(message, innerException)) {}
 
-			const char* what() const override
+			const char* what() const noexcept override
 			{
 				return message.c_str();
 			}
