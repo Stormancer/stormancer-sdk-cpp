@@ -11,7 +11,7 @@ using namespace std::literals;
 
 namespace Stormancer
 {
-	void Tester::run_all_tests_nonblocking()
+	pplx::task<void> Tester::run_all_tests_nonblocking()
 	{
 		_testsDone = false;
 		_testsPassed = false;
@@ -37,6 +37,8 @@ namespace Stormancer
 
 		// Some platforms require a Client to be created before using pplx::task
 		test_create();
+
+		return pplx::create_task(_testsCompletedTce);
 	}
 
 	void Tester::execNextTest()
@@ -52,6 +54,7 @@ namespace Stormancer
 			_testsPassed = true;
 			_testsDone = true;
 			_logger->log(LogLevel::Info, "execNextTest", "TESTS SUCCEEDED !");
+			_testsCompletedTce.set();
 		}
 	}
 
@@ -645,12 +648,7 @@ namespace Stormancer
 
 	void Tester::run_all_tests()
 	{
-		run_all_tests_nonblocking();
-
-		while (!_testsDone)
-		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));
-		}
+		run_all_tests_nonblocking().get();
 	}
 
 	void Tester::test_Ping_Cluster()

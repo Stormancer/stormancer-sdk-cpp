@@ -40,9 +40,15 @@ namespace Stormancer
 					throw std::runtime_error("Steam init failed");
 				}
 
+				auto steamUser = SteamUser();
+				if (steamUser == nullptr)
+				{
+					throw std::runtime_error("SteamUser() returned null");
+				}
+
 				auto steamTicket = std::make_shared<std::vector<byte>>(1024);
 				auto pcbTicket = std::make_shared<uint32>(0);
-				auto hAuthTicket = SteamUser()->GetAuthSessionTicket(steamTicket->data(), (int)steamTicket->size(), pcbTicket.get());
+				auto hAuthTicket = steamUser->GetAuthSessionTicket(steamTicket->data(), (int)steamTicket->size(), pcbTicket.get());
 
 				if (hAuthTicket == k_HAuthTicketInvalid)
 				{

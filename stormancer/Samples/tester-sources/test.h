@@ -25,12 +25,12 @@ namespace Stormancer
 
 		Tester() = default;
 
-		/// Run the test suite, and block indefinitely on stdin.
+		/// Run the test suite.
 		void run_all_tests();
 
 		/// Same as run_all_tests(), but returns immediately.
 		/// Use tests_done() and tests_passed() to check the tests' status.
-		void run_all_tests_nonblocking();
+		pplx::task<void> run_all_tests_nonblocking();
 
 		/// Check whether the tests are done (NOT if they're succesful).
 		bool tests_done();
@@ -109,7 +109,7 @@ namespace Stormancer
 		bool _testsDone = false;
 		bool _testsPassed = false;
 
-		pplx::task_completion_event<void> testCompletedTce;
+		pplx::task_completion_event<void> _testsCompletedTce;
 
 #pragma endregion
 	};

@@ -10,8 +10,17 @@ int main(int argc, char** argv)
 	std::string application = (argc >= 4) ? argv[3] : "test-application";
 
 	{
-		Stormancer::Tester tester(endpoint, account, application, "test-scene");
-		tester.run_all_tests();
+		int nbParallelTests = 1;
+		std::vector<pplx::task<void>> tasks;
+		std::vector<std::shared_ptr<Stormancer::Tester>> testers;
+		for (int i = 0; i < nbParallelTests; i++)
+		{
+			auto tester = std::make_shared<Stormancer::Tester>(endpoint, account, application, "test-scene");
+			testers.push_back(tester);
+			tasks.push_back(tester->run_all_tests_nonblocking());
+		}
+
+		pplx::when_all(tasks.begin(), tasks.end()).get();
 		std::cin.ignore();
 	}
 
