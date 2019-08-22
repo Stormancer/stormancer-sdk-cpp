@@ -6,13 +6,15 @@
 #include "stormancer/Utilities/TaskUtilities.h"
 #include "TestHelpers.h"
 
+#include <sstream>
+
 class TestParty
 {
 public:
 	static void runTests(const Stormancer::Tester& tester)
 	{
 		testCreatePartyBadRequest(tester);
-		testCreateParty(tester);
+		testPartyFull(tester);
 	}
 
 private:
@@ -64,12 +66,18 @@ private:
 
 	static void failAfterTimeout(pplx::task_completion_event<void> tce, std::string msg, std::chrono::milliseconds timeout = std::chrono::milliseconds(1000))
 	{
+		failAfterTimeout(tce, [msg] { return msg; }, timeout);
+	}
+
+	static void failAfterTimeout(pplx::task_completion_event<void> tce, std::function<std::string()> msgBuilder, std::chrono::milliseconds timeout = std::chrono::milliseconds(1000))
+	{
 		auto timeoutCt = Stormancer::timeout(timeout);
-		timeoutCt.register_callback([tce, msg]
+		timeoutCt.register_callback([tce, msgBuilder]
 		{
-			tce.set_exception(std::runtime_error(msg));
+			tce.set_exception(std::runtime_error(msgBuilder().c_str()));
 		});
 	}
+
 
 	template<typename T>
 	static pplx::task<T> taskFailAfterTimeout(pplx::task<T> task, std::string msg, std::chrono::milliseconds timeout = std::chrono::milliseconds(1000))
@@ -108,13 +116,27 @@ private:
 		throw std::runtime_error("createParty should have failed because of bad request");
 	}
 
-	static void testCreateParty(const Stormancer::Tester& tester)
+	static void testPartyFull(const Stormancer::Tester& tester)
 	{
 		using namespace Stormancer;
 		using namespace TestHelpers;
 
 		auto clients = makeClients(tester, 2).get();
-		auto client = clients[0];
+
+		tester.logger()->log(LogLevel::Info, "TestParty", "testCreateParty");
+		testCreateParty(clients[0]).get();
+		tester.logger()->log(LogLevel::Info, "TestParty", "testCreateParty PASSED");
+
+		tester.logger()->log(LogLevel::Info, "TestParty", "testInvitation");
+		testInvitation(clients[0], clients[1]).get();
+		tester.logger()->log(LogLevel::Info, "TestParty", "testInvitation PASSED");
+	}
+
+	static pplx::task<void> testCreateParty(std::shared_ptr<Stormancer::IClient> client)
+	{
+		using namespace Stormancer;
+		using namespace TestHelpers;
+
 		auto party = client->dependencyResolver().resolve<Party::PartyApi>();
 		auto users = client->dependencyResolver().resolve<AuthenticationService>();
 
@@ -128,50 +150,20 @@ private:
 		{
 			joinedSubTce.set();
 		});
-		SelfObservingTask<void> checkSettingsTask(testSettingsValidityOnPartyJoined(party, users, request));
-		SelfObservingTask<void> checkMembersTask(testMembersValidityOnPartyJoined(party, users));
+		SelfObservingTask<void> joinedSubTask = pplx::create_task(joinedSubTce).then([subJoined] {});
+		SelfObservingTask<void> checkSettingsTask = testSettingsValidityOnPartyJoined(party, users, request);
 
-		party->createParty(request).get();
-
-		assertex(party->isInParty(), "I should be in a party after a successful createParty");
-		assertex(party->getPendingInvitations().empty(), "Pending invitations should be empty");
-		
-		failAfterTimeout(joinedSubTce, "OnJoinedParty subscription was not triggered in time");
-		SelfObservingTask<void> joinedSubTask(pplx::create_task(joinedSubTce));
-		auto creationCheckTasks = { joinedSubTask.task, checkSettingsTask.task, checkMembersTask.task };
-		pplx::when_all(creationCheckTasks.begin(), creationCheckTasks.end()).get();
-
-		auto client2 = clients[1];
-		auto party2 = client2->dependencyResolver().resolve<Party::PartyApi>();
-
-		auto senderId = users->userId();
-		pplx::task_completion_event<void> inviteReceivedTce;
-		auto party2inviteSub = party2->subscribeOnInvitationReceived([inviteReceivedTce, senderId](Party::PartyInvitation invite)
+		return party->createParty(request).then([=]
 		{
-			if (invite.UserId != senderId)
-			{
-				inviteReceivedTce.set_exception(std::runtime_error("Bad sender Id: " + invite.UserId + ", should be " + senderId));
-			}
-			else
-			{
-				inviteReceivedTce.set();
-			}
+			assertex(party->isInParty(), "I should be in a party after a successful createParty");
+			assertex(party->getPendingInvitations().empty(), "Pending invitations should be empty");
+
+			failAfterTimeout(joinedSubTce, "OnJoinedParty subscription was not triggered in time");
+			SelfObservingTask<void> checkMembersTask = testMembersValidityOnPartyJoined(party, users);
+
+			auto creationCheckTasks = { *joinedSubTask, *checkSettingsTask, *checkMembersTask };
+			return pplx::when_all(creationCheckTasks.begin(), creationCheckTasks.end());
 		});
-
-		SelfObservingTask<void> inviteTask(party->invitePlayer(client2->dependencyResolver().resolve<AuthenticationService>()->userId()));
-
-		failAfterTimeout(inviteReceivedTce, "invite was not received on time");
-		pplx::create_task(inviteReceivedTce).get();
-
-		auto invites = party2->getPendingInvitations();
-		assertex(invites.size() == 1, "User 2 should have only 1 invite");
-
-		SelfObservingTask<void> countUpdateTest = testMemberCountUpdate({ party, party2 }, 2);
-		
-		party2->joinParty(invites[0]).get();
-		tester.logger()->log(LogLevel::Info, "TestParty", "Waiting for invite completion...");
-		taskFailAfterTimeout(inviteTask.task, "Invitation task should have completed after invitee joined the party", std::chrono::seconds(5)).get();
-		countUpdateTest.task.get();
 	}
 
 	static pplx::task<void> testSettingsValidityOnPartyJoined(std::shared_ptr<Stormancer::Party::PartyApi> party,
@@ -201,19 +193,12 @@ private:
 	{
 		using namespace Stormancer;
 
-		pplx::task_completion_event<void> tce;
-		auto sub = party->subscribeOnUpdatedPartyMembers([tce, party, users](std::vector<Party::PartyUserDto>)
-		{
-			auto members = party->getPartyMembers();
-			assertex(members.size() == 1, "there should be exactly 1 member ; currently there is " + std::to_string(members.size()), tce);
-			assertex(members[0].userId == users->userId(), "the member's Id should be my Id ; instead, it is " + members[0].userId, tce);
-			assertex(members[0].isLeader == true, "I should be the leader", tce);
-			assertex(members[0].partyUserStatus == Party::PartyUserStatus::NotReady, "My status should be NotReady", tce);
-			tce.set();
-		});
+		Party::PartyUserDto expectedMember{};
+		expectedMember.isLeader = true;
+		expectedMember.partyUserStatus = Party::PartyUserStatus::NotReady;
+		expectedMember.userId = users->userId();
 
-		failAfterTimeout(tce, "PartyMembers update was not received in time", std::chrono::seconds(5));
-		return pplx::create_task(tce).then([sub] {});
+		return awaitMembersConsistency(party, { expectedMember });
 	}
 
 	static pplx::task<void> testMemberCountUpdate(std::vector<std::shared_ptr<Stormancer::Party::PartyApi>> parties, int expectedCount)
@@ -232,10 +217,6 @@ private:
 				{
 					tce.set();
 				}
-				else
-				{
-					tce.set_exception(std::runtime_error("Bad member count: got " + std::to_string(members.size()) + ", should be " + std::to_string(expectedCount)));
-				}
 			}));
 			failAfterTimeout(tce, "did not get member count update in time", std::chrono::seconds(2));
 		}
@@ -253,7 +234,134 @@ private:
 				throw;
 			}
 		});
+	}
 
+	static std::string memberToString(const Stormancer::Party::PartyUserDto& member)
+	{
+		using namespace Stormancer;
+
+		std::stringstream ss;
+		ss << "{\n";
+		ss << "\tuserId: " << member.userId << "\n";
+		ss << "\tisReady: " << (member.partyUserStatus == Party::PartyUserStatus::Ready ? "true" : "false") << "\n";
+		ss << "\tisLeader: " << member.isLeader << "\n";
+		ss << "\tuserData: " << member.userData << "\n";
+		ss << "}";
+
+		return ss.str();
+	}
+
+	static std::string membersToString(const std::vector<Stormancer::Party::PartyUserDto>& members)
+	{
+		using namespace Stormancer;
+
+		std::stringstream ss;
+		for (const auto& member : members)
+		{
+			ss << memberToString(member) << "\n";
+		}
+
+		return ss.str();
+	}
+
+	static pplx::task<void> awaitMembersConsistency(std::shared_ptr<Stormancer::Party::PartyApi> party, const std::vector<Stormancer::Party::PartyUserDto>& expectedMembers)
+	{
+		using namespace Stormancer;
+
+		pplx::task_completion_event<void> tce;
+		auto sub = party->subscribeOnUpdatedPartyMembers([tce, expectedMembers](std::vector<Party::PartyUserDto> members)
+		{
+			if (membersAreEqual(members, expectedMembers))
+			{
+				tce.set();
+			}
+		});
+
+		if (membersAreEqual(party->getPartyMembers(), expectedMembers))
+		{
+			tce.set();
+			sub->unsubscribe();
+		}
+
+		failAfterTimeout(tce, [party, expectedMembers]
+		{
+			std::stringstream ss;
+			ss << "Members are not consistent with what was expected.\n";
+			ss << "Expected Members:\n";
+			ss << membersToString(expectedMembers);
+			ss << "Actual Members:\n";
+			ss << membersToString(party->getPartyMembers());
+			return ss.str();
+		}, std::chrono::seconds(3));
+
+		return pplx::create_task(tce).then([sub] {});
+	}
+
+	static bool membersAreEqual(const std::vector<Stormancer::Party::PartyUserDto>& members, const std::vector<Stormancer::Party::PartyUserDto>& expectedMembers)
+	{
+		if (members.size() != expectedMembers.size())
+		{
+			return false;
+		}
+
+		for (const auto& expectedMember : expectedMembers)
+		{
+			auto memberIt = std::find_if(members.begin(), members.end(), [&expectedMember](const auto& member) { return expectedMember.userId == member.userId; });
+			if (memberIt == members.end())
+			{
+				return false;
+			}
+			if (
+				memberIt->isLeader != expectedMember.isLeader ||
+				memberIt->partyUserStatus != expectedMember.partyUserStatus ||
+				memberIt->userData != expectedMember.userData
+				)
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	static pplx::task<void> testInvitation(std::shared_ptr<Stormancer::IClient> sender, std::shared_ptr<Stormancer::IClient> recipient)
+	{
+		using namespace Stormancer;
+		using namespace TestHelpers;
+
+		auto senderUsers = sender->dependencyResolver().resolve<AuthenticationService>();
+		auto senderId = senderUsers->userId();
+		auto party = sender->dependencyResolver().resolve<Party::PartyApi>();
+		auto party2 = recipient->dependencyResolver().resolve<Party::PartyApi>();
+
+		pplx::task_completion_event<void> inviteReceivedTce;
+		auto party2inviteSub = party2->subscribeOnInvitationReceived([inviteReceivedTce, senderId](Party::PartyInvitation invite)
+		{
+			if (invite.UserId != senderId)
+			{
+				inviteReceivedTce.set_exception(std::runtime_error("Bad sender Id: " + invite.UserId + ", should be " + senderId));
+			}
+			else
+			{
+				inviteReceivedTce.set();
+			}
+		});
+
+		SelfObservingTask<void> inviteTask(party->invitePlayer(recipient->dependencyResolver().resolve<AuthenticationService>()->userId()));
+
+		failAfterTimeout(inviteReceivedTce, "invite was not received on time");
+		return pplx::create_task(inviteReceivedTce).then([=]
+		{
+			party2inviteSub->unsubscribe();
+			auto invites = party2->getPendingInvitations();
+			assertex(invites.size() == 1, "User 2 should have only 1 invite");
+
+			return party2->joinParty(invites[0]);
+		})
+			.then([=]
+		{
+			return taskFailAfterTimeout(*inviteTask, "Invitation task should have completed after invitee joined the party", std::chrono::seconds(5));
+		});
 	}
 
 	static pplx::task<void> testSettingsUpdate(std::vector<std::shared_ptr<Stormancer::IClient>> clients)

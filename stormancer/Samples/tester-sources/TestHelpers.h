@@ -26,7 +26,7 @@ namespace TestHelpers
 			return &task;
 		}
 
-		pplx::task<T>& operator*()
+		pplx::task<T> operator*() const
 		{
 			return task;
 		}
