@@ -390,7 +390,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameSession\Gamesessions.hpp">
       <Filter>public\GameSession</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Steam\SteamPlugin.hpp">
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Steam\Steam.hpp">
       <Filter>public\Steam</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Users\Users.hpp">

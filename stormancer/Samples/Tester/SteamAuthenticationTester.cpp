@@ -1,6 +1,6 @@
 #include "IAuthenticationTester.h"
 #include "test.h"
-#include "Steam/SteamPlugin.hpp"
+#include "Steam/Steam.hpp"
 #include "Users/Users.hpp"
 #include <exception>
 #include <vector>
