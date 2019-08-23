@@ -516,24 +516,25 @@ namespace Stormancer
 						catch (...) {}
 					});
 
+					auto token = _gameFinderConnectionCts.get_token();
 					std::weak_ptr<PartyService> wThat = this->shared_from_this();
-					_gameFinderConnectionTask = _gameFinderConnectionTask.then([wThat, newGameFinderName](pplx::task<void> task)
+					_gameFinderConnectionTask = _gameFinderConnectionTask.then([wThat, newGameFinderName, token](pplx::task<void> task)
 					{
 						// I want to recover from cancellation, but not from error, since error means we're leaving the party
 						task.wait();
 
 						auto that = wThat.lock();
-						if (!that || pplx::is_task_cancellation_requested())
+						if (!that || token.is_canceled())
 						{
 							pplx::cancel_current_task();
 						}
 
 						return that->_gameFinder->connectToGameFinder(newGameFinderName);
-					}, _gameFinderConnectionCts.get_token())
-						.then([wThat, newGameFinderName]
+					}, token)
+						.then([wThat, newGameFinderName, token]
 					{
 						auto that = wThat.lock();
-						if (!that || pplx::is_task_cancellation_requested())
+						if (!that || token.is_canceled())
 						{
 							pplx::cancel_current_task();
 						}
