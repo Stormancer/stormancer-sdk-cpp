@@ -343,30 +343,26 @@ namespace Stormancer
 
 					// When setting our status to Ready, we need to account for the case when the settings change during the ready RPC
 					std::weak_ptr<PartyService> wThat = this->shared_from_this();
-					return _gameFinderConnectionTask.then([newStatus, wThat](pplx::task<void> task)
+					auto currentGameFinder = _settings.gameFinderName;
+					return _gameFinderConnectionTask.then([newStatus, wThat, currentGameFinder](pplx::task<void> task)
 					{
-						auto that = wThat.lock();
-						try
+						// I let GameFinder connection errors propagate as unspecified errors to the caller.
+						// I don't see any good in creating a specific error type for these, since they most likely mean there's a bug
+						task.wait();
+
+						if (auto that = wThat.lock())
 						{
-							auto status = task.wait();
-							if (status == pplx::canceled)
+							std::lock_guard<std::recursive_mutex> lg(that->_stateMutex);
+
+							if (currentGameFinder != that->_settings.gameFinderName)
 							{
-								return pplx::task_from_exception<void>(std::runtime_error(PartyError::Str::SettingsUpdated));
+								throw std::runtime_error(PartyError::Str::SettingsUpdated);
 							}
-							if (that)
-							{
-								return that->_rpcService->rpc<void>("party.updategamefinderplayerstatus", newStatus);
-							}
-							else
-							{
-								pplx::cancel_current_task();
-							}
+
+							return that->_rpcService->rpc<void>("party.updategamefinderplayerstatus", newStatus);
 						}
-						catch (...)
-						{
-							// Error connecting to the game finder ; we're about to leave the party
-							pplx::cancel_current_task();
-						}
+
+						return pplx::task_from_result();
 					});
 				}
 
@@ -510,7 +506,7 @@ namespace Stormancer
 					_gameFinderConnectionCts = pplx::cancellation_token_source();
 
 					// No need to wait for the old GF disconnection before connecting to the new GF
-					_gameFinder->disconnectFromGameFinder(_settings.gameFinderName).then([](pplx::task<void> task)
+					_gameFinder->disconnectFromGameFinder(oldGameFinderName).then([](pplx::task<void> task)
 					{
 						try { task.get(); }
 						catch (...) {}
@@ -531,47 +527,32 @@ namespace Stormancer
 
 						return that->_gameFinder->connectToGameFinder(newGameFinderName);
 					}, token)
-						.then([wThat, newGameFinderName, token]
-					{
-						auto that = wThat.lock();
-						if (!that || token.is_canceled())
-						{
-							pplx::cancel_current_task();
-						}
-
-						that->_logger->log(LogLevel::Trace, "PartyService", "Connected to the GameFinder", newGameFinderName);
-					})
 						.then([wThat, newGameFinderName](pplx::task<void> task)
 					{
 						auto that = wThat.lock();
 						try
 						{
 							auto status = task.wait();
-							if (status == pplx::canceled)
+							if (that && status == pplx::completed)
 							{
-								if (that)
-								{
-									that->_logger->log(LogLevel::Trace, "PartyService", "Connection to the GameFinder was canceled", newGameFinderName);
-								}
-								pplx::cancel_current_task();
+								that->_logger->log(LogLevel::Trace, "PartyService", "Connected to the GameFinder", newGameFinderName);
 							}
 						}
 						catch (const std::exception& ex)
 						{
 							if (that)
 							{
+								that->_logger->log(LogLevel::Error, "PartyService", "Error connecting to the GameFinder '" + newGameFinderName + "'", ex);
 								if (auto scene = that->_scene.lock())
 								{
-									that->_logger->log(LogLevel::Error, "PartyService", "Error connecting to the GameFinder '"+ newGameFinderName +"' ; now leaving the party", ex);
-									scene->disconnect().then([](pplx::task<void> t) { try { t.get(); } catch (...) {} });
-
 									std::lock_guard<std::recursive_mutex> lg(that->_stateMutex);
+									scene->disconnect().then([](pplx::task<void> t) { try { t.get(); } catch (...) {}});
 									that->_scene.reset();
 								}
 							}
 							throw;
 						}
-					});
+					}, token);
 				}
 
 				void setNewLocalSettings(const PartySettings& partySettingsDto)

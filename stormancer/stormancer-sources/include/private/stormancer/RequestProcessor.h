@@ -128,6 +128,7 @@ namespace Stormancer
 		std::unordered_map<byte, std::function<pplx::task<void>(std::shared_ptr<RequestContext>)>> _handlers;
 		Serializer _serializer;
 		int systemRequestChannelUid = 0;
+		uint16 _requestIdCounter = 0;
 
 #pragma endregion
 	};
