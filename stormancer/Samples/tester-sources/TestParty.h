@@ -121,7 +121,7 @@ private:
 		using namespace Stormancer;
 		using namespace TestHelpers;
 
-		auto clients = makeClients(tester, 10).get();
+		auto clients = makeClients(tester, 15).get();
 
 		tester.logger()->log(LogLevel::Info, "TestParty", "testCreateParty");
 		testCreateParty(clients[0]).get();
@@ -238,6 +238,7 @@ private:
 
 		pplx::task_completion_event<void> tce;
 		auto party = client->dependencyResolver().resolve<Party::PartyApi>();
+		auto userId = client->dependencyResolver().resolve<AuthenticationService>();
 		auto sub = party->subscribeOnUpdatedPartyMembers([tce, expectedMembers](std::vector<Party::PartyUserDto> members)
 		{
 			if (membersAreEqual(members, expectedMembers))
@@ -259,7 +260,14 @@ private:
 			ss << "Expected Members:\n";
 			ss << membersToString(expectedMembers);
 			ss << "Actual Members:\n";
-			ss << membersToString(party->getPartyMembers());
+			if (party->isInParty())
+			{
+				ss << membersToString(party->getPartyMembers());
+			}
+			else
+			{
+				ss << "(not connected to party)\n";
+			}
 			return ss.str();
 		}, timeout);
 
@@ -316,20 +324,34 @@ private:
 			}
 		});
 
-		SelfObservingTask<void> inviteTask(party->invitePlayer(recipient->dependencyResolver().resolve<AuthenticationService>()->userId()));
+		auto recipientId = recipient->dependencyResolver().resolve<AuthenticationService>()->userId();
+		auto inviteTask = party->invitePlayer(recipientId);
 
-		failAfterTimeout(inviteReceivedTce, "invite was not received on time");
+		failAfterTimeout(inviteReceivedTce, "invite was not received on time by user "+recipientId);
 		return pplx::create_task(inviteReceivedTce).then([=]
 		{
 			party2inviteSub->unsubscribe();
 			auto invites = party2->getPendingInvitations();
-			assertex(invites.size() == 1, "User 2 should have only 1 invite");
+			assertex(invites.size() == 1, "User " + recipientId + " should have only 1 invite");
 
-			return party2->joinParty(invites[0]);
+			recipient->dependencyResolver().resolve<ILogger>()->log(LogLevel::Debug, "testInvitation", "User connecting to party", recipientId);
+			return taskFailAfterTimeout(party2->joinParty(invites[0]), "JoinParty did not complete in time for user "+recipientId, std::chrono::seconds(5));
 		})
-			.then([=]
+			.then([=](pplx::task<void> task)
 		{
-			return taskFailAfterTimeout(*inviteTask, "Invitation task should have completed after invitee joined the party", std::chrono::seconds(5));
+			// debug help
+			auto sender2 = sender;
+			auto recpt = recipient;
+			try
+			{
+				task.get();
+				return taskFailAfterTimeout(inviteTask, "Invitation task should have completed for "+senderId+" after invitee ("+recipientId+") joined the party");
+			}
+			catch (...)
+			{
+				inviteTask.then([](pplx::task<void> t) { try { t.get(); } catch (...) {} });
+				throw;
+			}
 		});
 	}
 
@@ -363,18 +385,18 @@ private:
 		auto logger = tester.logger();
 		for (auto client = recipientsFirst; client != recipientsEnd; client++)
 		{
-			auto clientId = (*client)->dependencyResolver().resolve<AuthenticationService>()->userId();
+			auto clientId = (*client)->dependencyResolver().template resolve<AuthenticationService>()->userId();
 			tasks.push_back(testInvitation(sender, *client).then([logger, clientId]
 			{
 				logger->log(LogLevel::Debug, "testInvitations", "Invite complete", clientId);
 			}));
-			tasks.push_back(awaitMembersConsistency(*client, users, std::chrono::seconds(10)).then([logger, clientId]
+			tasks.push_back(awaitMembersConsistency(*client, users, std::chrono::seconds(15)).then([logger, clientId]
 			{
 				logger->log(LogLevel::Debug, "testInvitations", "MemberConsistency complete recipient", clientId);
 			}));
 		}
 		auto senderId = sender->dependencyResolver().resolve<AuthenticationService>()->userId();
-		tasks.push_back(awaitMembersConsistency(sender, users, std::chrono::seconds(10)).then([logger, senderId]
+		tasks.push_back(awaitMembersConsistency(sender, users, std::chrono::seconds(15)).then([logger, senderId]
 		{
 			logger->log(LogLevel::Debug, "testInvitations", "MemberConsistency complete sender", senderId);
 		}));

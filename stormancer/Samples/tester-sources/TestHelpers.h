@@ -1,4 +1,6 @@
 #pragma once
+#include <memory>
+#include "stormancer/Tasks.h"
 
 namespace TestHelpers
 {
@@ -6,29 +8,38 @@ namespace TestHelpers
 	class SelfObservingTask
 	{
 	public:
-		SelfObservingTask(pplx::task<T> task) : task(task) {}
-		~SelfObservingTask()
-		{
-			task.then([](pplx::task<T> t)
-			{
-				try
-				{
-					t.get();
-				}
-				catch (...) {}
-			});
-		}
-
-		pplx::task<T> task;
+		SelfObservingTask(pplx::task<T> task) : _impl(std::make_shared<impl>(task)) {}
 
 		pplx::task<T>* operator->()
 		{
-			return &task;
+			return &(_impl->task);
 		}
 
 		pplx::task<T> operator*() const
 		{
-			return task;
+			return _impl->task;
 		}
+
+	private:
+		struct impl
+		{
+			pplx::task<T> task;
+
+			impl(pplx::task<T> task) : task(task) {}
+
+			~impl()
+			{
+				task.then([](pplx::task<T> t)
+				{
+					try
+					{
+						t.get();
+					}
+					catch (...) {}
+				});
+			}
+		};
+
+		std::shared_ptr<impl> _impl;
 	};
 }
