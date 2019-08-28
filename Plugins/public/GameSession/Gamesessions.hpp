@@ -1,5 +1,5 @@
 #pragma once
-#include "Authentication/AuthenticationService.h"
+#include "Users/Users.hpp"
 #include "stormancer/IPlugin.h"
 #include "stormancer/msgpack_define.h"
 #include "stormancer/ITokenHandler.h"

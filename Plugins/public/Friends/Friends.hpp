@@ -2,13 +2,13 @@
 
 #include "stormancer/StormancerTypes.h"
 #include "stormancer/msgpack_define.h"
-#include "stormancer/ClientAPI.h"
+#include "Users/ClientAPI.hpp"
 #include "stormancer/Event.h"
 #include "stormancer/Tasks.h"
 #include "stormancer/IPlugin.h"
 #include "stormancer/Scene.h"
 #include "stormancer/Utilities/PointerUtilities.h"
-#include "Authentication/AuthenticationService.h"
+//#include "Users/Users.hpp"
 #include <unordered_map>
 #include <functional>
 #include <string>
@@ -238,8 +238,8 @@ namespace Stormancer
 		{
 		public:
 
-			Friends_Impl(std::weak_ptr<AuthenticationService> auth, std::vector<std::shared_ptr<IFriendsEventHandler>> friendsEventHandlers)
-				: ClientAPI(auth)
+			Friends_Impl(std::weak_ptr<Users::UsersApi> users, std::vector<std::shared_ptr<IFriendsEventHandler>> friendsEventHandlers)
+				: ClientAPI(users)
 				, _friendsEventHandlers(friendsEventHandlers)
 			{
 			}
@@ -337,7 +337,7 @@ namespace Stormancer
 
 			void registerClientDependencies(ContainerBuilder& builder) override
 			{
-				builder.registerDependency<Friends_Impl, AuthenticationService, ContainerBuilder::All<IFriendsEventHandler>>().as<Friends>().singleInstance();
+				builder.registerDependency<Friends_Impl, Users::UsersApi, ContainerBuilder::All<IFriendsEventHandler>>().as<Friends>().singleInstance();
 			}
 		};
 	}

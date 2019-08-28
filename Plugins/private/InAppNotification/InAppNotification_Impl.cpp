@@ -8,18 +8,18 @@
 
 namespace Stormancer
 {
-	InAppNotification_Impl::InAppNotification_Impl(std::weak_ptr<AuthenticationService> auth, std::shared_ptr<ILogger> logger)
-		: ClientAPI(auth)
-		, _auth(auth)
+	InAppNotification_Impl::InAppNotification_Impl(std::weak_ptr<Users::UsersApi> users, std::shared_ptr<ILogger> logger)
+		: ClientAPI(users)
+		, _users(users)
 		, _logger(logger)
 	{
 	}
 
 	void InAppNotification_Impl::initialize()
 	{
-		auto auth = _auth.lock();
+		auto users = _users.lock();
 
-		if (!auth)
+		if (!users)
 		{
 			_logger->log(LogLevel::Error, "InAppNotification", "Can't initialize InAppNotification : Authentication service destroyed.");
 			return;
@@ -27,7 +27,7 @@ namespace Stormancer
 
 		auto logger = _logger;
 		std::weak_ptr<InAppNotification_Impl> wNotifications = this->shared_from_this();
-		_notificationContainerTask = auth->getSceneForService("stormancer.plugins.notifications")
+		_notificationContainerTask = users->getSceneForService("stormancer.plugins.notifications")
 			.then([wNotifications](std::shared_ptr<Scene> scene)
 		{
 			auto notifications = wNotifications.lock();

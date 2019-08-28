@@ -4,10 +4,9 @@
 #include "stormancer/msgpack_define.h"
 #include "stormancer/StormancerTypes.h"
 #include "stormancer/Scene.h"
-#include "stormancer/ClientAPI.h"
+#include "Users/ClientAPI.hpp"
 #include "Users/Users.hpp"
 #include "GameFinder/GameFinder.h"
-#include "Authentication/AuthenticationService.h" // TODO replace with Users
 #include <string>
 #include <unordered_map>
 
@@ -295,7 +294,7 @@ namespace Stormancer
 					, _logger(scene.lock()->dependencyResolver().resolve<ILogger>())
 					, _rpcService(_scene.lock()->dependencyResolver().resolve<RpcService>())
 					, _gameFinder(scene.lock()->dependencyResolver().resolve<GameFinder>())
-					, _myUserId(scene.lock()->dependencyResolver().resolve<AuthenticationService>()->userId())
+					, _myUserId(scene.lock()->dependencyResolver().resolve<Users::UsersApi>()->userId())
 				{}
 
 				~PartyService()
@@ -660,7 +659,7 @@ namespace Stormancer
 
 				bool isLeader() const
 				{
-					return (settings().leaderId == _partyScene->dependencyResolver().resolve<AuthenticationService>()->userId());
+					return (settings().leaderId == _partyScene->dependencyResolver().resolve<Users::UsersApi>()->userId());
 				}
 
 				std::shared_ptr<Scene> getScene() const { return _partyScene; }
@@ -747,11 +746,11 @@ namespace Stormancer
 			public:
 
 				Party_Impl(
-					std::weak_ptr<AuthenticationService> auth,
+					std::weak_ptr<Users::UsersApi> users,
 					std::weak_ptr<ILogger> logger,
 					std::shared_ptr<IActionDispatcher> dispatcher
 				)
-					: ClientAPI(auth)
+					: ClientAPI(users)
 					, _logger(logger)
 					, _dispatcher(dispatcher)
 				{}
@@ -762,8 +761,8 @@ namespace Stormancer
 					{
 						return pplx::task_from_exception<void>(std::runtime_error(PartyError::Str::AlreadyInParty));
 					}
-					auto auth = _auth.lock();
-					if (!auth)
+					auto users = _users.lock();
+					if (!users)
 					{
 						return pplx::task_from_exception<void>(std::runtime_error("destroyed"));
 					}
@@ -846,7 +845,7 @@ namespace Stormancer
 					}
 
 					auto wThat = this->weak_from_this();
-					return _auth.lock()->getSceneConnectionToken("stormancer.plugins.party", invitation.SceneId, pplx::cancellation_token::none())
+					return _users.lock()->getSceneConnectionToken("stormancer.plugins.party", invitation.SceneId, pplx::cancellation_token::none())
 						.then([wThat](std::string token)
 					{
 						if (auto that = wThat.lock())
@@ -1006,13 +1005,13 @@ namespace Stormancer
 						return pplx::task_from_exception<void>(std::runtime_error(PartyError::Str::NotInParty));
 					}
 
-					auto wAuth = _auth;
+					auto wUsers = _users;
 					auto wThat = this->weak_from_this();
-					return _party->then([wAuth, wThat, recipient, ct](std::shared_ptr<PartyContainer> party)
+					return _party->then([wUsers, wThat, recipient, ct](std::shared_ptr<PartyContainer> party)
 					{
-						auto auth = wAuth.lock();
+						auto users = wUsers.lock();
 						auto that = wThat.lock();
-						if (!auth || !that)
+						if (!users || !that)
 						{
 							return pplx::task_from_result();
 						}
@@ -1024,7 +1023,7 @@ namespace Stormancer
 						party->registerInvitationRequest(recipient, cts);
 
 						std::weak_ptr<PartyContainer> wParty(party);
-						auto requestTask = auth->sendRequestToUser<void>(recipient, "party.invite", cts.get_token(), partyId)
+						auto requestTask = users->sendRequestToUser<void>(recipient, "party.invite", cts.get_token(), partyId)
 							.then([recipient, wParty]
 						{
 							if (auto party = wParty.lock())
@@ -1091,7 +1090,7 @@ namespace Stormancer
 				void initialize()
 				{
 					auto wThat = this->weak_from_this();
-					_auth.lock()->SetOperationHandler("party.invite", [wThat](OperationCtx& ctx)
+					_users.lock()->setOperationHandler("party.invite", [wThat](Users::OperationCtx& ctx)
 					{
 						if (auto that = wThat.lock())
 						{
@@ -1123,10 +1122,10 @@ namespace Stormancer
 
 				pplx::task<std::shared_ptr<PartyContainer>> getPartySceneByToken(const std::string& token)
 				{
-					auto auth = _auth.lock();
+					auto users = _users.lock();
 					auto wPartyManagement = this->weak_from_this();
 
-					return auth->connectToPrivateSceneByToken(token).then([wPartyManagement](std::shared_ptr<Scene> scene)
+					return users->connectToPrivateSceneByToken(token).then([wPartyManagement](std::shared_ptr<Scene> scene)
 					{
 						auto pManagement = wPartyManagement.lock();
 						if (!pManagement)
@@ -1198,7 +1197,7 @@ namespace Stormancer
 					return partyService->waitForPartyReady().then([party] { return party; });
 				}
 
-				pplx::task<void> invitationHandler(OperationCtx& ctx)
+				pplx::task<void> invitationHandler(Users::OperationCtx& ctx)
 				{
 					Serializer serializer;
 					auto senderId = ctx.originId;
@@ -1279,7 +1278,7 @@ namespace Stormancer
 			{
 				builder.registerDependency<PartyApi>([](const DependencyScope& dr) {
 					auto partyImpl = std::make_shared<details::Party_Impl>(
-						dr.resolve<AuthenticationService>(),
+						dr.resolve<Users::UsersApi>(),
 						dr.resolve<ILogger>(),
 						dr.resolve<IActionDispatcher>()
 					);

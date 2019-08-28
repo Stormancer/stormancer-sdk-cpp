@@ -4,7 +4,7 @@
 namespace Helloworld
 {
 
-	Hello::Hello(std::weak_ptr<Stormancer::AuthenticationService> auth) : Stormancer::ClientAPI<Hello>(auth) {}
+	Hello::Hello(std::weak_ptr<Stormancer::Users::UsersApi> users) : Stormancer::ClientAPI<Hello>(users) {}
 
 	pplx::task<std::string> Hello::world(std::string name)
 	{

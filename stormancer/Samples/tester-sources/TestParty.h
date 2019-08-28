@@ -1,7 +1,7 @@
 #pragma once
 #include "test.h"
 #include "Party/Party.hpp"
-#include "Authentication/AuthenticationPlugin.h"
+#include "Users/Users.hpp"
 #include "GameFinder/GameFinderPlugin.h"
 #include "stormancer/Utilities/TaskUtilities.h"
 #include "TestHelpers.h"
@@ -25,18 +25,18 @@ private:
 
 		auto conf = Configuration::create(tester.endpoint(), tester.account(), tester.application());
 		conf->logger = tester.logger();
-		conf->addPlugin(new AuthenticationPlugin);
+		conf->addPlugin(new Users::UsersPlugin);
 		conf->addPlugin(new GameFinderPlugin);
 		conf->addPlugin(new Party::PartyPlugin);
 
 		auto client = IClient::create(conf);
-		auto users = client->dependencyResolver().resolve<AuthenticationService>();
+		auto users = client->dependencyResolver().resolve<Users::UsersApi>();
 		users->getCredentialsCallback = []
 		{
-			AuthParameters params;
+			Users::AuthParameters params;
 			params.type = "test";
 			params.parameters["testkey"] = "testvalue";
-			return pplx::task_from_result<AuthParameters>(params);
+			return pplx::task_from_result<Users::AuthParameters>(params);
 		};
 		return users->login().then([client] { return client; });
 	}
@@ -138,7 +138,7 @@ private:
 		using namespace TestHelpers;
 
 		auto party = client->dependencyResolver().resolve<Party::PartyApi>();
-		auto users = client->dependencyResolver().resolve<AuthenticationService>();
+		auto users = client->dependencyResolver().resolve<Users::UsersApi>();
 
 		Party::PartyRequestDto request = {};
 		request.platformSessionId = ""; // This will make a guid
@@ -167,7 +167,7 @@ private:
 	}
 
 	static pplx::task<void> testSettingsValidityOnPartyJoined(std::shared_ptr<Stormancer::Party::PartyApi> party,
-		std::shared_ptr<Stormancer::AuthenticationService> users,
+		std::shared_ptr<Stormancer::Users::UsersApi> users,
 		const Stormancer::Party::PartyRequestDto& request
 	)
 	{
@@ -192,7 +192,7 @@ private:
 		using namespace Stormancer;
 
 		auto party = client->dependencyResolver().resolve<Party::PartyApi>();
-		auto users = client->dependencyResolver().resolve<AuthenticationService>();
+		auto users = client->dependencyResolver().resolve<Users::UsersApi>();
 
 		Party::PartyUserDto expectedMember{};
 		expectedMember.isLeader = true;
@@ -238,7 +238,7 @@ private:
 
 		pplx::task_completion_event<void> tce;
 		auto party = client->dependencyResolver().resolve<Party::PartyApi>();
-		auto userId = client->dependencyResolver().resolve<AuthenticationService>();
+		auto userId = client->dependencyResolver().resolve<Users::UsersApi>();
 		auto sub = party->subscribeOnUpdatedPartyMembers([tce, expectedMembers](std::vector<Party::PartyUserDto> members)
 		{
 			if (membersAreEqual(members, expectedMembers))
@@ -306,7 +306,7 @@ private:
 		using namespace Stormancer;
 		using namespace TestHelpers;
 
-		auto senderUsers = sender->dependencyResolver().resolve<AuthenticationService>();
+		auto senderUsers = sender->dependencyResolver().resolve<Users::UsersApi>();
 		auto senderId = senderUsers->userId();
 		auto party = sender->dependencyResolver().resolve<Party::PartyApi>();
 		auto party2 = recipient->dependencyResolver().resolve<Party::PartyApi>();
@@ -324,7 +324,7 @@ private:
 			}
 		});
 
-		auto recipientId = recipient->dependencyResolver().resolve<AuthenticationService>()->userId();
+		auto recipientId = recipient->dependencyResolver().resolve<Users::UsersApi>()->userId();
 		auto inviteTask = party->invitePlayer(recipientId);
 
 		failAfterTimeout(inviteReceivedTce, "invite was not received on time by user "+recipientId);
@@ -362,7 +362,7 @@ private:
 		Party::PartyUserDto dto = {};
 		dto.isLeader = isLeader;
 		dto.partyUserStatus = Party::PartyUserStatus::NotReady;
-		dto.userId = user->dependencyResolver().resolve<AuthenticationService>()->userId();
+		dto.userId = user->dependencyResolver().resolve<Users::UsersApi>()->userId();
 
 		return dto;
 	}
@@ -385,7 +385,7 @@ private:
 		auto logger = tester.logger();
 		for (auto client = recipientsFirst; client != recipientsEnd; client++)
 		{
-			auto clientId = (*client)->dependencyResolver().template resolve<AuthenticationService>()->userId();
+			auto clientId = (*client)->dependencyResolver().template resolve<Users::UsersApi>()->userId();
 			tasks.push_back(testInvitation(sender, *client).then([logger, clientId]
 			{
 				logger->log(LogLevel::Debug, "testInvitations", "Invite complete", clientId);
@@ -395,7 +395,7 @@ private:
 				logger->log(LogLevel::Debug, "testInvitations", "MemberConsistency complete recipient", clientId);
 			}));
 		}
-		auto senderId = sender->dependencyResolver().resolve<AuthenticationService>()->userId();
+		auto senderId = sender->dependencyResolver().resolve<Users::UsersApi>()->userId();
 		tasks.push_back(awaitMembersConsistency(sender, users, std::chrono::seconds(15)).then([logger, senderId]
 		{
 			logger->log(LogLevel::Debug, "testInvitations", "MemberConsistency complete sender", senderId);

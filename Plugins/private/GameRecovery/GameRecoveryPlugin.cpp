@@ -3,7 +3,6 @@
 #endif
 #include "GameRecoveryPlugin.h"
 #include "GameRecovery/GameRecovery.h"
-#include "Authentication/AuthenticationService.h"
 #include "GameRecoveryService.h"
 #include "GameRecovery_Impl.h"
 
@@ -24,6 +23,6 @@ namespace Stormancer
 
 	void GameRecoveryPlugin::registerClientDependencies(ContainerBuilder& builder)
 	{
-		builder.registerDependency<GameRecovery_Impl, AuthenticationService>().as<GameRecovery>().singleInstance();
+		builder.registerDependency<GameRecovery_Impl, Users::UsersApi>().as<GameRecovery>().singleInstance();
 	}
 }

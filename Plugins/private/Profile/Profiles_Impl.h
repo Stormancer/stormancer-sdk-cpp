@@ -1,18 +1,21 @@
 #pragma once
 
-#include "stormancer/ClientAPI.h"
+#include "Users/ClientAPI.hpp"
 #include "Profile/Profiles.h"
 
 namespace Stormancer
 {
 	class ProfileService;
-	class AuthenticationService;
+	namespace Users
+	{
+		class UsersApi;
+	}
 
 	class Profiles_Impl : public ClientAPI<Profiles_Impl>, public Profiles
 	{
 	public:
 
-		Profiles_Impl(std::weak_ptr<AuthenticationService> auth);
+		Profiles_Impl(std::weak_ptr<Users::UsersApi> users);
 		pplx::task<std::unordered_map<std::string, Profile>> getProfiles(const std::list<std::string>& userIds, const std::unordered_map<std::string, std::string>& displayOptions = defaultDisplayOptions) override;
 		pplx::task<Profile> getProfile(const std::string& userId, const std::unordered_map<std::string, std::string>& displayOptions = defaultDisplayOptions) override;
 		pplx::task<void> updateUserHandle(const std::string& userIds) override;

@@ -1,18 +1,21 @@
 #pragma once
 
-#include "stormancer/ClientAPI.h"
+#include "Users/ClientAPI.hpp"
 #include "GameRecovery/GameRecovery.h"
 
 namespace Stormancer
 {
-	class AuthenticationService;
+	namespace Users
+	{
+		class UsersApi;
+	}
 	struct RecoverableGame;
 	class GameRecoveryService;
 
 	class GameRecovery_Impl : public ClientAPI<GameRecovery_Impl>, public GameRecovery
 	{
 	public:
-		GameRecovery_Impl(std::weak_ptr<AuthenticationService> auth);
+		GameRecovery_Impl(std::weak_ptr<Users::UsersApi> users);
 		
 		pplx::task<std::shared_ptr<RecoverableGame>> getCurrent() override;
 

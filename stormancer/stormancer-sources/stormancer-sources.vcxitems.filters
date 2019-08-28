@@ -483,9 +483,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\P2P\P2PDisconnectFromSceneMessage.h">
       <Filter>Header Files\public\P2P</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\ClientAPI.h">
-      <Filter>Header Files\public</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\ConnectionData.h">
       <Filter>Header Files\public</Filter>
     </ClInclude>

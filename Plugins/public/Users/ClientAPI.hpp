@@ -1,7 +1,7 @@
 #pragma once
 
 #include "stormancer/Scene.h"
-#include  "Authentication/AuthenticationService.h"
+#include  "Users/Users.hpp"
 
 namespace Stormancer
 {
@@ -10,7 +10,7 @@ namespace Stormancer
 	{
 	protected:
 
-		ClientAPI(std::weak_ptr<AuthenticationService> auth) : _auth(auth)
+		ClientAPI(std::weak_ptr<Users::UsersApi> users) : _users(users)
 		{
 		}
 
@@ -25,9 +25,9 @@ namespace Stormancer
 			std::function<void(std::shared_ptr<TManager>, std::shared_ptr<Scene>)> cleanup = [](auto that, auto scene) {},
 			std::string name = "")
 		{
-			auto auth = _auth.lock();
+			auto users = _users.lock();
 			std::weak_ptr<TManager> wThat = this->shared_from_this();
-			if (!auth)
+			if (!users)
 			{
 				return pplx::task_from_exception<std::shared_ptr<TService>>(std::runtime_error("destroyed"));
 			}
@@ -35,7 +35,7 @@ namespace Stormancer
 			{
 
 
-				_scene = std::make_shared<pplx::task<std::shared_ptr<Scene>>>(auth->getSceneForService(type, name).then([wThat, cleanup](std::shared_ptr<Scene> scene) {
+				_scene = std::make_shared<pplx::task<std::shared_ptr<Scene>>>(users->getSceneForService(type, name).then([wThat, cleanup](std::shared_ptr<Scene> scene) {
 					auto that = wThat.lock();
 					if (!that)
 					{
@@ -111,7 +111,7 @@ namespace Stormancer
 			});
 		}
 	protected:
-		std::weak_ptr<AuthenticationService> _auth;
+		std::weak_ptr<Users::UsersApi> _users;
 
 	private:
 

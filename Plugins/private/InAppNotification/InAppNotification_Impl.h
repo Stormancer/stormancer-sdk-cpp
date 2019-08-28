@@ -1,11 +1,11 @@
 #pragma once
 
-#include "stormancer/ClientAPI.h"
+#include "Users/ClientAPI.hpp"
 #include "stormancer/Event.h"
 #include "InAppNotification/InAppNotificationManager.h"
 #include "InAppNotification/InAppNotificationModels.h"
 #include "InAppNotification/InAppNotificationService.h"
-#include "Authentication/AuthenticationService.h"
+#include "Users/Users.hpp"
 
 namespace Stormancer
 {
@@ -13,7 +13,7 @@ namespace Stormancer
 	{
 	public:
 
-		InAppNotification_Impl(std::weak_ptr<AuthenticationService> auth, std::shared_ptr<ILogger> logger);		
+		InAppNotification_Impl(std::weak_ptr<Users::UsersApi> users, std::shared_ptr<ILogger> logger);		
 
 		void initialize() override;
 
@@ -27,7 +27,7 @@ namespace Stormancer
 
 		pplx::task<std::shared_ptr<InAppNotificationContainer>> _notificationContainerTask;
 		Event<InAppNotification> _onNotificationReceived;
-		std::weak_ptr<AuthenticationService> _auth;
+		std::weak_ptr<Users::UsersApi> _users;
 		std::shared_ptr<ILogger> _logger;
 	};
 }

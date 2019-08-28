@@ -1,19 +1,22 @@
 #pragma once
 
 #include "Members/Organizations.h"
-#include "stormancer/ClientAPI.h"
+#include "Users/ClientAPI.hpp"
 #include "OrganizationsTypes.h"
 
 namespace Stormancer
 {
 	class OrganizationsContainer;
-	class AuthenticationService;
+	namespace Users
+	{
+		class UsersApi;
+	}
 
 	class Organizations_Impl : public ClientAPI<Organizations_Impl>, public Organizations
 	{
 	public:
 
-		Organizations_Impl(std::shared_ptr<AuthenticationService> auth);
+		Organizations_Impl(std::shared_ptr<Users::UsersApi> users);
 
 		virtual ~Organizations_Impl();
 
@@ -38,6 +41,6 @@ namespace Stormancer
 	private:
 
 		pplx::task<std::shared_ptr<OrganizationsContainer>> _organizationsContainerTask;
-		std::weak_ptr<AuthenticationService> _auth;
+		std::weak_ptr<Users::UsersApi> _users;
 	};
 }

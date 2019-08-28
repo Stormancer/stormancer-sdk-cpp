@@ -81,7 +81,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)include\private\stormancer\Watch.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Action.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\BuildConfig.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\ClientAPI.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\Configuration.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\ConnectionState.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)include\public\stormancer\DependencyInjection.h" />

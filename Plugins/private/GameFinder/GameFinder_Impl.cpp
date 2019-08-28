@@ -2,7 +2,7 @@
 #include STORMANCER_CUSTOM_PCH
 #endif
 #include "GameFinder_Impl.h"
-#include "Authentication/AuthenticationService.h"
+#include "Users/Users.hpp"
 #include "stormancer/IClient.h"
 #include "GameFinderService.h"
 
@@ -31,9 +31,9 @@ namespace Stormancer
 		rxcpp::subscription connectionStateChangedSubscription;
 	};
 
-	GameFinder_Impl::GameFinder_Impl(std::weak_ptr<AuthenticationService> auth)
+	GameFinder_Impl::GameFinder_Impl(std::weak_ptr<Users::UsersApi> users)
 	{
-		_auth = auth;
+		_users = users;
 	}
 
 	std::unordered_map<std::string, GameFinderStatusChangedEvent> GameFinder_Impl::getPendingFindGameStatus()
@@ -120,16 +120,16 @@ namespace Stormancer
 
 	pplx::task<std::shared_ptr<GameFinderContainer>> GameFinder_Impl::connectToGameFinderImpl(std::string gameFinderName)
 	{
-		auto auth = _auth.lock();
+		auto users = _users.lock();
 
-		if (!auth)
+		if (!users)
 		{
-			return pplx::task_from_exception<std::shared_ptr<GameFinderContainer>>(std::runtime_error("Authentication service destroyed."));
+			return pplx::task_from_exception<std::shared_ptr<GameFinderContainer>>(std::runtime_error("Users service destroyed."));
 		}
 
 		std::weak_ptr<GameFinder_Impl> wThat = this->shared_from_this();
 
-		return auth->getSceneForService("stormancer.plugins.gamefinder", gameFinderName)
+		return users->getSceneForService("stormancer.plugins.gamefinder", gameFinderName)
 			.then([gameFinderName, wThat](pplx::task<std::shared_ptr<Scene>> task)
 		{
 			try

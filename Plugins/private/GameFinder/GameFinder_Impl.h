@@ -8,14 +8,17 @@
 
 namespace Stormancer
 {
-	class AuthenticationService;
+	namespace Users
+	{
+		class UsersApi;
+	}
 	struct GameFinderContainer;
 	
 	class GameFinder_Impl : public std::enable_shared_from_this<GameFinder_Impl>, public GameFinder
 	{
 	public:
 
-		GameFinder_Impl(std::weak_ptr<AuthenticationService> auth);		
+		GameFinder_Impl(std::weak_ptr<Users::UsersApi> users);
 		
 		pplx::task<void> findGame(const std::string& gameFinder, const std::string& provider, const StreamWriter& streamWriter) override;
 		void cancel(const std::string& gameFinder) override;
@@ -42,6 +45,6 @@ namespace Stormancer
 		std::recursive_mutex _lock;
 		std::unordered_map<std::string, pplx::task<std::shared_ptr<GameFinderContainer>>> _gameFinders;
 		std::unordered_map<std::string, pplx::cancellation_token_source> _pendingFindGameRequests;
-		std::weak_ptr<AuthenticationService> _auth;
+		std::weak_ptr<Users::UsersApi> _users;
 	};
 }

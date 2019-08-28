@@ -3,13 +3,13 @@
 #endif
 #include "Profiles_Impl.h"
 #include "ProfileService.h"
-#include "Authentication/AuthenticationService.h"
+#include "Users/Users.hpp"
 
 namespace Stormancer
 {
 	const std::unordered_map<std::string, std::string> Profiles::defaultDisplayOptions = { { "character", "details" } };
 
-	Profiles_Impl::Profiles_Impl(std::weak_ptr<AuthenticationService> auth) :ClientAPI(auth) {}
+	Profiles_Impl::Profiles_Impl(std::weak_ptr<Users::UsersApi> users) : ClientAPI(users) {}
 
 	pplx::task<std::unordered_map<std::string, Profile>> Profiles_Impl::getProfiles(const std::list<std::string>& userIds, const std::unordered_map<std::string, std::string>& displayOptions)
 	{

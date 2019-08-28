@@ -16,9 +16,6 @@
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)private\AssetsStorage\AssetsStoragePlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\AssetsStorage\AssetsStorageService.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Authentication\AuthenticationException.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Authentication\AuthenticationPlugin.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Authentication\AuthenticationService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\BugReport\BugReportPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\BugReport\BugReportService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\GameFinder\GameFinderPlugin.cpp" />
@@ -49,11 +46,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Members\Organizations_Impl.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Messaging\MessagingPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Messaging\MessagingService.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Party\PartyContainer.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Party\PartyManagementService.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Party\PartyPlugin.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Party\PartyService.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Party\Party_Impl.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Persistence\PersistenceService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\PlayerData\PlayerDataService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\PlayerReport\PlayerReportPlugin.cpp" />
@@ -66,7 +58,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Servers\Servers_Impl.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Authentication\AuthenticationException.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameFinder\GameFinderService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameFinder\GameFinder_Impl.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameRecovery\GameRecoveryPlugin.h" />
@@ -108,18 +99,11 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Members\OrganizationsService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Members\OrganizationsTypes.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Members\Organizations_Impl.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Party\PartyContainer.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Party\PartyManagementService.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Party\PartyPlugin.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Party\PartyService.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Party\Party_Impl.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Profile\ProfileService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Profile\Profiles_Impl.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\AssetsStorage\AssetsStorageDto.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\AssetsStorage\AssetsStoragePlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\AssetsStorage\AssetsStorageService.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Authentication\AuthenticationPlugin.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Authentication\AuthenticationService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\BugReport\BugReportPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\BugReport\BugReportService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameFinder\GameFinder.h" />
@@ -136,8 +120,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Invitations\InvitationsPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\Leaderboard.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Members\Organizations.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Party\Party.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Party\PartyModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Persistence\PersistenceModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Persistence\PersistenceService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\PlayerData\PlayerDataService.h" />
@@ -149,6 +131,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Servers\Servers.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Steam\Steam.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Tunnels\Tunnels.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Users\ClientAPI.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Users\Users.hpp" />
   </ItemGroup>
 </Project>
