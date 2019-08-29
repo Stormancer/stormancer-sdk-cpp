@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include "stormancer/Tasks.h"
+#include "stormancer/Utilities/TaskUtilities.h"
 
 namespace TestHelpers
 {
