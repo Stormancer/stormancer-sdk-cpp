@@ -193,8 +193,7 @@ namespace Stormancer
 			{
 				p->metadata["request"] = idStr;
 				std::string msg = serializer.deserializeOne<std::string>(p->stream);
-				std::string message = msg + "(msgId:" + std::to_string(request->operation()) + ")";
-				if (!request->trySetException(std::runtime_error(message.c_str())))
+				if (!request->trySetException(std::runtime_error(msg.c_str())))
 				{
 					logger->log(LogLevel::Warn, "RequestProcessor/error", "Can't set the exception in the system request", idStr);
 				}

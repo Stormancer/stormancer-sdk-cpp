@@ -155,6 +155,8 @@
       <AdditionalIncludeDirectories>$(StormancerSdkRoot)dependencies\RakNet\RakNet\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CppLanguageStandard>c++14</CppLanguageStandard>
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
+      <CAdditionalWarning />
+      <CppAdditionalWarning />
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
@@ -162,6 +164,8 @@
       <AdditionalIncludeDirectories>$(StormancerSdkRoot)dependencies\RakNet\RakNet\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CppLanguageStandard>c++14</CppLanguageStandard>
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
+      <CAdditionalWarning />
+      <CppAdditionalWarning />
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
@@ -169,6 +173,8 @@
       <AdditionalIncludeDirectories>$(StormancerSdkRoot)dependencies\RakNet\RakNet\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CppLanguageStandard>c++14</CppLanguageStandard>
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
+      <CAdditionalWarning />
+      <CppAdditionalWarning />
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
@@ -176,6 +182,8 @@
       <AdditionalIncludeDirectories>$(StormancerSdkRoot)dependencies\RakNet\RakNet\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CppLanguageStandard>c++14</CppLanguageStandard>
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
+      <CAdditionalWarning />
+      <CppAdditionalWarning />
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -183,6 +191,8 @@
       <AdditionalIncludeDirectories>$(StormancerSdkRoot)dependencies\RakNet\RakNet\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CppLanguageStandard>c++14</CppLanguageStandard>
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
+      <CAdditionalWarning />
+      <CppAdditionalWarning />
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -190,6 +200,8 @@
       <AdditionalIncludeDirectories>$(StormancerSdkRoot)dependencies\RakNet\RakNet\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CppLanguageStandard>c++14</CppLanguageStandard>
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
+      <CAdditionalWarning />
+      <CppAdditionalWarning />
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
@@ -197,6 +209,8 @@
       <AdditionalIncludeDirectories>$(StormancerSdkRoot)dependencies\RakNet\RakNet\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CppLanguageStandard>c++14</CppLanguageStandard>
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
+      <CAdditionalWarning />
+      <CppAdditionalWarning />
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
@@ -204,6 +218,8 @@
       <AdditionalIncludeDirectories>$(StormancerSdkRoot)dependencies\RakNet\RakNet\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CppLanguageStandard>c++14</CppLanguageStandard>
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
+      <CAdditionalWarning />
+      <CppAdditionalWarning />
     </ClCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

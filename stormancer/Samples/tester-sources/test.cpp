@@ -19,6 +19,7 @@ namespace Stormancer
 		_tests.push_back([this]() { test_dependencyInjection(); });
 		_tests.push_back([this]() { test_streams(); });
 		_tests.push_back([this]() { test_connect(); });
+		_tests.push_back([this]() { test_connectionRejected(); });
 		_tests.push_back([this]() { test_echo(); });
 		_tests.push_back([this]() { test_rpc_server(); });
 		_tests.push_back([this]() { test_rpc_server_cancel(); });
@@ -112,6 +113,12 @@ namespace Stormancer
 			_logger->log(LogLevel::Debug, "onMessage", "RPC CLIENT EXCEPTION OK");
 			execNextTest();
 		}
+	}
+
+	void Tester::onConnectionRejected(Packetisp_ptr packet)
+	{
+		_logger->log(LogLevel::Debug, "onConnectionRejected", "Connection Rejected message received");
+		_connectionRejectedReceivedTce.set();
 	}
 
 	pplx::task<void> Tester::test_rpc_client_received(RpcRequestContext_ptr rc)
@@ -252,6 +259,10 @@ namespace Stormancer
 				{
 					onMessage(p);
 				});
+				scene->addRoute("connectionRejected", [this](Packetisp_ptr p)
+				{
+					onConnectionRejected(p);
+				});
 
 				_logger->log(LogLevel::Debug, "test_connect", "Add route OK");
 
@@ -294,6 +305,47 @@ namespace Stormancer
 		{
 			_logger->log(ex);
 		}
+	}
+
+	void Tester::test_connectionRejected()
+	{
+		_logger->log(LogLevel::Info, "test_connectionRejected", "CONNECTION REJECTED");
+
+		auto conf = Configuration::create(_endpoint, _accountId, _applicationName);
+		auto client = IClient::create(conf);
+
+		client->connectToPublicScene(_sceneName).then([](pplx::task<std::shared_ptr<Scene>> task)
+		{
+			try
+			{
+				task.get();
+			}
+			catch (const std::exception& ex)
+			{
+				std::string msg(ex.what());
+				if (msg != "Rejected")
+				{
+					throw std::runtime_error("Wrong exception message: " + msg + ", should be 'Rejected'");
+				}
+				return;
+			}
+			throw std::runtime_error("Connection should have failed");
+		}).then([this]
+		{
+			return cancel_after_timeout(pplx::create_task(_connectionRejectedReceivedTce), 1000);
+		}).then([this, client](pplx::task<void> task) // Keep the client alive
+		{
+			try
+			{
+				task.get();
+				_logger->log(LogLevel::Info, "test_connectionRejected", "Connection Rejected OK");
+				execNextTest();
+			}
+			catch (const std::exception& ex)
+			{
+				_logger->log(LogLevel::Error, "test_connectionRejected", "Connection Rejected FAILED", ex.what());
+			}
+		});
 	}
 
 	void Tester::test_echo()

@@ -25,6 +25,7 @@ Changed
 
 - ``AuthenticationService::sendRequestToUser()``: Breaking change to the data contract, requires the latest server-side Users plugin.
 - All plugings use the ``Users`` plugin instead of the ``Authentication`` plugin.
+- When a System Request returns an error, ``(msgId:<type id of the request>)`` is no longer appended to the exception's message.
 
 Fixed
 *****

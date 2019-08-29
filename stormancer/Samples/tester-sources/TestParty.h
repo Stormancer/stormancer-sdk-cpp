@@ -64,36 +64,6 @@ private:
 		});
 	}
 
-	static void failAfterTimeout(pplx::task_completion_event<void> tce, std::string msg, std::chrono::milliseconds timeout = std::chrono::milliseconds(1000))
-	{
-		failAfterTimeout(tce, [msg] { return msg; }, timeout);
-	}
-
-	static void failAfterTimeout(pplx::task_completion_event<void> tce, std::function<std::string()> msgBuilder, std::chrono::milliseconds timeout = std::chrono::milliseconds(1000))
-	{
-		auto timeoutCt = Stormancer::timeout(timeout);
-		timeoutCt.register_callback([tce, msgBuilder]
-		{
-			tce.set_exception(std::runtime_error(msgBuilder().c_str()));
-		});
-	}
-
-
-	template<typename T>
-	static pplx::task<T> taskFailAfterTimeout(pplx::task<T> task, std::string msg, std::chrono::milliseconds timeout = std::chrono::milliseconds(1000))
-	{
-		return Stormancer::cancel_after_timeout(task, static_cast<unsigned int>(timeout.count()))
-			.then([msg](pplx::task<T> t)
-		{
-			auto status = t.wait();
-			if (status == pplx::canceled)
-			{
-				throw std::runtime_error(msg);
-			}
-			return t;
-		});
-	}
-
 	static void testCreatePartyBadRequest(const Stormancer::Tester& tester)
 	{
 		using namespace Stormancer;
@@ -172,6 +142,7 @@ private:
 	)
 	{
 		using namespace Stormancer;
+		using namespace TestHelpers;
 
 		pplx::task_completion_event<void> tce;
 		auto sub = party->subscribeOnUpdatedPartySettings([tce, party, request, users](Party::PartySettings)
@@ -235,6 +206,7 @@ private:
 		std::chrono::milliseconds timeout = std::chrono::seconds(3))
 	{
 		using namespace Stormancer;
+		using namespace TestHelpers;
 
 		pplx::task_completion_event<void> tce;
 		auto party = client->dependencyResolver().resolve<Party::PartyApi>();

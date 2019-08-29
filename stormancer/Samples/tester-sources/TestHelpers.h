@@ -42,4 +42,24 @@ namespace TestHelpers
 
 		std::shared_ptr<impl> _impl;
 	};
+
+	void failAfterTimeout(pplx::task_completion_event<void> tce, std::string msg, std::chrono::milliseconds timeout = std::chrono::milliseconds(1000));
+
+	void failAfterTimeout(pplx::task_completion_event<void> tce, std::function<std::string()> msgBuilder, std::chrono::milliseconds timeout = std::chrono::milliseconds(1000));
+
+	template<typename T>
+	pplx::task<T> taskFailAfterTimeout(pplx::task<T> task, std::string msg, std::chrono::milliseconds timeout = std::chrono::milliseconds(1000))
+	{
+		return Stormancer::cancel_after_timeout(task, static_cast<unsigned int>(timeout.count()))
+			.then([msg](pplx::task<T> t)
+		{
+			auto status = t.wait();
+			if (status == pplx::canceled)
+			{
+				throw std::runtime_error(msg);
+			}
+			return t;
+		});
+	}
+
 }

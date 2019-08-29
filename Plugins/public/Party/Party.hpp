@@ -170,26 +170,22 @@ namespace Stormancer
 			/// </summary>
 			/// <remarks>
 			/// The caller must be the leader of the party
-			/// </remarks>
-			/// <remarks>
 			/// The new leader must be in the party
 			/// </remarks>
 			/// <param name="userId">The id of the player to promote</param>
-			/// <returns></returns>
-			virtual pplx::task<bool> promoteLeader(std::string userId) = 0;
+			/// <returns>A task that completes when the underlying RPC (remote procedure call) has returned.</returns>
+			virtual pplx::task<void> promoteLeader(std::string userId) = 0;
 
 			/// <summary>
 			/// Kick the specified user from the party
 			/// </summary>
 			/// <remarks>
 			/// The caller must be the leader of the party
-			/// </remarks>
-			/// <remarks>
 			/// If the user has already left the party, the operation succeeds.
 			/// </remarks>
 			/// <param name="userId">The id of the player to kick</param>
-			/// <returns></returns>
-			virtual pplx::task<bool> kickPlayer(std::string userId) = 0;
+			/// <returns>A task that completes when the underlying RPC (remote procedure call) has returned.</returns>
+			virtual pplx::task<void> kickPlayer(std::string userId) = 0;
 
 			/// <summary>
 			/// Invite a player to join the party.
@@ -376,17 +372,17 @@ namespace Stormancer
 				///
 				/// Promote player to leader of the party
 				/// \param playerId party userid will be promote
-				pplx::task<bool> promoteLeader(const std::string playerId)
+				pplx::task<void> promoteLeader(const std::string playerId)
 				{
-					return _rpcService->rpc<bool>("party.promoteleader", playerId);
+					return _rpcService->rpc<void>("party.promoteleader", playerId);
 				}
 
 				///
 				/// Remove player from party this method can be call only by party leader.
 				/// \param playerToKick is the user player id to be kicked
-				pplx::task<bool> kickPlayer(const std::string playerId)
+				pplx::task<void> kickPlayer(const std::string playerId)
 				{
-					return _rpcService->rpc<bool>("party.kickplayer", playerId);
+					return _rpcService->rpc<void>("party.kickplayer", playerId);
 				}
 
 				///
@@ -972,11 +968,11 @@ namespace Stormancer
 					});
 				}
 
-				pplx::task<bool> promoteLeader(std::string userId) override
+				pplx::task<void> promoteLeader(std::string userId) override
 				{
 					if (!isInParty())
 					{
-						return pplx::task_from_exception<bool>(std::runtime_error(PartyError::Str::NotInParty));
+						return pplx::task_from_exception<void>(std::runtime_error(PartyError::Str::NotInParty));
 					}
 
 					return _party->then([userId](std::shared_ptr<PartyContainer> party) {
@@ -985,11 +981,11 @@ namespace Stormancer
 					});
 				}
 
-				pplx::task<bool> kickPlayer(std::string userId) override
+				pplx::task<void> kickPlayer(std::string userId) override
 				{
 					if (!isInParty())
 					{
-						return pplx::task_from_exception<bool>(std::runtime_error(PartyError::Str::NotInParty));
+						return pplx::task_from_exception<void>(std::runtime_error(PartyError::Str::NotInParty));
 					}
 
 					return _party->then([userId](std::shared_ptr<PartyContainer> party) {

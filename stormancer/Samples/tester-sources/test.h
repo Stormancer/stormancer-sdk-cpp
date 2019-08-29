@@ -59,12 +59,15 @@ namespace Stormancer
 		std::string connectionStateToString(ConnectionState connectionState);
 		void onEcho(Packetisp_ptr packet);
 		void onMessage(Packetisp_ptr packet);
+		void onConnectionRejected(Packetisp_ptr packet);
+
 		pplx::task<void> test_rpc_client_received(RpcRequestContext_ptr rc);
 		pplx::task<void> test_rpc_client_cancel_received(RpcRequestContext_ptr rc);
 		pplx::task<void> test_rpc_client_exception_received(RpcRequestContext_ptr rc);
 		
 		void test_create();
 		void test_connect();
+		void test_connectionRejected();
 		void test_echo();
 		void test_rpc_server();
 		void test_rpc_server_cancel();
@@ -109,6 +112,7 @@ namespace Stormancer
 		bool _testsDone = false;
 		bool _testsPassed = false;
 
+		pplx::task_completion_event<void> _connectionRejectedReceivedTce;
 		pplx::task_completion_event<void> _testsCompletedTce;
 
 #pragma endregion
