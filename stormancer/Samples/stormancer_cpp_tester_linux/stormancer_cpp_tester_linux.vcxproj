@@ -87,60 +87,68 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
-    <MultiProcNumber>6</MultiProcNumber>
+    <MultiProcNumber>3</MultiProcNumber>
     <RemoteProjectDir>$(RemoteRootDir)/stormancer/Samples/stormancer_cpp_tester_linux</RemoteProjectDir>
     <OutDir>$(StormancerDependenciesOutputDir)</OutDir>
     <TargetName>$(ProjectName)_$(Configuration)_$(Platform)-$(StormancerLinuxToolset)</TargetName>
     <TargetExt />
+    <RemoteLinkLocalCopyOutput>false</RemoteLinkLocalCopyOutput>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
-    <MultiProcNumber>6</MultiProcNumber>
+    <MultiProcNumber>3</MultiProcNumber>
     <RemoteProjectDir>$(RemoteRootDir)/stormancer/Samples/stormancer_cpp_tester_linux</RemoteProjectDir>
     <OutDir>$(StormancerDependenciesOutputDir)</OutDir>
     <TargetName>$(ProjectName)_$(Configuration)_$(Platform)-$(StormancerLinuxToolset)</TargetName>
     <TargetExt />
+    <RemoteLinkLocalCopyOutput>false</RemoteLinkLocalCopyOutput>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
-    <MultiProcNumber>6</MultiProcNumber>
+    <MultiProcNumber>3</MultiProcNumber>
     <RemoteProjectDir>$(RemoteRootDir)/stormancer/Samples/stormancer_cpp_tester_linux</RemoteProjectDir>
     <OutDir>$(StormancerDependenciesOutputDir)</OutDir>
     <TargetName>$(ProjectName)_$(Configuration)_$(Platform)-$(StormancerLinuxToolset)</TargetName>
     <TargetExt />
+    <RemoteLinkLocalCopyOutput>false</RemoteLinkLocalCopyOutput>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
-    <MultiProcNumber>6</MultiProcNumber>
+    <MultiProcNumber>3</MultiProcNumber>
     <RemoteProjectDir>$(RemoteRootDir)/stormancer/Samples/stormancer_cpp_tester_linux</RemoteProjectDir>
     <OutDir>$(StormancerDependenciesOutputDir)</OutDir>
     <TargetName>$(ProjectName)_$(Configuration)_$(Platform)-$(StormancerLinuxToolset)</TargetName>
     <TargetExt />
+    <RemoteLinkLocalCopyOutput>false</RemoteLinkLocalCopyOutput>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <MultiProcNumber>6</MultiProcNumber>
+    <MultiProcNumber>3</MultiProcNumber>
     <RemoteProjectDir>$(RemoteRootDir)/stormancer/Samples/stormancer_cpp_tester_linux</RemoteProjectDir>
     <OutDir>$(StormancerDependenciesOutputDir)</OutDir>
     <TargetName>$(ProjectName)_$(Configuration)_$(Platform)-$(StormancerLinuxToolset)</TargetName>
     <TargetExt />
+    <RemoteLinkLocalCopyOutput>false</RemoteLinkLocalCopyOutput>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <MultiProcNumber>6</MultiProcNumber>
+    <MultiProcNumber>3</MultiProcNumber>
     <RemoteProjectDir>$(RemoteRootDir)/stormancer/Samples/stormancer_cpp_tester_linux</RemoteProjectDir>
     <OutDir>$(StormancerDependenciesOutputDir)</OutDir>
     <TargetName>$(ProjectName)_$(Configuration)_$(Platform)-$(StormancerLinuxToolset)</TargetName>
     <TargetExt />
+    <RemoteLinkLocalCopyOutput>false</RemoteLinkLocalCopyOutput>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
-    <MultiProcNumber>6</MultiProcNumber>
+    <MultiProcNumber>3</MultiProcNumber>
     <RemoteProjectDir>$(RemoteRootDir)/stormancer/Samples/stormancer_cpp_tester_linux</RemoteProjectDir>
     <OutDir>$(StormancerDependenciesOutputDir)</OutDir>
     <TargetName>$(ProjectName)_$(Configuration)_$(Platform)-$(StormancerLinuxToolset)</TargetName>
     <TargetExt />
+    <RemoteLinkLocalCopyOutput>false</RemoteLinkLocalCopyOutput>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
-    <MultiProcNumber>6</MultiProcNumber>
+    <MultiProcNumber>3</MultiProcNumber>
     <RemoteProjectDir>$(RemoteRootDir)/stormancer/Samples/stormancer_cpp_tester_linux</RemoteProjectDir>
     <OutDir>$(StormancerDependenciesOutputDir)</OutDir>
     <TargetName>$(ProjectName)_$(Configuration)_$(Platform)-$(StormancerLinuxToolset)</TargetName>
     <TargetExt />
+    <RemoteLinkLocalCopyOutput>false</RemoteLinkLocalCopyOutput>
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="LinuxAuthenticationTester.cpp" />
