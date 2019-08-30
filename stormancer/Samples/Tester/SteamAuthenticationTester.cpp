@@ -24,23 +24,12 @@ public:
 			conf->logger = tester.logger();
 			conf->addPlugin(new Users::UsersPlugin);
 			conf->addPlugin(new Steam::SteamPlugin);
+			conf->additionalParameters["steam.initAndRunSteam"] = "true";
+			conf->additionalParameters["steam.forcedTicket"] = "MyTicket";
 
 			auto client = IClient::create(conf);
-
 			auto users = client->dependencyResolver().resolve<Users::UsersApi>();
-
-			auto scheduler = client->dependencyResolver().resolve<IScheduler>();
-			pplx::cancellation_token_source cts;
-			auto logger = _logger;
-			scheduler->schedulePeriodic(100, [logger]()
-			{
-				logger->log(LogLevel::Trace, "SteamAPI", "execute SteamAPI_RunCallbacks()");
-				SteamAPI_RunCallbacks();
-			}, cts.get_token());
-
 			users->login().get();
-
-			cts.cancel();
 
 			_logger->log(LogLevel::Info, "SteamAuthenticationTester", "User logged in");
 			_logger->log(LogLevel::Info, "SteamAuthenticationTester", "Tests PASSED");
