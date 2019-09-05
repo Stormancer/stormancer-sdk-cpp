@@ -51,6 +51,13 @@ namespace Stormancer
 			return _inputStream;
 		}
 
+		template<typename T>
+		T readObject()
+		{
+			Serializer serializer;
+			return serializer.deserializeOne<T>(_inputStream);
+		}
+
 		void sendValue(const StreamWriter& streamWriter, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY)
 		{
 			auto scene = _scene.lock();

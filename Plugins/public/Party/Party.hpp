@@ -17,7 +17,6 @@ namespace Stormancer
 		struct PartyUserDto;
 		struct PartyUserData;
 		struct PartySettings;
-		struct PartySettingsUpdate;
 		struct PartyInvitation;
 		struct PartyRequestDto;
 
@@ -135,6 +134,12 @@ namespace Stormancer
 			virtual PartySettings getPartySettings() const = 0;
 
 			/// <summary>
+			/// Get the User Id of the party leader.
+			/// </summary>
+			/// <returns>The Stormancer User Id of the party leader.</returns>
+			virtual std::string getPartyLeaderId() const = 0;
+
+			/// <summary>
 			/// Update the party settings
 			/// </summary>
 			/// <remarks>
@@ -146,7 +151,7 @@ namespace Stormancer
 			/// </remarks>
 			/// <param name="partySettings"></param>
 			/// <returns></returns>
-			virtual pplx::task<void> updatePartySettings(PartySettingsUpdate partySettings) = 0;
+			virtual pplx::task<void> updatePartySettings(PartySettings partySettings) = 0;
 
 			/// <summary>
 			/// Update the data associated with the player
@@ -221,7 +226,8 @@ namespace Stormancer
 			std::string platformSessionId;
 			std::string GameFinderName;
 			std::string CustomData;
-			MSGPACK_DEFINE(platformSessionId, GameFinderName, CustomData);
+
+			MSGPACK_DEFINE(platformSessionId, GameFinderName, CustomData)
 		};
 
 		struct PartyInvitation
@@ -243,6 +249,9 @@ namespace Stormancer
 
 			bool isLeader = false; // Computed locally
 
+			PartyUserDto(std::string userId) : userId(userId) {}
+			PartyUserDto() = default;
+
 			MSGPACK_DEFINE(userId, partyUserStatus, userData)
 		};
 
@@ -255,32 +264,53 @@ namespace Stormancer
 
 		struct PartySettings
 		{
-			/// <summary>
-			/// The name of game finder scene
-			/// </summary>
-			std::string gameFinderName;
-
-			/// <summary>
-			/// The leader user id
-			/// </summary>
-			std::string leaderId;
-
-			std::string customData;
-
-			MSGPACK_DEFINE(gameFinderName, leaderId, customData)
-		};
-
-		struct PartySettingsUpdate
-		{
 			std::string gameFinderName;
 			std::string customData;
 
 			MSGPACK_DEFINE(gameFinderName, customData)
 		};
 
-
 		namespace details
 		{
+			struct PartyState
+			{
+				PartySettings				settings;
+				std::string					leaderId;
+				std::vector<PartyUserDto>	members;
+				int							version = 0;
+
+				MSGPACK_DEFINE(settings, leaderId, members, version)
+			};
+
+			struct MemberStatusUpdate
+			{
+				std::string		userId;
+				PartyUserStatus	status;
+
+				MSGPACK_DEFINE(userId, status)
+			};
+
+			struct BatchStatusUpdate
+			{
+				std::vector<MemberStatusUpdate> memberStatus;
+
+				MSGPACK_DEFINE(memberStatus)
+			};
+
+			enum class MemberDisconnectionReason
+			{
+				Left = 0,
+				Kicked = 1
+			};
+
+			struct MemberDisconnection
+			{
+				std::string					userId;
+				MemberDisconnectionReason	reason;
+
+				MSGPACK_DEFINE(userId, reason)
+			};
+
 			class PartyService : public std::enable_shared_from_this<PartyService>
 			{
 			public:
@@ -306,7 +336,7 @@ namespace Stormancer
 				///
 				/// Sent to server the new party status
 				///
-				pplx::task<void> updatePartySettings(const PartySettingsUpdate& newPartySettings)
+				pplx::task<void> updatePartySettings(const PartySettings& newPartySettings)
 				{
 					return _rpcService->rpc<void>("party.updatepartysettings", newPartySettings);
 				}
@@ -319,14 +349,14 @@ namespace Stormancer
 				{
 					std::lock_guard<std::recursive_mutex> lg(_stateMutex);
 
-					bool statusHasChanged = std::any_of(_members.begin(), _members.end(),
+					bool statusHasChanged = std::any_of(_state.members.begin(), _state.members.end(),
 						[newStatus, this](const auto& member) { return member.userId == _myUserId && member.partyUserStatus != newStatus; });
 
 					if (!statusHasChanged)
 					{
 						return pplx::task_from_result();
 					}
-					if (_settings.gameFinderName.empty())
+					if (_state.settings.gameFinderName.empty())
 					{
 						return pplx::task_from_exception<void>(std::runtime_error(PartyError::Str::PartyNotReady));
 					}
@@ -338,7 +368,7 @@ namespace Stormancer
 
 					// When setting our status to Ready, we need to account for the case when the settings change during the ready RPC
 					std::weak_ptr<PartyService> wThat = this->shared_from_this();
-					auto currentGameFinder = _settings.gameFinderName;
+					auto currentGameFinder = _state.settings.gameFinderName;
 					return _gameFinderConnectionTask.then([newStatus, wThat, currentGameFinder](pplx::task<void> task)
 					{
 						// I let GameFinder connection errors propagate as unspecified errors to the caller.
@@ -349,7 +379,7 @@ namespace Stormancer
 						{
 							std::lock_guard<std::recursive_mutex> lg(that->_stateMutex);
 
-							if (currentGameFinder != that->_settings.gameFinderName)
+							if (currentGameFinder != that->_state.settings.gameFinderName)
 							{
 								throw std::runtime_error(PartyError::Str::SettingsUpdated);
 							}
@@ -400,55 +430,90 @@ namespace Stormancer
 				std::vector<PartyUserDto> members() const
 				{
 					std::lock_guard<std::recursive_mutex> lg(_stateMutex);
-					return _members;
+					return _state.members;
 				}
 
 				PartySettings settings() const
 				{
 					std::lock_guard<std::recursive_mutex> lg(_stateMutex);
-					return _settings;
+					return _state.settings;
+				}
+
+				std::string leaderId() const
+				{
+					std::lock_guard<std::recursive_mutex> lg(_stateMutex);
+					return _state.leaderId;
 				}
 
 				void initialize()
 				{
 					std::weak_ptr<PartyService> wThat = this->shared_from_this();
+					auto scene = _scene.lock();
+					auto rpcService = scene->dependencyResolver().resolve<RpcService>();
 
-					_scene.lock()->addRoute("party.updatesettings", [wThat](Packetisp_ptr data)
-					{
-						auto that = wThat.lock();
-						if (that)
-						{
-							auto updatedSettings = data->readObject<PartySettings>();
-							that->setNewLocalSettings(updatedSettings);
-						}
-					});
-
-					_scene.lock()->addRoute("party.updateuserdata", [wThat](Packetisp_ptr data)
+					rpcService->addProcedure("party.getPartyStateResponse", [wThat](RpcRequestContext_ptr ctx)
 					{
 						if (auto that = wThat.lock())
 						{
-							auto updatedPartyUserData = data->readObject<PartyUserData>();
-							that->updateUserData(updatedPartyUserData);
+							return that->handlePartyStateResponse(ctx);
 						}
+						return pplx::task_from_result();
 					});
 
-					_scene.lock()->addRoute("party.updatepartymembers", [wThat](Packetisp_ptr data)
+					rpcService->addProcedure("party.settingsUpdated", [wThat](RpcRequestContext_ptr ctx)
 					{
 						if (auto that = wThat.lock())
 						{
-							auto members = data->readObject<std::vector<PartyUserDto>>();
-							that->updatePartyMembers(members);
+							return that->handleSettingsUpdate(ctx);
 						}
+						return pplx::task_from_result();
 					});
 
-					_scene.lock()->addRoute("party.kicked", [wThat](Packetisp_ptr data)
+					rpcService->addProcedure("party.memberDataUpdated", [wThat](RpcRequestContext_ptr ctx)
 					{
 						if (auto that = wThat.lock())
 						{
-							that->KickedFromParty();
+							return that->handleUserDataUpdate(ctx);
 						}
+						return pplx::task_from_result();
 					});
 
+					rpcService->addProcedure("party.memberStatusUpdated", [wThat](RpcRequestContext_ptr ctx)
+					{
+						if (auto that = wThat.lock())
+						{
+							return that->handleMemberStatusUpdate(ctx);
+						}
+						return pplx::task_from_result();
+					});
+
+					rpcService->addProcedure("party.memberConnected", [wThat](RpcRequestContext_ptr ctx)
+					{
+						if (auto that = wThat.lock())
+						{
+							return that->handleMemberConnected(ctx);
+						}
+						return pplx::task_from_result();
+					});
+
+					rpcService->addProcedure("party.memberDisconnected", [wThat](RpcRequestContext_ptr ctx)
+					{
+						if (auto that = wThat.lock())
+						{
+							return that->handleMemberDisconnected(ctx);
+						}
+						return pplx::task_from_result();
+					});
+
+					rpcService->addProcedure("party.leaderChanged", [wThat](RpcRequestContext_ptr ctx)
+					{
+						if (auto that = wThat.lock())
+						{
+							return that->handleLeaderChanged(ctx);
+						}
+						return pplx::task_from_result();
+					});
+					
 					_scene.lock()->getConnectionStateChangedObservable().subscribe([wThat](ConnectionState state) {
 						if (auto that = wThat.lock())
 						{
@@ -458,7 +523,7 @@ namespace Stormancer
 							}
 							else if (state == ConnectionState::Disconnected)
 							{
-								that->_gameFinder->disconnectFromGameFinder(that->_settings.gameFinderName)
+								that->_gameFinder->disconnectFromGameFinder(that->_state.settings.gameFinderName)
 									.then([](pplx::task<void> t)
 								{
 									try {
@@ -467,6 +532,10 @@ namespace Stormancer
 									catch (...) {}
 								});
 
+								if (state.reason == "party.kicked")
+								{
+									that->KickedFromParty();
+								}
 								that->LeftParty();
 							}
 						}
@@ -476,37 +545,40 @@ namespace Stormancer
 
 				pplx::task<void> waitForPartyReady()
 				{
-					auto tasks = { pplx::create_task(_memberUpdateReceived), pplx::create_task(_settingsUpdateReceived) };
-					return pplx::when_all(tasks.begin(), tasks.end());
+					return pplx::create_task(_partyStateReceived);
 				}
 
 			private:
 
-				void updateGameFinder(std::string newGameFinderName)
+				void updateGameFinder()
 				{
 					std::lock_guard<std::recursive_mutex> lg(_stateMutex);
 
-					if (newGameFinderName.empty() || newGameFinderName == _settings.gameFinderName)
+					if (_currentGameFinder == _state.settings.gameFinderName)
 					{
 						return;
 					}
-
-					std::string oldGameFinderName = _settings.gameFinderName;
-					_settings.gameFinderName = newGameFinderName;
-
-					_logger->log(LogLevel::Trace, "PartyService", "Connecting to the party's new GameFinder", newGameFinderName);
 
 					// This CTS prevents multiple game finder connection requests from queuing up.
 					_gameFinderConnectionCts.cancel();
 					_gameFinderConnectionCts = pplx::cancellation_token_source();
 
 					// No need to wait for the old GF disconnection before connecting to the new GF
-					_gameFinder->disconnectFromGameFinder(oldGameFinderName).then([](pplx::task<void> task)
+					_gameFinder->disconnectFromGameFinder(_currentGameFinder).then([](pplx::task<void> task)
 					{
-						try { task.get(); }
+						try { task.wait(); }
 						catch (...) {}
 					});
 
+					_currentGameFinder = _state.settings.gameFinderName;
+					if (_currentGameFinder.empty())
+					{
+						return;
+					}
+
+					_logger->log(LogLevel::Trace, "PartyService", "Connecting to the party's GameFinder", _state.settings.gameFinderName);
+
+					std::string newGameFinderName = _currentGameFinder;
 					auto token = _gameFinderConnectionCts.get_token();
 					std::weak_ptr<PartyService> wThat = this->shared_from_this();
 					_gameFinderConnectionTask = _gameFinderConnectionTask.then([wThat, newGameFinderName, token](pplx::task<void> task)
@@ -550,77 +622,222 @@ namespace Stormancer
 					}, token);
 				}
 
-				void setNewLocalSettings(const PartySettings& partySettingsDto)
+				bool checkVersionNumber(RpcRequestContext_ptr ctx)
 				{
-					std::lock_guard<std::recursive_mutex> lg(_stateMutex);
-
-					bool leaderChanged = _settings.leaderId != partySettingsDto.leaderId;
-					
-					_settings.leaderId = partySettingsDto.leaderId;
-					_settings.customData = partySettingsDto.customData;
-					updateGameFinder(partySettingsDto.gameFinderName);
-
-					if (leaderChanged && _members.size() > 0)
+					auto versionNumber = ctx->readObject<int>();
+					if (_state.version > 0 && versionNumber == _state.version + 1)
 					{
-						updatePartyMembers(_members);
+						_state.version = versionNumber;
+						return true;
 					}
-
-					this->UpdatedPartySettings(_settings);
-					_settingsUpdateReceived.set();
+					else
+					{
+						_logger->log(LogLevel::Trace, "PartyService::checkVersionNumber", "Version number mismatch ; current="+std::to_string(_state.version)+", received="+std::to_string(versionNumber));
+						syncPartyState();
+						return false;
+					}
 				}
 
-				void updatePartyMembers(std::vector<PartyUserDto> members)
+				// This returns vois because we must not block on it (or else we would cause a timeout in party update RPC)
+				void syncPartyState()
+				{
+					if (_isPendingStateSync)
+					{
+						return;
+					}
+					_isPendingStateSync = true;
+					auto logger = _logger;
+					std::weak_ptr<PartyService> wThat = this->shared_from_this();
+					_rpcService->rpc("party.getpartystate").then([logger, wThat](pplx::task<void> task)
+					{
+						bool success = true;
+						try
+						{
+							success = task.wait() == pplx::completed;
+						}
+						catch (const std::exception& ex)
+						{
+							logger->log(LogLevel::Error, "PartyService::syncPartyState", "Error in party.getpartystate RPC", ex);
+							success = false;
+						}
+						// In case of success, _isPendingStateSync is reset in the party.getPartyStateResponse handler.
+						if (!success)
+						{
+							if (auto that = wThat.lock())
+							{
+								std::lock_guard<std::recursive_mutex> lg(that->_stateMutex);
+								that->_isPendingStateSync = false;
+							}
+						}
+					});
+				}
+
+				pplx::task<void> handlePartyStateResponse(RpcRequestContext_ptr ctx)
 				{
 					std::lock_guard<std::recursive_mutex> lg(_stateMutex);
 
-					for (auto& member : members)
+					_state = ctx->readObject<PartyState>();
+					_logger->log(LogLevel::Trace, "PartyService::handlePartyStateResponse", "Received party state, version = " + std::to_string(_state.version));
+
+					updateLeader();
+					updateGameFinder();
+					_partyStateReceived.set();
+					_isPendingStateSync = false;
+					this->UpdatedPartySettings(_state.settings);
+					this->UpdatedPartyMembers(_state.members);
+
+					return pplx::task_from_result();
+				}
+
+				pplx::task<void> handleSettingsUpdate(RpcRequestContext_ptr ctx)
+				{
+					std::lock_guard<std::recursive_mutex> lg(_stateMutex);
+
+					if (checkVersionNumber(ctx))
 					{
-						if (member.userId == _settings.leaderId)
+						_logger->log(LogLevel::Trace, "PartyService::handleSettingsUpdate", "Received settings update, version = " + std::to_string(_state.version));
+						_state.settings = ctx->readObject<PartySettings>();
+						updateGameFinder();
+						this->UpdatedPartySettings(_state.settings);
+					}
+
+					return pplx::task_from_result();
+				}
+
+				pplx::task<void> handleUserDataUpdate(RpcRequestContext_ptr ctx)
+				{
+					std::lock_guard<std::recursive_mutex> lg(_stateMutex);
+
+					if (checkVersionNumber(ctx))
+					{
+						_logger->log(LogLevel::Trace, "PartyService::handleUserDataUpdate", "Received user data update, version = " + std::to_string(_state.version));
+						auto update = ctx->readObject<PartyUserData>();
+						auto member = std::find_if(_state.members.begin(), _state.members.end(), [&update](const PartyUserDto& user) { return update.userId == user.userId; });
+
+						if (member != _state.members.end())
 						{
-							member.isLeader = true;
+							member->userData = update.userData;
+							this->UpdatedPartyUserData(update);
 						}
 					}
-					_members = members;
 
-					// Wait until the first settings update has been received to trigger the event
-					if (!_settings.leaderId.empty())
-					{
-						this->UpdatedPartyMembers(_members);
-						_memberUpdateReceived.set();
-					}
+					return pplx::task_from_result();
 				}
 
-				void updateUserData(const PartyUserData& data)
+				pplx::task<void> handleMemberStatusUpdate(RpcRequestContext_ptr ctx)
 				{
 					std::lock_guard<std::recursive_mutex> lg(_stateMutex);
 
-					auto member = std::find_if(_members.begin(), _members.end(), [&data](const PartyUserDto& user) { return data.userId == user.userId; });
-
-					if (member != _members.end())
+					if (checkVersionNumber(ctx))
 					{
-						member->userData = data.userData;
+						_logger->log(LogLevel::Trace, "PartyService::handleMemberStatusUpdate", "Received member status update, version = " + std::to_string(_state.version));
+
+						auto updates = ctx->readObject<BatchStatusUpdate>();
+						for (const auto& update : updates.memberStatus)
+						{
+							auto member = std::find_if(_state.members.begin(), _state.members.end(), [&update](const PartyUserDto& user) { return update.userId == user.userId; });
+
+							if (member != _state.members.end())
+							{
+								member->partyUserStatus = update.status;
+							}
+						}
+
+						this->UpdatedPartyMembers(_state.members);
 					}
 
-					this->UpdatedPartyUserData(data);
+					return pplx::task_from_result();
 				}
 
-				PartySettings _settings;
+				pplx::task<void> handleMemberConnected(RpcRequestContext_ptr ctx)
+				{
+					std::lock_guard<std::recursive_mutex> lg(_stateMutex);
+
+					if (checkVersionNumber(ctx))
+					{
+						auto member = ctx->readObject<PartyUserDto>();
+						_logger->log(LogLevel::Trace, "PartyService::handleMemberConnected", "New party member: Id="+ member.userId +", version = " + std::to_string(_state.version));
+
+						_state.members.push_back(member);
+						this->UpdatedPartyMembers(_state.members);
+					}
+
+					return pplx::task_from_result();
+				}
+
+				pplx::task<void> handleMemberDisconnected(RpcRequestContext_ptr ctx)
+				{
+					std::lock_guard<std::recursive_mutex> lg(_stateMutex);
+
+					if (checkVersionNumber(ctx))
+					{
+						auto message = ctx->readObject<MemberDisconnection>();
+						_logger->log(LogLevel::Trace, "PartyService::handleMemberDisconnected", "Member disconnected: Id=" + message.userId + ", Reason="+ std::to_string(static_cast<int>(message.reason)) + ", version = " + std::to_string(_state.version));
+
+						auto member = std::find_if(_state.members.begin(), _state.members.end(), [&message](const PartyUserDto& user) { return message.userId == user.userId; });
+						if (member != _state.members.end())
+						{
+							_state.members.erase(member);
+							this->UpdatedPartyMembers(_state.members);
+						}
+					}
+
+					return pplx::task_from_result();
+				}
+
+				pplx::task<void> handleLeaderChanged(RpcRequestContext_ptr ctx)
+				{
+					std::lock_guard<std::recursive_mutex> lg(_stateMutex);
+
+					if (checkVersionNumber(ctx))
+					{
+						auto leaderId = ctx->readObject<std::string>();
+						_logger->log(LogLevel::Trace, "PartyService::handleLeaderChanged", "New leader: Id=" + leaderId + ", version = " + std::to_string(_state.version));
+
+						if (_state.leaderId != leaderId)
+						{
+							_state.leaderId = leaderId;
+							updateLeader();
+							this->UpdatedPartyMembers(_state.members);
+						}
+					}
+
+					return pplx::task_from_result();
+				}
+
+				void updateLeader()
+				{
+					const std::string& newLeaderId = _state.leaderId;
+					auto currentLeader = std::find_if(_state.members.begin(), _state.members.end(), [](const PartyUserDto& user) { return user.isLeader; });
+					if (currentLeader != _state.members.end())
+					{
+						currentLeader->isLeader = false;
+					}
+
+					auto newLeader = std::find_if(_state.members.begin(), _state.members.end(), [&newLeaderId](const PartyUserDto& user) { return newLeaderId == user.userId; });
+					if (newLeader != _state.members.end())
+					{
+						newLeader->isLeader = true;
+					}
+				}
+
+				PartyState _state;
+				std::string _currentGameFinder;
 				std::weak_ptr<Scene> _scene;
 				std::shared_ptr<ILogger> _logger;
 				std::shared_ptr<RpcService> _rpcService;
 				std::shared_ptr<GameFinder> _gameFinder;
 
 				std::string _myUserId;
-				std::vector<PartyUserDto> _members;
 				// Synchronize async state update, as well as getters.
 				// This is "coarse grain" synchronization, but the simplicity gains vs. multiple mutexes win against the possible performance loss imo.
 				mutable std::recursive_mutex _stateMutex;
 				// Prevent having multiple game finder connection tasks at the same time (could happen if multiple settings updates are received in a short amount of time)
 				pplx::task<void> _gameFinderConnectionTask = pplx::task_from_result();
 				pplx::cancellation_token_source _gameFinderConnectionCts;
-				// Used to signal to client code when party settings/members are initially ready
-				pplx::task_completion_event<void> _memberUpdateReceived;
-				pplx::task_completion_event<void> _settingsUpdateReceived;
+				// Used to signal to client code when the party is ready
+				pplx::task_completion_event<void> _partyStateReceived;
+				bool _isPendingStateSync = false;
 			};
 
 			class PartyContainer
@@ -635,6 +852,7 @@ namespace Stormancer
 					Event<PartySettings>::Subscription UpdatedPartySettingsSubscription
 				)
 					: _partyScene(scene)
+					, _partyService(scene->dependencyResolver().resolve<PartyService>())
 					, LeftPartySubscription(LeftPartySubscription)
 					, KickedFromPartySubscription(KickedFromPartySubscription)
 					, UpdatedPartyMembersSubscription(UpdatedPartyMembersSubscription)
@@ -645,17 +863,22 @@ namespace Stormancer
 
 				PartySettings settings() const
 				{
-					return  _partyScene->dependencyResolver().resolve<details::PartyService>()->settings();
+					return  _partyService->settings();
 				}
 
 				std::vector<PartyUserDto> members() const
 				{
-					return _partyScene->dependencyResolver().resolve<details::PartyService>()->members();
+					return _partyService->members();
 				}
 
 				bool isLeader() const
 				{
-					return (settings().leaderId == _partyScene->dependencyResolver().resolve<Users::UsersApi>()->userId());
+					return (_partyService->leaderId() == _partyScene->dependencyResolver().resolve<Users::UsersApi>()->userId());
+				}
+
+				std::string leaderId() const
+				{
+					return _partyService->leaderId();
 				}
 
 				std::shared_ptr<Scene> getScene() const { return _partyScene; }
@@ -702,6 +925,7 @@ namespace Stormancer
 
 			private:
 				std::shared_ptr<Scene> _partyScene;
+				std::shared_ptr<PartyService> _partyService;
 
 				Event<void>::Subscription LeftPartySubscription;
 				Event<void>::Subscription KickedFromPartySubscription;
@@ -897,6 +1121,16 @@ namespace Stormancer
 					return _party->get()->settings();
 				}
 
+				std::string getPartyLeaderId() const override
+				{
+					if (!isInParty())
+					{
+						throw std::runtime_error(PartyError::Str::NotInParty);
+					}
+
+					return _party->get()->leaderId();
+				}
+
 				bool isLeader() const override
 				{
 					if (!isInParty())
@@ -936,7 +1170,7 @@ namespace Stormancer
 					});
 				}
 
-				pplx::task<void> updatePartySettings(PartySettingsUpdate partySettingsDto) override
+				pplx::task<void> updatePartySettings(PartySettings partySettingsDto) override
 				{
 					if (!isInParty())
 					{
@@ -1247,16 +1481,19 @@ namespace Stormancer
 
 		class PartyPlugin : public IPlugin
 		{
+			static constexpr const char* PARTY_VERSION = "2019-08-30.1";
+			static constexpr const char* PARTYMANAGEMENT_VERSION = "2019-08-30.1";
+
 			void registerSceneDependencies(ContainerBuilder& builder, std::shared_ptr<Scene> scene)
 			{
-				auto name = scene->getHostMetadata("stormancer.party.v2");
-				if (name.length() > 0)
+				auto version = scene->getHostMetadata("stormancer.party");
+				if (version == PARTY_VERSION)
 				{
 					builder.registerDependency<details::PartyService, Scene>().singleInstance();
 				}
 
-				name = scene->getHostMetadata("stormancer.partymanagement.v2");
-				if (name.length() > 0)
+				version = scene->getHostMetadata("stormancer.partymanagement");
+				if (version == PARTYMANAGEMENT_VERSION)
 				{
 					builder.registerDependency<details::PartyManagementService, Scene>().singleInstance();
 				}
@@ -1264,7 +1501,7 @@ namespace Stormancer
 
 			void sceneCreated(std::shared_ptr<Scene> scene)
 			{
-				if (!scene->getHostMetadata("stormancer.party.v2").empty())
+				if (scene->getHostMetadata("stormancer.party") == PARTY_VERSION)
 				{
 					scene->dependencyResolver().resolve<details::PartyService>()->initialize();
 				}
@@ -1287,3 +1524,4 @@ namespace Stormancer
 }
 
 MSGPACK_ADD_ENUM(Stormancer::Party::PartyUserStatus)
+MSGPACK_ADD_ENUM(Stormancer::Party::details::MemberDisconnectionReason)

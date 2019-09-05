@@ -67,6 +67,7 @@ private:
 	static void testCreatePartyBadRequest(const Stormancer::Tester& tester)
 	{
 		using namespace Stormancer;
+		tester.logger()->log(LogLevel::Info, "TestParty", "testCreatePartyBadRequest");
 
 		auto client = makeClient(tester).get();
 
@@ -81,6 +82,7 @@ private:
 		catch (const std::exception& ex)
 		{
 			tester.logger()->log(LogLevel::Trace, "testCreatePartyBadRequest", "expected createParty error", ex.what());
+			tester.logger()->log(LogLevel::Info, "TestParty", "testCreatePartyBadRequest PASSED");
 			return;
 		}
 		throw std::runtime_error("createParty should have failed because of bad request");
@@ -91,7 +93,10 @@ private:
 		using namespace Stormancer;
 		using namespace TestHelpers;
 
-		auto clients = makeClients(tester, 15).get();
+		int numClients = 10;
+		tester.logger()->log(LogLevel::Info, "TestParty", "Connecting with "+std::to_string(numClients)+" clients...");
+		auto clients = makeClients(tester, numClients).get();
+		tester.logger()->log(LogLevel::Info, "TestParty", "Done");
 
 		tester.logger()->log(LogLevel::Info, "TestParty", "testCreateParty");
 		testCreateParty(clients[0]).get();
@@ -149,7 +154,7 @@ private:
 		{
 			assertex(party->getPartySettings().customData == request.CustomData, "CustomData should be the same as in the request", tce);
 			assertex(party->getPartySettings().gameFinderName == request.GameFinderName, "gameFinderName should be the same as in the request", tce);
-			assertex(party->getPartySettings().leaderId == users->userId(), "I should be the leader ; actual leader value from settings: " + party->getPartySettings().leaderId, tce);
+			assertex(party->getPartyLeaderId() == users->userId(), "I should be the leader ; actual leader value from settings: " + party->getPartyLeaderId(), tce);
 			assertex(party->isLeader(), "PartyApi should also report that I'm the leader", tce);
 			tce.set();
 		});
@@ -165,10 +170,9 @@ private:
 		auto party = client->dependencyResolver().resolve<Party::PartyApi>();
 		auto users = client->dependencyResolver().resolve<Users::UsersApi>();
 
-		Party::PartyUserDto expectedMember{};
+		Party::PartyUserDto expectedMember(users->userId());
 		expectedMember.isLeader = true;
 		expectedMember.partyUserStatus = Party::PartyUserStatus::NotReady;
-		expectedMember.userId = users->userId();
 
 		return awaitMembersConsistency(client, { expectedMember });
 	}
@@ -331,10 +335,9 @@ private:
 	{
 		using namespace Stormancer;
 
-		Party::PartyUserDto dto = {};
+		Party::PartyUserDto dto(user->dependencyResolver().resolve<Users::UsersApi>()->userId());
 		dto.isLeader = isLeader;
 		dto.partyUserStatus = Party::PartyUserStatus::NotReady;
-		dto.userId = user->dependencyResolver().resolve<Users::UsersApi>()->userId();
 
 		return dto;
 	}
