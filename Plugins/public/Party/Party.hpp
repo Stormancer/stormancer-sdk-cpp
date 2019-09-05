@@ -35,7 +35,7 @@ namespace Stormancer
 				AlreadyInParty,
 				NotInParty,
 				PartyNotReady,
-				SettingsUpdated
+				SettingsOutdated
 			};
 
 			struct Str
@@ -44,7 +44,7 @@ namespace Stormancer
 				static constexpr const char* AlreadyInParty = "party.alreadyInParty";
 				static constexpr const char* NotInParty = "party.notInParty";
 				static constexpr const char* PartyNotReady = "party.partyNotReady";
-				static constexpr const char* SettingsUpdated = "party.settingsUpdated";
+				static constexpr const char* SettingsOutdated = "party.settingsOutdated";
 
 				Str() = delete;
 			};
@@ -58,6 +58,8 @@ namespace Stormancer
 				if (std::strcmp(error, Str::NotInParty) == 0)			{ return NotInParty; }
 
 				if (std::strcmp(error, Str::PartyNotReady) == 0)		{ return PartyNotReady; }
+
+				if (std::strcmp(error, Str::SettingsOutdated) == 0)		{ return SettingsOutdated; }
 
 				return UnspecifiedError;
 			}
@@ -272,14 +274,39 @@ namespace Stormancer
 
 		namespace details
 		{
+			struct PartySettingsInternal
+			{
+				std::string gameFinderName;
+				std::string customData;
+				int settingsVersionNumber = 0;
+
+				operator PartySettings() const
+				{
+					PartySettings settings;
+					settings.gameFinderName = gameFinderName;
+					settings.customData = customData;
+					return settings;
+				}
+
+				MSGPACK_DEFINE(gameFinderName, customData, settingsVersionNumber)
+			};
+
 			struct PartyState
 			{
-				PartySettings				settings;
+				PartySettingsInternal		settings;
 				std::string					leaderId;
 				std::vector<PartyUserDto>	members;
 				int							version = 0;
 
 				MSGPACK_DEFINE(settings, leaderId, members, version)
+			};
+
+			struct MemberStatusUpdateRequest
+			{
+				PartyUserStatus	desiredStatus;
+				int				localSettingsVersion;
+
+				MSGPACK_DEFINE(desiredStatus, localSettingsVersion)
 			};
 
 			struct MemberStatusUpdate
@@ -361,15 +388,18 @@ namespace Stormancer
 						return pplx::task_from_exception<void>(std::runtime_error(PartyError::Str::PartyNotReady));
 					}
 
-					if (newStatus == PartyUserStatus::NotReady)
+					MemberStatusUpdateRequest request;
+					request.desiredStatus = newStatus;
+					request.localSettingsVersion = _state.settings.settingsVersionNumber;
+
+					if (request.desiredStatus == PartyUserStatus::NotReady)
 					{
-						return _rpcService->rpc<void>("party.updategamefinderplayerstatus", newStatus);
+						return _rpcService->rpc<void>("party.updategamefinderplayerstatus", request);
 					}
 
 					// When setting our status to Ready, we need to account for the case when the settings change during the ready RPC
 					std::weak_ptr<PartyService> wThat = this->shared_from_this();
-					auto currentGameFinder = _state.settings.gameFinderName;
-					return _gameFinderConnectionTask.then([newStatus, wThat, currentGameFinder](pplx::task<void> task)
+					return _gameFinderConnectionTask.then([request, wThat](pplx::task<void> task)
 					{
 						// I let GameFinder connection errors propagate as unspecified errors to the caller.
 						// I don't see any good in creating a specific error type for these, since they most likely mean there's a bug
@@ -379,12 +409,12 @@ namespace Stormancer
 						{
 							std::lock_guard<std::recursive_mutex> lg(that->_stateMutex);
 
-							if (currentGameFinder != that->_state.settings.gameFinderName)
+							if (request.localSettingsVersion != that->_state.settings.settingsVersionNumber)
 							{
-								throw std::runtime_error(PartyError::Str::SettingsUpdated);
+								throw std::runtime_error(PartyError::Str::SettingsOutdated);
 							}
 
-							return that->_rpcService->rpc<void>("party.updategamefinderplayerstatus", newStatus);
+							return that->_rpcService->rpc<void>("party.updategamefinderplayerstatus", request);
 						}
 
 						return pplx::task_from_result();
@@ -696,7 +726,7 @@ namespace Stormancer
 					if (checkVersionNumber(ctx))
 					{
 						_logger->log(LogLevel::Trace, "PartyService::handleSettingsUpdate", "Received settings update, version = " + std::to_string(_state.version));
-						_state.settings = ctx->readObject<PartySettings>();
+						_state.settings = ctx->readObject<PartySettingsInternal>();
 						updateGameFinder();
 						this->UpdatedPartySettings(_state.settings);
 					}
