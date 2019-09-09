@@ -10,6 +10,10 @@
 #include "stormancer/Configuration.h"
 #include "stormancer/IScheduler.h"
 
+// https://partner.steamgames.com/doc/sdk/api
+// https://partner.steamgames.com/doc/features/auth#client_to_backend_webapi
+// https://partner.steamgames.com/doc/api/ISteamUser#GetAuthSessionTicket
+
 namespace Stormancer
 {
 	namespace Steam
@@ -25,14 +29,16 @@ namespace Stormancer
 					_initAndRunSteam = (config->additionalParameters.at("steam.initAndRunSteam") == "true");
 					_forcedTicket = config->additionalParameters.at("steam.forcedTicket");
 
-					scheduler->schedulePeriodic(100, [actionDispatcher = config->actionDispatcher]()
+					if (_initAndRunSteam)
 					{
-						pplx::create_task([]()
+						scheduler->schedulePeriodic(100, [actionDispatcher = config->actionDispatcher]()
 						{
-							std::cout << "SteamAPI_RunCallbacks()\n";
-							SteamAPI_RunCallbacks();
-						}, actionDispatcher);
-					}, _cts.get_token());
+							pplx::create_task([]()
+							{
+								SteamAPI_RunCallbacks();
+							}, actionDispatcher);
+						}, _cts.get_token());
+					}
 				}
 
 				~SteamService()
@@ -70,22 +76,39 @@ namespace Stormancer
 
 			pplx::task<void> retrieveCredentials(const Users::CredientialsContext& context)
 			{
-				// https://partner.steamgames.com/doc/sdk/api
-				// https://partner.steamgames.com/doc/features/auth#client_to_backend_webapi
-				// https://partner.steamgames.com/doc/api/ISteamUser#GetAuthSessionTicket
+				std::lock_guard<std::recursive_mutex> lg(_mutex);
+				
+				_tce = std::make_shared<pplx::task_completion_event<void>>();
 
 				if (!SteamAPI_IsSteamRunning())
 				{
 					throw std::runtime_error("Steam is not running");
 				}
 
-				if (_initAndRunSteam && !SteamAPI_Init())
+				auto ct = pplx::cancellation_token::none();
+
+				if (_initAndRunSteam)
 				{
-					throw std::runtime_error("Steam init failed");
+					if (!SteamAPI_Init())
+					{
+						throw std::runtime_error("Steam init failed");
+					}
+
+					ct = timeout(10s);
+					auto wSteamAuthEventHandler = STORM_WEAK_FROM_THIS();
+					ct.register_callback([wSteamAuthEventHandler]()
+					{
+						if (auto steamAuthEventHandler = wSteamAuthEventHandler.lock())
+						{
+							std::lock_guard<std::recursive_mutex> lg(steamAuthEventHandler->_mutex);
+							steamAuthEventHandler->_tce.reset();
+						}
+					});
 				}
 
 				std::string steamTicketHex;
-				auto ct = pplx::cancellation_token::none();
+
+				std::shared_ptr<std::vector<byte>> steamTicket;
 
 				if (_forcedTicket.empty())
 				{
@@ -95,7 +118,8 @@ namespace Stormancer
 						throw std::runtime_error("SteamUser() returned null");
 					}
 
-					auto steamTicket = std::make_shared<std::vector<byte>>(1024);
+					steamTicket = std::make_shared<std::vector<byte>>(1024);
+
 					auto pcbTicket = std::make_shared<uint32>(0);
 					auto hAuthTicket = steamUser->GetAuthSessionTicket(steamTicket->data(), (int)steamTicket->size(), pcbTicket.get());
 
@@ -103,38 +127,24 @@ namespace Stormancer
 					{
 						throw std::runtime_error("Steam : invalid user authentication ticket");
 					}
+				}
+				else
+				{
+					steamTicket = std::make_shared<std::vector<byte>>(_forcedTicket.data(), _forcedTicket.data() + _forcedTicket.size());
+					_tce->set();
+				}
 
+				return pplx::create_task(*_tce, ct)
+					.then([context, steamTicket]()
+				{
 					std::stringstream ss;
 					ss << std::uppercase << std::hex << std::setfill('0');
 					for (auto b : *steamTicket)
 					{
 						ss << std::setw(2) << static_cast<unsigned>(b);
 					}
-					steamTicketHex = ss.str();
-				}
-				else
-				{
-					steamTicketHex = _forcedTicket;
-					_tce->set();
-				}
+					auto steamTicketHex = ss.str();
 
-				if (_initAndRunSteam)
-				{
-					ct = timeout(10s);
-					auto wSteamAuthEventHandler = STORM_WEAK_FROM_THIS();
-					ct.register_callback([wSteamAuthEventHandler]()
-					{
-						if (auto steamAuthEventHandler = wSteamAuthEventHandler.lock())
-						{
-							std::cerr << "CANCELED!!!";
-							steamAuthEventHandler->_tce.reset();
-						}
-					});
-				}
-
-				return pplx::create_task(*_tce, ct)
-					.then([context, steamTicketHex]()
-				{
 					context.authParameters->type = "steam";
 					context.authParameters->parameters = {
 						{ "provider", "steam" },
@@ -147,9 +157,10 @@ namespace Stormancer
 
 			STEAM_CALLBACK(SteamAuthenticationEventHandler, onAuthSessionTicket, GetAuthSessionTicketResponse_t);
 
+			std::recursive_mutex _mutex;
 			bool _initAndRunSteam = false;
 			std::string _forcedTicket;
-			std::shared_ptr<pplx::task_completion_event<void>> _tce = std::make_shared<pplx::task_completion_event<void>>();
+			std::shared_ptr<pplx::task_completion_event<void>> _tce;
 		};
 
 		class SteamPlugin : public IPlugin
@@ -168,6 +179,8 @@ namespace Stormancer
 
 		void SteamAuthenticationEventHandler::onAuthSessionTicket(GetAuthSessionTicketResponse_t* pCallback)
 		{
+			std::lock_guard<std::recursive_mutex> lg(_mutex);
+
 			if (pCallback->m_eResult != EResult::k_EResultOK)
 			{
 				_tce->set_exception(std::runtime_error("Steam : failed to get auth session ticket (EResult = " + std::to_string((int)pCallback->m_eResult) + ")"));
