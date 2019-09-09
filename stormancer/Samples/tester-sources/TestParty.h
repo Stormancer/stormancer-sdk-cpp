@@ -14,12 +14,47 @@ public:
 	static void runTests(const Stormancer::Tester& tester)
 	{
 		testCreatePartyBadRequest(tester);
+		testPartyEventHandler(tester);
 		testPartyFull(tester);
 	}
 
 private:
 
-	static pplx::task<std::shared_ptr<Stormancer::IClient>> makeClient(const Stormancer::Tester& tester)
+	class TestPartyEventHandlerFailure : public Stormancer::Party::IPartyEventHandler
+	{
+	public:
+		class Plugin : public Stormancer::IPlugin
+		{
+			void registerClientDependencies(Stormancer::ContainerBuilder& builder)
+			{
+				builder.registerDependency<TestPartyEventHandlerFailure>().as<Stormancer::Party::IPartyEventHandler>().asSelf().singleInstance();
+			}
+		};
+
+		class TestException {};
+
+	private:
+		pplx::task<void> onJoiningParty(std::shared_ptr<Stormancer::Party::PartyApi> party, std::string scene) override
+		{
+			throw TestException();
+		}
+
+		pplx::task<void> onLeavingParty(std::shared_ptr<Stormancer::Party::PartyApi> party, std::string scene) override
+		{
+			_leavingTce.set();
+			return pplx::task_from_result();
+		}
+
+		pplx::task_completion_event<void> _leavingTce;
+
+	public:
+		pplx::task<void> awaitOnLeaving()
+		{
+			return TestHelpers::taskFailAfterTimeout(pplx::create_task(_leavingTce), "onLeavingParty() should have been called", std::chrono::seconds(2));
+		}
+	};
+
+	static pplx::task<std::shared_ptr<Stormancer::IClient>> makeClient(const Stormancer::Tester& tester, Stormancer::IPlugin* additionalPlugin = nullptr)
 	{
 		using namespace Stormancer;
 
@@ -28,6 +63,10 @@ private:
 		conf->addPlugin(new Users::UsersPlugin);
 		conf->addPlugin(new GameFinderPlugin);
 		conf->addPlugin(new Party::PartyPlugin);
+		if (additionalPlugin)
+		{
+			conf->addPlugin(additionalPlugin);
+		}
 
 		auto client = IClient::create(conf);
 		auto users = client->dependencyResolver().resolve<Users::UsersApi>();
@@ -88,6 +127,59 @@ private:
 		throw std::runtime_error("createParty should have failed because of bad request");
 	}
 
+	static void testPartyEventHandler(const Stormancer::Tester& tester)
+	{
+		using namespace Stormancer;
+		using namespace TestHelpers;
+
+		tester.logger()->log(LogLevel::Info, "TestParty", "testPartyEventHandler");
+
+		auto client = makeClient(tester, new TestPartyEventHandlerFailure::Plugin).get();
+		auto party = client->dependencyResolver().resolve<Party::PartyApi>();
+		auto eventHandler = client->dependencyResolver().resolve<TestPartyEventHandlerFailure>();
+
+		Party::PartyRequestDto request = {};
+		request.platformSessionId = ""; // This will make a guid
+		request.GameFinderName = "testGameFinder";
+		request.CustomData = "customData";
+
+		bool joinedTriggered = false;
+		auto joinedSub = party->subscribeOnJoinedParty([&joinedTriggered]
+		{
+			joinedTriggered = true;
+		});
+		bool leftTriggered = false;
+		auto leftSub = party->subscribeOnLeftParty([&leftTriggered]
+		{
+			leftTriggered = true;
+		});
+
+		try
+		{
+			party->createParty(request).get();
+			throw std::runtime_error("createParty should have failed because of event handler throwing in onJoiningParty");
+		}
+		catch (const TestPartyEventHandlerFailure::TestException&) { /* OK */ }
+		catch (const std::exception& ex)
+		{
+			throw std::runtime_error("createParty unexpectedly failed: " + std::string(ex.what()));
+		}
+
+		if (joinedTriggered)
+		{
+			throw std::runtime_error("OnJoinedParty event should not have been triggered");
+		}
+
+		eventHandler->awaitOnLeaving().get();
+
+		if (leftTriggered)
+		{
+			throw std::runtime_error("OnLeftParty should not have been triggered");
+		}
+
+		tester.logger()->log(LogLevel::Info, "TestParty", "testPartyEventHandler PASSED");
+	}
+
 	static void testPartyFull(const Stormancer::Tester& tester)
 	{
 		using namespace Stormancer;
@@ -105,6 +197,10 @@ private:
 		tester.logger()->log(LogLevel::Info, "TestParty", "testInvitations");
 		testInvitations(clients[0], clients.begin()+1, clients.end(), tester).get();
 		tester.logger()->log(LogLevel::Info, "TestParty", "testInvitations PASSED");
+
+		//tester.logger()->log(LogLevel::Info, "TestParty", "testSettingsUpdate");
+		//testSettingsUpdate(clients).get();
+		//tester.logger()->log(LogLevel::Info, "TestParty", "testSettingsUpdate PASSED");
 	}
 
 	static pplx::task<void> testCreateParty(std::shared_ptr<Stormancer::IClient> client)
@@ -391,11 +487,37 @@ private:
 		});
 	}
 
-	static pplx::task<void> testSettingsUpdate(std::vector<std::shared_ptr<Stormancer::IClient>> clients)
+	static std::shared_ptr<Stormancer::Party::PartyApi> getLeader(const std::vector<std::shared_ptr<Stormancer::IClient>>& clients)
 	{
-		// TODO
-		return pplx::task_from_result();
+		using namespace Stormancer;
+
+		for (auto client : clients)
+		{
+			auto party = client->dependencyResolver().resolve<Party::PartyApi>();
+			if (party->isLeader())
+			{
+				return party;
+			}
+		}
+
+		return nullptr;
 	}
+	
+	//static pplx::task<void> testSettingsUpdate(const std::vector<std::shared_ptr<Stormancer::IClient>>& clients)
+	//{
+	//	using namespace Stormancer;
+	//	using namespace TestHelpers;
+
+	//	auto leader = getLeader(clients);
+	//	assertex(leader != nullptr, "Party should have a leader");
+
+	//	Party::PartySettings settings = leader->getPartySettings();
+	//	settings.customData = "newCustomData";
+	//	leader->updatePartySettings(settings).then([](pplx::task<void> task)
+	//	{
+
+	//	});
+	//}
 
 	static void assertex(bool condition, const std::string& msg)
 	{
