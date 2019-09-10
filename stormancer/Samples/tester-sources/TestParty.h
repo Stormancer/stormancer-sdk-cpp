@@ -149,7 +149,7 @@ private:
 			joinedTriggered = true;
 		});
 		bool leftTriggered = false;
-		auto leftSub = party->subscribeOnLeftParty([&leftTriggered]
+		auto leftSub = party->subscribeOnLeftParty([&leftTriggered](Party::MemberDisconnectionReason)
 		{
 			leftTriggered = true;
 		});

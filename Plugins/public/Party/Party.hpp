@@ -25,6 +25,12 @@ namespace Stormancer
 			Ready = 1
 		};
 
+		enum class MemberDisconnectionReason
+		{
+			Left = 0,
+			Kicked = 1
+		};
+
 		struct PartyError
 		{
 			enum Value
@@ -73,13 +79,14 @@ namespace Stormancer
 			virtual ~PartyApi() = default;
 
 			/// <summary>
-			/// Create a party and set the player as leader
+			/// Create and join a new party.
 			/// </summary>
 			/// <remarks>
-			/// If the player is currently in a party, the operation fails.
+			/// If the local player is currently in a party, the operation fails.
+			/// The local player will be the leader of the newly created party.
 			/// </remarks>
 			/// <param name="partyRequest">Party creation parameters</param>
-			/// <returns></returns>
+			/// <returns>A task that completes when the party has been created and joined.</returns>
 			virtual pplx::task<void> createParty(const PartyRequestDto& partyRequest) = 0;
 
 			/// <summary>
@@ -112,29 +119,40 @@ namespace Stormancer
 			virtual bool isInParty() const = 0;
 
 			/// <summary>
-			/// Get the members of the currently joined party.
+			/// Get the member list of the currently joined party.
 			/// </summary>
+			/// <remarks>
+			/// It is invalid to call this method while not in a party.
+			/// Call <c>isInParty()</c> to check.
+			/// </remarks>
 			/// <returns>A vector of structs that describe every user who is currently in the party.</returns>
+			/// <exception cref="std::exception">If you are not in a party.</exception>
 			virtual std::vector<PartyUserDto> getPartyMembers() const = 0;
 
 			/// <summary>
-			/// Set the player status.
-			/// When all players in party are ready, gamefinding is automatically started.
+			/// Set the local player's status (ready/not ready).
 			/// </summary>
+			/// <remarks>
+			/// By default, a GameFinder request (matchmaking group queuing) is automatically started when all players in the party are ready.
+			/// This behavior can be controlled server-side. See the Party documentation for details.
+			/// </remarks>
 			/// <param name="playerStatus">Ready or not ready</param>
 			/// <returns>A task that completes when the update has been sent.</returns>
+			/// <exception cref="std::exception">If you are not in a party.</exception>
 			virtual pplx::task<void> updatePlayerStatus(PartyUserStatus playerStatus) = 0;
 
 			/// <summary>
 			/// Get the settings of the current party.
 			/// </summary>
 			/// <returns>The settings of the current party, if the current user is currently in a party.</returns>
+			/// <exception cref="std::exception">If you are not in a party.</exception>
 			virtual PartySettings getPartySettings() const = 0;
 
 			/// <summary>
 			/// Get the User Id of the party leader.
 			/// </summary>
 			/// <returns>The Stormancer User Id of the party leader.</returns>
+			/// <exception cref="std::exception">If you are not in a party.</exception>
 			virtual std::string getPartyLeaderId() const = 0;
 
 			/// <summary>
@@ -142,30 +160,31 @@ namespace Stormancer
 			/// </summary>
 			/// <remarks>
 			/// Party settings can only be set by the party leader.
-			/// </remarks>
-			/// <remarks>
 			/// Party settings are automatically replicated to other players. The current value is available
 			/// in the current party object. Subscribe to the onUpdatedPartySettings event to listen to update events.
 			/// </remarks>
-			/// <param name="partySettings"></param>
-			/// <returns></returns>
+			/// <param name="partySettings">New settings</param>
+			/// <returns>A task that completes when the settings have been updated and replicated to other players.</returns>
+			/// <exception cref="std::exception">If you are not in a party.</exception>
 			virtual pplx::task<void> updatePartySettings(PartySettings partySettings) = 0;
 
 			/// <summary>
-			/// Update the data associated with the player
+			/// Update the data associated with the local player
 			/// </summary>
 			/// <remarks>
 			/// player data are automatically replicated to other players. The current value is available
-			/// in the current party members list. Subscribe to the onUpdatedUserData event to listen to update events.
+			/// in the current party members list. Subscribe to the OnUpdatedPartyMembers event to listen to update events.
 			/// </remarks>
-			/// <param name="data"></param>
-			/// <returns></returns>
+			/// <param name="data">New player data</param>
+			/// <returns>A task that completes when the data has been updated and replicated to other players.</returns>
+			/// <exception cref="std::exception">If you are not in a party.</exception>
 			virtual pplx::task<void> updatePlayerData(std::string data) = 0;
 
 			/// <summary>
 			/// Check if the local user is the leader of the party.
 			/// </summary>
 			/// <returns><c>true</c> if the local user is the leader, <c>false</c> otherwise.</returns>
+			/// <exception cref="std::exception">If you are not in a party.</exception>
 			virtual bool isLeader() const = 0;
 
 			/// <summary>
@@ -177,6 +196,7 @@ namespace Stormancer
 			/// </remarks>
 			/// <param name="userId">The id of the player to promote</param>
 			/// <returns>A task that completes when the underlying RPC (remote procedure call) has returned.</returns>
+			/// <exception cref="std::exception">If you are not in a party.</exception>
 			virtual pplx::task<void> promoteLeader(std::string userId) = 0;
 
 			/// <summary>
@@ -188,6 +208,7 @@ namespace Stormancer
 			/// </remarks>
 			/// <param name="userId">The id of the player to kick</param>
 			/// <returns>A task that completes when the underlying RPC (remote procedure call) has returned.</returns>
+			/// <exception cref="std::exception">If you are not in a party.</exception>
 			virtual pplx::task<void> kickPlayer(std::string userId) = 0;
 
 			/// <summary>
@@ -201,20 +222,70 @@ namespace Stormancer
 			/// - declined the invitation
 			/// - quit the game.
 			/// </returns>
+			/// <exception cref="std::exception">If you are not in a party.</exception>
 			virtual pplx::task<void> invitePlayer(const std::string& userId, pplx::cancellation_token ct = pplx::cancellation_token::none()) = 0;
 
 			/// <summary>
 			/// Get pending party invitations for the player.
 			/// </summary>
+			/// <remarks>
+			/// Call <c>subscribeOnInvitationReceived()</c> in order to be notified when an invitation is received.
+			/// </remarks>
 			/// <returns>A vector of invitations that have been received and have not yet been accepted.</returns>
 			virtual std::vector<PartyInvitation> getPendingInvitations() = 0;
 
+			/// <summary>
+			/// Register a callback to be run when the party leader changes the party settings.
+			/// </summary>
+			/// <param name="callback">Callable object taking a <c>PartySettings</c> struct as parameter.</param>
+			/// <returns>A <c>Subscription</c> object to track the lifetime of the subscription.</returns>
 			virtual Event<PartySettings>::Subscription subscribeOnUpdatedPartySettings(std::function<void(PartySettings)> callback) = 0;
+			/// <summary>
+			/// Register a callback to be run when the party member list changes.
+			/// </summary>
+			/// <remarks>
+			/// This event is triggered for any kind of change to the list:
+			/// - Member addition and removal
+			/// - Member data change
+			/// - Member status change
+			/// - Leader change
+			/// The list of <c>PartyUserDto</c> passed to the callback contains only the entries that have changed.
+			/// To retrieve the updated full list of members, call <c>getPartyMembers()</c> (it is safe to call from inside the callback too).
+			/// </remarks>
+			/// <param name="callback">Callable object taking a vector of <c>PartyUserDto</c> structs as parameter.</param>
+			/// <returns>A <c>Subscription</c> object to track the lifetime of the subscription.</returns>
 			virtual Event<std::vector<PartyUserDto>>::Subscription subscribeOnUpdatedPartyMembers(std::function<void(std::vector<PartyUserDto>)> callback) = 0;
+			/// <summary>
+			/// Register a callback to be run when the local player has joined a party.
+			/// </summary>
+			/// <param name="callback">Callable object.</param>
+			/// <returns>A <c>Subscription</c> object to track the lifetime of the subscription.</returns>
 			virtual Event<void>::Subscription subscribeOnJoinedParty(std::function<void()> callback) = 0;
-			virtual Event<void>::Subscription subscribeOnKickedFromParty(std::function<void()> callback) = 0;
-			virtual Event<void>::Subscription subscribeOnLeftParty(std::function<void()> callback) = 0;
+			/// <summary>
+			/// Register a callback to be run when the local player has left the party.
+			/// </summary>
+			/// <remarks>
+			/// The callback parameter <c>MemberDisconnectionReason</c> will be set to <c>Kicked</c> if you were kicked by the party leader.
+			/// In any other case, it will be set to <c>Left</c>.
+			/// </remarks>
+			/// <param name="callback">Callable object taking a <c>MemberDisconnectionReason</c> parameter.</param>
+			/// <returns>A <c>Subscription</c> object to track the lifetime of the subscription.</returns>
+			virtual Event<MemberDisconnectionReason>::Subscription subscribeOnLeftParty(std::function<void(MemberDisconnectionReason)> callback) = 0;
+			/// <summary>
+			/// Register a callback to be run when the local player receives an invitation to a party from a remote player.
+			/// </summary>
+			/// <remarks>
+			/// To accept the invitation, call <c>joinParty(PartyInvitation)</c>.
+			/// To retrieve the list of every pending invitations received by the local player, call <c>getPendingInvitations()</c>.
+			/// </remarks>
+			/// <param name="callback">Callable object taking a <c>PartyInvitation</c> parameter.</param>
+			/// <returns>A <c>Subscription</c> object to track the lifetime of the subscription.</returns>
 			virtual Event<PartyInvitation>::Subscription subscribeOnInvitationReceived(std::function<void(PartyInvitation)> callback) = 0;
+			/// <summary>
+			/// Register a callback to be run when an invitation sent to the local player was canceled by the sender.
+			/// </summary>
+			/// <param name="callback">Callable object taking the Id of the user who canceled the invitation.</param>
+			/// <returns>A <c>Subscription</c> object to track the lifetime of the subscription.</returns>
 			virtual Event<std::string>::Subscription subscribeOnInvitationCanceled(std::function<void(std::string)> callback) = 0;
 		};
 
@@ -356,12 +427,6 @@ namespace Stormancer
 				MSGPACK_DEFINE(userId, userData)
 			};
 
-			enum class MemberDisconnectionReason
-			{
-				Left = 0,
-				Kicked = 1
-			};
-
 			struct MemberDisconnection
 			{
 				std::string					userId;
@@ -482,9 +547,8 @@ namespace Stormancer
 				///
 				Event<GameFinderStatus> PartyGameFinderStateUpdated;
 				Event<GameFinderResponse> onPartyGameFound;
-				Event<void> LeftParty;
+				Event<MemberDisconnectionReason> LeftParty;
 				Event<void> JoinedParty;
-				Event<void> KickedFromParty;
 				Event<std::vector<PartyUserDto>> UpdatedPartyMembers;
 				Event<PartySettings> UpdatedPartySettings;
 
@@ -595,11 +659,12 @@ namespace Stormancer
 										catch (...) {}
 									});
 
+									MemberDisconnectionReason reason = MemberDisconnectionReason::Left;
 									if (state.reason == "party.kicked")
 									{
-										that->KickedFromParty();
+										reason = MemberDisconnectionReason::Kicked;
 									}
-									that->LeftParty();
+									that->LeftParty(reason);
 								}
 							}
 							catch (const std::exception& ex)
@@ -913,15 +978,13 @@ namespace Stormancer
 			public:
 				PartyContainer(
 					std::shared_ptr<Scene> scene,
-					Event<void>::Subscription LeftPartySubscription,
-					Event<void>::Subscription KickedFromPartySubscription,
+					Event<MemberDisconnectionReason>::Subscription LeftPartySubscription,
 					Event<std::vector<PartyUserDto>>::Subscription UpdatedPartyMembersSubscription,
 					Event<PartySettings>::Subscription UpdatedPartySettingsSubscription
 				)
 					: _partyScene(scene)
 					, _partyService(scene->dependencyResolver().resolve<PartyService>())
 					, LeftPartySubscription(LeftPartySubscription)
-					, KickedFromPartySubscription(KickedFromPartySubscription)
 					, UpdatedPartyMembersSubscription(UpdatedPartyMembersSubscription)
 					, UpdatedPartySettingsSubscription(UpdatedPartySettingsSubscription)
 				{
@@ -993,8 +1056,7 @@ namespace Stormancer
 				std::shared_ptr<Scene> _partyScene;
 				std::shared_ptr<PartyService> _partyService;
 
-				Event<void>::Subscription LeftPartySubscription;
-				Event<void>::Subscription KickedFromPartySubscription;
+				Event<MemberDisconnectionReason>::Subscription LeftPartySubscription;
 				Event<std::vector<PartyUserDto>>::Subscription UpdatedPartyMembersSubscription;
 				Event<PartySettings>::Subscription UpdatedPartySettingsSubscription;
 
@@ -1360,12 +1422,7 @@ namespace Stormancer
 					return _onJoinedParty.subscribe(callback);
 				}
 
-				Event<void>::Subscription subscribeOnKickedFromParty(std::function<void()> callback) override
-				{
-					return _onKickedFromParty.subscribe(callback);
-				}
-
-				Event<void>::Subscription subscribeOnLeftParty(std::function<void()> callback) override
+				Event<MemberDisconnectionReason>::Subscription subscribeOnLeftParty(std::function<void(MemberDisconnectionReason)> callback) override
 				{
 					return _onLeftParty.subscribe(callback);
 				}
@@ -1407,8 +1464,7 @@ namespace Stormancer
 				Event<PartySettings> _onUpdatedPartySettings;
 				Event<std::vector<PartyUserDto>> _onUpdatedPartyMembers;
 				Event<void> _onJoinedParty;
-				Event<void> _onKickedFromParty;
-				Event<void> _onLeftParty;
+				Event<MemberDisconnectionReason> _onLeftParty;
 				Event<PartyInvitation> _onInvitationReceived;
 				Event<std::string> _onInvitationCanceled;
 
@@ -1485,7 +1541,7 @@ namespace Stormancer
 
 					auto party = std::make_shared<PartyContainer>(
 						scene,
-						partyService->LeftParty.subscribe([wPartyManagement, sceneId]() {
+						partyService->LeftParty.subscribe([wPartyManagement, sceneId](MemberDisconnectionReason reason) {
 							if (auto partyManagement = wPartyManagement.lock())
 							{
 								pplx::task<void> handlersTask = pplx::task_from_result();
@@ -1514,14 +1570,8 @@ namespace Stormancer
 								if (partyManagement->isInParty())
 								{
 									partyManagement->_party = nullptr;
-									partyManagement->_onLeftParty();
+									partyManagement->_onLeftParty(reason);
 								}
-							}
-						}),
-						partyService->KickedFromParty.subscribe([wPartyManagement]() {
-							if (auto partyManagement = wPartyManagement.lock())
-							{
-								partyManagement->_onKickedFromParty();
 							}
 						}),
 						partyService->UpdatedPartyMembers.subscribe([wPartyManagement](std::vector<PartyUserDto> partyUsers) {
@@ -1646,4 +1696,4 @@ namespace Stormancer
 }
 
 MSGPACK_ADD_ENUM(Stormancer::Party::PartyUserStatus)
-MSGPACK_ADD_ENUM(Stormancer::Party::details::MemberDisconnectionReason)
+MSGPACK_ADD_ENUM(Stormancer::Party::MemberDisconnectionReason)
