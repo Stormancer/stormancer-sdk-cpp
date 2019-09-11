@@ -79,6 +79,15 @@ namespace Stormancer
 			_msgSent = 1;
 		}
 
+		template<typename TValue>
+		void sendValueTemplated(const TValue& value, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY)
+		{
+			sendValue([&value](obytestream& stream)
+			{
+				Serializer().serialize(stream, value);
+			}, priority);
+		}
+
 		void sendError(std::string errorMsg) const
 		{
 			auto scene = _scene.lock();

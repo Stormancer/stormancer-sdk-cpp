@@ -15,7 +15,7 @@ private:
 	class TestAuthProvider1 : public Stormancer::Users::IAuthenticationEventHandler
 	{
 		// Inherited via IAuthenticationEventHandler
-		virtual pplx::task<void> retrieveCredentials(const Stormancer::Users::CredientialsContext & context) override
+		pplx::task<void> retrieveCredentials(const Stormancer::Users::CredientialsContext & context) override
 		{
 			context.authParameters->type = "test";
 			passed = true;
@@ -27,12 +27,13 @@ private:
 	class TestAuthProvider2 : public Stormancer::Users::IAuthenticationEventHandler
 	{
 		// Inherited via IAuthenticationEventHandler
-		virtual pplx::task<void> retrieveCredentials(const Stormancer::Users::CredientialsContext & context) override
+		pplx::task<void> retrieveCredentials(const Stormancer::Users::CredientialsContext & context) override
 		{
 			context.authParameters->parameters["testkey"] = "testvalue";
 			passed = true;
 			return pplx::task_from_result();
 		}
+
 	public:
 		bool passed = false;
 	};
@@ -77,6 +78,42 @@ private:
 		}
 	};
 
+	class TestCredsRenewalHandler : public Stormancer::Users::IAuthenticationEventHandler
+	{
+	public:
+		pplx::task_completion_event<void> tce;
+
+		TestCredsRenewalHandler(pplx::task_completion_event<void> tce) : tce(tce) {}
+
+		pplx::task<void> retrieveCredentials(const Stormancer::Users::CredientialsContext & context) override
+		{
+			// renew credentials in 5 seconds
+			context.authParameters->parameters["testrenewal"] = "00:00:05";
+			return pplx::task_from_result();
+		}
+
+		pplx::task<void> renewCredentials(const Stormancer::Users::CredentialsRenewalContext& context) override
+		{
+			context.response->parameters["userData"] = "updatedData";
+			tce.set();
+			return pplx::task_from_result();
+		}
+	};
+
+	class TestCredsRenewalPlugin : public Stormancer::IPlugin
+	{
+		void registerClientDependencies(Stormancer::ContainerBuilder& builder) override
+		{
+			builder.registerDependency<TestCredsRenewalHandler>([this](const Stormancer::DependencyScope&)
+			{
+				return std::make_shared<TestCredsRenewalHandler>(renewCredentialsCalledTce);
+			}).as<Stormancer::Users::IAuthenticationEventHandler>();
+		}
+
+	public:
+		pplx::task_completion_event<void> renewCredentialsCalledTce;
+	};
+
 public:
 	static void runTests(const Stormancer::Tester& tester)
 	{
@@ -86,6 +123,7 @@ public:
 		testNoEventHandlersWithCallback(tester);
 		testCurrentLocalUser(tester);
 		testSendRequest(tester);
+		testRenewCredentials(tester);
 
 		auto authTester = IAuthenticationTester::create();
 		authTester->runTests(tester);
@@ -313,6 +351,38 @@ private:
 		assertex(status == pplx::completed, "completion of the request on the sender's side timed out");
 
 		tester.logger()->log(LogLevel::Info, "TestUsersPlugin", "testSendRequest PASSED");
+	}
+
+	static void testRenewCredentials(const Stormancer::Tester& tester)
+	{
+		using namespace Stormancer;
+		using namespace TestHelpers;
+
+		tester.logger()->log(LogLevel::Info, "TestUsersPlugin", "testRenewCredentials");
+
+		auto conf = Configuration::create(tester.endpoint(), tester.account(), tester.application());
+		conf->addPlugin(new Users::UsersPlugin);
+		conf->addPlugin(new TestPlugin);
+		auto* credsPlugin = new TestCredsRenewalPlugin;
+		conf->addPlugin(credsPlugin);
+		conf->logger = tester.logger();
+
+		auto client = IClient::create(conf);
+		auto users = client->dependencyResolver().resolve<Users::UsersApi>();
+		users->login().get();
+
+		auto scene = users->connectToPrivateScene("test-services-scene").get();
+		auto rpc = scene->dependencyResolver().resolve<RpcService>();
+		auto sessionData = rpc->rpc<std::unordered_map<std::string, std::string>>("users.test.GetSessionData").get();
+		assertex(sessionData["userData"] == "initial", "Initially, session data's 'userData' entry should have the value 'initial' ; instead, it is '" + sessionData["userData"] + "'");
+
+		taskDelay(std::chrono::seconds(6)).get();
+		assertex(pplx::create_task(credsPlugin->renewCredentialsCalledTce).is_done(), "renewCredentials should have been called");
+
+		sessionData = rpc->rpc<std::unordered_map<std::string, std::string>>("users.test.GetSessionData").get();
+		assertex(sessionData["userData"] == "updatedData", "session data should now be 'updatedData' ; instead, it is '" + sessionData["userData"] + "'");
+
+		tester.logger()->log(LogLevel::Info, "TestUsersPlugin", "testRenewCredentials PASSED");
 	}
 
 	static void assertex(bool condition, std::string message)

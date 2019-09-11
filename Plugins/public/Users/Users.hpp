@@ -121,6 +121,13 @@ namespace Stormancer
 			MSGPACK_DEFINE(type, parameters);
 		};
 
+		struct RenewCredentialsParameters
+		{
+			std::unordered_map<std::string, std::string> parameters;
+
+			MSGPACK_DEFINE(parameters);
+		};
+
 		/// <summary>
 		/// A platform-specific user Id.
 		/// </summary>
@@ -172,6 +179,20 @@ namespace Stormancer
 			std::shared_ptr<PlatformUserId> platformUserId;
 		};
 
+		class UsersApi;
+		struct CredentialsRenewalContext
+		{
+			/// <summary>
+			/// The type (name) of the provider that needs its credentials renewed
+			/// </summary>
+			std::string authProviderType;
+			/// <summary>
+			/// Parameters needed by the server-side authentication provider to renew the credentials. Must be set by the event handler.
+			/// </summary>
+			std::shared_ptr<RenewCredentialsParameters> response;
+			std::shared_ptr<UsersApi> usersApi;
+		};
+
 		/// <summary>
 		/// Run custom code to provide or modify authentication credentials.
 		/// </summary>
@@ -208,6 +229,30 @@ namespace Stormancer
 			/// You must not modify <c>context</c> after this task has completed, or else you would run into a race condition.
 			/// </returns>
 			virtual pplx::task<void> retrieveCredentials(const CredientialsContext& context) = 0;
+
+			/// <summary>
+			/// Fulfill a request from the server to renew credentials for a specific authentication provider.
+			/// </summary>
+			/// <remarks>
+			/// You should override this method if your server-side authentication logic requires renewal of client credentials.
+			/// In this case, this method will be called when such a renewal is requested by the server.
+			/// </remarks>
+			/// <remarks>
+			/// Credentials renewal is performed for a single authentication provider at a time.
+			/// The type of the provider that requeted the renewal can be obtained from <paramref name="context"></paramref>.
+			/// </remarks>
+			/// <param name="context">
+			/// Object containing information about the current renewal request.
+			/// The parameters needed by the authentication provider to perform the renewal must be set by the handler in <c>context.response->parameters</c>.
+			/// </param>
+			/// <returns>
+			/// A pplx::task&lt;void&gt; that should complete when the processing that you needed to do is done.
+			/// You must not modify <c>context</c> after this task has completed, or else you would run into a race condition.
+			/// </returns>
+			virtual pplx::task<void> renewCredentials(const CredentialsRenewalContext& /*context*/)
+			{
+				return pplx::task_from_result();
+			}
 
 			virtual ~IAuthenticationEventHandler() = default;
 		};
@@ -813,7 +858,9 @@ namespace Stormancer
 						});
 					}
 
-					scene->dependencyResolver().resolve<RpcService>()->addProcedure("sendRequest", [wThat](RpcRequestContext_ptr ctx)
+					auto rpcService = scene->dependencyResolver().resolve<RpcService>();
+
+					rpcService->addProcedure("sendRequest", [wThat](RpcRequestContext_ptr ctx)
 					{
 						OperationCtx opCtx;
 						opCtx.request = ctx;
@@ -835,6 +882,31 @@ namespace Stormancer
 						return it->second(opCtx);
 					});
 
+					rpcService->addProcedure("users.renewCredentials", [wThat](RpcRequestContext_ptr ctx)
+					{
+						auto that = wThat.lock();
+						if (!that)
+						{
+							return pplx::task_from_result();
+						}
+
+						auto provider = ctx->readObject<std::string>();
+						that->_logger->log(LogLevel::Trace, "UsersApi", "Received a renewCredentials request for provider " + provider);
+
+						auto logger = that->_logger;
+						return that->runCredentialsRenewalHandlers(provider)
+							.then([ctx, logger](pplx::task<RenewCredentialsParameters> task)
+						{
+							try
+							{
+								ctx->sendValueTemplated(task.get());
+							}
+							catch (const std::exception& ex)
+							{
+								logger->log(LogLevel::Error, "UsersApi", "An exception was thrown by a renewCredentials handler", ex);
+							}
+						});
+					});
 				})
 					.then([wThat](std::shared_ptr<Scene> scene)
 				{
@@ -979,6 +1051,28 @@ namespace Stormancer
 					{
 						return *credentialsContext.authParameters;
 					});
+				});
+			}
+
+			pplx::task<RenewCredentialsParameters> runCredentialsRenewalHandlers(const std::string& providerType)
+			{
+				CredentialsRenewalContext context;
+				context.authProviderType = providerType;
+				context.response = std::make_shared<RenewCredentialsParameters>();
+				context.usersApi = this->shared_from_this();
+
+				pplx::task<void> handlersTask = pplx::task_from_result();
+				for (const auto& handler : _authenticationEventHandlers)
+				{
+					handlersTask = handlersTask.then([handler, context]
+					{
+						return handler->renewCredentials(context);
+					}, _userDispatcher);
+				}
+
+				return handlersTask.then([context]
+				{
+					return *context.response;
 				});
 			}
 
