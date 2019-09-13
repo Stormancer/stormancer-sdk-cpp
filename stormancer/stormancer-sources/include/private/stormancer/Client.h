@@ -172,6 +172,7 @@ namespace Stormancer
 		Action<ConnectionState> _onConnectionStateChanged;
 		std::shared_ptr<Configuration> _config;
 		rxcpp::composite_subscription _connectionSubscription;
+		std::weak_ptr<IPacketDispatcher> _packetDispatcher;
 		Serializer _serializer;
 		std::string _sessionToken;
 

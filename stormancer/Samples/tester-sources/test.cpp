@@ -19,7 +19,7 @@ namespace Stormancer
 		_tests.push_back([this]() { test_dependencyInjection(); });
 		_tests.push_back([this]() { test_streams(); });
 		_tests.push_back([this]() { test_connect(); });
-		_tests.push_back([this]() { test_connectionRejected(); });
+		//_tests.push_back([this]() { test_connectionRejected(); });
 		_tests.push_back([this]() { test_echo(); });
 		_tests.push_back([this]() { test_rpc_server(); });
 		_tests.push_back([this]() { test_rpc_server_cancel(); });

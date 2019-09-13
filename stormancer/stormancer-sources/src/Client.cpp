@@ -924,7 +924,15 @@ namespace Stormancer
 			plugin->packetReceived(packet);
 		}
 
-		_dependencyResolver.resolve<IPacketDispatcher>()->dispatchPacket(packet);
+		if (_packetDispatcher.expired())
+		{
+			_packetDispatcher = _dependencyResolver.resolve<IPacketDispatcher>();
+		}
+
+		if (auto packetDispatcher = _packetDispatcher.lock())
+		{
+			packetDispatcher->dispatchPacket(packet);
+		}
 	}
 
 	int64 Client::clock() const
