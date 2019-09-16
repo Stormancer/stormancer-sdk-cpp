@@ -775,7 +775,7 @@ namespace Stormancer
 								client->disconnect();//Disconnect still connected scenes.
 							}
 						}
-						if (_autoReconnect)
+						if (_autoReconnect && !_client.expired())
 						{
 							setConnectionState(GameConnectionState::Reconnecting);
 						}

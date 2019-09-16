@@ -82,8 +82,10 @@ private:
 	{
 	public:
 		pplx::task_completion_event<void> tce;
+		// Wait for the initial session data to be received before updating it
+		pplx::task<void> initialDataReceived;
 
-		TestCredsRenewalHandler(pplx::task_completion_event<void> tce) : tce(tce) {}
+		TestCredsRenewalHandler(pplx::task_completion_event<void> tce, pplx::task<void> initialDataReceived) : tce(tce), initialDataReceived(initialDataReceived) {}
 
 		pplx::task<void> retrieveCredentials(const Stormancer::Users::CredientialsContext & context) override
 		{
@@ -94,9 +96,9 @@ private:
 
 		pplx::task<void> renewCredentials(const Stormancer::Users::CredentialsRenewalContext& context) override
 		{
-			context.response->parameters["userData"] = "updatedData";
+			context.response->parameters["testData"] = "updatedData";
 			tce.set();
-			return pplx::task_from_result();
+			return initialDataReceived;
 		}
 	};
 
@@ -106,12 +108,19 @@ private:
 		{
 			builder.registerDependency<TestCredsRenewalHandler>([this](const Stormancer::DependencyScope&)
 			{
-				return std::make_shared<TestCredsRenewalHandler>(renewCredentialsCalledTce);
+				return std::make_shared<TestCredsRenewalHandler>(renewCredentialsCalledTce, pplx::create_task(initialDataReceivedTce));
 			}).as<Stormancer::Users::IAuthenticationEventHandler>();
 		}
 
-	public:
 		pplx::task_completion_event<void> renewCredentialsCalledTce;
+		pplx::task_completion_event<void> initialDataReceivedTce;
+
+	public:
+		pplx::task<void> renewCredentialsCalled() {
+			return pplx::create_task(renewCredentialsCalledTce);
+		}
+
+		void setInitialDataReceived() { initialDataReceivedTce.set(); }
 	};
 
 public:
@@ -360,6 +369,8 @@ private:
 
 		tester.logger()->log(LogLevel::Info, "TestUsersPlugin", "testRenewCredentials");
 
+		const char* testDataKey = "testData";
+
 		auto conf = Configuration::create(tester.endpoint(), tester.account(), tester.application());
 		conf->addPlugin(new Users::UsersPlugin);
 		conf->addPlugin(new TestPlugin);
@@ -373,14 +384,15 @@ private:
 
 		auto scene = users->connectToPrivateScene("test-services-scene").get();
 		auto rpc = scene->dependencyResolver().resolve<RpcService>();
-		auto sessionData = rpc->rpc<std::unordered_map<std::string, std::string>>("users.test.GetSessionData").get();
-		assertex(sessionData["userData"] == "initial", "Initially, session data's 'userData' entry should have the value 'initial' ; instead, it is '" + sessionData["userData"] + "'");
+		auto sessionData = rpc->rpc<std::string>("users.test.GetSessionData", testDataKey).get();
+		assertex(sessionData == "initial", "Initially, session data's 'testData' entry should have the value 'initial' ; instead, it is '" + sessionData + "'");
+		credsPlugin->setInitialDataReceived();
 
 		taskDelay(std::chrono::seconds(6)).get();
-		assertex(pplx::create_task(credsPlugin->renewCredentialsCalledTce).is_done(), "renewCredentials should have been called");
+		assertex(credsPlugin->renewCredentialsCalled().is_done(), "renewCredentials should have been called");
 
-		sessionData = rpc->rpc<std::unordered_map<std::string, std::string>>("users.test.GetSessionData").get();
-		assertex(sessionData["userData"] == "updatedData", "session data should now be 'updatedData' ; instead, it is '" + sessionData["userData"] + "'");
+		sessionData = rpc->rpc<std::string>("users.test.GetSessionData", testDataKey).get();
+		assertex(sessionData == "updatedData", "session data should now be 'updatedData' ; instead, it is '" + sessionData + "'");
 
 		tester.logger()->log(LogLevel::Info, "TestUsersPlugin", "testRenewCredentials PASSED");
 	}
