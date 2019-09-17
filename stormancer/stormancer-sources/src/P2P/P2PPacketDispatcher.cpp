@@ -2,7 +2,7 @@
 #include "stormancer/P2P/P2PPacketDispatcher.h"
 #include "stormancer/MessageIDTypes.h"
 #include "stormancer/P2P/RakNet/P2PTunnels.h"
-
+#include <cpprest/asyncrt_utils.h>
 namespace Stormancer
 {
 	P2PPacketDispatcher::P2PPacketDispatcher(std::shared_ptr<P2PTunnels> tunnels, std::shared_ptr<IConnectionManager> connections, std::shared_ptr<ILogger> logger, std::weak_ptr<Serializer> serializer)
@@ -20,7 +20,7 @@ namespace Stormancer
 
 		config.addProcessor((byte)MessageIDTypes::ID_P2P_RELAY, [wSerializer, wConnections](Packet_ptr p)
 			{
-				std::string peerId;
+				std::vector<byte> peerId;
 				auto serializer = wSerializer.lock();
 				if (!serializer)
 				{
@@ -35,15 +35,15 @@ namespace Stormancer
 				}
 
 				serializer->deserialize(p->stream, peerId);
-
-				auto connection = connections->getConnection(peerId);
+				auto clientSessionId = utility::conversions::to_utf8string(utility::conversions::to_base64(peerId));
+				auto connection = connections->getConnection(clientSessionId);
 				if (connection)
 				{
 					p->connection = connection;
 				}
 				else
 				{
-					throw std::runtime_error(("ID_P2P_RELAY processor: Connection for peer Id " + peerId + " was not found").c_str());
+					throw std::runtime_error(("ID_P2P_RELAY processor: Connection for peer Id " + clientSessionId + " was not found").c_str());
 				}
 
 				return false;
