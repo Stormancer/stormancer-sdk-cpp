@@ -46,7 +46,7 @@ namespace Stormancer
 		}
 
 		const auto& session = (*it).second;
-		auto connection = _connections->getConnection(session.RemotePeerId);
+		auto connection = _connections->getConnection(session.RemoteSessionId);
 		_sessions.erase(it);
 		if (connection)
 		{

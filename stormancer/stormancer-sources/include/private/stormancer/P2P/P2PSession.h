@@ -27,9 +27,10 @@ namespace Stormancer
 	struct P2PSessionResult
 	{
 		std::vector<byte> SessionId;
-		uint64 RemoteSessionId = 0;
+		uint64 remotePeerId;
 		std::string SceneId;
+		std::string RemoteSessionId;
 
-		MSGPACK_DEFINE(SessionId, RemoteSessionId, SceneId)
+		MSGPACK_DEFINE(SessionId, remotePeerId, SceneId, RemoteSessionId)
 	};
 }

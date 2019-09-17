@@ -19,41 +19,41 @@ namespace Stormancer
 		std::weak_ptr<IConnectionManager> wConnections = _connections;
 
 		config.addProcessor((byte)MessageIDTypes::ID_P2P_RELAY, [wSerializer, wConnections](Packet_ptr p)
-		{
-			uint64 peerId;
-			auto serializer = wSerializer.lock();
-			if (!serializer)
 			{
-				assert(false);
-				throw std::runtime_error("ID_P2P_RELAY processor: Serializer was deleted (this is a bug!)");
-			}
-			auto connections = wConnections.lock();
-			if (!connections)
-			{
-				assert(false);
-				throw std::runtime_error("ID_P2P_RELAY processor: IConnectionManager was deleted (this is a bug!)");
-			}
+				std::string peerId;
+				auto serializer = wSerializer.lock();
+				if (!serializer)
+				{
+					assert(false);
+					throw std::runtime_error("ID_P2P_RELAY processor: Serializer was deleted (this is a bug!)");
+				}
+				auto connections = wConnections.lock();
+				if (!connections)
+				{
+					assert(false);
+					throw std::runtime_error("ID_P2P_RELAY processor: IConnectionManager was deleted (this is a bug!)");
+				}
 
-			serializer->deserialize(p->stream, peerId);
+				serializer->deserialize(p->stream, peerId);
 
-			auto connection = connections->getConnection(peerId);
-			if (connection)
-			{
-				p->connection = connection;
-			}
-			else
-			{
-				throw std::runtime_error(("ID_P2P_RELAY processor: Connection for peer Id " + std::to_string(peerId) + " was not found").c_str());
-			}
+				auto connection = connections->getConnection(peerId);
+				if (connection)
+				{
+					p->connection = connection;
+				}
+				else
+				{
+					throw std::runtime_error(("ID_P2P_RELAY processor: Connection for peer Id " + peerId + " was not found").c_str());
+				}
 
-			return false;
-		});
+				return false;
+			});
 
 		config.addProcessor((byte)MessageIDTypes::ID_P2P_TUNNEL, [=](Packet_ptr p)
-		{
-			//_logger->log(LogLevel::Trace, "Received packet from tunnel. Origin: ",std::to_string(p->connection->id()));
-			_tunnels->receiveFrom(p->connection->id(), p->stream);
-			return true;
-		});
+			{
+				//_logger->log(LogLevel::Trace, "Received packet from tunnel. Origin: ",std::to_string(p->connection->id()));
+				_tunnels->receiveFrom(p->connection->sessionId(), p->stream);
+				return true;
+			});
 	}
 }

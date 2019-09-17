@@ -51,9 +51,9 @@ namespace Stormancer
 		_onConnectionStateChangedSub = connection->getConnectionStateChangedObservable().subscribe(onNext);
 	}
 
-	uint64 P2PScenePeer::id() const
+	std::string P2PScenePeer::id() const
 	{
-		return _connection->id();
+		return _connection->sessionId();
 	}
 
 	std::string P2PScenePeer::getSceneId() const
@@ -115,7 +115,7 @@ namespace Stormancer
 			options.set_cancellation_token(ct);
 		}
 
-		return _p2pService->openTunnel((uint64)_connection->id(), scene->id() + "." + serverId, ct)
+		return _p2pService->openTunnel(_connection->sessionId(), scene->id() + "." + serverId, ct)
 			.then([](pplx::task<std::shared_ptr<P2PTunnel>> t)
 		{
 			return t.get();

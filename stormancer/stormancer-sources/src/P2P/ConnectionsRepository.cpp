@@ -10,14 +10,14 @@ namespace Stormancer
 	{
 	}
 
-	pplx::task<std::shared_ptr<IConnection>> Stormancer::ConnectionsRepository::addPendingConnection(uint64 id, std::string clientSessionId)
+	pplx::task<std::shared_ptr<IConnection>> Stormancer::ConnectionsRepository::addPendingConnection(std::string clientSessionId)
 	{
 		pplx::task_completion_event<std::shared_ptr<IConnection>> tce;
 		{
 			std::lock_guard<std::mutex> l(_mutex);
-			_pendingP2PConnections.emplace(id, PendingConnection{ id, clientSessionId, tce });
+			_pendingP2PConnections.emplace(clientSessionId, PendingConnection{ clientSessionId, tce });
 		}
-		_logger->log(LogLevel::Info, "P2P", "Added pending connection (id=" + std::to_string(id) + ", sessionId=" + clientSessionId + ")");
+		_logger->log(LogLevel::Info, "P2P", "Added pending connection ( sessionId=" + clientSessionId + ")");
 		return pplx::create_task(tce);
 	}
 
@@ -31,7 +31,7 @@ namespace Stormancer
 			throw std::runtime_error("connection is null");
 		}
 
-		auto id = connection->id();
+		auto id = connection->sessionId();
 		auto key = connection->key();
 
 		auto wThat = STORM_WEAK_FROM_THIS();
@@ -54,7 +54,7 @@ namespace Stormancer
 		_connectionsByKey.emplace(key, t);
 
 		_logger->log(LogLevel::Info, "connections", "Completed connection", std::to_string(connection->id()));
-		auto it = _pendingP2PConnections.find(connection->id());
+		auto it = _pendingP2PConnections.find(connection->sessionId());
 		if (it != _pendingP2PConnections.end())
 		{
 			auto pc = it->second;
@@ -100,32 +100,12 @@ namespace Stormancer
 		}
 	}
 
-	std::shared_ptr<IConnection> ConnectionsRepository::getConnection(uint64 id)
-	{
-		std::lock_guard<std::mutex> l(_mutex);
-		auto it = _connections.find(id);
-		if (it == _connections.end())
-		{
-			return std::shared_ptr<IConnection>();
-		}
-		else
-		{
-			auto t = it->second;
-			if (t.is_done())
-			{
-				return std::shared_ptr<IConnection>(t.get().connection);
-			}
-			else
-			{
-				return std::shared_ptr<IConnection>();
-			}
-		}
-	}
+	
 
 	void ConnectionsRepository::closeConnection(std::shared_ptr<IConnection> connection, const std::string& /*reason*/)
 	{
 		std::lock_guard<std::mutex> l(_mutex);
-		_connections.erase(connection->id());
+		_connections.erase(connection->sessionId());
 		_connectionsByKey.erase(connection->key());
 	}
 
@@ -153,7 +133,7 @@ namespace Stormancer
 				try
 				{
 					auto connection = tc.get();
-					auto pId = connection->id();
+					auto pId = connection->sessionId();
 					auto key = connection->key();
 					ConnectionContainer container;
 					container.connection = connection;

@@ -226,8 +226,8 @@ namespace Stormancer
 			auto candidate = serializer->deserializeOne<ConnectivityCandidate>(ctx->inputStream());
 
 			logger->log(LogLevel::Debug, "p2p", "Starting connectivity test (CLIENT) ");
-
-			auto connection = connections->getConnection(candidate.listeningPeer);
+			auto clientSessionId = utility::conversions::to_utf8string(utility::conversions::to_base64(candidate.listeningPeerSessionId));
+			auto connection = connections->getConnection(clientSessionId);
 			if (connection && connection->getConnectionState() == ConnectionState::Connected)
 			{
 				ctx->send([serializer](obytestream& s)
@@ -282,8 +282,8 @@ namespace Stormancer
 			auto candidate = serializer->deserializeOne<ConnectivityCandidate>(ctx->inputStream());
 
 			logger->log(LogLevel::Debug, "p2p", "Starting connectivity test (LISTENER) ");
-
-			auto connection = connections->getConnection(candidate.clientPeer);
+			auto clientSessionId = utility::conversions::to_utf8string(utility::conversions::to_base64(candidate.clientPeerSessionId));
+			auto connection = connections->getConnection(clientSessionId);
 			if (connection && connection->getConnectionState() == ConnectionState::Connected)
 			{
 				ctx->send(StreamWriter());
@@ -343,7 +343,7 @@ namespace Stormancer
 			auto clientSessionId = utility::conversions::to_utf8string(utility::conversions::to_base64(candidate.clientPeerSessionId));
 			auto parentId = ctx->packet()->connection->key();
 
-			auto connection = connections->getConnection(candidate.clientPeer);
+			auto connection = connections->getConnection(clientSessionId);
 			if (connection && connection->getConnectionState() == ConnectionState::Connected)
 			{
 				sessions->updateSessionState(p2pSessionId, P2PSessionState::Connected);
@@ -353,7 +353,7 @@ namespace Stormancer
 			}
 
 			logger->log(LogLevel::Debug, "p2p", "Waiting connection ");
-			connections->addPendingConnection(candidate.clientPeer, clientSessionId)
+			connections->addPendingConnection(clientSessionId)
 				.then([sessions, p2pSessionId, registerConnectionOnCloseSession, parentId](std::shared_ptr<IConnection> connection)
 			{
 				connection->setMetadata("type", "p2p");
@@ -386,7 +386,7 @@ namespace Stormancer
 
 			logger->log(LogLevel::Debug, "p2p", "Starting P2P client connection client peer", std::to_string(candidate.clientPeer));
 
-			auto connection = connections->getConnection(candidate.listeningPeer);
+			auto connection = connections->getConnection(clientSessionId);
 			if (connection && connection->getConnectionState() == ConnectionState::Connected)
 			{
 				sessions->updateSessionState(p2pSessionId, P2PSessionState::Connected);
@@ -399,7 +399,7 @@ namespace Stormancer
 			}
 
 			logger->log(LogLevel::Debug, "p2p", "Connecting... ");
-			connections->addPendingConnection(candidate.listeningPeer, clientSessionId)
+			connections->addPendingConnection( clientSessionId)
 				.then([sessions, p2pSessionId, registerConnectionOnCloseSession, parentId](std::shared_ptr<IConnection> connection)
 			{
 				connection->setMetadata("type", "p2p");
@@ -442,7 +442,7 @@ namespace Stormancer
 		builder.service((byte)SystemRequestIDTypes::ID_P2P_OPEN_TUNNEL, [serializer, config, tunnels](std::shared_ptr<RequestContext> ctx)
 		{
 			auto serverId = serializer->deserializeOne<std::string>(ctx->inputStream());
-			auto peerId = ctx->packet()->connection->id();
+			auto peerId = ctx->packet()->connection->sessionId();
 			if (!config->hasPublicIp())
 			{
 				auto strongTunnels = LockOrThrow(tunnels);
@@ -473,7 +473,7 @@ namespace Stormancer
 		builder.service((byte)SystemRequestIDTypes::ID_P2P_CLOSE_TUNNEL, [serializer, tunnels](std::shared_ptr<RequestContext> ctx)
 		{
 			auto handle = serializer->deserializeOne<byte>(ctx->inputStream());
-			LockOrThrow(tunnels)->closeTunnel(handle, ctx->packet()->connection->id());
+			LockOrThrow(tunnels)->closeTunnel(handle, ctx->packet()->connection->sessionId());
 			return pplx::task_from_result();
 		});
 
@@ -500,7 +500,7 @@ namespace Stormancer
 
 		builder.service((byte)SystemRequestIDTypes::ID_P2P_RELAY_CLOSE, [serializer, connections](std::shared_ptr<RequestContext> ctx)
 		{
-			auto peerId = serializer->deserializeOne<uint64>(ctx->inputStream());
+			auto peerId = serializer->deserializeOne<std::string>(ctx->inputStream());
 
 			auto connection = connections->getConnection(peerId);
 			if (connection)
