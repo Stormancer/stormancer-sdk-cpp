@@ -13,9 +13,9 @@ namespace Stormancer
 	{
 	}
 
-	std::string ScenePeer::id() const
+	uint64 ScenePeer::id() const
 	{
-		return _connection->sessionId();
+		return _connection->id();
 	}
 
 	std::string ScenePeer::getSceneId() const

@@ -19,7 +19,7 @@ namespace RakNet
 
 namespace Stormancer
 {
-	using peerHandle = std::tuple<std::string, byte>;
+	using peerHandle = std::tuple<uint64, byte>;
 
 	class P2PTunnelClient;
 
@@ -40,13 +40,13 @@ namespace Stormancer
 #pragma region public_methods
 
 		P2PTunnels(std::shared_ptr<RequestProcessor> sysCall, std::shared_ptr<IConnectionManager> connections, std::shared_ptr<Serializer> serializer, std::shared_ptr<Configuration> configuration, std::shared_ptr<ILogger> logger);
-		void receiveFrom(std::string id, ibytestream& stream);
+		void receiveFrom(uint64 id, ibytestream& stream);
 		std::shared_ptr<P2PTunnel> createServer(std::string serverId, std::shared_ptr<P2PTunnels> tunnels);
-		pplx::task<std::shared_ptr<P2PTunnel>> openTunnel(std::string sessionId, std::string serverId, pplx::cancellation_token ct = pplx::cancellation_token::none());
-		byte addClient(std::string serverId, std::string clientPeerSessionId);
-		void closeTunnel(byte handle, std::string peerId);
+		pplx::task<std::shared_ptr<P2PTunnel>> openTunnel(uint64 connectionId, std::string serverId, pplx::cancellation_token ct = pplx::cancellation_token::none());
+		byte addClient(std::string serverId, uint64 clientPeerId);
+		void closeTunnel(byte handle, uint64 peerId);
 		pplx::task<void> destroyServer(std::string serverId);
-		pplx::task<void> destroyTunnel(std::string peerId, byte handle);
+		pplx::task<void> destroyTunnel(uint64 peerId, byte handle);
 		void onMsgReceived(P2PTunnelClient* client, RakNet::RNS2RecvStruct* recvStruct);
 
 #pragma endregion

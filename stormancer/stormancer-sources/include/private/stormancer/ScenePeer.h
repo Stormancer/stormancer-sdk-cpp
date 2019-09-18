@@ -19,7 +19,7 @@ namespace Stormancer
 
 		ScenePeer(std::weak_ptr<IConnection> connection, byte sceneHandle, std::unordered_map<std::string, Route_ptr>& routeMapping, std::weak_ptr<Scene> scene);
 		
-		std::string id() const override;
+		uint64 id() const override;
 
 		std::string getSceneId() const override;
 

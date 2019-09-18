@@ -17,7 +17,7 @@ namespace Stormancer
 
 		P2PScenePeer(std::weak_ptr<Scene> scene, std::shared_ptr<IConnection> connection, std::shared_ptr<P2PService> P2pService, P2PConnectToSceneMessage message);
 
-		std::string id() const override;
+		uint64 id() const override;
 
 		std::string getSceneId() const override;
 

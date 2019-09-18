@@ -26,7 +26,7 @@ namespace Stormancer
 
 		std::shared_ptr<P2PTunnel> registerP2PServer(const std::string& p2pServerId);
 
-		pplx::task<std::shared_ptr<P2PTunnel>> openTunnel(std::string sessionId, const std::string& id, pplx::cancellation_token ct = pplx::cancellation_token::none());
+		pplx::task<std::shared_ptr<P2PTunnel>> openTunnel(uint64 connectionId, const std::string& id, pplx::cancellation_token ct = pplx::cancellation_token::none());
 
 		pplx::task<std::shared_ptr<IConnection>> openP2PConnection(std::shared_ptr<IConnection> server, const std::string& p2pToken, pplx::cancellation_token ct = pplx::cancellation_token::none());
 

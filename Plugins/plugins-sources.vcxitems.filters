@@ -336,18 +336,24 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameSession\Gamesessions.hpp">
       <Filter>public\GameSession</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Steam\Steam.hpp">
+      <Filter>public\Steam</Filter>
+    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Users\Users.hpp">
       <Filter>public\Users</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\PS4\PS4Plugin.hpp">
       <Filter>public\PS4</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Party\Party.hpp">
+      <Filter>public\Party</Filter>
+    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Friends\Friends.hpp">
       <Filter>public\Friends</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Party\Party.hpp" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Steam\Steam.hpp" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Users\ClientAPI.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Users\ClientAPI.hpp">
+      <Filter>public\Users</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="private">
