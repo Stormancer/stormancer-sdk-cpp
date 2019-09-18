@@ -376,7 +376,7 @@ private:
 		conf->addPlugin(new TestPlugin);
 		auto* credsPlugin = new TestCredsRenewalPlugin;
 		conf->addPlugin(credsPlugin);
-		conf->logger = tester.logger();
+		//conf->logger = tester.logger();
 
 		auto client = IClient::create(conf);
 		auto users = client->dependencyResolver().resolve<Users::UsersApi>();
@@ -388,7 +388,7 @@ private:
 		assertex(sessionData == "initial", "Initially, session data's 'testData' entry should have the value 'initial' ; instead, it is '" + sessionData + "'");
 		credsPlugin->setInitialDataReceived();
 
-		taskDelay(std::chrono::seconds(6)).get();
+		taskDelay(std::chrono::seconds(5)).get();
 		assertex(credsPlugin->renewCredentialsCalled().is_done(), "renewCredentials should have been called");
 
 		sessionData = rpc->rpc<std::string>("users.test.GetSessionData", testDataKey).get();

@@ -702,6 +702,14 @@ namespace RakNet {
 		//friend RAK_THREAD_DECLARATION(RecvFromLoop);
 		friend RAK_THREAD_DECLARATION(UDTConnect);
 
+		void UpdateNetworkLoopIteration(BitStream& updateBitStream);
+#if !defined(_NO_PPLX)
+		pplx::task<void> UpdateNetworkLoopAsync();
+		void UpdateNetworkLoopAsyncInt(pplx::task_completion_event<void> tce);
+		// With async iteration, BitStream needs to be a member if we want to avoid copying it with every iteration (also will perform better than a shared_ptr)
+		BitStream asyncUpdateBitStream;
+#endif
+
 		friend bool ProcessOfflineNetworkPacket(SystemAddress systemAddress, const char *data, const int length, RakPeer *rakPeer, RakNetSocket2* rakNetSocket, bool *isOfflineMessage, RakNet::TimeUS timeRead);
 		friend void ProcessNetworkPacket(const SystemAddress systemAddress, const char *data, const int length, RakPeer *rakPeer, RakNet::TimeUS timeRead, BitStream &updateBitStream);
 		friend void ProcessNetworkPacket(const SystemAddress systemAddress, const char *data, const int length, RakPeer *rakPeer, RakNetSocket2* rakNetSocket, RakNet::TimeUS timeRead, BitStream &updateBitStream);

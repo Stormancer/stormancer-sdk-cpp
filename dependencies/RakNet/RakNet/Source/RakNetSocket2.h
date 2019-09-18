@@ -323,6 +323,11 @@ protected:
 	RNS2_BerkleyBindParameters binding;
 
 	unsigned RecvFromLoopInt(void);
+	void RecvFromLoopIteration(bool& wasLastRecvEmpty);
+#if !defined(_NO_PPLX)
+	pplx::task<void> RecvFromLoopAsync();
+	void RecvFromLoopAsyncInt(bool wasLastRcvEmpty, pplx::task_completion_event<void> tce);
+#endif
 	RakNet::LocklessUint32_t isRecvFromLoopThreadActive;
 	volatile bool endThreads;
 	// Constructor not called!

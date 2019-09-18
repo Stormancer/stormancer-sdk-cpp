@@ -48,7 +48,18 @@ namespace Stormancer
 		{
 			auto test = _tests[0];
 			_tests.pop_front();
-			pplx::create_task(test).wait();
+			auto logger = _logger;
+			pplx::create_task(test).then([logger](pplx::task<void> task)
+			{
+				try
+				{
+					task.get();
+				}
+				catch (const std::exception& ex)
+				{
+					logger->log(LogLevel::Error, "tester", "An exception was thrown by a test", ex);
+				}
+			});
 		}
 		else
 		{
