@@ -19,10 +19,10 @@
 			<ChosenLinuxProps>$(StormancerSdkRoot)CustomLinuxBuild.props</ChosenLinuxProps>
 		</PropertyGroup>
 		<Message
-			Condition="Exists('$(StormancerSdkRoot)DefaultLinuxBuild.props')"
+			Condition="'$(LinuxProps)'=='' And !Exists('$(StormancerSdkRoot)CustomLinuxBuild.props') And Exists('$(StormancerSdkRoot)DefaultLinuxBuild.props')"
 			Text="Linux build: using DefaultLinuxBuild.props"
 		/>
-		<PropertyGroup Condition="Exists('$(StormancerSdkRoot)DefaultLinuxBuild.props')">
+		<PropertyGroup Condition="'$(LinuxProps)'=='' And !Exists('$(StormancerSdkRoot)CustomLinuxBuild.props') And Exists('$(StormancerSdkRoot)DefaultLinuxBuild.props')">
 			<ChosenLinuxProps>$(StormancerSdkRoot)DefaultLinuxBuild.props</ChosenLinuxProps>
 		</PropertyGroup>
 		<Error
@@ -38,4 +38,8 @@
 	<Import Condition="'$(LinuxProps)'!='' And Exists('$(LinuxProps)')" Project="$(LinuxProps)" />
 	<Import Condition="Exists('$(StormancerSdkRoot)CustomLinuxBuild.props') And '$(LinuxProps)'==''" Project="$(StormancerSdkRoot)CustomLinuxBuild.props" />
 	<Import Condition="!Exists('$(StormancerSdkRoot)CustomLinuxBuild.props') And '$(LinuxProps)'==''" Project="$(StormancerSdkRoot)DefaultLinuxBuild.props" />
+	
+	<PropertyGroup Condition="'$(UseRtti)'==''">
+		<UseRtti>false</UseRtti>
+	</PropertyGroup>
 </Project>

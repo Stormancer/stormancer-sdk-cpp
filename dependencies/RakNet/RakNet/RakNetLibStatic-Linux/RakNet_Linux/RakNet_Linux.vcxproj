@@ -157,6 +157,7 @@
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <CAdditionalWarning />
       <CppAdditionalWarning />
+	  <RuntimeTypeInfo>$(UseRtti)</RuntimeTypeInfo>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
@@ -166,6 +167,7 @@
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <CAdditionalWarning />
       <CppAdditionalWarning />
+	  <RuntimeTypeInfo>$(UseRtti)</RuntimeTypeInfo>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
@@ -175,7 +177,8 @@
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <CAdditionalWarning />
       <CppAdditionalWarning />
-    </ClCompile>
+ 	  <RuntimeTypeInfo>$(UseRtti)</RuntimeTypeInfo>
+   </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <ClCompile>
@@ -184,7 +187,8 @@
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <CAdditionalWarning />
       <CppAdditionalWarning />
-    </ClCompile>
+ 	  <RuntimeTypeInfo>$(UseRtti)</RuntimeTypeInfo>
+   </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -193,6 +197,7 @@
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <CAdditionalWarning />
       <CppAdditionalWarning />
+	  <RuntimeTypeInfo>$(UseRtti)</RuntimeTypeInfo>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -202,6 +207,7 @@
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <CAdditionalWarning />
       <CppAdditionalWarning />
+	  <RuntimeTypeInfo>$(UseRtti)</RuntimeTypeInfo>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
@@ -211,6 +217,7 @@
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <CAdditionalWarning />
       <CppAdditionalWarning />
+	  <RuntimeTypeInfo>$(UseRtti)</RuntimeTypeInfo>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
@@ -220,6 +227,7 @@
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <CAdditionalWarning />
       <CppAdditionalWarning />
+	  <RuntimeTypeInfo>$(UseRtti)</RuntimeTypeInfo>
     </ClCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -22,6 +22,7 @@
 		<!-- Custom command-line parameters for the compiler and linker -->
 		<CustomCompilerOptions>-stdlib=libc++</CustomCompilerOptions>
 		<CustomLinkerOptions>-stdlib=libc++</CustomLinkerOptions>
+		<UseRtti>false</UseRtti>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(TargetPlatformIdentifier)'=='Linux'">
 		<!-- Set these to the executable names of your compiler/linker on the target linux machine -->
