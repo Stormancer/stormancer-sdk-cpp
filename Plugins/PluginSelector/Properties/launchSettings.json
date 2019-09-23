@@ -1,9 +1,0 @@
-{
-  "profiles": {
-    "PluginSelector": {
-      "commandName": "Project",
-      "commandLineArgs": "test_plugins.json \"C:\\Source\\Repos\\Stormancer\\stormancer\\src\\clients\\cpp\\Plugins\"",
-      "workingDirectory": "C:\\Source\\Repos\\Stormancer\\stormancer\\src\\clients\\cpp\\Plugins\\PluginSelector"
-    }
-  }
-}

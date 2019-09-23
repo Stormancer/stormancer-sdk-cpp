@@ -1,2 +1,0 @@
-OTHER_LIBTOOLFLAGS = $(CONFIGURATION_BUILD_DIR)/libstormancer-sdk-cpp-ios.a $(CONFIGURATION_BUILD_DIR)/libstormancer_cpp_tester_ios.iOS.StaticLibrary.a $(CONFIGURATION_BUILD_DIR)/liblibupnp.ios.a $(inherited)
-OTHER_LDFLAGS = $(CONFIGURATION_BUILD_DIR)/libstormancer-sdk-cpp-ios.a $(CONFIGURATION_BUILD_DIR)/libstormancer_cpp_tester_ios.iOS.StaticLibrary.a $(CONFIGURATION_BUILD_DIR)/liblibupnp.ios.a $(inherited)
