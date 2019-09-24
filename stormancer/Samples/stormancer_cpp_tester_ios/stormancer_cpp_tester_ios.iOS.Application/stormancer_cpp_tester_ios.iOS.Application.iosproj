@@ -1,0 +1,227 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|ARM64">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x86">
+      <Configuration>Debug</Configuration>
+      <Platform>x86</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM">
+      <Configuration>Release</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x86">
+      <Configuration>Release</Configuration>
+      <Platform>x86</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
+    <ProjectVersion>1.0</ProjectVersion>
+    <ProjectGuid>{a38ddab4-3ffb-44b6-b7bd-f9bd9373dd90}</ProjectGuid>
+    <PbxprojDirectory>stormancer_cpp_tester_ios.iOS.Application.xcodeproj</PbxprojDirectory>
+    <TARGET_NAME>stormancer_cpp_tester_ios</TARGET_NAME>
+  </PropertyGroup>
+  <Import Project="$(iOSTargetsPath)\iOS.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <iOSConfigurationType>Application</iOSConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'" Label="Configuration">
+    <UseOfStl>libc++</UseOfStl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
+    <UseOfStl>libc++</UseOfStl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'" Label="Configuration">
+    <UseOfStl>libc++</UseOfStl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM64'" Label="Configuration">
+    <UseOfStl>libc++</UseOfStl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'" Label="Configuration">
+    <UseOfStl>libc++</UseOfStl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="Configuration">
+    <UseOfStl>libc++</UseOfStl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|ARM'" Label="Configuration">
+    <UseOfStl>libc++</UseOfStl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|ARM64'" Label="Configuration">
+    <UseOfStl>libc++</UseOfStl>
+  </PropertyGroup>
+  <Import Project="$(iOSTargetsPath)\iOS.props" />
+  <ImportGroup Label="ExtensionSettings" />
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'" Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'" Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM64'" Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'" Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|ARM'" Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|ARM64'" Label="UserMacros" />
+  <PropertyGroup>
+    <TargetName>stormancer_cpp_tester_ios</TargetName>
+    <TargetExt>.app</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <IncludePath>C:\Users\hecto\Documents\Visual Studio 2017\Projects\stormancer-sdk-cpp-ps4\output\include;C:\Users\hecto\Documents\Visual Studio 2017\Projects\stormancer-sdk-cpp-ps4\Samples;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <IncludePath>C:\Users\hecto\Documents\Visual Studio 2017\Projects\stormancer-sdk-cpp-ps4\output\include;C:\Users\hecto\Documents\Visual Studio 2017\Projects\stormancer-sdk-cpp-ps4\Samples;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
+    <IncludePath>C:\Users\hecto\Documents\Visual Studio 2017\Projects\stormancer-sdk-cpp-ps4\output\include;C:\Users\hecto\Documents\Visual Studio 2017\Projects\stormancer-sdk-cpp-ps4\Samples;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM64'">
+    <IncludePath>C:\Users\hecto\Documents\Visual Studio 2017\Projects\stormancer-sdk-cpp-ps4\output\include;C:\Users\hecto\Documents\Visual Studio 2017\Projects\stormancer-sdk-cpp-ps4\Samples;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <IncludePath>C:\Users\hecto\Documents\Visual Studio 2017\Projects\stormancer-sdk-cpp-ps4\output\include;C:\Users\hecto\Documents\Visual Studio 2017\Projects\stormancer-sdk-cpp-ps4\Samples;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <IncludePath>C:\Users\hecto\Documents\Visual Studio 2017\Projects\stormancer-sdk-cpp-ps4\output\include;C:\Users\hecto\Documents\Visual Studio 2017\Projects\stormancer-sdk-cpp-ps4\Samples;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|ARM'">
+    <IncludePath>C:\Users\hecto\Documents\Visual Studio 2017\Projects\stormancer-sdk-cpp-ps4\output\include;C:\Users\hecto\Documents\Visual Studio 2017\Projects\stormancer-sdk-cpp-ps4\Samples;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|ARM64'">
+    <IncludePath>C:\Users\hecto\Documents\Visual Studio 2017\Projects\stormancer-sdk-cpp-ps4\output\include;C:\Users\hecto\Documents\Visual Studio 2017\Projects\stormancer-sdk-cpp-ps4\Samples;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <ClCompile>
+      <CppLanguageStandard>gnu++11</CppLanguageStandard>
+      <ObjCAutomaticRefCounting>true</ObjCAutomaticRefCounting>
+      <CLanguageStandard>gnu99</CLanguageStandard>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>"DEBUG=1";"$(inherited)";</PreprocessorDefinitions>
+      <SymbolsHiddenByDefault>false</SymbolsHiddenByDefault>
+      <GenerateDebugSymbols>true</GenerateDebugSymbols>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <ClCompile>
+      <CppLanguageStandard>gnu++11</CppLanguageStandard>
+      <ObjCAutomaticRefCounting>true</ObjCAutomaticRefCounting>
+      <CLanguageStandard>gnu99</CLanguageStandard>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>"DEBUG=1";"$(inherited)";</PreprocessorDefinitions>
+      <SymbolsHiddenByDefault>false</SymbolsHiddenByDefault>
+      <GenerateDebugSymbols>true</GenerateDebugSymbols>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
+    <ClCompile>
+      <CppLanguageStandard>gnu++11</CppLanguageStandard>
+      <ObjCAutomaticRefCounting>true</ObjCAutomaticRefCounting>
+      <CLanguageStandard>gnu99</CLanguageStandard>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>"DEBUG=1";"$(inherited)";</PreprocessorDefinitions>
+      <SymbolsHiddenByDefault>false</SymbolsHiddenByDefault>
+      <GenerateDebugSymbols>true</GenerateDebugSymbols>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM64'">
+    <ClCompile>
+      <CppLanguageStandard>gnu++11</CppLanguageStandard>
+      <ObjCAutomaticRefCounting>true</ObjCAutomaticRefCounting>
+      <CLanguageStandard>gnu99</CLanguageStandard>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>"DEBUG=1";"$(inherited)";</PreprocessorDefinitions>
+      <SymbolsHiddenByDefault>false</SymbolsHiddenByDefault>
+      <GenerateDebugSymbols>true</GenerateDebugSymbols>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <ClCompile>
+      <CppLanguageStandard>gnu++11</CppLanguageStandard>
+      <ObjCAutomaticRefCounting>true</ObjCAutomaticRefCounting>
+      <CLanguageStandard>gnu99</CLanguageStandard>
+      <GenerateDebugSymbols>false</GenerateDebugSymbols>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <ClCompile>
+      <CppLanguageStandard>gnu++11</CppLanguageStandard>
+      <ObjCAutomaticRefCounting>true</ObjCAutomaticRefCounting>
+      <CLanguageStandard>gnu99</CLanguageStandard>
+      <GenerateDebugSymbols>false</GenerateDebugSymbols>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Release|ARM'">
+    <ClCompile>
+      <CppLanguageStandard>gnu++11</CppLanguageStandard>
+      <ObjCAutomaticRefCounting>true</ObjCAutomaticRefCounting>
+      <CLanguageStandard>gnu99</CLanguageStandard>
+      <GenerateDebugSymbols>false</GenerateDebugSymbols>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Release|ARM64'">
+    <ClCompile>
+      <CppLanguageStandard>gnu++11</CppLanguageStandard>
+      <ObjCAutomaticRefCounting>true</ObjCAutomaticRefCounting>
+      <CLanguageStandard>gnu99</CLanguageStandard>
+      <GenerateDebugSymbols>false</GenerateDebugSymbols>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\test.cpp" />
+    <ClCompile Include="stormancer_cpp_tester_ios.iOS\AppDelegate.mm" />
+    <ClCompile Include="stormancer_cpp_tester_ios.iOS\ConsoleLogger.cpp" />
+    <ClCompile Include="stormancer_cpp_tester_ios.iOS\GameViewController.mm" />
+    <ClCompile Include="stormancer_cpp_tester_ios.iOS\main.mm" />
+    <ClInclude Include="..\..\test.h" />
+    <ClInclude Include="stormancer_cpp_tester_ios.iOS\AppDelegate.h" />
+    <ClInclude Include="stormancer_cpp_tester_ios.iOS\ConsoleLogger.h" />
+    <ClInclude Include="stormancer_cpp_tester_ios.iOS\GameViewController.h" />
+    <ClInclude Include="stormancer_cpp_tester_ios.iOS\pch.h" />
+    <Content Include="stormancer_cpp_tester_ios.iOS\Base.lproj\Main.storyboard" />
+    <Content Include="stormancer_cpp_tester_ios.iOS\Images.xcassets\AppIcon.appiconset\Contents.json" />
+    <InfoPlist Include="stormancer_cpp_tester_ios.iOS\Info.plist" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\stormancer-sdk-cpp-ios.vcxproj">
+      <Project>{2a9c1bb4-5579-4705-bdab-aec079232077}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\stormancer_cpp_tester_ios.iOS.StaticLibrary\stormancer_cpp_tester_ios.iOS.StaticLibrary.vcxproj">
+      <Project>{007bbf8b-2e45-409a-89ed-7375395d3149}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <FrameworkReference Include="System\Library\Frameworks\GLKit.framework">
+      <SourceTree>SDKROOT</SourceTree>
+    </FrameworkReference>
+    <FrameworkReference Include="System\Library\Frameworks\OpenGLES.framework">
+      <SourceTree>SDKROOT</SourceTree>
+    </FrameworkReference>
+    <FrameworkReference Include="System\Library\Frameworks\UIKit.framework">
+      <SourceTree>SDKROOT</SourceTree>
+    </FrameworkReference>
+  </ItemGroup>
+  <ItemGroup>
+    <pbxproj Include="stormancer_cpp_tester_ios.iOS.Application.xcodeproj\project.pbxproj" />
+  </ItemGroup>
+  <Import Project="$(iOSTargetsPath)\iOS.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>

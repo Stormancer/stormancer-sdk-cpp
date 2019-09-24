@@ -1,0 +1,5 @@
+IUpnp*.txt
+*.bak
+bin
+x64
+x86

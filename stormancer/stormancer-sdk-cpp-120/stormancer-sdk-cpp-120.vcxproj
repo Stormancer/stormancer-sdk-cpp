@@ -1,0 +1,338 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{D8CF547F-8B5B-4651-A48F-D6E56EE0B8C1}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>stormancersdkcpp</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">.\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+    <ProjectName>stormancer-sdk-cpp-lib-120</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(ProjectDir)output\libs\</OutDir>
+    <IntDir>$(ProjectDir)bin\$(Configuration)\$(Platform)\</IntDir>
+    <TargetName>Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(ProjectDir)output\libs\</OutDir>
+    <IntDir>$(ProjectDir)bin\$(Configuration)\$(Platform)\</IntDir>
+    <TargetName>Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(ProjectDir)output\libs\</OutDir>
+    <IntDir>$(ProjectDir)bin\$(Configuration)\$(Platform)\</IntDir>
+    <TargetName>Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(ProjectDir)output\libs\</OutDir>
+    <IntDir>$(ProjectDir)bin\$(Configuration)\$(Platform)\</IntDir>
+    <TargetName>Stormancer$(PlatformToolsetVersion)_$(Configuration)_$(Platform)</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_STORMANCERSDKCPP;_MSC_PLATFORM_TOOLSET=$(PlatformToolsetVersion);%(PreprocessorDefinitions);__PLATFORM__="$(Platform)"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)stormancer\include;$(SolutionDir)cpprestsdk\Release\include;$(SolutionDir)msgpack-c\include;$(SolutionDir)RakNet\Source;$(SolutionDir)rxcpp\Rx\v2\src\rxcpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)RakNet\Lib\DLL\Lib;$(SolutionDir)cpprestsdk\Binaries\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>RakNet$(PlatformToolsetVersion)_$(Configuration)_$(Platform).lib;cpprest$(PlatformToolsetVersion)d_2_8.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Lib>
+      <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
+      <AdditionalDependencies>RakNet$(PlatformToolsetVersion)_$(Configuration)_$(Platform).lib;cpprest$(PlatformToolsetVersion)_$(Configuration)_$(Platform).lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)binaries\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_STORMANCERSDKCPP;_MSC_PLATFORM_TOOLSET=$(PlatformToolsetVersion);%(PreprocessorDefinitions);__PLATFORM__="$(Platform)"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)stormancer\include;$(SolutionDir)cpprestsdk\Release\include;$(SolutionDir)msgpack-c\include;$(SolutionDir)RakNet\Source;$(SolutionDir)rxcpp\Rx\v2\src\rxcpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)binaries\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>RakNet$(PlatformToolsetVersion)_$(Configuration)_$(Platform).lib;cpprest$(PlatformToolsetVersion)d_2_8.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+    <Lib>
+      <AdditionalDependencies>RakNet$(PlatformToolsetVersion)_$(Configuration)_$(Platform).lib;cpprest$(PlatformToolsetVersion)_$(Configuration)_$(Platform).lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)binaries\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_STORMANCERSDKCPP;_MSC_PLATFORM_TOOLSET=$(PlatformToolsetVersion);%(PreprocessorDefinitions);__PLATFORM__="$(Platform)"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)stormancer\include;$(SolutionDir)cpprestsdk\Release\include;$(SolutionDir)msgpack-c\include;$(SolutionDir)RakNet\Source;$(SolutionDir)rxcpp\Rx\v2\src\rxcpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(SolutionDir)RakNet\Lib\DLL\Lib;$(SolutionDir)cpprestsdk\Binaries\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>RakNet$(PlatformToolsetVersion)_$(Configuration)_$(Platform).lib;cpprest$(PlatformToolsetVersion)_2_8.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+    </Link>
+    <Lib>
+      <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
+      <AdditionalDependencies>RakNet$(PlatformToolsetVersion)_$(Configuration)_$(Platform).lib;cpprest$(PlatformToolsetVersion)_$(Configuration)_$(Platform).lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)binaries\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_STORMANCERSDKCPP;_MSC_PLATFORM_TOOLSET=$(PlatformToolsetVersion);%(PreprocessorDefinitions);__PLATFORM__="$(Platform)"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)stormancer\include;$(SolutionDir)cpprestsdk\Release\include;$(SolutionDir)msgpack-c\include;$(SolutionDir)RakNet\Source;$(SolutionDir)rxcpp\Rx\v2\src\rxcpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <OmitFramePointers>false</OmitFramePointers>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(SolutionDir)RakNet\Lib\DLL\Lib;$(SolutionDir)cpprestsdk\Binaries\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>RakNet$(PlatformToolsetVersion)_$(Configuration)_$(Platform).lib;cpprest$(PlatformToolsetVersion)_2_8.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>RakNet$(PlatformToolsetVersion)_$(Configuration)_$(Platform).lib;cpprest$(PlatformToolsetVersion)_$(Configuration)_$(Platform).lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)binaries\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="stormancer\src\ApiClient.cpp" />
+    <ClCompile Include="stormancer\src\Client.cpp" />
+    <ClCompile Include="stormancer\src\Configuration.cpp" />
+    <ClCompile Include="stormancer\src\ConnectionData.cpp" />
+    <ClCompile Include="stormancer\src\ConnectionResult.cpp" />
+    <ClCompile Include="stormancer\src\ConnectToSceneMsg.cpp" />
+    <ClCompile Include="stormancer\src\DefaultPacketDispatcher.cpp" />
+    <ClCompile Include="stormancer\src\DefaultScheduler.cpp" />
+    <ClCompile Include="stormancer\src\DependencyResolver.cpp" />
+    <ClCompile Include="stormancer\src\DisconnectFromSceneDto.cpp" />
+    <ClCompile Include="stormancer\src\dllmain.cpp" />
+    <ClCompile Include="stormancer\src\EmptyDto.cpp" />
+    <ClCompile Include="stormancer\src\FileLogger.cpp" />
+    <ClCompile Include="stormancer\src\Helpers.cpp" />
+    <ClCompile Include="stormancer\src\IActionDispatcher.cpp" />
+    <ClCompile Include="stormancer\src\ILogger.cpp" />
+    <ClCompile Include="stormancer\src\IPlugin.cpp" />
+    <ClCompile Include="stormancer\src\IRpcService.cpp" />
+    <ClCompile Include="stormancer\src\NullLogger.cpp" />
+    <ClCompile Include="stormancer\src\PacketProcessorConfig.cpp" />
+    <ClCompile Include="stormancer\src\RakNetConnection.cpp" />
+    <ClCompile Include="stormancer\src\RakNetTransport.cpp" />
+    <ClCompile Include="stormancer\src\RequestContext.cpp" />
+    <ClCompile Include="stormancer\src\RequestModuleBuilder.cpp" />
+    <ClCompile Include="stormancer\src\RequestProcessor.cpp" />
+    <ClCompile Include="stormancer\src\Route.cpp" />
+    <ClCompile Include="stormancer\src\RouteDto.cpp" />
+    <ClCompile Include="stormancer\src\RpcPlugin.cpp" />
+    <ClCompile Include="stormancer\src\RpcRequest.cpp" />
+    <ClCompile Include="stormancer\src\RpcService.cpp" />
+    <ClCompile Include="stormancer\src\Scene.cpp" />
+    <ClCompile Include="stormancer\src\SceneDispatcher.cpp" />
+    <ClCompile Include="stormancer\src\SceneEndpoint.cpp" />
+    <ClCompile Include="stormancer\src\SceneInfosDto.cpp" />
+    <ClCompile Include="stormancer\src\SceneInfosRequestDto.cpp" />
+    <ClCompile Include="stormancer\src\ScenePeer.cpp" />
+    <ClCompile Include="stormancer\src\SyncClock.cpp" />
+    <ClCompile Include="stormancer\src\SystemRequest.cpp" />
+    <ClCompile Include="stormancer\src\TcpConnection.cpp" />
+    <ClCompile Include="stormancer\src\TcpTransport.cpp" />
+    <ClCompile Include="stormancer\src\TokenHandler.cpp" />
+    <ClCompile Include="stormancer\src\Watch.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stormancer\include\Action.h" />
+    <ClInclude Include="stormancer\include\ApiClient.h" />
+    <ClInclude Include="stormancer\include\basic_bytebuf.h" />
+    <ClInclude Include="stormancer\include\basic_bytestream.h" />
+    <ClInclude Include="stormancer\include\Client.h" />
+    <ClInclude Include="stormancer\include\Configuration.h" />
+    <ClInclude Include="stormancer\include\ConnectionData.h" />
+    <ClInclude Include="stormancer\include\ConnectionResult.h" />
+    <ClInclude Include="stormancer\include\ConnectionState.h" />
+    <ClInclude Include="stormancer\include\ConnectToSceneMsg.h" />
+    <ClInclude Include="stormancer\include\DefaultPacketDispatcher.h" />
+    <ClInclude Include="stormancer\include\DefaultScheduler.h" />
+    <ClInclude Include="stormancer\include\DependencyResolver.h" />
+    <ClInclude Include="stormancer\include\DisconnectFromSceneDto.h" />
+    <ClInclude Include="stormancer\include\EmptyDto.h" />
+    <ClInclude Include="stormancer\include\FileLogger.h" />
+    <ClInclude Include="stormancer\include\headers.h" />
+    <ClInclude Include="stormancer\include\Helpers.h" />
+    <ClInclude Include="stormancer\include\IActionDispatcher.h" />
+    <ClInclude Include="stormancer\include\IConnection.h" />
+    <ClInclude Include="stormancer\include\IConnectionManager.h" />
+    <ClInclude Include="stormancer\include\ILogger.h" />
+    <ClInclude Include="stormancer\include\IPacketDispatcher.h" />
+    <ClInclude Include="stormancer\include\IPacketProcessor.h" />
+    <ClInclude Include="stormancer\include\IPlugin.h" />
+    <ClInclude Include="stormancer\include\IRequestModule.h" />
+    <ClInclude Include="stormancer\include\IRpcService.h" />
+    <ClInclude Include="stormancer\include\IScenePeer.h" />
+    <ClInclude Include="stormancer\include\IScheduler.h" />
+    <ClInclude Include="stormancer\include\ITokenHandler.h" />
+    <ClInclude Include="stormancer\include\ITransport.h" />
+    <ClInclude Include="stormancer\include\MessageIDTypes.h" />
+    <ClInclude Include="stormancer\include\NullLogger.h" />
+    <ClInclude Include="stormancer\include\Observable.h" />
+    <ClInclude Include="stormancer\include\Packet.h" />
+    <ClInclude Include="stormancer\include\PacketProcessorConfig.h" />
+    <ClInclude Include="stormancer\include\RakNetConnection.h" />
+    <ClInclude Include="stormancer\include\RakNetTransport.h" />
+    <ClInclude Include="stormancer\include\RequestContext.h" />
+    <ClInclude Include="stormancer\include\RequestModuleBuilder.h" />
+    <ClInclude Include="stormancer\include\RequestProcessor.h" />
+    <ClInclude Include="stormancer\include\Route.h" />
+    <ClInclude Include="stormancer\include\RouteDto.h" />
+    <ClInclude Include="stormancer\include\RpcPlugin.h" />
+    <ClInclude Include="stormancer\include\RpcRequest.h" />
+    <ClInclude Include="stormancer\include\RpcRequestContext.h" />
+    <ClInclude Include="stormancer\include\RpcService.h" />
+    <ClInclude Include="stormancer\include\Scene.h" />
+    <ClInclude Include="stormancer\include\SceneDispatcher.h" />
+    <ClInclude Include="stormancer\include\SceneEndpoint.h" />
+    <ClInclude Include="stormancer\include\SceneInfosDto.h" />
+    <ClInclude Include="stormancer\include\SceneInfosRequestDto.h" />
+    <ClInclude Include="stormancer\include\ScenePeer.h" />
+    <ClInclude Include="stormancer\include\stormancer.h" />
+    <ClInclude Include="stormancer\include\SyncClock.h" />
+    <ClInclude Include="stormancer\include\SystemRequest.h" />
+    <ClInclude Include="stormancer\include\SystemRequestIDTypes.h" />
+    <ClInclude Include="stormancer\include\TcpConnection.h" />
+    <ClInclude Include="stormancer\include\TcpTransport.h" />
+    <ClInclude Include="stormancer\include\TokenHandler.h" />
+    <ClInclude Include="stormancer\include\typedef.h" />
+    <ClInclude Include="stormancer\include\Watch.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <ItemGroup>
+      <RxcppIncludes Include="$(SolutionDir)rxcpp\Rx\v2\src\rxcpp\**\*.*" Exclude="$(SolutionDir)rxcpp\Rx\v2\src\rxcpp\**\*.cpp" />
+      <RestSdkIncludes Include="$(SolutionDir)cpprestsdk\Release\include\**\*.*" />
+      <MsgpackIncludes Include="$(SolutionDir)msgpack-c\include\**\*.*" />
+      <StormancerIncludes Include="$(SolutionDir)stormancer\include\**\*.*" />
+      <RaknetIncludes Include="$(SolutionDir)RakNet\Source\**\*.*" />
+      <BuildFiles Include="$(SolutionDir)Build\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(BuildFiles)" DestinationFiles="@(BuildFiles->'$(SolutionDir)output\build\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(RaknetIncludes)" DestinationFiles="@(RaknetIncludes->'$(SolutionDir)output\include\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(RxcppIncludes)" DestinationFiles="@(RxcppIncludes->'$(SolutionDir)output\include\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(RestSdkIncludes)" DestinationFiles="@(RestSdkIncludes->'$(SolutionDir)output\include\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(MsgpackIncludes)" DestinationFiles="@(MsgpackIncludes->'$(SolutionDir)output\include\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(StormancerIncludes)" DestinationFiles="@(StormancerIncludes->'$(SolutionDir)output\include\%(RecursiveDir)%(Filename)%(Extension)')" />
+  </Target>
+</Project>

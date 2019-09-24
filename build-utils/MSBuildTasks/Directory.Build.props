@@ -1,0 +1,7 @@
+<Project>
+  <PropertyGroup>
+	<StormancerSdkRoot>..\..\..\</StormancerSdkRoot>
+	<BaseOutputPath>$(StormancerSdkRoot)\binaries\$(MSBuildProjectName)\</BaseOutputPath>
+	<BaseIntermediateOutputPath>$(StormancerSdkRoot)\intermediate\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+</Project>
