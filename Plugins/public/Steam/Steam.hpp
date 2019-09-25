@@ -18,6 +18,9 @@ namespace Stormancer
 {
 	namespace Steam
 	{
+		constexpr const char* ConfigFieldInitAndRun = "steam.initAndRunSteam";
+		constexpr const char* ConfigFieldForcedTicket = "steam.forcedTicket";
+
 		namespace Details
 		{
 			class SteamService
@@ -26,8 +29,8 @@ namespace Stormancer
 
 				SteamService(std::shared_ptr<Configuration> config, std::shared_ptr<IScheduler> scheduler)
 				{
-					_initAndRunSteam = (config->additionalParameters.at("steam.initAndRunSteam") == "true");
-					_forcedTicket = config->additionalParameters.at("steam.forcedTicket");
+					_initAndRunSteam = config->additionalParameters.find(ConfigFieldInitAndRun) != config->additionalParameters.end() ? (config->additionalParameters.at(ConfigFieldInitAndRun) == "true") : false;
+					_forcedTicket = config->additionalParameters.find(ConfigFieldForcedTicket) != config->additionalParameters.end() ? config->additionalParameters.at(ConfigFieldForcedTicket) : "";
 
 					if (_initAndRunSteam)
 					{
@@ -77,8 +80,8 @@ namespace Stormancer
 			pplx::task<void> retrieveCredentials(const Users::CredientialsContext& context)
 			{
 				std::lock_guard<std::recursive_mutex> lg(_mutex);
-				
-				_tce = std::make_shared<pplx::task_completion_event<void>>();
+
+				auto tce = _tce = std::make_shared<pplx::task_completion_event<void>>();
 
 				if (!SteamAPI_IsSteamRunning())
 				{
@@ -131,10 +134,10 @@ namespace Stormancer
 				else
 				{
 					steamTicket = std::make_shared<std::vector<byte>>(_forcedTicket.data(), _forcedTicket.data() + _forcedTicket.size());
-					_tce->set();
+					tce->set();
 				}
 
-				return pplx::create_task(*_tce, ct)
+				return pplx::create_task(*tce, ct)
 					.then([context, steamTicket]()
 				{
 					std::stringstream ss;
@@ -181,24 +184,24 @@ namespace Stormancer
 		{
 			std::lock_guard<std::recursive_mutex> lg(_mutex);
 
+			auto tce = _tce;
+
+			if (!tce)
+			{
+				throw std::runtime_error("Steam auth callback: tce not available");
+			}
+
 			if (pCallback->m_eResult != EResult::k_EResultOK)
 			{
-				_tce->set_exception(std::runtime_error("Steam : failed to get auth session ticket (EResult = " + std::to_string((int)pCallback->m_eResult) + ")"));
+				tce->set_exception(std::runtime_error("Steam : failed to get auth session ticket (EResult = " + std::to_string((int)pCallback->m_eResult) + ")"));
 			}
 
 			if (pCallback->m_hAuthTicket == k_HAuthTicketInvalid)
 			{
-				_tce->set_exception(std::runtime_error("Steam : invalid user authentication ticket"));
+				tce->set_exception(std::runtime_error("Steam : invalid user authentication ticket"));
 			}
 
-			if (_tce)
-			{
-				_tce->set();
-			}
-			else
-			{
-				throw std::runtime_error("Steam auth callback: tce not available");
-			}
+			tce->set();
 		}
 	}
 }
