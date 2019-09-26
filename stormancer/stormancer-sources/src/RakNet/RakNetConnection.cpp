@@ -26,8 +26,8 @@ namespace Stormancer
 		ILogger_ptr logger,
 		DependencyScope& parentScope
 	)
-		: _sessionId(sessionId)
-		, _key(key)
+		: _key(key)
+		, _sessionId(sessionId)
 		, _peer(peer)
 		, _guid(guid)
 		, _lastActivityDate(nowTime_t())

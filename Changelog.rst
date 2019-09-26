@@ -9,6 +9,15 @@ Please use only reStructuredText in this file, no Markdown!
 
 This project does not currently adhere to semantic versioning.
 
+Unreleased
+----------
+
+Changed
+*******
+
+- All use of Peer Id in the client library has been replaced with Session Id. This is required for Stormancer server 2.9 and up. Note that compatibility with 2.8 is broken as a result.
+  If you need 2.8 compatibility, please use v1.8_.
+
 .. _v1.8:
 
 v1.8

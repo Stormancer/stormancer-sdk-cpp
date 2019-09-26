@@ -9,10 +9,10 @@ namespace Stormancer
 	RelayConnection::RelayConnection(std::shared_ptr<IConnection> serverConnection, std::string address, std::string remotePeerId, std::string p2pSessionId, std::weak_ptr<Serializer> serializer)
 		: _serverConnection(serverConnection)
 		, _p2pSessionId(p2pSessionId)
-		, _sessionId(remotePeerId)
 		, _ipAddress(address)
 		, _dependencyResolver(serverConnection->dependencyResolver().beginLifetimeScope())
 		, _serializer(serializer)
+		, _sessionId(remotePeerId)
 	{
 	}
 
