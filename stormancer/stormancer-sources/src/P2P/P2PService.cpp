@@ -24,9 +24,9 @@ namespace Stormancer
 		return _tunnels->createServer(p2pServerId, _tunnels);
 	}
 
-	pplx::task<std::shared_ptr<P2PTunnel>> P2PService::openTunnel(uint64 connectionId, const std::string& id, pplx::cancellation_token ct)
+	pplx::task<std::shared_ptr<P2PTunnel>> P2PService::openTunnel(std::string sessionId, const std::string& id, pplx::cancellation_token ct)
 	{
-		return _tunnels->openTunnel(connectionId, id, ct);
+		return _tunnels->openTunnel(sessionId, id, ct);
 	}
 
 	pplx::task<std::shared_ptr<IConnection>> P2PService::openP2PConnection(std::shared_ptr<IConnection> server, const std::string& p2pToken, pplx::cancellation_token ct)
@@ -48,7 +48,7 @@ namespace Stormancer
 			auto connection = p2pService->_connections->getConnection(sessionResult.RemoteSessionId);
 			if (!connection)
 			{
-				throw std::runtime_error(("Failed to get P2P connection for peer " + std::to_string(sessionResult.RemoteSessionId)).c_str());
+				throw std::runtime_error(("Failed to get P2P connection for peer " + sessionResult.RemoteSessionId).c_str());
 			}
 			else
 			{

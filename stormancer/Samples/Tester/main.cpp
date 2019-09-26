@@ -28,18 +28,22 @@ int main(int argc, char** argv)
 		int guestsCount = 1;
 		testP2P(endpoint, account, application, "test-scene", guestsCount)
 			.then([](pplx::task<void> task)
-		{
-			try
-			{
-				task.get();
-			}
-			catch (const std::exception& ex)
-			{
-				std::clog << "P2P tests failed: " << ex.what() << std::endl;
-			}
-		});
+				{
+					try
+					{
+						task.get();
+					}
+					catch (const std::exception& ex)
+					{
+						std::clog << "P2P tests failed: " << ex.what() << std::endl;
+					}
+				});
 		std::cin.ignore();
 	}
+
+	
+
+	
 
 	return 0;
 }

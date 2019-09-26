@@ -20,13 +20,13 @@ namespace Stormancer
 	class Scene_Impl;
 	RakNetConnection::RakNetConnection(
 		RakNet::RakNetGUID guid,
-		int64 id,
+		std::string sessionId,
 		std::string key,
 		std::weak_ptr<RakNet::RakPeerInterface> peer,
 		ILogger_ptr logger,
 		DependencyScope& parentScope
 	)
-		: _id(id)
+		: _sessionId(sessionId)
 		, _key(key)
 		, _peer(peer)
 		, _guid(guid)
@@ -61,7 +61,7 @@ namespace Stormancer
 
 	RakNetConnection::~RakNetConnection()
 	{
-		_logger->log(LogLevel::Trace, "raknetConnection", "Destroying connection object ", std::to_string(id()));
+		_logger->log(LogLevel::Trace, "raknetConnection", "Destroying connection object ", sessionId());
 		close("Connection object destroyed");
 	}
 
@@ -146,7 +146,7 @@ namespace Stormancer
 
 	void RakNetConnection::close(std::string reason)
 	{
-		_logger->log(LogLevel::Trace, "raknetConnection", "Closing connection " + reason, std::to_string(id()));
+		_logger->log(LogLevel::Trace, "raknetConnection", "Closing connection " + reason, sessionId());
 		if (_connectionState == ConnectionState::Connected || _connectionState == ConnectionState::Connecting)
 		{
 			setConnectionState(ConnectionState(ConnectionState::Disconnecting, reason));
@@ -180,7 +180,7 @@ namespace Stormancer
 		StreamWriter writer2 = streamWriter;
 		for (auto& packetTransform : packetTransforms)
 		{
-			packetTransform->onSend(writer2, this->id(), transformMetadata);
+			packetTransform->onSend(writer2, this->sessionId(), transformMetadata);
 		}
 		if (writer2)
 		{
@@ -220,10 +220,7 @@ namespace Stormancer
 		}
 	}
 
-	uint64 RakNetConnection::id() const
-	{
-		return _id;
-	}
+	
 
 	std::string RakNetConnection::key() const
 	{

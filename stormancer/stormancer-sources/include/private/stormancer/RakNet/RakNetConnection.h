@@ -22,14 +22,14 @@ namespace Stormancer
 #pragma region public_methods
 
 		RakNetConnection(RakNet::RakNetGUID guid,
-			int64 id,
+			std::string id,
 			std::string key,
 			std::weak_ptr<RakNet::RakPeerInterface> peer,
 			ILogger_ptr logger,
 			DependencyScope& parentScope
 		);
 		~RakNetConnection();
-		uint64 id() const override;
+		
 		std::string key() const override;
 
 		time_t connectionDate() const override;

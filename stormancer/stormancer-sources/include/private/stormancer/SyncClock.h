@@ -41,7 +41,7 @@ namespace Stormancer
 		Watch _watch;
 		bool _isRunning = false;
 		bool _lastPingFinished = true;
-		unsigned int _maxValues = 24;
+		unsigned int _maxValues = 6;
 		int _lastPing = 0;
 		int _interval = 1000;
 		int _intervalAtStart = 100;

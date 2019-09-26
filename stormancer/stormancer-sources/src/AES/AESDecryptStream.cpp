@@ -5,7 +5,7 @@ namespace Stormancer
 {
 	
 
-	AESDecryptStream::AESDecryptStream(std::shared_ptr<IAES> aes, byte* encryptedDataPtr, std::streamsize encryptedDataSize, uint64 keyId)
+	AESDecryptStream::AESDecryptStream(std::shared_ptr<IAES> aes, byte* encryptedDataPtr, std::streamsize encryptedDataSize, std::string keyId)
 		: obytestream(encryptedDataPtr, encryptedDataSize)
 		, _aes(aes)
 		, _keyId(keyId)

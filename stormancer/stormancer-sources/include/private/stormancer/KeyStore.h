@@ -12,9 +12,9 @@ namespace Stormancer
 	class KeyStore
 	{
 	public:
-		std::unordered_map<uint64, std::vector<byte>> keys; // byte key[256 / 8];
+		std::unordered_map<std::string, std::vector<byte>> keys; // byte key[256 / 8];
 
-		std::vector<byte>& getKey(uint64 keyId)
+		std::vector<byte>& getKey(std::string keyId)
 		{
 			auto it = keys.find(keyId);
 			if (it == keys.end())
@@ -27,7 +27,7 @@ namespace Stormancer
 			}
 		}
 
-		void deleteKey(uint64 keyId)
+		void deleteKey(std::string keyId)
 		{
 			keys.erase(keyId);
 		}

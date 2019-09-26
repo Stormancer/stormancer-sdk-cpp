@@ -15,13 +15,13 @@ namespace Stormancer
 
 #pragma region public_methods
 
-		RelayConnection(std::shared_ptr<IConnection> serverConnection, std::string address, uint64 remotePeerId, std::string p2pSessionId, std::weak_ptr<Serializer> serializer);
+		RelayConnection(std::shared_ptr<IConnection> serverConnection, std::string address, std::string remotePeerId, std::string p2pSessionId, std::weak_ptr<Serializer> serializer);
 		virtual void send(const StreamWriter& streamWriter, int channelUid, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY, PacketReliability reliability = PacketReliability::RELIABLE_ORDERED, const TransformMetadata& transformMetadata = TransformMetadata()) override;
 		void setApplication(std::string account, std::string application) override;
 		void close(std::string reason = "") override;
 		std::string ipAddress() const override;
 		int ping() const override;
-		uint64 id() const override;
+		
 		std::string key() const override;
 		time_t connectionDate() const override;
 		const std::string& account() const override;
@@ -53,7 +53,7 @@ namespace Stormancer
 		std::shared_ptr<IConnection> _serverConnection;
 		std::unordered_map<std::string, std::string> _metadata;
 		std::string _p2pSessionId;
-		uint64 _remotePeerId;
+		
 		std::string _ipAddress;
 		time_t _connectionDate = nowTime_t();
 		DependencyScope _dependencyResolver;

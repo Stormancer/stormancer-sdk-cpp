@@ -19,14 +19,13 @@ namespace Stormancer
 		_tests.push_back([this]() { test_dependencyInjection(); });
 		_tests.push_back([this]() { test_streams(); });
 		_tests.push_back([this]() { test_connect(); });
-		// TODO uncomment when GC3 has been updated to support ConnectionRejected
-		//_tests.push_back([this]() { test_connectionRejected(); });
-		_tests.push_back([this]() { test_echo(); });
+		_tests.push_back([this]() { test_connectionRejected(); });		_tests.push_back([this]() { test_echo(); });
 		_tests.push_back([this]() { test_rpc_server(); });
 		_tests.push_back([this]() { test_rpc_server_cancel(); });
 		_tests.push_back([this]() { test_rpc_server_exception(); });
 		_tests.push_back([this]() { test_rpc_server_clientException(); });
 		_tests.push_back([this]() { test_rpc_client(); });
+		_tests.push_back([this]() { test_s2s(); });
 		_tests.push_back([this]() { test_rpc_client_cancel(); });
 		_tests.push_back([this]() { test_rpc_client_exception(); });
 		_tests.push_back([this]() { test_syncClock(); });
@@ -51,16 +50,16 @@ namespace Stormancer
 			_tests.pop_front();
 			auto logger = _logger;
 			pplx::create_task(test).then([logger](pplx::task<void> task)
-			{
-				try
 				{
-					task.get();
-				}
-				catch (const std::exception& ex)
-				{
-					logger->log(LogLevel::Error, "tester", "An exception was thrown by a test", ex);
-				}
-			});
+					try
+					{
+						task.get();
+					}
+					catch (const std::exception& ex)
+					{
+						logger->log(LogLevel::Error, "tester", "An exception was thrown by a test", ex);
+					}
+				});
 		}
 		else
 		{
@@ -145,9 +144,9 @@ namespace Stormancer
 			_logger->log(LogLevel::Debug, "test_rpc_client", "RPC CLIENT OK");
 			_logger->log(LogLevel::Debug, "test_rpc_client", "sending rpc response...");
 			rc->sendValue([serializer, message](obytestream& stream)
-			{
-				serializer.serialize(stream, message);
-			});
+				{
+					serializer.serialize(stream, message);
+				});
 			execNextTest();
 			return pplx::task_from_result();
 		}
@@ -161,10 +160,10 @@ namespace Stormancer
 	pplx::task<void> Tester::test_rpc_client_cancel_received(RpcRequestContext_ptr rc)
 	{
 		rc->cancellationToken().register_callback([this]()
-		{
-			_logger->log(LogLevel::Debug, "test_rpc_client", "RPC CLIENT CANCEL OK");
-			execNextTest();
-		});
+			{
+				_logger->log(LogLevel::Debug, "test_rpc_client", "RPC CLIENT CANCEL OK");
+				execNextTest();
+			});
 
 		Serializer serializer;
 		std::string message = serializer.deserializeOne<std::string>(rc->inputStream());
@@ -210,102 +209,94 @@ namespace Stormancer
 			_logger->log(LogLevel::Debug, "test_connect", "Get scene");
 
 			_client->connectToPublicScene(_sceneName, [this](std::shared_ptr<Scene> scene)
-			{
-				_sceneMain = scene;
-				_logger->log(LogLevel::Debug, "test_connect", "Get scene OK");
-
-				auto onNext = [this](ConnectionState state)
 				{
-					auto stateStr = connectionStateToString(state);
-					_logger->log(LogLevel::Debug, "test_connect", "Scene connection state changed: " + stateStr, state.reason);
+					_sceneMain = scene;
+					_logger->log(LogLevel::Debug, "test_connect", "Get scene OK");
 
-					if (_disconnectWithReasonRequested && state == ConnectionState::Disconnected)
+					auto onNext = [this](ConnectionState state)
 					{
-						if (state.reason == _disconnectReason)
+						auto stateStr = connectionStateToString(state);
+						_logger->log(LogLevel::Debug, "test_connect", "Scene connection state changed: " + stateStr, state.reason);
+
+						if (_disconnectWithReasonRequested && state == ConnectionState::Disconnected)
 						{
-							_logger->log(LogLevel::Debug, "test_disconnectWithReason", "Test disconnect with reason OK");
-							execNextTest();
-						}
-						else
-						{
-							_logger->log(LogLevel::Error, "test_disconnectWithReason", "Test disconnect with reason failed");
-						}
-					}
-				};
-
-				auto onError = [this](std::exception_ptr exptr)
-				{
-					// On error
-					try
-					{
-						std::rethrow_exception(exptr);
-					}
-					catch (const std::exception& ex)
-					{
-						_logger->log(LogLevel::Error, "Test", "Scene connection state change failed", ex.what());
-					}
-				};
-
-				scene->getConnectionStateChangedObservable().subscribe(onNext, onError);
-
-				_logger->log(LogLevel::Debug, "test_connect", "Add route");
-				std::weak_ptr<Scene> wScene = scene;
-				scene->addRoute("echo.in", [wScene](Packetisp_ptr p)
-				{
-					if (auto scene = wScene.lock())
-					{
-						scene->send("echo.out", [p](obytestream& stream)
-						{
-							if (p->stream.availableSize() > 0)
+							if (state.reason == _disconnectReason)
 							{
-								stream.write(p->stream.currentPtr(), p->stream.availableSize());
+								_logger->log(LogLevel::Debug, "test_disconnectWithReason", "Test disconnect with reason OK");
+								execNextTest();
+							}
+							else
+							{
+								_logger->log(LogLevel::Error, "test_disconnectWithReason", "Test disconnect with reason failed");
+							}
+						}
+					};
+
+					auto onError = [this](std::exception_ptr exptr)
+					{
+						// On error
+						try
+						{
+							std::rethrow_exception(exptr);
+						}
+						catch (const std::exception& ex)
+						{
+							_logger->log(LogLevel::Error, "Test", "Scene connection state change failed", ex.what());
+						}
+					};
+
+					scene->getConnectionStateChangedObservable().subscribe(onNext, onError);
+
+					_logger->log(LogLevel::Debug, "test_connect", "Add route");
+					std::weak_ptr<Scene> wScene = scene;
+					scene->addRoute("echo.in", [wScene](Packetisp_ptr p)
+						{
+							if (auto scene = wScene.lock())
+							{
+								scene->send("echo.out", [p](obytestream& stream)
+									{
+										if (p->stream.availableSize() > 0)
+										{
+											stream.write(p->stream.currentPtr(), p->stream.availableSize());
+										}
+									});
 							}
 						});
-					}
-				});
-				scene->addRoute("echo.out", [this](Packetisp_ptr p)
-				{
-					onEcho(p);
-				});
-				scene->addRoute("message", [this](Packetisp_ptr p)
-				{
-					onMessage(p);
-				});
 
-				_logger->log(LogLevel::Debug, "test_connect", "Add route OK");
+					_logger->log(LogLevel::Debug, "test_connect", "Add route OK");
 
-				_logger->log(LogLevel::Debug, "test_connect", "Add procedure");
-				auto rpcService = scene->dependencyResolver().resolve<RpcService>();
-				rpcService->addProcedure("rpc", [this](RpcRequestContext_ptr rc) { return test_rpc_client_received(rc); }, MessageOriginFilter::Host, true);
-				rpcService->addProcedure("rpcCancel", [this](RpcRequestContext_ptr rc) { return test_rpc_client_cancel_received(rc); }, MessageOriginFilter::Host, true);
-				rpcService->addProcedure("rpcException", [this](RpcRequestContext_ptr rc) { return test_rpc_client_exception_received(rc); }, MessageOriginFilter::Host, true);
-				_logger->log(LogLevel::Debug, "test_connect", "Add procedure OK");
+					_logger->log(LogLevel::Debug, "test_connect", "Add procedure");
+					auto rpcService = scene->dependencyResolver().resolve<RpcService>();
+					rpcService->addProcedure("rpc", [this](RpcRequestContext_ptr rc) { return test_rpc_client_received(rc); }, MessageOriginFilter::Host, true);
+					rpcService->addProcedure("rpcCancel", [this](RpcRequestContext_ptr rc) { return test_rpc_client_cancel_received(rc); }, MessageOriginFilter::Host, true);
+					rpcService->addProcedure("rpcException", [this](RpcRequestContext_ptr rc) { return test_rpc_client_exception_received(rc); }, MessageOriginFilter::Host, true);
+					_logger->log(LogLevel::Debug, "test_connect", "Add procedure OK");
 
-				_logger->log(LogLevel::Debug, "test_connect", "Connect to scene");
-			})
+					_logger->log(LogLevel::Debug, "test_connect", "Connect to scene");
+				})
 				.then([this](pplx::task<std::shared_ptr<Scene>> task)
-			{
-				try
-				{
-					auto scene = task.get();
-					_sceneMain = scene;
-
-					auto connection = scene->hostConnection().lock();
-					if (!connection)
 					{
-						throw std::runtime_error("Connection deleted");
-					}
+						try
+						{
+							auto scene = task.get();
+							_sceneMain = scene;
 
-					_logger->log(LogLevel::Debug, "test_connect", "Connect to scene OK");
-					_logger->log(LogLevel::Debug, "test_connect", "External addresses: " + connection->metadata("externalAddrs"));
-					
-					this->execNextTest();
-				}
-				catch (const std::exception& ex)
-				{
-					_logger->log(LogLevel::Error, "test_connect", "Failed to get and connect to the scene.", ex.what());
-				}
-			});
+							auto connection = scene->hostConnection().lock();
+							if (!connection)
+							{
+								throw std::runtime_error("Connection deleted");
+							}
+
+							_logger->log(LogLevel::Debug, "test_connect", "Connect to scene OK");
+							_logger->log(LogLevel::Debug, "test_connect", "External addresses: " + connection->metadata("externalAddrs"));
+
+							this->execNextTest();
+						}
+						catch (const std::exception& ex)
+						{
+							_logger->log(LogLevel::Error, "test_connect", "Failed to get and connect to the scene.", ex.what());
+						}
+					});
 		}
 		catch (const std::exception& ex)
 		{
@@ -323,47 +314,49 @@ namespace Stormancer
 		auto client2 = IClient::create(conf);
 
 		client->connectToPublicScene("test-connection-rejected-scene",
-		[this](std::shared_ptr<Scene> scene)
-		{
-			scene->addRoute("connectionRejected", [this](Packetisp_ptr p)
+			[this](std::shared_ptr<Scene> scene)
 			{
-				onConnectionRejected(p);
-			});
-		}).then([this, client2](std::shared_ptr<Scene>)
-		{
-			return client2->connectToPublicScene("test-connection-rejected-scene");
-		}).then([](pplx::task<std::shared_ptr<Scene>> task)
-		{
-			try
-			{
-				task.get();
-			}
-			catch (const std::exception& ex)
-			{
-				std::string msg(ex.what());
-				if (msg != "Rejected")
+				scene->addRoute("connectionRejected", [this](Packetisp_ptr p)
+					{
+						onConnectionRejected(p);
+					});
+			}).then([this, client2](std::shared_ptr<Scene>)
 				{
-					throw std::runtime_error("Wrong exception message: " + msg + ", should be 'Rejected'");
-				}
-				return;
-			}
-			throw std::runtime_error("Connection should have failed");
-		}).then([this]
-		{
-			return cancel_after_timeout(pplx::create_task(_connectionRejectedReceivedTce), 1000);
-		}).then([this, client, client2](pplx::task<void> task) // Keep the clients alive
-		{
-			try
-			{
-				task.get();
-				_logger->log(LogLevel::Info, "test_connectionRejected", "Connection Rejected OK");
-				execNextTest();
-			}
-			catch (const std::exception& ex)
-			{
-				_logger->log(LogLevel::Error, "test_connectionRejected", "Connection Rejected FAILED", ex.what());
-			}
-		});
+					return client2->connectToPublicScene("test-connection-rejected-scene");
+				}).then([](pplx::task<std::shared_ptr<Scene>> task)
+					{
+						try
+						{
+
+							task.get();
+
+						}
+						catch (const std::exception& ex)
+						{
+							std::string msg(ex.what());
+							if (msg != "Rejected")
+							{
+								throw std::runtime_error("Wrong exception message: " + msg + ", should be 'Rejected'");
+							}
+							return;
+						}
+						throw std::runtime_error("Connection should have failed");
+					}).then([this]
+						{
+							return cancel_after_timeout(pplx::create_task(_connectionRejectedReceivedTce), 1000);
+						}).then([this, client, client2](pplx::task<void> task) // Keep the clients alive
+							{
+								try
+								{
+									task.get();
+									_logger->log(LogLevel::Info, "test_connectionRejected", "Connection Rejected OK");
+									execNextTest();
+								}
+								catch (const std::exception& ex)
+								{
+									_logger->log(LogLevel::Error, "test_connectionRejected", "Connection Rejected FAILED", ex.what());
+								}
+							});
 	}
 
 	void Tester::test_echo()
@@ -382,10 +375,10 @@ namespace Stormancer
 			_logger->log(LogLevel::Debug, "test_echo", "Sending message...");
 			auto echoMessage = _echoMessage;
 			scene->send("echo.in", [&echoMessage](obytestream& stream)
-			{
-				Serializer serializer;
-				serializer.serialize(stream, echoMessage);
-			});
+				{
+					Serializer serializer;
+					serializer.serialize(stream, echoMessage);
+				});
 		}
 		catch (std::exception& ex)
 		{
@@ -410,28 +403,28 @@ namespace Stormancer
 		// We do an RPC on the server (by sending the string "stormancer") and get back a string response (that should be "stormancer" too)
 		rpcService->rpc<std::string>("rpc", "stormancer")
 			.then([this](pplx::task<std::string> t)
-		{
-			try
-			{
-				std::string response = t.get();
-
-				_logger->log(LogLevel::Debug, "test_rpc_server", "rpc response received", response.c_str());
-
-				if (response == "stormancer")
 				{
-					_logger->log(LogLevel::Debug, "test_rpc_server", "RPC SERVER OK");
-				}
-				else
-				{
-					_logger->log(LogLevel::Error, "test_rpc_server", "RPC SERVER FAILED", "Bad RPC response");
-				}
-				execNextTest();
-			}
-			catch (const std::exception& ex)
-			{
-				_logger->log(LogLevel::Error, "test_rpc_server", "RPC SERVER failed", ex.what());
-			}
-		});
+					try
+					{
+						std::string response = t.get();
+
+						_logger->log(LogLevel::Debug, "test_rpc_server", "rpc response received", response.c_str());
+
+						if (response == "stormancer")
+						{
+							_logger->log(LogLevel::Debug, "test_rpc_server", "RPC SERVER OK");
+						}
+						else
+						{
+							_logger->log(LogLevel::Error, "test_rpc_server", "RPC SERVER FAILED", "Bad RPC response");
+						}
+						execNextTest();
+					}
+					catch (const std::exception& ex)
+					{
+						_logger->log(LogLevel::Error, "test_rpc_server", "RPC SERVER failed", ex.what());
+					}
+				});
 
 		// Test disconnecting while doing an RPC ! =)
 		//client->disconnect()
@@ -463,10 +456,10 @@ namespace Stormancer
 		auto rpcService = scene->dependencyResolver().resolve<RpcService>();
 
 		auto observable = rpcService->rpcObservable("rpcCancel", [](obytestream& stream)
-		{
-			Serializer serializer;
-			serializer.serialize(stream, "stormancer2");
-		});
+			{
+				Serializer serializer;
+				serializer.serialize(stream, "stormancer2");
+			});
 
 		auto onNext = [this](Packetisp_ptr packet)
 		{
@@ -493,23 +486,23 @@ namespace Stormancer
 		auto subscription = observable.subscribe(onNext, onError, onComplete);
 
 		subscription.add([=]()
-		{
-			_logger->log(LogLevel::Debug, "test_rpc_server_cancel", "RPC subscription unsubscribed");
-		});
+			{
+				_logger->log(LogLevel::Debug, "test_rpc_server_cancel", "RPC subscription unsubscribed");
+			});
 
 		taskDelay(30ms)
 			.then([this, subscription]()
-		{
-			if (subscription.is_subscribed())
-			{
-				subscription.unsubscribe();
-				_logger->log(LogLevel::Debug, "test_rpc_server_cancel", "RPC cancel sent");
-			}
-			else
-			{
-				_logger->log(LogLevel::Error, "test_rpc_server_cancel", "subscription is empty");
-			}
-		});
+				{
+					if (subscription.is_subscribed())
+					{
+						subscription.unsubscribe();
+						_logger->log(LogLevel::Debug, "test_rpc_server_cancel", "RPC cancel sent");
+					}
+					else
+					{
+						_logger->log(LogLevel::Error, "test_rpc_server_cancel", "subscription is empty");
+					}
+				});
 	}
 
 	void Tester::test_rpc_server_exception()
@@ -527,18 +520,18 @@ namespace Stormancer
 
 		rpcService->rpc<void>("rpcException")
 			.then([this](pplx::task<void> t)
-		{
-			try
-			{
-				t.get();
-				_logger->log(LogLevel::Error, "test_rpc_server_exception", "Rpc should fail");
-			}
-			catch (const std::exception& ex)
-			{
-				_logger->log(LogLevel::Debug, "test_rpc_server_exception", "RPC SERVER EXCEPTION OK", ex.what());
-				execNextTest();
-			}
-		});
+				{
+					try
+					{
+						t.get();
+						_logger->log(LogLevel::Error, "test_rpc_server_exception", "Rpc should fail");
+					}
+					catch (const std::exception& ex)
+					{
+						_logger->log(LogLevel::Debug, "test_rpc_server_exception", "RPC SERVER EXCEPTION OK", ex.what());
+						execNextTest();
+					}
+				});
 	}
 
 	void Tester::test_rpc_server_clientException()
@@ -556,18 +549,18 @@ namespace Stormancer
 
 		rpcService->rpc<void>("rpcClientException")
 			.then([this](pplx::task<void> t)
-		{
-			try
-			{
-				t.get();
-				_logger->log(LogLevel::Error, "test_rpc_server_clientException", "Rpc should fail");
-			}
-			catch (const std::exception& ex)
-			{
-				_logger->log(LogLevel::Debug, "test_rpc_server_clientException", "RPC SERVER CLIENT EXCEPTION OK", ex.what());
-				execNextTest();
-			}
-		});
+				{
+					try
+					{
+						t.get();
+						_logger->log(LogLevel::Error, "test_rpc_server_clientException", "Rpc should fail");
+					}
+					catch (const std::exception& ex)
+					{
+						_logger->log(LogLevel::Debug, "test_rpc_server_clientException", "RPC SERVER CLIENT EXCEPTION OK", ex.what());
+						execNextTest();
+					}
+				});
 	}
 
 	void Tester::test_rpc_client()
@@ -582,10 +575,41 @@ namespace Stormancer
 		}
 
 		scene->send("message", [](obytestream& stream)
+			{
+				Serializer serializer;
+				serializer.serialize(stream, "rpc");
+			});
+	}
+
+	void Tester::test_s2s()
+	{
+		_logger->log(LogLevel::Info, "test_rpc_client", "S2S");
+
+		auto scene = _sceneMain.lock();
+		if (!scene)
 		{
-			Serializer serializer;
-			serializer.serialize(stream, "rpc");
-		});
+			_logger->log(LogLevel::Error, "StormancerWrapper", "scene deleted");
+			return;
+		}
+
+		auto rpcService = scene->dependencyResolver().resolve<RpcService>();
+
+		rpcService->rpc<std::string>("s2s", 10, "custom data")
+			.then([this](pplx::task<std::string> t)
+				{
+					try
+					{
+						auto v = t.get();
+						_logger->log(LogLevel::Info, v, "");
+
+						execNextTest();
+
+					}
+					catch (const std::exception& ex)
+					{
+						_logger->log(LogLevel::Error, "test_s2s", "An exception occured", ex.what());
+					}
+				});
 	}
 
 	void Tester::test_rpc_client_cancel()
@@ -600,10 +624,10 @@ namespace Stormancer
 		}
 
 		scene->send("message", [](obytestream& stream)
-		{
-			Serializer serializer;
-			serializer.serialize(stream, "rpcCancel");
-		});
+			{
+				Serializer serializer;
+				serializer.serialize(stream, "rpcCancel");
+			});
 	}
 
 	void Tester::test_rpc_client_exception()
@@ -618,10 +642,10 @@ namespace Stormancer
 		}
 
 		scene->send("message", [](obytestream& stream)
-		{
-			Serializer serializer;
-			serializer.serialize(stream, "rpcException");
-		});
+			{
+				Serializer serializer;
+				serializer.serialize(stream, "rpcException");
+			});
 	}
 
 	void Tester::test_syncClock()
@@ -630,23 +654,23 @@ namespace Stormancer
 
 		_stop = false;
 		pplx::create_task([this]()
-		{
-			while (!_stop && !_client->lastPing())
 			{
-				taskDelay(100ms).wait();
-			}
-			if (!_stop && _client->lastPing() > 0)
-			{
-				int64 clock = _client->clock();
-				if (clock)
+				while (!_stop && !_client->lastPing())
 				{
-					std::string clockStr = std::to_string(clock / 1000.0);
-					_logger->log(LogLevel::Debug, "test_syncclock", "clock", clockStr.c_str());
-					_logger->log(LogLevel::Debug, "test_syncclock", "SyncClock OK");
-					execNextTest();
+					taskDelay(100ms).wait();
 				}
-			}
-		});
+				if (!_stop && _client->lastPing() > 0)
+				{
+					int64 clock = _client->clock();
+					if (clock)
+					{
+						std::string clockStr = std::to_string(clock / 1000.0);
+						_logger->log(LogLevel::Debug, "test_syncclock", "clock", clockStr.c_str());
+						_logger->log(LogLevel::Debug, "test_syncclock", "SyncClock OK");
+						execNextTest();
+					}
+				}
+			});
 	}
 
 	void Tester::test_setServerTimeout()
@@ -654,10 +678,10 @@ namespace Stormancer
 		_logger->log(LogLevel::Info, "test_setServerTimeout", "SET SERVER TIMEOUT");
 
 		_client->setServerTimeout(10s).then([this]
-		{
-			_logger->log(LogLevel::Debug, "test_setServerTimeout", "setServerTimeout OK");
-			execNextTest();
-		});
+			{
+				_logger->log(LogLevel::Debug, "test_setServerTimeout", "setServerTimeout OK");
+				execNextTest();
+			});
 	}
 
 	void Tester::test_disconnect()
@@ -666,19 +690,19 @@ namespace Stormancer
 
 		_client->disconnect()
 			.then([this](pplx::task<void> t)
-		{
-			try
-			{
-				t.get();
-				_logger->log(LogLevel::Debug, "test_disconnect", "Disconnect client OK");
+				{
+					try
+					{
+						t.get();
+						_logger->log(LogLevel::Debug, "test_disconnect", "Disconnect client OK");
 
-				execNextTest();
-			}
-			catch (const std::exception& ex)
-			{
-				_logger->log(LogLevel::Error, "test_disconnect", "Failed to disconnect client", ex.what());
-			}
-		});
+						execNextTest();
+					}
+					catch (const std::exception& ex)
+					{
+						_logger->log(LogLevel::Error, "test_disconnect", "Failed to disconnect client", ex.what());
+					}
+				});
 	}
 
 	void Tester::test_disconnectWithReason()
@@ -697,11 +721,11 @@ namespace Stormancer
 		auto disconnectReason = _disconnectReason;
 
 		scene->send("message", [disconnectReason](obytestream& stream)
-		{
-			Serializer serializer;
-			serializer.serialize(stream, "disconnectWithReason");
-			serializer.serialize(stream, disconnectReason);
-		});
+			{
+				Serializer serializer;
+				serializer.serialize(stream, "disconnectWithReason");
+				serializer.serialize(stream, disconnectReason);
+			});
 	}
 
 	void Tester::test_clean()
@@ -726,29 +750,29 @@ namespace Stormancer
 		_logger->log(LogLevel::Info, "test_Ping_Cluster", "PING_CLUSTER");
 		_client->getFederation()
 			.then([this](Federation fed)
-		{
+				{
 
-			std::vector<pplx::task<int>> ping;
-			for (auto cluster : fed.clusters)
-			{
-				ping.push_back(_client->pingCluster(cluster.id));
-			}
-			return pplx::when_all(ping.begin(), ping.end());
-		})
+					std::vector<pplx::task<int>> ping;
+					for (auto cluster : fed.clusters)
+					{
+						ping.push_back(_client->pingCluster(cluster.id));
+					}
+					return pplx::when_all(ping.begin(), ping.end());
+				})
 			.then([this](pplx::task<std::vector<int>> task)
-		{
-			try
-			{
-				std::vector<int> test = task.get();
-				_logger->log(LogLevel::Debug, "test_Ping_Cluster", "Ping Cluster OK");
-			}
-			catch (std::exception ex)
-			{
-				_logger->log(LogLevel::Error, "test_Ping_Cluster", "Ping Cluster FAILED", ex.what());
-				return;
-			}
-			execNextTest();
-		});
+				{
+					try
+					{
+						std::vector<int> test = task.get();
+						_logger->log(LogLevel::Debug, "test_Ping_Cluster", "Ping Cluster OK");
+					}
+					catch (std::exception ex)
+					{
+						_logger->log(LogLevel::Error, "test_Ping_Cluster", "Ping Cluster FAILED", ex.what());
+						//return;
+					}
+					execNextTest();
+				});
 	}
 
 	void Tester::test_dependencyInjection()
@@ -792,13 +816,14 @@ namespace Stormancer
 		try
 		{
 			TestUsersPlugin::runTests(*this);
+			_logger->log(LogLevel::Info, "test_users", "Users OK");
 		}
 		catch (const std::exception& ex)
 		{
 			_logger->log(LogLevel::Error, "test_users", "Users FAILED", ex.what());
 			return;
 		}
-		_logger->log(LogLevel::Info, "test_users", "Users OK");
+
 		execNextTest();
 	}
 

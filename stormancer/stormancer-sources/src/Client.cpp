@@ -528,6 +528,7 @@ namespace Stormancer
 			throw PointerDeletedException("Client destroyed");
 		}
 
+
 		std::weak_ptr<Client> wClient = this->shared_from_this();
 		return connections->getConnection(clusterId, [wClient, ct, sceneEndpoint](std::string id)
 		{
@@ -581,7 +582,7 @@ namespace Stormancer
 						{
 							throw std::runtime_error(("Unexpected key size. received " + std::to_string(key.size() * 8) + " bits expected 256 bits ").c_str());
 						}
-						keyStore->keys.emplace(connection->id(), key);
+						keyStore->keys.emplace(connection->sessionId(), key);
 					}
 
 					return connection->setTimeout(client->_serverTimeout, ct).then([connection]() { return connection; });
@@ -1079,6 +1080,7 @@ namespace Stormancer
 				if (client->_sessionToken.empty())
 				{
 					client->_sessionToken = serverToken;
+					
 				}
 
 				return pplx::task_from_result(); // all control paths should return a value...
@@ -1103,8 +1105,12 @@ namespace Stormancer
 	pplx::task<Federation> Client::getFederation(pplx::cancellation_token ct)
 	{
 		std::lock_guard<std::mutex> lg(_connectionMutex);
-		auto api = this->dependencyResolver().resolve<ApiClient>();
-		return api->getFederation(_config->_serverEndpoints, ct);
+		if (!_federation)
+		{
+			auto api = this->dependencyResolver().resolve<ApiClient>();
+			_federation = std::make_shared<pplx::task<Federation>>(api->getFederation(_config->_serverEndpoints, ct));
+		}
+		return *_federation;
 	}
 
 	pplx::task<int> Client::pingCluster(std::string clusterId, pplx::cancellation_token ct)

@@ -20,9 +20,9 @@ namespace Stormancer
 
 		~AESWindows();
 
-		void encrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream& outputStream, uint64 keyId) override;
+		void encrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream& outputStream, std::string keyId) override;
 
-		void decrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream& outputStream, uint64 keyId) override;
+		void decrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream& outputStream, std::string keyId) override;
 
 		void generateRandomIV(std::vector<byte>& iv) override;
 
@@ -32,7 +32,7 @@ namespace Stormancer
 
 #pragma region private_methods
 
-		bool initAES(uint64 keyId);
+		bool initAES(std::string keyId);
 
 		void cleanAES();
 
@@ -44,8 +44,8 @@ namespace Stormancer
 
 		BCRYPT_ALG_HANDLE _hAesAlg = NULL;
 
-		std::unordered_map<uint64, BCRYPT_KEY_HANDLE> _keyHandles;
-		std::unordered_map<uint64, PBYTE> _keyPointers;
+		std::unordered_map<std::string, BCRYPT_KEY_HANDLE> _keyHandles;
+		std::unordered_map<std::string, PBYTE> _keyPointers;
 		
 		DWORD _cbBlockLen = 0;
 		BCRYPT_AUTH_TAG_LENGTHS_STRUCT authTagLengths;

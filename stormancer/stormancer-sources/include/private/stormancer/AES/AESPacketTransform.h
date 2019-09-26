@@ -21,9 +21,9 @@ namespace Stormancer
 
 		AESPacketTransform(std::shared_ptr<IAES> aes, std::shared_ptr<Configuration>);
 
-		void onSend(StreamWriter& streamWriter, uint64 peerId, const TransformMetadata& transformMetadata = TransformMetadata()) override;
+		void onSend(StreamWriter& streamWriter, std::string peerId, const TransformMetadata& transformMetadata = TransformMetadata()) override;
 
-		void onReceive(ibytestream& stream, uint64 peerId) override;
+		void onReceive(ibytestream& stream, std::string peerId) override;
 
 #pragma endregion
 

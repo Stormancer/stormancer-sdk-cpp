@@ -93,7 +93,7 @@ namespace Stormancer
 		cleanAES();
 	}
 
-	void AESWindows::encrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream& outputStream, uint64 keyId)
+	void AESWindows::encrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream& outputStream, std::string keyId)
 	{
 		initAES(keyId);
 		
@@ -142,7 +142,7 @@ namespace Stormancer
 		outputStream.write(reinterpret_cast<byte*>(tag.data()), tag.size());
 	}
 
-	void AESWindows::decrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream& outputStream, uint64 keyId)
+	void AESWindows::decrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream& outputStream, std::string keyId)
 	{
 		NTSTATUS status = STATUS_UNSUCCESSFUL;
 
@@ -198,7 +198,7 @@ namespace Stormancer
 		return _cbBlockLen;
 	}
 
-	bool AESWindows::initAES(uint64 keyId)
+	bool AESWindows::initAES(std::string keyId)
 	{
 		NTSTATUS status = STATUS_UNSUCCESSFUL;
 		if (_keyHandles.find(keyId) != _keyHandles.end())

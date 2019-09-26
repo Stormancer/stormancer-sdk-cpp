@@ -16,7 +16,7 @@ namespace Stormancer
 		{
 			if (auto t = transform.lock())
 			{
-				t->onReceive(p->stream, p->connection->id());
+				t->onReceive(p->stream, p->connection->sessionId());
 			}
 			return false;
 		});

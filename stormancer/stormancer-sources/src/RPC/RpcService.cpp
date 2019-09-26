@@ -183,27 +183,33 @@ namespace Stormancer
 
 				if (ctx)
 				{
+					auto wScene = _scene;
 					invokeWrapping(handler, ctx)
-						.then([this, id, ctx](pplx::task<void> t)
+						.then([this, id, ctx, wScene](pplx::task<void> t)
 					{
+						auto scene = wScene.lock();
 						try
 						{
 							t.wait();
-							bool requestFound = false;
-
+							// Make sure 'this' isn't destroyed (its life span is tied to the scene's)
+							if (scene)
 							{
-								std::lock_guard<std::mutex> lock(_runningRequestsMutex);
-								auto it = _runningRequests.find(id);
-								requestFound = it != _runningRequests.end();
+								bool requestFound = false;
+
+								{
+									std::lock_guard<std::mutex> lock(_runningRequestsMutex);
+									auto it = _runningRequests.find(id);
+									requestFound = it != _runningRequests.end();
+									if (requestFound)
+									{
+										_runningRequests.erase(id);
+									}
+								}
+
 								if (requestFound)
 								{
-									_runningRequests.erase(id);
+									ctx->sendComplete();
 								}
-							}
-
-							if (requestFound)
-							{
-								ctx->sendComplete();
 							}
 						}
 						catch (const std::exception& ex)

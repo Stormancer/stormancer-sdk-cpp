@@ -42,7 +42,7 @@ namespace Stormancer
 
 #pragma region public_members
 
-		uint64 peerId;
+		std::string peerSessionId;
 		std::string serverId;
 		RakNet::RakNetSocket2* socket;
 		bool isRunning;

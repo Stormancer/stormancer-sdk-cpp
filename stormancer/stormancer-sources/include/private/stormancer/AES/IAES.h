@@ -17,9 +17,9 @@ namespace Stormancer
 		
 		virtual uint16 ivSize();
 
-		virtual void encrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream& outputStream, uint64 keyId) = 0;
+		virtual void encrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream& outputStream, std::string keyId) = 0;
 
-		virtual void decrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream& outputStream, uint64 keyId) = 0;
+		virtual void decrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream& outputStream, std::string keyId) = 0;
 
 		virtual void generateRandomIV(std::vector<byte>& iv) = 0;
 

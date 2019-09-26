@@ -276,7 +276,7 @@ namespace Stormancer
 
 						std::shared_ptr<IScenePeer> origin = nullptr;
 						bool isOriginHost = false;
-						if (p->connection->id() == scene->host()->id())
+						if (p->connection->sessionId() == scene->host()->id())
 						{
 							isOriginHost = true;
 							origin = scene->_host;
@@ -623,12 +623,12 @@ namespace Stormancer
 				}
 			}
 
-			if (packet->connection->id() == _host->id() && !((int)route->filter() & (int)Stormancer::MessageOriginFilter::Host))
+			if (packet->connection->sessionId() == _host->id() && !((int)route->filter() & (int)Stormancer::MessageOriginFilter::Host))
 			{
 				return; // The route doesn't accept messages from the scene host.
 			}
 
-			if (packet->connection->id() != _host->id() && !((int)route->filter() & (int)Stormancer::MessageOriginFilter::Peer))
+			if (packet->connection->sessionId() != _host->id() && !((int)route->filter() & (int)Stormancer::MessageOriginFilter::Peer))
 			{
 				return; // The route doesn't accept messages from the scene host.
 			}

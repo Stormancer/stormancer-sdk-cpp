@@ -13,7 +13,7 @@ namespace Stormancer
 
 #pragma region public_methods
 
-		AESEncryptStream(std::shared_ptr<IAES> aes, uint64 keyId);
+		AESEncryptStream(std::shared_ptr<IAES> aes, std::string keyId);
 
 		~AESEncryptStream();
 
@@ -26,7 +26,7 @@ namespace Stormancer
 #pragma region private_members
 
 		std::shared_ptr<IAES> _aes;
-		uint64 _keyId;
+		std::string _keyId;
 #pragma endregion
 	};
 }

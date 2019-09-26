@@ -27,12 +27,12 @@ namespace Stormancer
 		return _key;
 	}
 
-	void AESLinux::encrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream& outputStream, uint64 keyId)
+	void AESLinux::encrypt(byte* dataPtr, std::streamsize dataSize, byte* ivPtr, std::streamsize ivSize, obytestream& outputStream, std::string keyId)
 	{
 		throw std::runtime_error("unimplemented");
 	}
 
-	void AESLinux::decrypt(byte* encryptedDataPtr, std::streamsize encryptedDataSize, byte* ivPtr, std::streamsize ivSize, obytestream& outputStream, uint64 keyId)
+	void AESLinux::decrypt(byte* encryptedDataPtr, std::streamsize encryptedDataSize, byte* ivPtr, std::streamsize ivSize, obytestream& outputStream, std::string keyId)
 	{
 		throw std::runtime_error("unimplemented");
 	}

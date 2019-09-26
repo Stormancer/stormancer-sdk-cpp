@@ -217,7 +217,7 @@ namespace Stormancer
 		auto request = reserveRequestSlot(msgId, ct);
 		auto requestId = request->getId();
 		auto wRequestProcessor = STORM_WEAK_FROM_THIS();
-		_logger->log(LogLevel::Trace, "RequestProcessor", "Sending system request " + std::to_string(msgId) + " to " + std::to_string(peer->id()) + ", Id=" + std::to_string(requestId));
+		_logger->log(LogLevel::Trace, "RequestProcessor", "Sending system request " + std::to_string(msgId) + " to " + peer->sessionId() + ", Id=" + std::to_string(requestId));
 		if (ct.is_cancelable())
 		{
 			ct.register_callback([requestId, wRequestProcessor]()

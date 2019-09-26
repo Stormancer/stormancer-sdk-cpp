@@ -6,10 +6,10 @@
 
 namespace Stormancer
 {
-	RelayConnection::RelayConnection(std::shared_ptr<IConnection> serverConnection, std::string address, uint64 remotePeerId, std::string p2pSessionId, std::weak_ptr<Serializer> serializer)
+	RelayConnection::RelayConnection(std::shared_ptr<IConnection> serverConnection, std::string address, std::string remotePeerId, std::string p2pSessionId, std::weak_ptr<Serializer> serializer)
 		: _serverConnection(serverConnection)
 		, _p2pSessionId(p2pSessionId)
-		, _remotePeerId(remotePeerId)
+		, _sessionId(remotePeerId)
 		, _ipAddress(address)
 		, _dependencyResolver(serverConnection->dependencyResolver().beginLifetimeScope())
 		, _serializer(serializer)
@@ -61,10 +61,7 @@ namespace Stormancer
 		return _p2pSessionId;
 	}
 
-	uint64 RelayConnection::id() const
-	{
-		return _remotePeerId;
-	}
+	
 
 	time_t RelayConnection::connectionDate() const
 	{

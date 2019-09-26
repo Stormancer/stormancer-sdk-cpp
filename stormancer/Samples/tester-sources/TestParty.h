@@ -198,9 +198,9 @@ private:
 		testInvitations(clients[0], clients.begin()+1, clients.end(), tester).get();
 		tester.logger()->log(LogLevel::Info, "TestParty", "testInvitations PASSED");
 
-		//tester.logger()->log(LogLevel::Info, "TestParty", "testSettingsUpdate");
-		//testSettingsUpdate(clients).get();
-		//tester.logger()->log(LogLevel::Info, "TestParty", "testSettingsUpdate PASSED");
+		tester.logger()->log(LogLevel::Info, "TestParty", "testSettingsUpdate");
+		testSettingsUpdate(clients).get();
+		tester.logger()->log(LogLevel::Info, "TestParty", "testSettingsUpdate PASSED");
 	}
 
 	static pplx::task<void> testCreateParty(std::shared_ptr<Stormancer::IClient> client)
@@ -255,7 +255,7 @@ private:
 			tce.set();
 		});
 
-		failAfterTimeout(tce, "PartySettings update was not received in time", std::chrono::seconds(5));
+		failAfterTimeout(tce, "PartySettings update was not received in time", std::chrono::seconds(10));
 		return pplx::create_task(tce).then([sub] {});
 	}
 
@@ -310,7 +310,6 @@ private:
 
 		pplx::task_completion_event<void> tce;
 		auto party = client->dependencyResolver().resolve<Party::PartyApi>();
-		auto userId = client->dependencyResolver().resolve<Users::UsersApi>();
 		auto sub = party->subscribeOnUpdatedPartyMembers([tce, expectedMembers](std::vector<Party::PartyUserDto> members)
 		{
 			if (membersAreEqual(members, expectedMembers))
@@ -344,6 +343,92 @@ private:
 		}, timeout);
 
 		return pplx::create_task(tce).then([sub] {});
+	}
+
+	static pplx::task<void> awaitMembersConsistency(
+		const std::vector<std::shared_ptr<Stormancer::IClient>>& clients,
+		const std::vector<Stormancer::Party::PartyUserDto>& expectedMembers,
+		std::chrono::milliseconds timeout = std::chrono::seconds(3)
+	)
+	{
+		std::vector<pplx::task<void>> tasks;
+		tasks.reserve(clients.size());
+		std::transform(clients.begin(), clients.end(), std::back_inserter(tasks), [&](std::shared_ptr<Stormancer::IClient> client)
+		{
+			return awaitMembersConsistency(client, expectedMembers, timeout);
+		});
+
+		return when_all_handle_exceptions(tasks);
+	}
+
+	static std::string settingsToString(const Stormancer::Party::PartySettings& settings)
+	{
+		std::stringstream ss;
+		ss << "gameFinderName: " << settings.gameFinderName << "\n";
+		ss << "customData: " << settings.customData << "\n";
+		return ss.str();
+	}
+
+	static pplx::task<void> awaitSettingsConsistency(
+		std::shared_ptr<Stormancer::IClient> client,
+		const Stormancer::Party::PartySettings& settings,
+		std::chrono::milliseconds timeout = std::chrono::seconds(3)
+	)
+	{
+		using namespace Stormancer;
+		using namespace TestHelpers;
+
+		pplx::task_completion_event<void> tce;
+		auto party = client->dependencyResolver().resolve<Party::PartyApi>();
+		auto sub = party->subscribeOnUpdatedPartySettings([tce, settings](Party::PartySettings newSettings)
+		{
+			if (newSettings.gameFinderName == settings.gameFinderName && newSettings.customData == settings.customData)
+			{
+				tce.set();
+			}
+		});
+
+		if (party->isInParty() && party->getPartySettings().gameFinderName == settings.gameFinderName && party->getPartySettings().customData == settings.customData)
+		{
+			tce.set();
+			sub->unsubscribe();
+		}
+
+		failAfterTimeout(tce, [party, settings]
+		{
+			std::stringstream ss;
+			ss << "Settings are not consistent with what was expected.\n";
+			ss << "Expected Settings:\n";
+			ss << settingsToString(settings);
+			ss << "Actual Settings:\n";
+			if (party->isInParty())
+			{
+				ss << settingsToString(party->getPartySettings());
+			}
+			else
+			{
+				ss << "(not connected to party)\n";
+			}
+			return ss.str();
+		}, timeout);
+
+		return pplx::create_task(tce).then([sub] {});
+	}
+
+	static pplx::task<void> awaitSettingsConsistency(
+		const std::vector<std::shared_ptr<Stormancer::IClient>>& clients,
+		const Stormancer::Party::PartySettings& settings,
+		std::chrono::milliseconds timeout = std::chrono::seconds(3)
+	)
+	{
+		std::vector<pplx::task<void>> tasks;
+		tasks.reserve(clients.size());
+		std::transform(clients.begin(), clients.end(), std::back_inserter(tasks), [&](std::shared_ptr<Stormancer::IClient> client)
+		{
+			return awaitSettingsConsistency(client, settings, timeout);
+		});
+
+		return when_all_handle_exceptions(tasks);
 	}
 
 	static bool membersAreEqual(const std::vector<Stormancer::Party::PartyUserDto>& members, const std::vector<Stormancer::Party::PartyUserDto>& expectedMembers)
@@ -427,13 +512,19 @@ private:
 		});
 	}
 
-	static Stormancer::Party::PartyUserDto makeUserDto(std::shared_ptr<Stormancer::IClient> user, bool isLeader = false)
+	static Stormancer::Party::PartyUserDto makeUserDto(
+		std::shared_ptr<Stormancer::IClient> user,
+		bool isLeader = false,
+		Stormancer::Party::PartyUserStatus status = Stormancer::Party::PartyUserStatus::NotReady,
+		std::string userData = ""
+	)
 	{
 		using namespace Stormancer;
 
 		Party::PartyUserDto dto(user->dependencyResolver().resolve<Users::UsersApi>()->userId());
 		dto.isLeader = isLeader;
-		dto.partyUserStatus = Party::PartyUserStatus::NotReady;
+		dto.partyUserStatus = status;
+		dto.userData = userData;
 
 		return dto;
 	}
@@ -487,37 +578,64 @@ private:
 		});
 	}
 
-	static std::shared_ptr<Stormancer::Party::PartyApi> getLeader(const std::vector<std::shared_ptr<Stormancer::IClient>>& clients)
+	static int getLeader(const std::vector<std::shared_ptr<Stormancer::IClient>>& clients)
 	{
 		using namespace Stormancer;
 
-		for (auto client : clients)
+		for (int i=0; i<clients.size(); i++)
 		{
-			auto party = client->dependencyResolver().resolve<Party::PartyApi>();
-			if (party->isLeader())
+			if (getParty(clients[i])->isLeader())
 			{
-				return party;
+				return i;
 			}
 		}
 
-		return nullptr;
+		return -1;
+	}
+
+	static std::shared_ptr<Stormancer::Party::PartyApi> getParty(const std::shared_ptr<Stormancer::IClient>& client)
+	{
+		return client->dependencyResolver().resolve<Stormancer::Party::PartyApi>();
 	}
 	
-	//static pplx::task<void> testSettingsUpdate(const std::vector<std::shared_ptr<Stormancer::IClient>>& clients)
-	//{
-	//	using namespace Stormancer;
-	//	using namespace TestHelpers;
+	static pplx::task<void> testSettingsUpdate(const std::vector<std::shared_ptr<Stormancer::IClient>>& clients)
+	{
+		using namespace Stormancer;
+		using namespace TestHelpers;
 
-	//	auto leader = getLeader(clients);
-	//	assertex(leader != nullptr, "Party should have a leader");
+		int leader = getLeader(clients);
+		assertex(leader != -1, "Party should have a leader");
 
-	//	Party::PartySettings settings = leader->getPartySettings();
-	//	settings.customData = "newCustomData";
-	//	leader->updatePartySettings(settings).then([](pplx::task<void> task)
-	//	{
+		Party::PartySettings settings = getParty(clients[leader])->getPartySettings();
+		settings.customData = "newCustomData";
+		int nextLeader = (leader + 1) % clients.size();
 
-	//	});
-	//}
+		std::vector<pplx::task<void>> tasks;
+		std::vector<Party::PartyUserDto> members;
+		for (int i=0; i<clients.size(); i++)
+		{
+			std::string data = "client" + std::to_string(i) + "data";
+			Party::PartyUserStatus status = (i % 2 == 0) ? Party::PartyUserStatus::Ready : Party::PartyUserStatus::NotReady;
+			auto party = getParty(clients[i]);
+
+			tasks.push_back(party->updatePlayerData(data));
+			tasks.push_back(party->updatePlayerStatus(status));
+
+			if (party->isLeader())
+			{
+				auto nextLeaderId = clients[nextLeader]->dependencyResolver().resolve<Users::UsersApi>()->userId();
+				tasks.push_back(party->updatePartySettings(settings).then([party, nextLeaderId]
+				{
+					return party->promoteLeader(nextLeaderId);
+				}));
+			}
+			members.push_back(makeUserDto(clients[i], i == nextLeader, status, data));
+		}
+		tasks.push_back(awaitMembersConsistency(clients, members));
+		tasks.push_back(awaitSettingsConsistency(clients, settings));
+
+		return when_all_handle_exceptions(tasks);
+	}
 
 	static void assertex(bool condition, const std::string& msg)
 	{
@@ -550,5 +668,22 @@ private:
 				catch (...) {}
 			});
 		}
+	}
+
+	template<typename T>
+	static pplx::task<void> when_all_handle_exceptions(const std::vector<pplx::task<T>>& tasks)
+	{
+		return pplx::when_all(tasks.begin(), tasks.end()).then([tasks](pplx::task<void> task)
+		{
+			try
+			{
+				task.get();
+			}
+			catch (...)
+			{
+				handleExceptions(tasks.begin(), tasks.end());
+				throw;
+			}
+		});
 	}
 };

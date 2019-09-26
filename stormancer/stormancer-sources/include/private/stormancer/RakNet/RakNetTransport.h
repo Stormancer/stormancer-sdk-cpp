@@ -19,7 +19,8 @@ namespace Stormancer
 		pplx::task_completion_event<std::shared_ptr<IConnection>> tce;
 		std::string endpoint;
 		pplx::cancellation_token cancellationToken = pplx::cancellation_token::none();
-		std::string id;
+		std::string p2pSessionId;
+		std::string peerSessionId;
 		std::string parentId;
 		bool isP2P()
 		{
@@ -59,13 +60,13 @@ namespace Stormancer
 		void initialize(uint16 maxConnections, uint16 serverPort, const DependencyScope& parentScope);
 		void run();
 		// This overload sets the request as completed after it has updated its ConnectionState.
-		std::shared_ptr<RakNetConnection> onConnection(RakNet::SystemAddress systemAddress, RakNet::RakNetGUID guid, uint64 peerId, const ConnectionRequest& request);
+		std::shared_ptr<RakNetConnection> onConnection(RakNet::SystemAddress systemAddress, RakNet::RakNetGUID guid, std::string peerId, const ConnectionRequest& request);
 		// This overolad is for connections that do not have an associated ConnectionRequest.
-		std::shared_ptr<RakNetConnection> onConnection(RakNet::SystemAddress systemAddress, RakNet::RakNetGUID guid, uint64 peerId, std::string connectionId);
+		std::shared_ptr<RakNetConnection> onConnection(RakNet::SystemAddress systemAddress, RakNet::RakNetGUID guid, std::string remotePeerSessionId, std::string connectionId);
 		void onDisconnection(uint64 guid, std::string reason);
 		void onMessageReceived(RakNet::Packet* packet);
 		std::shared_ptr<RakNetConnection> getConnection(uint64 guid);
-		std::shared_ptr<RakNetConnection> createNewConnection(RakNet::RakNetGUID raknetGuid, uint64 peerId, std::string key);
+		std::shared_ptr<RakNetConnection> createNewConnection(RakNet::RakNetGUID raknetGuid, std::string peerId, std::string key);
 		std::shared_ptr<RakNetConnection> removeConnection(uint64 guid);
 		pplx::task<int> sendPing(const std::string& address, pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
 		pplx::task<bool> sendPingImplTask(const std::string& address);

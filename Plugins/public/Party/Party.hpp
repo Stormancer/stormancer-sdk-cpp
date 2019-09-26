@@ -1296,7 +1296,7 @@ namespace Stormancer
 					return _party->then([playerStatus](std::shared_ptr<PartyContainer> party)
 					{
 						auto partyService = party->getScene()->dependencyResolver().resolve<PartyService>();
-						partyService->updatePlayerStatus(playerStatus);
+						return partyService->updatePlayerStatus(playerStatus);
 					});
 				}
 

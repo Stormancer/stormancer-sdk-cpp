@@ -24,10 +24,11 @@ namespace Stormancer
 	{
 		uint64 parentConnectionId = 0;
 		std::string parentId;
-		std::string id;
+		std::string p2pSessionId;
+		std::string peerSessionId;
 		bool isRequest = false;
 
-		MSGPACK_DEFINE(parentConnectionId, parentId, id, isRequest)
+		MSGPACK_DEFINE(parentConnectionId, parentId, p2pSessionId, isRequest,peerSessionId)
 	};
 
 	RakNetTransport::RakNetTransport(const DependencyScope& scope)
@@ -201,9 +202,10 @@ namespace Stormancer
 								auto parentConnection = _handler->getConnection(rq.parentId);
 
 								P2PConnectionInfosExchange p2pConnecInfos;
-								p2pConnecInfos.parentConnectionId = parentConnection->id();
+							
 								p2pConnecInfos.parentId = rq.parentId;
-								p2pConnecInfos.id = rq.id;
+								p2pConnecInfos.p2pSessionId = rq.p2pSessionId;
+								p2pConnecInfos.peerSessionId = rq.peerSessionId;
 								p2pConnecInfos.isRequest = true;
 
 								obytestream stream;
@@ -216,7 +218,7 @@ namespace Stormancer
 								char* dataPtr = reinterpret_cast<char*>(stream.startPtr());
 								int dataSize = static_cast<int>(stream.currentPosition());
 
-								_logger->log(LogLevel::Trace, "RakNetTransport", "sending Advertise peer request parentid=" + rq.parentId + " id=" + rq.id);
+								_logger->log(LogLevel::Trace, "RakNetTransport", "sending Advertise peer request parentid=" + rq.parentId + " p2psessionId=" + rq.p2pSessionId+ " peerSessionId="+rq.peerSessionId);
 								_peer->Send(dataPtr, dataSize, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE, 0, rakNetPacket->guid, false);
 							}
 						}
@@ -338,10 +340,10 @@ namespace Stormancer
 
 							int64 sid;
 							std::memcpy(&sid, (rakNetPacket->data + 1), sizeof(sid));
+							auto ip = rakNetPacket->systemAddress.ToString();
+							_logger->log(LogLevel::Trace, "RakNetTransport", "Successfully connected to "+std::string(ip)+" as "+rq.peerSessionId);
 
-							_logger->log(LogLevel::Trace, "RakNetTransport", "Successfully connected to ", rakNetPacket->systemAddress.ToString());
-
-							auto connection = onConnection(rakNetPacket->systemAddress, rakNetPacket->guid, sid, rq);
+							auto connection = onConnection(rakNetPacket->systemAddress, rakNetPacket->guid, rq.peerSessionId, rq);
 							startNextPendingConnections();
 						}
 						break;
@@ -369,7 +371,7 @@ namespace Stormancer
 
 						if (!p2pRemoteConnecInfos.isRequest)
 						{
-							_logger->log(LogLevel::Trace, "RakNetTransport", "received Advertise peer response parentid=" + p2pRemoteConnecInfos.parentId + " id=" + p2pRemoteConnecInfos.id);
+							_logger->log(LogLevel::Trace, "RakNetTransport", "received Advertise peer response parentid=" + p2pRemoteConnecInfos.parentId + " id=" + p2pRemoteConnecInfos.peerSessionId);
 							auto rq = _pendingConnections.front();
 							_pendingConnections.pop();
 							if (rq.cancellationToken.is_canceled())
@@ -379,20 +381,21 @@ namespace Stormancer
 							else
 							{
 								_logger->log(LogLevel::Trace, "RakNetTransport", "Connection request accepted", packetSystemAddressStr.c_str());
-								auto connection = onConnection(rakNetPacket->systemAddress, rakNetPacket->guid, (uint64)p2pRemoteConnecInfos.parentConnectionId, rq);
+								auto connection = onConnection(rakNetPacket->systemAddress, rakNetPacket->guid, p2pRemoteConnecInfos.peerSessionId, rq);
 							}
 							startNextPendingConnections();
 						}
 						else
 						{
-							_logger->log(LogLevel::Trace, "RakNetTransport", "Received Advertise peer request parentid=" + p2pRemoteConnecInfos.parentId + " id=" + p2pRemoteConnecInfos.id);
+							_logger->log(LogLevel::Trace, "RakNetTransport", "Received Advertise peer request parentid=" + p2pRemoteConnecInfos.parentId + " id=" + p2pRemoteConnecInfos.peerSessionId);
 
 							auto parentConnection = _handler->getConnection(std::string(p2pRemoteConnecInfos.parentId));
 
 							P2PConnectionInfosExchange p2pConnecInfos;
-							p2pConnecInfos.parentConnectionId = parentConnection->id();
+						
 							p2pConnecInfos.parentId = p2pRemoteConnecInfos.parentId;
-							p2pConnecInfos.id = p2pRemoteConnecInfos.id;
+							p2pConnecInfos.p2pSessionId = p2pRemoteConnecInfos.p2pSessionId;
+							p2pConnecInfos.peerSessionId = _handler->currentSessionId;
 							p2pConnecInfos.isRequest = false;
 
 							obytestream stream;
@@ -406,7 +409,7 @@ namespace Stormancer
 
 							_peer->Send(dataPtr, dataSize, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE, 0, rakNetPacket->guid, false);
 
-							onConnection(rakNetPacket->systemAddress, rakNetPacket->guid, (uint64)p2pRemoteConnecInfos.parentConnectionId, p2pRemoteConnecInfos.id);
+							onConnection(rakNetPacket->systemAddress, rakNetPacket->guid, p2pRemoteConnecInfos.peerSessionId, p2pRemoteConnecInfos.parentId);
 						}
 						break;
 					}
@@ -516,13 +519,15 @@ namespace Stormancer
 
 	pplx::task<std::shared_ptr<IConnection>> RakNetTransport::connect(std::string endpoint, std::string id, std::string parentId, pplx::cancellation_token ct)
 	{
+		
+		_logger->log(LogLevel::Info, "raknet", "connecting to " + endpoint + " with id='" + id + "', parentId='" + parentId + "'");
 		std::lock_guard<std::mutex> lock(_pendingConnection_mtx);
 
 		auto shouldStart = _pendingConnections.empty();
 		ConnectionRequest rq;
 		rq.endpoint = endpoint;
 		rq.cancellationToken = ct;
-		rq.id = id;
+		rq.peerSessionId = id;
 		rq.parentId = parentId;
 
 		_pendingConnections.push(rq);
@@ -579,7 +584,7 @@ namespace Stormancer
 			tce.set_exception(std::runtime_error("Transport not started. Make sure you started it."));
 			return;
 		}
-
+		_logger->log(LogLevel::Info, "raknet", "connecting rakpeer to " + hostStr + " with id='" + rq.peerSessionId + "', parentId='" + rq.parentId + "'");
 		auto result = _peer->Connect(hostStr.c_str(), _port, nullptr, 0, nullptr, 0, 12, 500, 30000);
 		if (result != RakNet::ConnectionAttemptResult::CONNECTION_ATTEMPT_STARTED)
 		{
@@ -588,12 +593,12 @@ namespace Stormancer
 		}
 	}
 
-	std::shared_ptr<RakNetConnection> RakNetTransport::onConnection(RakNet::SystemAddress systemAddress, RakNet::RakNetGUID guid, uint64 peerId, const ConnectionRequest& request)
+	std::shared_ptr<RakNetConnection> RakNetTransport::onConnection(RakNet::SystemAddress systemAddress, RakNet::RakNetGUID guid, std::string peerId, const ConnectionRequest& request)
 	{
 		auto msg = std::string() + systemAddress.ToString(true, ':') + " connected";
 		_logger->log(LogLevel::Trace, "RakNetTransport", msg.c_str());
 
-		auto connection = createNewConnection(guid, peerId, request.id);
+		auto connection = createNewConnection(guid, peerId, request.parentId);
 
 		_handler->newConnection(connection);
 
@@ -604,12 +609,12 @@ namespace Stormancer
 		return connection;
 	}
 
-	std::shared_ptr<RakNetConnection> RakNetTransport::onConnection(RakNet::SystemAddress systemAddress, RakNet::RakNetGUID guid, uint64 peerId, std::string connectionId)
+	std::shared_ptr<RakNetConnection> RakNetTransport::onConnection(RakNet::SystemAddress systemAddress, RakNet::RakNetGUID guid, std::string remotePeerSessionId, std::string connectionId)
 	{
 		auto msg = std::string() + systemAddress.ToString(true, ':') + " connected";
 		_logger->log(LogLevel::Trace, "RakNetTransport", msg.c_str());
 
-		auto connection = createNewConnection(guid, peerId, connectionId);
+		auto connection = createNewConnection(guid, remotePeerSessionId, connectionId);
 
 		_handler->newConnection(connection);
 
@@ -678,11 +683,11 @@ namespace Stormancer
 		}
 	}
 
-	std::shared_ptr<RakNetConnection> RakNetTransport::createNewConnection(RakNet::RakNetGUID raknetGuid, uint64 peerId, std::string key)
+	std::shared_ptr<RakNetConnection> RakNetTransport::createNewConnection(RakNet::RakNetGUID raknetGuid, std::string remotePeerSessionId, std::string key)
 	{
 		if (_peer)
 		{
-			int64 cid = peerId;
+			std::string cid = remotePeerSessionId;
 			auto connection = std::shared_ptr<RakNetConnection>(new RakNetConnection(raknetGuid, cid, key, _peer, _logger, _dependencyScope), deleter<RakNetConnection>());
 			RakNet::RakNetGUID guid(connection->guid());
 			auto logger = _logger;
@@ -699,7 +704,7 @@ namespace Stormancer
 				//#endif
 				if (auto peer = weakPeer.lock())
 				{
-					logger->log(LogLevel::Trace, "RakNetTransport", "RakNet connection onClose: " + reason, std::to_string(cid));
+					logger->log(LogLevel::Trace, "RakNetTransport", "RakNet connection onClose: " + reason,cid);
 					peer->CloseConnection(guid, true);
 				}
 			});

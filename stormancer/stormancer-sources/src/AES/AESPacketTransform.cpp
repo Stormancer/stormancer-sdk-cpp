@@ -15,7 +15,7 @@ namespace Stormancer
 	{
 	}
 
-	void AESPacketTransform::onSend(StreamWriter& streamWriter, uint64 peerId, const TransformMetadata& metadata)
+	void AESPacketTransform::onSend(StreamWriter& streamWriter, std::string peerId, const TransformMetadata& metadata)
 	{
 		if (_enabled && !metadata.dontEncrypt)
 		{
@@ -34,7 +34,7 @@ namespace Stormancer
 		}
 	}
 
-	void AESPacketTransform::onReceive(ibytestream& stream, uint64 peerId)
+	void AESPacketTransform::onReceive(ibytestream& stream, std::string peerId)
 	{
 		auto bc = stream.rdbuf()->sgetc();
 		if (bc != bytestreambuf::traits_type::eof())

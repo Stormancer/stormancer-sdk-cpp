@@ -3,7 +3,7 @@
 
 namespace Stormancer
 {
-	AESEncryptStream::AESEncryptStream(std::shared_ptr<IAES> aes, uint64 keyId)
+	AESEncryptStream::AESEncryptStream(std::shared_ptr<IAES> aes, std::string keyId)
 		: _aes(aes)
 		, _keyId(keyId)
 	{
