@@ -1,6 +1,6 @@
 #include "LeaderboardService.h"
 #include "Leaderboard_Impl.h"
-#include "Authentication/AuthenticationService.h"
+#include "Users/Users.hpp"
 
 namespace Stormancer
 {
@@ -23,7 +23,7 @@ namespace Stormancer
 		return _rpcService->rpc<LeaderboardResult, std::string>("leaderboard.cursor", cursor);
 	}
 
-	Leaderboard_Impl::Leaderboard_Impl(std::weak_ptr<AuthenticationService> auth) :ClientAPI(auth)
+	Leaderboard_Impl::Leaderboard_Impl(std::weak_ptr<Users::UsersApi> users) : ClientAPI(users)
 	{
 	}
 

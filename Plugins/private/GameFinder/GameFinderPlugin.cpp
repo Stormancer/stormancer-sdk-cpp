@@ -5,7 +5,7 @@
 #include "GameFinderService.h"
 #include "GameFinder/GameFinder.h"
 #include "GameFinder_Impl.h"
-#include "Authentication/AuthenticationService.h"
+#include "Users/Users.hpp"
 
 namespace Stormancer
 {
@@ -35,6 +35,15 @@ namespace Stormancer
 
 	void GameFinderPlugin::registerClientDependencies(ContainerBuilder& builder)
 	{
-		builder.registerDependency<GameFinder_Impl, AuthenticationService>().as<GameFinder>().singleInstance();
+		builder.registerDependency<GameFinder_Impl, Users::UsersApi>().as<GameFinder>().singleInstance();
+	}
+
+	void GameFinderPlugin::sceneDisconnecting(std::shared_ptr<Scene> scene)
+	{
+		auto name = scene->getHostMetadata("stormancer.plugins.gamefinder");
+		if (!name.empty())
+		{
+			scene->dependencyResolver().resolve<GameFinderService>()->onSceneDisconnecting();
+		}
 	}
 }

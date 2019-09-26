@@ -6,6 +6,7 @@
 
 
 
+
 namespace Stormancer
 {
 	class Tester
@@ -24,12 +25,12 @@ namespace Stormancer
 
 		Tester() = default;
 
-		/// Run the test suite, and block indefinitely on stdin.
+		/// Run the test suite.
 		void run_all_tests();
 
 		/// Same as run_all_tests(), but returns immediately.
 		/// Use tests_done() and tests_passed() to check the tests' status.
-		void run_all_tests_nonblocking();
+		pplx::task<void> run_all_tests_nonblocking();
 
 		/// Check whether the tests are done (NOT if they're succesful).
 		bool tests_done();
@@ -37,6 +38,16 @@ namespace Stormancer
 		/// Check whether or not the tests were succsful.
 		/// You need to check that the tests have finished running with tests_done() before calling this function.
 		bool tests_passed();
+
+		//-----------
+		// Accessors
+		//-----------
+
+		ILogger_ptr logger() const { return _logger; }
+
+		const std::string& endpoint() const { return _endpoint; }
+		const std::string& account() const { return _accountId; }
+		const std::string& application() const { return _applicationName; }
 
 #pragma endregion
 
@@ -48,12 +59,15 @@ namespace Stormancer
 		std::string connectionStateToString(ConnectionState connectionState);
 		void onEcho(Packetisp_ptr packet);
 		void onMessage(Packetisp_ptr packet);
+		void onConnectionRejected(Packetisp_ptr packet);
+
 		pplx::task<void> test_rpc_client_received(RpcRequestContext_ptr rc);
 		pplx::task<void> test_rpc_client_cancel_received(RpcRequestContext_ptr rc);
 		pplx::task<void> test_rpc_client_exception_received(RpcRequestContext_ptr rc);
 		
 		void test_create();
 		void test_connect();
+		void test_connectionRejected();
 		void test_echo();
 		void test_rpc_server();
 		void test_rpc_server_cancel();
@@ -70,6 +84,8 @@ namespace Stormancer
 		void test_Ping_Cluster();
 		void test_dependencyInjection();
 		void test_streams();
+		void test_users();
+		void test_party();
 
 #pragma endregion
 
@@ -96,7 +112,8 @@ namespace Stormancer
 		bool _testsDone = false;
 		bool _testsPassed = false;
 
-		pplx::task_completion_event<void> testCompletedTce;
+		pplx::task_completion_event<void> _connectionRejectedReceivedTce;
+		pplx::task_completion_event<void> _testsCompletedTce;
 
 #pragma endregion
 	};

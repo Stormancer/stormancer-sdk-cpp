@@ -1,6 +1,6 @@
 #pragma once
 
-#include "stormancer/ClientAPI.h"
+#include "Users/ClientAPI.hpp"
 #include "Servers/Servers.h"
 #include "Servers/ServersModels.h"
 
@@ -11,7 +11,7 @@ namespace Stormancer
 	class Servers_Impl: public ClientAPI<Servers_Impl>, public Servers
 	{
 	public:
-		Servers_Impl(std::weak_ptr<AuthenticationService> auth);
+		Servers_Impl(std::weak_ptr<Users::UsersApi> users);
 
 		virtual pplx::task<std::vector<ServerDescription>> GetServersDescription() override;
 		

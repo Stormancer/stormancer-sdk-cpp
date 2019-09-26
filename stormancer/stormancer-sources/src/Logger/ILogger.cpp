@@ -2,6 +2,7 @@
 #include "stormancer/Logger/NullLogger.h"
 #include "stormancer/Helpers.h"
 #include <sstream>
+#include <exception>
 
 namespace Stormancer
 {
@@ -64,5 +65,11 @@ namespace Stormancer
 	std::string ILogger::formatException(const std::exception& ex)
 	{
 		return format(LogLevel::Error, "exception", ex.what());
+	}
+
+	void ILogger::log(LogLevel level, const std::string& category, const std::string& message, const std::exception& exception)
+	{
+		std::string formattedException = "Exception: " + std::string(exception.what());
+		log(level, category, message, formattedException);
 	}
 }

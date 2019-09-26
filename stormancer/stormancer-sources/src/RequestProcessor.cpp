@@ -50,7 +50,11 @@ namespace Stormancer
 
 		config.addProcessor((byte)MessageIDTypes::ID_SYSTEM_REQUEST, [wProcessor, logger, serializer](Packet_ptr packet)
 		{
-			auto processor = LockOrThrow(wProcessor);
+			auto processor = wProcessor.lock();
+			if (!processor)
+			{
+				return false;
+			}
 
 			byte sysRequestId;
 			packet->stream >> sysRequestId;
@@ -102,7 +106,11 @@ namespace Stormancer
 
 		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_MSG, [wProcessor, logger](Packet_ptr packet)
 		{
-			auto processor = LockOrThrow(wProcessor);
+			auto processor = wProcessor.lock();
+			if (!processor)
+			{
+				return false;
+			}
 
 			uint16 id;
 			packet->stream >> id;
@@ -130,7 +138,11 @@ namespace Stormancer
 
 		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_COMPLETE, [wProcessor, logger](Packet_ptr p)
 		{
-			auto processor = LockOrThrow(wProcessor);
+			auto processor = wProcessor.lock();
+			if (!processor)
+			{
+				return false;
+			}
 
 			uint16 id;
 			p->stream >> id;
@@ -164,7 +176,11 @@ namespace Stormancer
 
 		config.addProcessor((byte)MessageIDTypes::ID_REQUEST_RESPONSE_ERROR, [wProcessor, serializer, logger](Packet_ptr p)
 		{
-			auto processor = LockOrThrow(wProcessor);
+			auto processor = wProcessor.lock();
+			if (!processor)
+			{
+				return false;
+			}
 
 			uint16 id;
 			p->stream >> id;
@@ -177,8 +193,7 @@ namespace Stormancer
 			{
 				p->metadata["request"] = idStr;
 				std::string msg = serializer.deserializeOne<std::string>(p->stream);
-				std::string message = msg + "(msgId:" + std::to_string(request->operation()) + ")";
-				if (!request->trySetException(std::runtime_error(message.c_str())))
+				if (!request->trySetException(std::runtime_error(msg.c_str())))
 				{
 					logger->log(LogLevel::Warn, "RequestProcessor/error", "Can't set the exception in the system request", idStr);
 				}
@@ -202,7 +217,7 @@ namespace Stormancer
 		auto request = reserveRequestSlot(msgId, ct);
 		auto requestId = request->getId();
 		auto wRequestProcessor = STORM_WEAK_FROM_THIS();
-		_logger->log(LogLevel::Trace, "RequestProcessor", "Sending system request " + std::to_string(msgId) + " to " + std::to_string(peer->id()));
+		_logger->log(LogLevel::Trace, "RequestProcessor", "Sending system request " + std::to_string(msgId) + " to " + std::to_string(peer->id()) + ", Id=" + std::to_string(requestId));
 		if (ct.is_cancelable())
 		{
 			ct.register_callback([requestId, wRequestProcessor]()
@@ -248,11 +263,10 @@ namespace Stormancer
 		{ // this scope ensures the static id is not used outside the locked mutex.
 			std::lock_guard<std::mutex> lock(_mutexPendingRequests);
 
-			static uint16 id = 0;
 			// i is used to know if we tested all uint16 available values, whatever the current value of id.
 			for (uint32 i = 0; i <= 0xffff; i++)
 			{
-				id++;
+				uint16 id = ++_requestIdCounter;
 
 				if (!mapContains(_pendingRequests, id))
 				{

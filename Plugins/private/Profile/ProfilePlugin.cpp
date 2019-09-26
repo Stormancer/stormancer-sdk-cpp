@@ -4,7 +4,7 @@
 #include "Profile/ProfilePlugin.h"
 #include "ProfileService.h"
 #include "Profiles_Impl.h"
-#include "Authentication/AuthenticationService.h"
+#include "Users/Users.hpp"
 #include "stormancer/Scene.h"
 
 namespace Stormancer
@@ -23,6 +23,6 @@ namespace Stormancer
 	
 	void ProfilePlugin::registerClientDependencies(ContainerBuilder& builder)
 	{
-		builder.registerDependency<Profiles_Impl, AuthenticationService>().as<Profiles>().singleInstance();
+		builder.registerDependency<Profiles_Impl, Users::UsersApi>().as<Profiles>().singleInstance();
 	}
 }

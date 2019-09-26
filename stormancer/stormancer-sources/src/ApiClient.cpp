@@ -129,7 +129,7 @@ namespace Stormancer
 		return client.request(request, ct)
 			.then([wApiClient, baseUri,relativeUri, errors, endpoints, ct](pplx::task<web::http::http_response> task)
 		{
-			auto apiClient = LockOrThrow(wApiClient);
+			auto apiClient = wApiClient.lock();
 
 			web::http::http_response response;
 			try
@@ -138,12 +138,20 @@ namespace Stormancer
 			}
 			catch (const std::exception& ex)
 			{
+				if (!apiClient)
+				{ 
+					throw;
+				}
 				auto msgStr = "Can't reach the server endpoint. " + baseUri;
 				apiClient->_logger->log(LogLevel::Warn, "ApiClient.getFederation", msgStr, ex.what());
 				(*errors).push_back("[" + msgStr + ":" + ex.what() + "]");
 				return apiClient->getFederationImpl(endpoints, errors, ct);
 			}
 
+			if (!apiClient)
+			{
+				throw PointerDeletedException("ApiClient");
+			}
 			try
 			{
 				uint16 statusCode = response.status_code();

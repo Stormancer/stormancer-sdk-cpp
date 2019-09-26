@@ -25,6 +25,6 @@ namespace Stormancer
 
 	void LeaderboardPlugin::registerClientDependencies(ContainerBuilder& builder)
 	{
-		builder.registerDependency<Leaderboard_Impl, AuthenticationService>().as<Leaderboard>().singleInstance();
+		builder.registerDependency<Leaderboard_Impl, Users::UsersApi>().as<Leaderboard>().singleInstance();
 	}
 }

@@ -10,9 +10,9 @@
 
 namespace Stormancer
 {
-	void registerClientDependencies(ContainerBuilder& builder)
+	void ServerPlugin::registerClientDependencies(ContainerBuilder& builder)
 	{
-		builder.registerDependency<Servers_Impl, AuthenticationService>().as<Servers>().singleInstance();
+		builder.registerDependency<Servers_Impl, Users::UsersApi>().as<Servers>().singleInstance();
 	}
 
 	void ServerPlugin::registerSceneDependencies(ContainerBuilder& builder, std::shared_ptr<Scene> scene)

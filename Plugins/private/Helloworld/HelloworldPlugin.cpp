@@ -18,5 +18,5 @@ void Helloworld::HelloworldPlugin::registerSceneDependencies(Stormancer::Contain
 
 void Helloworld::HelloworldPlugin::registerClientDependencies(Stormancer::ContainerBuilder& builder)
 {
-	builder.registerDependency<Helloworld::Hello, Stormancer::AuthenticationService>().singleInstance();
+	builder.registerDependency<Helloworld::Hello, Stormancer::Users::UsersApi>().singleInstance();
 }

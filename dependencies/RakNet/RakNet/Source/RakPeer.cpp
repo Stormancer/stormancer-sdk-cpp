@@ -197,6 +197,13 @@ STATIC_FACTORY_DEFINITIONS(RakPeerInterface, RakPeer)
 // Constructor
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 RakPeer::RakPeer()
+#if !defined(_NO_PPLX)
+ : asyncUpdateBitStream(MAXIMUM_MTU_SIZE
+#if LIBCAT_SECURITY==1
+	 + cat::AuthenticatedEncryption::OVERHEAD_BYTES
+#endif
+ )
+#endif
 {
 #if LIBCAT_SECURITY==1
 	// Encryption and security
@@ -632,10 +639,7 @@ StartupResult RakNet::RakPeer::Startup(unsigned int maxConnections, const DataSt
 				return FAILED_TO_CREATE_NETWORK_THREAD;
 			}
 #else
-			pplx::task<void> t;
-			t = RakNet::RakThread::Create([this]() {
-				UpdateNetworkLoop(this);
-			}, threadPriority);
+			pplx::task<void> t = UpdateNetworkLoopAsync();
 
 			if (t.is_done())
 			{
@@ -6116,6 +6120,103 @@ void RakPeer::OnRNS2Recv(RNS2RecvStruct *recvStruct)
 	quitAndDataEvents.SetEvent();
 }
 
+void RakPeer::UpdateNetworkLoopIteration(BitStream& updateBitStream)
+{
+	// #ifdef _DEBUG
+// 		// Sanity check, make sure RunUpdateCycle does not block or not otherwise get called for a long time
+// 		RakNetTime thisCall=RakNet::GetTime();
+// 		RakAssert(thisCall-lastCall<250);
+// 		lastCall=thisCall;
+// #endif
+	if (userUpdateThreadPtr)
+		userUpdateThreadPtr(this, userUpdateThreadData);
+
+	RunUpdateCycle(updateBitStream);
+
+	// Pending sends go out this often, unless quitAndDataEvents is set
+	quitAndDataEvents.WaitOnEvent(10);
+
+	/*
+
+	// #if ((_WIN32_WINNT >= 0x0400) || (_WIN32_WINDOWS > 0x0400)) &&
+	#if defined(USE_WAIT_FOR_MULTIPLE_EVENTS) && defined(_WIN32)
+
+	if (threadSleepTimer>0)
+	{
+		WSAEVENT eventArray[256];
+		unsigned int i, eventArrayIndex;
+		for (i=0,eventArrayIndex=0; i < socketList.Size(); i++)
+		{
+			if (socketList[i]->recvEvent!=INVALID_HANDLE_VALUE)
+			{
+				eventArray[eventArrayIndex]=socketList[i]->recvEvent;
+				eventArrayIndex++;
+				if (eventArrayIndex==256)
+					break;
+			}
+		}
+		WSAWaitForMultipleEvents(eventArrayIndex,(const HANDLE*) &eventArray,FALSE,threadSleepTimer,FALSE);
+	}
+	else
+	{
+		RakSleep(0);
+	}
+
+	#else // ((_WIN32_WINNT >= 0x0400) || (_WIN32_WINDOWS > 0x0400)) && defined(USE_WAIT_FOR_MULTIPLE_EVENTS)
+	#pragma message("-- RakNet: Using Sleep(). Uncomment USE_WAIT_FOR_MULTIPLE_EVENTS in RakNetDefines.h if you want to use WaitForSingleObject instead. --")
+
+	RakSleep( threadSleepTimer );
+	#endif
+	*/
+}
+
+#if !defined(_NO_PPLX)
+
+pplx::task<void> RakPeer::UpdateNetworkLoopAsync()
+{
+	asyncUpdateBitStream.Reset();
+	isMainLoopThreadActive = true;
+
+	pplx::task_completion_event<void> tce;
+
+	// Run asynchronously to avoid blocking on the first iteration
+	pplx::create_task([this, tce]
+	{
+		UpdateNetworkLoopAsyncInt(tce);
+	});
+	
+	return pplx::create_task(tce).then([this](pplx::task<void> task)
+	{
+		isMainLoopThreadActive = false;
+		return task;
+	});
+}
+
+void RakPeer::UpdateNetworkLoopAsyncInt(pplx::task_completion_event<void> tce)
+{
+	if (endThreads == false)
+	{
+		try
+		{
+			UpdateNetworkLoopIteration(asyncUpdateBitStream);
+			pplx::create_task([this, tce]
+			{
+				UpdateNetworkLoopAsyncInt(tce);
+			});
+		}
+		catch (...)
+		{
+			tce.set_exception(std::current_exception());
+		}
+	}
+	else
+	{
+		tce.set();
+	}
+}
+
+#endif // !defined(_NO_PPLX)
+
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 RAK_THREAD_DECLARATION(RakNet::UpdateNetworkLoop)
 {
@@ -6161,52 +6262,7 @@ RAK_THREAD_DECLARATION(RakNet::UpdateNetworkLoop)
 
 	while (rakPeer->endThreads == false)
 	{
-		// #ifdef _DEBUG
-		// 		// Sanity check, make sure RunUpdateCycle does not block or not otherwise get called for a long time
-		// 		RakNetTime thisCall=RakNet::GetTime();
-		// 		RakAssert(thisCall-lastCall<250);
-		// 		lastCall=thisCall;
-		// #endif
-		if (rakPeer->userUpdateThreadPtr)
-			rakPeer->userUpdateThreadPtr(rakPeer, rakPeer->userUpdateThreadData);
-
-		rakPeer->RunUpdateCycle(updateBitStream);
-
-		// Pending sends go out this often, unless quitAndDataEvents is set
-		rakPeer->quitAndDataEvents.WaitOnEvent(10);
-
-		/*
-
-		// #if ((_WIN32_WINNT >= 0x0400) || (_WIN32_WINDOWS > 0x0400)) &&
-		#if defined(USE_WAIT_FOR_MULTIPLE_EVENTS) && defined(_WIN32)
-
-		if (rakPeer->threadSleepTimer>0)
-		{
-			WSAEVENT eventArray[256];
-			unsigned int i, eventArrayIndex;
-			for (i=0,eventArrayIndex=0; i < rakPeer->socketList.Size(); i++)
-			{
-				if (rakPeer->socketList[i]->recvEvent!=INVALID_HANDLE_VALUE)
-				{
-					eventArray[eventArrayIndex]=rakPeer->socketList[i]->recvEvent;
-					eventArrayIndex++;
-					if (eventArrayIndex==256)
-						break;
-				}
-			}
-			WSAWaitForMultipleEvents(eventArrayIndex,(const HANDLE*) &eventArray,FALSE,rakPeer->threadSleepTimer,FALSE);
-		}
-		else
-		{
-			RakSleep(0);
-		}
-
-		#else // ((_WIN32_WINNT >= 0x0400) || (_WIN32_WINDOWS > 0x0400)) && defined(USE_WAIT_FOR_MULTIPLE_EVENTS)
-		#pragma message("-- RakNet: Using Sleep(). Uncomment USE_WAIT_FOR_MULTIPLE_EVENTS in RakNetDefines.h if you want to use WaitForSingleObject instead. --")
-
-		RakSleep( rakPeer->threadSleepTimer );
-		#endif
-		*/
+		rakPeer->UpdateNetworkLoopIteration(updateBitStream);
 	}
 
 	rakPeer->isMainLoopThreadActive = false;

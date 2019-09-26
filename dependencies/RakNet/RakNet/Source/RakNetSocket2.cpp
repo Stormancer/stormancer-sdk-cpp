@@ -340,6 +340,7 @@ RNS2BindResult RNS2_Berkley::BindShared(RNS2_BerkleyBindParameters *bindParamete
 	return br;
 }
 
+// Stormancer: Unused when _NO_PPLX is NOT defined
 RAK_THREAD_DECLARATION(RNS2_Berkley::RecvFromLoop)
 {
 
@@ -351,51 +352,94 @@ RAK_THREAD_DECLARATION(RNS2_Berkley::RecvFromLoop)
 	b->RecvFromLoopInt();
 	return 0;
 }
+
+void RNS2_Berkley::RecvFromLoopIteration(bool& wasLastRcvEmpty)
+{
+	RNS2RecvStruct *recvFromStruct;
+
+	recvFromStruct = binding.eventHandler->AllocRNS2RecvStruct(_FILE_AND_LINE_);
+	if (recvFromStruct != NULL)
+	{
+		recvFromStruct->socket = this;
+		// TODO Stormancer: Use non-blocking recvfrom when using tasks
+		RecvFromBlocking(recvFromStruct);
+
+		if (recvFromStruct->bytesRead > 0)
+		{
+			wasLastRcvEmpty = false;
+			RakAssert(recvFromStruct->systemAddress.GetPort());
+			//RAKNET_DEBUG_PRINTF("Received %i bytes.\n", recvFromStruct->bytesRead);
+			binding.eventHandler->OnRNS2Recv(recvFromStruct);
+		}
+		else
+		{
+			if (wasLastRcvEmpty)
+			{
+				RakSleep(1);
+			}
+			else
+			{
+				wasLastRcvEmpty = true;
+				RakSleep(0);
+			}
+			binding.eventHandler->DeallocRNS2RecvStruct(recvFromStruct, _FILE_AND_LINE_);
+		}
+	}
+}
+
+#if !defined(_NO_PPLX)
+pplx::task<void> RNS2_Berkley::RecvFromLoopAsync()
+{
+	isRecvFromLoopThreadActive.Increment();
+	pplx::task_completion_event<void> tce;
+
+	// Call asynchronously to avoid blocking on the first RecvFrom
+	pplx::create_task([this, tce]
+	{
+		bool wasLastRcvEmpty = false;
+		RecvFromLoopAsyncInt(wasLastRcvEmpty, tce);
+	});
+	
+	return pplx::create_task(tce).then([this](pplx::task<void> task)
+	{
+		isRecvFromLoopThreadActive.Decrement();
+		return task;
+	});
+}
+
+void RNS2_Berkley::RecvFromLoopAsyncInt(bool wasLastRcvEmpty, pplx::task_completion_event<void> tce)
+{
+	if (endThreads == false)
+	{
+		try
+		{
+			RecvFromLoopIteration(wasLastRcvEmpty);
+			pplx::create_task([this, wasLastRcvEmpty, tce]
+			{
+				RecvFromLoopAsyncInt(wasLastRcvEmpty, tce);
+			});
+		}
+		catch (...)
+		{
+			tce.set_exception(std::current_exception());
+		}
+	}
+	else
+	{
+		tce.set();
+	}
+}
+#endif // !defined(_NO_PPLX)
+
 unsigned RNS2_Berkley::RecvFromLoopInt(void)
 {
 	isRecvFromLoopThreadActive.Increment();
 	bool wasLastRcvEmpty = false;
 	while (endThreads == false)
 	{
-		RNS2RecvStruct *recvFromStruct;
-
-		recvFromStruct = binding.eventHandler->AllocRNS2RecvStruct(_FILE_AND_LINE_);
-		if (recvFromStruct != NULL)
-		{
-			recvFromStruct->socket = this;
-			RecvFromBlocking(recvFromStruct);
-
-			if (recvFromStruct->bytesRead>0)
-			{
-				wasLastRcvEmpty = false;
-				RakAssert(recvFromStruct->systemAddress.GetPort());
-				//RAKNET_DEBUG_PRINTF("Received %i bytes.\n", recvFromStruct->bytesRead);
-				binding.eventHandler->OnRNS2Recv(recvFromStruct);
-			}
-			else
-			{
-				if (wasLastRcvEmpty)
-				{
-					RakSleep(1);
-				}
-				else
-				{
-					wasLastRcvEmpty = true;
-					RakSleep(0);
-				}
-				binding.eventHandler->DeallocRNS2RecvStruct(recvFromStruct, _FILE_AND_LINE_);
-			}
-		}
+		RecvFromLoopIteration(wasLastRcvEmpty);
 	}
 	isRecvFromLoopThreadActive.Decrement();
-
-
-
-
-
-
-
-
 
 
 
@@ -441,21 +485,16 @@ int RNS2_Berkley::CreateRecvPollingThread(int threadPriority)
 	return errorCode;
 }
 
-#else
+#else // defined (_NO_PPLX)
 
 pplx::task<void> RNS2_Berkley::CreateRecvPollingThread(int threadPriority)
 {
 	endThreads = false;
 
-
-	pplx::task<void> task = RakNet::RakThread::Create([this]() {
-		RecvFromLoop(this);
-	}, threadPriority);
-
-	return task;
+	return RecvFromLoopAsync();
 }
 
-#endif
+#endif // defined (_NO_PPLX)
 // fin ajout Vincent
 
 void RNS2_Berkley::SignalStopRecvPollingThread(void)

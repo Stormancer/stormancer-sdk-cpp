@@ -3,7 +3,7 @@
 #endif
 #include "InAppNotification/InAppNotificationContainer.h"
 #include "stormancer/Scene.h"
-#include "Authentication/AuthenticationService.h"
+#include "Users/Users.hpp"
 #include "stormancer/Exceptions.h"
 
 namespace Stormancer

@@ -51,6 +51,13 @@ namespace Stormancer
 			return _inputStream;
 		}
 
+		template<typename TObj>
+		TObj readObject()
+		{
+			Serializer serializer;
+			return serializer.deserializeOne<TObj>(_inputStream);
+		}
+
 		void sendValue(const StreamWriter& streamWriter, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY)
 		{
 			auto scene = _scene.lock();
@@ -70,6 +77,15 @@ namespace Stormancer
 			}, priority, (_ordered ? PacketReliability::RELIABLE_ORDERED : PacketReliability::RELIABLE), _rpcClientChannelIdentifier);
 
 			_msgSent = 1;
+		}
+
+		template<typename TValue>
+		void sendValueTemplated(const TValue& value, PacketPriority priority = PacketPriority::MEDIUM_PRIORITY)
+		{
+			sendValue([&value](obytestream& stream)
+			{
+				Serializer().serialize(stream, value);
+			}, priority);
 		}
 
 		void sendError(std::string errorMsg) const
@@ -124,7 +140,7 @@ namespace Stormancer
 		ibytestream& _inputStream;
 		uint16 _id;
 		bool _ordered;
-		byte _msgSent;
+		byte _msgSent = 0;
 		pplx::cancellation_token _cancellationToken;
 		Serializer _serializer;
 		const std::string _rpcClientChannelIdentifier = "RPC_client";

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "stormancer/ClientAPI.h"
+#include "Users/ClientAPI.hpp"
 #include "Leaderboard/Leaderboard.h"
 #include "Leaderboard/LeaderboardModels.h"
 
@@ -12,7 +12,7 @@ namespace Stormancer
 	{
 	public:
 
-		Leaderboard_Impl(std::weak_ptr<AuthenticationService> auth);
+		Leaderboard_Impl(std::weak_ptr<Users::UsersApi> users);
 
 		//Query a leaderboard
 		pplx::task<LeaderboardResult> query(LeaderboardQuery query);

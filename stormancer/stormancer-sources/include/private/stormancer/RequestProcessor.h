@@ -8,6 +8,7 @@
 #include "stormancer/SystemRequest.h"
 #include "stormancer/PacketPriority.h"
 #include "stormancer/Serializer.h"
+#include "stormancer/Utilities/TypeReflection.h"
 
 namespace Stormancer
 {
@@ -96,7 +97,7 @@ namespace Stormancer
 		template<typename TResult>
 		pplx::task<TResult> sendSystemRequestInternal(IConnection* peer, byte msgId, const StreamWriter& streamWriter, PacketPriority priority, pplx::cancellation_token ct)
 		{
-			std::string Tname = typeid(TResult).name();
+			std::string Tname = getTypeName<TResult>();
 			auto logger = _logger;
 			auto serializer = _serializer;
 
@@ -127,6 +128,7 @@ namespace Stormancer
 		std::unordered_map<byte, std::function<pplx::task<void>(std::shared_ptr<RequestContext>)>> _handlers;
 		Serializer _serializer;
 		int systemRequestChannelUid = 0;
+		uint16 _requestIdCounter = 0;
 
 #pragma endregion
 	};

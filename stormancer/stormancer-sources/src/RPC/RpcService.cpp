@@ -208,7 +208,11 @@ namespace Stormancer
 						}
 						catch (const std::exception& ex)
 						{
-							ctx->sendError(ex.what());
+							try
+							{
+								ctx->sendError(ex.what());
+							}
+							catch (...) {}
 						}
 					});
 				}

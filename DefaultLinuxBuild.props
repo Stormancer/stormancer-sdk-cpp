@@ -16,6 +16,8 @@
 		<!-- Custom command-line parameters for the compiler and linker -->
 		<CustomCompilerOptions></CustomCompilerOptions>
 		<CustomLinkerOptions></CustomLinkerOptions>
+		<!-- Set to false to disable RTTI, or true to enable them. They are disabled by default. -->
+		<UseRtti>false</UseRtti>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(TargetPlatformIdentifier)'=='Linux'">
 		<!-- Set these to the executable names of your compiler/linker on the target linux machine -->

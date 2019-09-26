@@ -7,7 +7,7 @@
 
 namespace Stormancer
 {
-	GameRecovery_Impl::GameRecovery_Impl(std::weak_ptr<AuthenticationService> auth) :ClientAPI(auth) {}
+	GameRecovery_Impl::GameRecovery_Impl(std::weak_ptr<Users::UsersApi> users) : ClientAPI(users) {}
 
 	pplx::task<std::shared_ptr<RecoverableGame>> GameRecovery_Impl::getCurrent()
 	{

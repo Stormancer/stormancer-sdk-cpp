@@ -35,6 +35,7 @@
       <AdditionalIncludeDirectories>../stormancer-sources/include/private;../stormancer-sources/include/public;../../dependencies/msgpack-c/include;../../dependencies/RakNet/RakNet/Source;../../dependencies/rxcpp/Rx/v2/src;../../Plugins/private;../../Plugins/public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NOMINMAX;_STORMANCERSDKCPP;__PLATFORM__="$(Platform)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
+	  <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />

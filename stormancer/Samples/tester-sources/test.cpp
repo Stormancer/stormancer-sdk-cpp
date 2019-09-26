@@ -4,11 +4,14 @@
 #include "Helloworld/Helloworld.hpp"
 #include "TestStreams.h"
 #include "GameSession/Gamesessions.hpp"
+#include "TestUsersPlugin.h"
+#include "TestParty.h"
+
 using namespace std::literals;
 
 namespace Stormancer
 {
-	void Tester::run_all_tests_nonblocking()
+	pplx::task<void> Tester::run_all_tests_nonblocking()
 	{
 		_testsDone = false;
 		_testsPassed = false;
@@ -16,6 +19,8 @@ namespace Stormancer
 		_tests.push_back([this]() { test_dependencyInjection(); });
 		_tests.push_back([this]() { test_streams(); });
 		_tests.push_back([this]() { test_connect(); });
+		// TODO uncomment when GC3 has been updated to support ConnectionRejected
+		//_tests.push_back([this]() { test_connectionRejected(); });
 		_tests.push_back([this]() { test_echo(); });
 		_tests.push_back([this]() { test_rpc_server(); });
 		_tests.push_back([this]() { test_rpc_server_cancel(); });
@@ -29,9 +34,13 @@ namespace Stormancer
 		_tests.push_back([this]() { test_disconnect(); });
 		_tests.push_back([this]() { test_Ping_Cluster(); });
 		_tests.push_back([this]() { test_clean(); });
+		_tests.push_back([this]() { test_users(); });
+		_tests.push_back([this]() { test_party(); });
 
 		// Some platforms require a Client to be created before using pplx::task
 		test_create();
+
+		return pplx::create_task(_testsCompletedTce);
 	}
 
 	void Tester::execNextTest()
@@ -40,13 +49,25 @@ namespace Stormancer
 		{
 			auto test = _tests[0];
 			_tests.pop_front();
-			pplx::create_task(test).wait();
+			auto logger = _logger;
+			pplx::create_task(test).then([logger](pplx::task<void> task)
+			{
+				try
+				{
+					task.get();
+				}
+				catch (const std::exception& ex)
+				{
+					logger->log(LogLevel::Error, "tester", "An exception was thrown by a test", ex);
+				}
+			});
 		}
 		else
 		{
 			_testsPassed = true;
 			_testsDone = true;
 			_logger->log(LogLevel::Info, "execNextTest", "TESTS SUCCEEDED !");
+			_testsCompletedTce.set();
 		}
 	}
 
@@ -104,6 +125,12 @@ namespace Stormancer
 			_logger->log(LogLevel::Debug, "onMessage", "RPC CLIENT EXCEPTION OK");
 			execNextTest();
 		}
+	}
+
+	void Tester::onConnectionRejected(Packetisp_ptr packet)
+	{
+		_logger->log(LogLevel::Debug, "onConnectionRejected", "Connection Rejected message received");
+		_connectionRejectedReceivedTce.set();
 	}
 
 	pplx::task<void> Tester::test_rpc_client_received(RpcRequestContext_ptr rc)
@@ -272,20 +299,71 @@ namespace Stormancer
 					_logger->log(LogLevel::Debug, "test_connect", "Connect to scene OK");
 					_logger->log(LogLevel::Debug, "test_connect", "External addresses: " + connection->metadata("externalAddrs"));
 					
-					
+					this->execNextTest();
 				}
 				catch (const std::exception& ex)
 				{
 					_logger->log(LogLevel::Error, "test_connect", "Failed to get and connect to the scene.", ex.what());
 				}
-					}).then([this]() {
-						this->execNextTest();
-						});
+			});
 		}
 		catch (const std::exception& ex)
 		{
 			_logger->log(ex);
 		}
+	}
+
+	void Tester::test_connectionRejected()
+	{
+		_logger->log(LogLevel::Info, "test_connectionRejected", "CONNECTION REJECTED");
+
+		auto conf = Configuration::create(_endpoint, _accountId, _applicationName);
+		auto client = IClient::create(conf);
+		conf = Configuration::create(_endpoint, _accountId, _applicationName);
+		auto client2 = IClient::create(conf);
+
+		client->connectToPublicScene("test-connection-rejected-scene",
+		[this](std::shared_ptr<Scene> scene)
+		{
+			scene->addRoute("connectionRejected", [this](Packetisp_ptr p)
+			{
+				onConnectionRejected(p);
+			});
+		}).then([this, client2](std::shared_ptr<Scene>)
+		{
+			return client2->connectToPublicScene("test-connection-rejected-scene");
+		}).then([](pplx::task<std::shared_ptr<Scene>> task)
+		{
+			try
+			{
+				task.get();
+			}
+			catch (const std::exception& ex)
+			{
+				std::string msg(ex.what());
+				if (msg != "Rejected")
+				{
+					throw std::runtime_error("Wrong exception message: " + msg + ", should be 'Rejected'");
+				}
+				return;
+			}
+			throw std::runtime_error("Connection should have failed");
+		}).then([this]
+		{
+			return cancel_after_timeout(pplx::create_task(_connectionRejectedReceivedTce), 1000);
+		}).then([this, client, client2](pplx::task<void> task) // Keep the clients alive
+		{
+			try
+			{
+				task.get();
+				_logger->log(LogLevel::Info, "test_connectionRejected", "Connection Rejected OK");
+				execNextTest();
+			}
+			catch (const std::exception& ex)
+			{
+				_logger->log(LogLevel::Error, "test_connectionRejected", "Connection Rejected FAILED", ex.what());
+			}
+		});
 	}
 
 	void Tester::test_echo()
@@ -640,12 +718,7 @@ namespace Stormancer
 
 	void Tester::run_all_tests()
 	{
-		run_all_tests_nonblocking();
-
-		while (!_testsDone)
-		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));
-		}
+		run_all_tests_nonblocking().get();
 	}
 
 	void Tester::test_Ping_Cluster()
@@ -709,6 +782,40 @@ namespace Stormancer
 			return;
 		}
 		_logger->log(LogLevel::Info, "test_streams", "Streams OK");
+		execNextTest();
+	}
+
+	void Tester::test_users()
+	{
+		_logger->log(LogLevel::Info, "test_users", "USERS");
+
+		try
+		{
+			TestUsersPlugin::runTests(*this);
+		}
+		catch (const std::exception& ex)
+		{
+			_logger->log(LogLevel::Error, "test_users", "Users FAILED", ex.what());
+			return;
+		}
+		_logger->log(LogLevel::Info, "test_users", "Users OK");
+		execNextTest();
+	}
+
+	void Tester::test_party()
+	{
+		_logger->log(LogLevel::Info, "test_party", "PARTY");
+
+		try
+		{
+			TestParty::runTests(*this);
+		}
+		catch (const std::exception& ex)
+		{
+			_logger->log(LogLevel::Error, "test_party", "Party FAILED", ex.what());
+			return;
+		}
+		_logger->log(LogLevel::Info, "test_party", "Party OK");
 		execNextTest();
 	}
 

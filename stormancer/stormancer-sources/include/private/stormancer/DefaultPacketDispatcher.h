@@ -14,7 +14,7 @@ namespace Stormancer
 	{
 	public:
 
-		DefaultPacketDispatcher(ILogger_ptr logger, bool asyncDispatch = true);
+		DefaultPacketDispatcher(ILogger_ptr logger);
 
 		virtual ~DefaultPacketDispatcher();
 
@@ -30,10 +30,10 @@ namespace Stormancer
 
 		std::vector<ProcessorFunction> _defaultProcessors;
 
-		bool _asyncDispatch = true;
-
 		int _maxLayerCount = 0;
 
 		ILogger_ptr _logger;
+
+		pplx::task<void> _currentPacketTask = pplx::task_from_result();
 	};
 }

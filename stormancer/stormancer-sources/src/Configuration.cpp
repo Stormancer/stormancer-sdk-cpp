@@ -14,11 +14,11 @@ namespace Stormancer
 		, application(application)
 		, actionDispatcher(std::make_shared<SameThreadActionDispatcher>())
 		, logger(std::make_shared<NullLogger>())
-		, transportFactory(_defaultTransportFactory)
-		, scheduler(std::make_shared<DefaultScheduler>())
+		, _transportFactory(_defaultTransportFactory)
+		, _scheduler(std::make_shared<DefaultScheduler>())
 		, _headersVersion(headersVersion)
 	{
-		dispatcher = [](const DependencyScope& dr)
+		_dispatcher = [](const DependencyScope& dr)
 		{
 			return std::make_shared<DefaultPacketDispatcher>(dr.resolve<ILogger>());
 		};
@@ -64,12 +64,6 @@ namespace Stormancer
 		}
 
 		return std::shared_ptr<Configuration>(new Configuration(endpoint, account, application, headersVersion), [](Configuration* ptr) { delete ptr; });
-	}
-
-	Configuration& Configuration::setMetadata(const std::string& key, const std::string& value)
-	{
-		_metadata[key] = value;
-		return *this;
 	}
 
 	void Configuration::addPlugin(IPlugin* plugin)

@@ -1,12 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Authentication\AuthenticationPlugin.cpp">
-      <Filter>private\Authentication</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Authentication\AuthenticationService.cpp">
-      <Filter>private\Authentication</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)private\AssetsStorage\AssetsStoragePlugin.cpp">
       <Filter>private\AssetsStorage</Filter>
     </ClCompile>
@@ -61,12 +55,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Persistence\PersistenceService.cpp">
       <Filter>private\Persistence</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Party\PartyPlugin.cpp">
-      <Filter>private\Party</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Party\PartyService.cpp">
-      <Filter>private\Party</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)private\BugReport\BugReportPlugin.cpp">
       <Filter>private\BugReport</Filter>
     </ClCompile>
@@ -82,15 +70,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)private\GameSession\GameSession_Impl.cpp">
       <Filter>private\GameSession</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Members\Friends_Impl.cpp">
-      <Filter>private\Members</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Members\FriendsPlugin.cpp">
-      <Filter>private\Members</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Members\FriendsService.cpp">
-      <Filter>private\Members</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Members\Organizations_Impl.cpp">
       <Filter>private\Members</Filter>
     </ClCompile>
@@ -102,15 +81,6 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Members\OrganizationsService.cpp">
       <Filter>private\Members</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Party\Party_Impl.cpp">
-      <Filter>private\Party</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Party\PartyManagementService.cpp">
-      <Filter>private\Party</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Party\PartyContainer.cpp">
-      <Filter>private\Party</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Profile\ProfilePlugin.cpp">
       <Filter>private\Profile</Filter>
@@ -142,9 +112,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Servers\ServersService.cpp">
       <Filter>private\Servers</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Authentication\AuthenticationException.cpp">
-      <Filter>private\Authentication</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Helloworld\Hello.cpp">
       <Filter>private\Helloworld</Filter>
     </ClCompile>
@@ -167,12 +134,6 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Leaderboard\LeaderboardService.h">
       <Filter>private\Leaderboard</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Authentication\AuthenticationPlugin.h">
-      <Filter>public\Authentication</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Authentication\AuthenticationService.h">
-      <Filter>public\Authentication</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\AssetsStorage\AssetsStorageDto.h">
       <Filter>public\AssetsStorage</Filter>
@@ -252,23 +213,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameSession\GameSessionService.h">
       <Filter>private\GameSession</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Members\Friends.h">
-      <Filter>public\Members</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Members\Organizations.h">
       <Filter>public\Members</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Members\Friends_Impl.h">
-      <Filter>private\Members</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Members\FriendsModels.h">
-      <Filter>private\Members</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Members\FriendsPlugin.h">
-      <Filter>private\Members</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Members\FriendsService.h">
-      <Filter>private\Members</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Members\Organizations_Impl.h">
       <Filter>private\Members</Filter>
@@ -284,27 +230,6 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Members\OrganizationsTypes.h">
       <Filter>private\Members</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Party\Party_Impl.h">
-      <Filter>private\Party</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Party\PartyContainer.h">
-      <Filter>private\Party</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Party\PartyPlugin.h">
-      <Filter>private\Party</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Party\PartyService.h">
-      <Filter>private\Party</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Party\PartyModels.h">
-      <Filter>public\Party</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Party\Party.h">
-      <Filter>public\Party</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Party\PartyManagementService.h">
-      <Filter>private\Party</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Profile\Profiles.h">
       <Filter>public\Profile</Filter>
@@ -366,9 +291,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Servers\Servers.h">
       <Filter>public\Servers</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Authentication\AuthenticationException.h">
-      <Filter>private\Authentication</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Servers\ServersModels.h">
       <Filter>public\Servers</Filter>
     </ClInclude>
@@ -413,6 +335,24 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameSession\Gamesessions.hpp">
       <Filter>public\GameSession</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Steam\Steam.hpp">
+      <Filter>public\Steam</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Users\Users.hpp">
+      <Filter>public\Users</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\PS4\PS4Plugin.hpp">
+      <Filter>public\PS4</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Party\Party.hpp">
+      <Filter>public\Party</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Friends\Friends.hpp">
+      <Filter>public\Friends</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Users\ClientAPI.hpp">
+      <Filter>public\Users</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -500,9 +440,6 @@
     <Filter Include="private\Members">
       <UniqueIdentifier>{878f93cd-5420-4e25-9bb1-3a793df49f91}</UniqueIdentifier>
     </Filter>
-    <Filter Include="private\Party">
-      <UniqueIdentifier>{6d1fe49b-df9e-49f0-8b86-3be7119bdc92}</UniqueIdentifier>
-    </Filter>
     <Filter Include="private\Persistence">
       <UniqueIdentifier>{2fa5249c-815c-496b-8dcf-441c2f547d1d}</UniqueIdentifier>
     </Filter>
@@ -538,6 +475,18 @@
     </Filter>
     <Filter Include="public\Tunnels">
       <UniqueIdentifier>{381d17f9-09ec-4637-98ec-c593408ff7ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="public\Steam">
+      <UniqueIdentifier>{09572441-65be-4936-9098-7f29ec45dc7c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="public\Users">
+      <UniqueIdentifier>{7093c00a-886a-4bbf-8aa4-3000ff716050}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="public\PS4">
+      <UniqueIdentifier>{9eea906d-031f-4e22-8f41-6ce218a633a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="public\Friends">
+      <UniqueIdentifier>{31f4e0f9-e083-4479-8d4e-6bd6cfcb331a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

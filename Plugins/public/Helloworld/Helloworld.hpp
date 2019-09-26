@@ -1,6 +1,6 @@
 #pragma once
-#include "stormancer/ClientAPI.h"
-#include "Authentication/AuthenticationService.h"
+#include "Users/ClientAPI.hpp"
+#include "Users/Users.hpp"
 #include "stormancer/IPlugin.h"
 
 namespace Stormancer
@@ -64,7 +64,7 @@ namespace Stormancer
 			friend class HelloworldPlugin;
 		public:
 
-			Hello(std::weak_ptr<Stormancer::AuthenticationService> auth) : Stormancer::ClientAPI<Hello>(auth) {}
+			Hello(std::weak_ptr<Users::UsersApi> users) : Stormancer::ClientAPI<Hello>(users) {}
 			pplx::task<std::string> world(std::string name)
 			{
 				return this->getService<details::HelloService>("helloworld")
@@ -122,7 +122,7 @@ namespace Stormancer
 			}
 			void registerClientDependencies(Stormancer::ContainerBuilder& builder) override
 			{
-				builder.registerDependency<Hello, Stormancer::AuthenticationService>().singleInstance();
+				builder.registerDependency<Hello, Stormancer::Users::UsersApi>().singleInstance();
 			}
 			void sceneConnecting(std::shared_ptr<Scene> scene) override
 			{

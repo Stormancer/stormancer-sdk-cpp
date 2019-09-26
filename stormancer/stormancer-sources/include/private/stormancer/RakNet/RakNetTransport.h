@@ -105,7 +105,7 @@ namespace Stormancer
 		std::queue<ConnectionRequest> _pendingConnections;
 		std::shared_ptr<IScheduler> _scheduler;
 		std::shared_ptr<RakNet::SocketDescriptor> _socketDescriptor;
-		std::mutex _mutex;
+		std::recursive_mutex _mutex;
 		std::string _name = "raknet";
 		
 		Action<Packet_ptr> _onPacketReceived;

@@ -50,10 +50,47 @@
 
 #include <openssl/err.h>
 #include <openssl/ssl.h>
+#include <openssl/crypto.h>
 
 
 namespace
 {
+
+
+	void init_openssl_locks();
+	std::unique_ptr<std::mutex[]> openssl_mutexes;
+
+	void openssl_locking_function(int mode, int mutex_index, const char */*file*/, int /*line*/)
+	{
+		if (mode & CRYPTO_LOCK)
+		{
+			openssl_mutexes[mutex_index].lock();
+		}
+		else
+		{
+			openssl_mutexes[mutex_index].unlock();
+		}
+	}
+
+	unsigned long openssl_threadid_function(void)
+	{
+		// The id returned by get_id() cannot be converted to int...
+		// This might not be portable.
+		std::hash<std::thread::id> hasher;
+		return hasher(std::this_thread::get_id());
+	}
+
+	void init_openssl_locks()
+	{
+		// Create the number of mutextes required by OpenSSL
+		openssl_mutexes = std::make_unique<std::mutex[]>(CRYPTO_num_locks());
+
+		CRYPTO_set_locking_callback(openssl_locking_function);
+		CRYPTO_set_id_callback(openssl_threadid_function);
+	}
+
+
+
 	// Curl initialization and cleanup should happen respectively at the very start and at the very end of the program.
 	// The recommended way to achieve this in a third-party library like ours is to use a static object.
 	// We do not need to worry about other parts of the program that might also use curl, as the library has an internal refcount.
@@ -64,6 +101,10 @@ namespace
 		cpprest_curl_initializer()
 		{
 			curl_global_init(CURL_GLOBAL_ALL);
+			// TODO Figure out if this is needed on NX too. NX doesn't have CRYPTO_ functions
+
+			init_openssl_locks();
+
 		}
 
 		~cpprest_curl_initializer()
@@ -73,7 +114,7 @@ namespace
 	};
 
 	cpprest_curl_initializer curl_static_initializer;
-}
+	}
 
 namespace web {
 	namespace http

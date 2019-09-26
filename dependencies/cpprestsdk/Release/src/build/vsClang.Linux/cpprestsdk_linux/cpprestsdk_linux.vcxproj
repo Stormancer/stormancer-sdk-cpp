@@ -148,6 +148,9 @@
       <PreprocessorDefinitions>LINUX;_STORMANCERSDKCPP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <CppLanguageStandard>c++14</CppLanguageStandard>
+      <CAdditionalWarning />
+      <CppAdditionalWarning />
+	  <RuntimeTypeInfo>$(UseRtti)</RuntimeTypeInfo>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
@@ -156,7 +159,10 @@
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <CppLanguageStandard>c++14</CppLanguageStandard>
       <AdditionalIncludeDirectories>$(StormancerSdkRoot)dependencies\cpprestsdk\Release\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ClCompile>
+      <CAdditionalWarning />
+      <CppAdditionalWarning />
+ 	  <RuntimeTypeInfo>$(UseRtti)</RuntimeTypeInfo>
+   </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <ClCompile>
@@ -164,6 +170,9 @@
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <CppLanguageStandard>c++14</CppLanguageStandard>
       <AdditionalIncludeDirectories>$(StormancerSdkRoot)dependencies\cpprestsdk\Release\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <CAdditionalWarning />
+      <CppAdditionalWarning />
+	  <RuntimeTypeInfo>$(UseRtti)</RuntimeTypeInfo>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
@@ -172,7 +181,10 @@
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <CppLanguageStandard>c++14</CppLanguageStandard>
       <AdditionalIncludeDirectories>$(StormancerSdkRoot)dependencies\cpprestsdk\Release\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ClCompile>
+      <CAdditionalWarning />
+      <CppAdditionalWarning />
+ 	  <RuntimeTypeInfo>$(UseRtti)</RuntimeTypeInfo>
+   </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <ClCompile>
@@ -180,7 +192,10 @@
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <CppLanguageStandard>c++14</CppLanguageStandard>
       <AdditionalIncludeDirectories>$(StormancerSdkRoot)dependencies\cpprestsdk\Release\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ClCompile>
+      <CAdditionalWarning />
+      <CppAdditionalWarning />
+ 	  <RuntimeTypeInfo>$(UseRtti)</RuntimeTypeInfo>
+   </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -188,6 +203,9 @@
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <CppLanguageStandard>c++14</CppLanguageStandard>
       <AdditionalIncludeDirectories>$(StormancerSdkRoot)dependencies\cpprestsdk\Release\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <CAdditionalWarning />
+      <CppAdditionalWarning />
+	  <RuntimeTypeInfo>$(UseRtti)</RuntimeTypeInfo>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
@@ -196,6 +214,9 @@
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <CppLanguageStandard>c++14</CppLanguageStandard>
       <AdditionalIncludeDirectories>$(StormancerSdkRoot)dependencies\cpprestsdk\Release\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <CAdditionalWarning />
+      <CppAdditionalWarning />
+	  <RuntimeTypeInfo>$(UseRtti)</RuntimeTypeInfo>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
@@ -204,7 +225,10 @@
       <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
       <CppLanguageStandard>c++14</CppLanguageStandard>
       <AdditionalIncludeDirectories>$(StormancerSdkRoot)dependencies\cpprestsdk\Release\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ClCompile>
+      <CAdditionalWarning />
+      <CppAdditionalWarning />
+ 	  <RuntimeTypeInfo>$(UseRtti)</RuntimeTypeInfo>
+   </ClCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

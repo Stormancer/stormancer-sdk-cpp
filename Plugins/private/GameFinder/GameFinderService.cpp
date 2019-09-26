@@ -29,6 +29,8 @@ namespace Stormancer
 
 	GameFinderService::~GameFinderService()
 	{
+		// In case the scene gets brutally destroyed without a chance to trigger onDisconnecting, make sure to notify subscribers
+		onSceneDisconnecting();
 	}
 
 	void GameFinderService::initialize()
@@ -187,6 +189,18 @@ namespace Stormancer
 			auto scene = _scene.lock();
 			_gameFinderCTS.cancel();
 			scene->send("gamefinder.cancel", [](obytestream&) {}, PacketPriority::IMMEDIATE_PRIORITY, PacketReliability::RELIABLE_ORDERED);
+		}
+	}
+
+	void GameFinderService::onSceneDisconnecting()
+	{
+		if (_currentState != GameFinderStatus::Idle &&
+			_currentState != GameFinderStatus::Canceled &&
+			_currentState != GameFinderStatus::Failed &&
+			_currentState != GameFinderStatus::Success)
+		{
+			_currentState = GameFinderStatus::Failed;
+			GameFinderStatusUpdated(_currentState);
 		}
 	}
 }

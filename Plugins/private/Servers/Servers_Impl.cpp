@@ -1,11 +1,11 @@
 #include "ServersService.h"
 #include "Servers_Impl.h"
-#include "Authentication/AuthenticationService.h"
+#include "Users/Users.hpp"
 
 namespace Stormancer
 {
 
-	Servers_Impl::Servers_Impl(std::weak_ptr<AuthenticationService> auth) : ClientAPI(auth)
+	Servers_Impl::Servers_Impl(std::weak_ptr<Users::UsersApi> users) : ClientAPI(users)
 	{
 
 	}

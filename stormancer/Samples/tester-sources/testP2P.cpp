@@ -5,6 +5,8 @@
 #include "stormancer/RPC/Service.h"
 #include "stormancer/Utilities/TaskUtilities.h"
 
+#define TEST_RELIABLE_VALUE 100
+
 using namespace Stormancer;
 
 class UdpSocket : RakNet::RNS2EventHandler
@@ -119,6 +121,9 @@ struct TestContextBase
 	std::shared_ptr<UdpSocket> udpSocket;
 	Subscription peerConnectedSub;
 	Subscription peerDisconnectedSub;
+	int valueOrdered = 0;
+	pplx::task_completion_event<void> orderedTest;
+	pplx::cancellation_token_source orderedTestCts;
 };
 
 struct HostTestContext : public TestContextBase
@@ -193,7 +198,7 @@ pplx::task<void> testP2P(std::string endpoint, std::string account, std::string 
 	auto hostConfiguration = Configuration::create(endpoint, account, application);
 	hostConfiguration->logger = logger;
 	hostConfiguration->serverGamePort = 7777;
-	hostConfiguration->maxPeers = guestsCount + 1;
+	hostConfiguration->maxPeers = static_cast<uint16>(guestsCount + 1);
 	//hostConfiguration->encryptionEnabled = true;
 
 	auto hostClient = IClient::create(hostConfiguration);
@@ -283,17 +288,52 @@ pplx::task<void> hostConnect(std::shared_ptr<HostTestContext> hostContext, std::
 		{
 			logger->log(LogLevel::Info, "P2P_test", "host received a scene message from a peer", packet->readObject<std::string>());
 			{
-				std::lock_guard<std::mutex> lg(testContextesMutex);
 				auto p2pSessionId = packet->connection->connection()->key();
+				std::lock_guard<std::mutex> lg(testContextesMutex);
 				auto it = testContextes.find(p2pSessionId);
 				if (it == testContextes.end())
 				{
-					logger->log(LogLevel::Error, "testP2P", "guest test context not found", p2pSessionId);
+					logger->log(LogLevel::Error, "testP2P", "Host test context not found", p2pSessionId);
 				}
 				else
 				{
 					it->second->guest->hostReceivedMessageTce.set();
 				}
+			}
+		}, MessageOriginFilter::Peer);
+
+		scene->addRoute("testOrdered", [logger](Packetisp_ptr packet)
+		{
+			auto p2pSessionId = packet->connection->connection()->key();
+			int valueReceived = Serializer().deserializeOne<int>(packet->stream);
+
+			std::lock_guard<std::mutex> lg(testContextesMutex);
+			auto it = testContextes.find(p2pSessionId);
+			if (it == testContextes.end())
+			{
+				logger->log(LogLevel::Error, "testP2P", "Host test context not found", p2pSessionId);
+				return;
+			}
+
+			auto host = it->second->host;
+			if (valueReceived != host->valueOrdered)
+			{
+				if (!host->orderedTestCts.get_token().is_canceled())
+				{
+					logger->log(LogLevel::Error, "testP2P", "Host test ordered FAILED");
+					host->orderedTestCts.cancel();
+					host->orderedTest.set_exception(std::runtime_error("Host test ordered failed"));
+				}
+			}
+			else if (valueReceived == TEST_RELIABLE_VALUE)
+			{
+				logger->log(LogLevel::Info, "testP2P", "Host test ordered PASSED");
+				host->orderedTest.set();
+			}
+			else
+			{
+				logger->log(LogLevel::Trace, "testP2P", "Host value received", std::to_string(valueReceived));
+				host->valueOrdered++;
 			}
 		}, MessageOriginFilter::Peer);
 	})
@@ -340,6 +380,41 @@ pplx::task<void> p2pConnect(std::shared_ptr<TestContext> context, std::shared_pt
 		{
 			logger->log(LogLevel::Info, "P2P_test", "guest received a scene message from a peer", packet->readObject<std::string>());
 			receivedMessageTce.set();
+		}, MessageOriginFilter::Peer);
+
+		scene->addRoute("testOrdered", [logger](Packetisp_ptr packet)
+		{
+			auto p2pSessionId = packet->connection->connection()->key();
+			int valueReceived = Serializer().deserializeOne<int>(packet->stream);
+
+			std::lock_guard<std::mutex> lg(testContextesMutex);
+			auto it = testContextes.find(p2pSessionId);
+			if (it == testContextes.end())
+			{
+				logger->log(LogLevel::Error, "testP2P", "Guest test context not found", p2pSessionId);
+				return;
+			}
+
+			auto guest = it->second->guest;
+			if (valueReceived != guest->valueOrdered)
+			{
+				if (!guest->orderedTestCts.get_token().is_canceled())
+				{
+					logger->log(LogLevel::Error, "testP2P", "Guest test ordered FAILED");
+					guest->orderedTestCts.cancel();
+					guest->orderedTest.set_exception(std::runtime_error("Guest test ordered failed"));
+				}
+			}
+			else if (valueReceived == TEST_RELIABLE_VALUE)
+			{
+				logger->log(LogLevel::Info, "testP2P", "Guest test ordered PASSED");
+				guest->orderedTest.set();
+			}
+			else
+			{
+				logger->log(LogLevel::Trace, "testP2P", "Guest value received", std::to_string(valueReceived));
+				guest->valueOrdered++;
+			}
 		}, MessageOriginFilter::Peer);
 	})
 		.then([context, logger](std::shared_ptr<Scene> scene)
@@ -400,6 +475,34 @@ pplx::task<void> p2pConnect(std::shared_ptr<TestContext> context, std::shared_pt
 	})
 		.then([context, logger]()
 	{
+		auto hostOrderedCt = context->host->orderedTestCts.get_token();
+		for (int value = 0; value <= TEST_RELIABLE_VALUE; value++)
+		{
+			if (!hostOrderedCt.is_canceled())
+			{
+				context->guest->hostPeer->send("testOrdered", [value](obytestream& stream) {
+					Serializer().serialize(stream, value);
+				});
+			}
+		}
+
+		auto guestOrderedCt = context->guest->orderedTestCts.get_token();
+		for (int value = 0; value <= TEST_RELIABLE_VALUE; value++)
+		{
+			if (!guestOrderedCt.is_canceled())
+			{
+				context->guest->guestPeer->send("testOrdered", [value](obytestream& stream) {
+					Serializer().serialize(stream, value);
+				});
+			}
+		}
+
+		return Stormancer::when_all(pplx::create_task(context->guest->orderedTest), pplx::create_task(context->host->orderedTest));
+	})
+		.then([context, logger]()
+	{
+		logger->log(LogLevel::Info, "TestP2P", "Test ordered PASSED");
+
 		// Tunnel
 		context->guest->guestPeer->openP2PTunnel("pingServer")
 			.then([context, logger](std::shared_ptr<P2PTunnel> guestTunnel)

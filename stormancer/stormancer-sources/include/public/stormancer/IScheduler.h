@@ -17,8 +17,11 @@ namespace Stormancer
 		using clock_type = std::chrono::steady_clock;
 
 		/// Schedule a cancellable periodic task on the scheculder
+		/// \param delay milliseconds
 		virtual void schedulePeriodic(int delay, std::function<void()> work, pplx::cancellation_token ct = pplx::cancellation_token::none()) = 0;
 
+		/// Schedule a cancellable periodic task on the scheculder
+		/// \param delay milliseconds
 		virtual void schedulePeriodic(int delay, std::function<void()> work, std::shared_ptr<IActionDispatcher> dispatcher, pplx::cancellation_token ct = pplx::cancellation_token::none()) = 0;
 
 		/// Schedule a single-shot task at a given time point

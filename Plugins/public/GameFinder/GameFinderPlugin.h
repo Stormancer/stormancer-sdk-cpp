@@ -13,5 +13,7 @@ namespace Stormancer
 		void sceneCreated(std::shared_ptr<Scene> scene) override;
 
 		void registerClientDependencies(ContainerBuilder& builder) override;
+		
+		void sceneDisconnecting(std::shared_ptr<Scene> scene) override;
 	};
 }

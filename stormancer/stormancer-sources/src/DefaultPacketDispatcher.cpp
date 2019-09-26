@@ -5,9 +5,8 @@
 
 namespace Stormancer
 {
-	DefaultPacketDispatcher::DefaultPacketDispatcher(ILogger_ptr logger, bool asyncDispatch)
-		: _asyncDispatch(asyncDispatch)
-		, _maxLayerCount(40)
+	DefaultPacketDispatcher::DefaultPacketDispatcher(ILogger_ptr logger)
+		: _maxLayerCount(40)
 		, _logger(logger)
 	{
 	}
@@ -20,35 +19,23 @@ namespace Stormancer
 
 	void DefaultPacketDispatcher::dispatchPacket(Packet_ptr packet)
 	{
-		if (_asyncDispatch)
+		// Process network messages sequentially (to ensure RELIABLE_ORDERED and RELIABLE_SEQUENCED)
+		_currentPacketTask = _currentPacketTask
+			.then([this, packet]()
 		{
-			pplx::create_task([this, packet]()
-			{
-				dispatchImpl(packet);
-			})
-				.then([this](pplx::task<void> t)
-			{
-				try
-				{
-					t.wait();
-				}
-				catch (const std::exception& ex)
-				{
-					_logger->log(LogLevel::Error, "client.dispatchPacket", "Unhandled exception in dispatchPacketImpl" + std::string(ex.what()));
-				}
-			});
-		}
-		else
+			dispatchImpl(packet);
+		})
+			.then([this](pplx::task<void> t)
 		{
 			try
 			{
-				dispatchImpl(packet);
+				t.wait();
 			}
 			catch (const std::exception& ex)
 			{
 				_logger->log(LogLevel::Error, "client.dispatchPacket", "Unhandled exception in dispatchPacketImpl" + std::string(ex.what()));
 			}
-		}
+		});
 	}
 
 	void DefaultPacketDispatcher::dispatchImpl(Packet_ptr packet)

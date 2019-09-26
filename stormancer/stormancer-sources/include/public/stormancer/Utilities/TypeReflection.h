@@ -11,4 +11,10 @@ namespace Stormancer
 	{
 		return ctti::type_id<T>().hash();
 	}
+
+	template<typename T>
+	std::string getTypeName()
+	{
+		return ctti::type_id<T>().name().str();
+	}
 }

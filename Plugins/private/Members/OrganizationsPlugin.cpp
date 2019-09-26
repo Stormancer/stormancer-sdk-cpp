@@ -4,7 +4,7 @@
 #include "OrganizationsService.h"
 #include "Organizations_Impl.h"
 #include "stormancer/Scene.h"
-#include "Authentication/AuthenticationService.h"
+#include "Users/Users.hpp"
 
 namespace Stormancer
 {
@@ -25,8 +25,8 @@ namespace Stormancer
 	{
 		builder.registerDependency<Organizations>([](const DependencyScope& scope)
 		{
-			auto authService = scope.resolve<AuthenticationService>();
-			auto organizations = std::make_shared<Organizations_Impl>(authService);
+			auto usersService = scope.resolve<Users::UsersApi>();
+			auto organizations = std::make_shared<Organizations_Impl>(usersService);
 			organizations->initialize();
 			return organizations;
 		}).singleInstance();

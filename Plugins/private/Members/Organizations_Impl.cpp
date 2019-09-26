@@ -3,13 +3,13 @@
 #include "OrganizationsService.h"
 #include "stormancer/Scene.h"
 #include "stormancer/Exceptions.h"
-#include "Authentication/AuthenticationService.h"
+#include "Users/Users.hpp"
 
 namespace Stormancer
 {
-	Organizations_Impl::Organizations_Impl(std::shared_ptr<AuthenticationService> auth)
-		: ClientAPI(auth)
-		, _auth(auth)
+	Organizations_Impl::Organizations_Impl(std::shared_ptr<Users::UsersApi> users)
+		: ClientAPI(users)
+		, _users(users)
 	{
 	}
 
@@ -20,21 +20,21 @@ namespace Stormancer
 
 	pplx::task<std::shared_ptr<OrganizationsContainer>> Organizations_Impl::initialize()
 	{
-		auto auth = _auth.lock();
+		auto users = _users.lock();
 
-		if (!auth)
+		if (!users)
 		{
-			return pplx::task_from_exception<std::shared_ptr<OrganizationsContainer>>(std::runtime_error("Authentication service destroyed."));
+			return pplx::task_from_exception<std::shared_ptr<OrganizationsContainer>>(std::runtime_error("Users service destroyed."));
 		}
 
 		std::weak_ptr<Organizations_Impl> wOrganizations = this->shared_from_this();
-		_organizationsContainerTask = auth->getSceneForService("stormancer.plugins.organizations")
+		_organizationsContainerTask = users->getSceneForService("stormancer.plugins.organizations")
 			.then([wOrganizations](std::shared_ptr<Scene> scene)
 		{
 			auto organizations = wOrganizations.lock();
 			if (!organizations)
 			{
-				throw PointerDeletedException("Authentication service destroyed.");
+				throw PointerDeletedException("Users service destroyed.");
 			}
 
 			auto container = std::make_shared<OrganizationsContainer>();
