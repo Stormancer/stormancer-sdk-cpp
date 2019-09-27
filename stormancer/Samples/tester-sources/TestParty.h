@@ -198,9 +198,13 @@ private:
 		testInvitations(clients[0], clients.begin()+1, clients.end(), tester).get();
 		tester.logger()->log(LogLevel::Info, "TestParty", "testInvitations PASSED");
 
-		tester.logger()->log(LogLevel::Info, "TestParty", "testSettingsUpdate");
-		testSettingsUpdate(clients).get();
-		tester.logger()->log(LogLevel::Info, "TestParty", "testSettingsUpdate PASSED");
+		tester.logger()->log(LogLevel::Info, "TestParty", "testMembersUpdate");
+		testMembersUpdate(clients).get();
+		tester.logger()->log(LogLevel::Info, "TestParty", "testMembersUpdate PASSED");
+
+		tester.logger()->log(LogLevel::Info, "TestParty", "testUpdatePartySettings");
+		testUpdatePartySettings(clients).get();
+		tester.logger()->log(LogLevel::Info, "TestParty", "testUpdatePartySettings PASSED");
 	}
 
 	static pplx::task<void> testCreateParty(std::shared_ptr<Stormancer::IClient> client)
@@ -598,7 +602,29 @@ private:
 		return client->dependencyResolver().resolve<Stormancer::Party::PartyApi>();
 	}
 	
-	static pplx::task<void> testSettingsUpdate(const std::vector<std::shared_ptr<Stormancer::IClient>>& clients)
+	static pplx::task<void> testMembersUpdate(const std::vector<std::shared_ptr<Stormancer::IClient>>& clients)
+	{
+		using namespace Stormancer;
+		using namespace TestHelpers;
+
+		std::vector<pplx::task<void>> tasks;
+		std::vector<Party::PartyUserDto> members;
+		for (int i=0; i<clients.size(); i++)
+		{
+			std::string data = "client" + std::to_string(i) + "data";
+			Party::PartyUserStatus status = (i % 2 == 0) ? Party::PartyUserStatus::Ready : Party::PartyUserStatus::NotReady;
+			auto party = getParty(clients[i]);
+
+			tasks.push_back(party->updatePlayerData(data));
+			tasks.push_back(party->updatePlayerStatus(status));
+			members.push_back(makeUserDto(clients[i], party->isLeader(), status, data));
+		}
+		tasks.push_back(awaitMembersConsistency(clients, members, std::chrono::seconds(10)));
+
+		return when_all_handle_exceptions(tasks);
+	}
+
+	static pplx::task<void> testUpdatePartySettings(const std::vector<std::shared_ptr<Stormancer::IClient>>& clients)
 	{
 		using namespace Stormancer;
 		using namespace TestHelpers;
@@ -612,16 +638,10 @@ private:
 
 		std::vector<pplx::task<void>> tasks;
 		std::vector<Party::PartyUserDto> members;
-		for (int i=0; i<clients.size(); i++)
+		for (int i = 0; i < clients.size(); i++)
 		{
-			std::string data = "client" + std::to_string(i) + "data";
-			Party::PartyUserStatus status = (i % 2 == 0) ? Party::PartyUserStatus::Ready : Party::PartyUserStatus::NotReady;
 			auto party = getParty(clients[i]);
-
-			tasks.push_back(party->updatePlayerData(data));
-			tasks.push_back(party->updatePlayerStatus(status));
-
-			if (party->isLeader())
+			if (i == leader)
 			{
 				auto nextLeaderId = clients[nextLeader]->dependencyResolver().resolve<Users::UsersApi>()->userId();
 				tasks.push_back(party->updatePartySettings(settings).then([party, nextLeaderId]
@@ -629,10 +649,10 @@ private:
 					return party->promoteLeader(nextLeaderId);
 				}));
 			}
-			members.push_back(makeUserDto(clients[i], i == nextLeader, status, data));
+			members.push_back(makeUserDto(clients[i], i == nextLeader, Party::PartyUserStatus::NotReady, party->getLocalMember().userData));
 		}
-		tasks.push_back(awaitMembersConsistency(clients, members));
 		tasks.push_back(awaitSettingsConsistency(clients, settings));
+		tasks.push_back(awaitMembersConsistency(clients, members));
 
 		return when_all_handle_exceptions(tasks);
 	}

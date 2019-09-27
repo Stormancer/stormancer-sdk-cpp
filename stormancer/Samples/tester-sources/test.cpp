@@ -19,7 +19,8 @@ namespace Stormancer
 		_tests.push_back([this]() { test_dependencyInjection(); });
 		_tests.push_back([this]() { test_streams(); });
 		_tests.push_back([this]() { test_connect(); });
-		_tests.push_back([this]() { test_connectionRejected(); });		_tests.push_back([this]() { test_echo(); });
+		_tests.push_back([this]() { test_connectionRejected(); });
+		_tests.push_back([this]() { test_echo(); });
 		_tests.push_back([this]() { test_rpc_server(); });
 		_tests.push_back([this]() { test_rpc_server_cancel(); });
 		_tests.push_back([this]() { test_rpc_server_exception(); });
@@ -262,6 +263,18 @@ namespace Stormancer
 									});
 							}
 						});
+					scene->addRoute("echo.out", [this](Packetisp_ptr p)
+					{
+						onEcho(p);
+					});
+					scene->addRoute("message", [this](Packetisp_ptr p)
+					{
+						onMessage(p);
+					});
+					scene->addRoute("msg", [this](Packetisp_ptr p) {
+
+						_logger->log(LogLevel::Info, "test_connect", "received on connected message");
+					});
 
 					_logger->log(LogLevel::Debug, "test_connect", "Add route OK");
 

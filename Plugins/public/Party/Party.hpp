@@ -130,6 +130,20 @@ namespace Stormancer
 			virtual std::vector<PartyUserDto> getPartyMembers() const = 0;
 
 			/// <summary>
+			/// Get the local member's party data.
+			/// </summary>
+			/// <remarks>
+			/// This method is a shortcut for calling <c>getPartyMembers()</c> and iterating over the list to find the local member.
+			/// </remarks>
+			/// <remarks>
+			/// It is invalid to call this method while not in a party.
+			/// Call <c>isInParty()</c> to check.
+			/// </remarks>
+			/// <returns>The struct containing the local player's party data.</returns>
+			/// <exception cref="std::exception">If you are not in a party.</exception>
+			virtual PartyUserDto getLocalMember() const = 0;
+
+			/// <summary>
 			/// Set the local player's status (ready/not ready).
 			/// </summary>
 			/// <remarks>
@@ -1239,6 +1253,28 @@ namespace Stormancer
 					}
 
 					return _party->get()->members();
+				}
+
+				PartyUserDto getLocalMember() const override
+				{
+					if (!isInParty())
+					{
+						throw std::runtime_error(PartyError::Str::NotInParty);
+					}
+
+					auto myId = _users.lock()->userId();
+					auto members = _party->get()->members();
+					auto it = std::find_if(members.begin(), members.end(), [&myId](const PartyUserDto& user)
+					{
+						return user.userId == myId;
+					});
+
+					if (it != members.end())
+					{
+						return *it;
+					}
+					assert(false); // Bug!
+					throw std::runtime_error(PartyError::Str::NotInParty);
 				}
 
 				PartySettings getPartySettings() const override

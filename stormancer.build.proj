@@ -1,9 +1,12 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 	
 	<PropertyGroup>
+		<!-- A JSON specification of the projects to build and the properties to set for each project. See the documentation for details. -->
 		<BuildSpecs>[{"stormancer-sdk-cpp-141.sln":{"Platform":"x64","Configuration":"Debug"}},{"stormancer-sdk-cpp-141.sln":{"Platform":"x64","Configuration":"Release"}}]</BuildSpecs>
 		<!-- An identifier for the package, used when calling the Package target. Set this on the command line, for instance "Win64", or leave empty -->
 		<PackageName></PackageName>
+		<!-- When calling the Package target, the script will attempt to use 7zip for compressing the package, if it can find it. Set this property to true to always use regular zip instead. -->
+		<PackageForceZip>false</PackageForceZip>
 	</PropertyGroup>
 	
 	<Target Name="BuildTasks">
@@ -36,13 +39,13 @@
     </Target>
 	
 	<Target Name="CheckHas7zip">
-		<Exec Command="7z" IgnoreExitCode="true">
+		<Exec Command="7z" IgnoreExitCode="true" Condition="'$(PackageForceZip)'!='true'">
 			<Output TaskParameter="ExitCode" PropertyName="ExitCode7z" />
 		</Exec>
-		<PropertyGroup Condition="'$(ExitCode7z)'!='9009'">
+		<PropertyGroup Condition="'$(ExitCode7z)'!='9009' And '$(PackageForceZip)'!='true'">
 			<Has7z>True</Has7z>
 		</PropertyGroup>
-		<PropertyGroup Condition="'$(ExitCode7z)'=='9009'">
+		<PropertyGroup Condition="'$(ExitCode7z)'=='9009' Or '$(PackageForceZip)'=='true'">
 			<Has7z>False</Has7z>
 		</PropertyGroup>
 	</Target>
