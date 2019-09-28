@@ -37,7 +37,7 @@ namespace Stormancer
 					{
 						auto rpcService = scene->dependencyResolver().resolve<RpcService>();
 						auto logger = scene->dependencyResolver().resolve<ILogger>();
-						logger->log(LogLevel::Trace, "RpcService", "Received rpc.next message on scene", scene->id());
+					
 						rpcService->next(p);
 					}
 				});
@@ -49,7 +49,7 @@ namespace Stormancer
 					{
 						auto rpcService = scene->dependencyResolver().resolve<RpcService>();
 						auto logger = scene->dependencyResolver().resolve<ILogger>();
-						logger->log(LogLevel::Trace, "Received rpc.cancel message on scene", scene->id());
+					
 						rpcService->cancel(p);
 					}
 				});
@@ -61,7 +61,7 @@ namespace Stormancer
 					{
 						auto rpcService = scene->dependencyResolver().resolve<RpcService>();
 						auto logger = scene->dependencyResolver().resolve<ILogger>();
-						logger->log(LogLevel::Trace, "RpcService", "Received rpc.error message on scene", scene->id());
+					
 						rpcService->error(p);
 					}
 				});
@@ -73,7 +73,7 @@ namespace Stormancer
 					{
 						auto rpcService = scene->dependencyResolver().resolve<RpcService>();
 						auto logger = scene->dependencyResolver().resolve<ILogger>();
-						logger->log(LogLevel::Trace, "RpcService", "Received rpc.complete message on scene", scene->id());
+						
 						rpcService->complete(p);
 					}
 				});

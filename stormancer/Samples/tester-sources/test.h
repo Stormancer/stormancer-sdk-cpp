@@ -75,6 +75,7 @@ namespace Stormancer
 		void test_rpc_server_clientException();
 		void test_rpc_client();
 		void test_s2s();
+		void test_createScenes();
 		void test_rpc_client_cancel();
 		void test_rpc_client_exception();
 		void test_syncClock();

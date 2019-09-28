@@ -4,6 +4,7 @@
 #include "Helloworld/Helloworld.hpp"
 #include "TestStreams.h"
 #include "GameSession/Gamesessions.hpp"
+#include "ServerPool/ServerPools.hpp"
 #include "TestUsersPlugin.h"
 #include "TestParty.h"
 
@@ -19,13 +20,14 @@ namespace Stormancer
 		_tests.push_back([this]() { test_dependencyInjection(); });
 		_tests.push_back([this]() { test_streams(); });
 		_tests.push_back([this]() { test_connect(); });
-		_tests.push_back([this]() { test_connectionRejected(); });
-		_tests.push_back([this]() { test_echo(); });
+		_tests.push_back([this]() { test_connectionRejected(); });		
+		_tests.push_back([this]() { test_echo(); });		
 		_tests.push_back([this]() { test_rpc_server(); });
 		_tests.push_back([this]() { test_rpc_server_cancel(); });
 		_tests.push_back([this]() { test_rpc_server_exception(); });
 		_tests.push_back([this]() { test_rpc_server_clientException(); });
 		_tests.push_back([this]() { test_rpc_client(); });
+		_tests.push_back([this]() { test_createScenes(); });
 		_tests.push_back([this]() { test_s2s(); });
 		_tests.push_back([this]() { test_rpc_client_cancel(); });
 		_tests.push_back([this]() { test_rpc_client_exception(); });
@@ -621,6 +623,37 @@ namespace Stormancer
 					catch (const std::exception& ex)
 					{
 						_logger->log(LogLevel::Error, "test_s2s", "An exception occured", ex.what());
+					}
+				});
+	}
+
+	void Tester::test_createScenes()
+	{
+		_logger->log(LogLevel::Info, "test_rpc_client", "create scenes");
+
+		auto scene = _sceneMain.lock();
+		if (!scene)
+		{
+			_logger->log(LogLevel::Error, "StormancerWrapper", "scene deleted");
+			return;
+		}
+
+		auto rpcService = scene->dependencyResolver().resolve<RpcService>();
+
+		rpcService->rpc<std::string>("createScenes", 1000)
+			.then([this](pplx::task<std::string> t)
+				{
+					try
+					{
+						auto v = t.get();
+						_logger->log(LogLevel::Info, v, "");
+
+						execNextTest();
+
+					}
+					catch (const std::exception& ex)
+					{
+						_logger->log(LogLevel::Error, "test_create_scenes", "An exception occured", ex.what());
 					}
 				});
 	}

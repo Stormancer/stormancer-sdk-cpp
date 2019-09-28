@@ -20,6 +20,7 @@ namespace Stormancer
 
 	rxcpp::observable<Packetisp_ptr> RpcService::rpcObservable(const std::string& route, const StreamWriter& streamWriter, PacketPriority priority)
 	{
+		
 		auto scene = _scene.lock();
 
 		if (!scene)
@@ -86,6 +87,7 @@ namespace Stormancer
 
 			try
 			{
+				_logger->log(LogLevel::Trace, "RpcService", "Sending rpc route='"+route+"', scene='"+scene->id()+"' id="+std::to_string(id), "");
 				scene->send(route, [id, streamWriter](obytestream& stream)
 				{
 					stream << id;

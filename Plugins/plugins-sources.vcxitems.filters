@@ -354,6 +354,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Users\ClientAPI.hpp">
       <Filter>public\Users</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\ServerPool\ServerPools.hpp">
+      <Filter>public\ServerPools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="private">
@@ -487,6 +490,9 @@
     </Filter>
     <Filter Include="public\Friends">
       <UniqueIdentifier>{31f4e0f9-e083-4479-8d4e-6bd6cfcb331a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="public\ServerPools">
+      <UniqueIdentifier>{3a512558-20ec-4972-9300-5a2adb0010d8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
