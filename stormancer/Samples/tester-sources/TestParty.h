@@ -205,6 +205,16 @@ private:
 		tester.logger()->log(LogLevel::Info, "TestParty", "testUpdatePartySettings");
 		testUpdatePartySettings(clients).get();
 		tester.logger()->log(LogLevel::Info, "TestParty", "testUpdatePartySettings PASSED");
+
+		tester.logger()->log(LogLevel::Info, "TestParty", "testFindGame");
+		tester.logger()->log(LogLevel::Info, "TestParty::testFindGame", "Creating "+ std::to_string(numClients)+" more clients...");
+		auto clients2 = makeClients(tester, numClients).get();
+		tester.logger()->log(LogLevel::Info, "TestParty::testFindGame", "Putting them all into a party...");
+		testCreateParty(clients2[0]).get();
+		testInvitations(clients2[0], clients2.begin() + 1, clients2.end(), tester).get();
+		tester.logger()->log(LogLevel::Info, "TestParty::testFindGame", "Running a GameFinder request for both parties...");
+		testFindGame(clients, clients2).get();
+		tester.logger()->log(LogLevel::Info, "TestParty", "testFindGame PASSED");
 	}
 
 	static pplx::task<void> testCreateParty(std::shared_ptr<Stormancer::IClient> client)
@@ -496,7 +506,7 @@ private:
 			assertex(invites.size() == 1, "User " + recipientId + " should have only 1 invite");
 
 			recipient->dependencyResolver().resolve<ILogger>()->log(LogLevel::Debug, "testInvitation", "User connecting to party", recipientId);
-			return taskFailAfterTimeout(party2->joinParty(invites[0]), "JoinParty did not complete in time for user "+recipientId, std::chrono::seconds(5));
+			return taskFailAfterTimeout(party2->joinParty(invites[0]), "JoinParty did not complete in time for user "+recipientId, std::chrono::seconds(10));
 		})
 			.then([=](pplx::task<void> task)
 		{
@@ -655,6 +665,48 @@ private:
 		tasks.push_back(awaitMembersConsistency(clients, members));
 
 		return when_all_handle_exceptions(tasks);
+	}
+
+	static pplx::task<void> testFindGame(
+		const std::vector<std::shared_ptr<Stormancer::IClient>>& clients1,
+		const std::vector<std::shared_ptr<Stormancer::IClient>>& clients2,
+		std::chrono::seconds findGameTimeout = std::chrono::seconds(10)
+	)
+	{
+		using namespace Stormancer;
+		using namespace TestHelpers;
+
+		std::vector<pplx::task<void>> tasks;
+		tasks.reserve(clients1.size() + clients2.size());
+
+		std::transform(clients1.begin(), clients1.end(), std::back_inserter(tasks), memberFindGame);
+		std::transform(clients2.begin(), clients2.end(), std::back_inserter(tasks), memberFindGame);
+
+		return taskFailAfterTimeout(when_all_handle_exceptions(tasks), "GameFinder request timed out after " + std::to_string(findGameTimeout.count()) + " seconds", findGameTimeout);
+	}
+
+	static pplx::task<void> memberFindGame(std::shared_ptr<Stormancer::IClient> client)
+	{
+		using namespace Stormancer;
+		using namespace TestHelpers;
+
+		auto party = getParty(client);
+		pplx::task_completion_event<void> gameFoundTce;
+
+		auto sub = party->subscribeOnGameFound([gameFoundTce](GameFinderResponse)
+		{
+			gameFoundTce.set();
+		});
+		auto sub2 = party->subscribeOnGameFinderFailure([gameFoundTce](Party::PartyGameFinderFailure failure)
+		{
+			gameFoundTce.set_exception(std::runtime_error(failure.reason));
+		});
+
+		return party->updatePlayerStatus(Party::PartyUserStatus::Ready)
+			.then([sub, sub2, gameFoundTce]
+		{
+			return pplx::create_task(gameFoundTce).then([sub, sub2] {});
+		});
 	}
 
 	static void assertex(bool condition, const std::string& msg)

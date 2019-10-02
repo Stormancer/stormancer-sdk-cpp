@@ -58,7 +58,7 @@ namespace Stormancer
 		/// Returns the id of the application to which this connection is connected.
 		virtual const std::string& application() const = 0;
 
-		virtual const std::unordered_map<std::string, std::string>& metadata() const = 0;
+		virtual const std::unordered_map<std::string, std::string> metadata() const = 0;
 
 		virtual std::string metadata(const std::string& key) const = 0;
 
@@ -78,6 +78,15 @@ namespace Stormancer
 		virtual pplx::task<void> setTimeout(std::chrono::milliseconds /*timeout*/, pplx::cancellation_token /*ct*/ = pplx::cancellation_token::none()) { return pplx::task_from_result(); }
 
 		virtual std::string sessionId() const = 0;
+
+		/// <summary>
+		/// Test-and-set whether this connection has already been used to connect to a scene.
+		/// </summary>
+		/// <remarks>
+		/// This check is useful if you want to perform some operations only the first time the connection connects to a scene.
+		/// </remarks>
+		/// <returns><c>true</c> if this is the first scene that this connection is connecting to, <c>false</c> otherwise.</returns>
+		virtual bool trySetInitialSceneConnection() = 0;
 
 		Event<std::string> onClose;
 

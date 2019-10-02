@@ -18,6 +18,7 @@ namespace Stormancer
 		struct PartySettings;
 		struct PartyInvitation;
 		struct PartyRequestDto;
+		struct PartyGameFinderFailure;
 
 		enum class PartyUserStatus
 		{
@@ -29,6 +30,12 @@ namespace Stormancer
 		{
 			Left = 0,
 			Kicked = 1
+		};
+
+		enum class PartyGameFinderStatus
+		{
+			SearchStopped = 0,
+			SearchInProgress = 1
 		};
 
 		struct PartyError
@@ -301,6 +308,34 @@ namespace Stormancer
 			/// <param name="callback">Callable object taking the Id of the user who canceled the invitation.</param>
 			/// <returns>A <c>Subscription</c> object to track the lifetime of the subscription.</returns>
 			virtual Event<std::string>::Subscription subscribeOnInvitationCanceled(std::function<void(std::string)> callback) = 0;
+			/// <summary>
+			/// Register a callback to be run when the status of the GameFinder for this party is updated.
+			/// </summary>
+			/// <remarks>
+			/// Monitoring the status of the GameFinder can be useful to provide visual feedback to the player.
+			/// </remarks>
+			/// <param name="callback">Callable object taking a <c>GameFinderStatus</c>.</param>
+			/// <returns>A <c>Subscription</c> object to track the lifetime of the subscription.</returns>
+			virtual Subscription subscribeOnGameFinderStatusUpdate(std::function<void(PartyGameFinderStatus)> callback) = 0;
+			/// <summary>
+			/// Register a callback to be run when a game session has been found for this party.
+			/// </summary>
+			/// <remarks>
+			/// This event happens as a result of a successful GameFinder request. Call <c>subscribeOnGameFinderStatusUpdate()</c> to monitor the state of the request.
+			/// </remarks>
+			/// <param name="callback">Callable object taking a <c>GameFinderResponse</c> containing the information needed to join the game session.</param>
+			/// <returns>A <c>Subscription</c> object to track the lifetime of the subscription.</returns>
+			virtual Subscription subscribeOnGameFound(std::function<void(GameFinderResponse)> callback) = 0;
+			/// <summary>
+			/// Register a callback to be run when an error occurs while looking for a game session. 
+			/// </summary>
+			/// <remarks>
+			/// This event is triggered when an ongoing GameFinder request for this party fails for any reason.
+			/// GameFinder failure conditions are fully customizable on the server side ; please see the GameFinder documentation for details.
+			/// </remarks>
+			/// <param name="callback">Callable object taking a <c>PartyGameFinderFailure</c> containing details about the failure.</param>
+			/// <returns>A <c>Subscription</c> object to track the lifetime of the subscription.</returns>
+			virtual Subscription subscribeOnGameFinderFailure(std::function<void(PartyGameFinderFailure)> callback) = 0;
 		};
 
 		struct PartyRequestDto
@@ -343,6 +378,11 @@ namespace Stormancer
 			std::string customData;
 
 			MSGPACK_DEFINE(gameFinderName, customData)
+		};
+
+		struct PartyGameFinderFailure
+		{
+			std::string reason;
 		};
 
 		class IPartyEventHandler
@@ -1110,12 +1150,14 @@ namespace Stormancer
 					std::weak_ptr<Users::UsersApi> users,
 					std::weak_ptr<ILogger> logger,
 					std::shared_ptr<IActionDispatcher> dispatcher,
-					std::vector<std::shared_ptr<IPartyEventHandler>> eventHandlers
+					std::vector<std::shared_ptr<IPartyEventHandler>> eventHandlers,
+					std::shared_ptr<GameFinder> gameFinder
 				)
 					: ClientAPI(users)
 					, _logger(logger)
 					, _dispatcher(dispatcher)
 					, _eventHandlers(eventHandlers)
+					, _gameFinder(gameFinder)
 				{}
 
 				pplx::task<void> createParty(const PartyRequestDto& partySettings) override
@@ -1473,6 +1515,21 @@ namespace Stormancer
 					return _onInvitationCanceled.subscribe(callback);
 				}
 
+				Subscription subscribeOnGameFinderStatusUpdate(std::function<void(PartyGameFinderStatus)> callback) override
+				{
+					return _onGameFinderStatusUpdate.subscribe(callback);
+				}
+
+				Subscription subscribeOnGameFound(std::function<void(GameFinderResponse)> callback) override
+				{
+					return _onGameFound.subscribe(callback);
+				}
+
+				Subscription subscribeOnGameFinderFailure(std::function<void(PartyGameFinderFailure)> callback) override
+				{
+					return _onGameFinderFailure.subscribe(callback);
+				}
+
 				void initialize()
 				{
 					auto wThat = this->weak_from_this();
@@ -1483,6 +1540,44 @@ namespace Stormancer
 							return that->invitationHandler(ctx);
 						}
 						return pplx::task_from_result();
+					});
+					_gameFinder->subsribeGameFinderStateChanged([wThat](GameFinderStatusChangedEvent evt)
+					{
+						if (auto that = wThat.lock())
+						{
+							if (that->getPartySettings().gameFinderName == evt.gameFinder)
+							{
+								switch (evt.status)
+								{
+								case GameFinderStatus::Searching:
+									that->_onGameFinderStatusUpdate(PartyGameFinderStatus::SearchInProgress);
+									break;
+								default:
+									that->_onGameFinderStatusUpdate(PartyGameFinderStatus::SearchStopped);
+									break;
+								}
+							}
+						}
+					});
+					_gameFinder->subsribeGameFound([wThat](GameFoundEvent evt)
+					{
+						if (auto that = wThat.lock())
+						{
+							if (that->getPartySettings().gameFinderName == evt.gameFinder)
+							{
+								that->_onGameFound(evt.data);
+							}
+						}
+					});
+					_gameFinder->subscribeFindGameFailed([wThat](FindGameFailedEvent evt)
+					{
+						if (auto that = wThat.lock())
+						{
+							if (that->getPartySettings().gameFinderName == evt.gameFinder)
+							{
+								that->_onGameFinderFailure(PartyGameFinderFailure{ evt.reason });
+							}
+						}
 					});
 				}
 
@@ -1503,6 +1598,9 @@ namespace Stormancer
 				Event<MemberDisconnectionReason> _onLeftParty;
 				Event<PartyInvitation> _onInvitationReceived;
 				Event<std::string> _onInvitationCanceled;
+				Event<PartyGameFinderStatus> _onGameFinderStatusUpdate;
+				Event<GameFinderResponse> _onGameFound;
+				Event<PartyGameFinderFailure> _onGameFinderFailure;
 
 				pplx::task<std::shared_ptr<PartyContainer>> getPartySceneByToken(const std::string& token)
 				{
@@ -1683,6 +1781,7 @@ namespace Stormancer
 				std::recursive_mutex _invitationsMutex;
 				std::shared_ptr<IActionDispatcher> _dispatcher;
 				std::vector<std::shared_ptr<IPartyEventHandler>> _eventHandlers;
+				std::shared_ptr<GameFinder> _gameFinder;
 			};
 		}
 
@@ -1691,7 +1790,7 @@ namespace Stormancer
 			static constexpr const char* PARTY_VERSION = "2019-08-30.1";
 			static constexpr const char* PARTYMANAGEMENT_VERSION = "2019-08-30.1";
 
-			void registerSceneDependencies(ContainerBuilder& builder, std::shared_ptr<Scene> scene)
+			void registerSceneDependencies(ContainerBuilder& builder, std::shared_ptr<Scene> scene) override
 			{
 				auto version = scene->getHostMetadata("stormancer.party");
 				if (version == PARTY_VERSION)
@@ -1706,7 +1805,7 @@ namespace Stormancer
 				}
 			}
 
-			void sceneCreated(std::shared_ptr<Scene> scene)
+			void sceneCreated(std::shared_ptr<Scene> scene) override
 			{
 				if (scene->getHostMetadata("stormancer.party") == PARTY_VERSION)
 				{
@@ -1714,15 +1813,17 @@ namespace Stormancer
 				}
 			}
 
-			void registerClientDependencies(ContainerBuilder& builder)
+			void registerClientDependencies(ContainerBuilder& builder) override
 			{
 				builder.registerDependency<PartyApi>([](const DependencyScope& dr) {
 					auto partyImpl = std::make_shared<details::Party_Impl>(
 						dr.resolve<Users::UsersApi>(),
 						dr.resolve<ILogger>(),
 						dr.resolve<IActionDispatcher>(),
-						dr.resolveAll<IPartyEventHandler>()
-					);
+						dr.resolveAll<IPartyEventHandler>(),
+						dr.resolve<GameFinder>()
+						);
+					// initialize() needs weak_from_this(), so it can't be called from Party_Impl's constructor
 					partyImpl->initialize();
 					return partyImpl;
 				}).singleInstance();

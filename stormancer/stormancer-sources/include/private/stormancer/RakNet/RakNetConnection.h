@@ -9,6 +9,7 @@
 #include "stormancer/Logger/ILogger.h"
 #include "stormancer/Helpers.h"
 #include <functional>
+#include <atomic>
 
 namespace Stormancer
 {
@@ -41,7 +42,7 @@ namespace Stormancer
 		std::string ipAddress() const override;
 		bool operator==(RakNetConnection& other);
 		bool operator!=(RakNetConnection& other);
-		const std::unordered_map<std::string, std::string>& metadata() const override;
+		const std::unordered_map<std::string, std::string> metadata() const override;
 		std::string metadata(const std::string& key) const override;
 		void setMetadata(const std::unordered_map<std::string, std::string>& metadata) override;
 		void setMetadata(const std::string& key, const std::string& value) override;
@@ -57,6 +58,12 @@ namespace Stormancer
 		pplx::task<void> setTimeout(std::chrono::milliseconds timeout, pplx::cancellation_token ct = pplx::cancellation_token::none()) override;
 
 		std::string sessionId() const override;
+
+		bool trySetInitialSceneConnection() override
+		{
+			bool expected = false;
+			return _isConnectedToAScene.compare_exchange_strong(expected, true);
+		}
 
 #pragma endregion
 
@@ -89,6 +96,9 @@ namespace Stormancer
 		rxcpp::subjects::subject<ConnectionState> _connectionStateObservable;
 		ILogger_ptr _logger;
 		std::string _closeReason;
+		// Mutable allows locking the mutex in const-qualified methods
+		mutable std::recursive_mutex _metadataMutex;
+		std::atomic_bool _isConnectedToAScene = false;
 		
 #pragma endregion
 	};

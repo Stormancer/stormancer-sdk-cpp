@@ -664,11 +664,17 @@ namespace Stormancer
 
 			client->logger()->log(LogLevel::Trace, "Client", "SceneInfosDto received", ss.str());
 
+			pplx::task<void> updateMetadataTask = pplx::task_from_result(pplx::task_options(ct));
 
-			connection->setMetadata("serializer", sceneInfos.SelectedSerializer);
+			if (connection->trySetInitialSceneConnection())
+			{
+				connection->setMetadata("serializer", sceneInfos.SelectedSerializer);
+				updateMetadataTask = connection->updatePeerMetadata(ct);
+			}
 
-			return connection->updatePeerMetadata(ct)
-				.then([tuple]()
+			assert(!connection->metadata("serializer").empty());
+
+			return updateMetadataTask.then([tuple]()
 			{
 				return tuple;
 			}, ct);

@@ -78,13 +78,15 @@ namespace Stormancer
 		return _serverConnection->application();
 	}
 
-	const std::unordered_map<std::string, std::string>& RelayConnection::metadata() const
+	const std::unordered_map<std::string, std::string> RelayConnection::metadata() const
 	{
+		std::lock_guard<std::recursive_mutex> lg(_metadataMutex);
 		return _metadata;
 	}
 
 	std::string RelayConnection::metadata(const std::string & key) const
 	{
+		std::lock_guard<std::recursive_mutex> lg(_metadataMutex);
 		auto it = _metadata.find(key);
 		if (it != _metadata.end())
 		{
@@ -98,11 +100,13 @@ namespace Stormancer
 
 	void RelayConnection::setMetadata(const std::unordered_map<std::string, std::string>& metadata)
 	{
+		std::lock_guard<std::recursive_mutex> lg(_metadataMutex);
 		_metadata = metadata;
 	}
 
 	void RelayConnection::setMetadata(const std::string & key, const std::string & value)
 	{
+		std::lock_guard<std::recursive_mutex> lg(_metadataMutex);
 		_metadata[key] = value;
 	}
 

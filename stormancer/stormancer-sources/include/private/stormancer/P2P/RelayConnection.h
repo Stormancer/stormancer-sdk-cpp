@@ -5,6 +5,7 @@
 
 #include "stormancer/IConnection.h"
 #include "stormancer/Helpers.h"
+#include <atomic>
 
 namespace Stormancer
 {
@@ -26,7 +27,7 @@ namespace Stormancer
 		time_t connectionDate() const override;
 		const std::string& account() const override;
 		const std::string& application() const override;
-		const std::unordered_map<std::string, std::string>& metadata() const override;
+		const std::unordered_map<std::string, std::string> metadata() const override;
 		std::string metadata(const std::string& key) const override;
 		void setMetadata(const std::unordered_map<std::string, std::string>& metadata) override;
 		void setMetadata(const std::string& key, const std::string & value) override;
@@ -35,6 +36,12 @@ namespace Stormancer
 		rxcpp::observable<ConnectionState> getConnectionStateChangedObservable() const override;
 		void setConnectionState(ConnectionState connectionState) override;
 		std::string sessionId() const override;
+
+		bool trySetInitialSceneConnection() override
+		{
+			bool expected = false;
+			return _isConnectedToAScene.compare_exchange_strong(expected, true);
+		}
 
 #pragma endregion
 
@@ -59,6 +66,9 @@ namespace Stormancer
 		DependencyScope _dependencyResolver;
 		std::weak_ptr<Serializer> _serializer;
 		std::string _sessionId;
+		// Mutable allows locking the mutex in const-qualified methods
+		mutable std::recursive_mutex _metadataMutex;
+		std::atomic_bool _isConnectedToAScene = false;
 
 #pragma endregion
 	};

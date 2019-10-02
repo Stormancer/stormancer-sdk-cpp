@@ -98,13 +98,15 @@ namespace Stormancer
 		return (_id != other._id);
 	}
 
-	const std::unordered_map<std::string, std::string>& RakNetConnection::metadata() const
+	const std::unordered_map<std::string, std::string> RakNetConnection::metadata() const
 	{
+		std::lock_guard<std::recursive_mutex> lg(_metadataMutex);
 		return _metadata;
 	}
 
 	std::string RakNetConnection::metadata(const std::string& key) const
 	{
+		std::lock_guard<std::recursive_mutex> lg(_metadataMutex);
 		if (mapContains(_metadata, key))
 		{
 			return _metadata.at(key);
@@ -114,16 +116,20 @@ namespace Stormancer
 
 	void RakNetConnection::setMetadata(const std::unordered_map<std::string, std::string>& metadata)
 	{
+		std::lock_guard<std::recursive_mutex> lg(_metadataMutex);
 		_metadata = metadata;
 	}
 
 	void RakNetConnection::setMetadata(const std::string& key, const std::string& value)
 	{
+		std::lock_guard<std::recursive_mutex> lg(_metadataMutex);
 		_metadata[key] = value;
 	}
 
 	pplx::task<void> RakNetConnection::updatePeerMetadata(pplx::cancellation_token ct)
 	{
+		std::lock_guard<std::recursive_mutex> lg(_metadataMutex);
+
 		auto requestProcessor = _dependencyScope.resolve<RequestProcessor>();
 		auto logger = _logger;
 
@@ -131,7 +137,7 @@ namespace Stormancer
 
 		return requestProcessor->sendSystemRequest(this, (byte)SystemRequestIDTypes::ID_SET_METADATA, [this](obytestream& stream)
 		{
-			_dependencyScope.resolve<Serializer>()->serialize(stream, metadata());
+			_dependencyScope.resolve<Serializer>()->serialize(stream, _metadata);
 		}, PacketPriority::MEDIUM_PRIORITY, ct)
 			.then([logger](Packet_ptr)
 		{
