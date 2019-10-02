@@ -98,7 +98,7 @@ namespace Stormancer
 		std::string _closeReason;
 		// Mutable allows locking the mutex in const-qualified methods
 		mutable std::recursive_mutex _metadataMutex;
-		std::atomic_bool _isConnectedToAScene = false;
+		std::atomic_bool _isConnectedToAScene = { false };
 		
 #pragma endregion
 	};
