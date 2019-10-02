@@ -7,12 +7,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)private\AssetsStorage\AssetsStorageService.cpp">
       <Filter>private\AssetsStorage</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\GameFinder\GameFinderPlugin.cpp">
-      <Filter>private\GameFinder</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\GameFinder\GameFinderService.cpp">
-      <Filter>private\GameFinder</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)private\GameRecovery\GameRecoveryPlugin.cpp">
       <Filter>private\GameRecovery</Filter>
     </ClCompile>
@@ -97,9 +91,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)private\InAppNotification\InAppNotification_Impl.cpp">
       <Filter>private\InAppNotification</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\GameFinder\GameFinder_Impl.cpp">
-      <Filter>private\GameFinder</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)private\GameRecovery\GameRecovery_Impl.cpp">
       <Filter>private\GameRecovery</Filter>
     </ClCompile>
@@ -176,21 +167,6 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Persistence\PersistenceService.h">
       <Filter>public\Persistence</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\GameFinder\GameFinder.h">
-      <Filter>public\GameFinder</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\GameFinder\GameFinder_Impl.h">
-      <Filter>private\GameFinder</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\GameFinder\GameFinderModels.h">
-      <Filter>public\GameFinder</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\GameFinder\GameFinderPlugin.h">
-      <Filter>public\GameFinder</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\GameFinder\GameFinderService.h">
-      <Filter>private\GameFinder</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameRecovery\GameRecovery.h">
       <Filter>public\GameRecovery</Filter>
@@ -357,6 +333,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\ServerPool\ServerPools.hpp">
       <Filter>public\ServerPools</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\GameFinder\GameFinder.hpp">
+      <Filter>public\GameFinder</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="private">
@@ -364,9 +343,6 @@
     </Filter>
     <Filter Include="public">
       <UniqueIdentifier>{c8b112a7-e399-46e0-aeb3-e97cb8778357}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="public\Authentication">
-      <UniqueIdentifier>{185736db-abed-46a3-98ba-f20917845fc8}</UniqueIdentifier>
     </Filter>
     <Filter Include="public\AssetsStorage">
       <UniqueIdentifier>{df30d708-83c4-45c7-a52f-3f22505868f3}</UniqueIdentifier>
@@ -413,14 +389,8 @@
     <Filter Include="private\AssetsStorage">
       <UniqueIdentifier>{eeb70e96-c6fa-4e24-a22c-2453657fce7c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="private\Authentication">
-      <UniqueIdentifier>{da9fad0c-54ae-4397-82b8-8e03ada72d52}</UniqueIdentifier>
-    </Filter>
     <Filter Include="private\BugReport">
       <UniqueIdentifier>{d94d9d4e-a986-4e9c-a9fc-22b9b1e2ffeb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="private\GameFinder">
-      <UniqueIdentifier>{fc06fcab-d3e6-49bf-b85d-a0aed9710c29}</UniqueIdentifier>
     </Filter>
     <Filter Include="private\GameRecovery">
       <UniqueIdentifier>{e469410b-38cc-46d4-b169-1e93e6414175}</UniqueIdentifier>

@@ -2,7 +2,7 @@
 #include "test.h"
 #include "Party/Party.hpp"
 #include "Users/Users.hpp"
-#include "GameFinder/GameFinderPlugin.h"
+#include "GameFinder/GameFinder.hpp"
 #include "stormancer/Utilities/TaskUtilities.h"
 #include "TestHelpers.h"
 
@@ -61,7 +61,7 @@ private:
 		auto conf = Configuration::create(tester.endpoint(), tester.account(), tester.application());
 		conf->logger = tester.logger();
 		conf->addPlugin(new Users::UsersPlugin);
-		conf->addPlugin(new GameFinderPlugin);
+		conf->addPlugin(new GameFinder::GameFinderPlugin);
 		conf->addPlugin(new Party::PartyPlugin);
 		if (additionalPlugin)
 		{
@@ -693,7 +693,7 @@ private:
 		auto party = getParty(client);
 		pplx::task_completion_event<void> gameFoundTce;
 
-		auto sub = party->subscribeOnGameFound([gameFoundTce](GameFinderResponse)
+		auto sub = party->subscribeOnGameFound([gameFoundTce](GameFinder::GameFinderResponse)
 		{
 			gameFoundTce.set();
 		});

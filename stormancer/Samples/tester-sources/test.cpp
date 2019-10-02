@@ -1,10 +1,7 @@
 #include "test.h"
 #include "stormancer/Utilities/TaskUtilities.h"
 #include "TestDependencyInjection.h"
-#include "Helloworld/Helloworld.hpp"
 #include "TestStreams.h"
-#include "GameSession/Gamesessions.hpp"
-#include "ServerPool/ServerPools.hpp"
 #include "TestUsersPlugin.h"
 #include "TestParty.h"
 

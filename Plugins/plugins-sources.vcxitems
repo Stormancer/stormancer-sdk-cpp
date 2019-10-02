@@ -18,9 +18,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)private\AssetsStorage\AssetsStorageService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\BugReport\BugReportPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\BugReport\BugReportService.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\GameFinder\GameFinderPlugin.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\GameFinder\GameFinderService.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\GameFinder\GameFinder_Impl.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\GameRecovery\GameRecovery_Impl.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\GameRecovery\GameRecoveryPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\GameRecovery\GameRecoveryService.cpp" />
@@ -58,8 +55,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Servers\Servers_Impl.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\GameFinder\GameFinderService.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\GameFinder\GameFinder_Impl.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameRecovery\GameRecoveryPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameRecovery\GameRecoveryService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameRecovery\GameRecovery_Impl.h" />
@@ -68,6 +63,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Messaging\Messaging_Impl.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Profile\ProfilePrivateModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Friends\Friends.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\GameFinder\GameFinder.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameSession\Gamesessions.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Helloworld\Helloworld.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\LeaderboardModels.h" />
@@ -107,9 +103,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\AssetsStorage\AssetsStorageService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\BugReport\BugReportPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\BugReport\BugReportService.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\GameFinder\GameFinder.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\GameFinder\GameFinderPlugin.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\GameFinder\GameFinderModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameRecovery\GameRecovery.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameSession\GameSession.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameSession\GameSessionPlugin.h" />

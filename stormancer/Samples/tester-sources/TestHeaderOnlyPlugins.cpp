@@ -7,3 +7,5 @@
 #include "Users/Users.hpp"
 #include "GameSession/Gamesessions.hpp"
 #include "Party/Party.hpp"
+#include "GameFinder/GameFinder.hpp"
+#include "ServerPool/ServerPools.hpp"
