@@ -269,7 +269,7 @@ namespace Stormancer
 							{
 								std::string reason;
 								// There may or may not be a reason string supplied with the failure notification, so check if the stream has more data
-								if (packet->stream.good())
+								if (packet->stream.good() && packet->stream.availableSize() > 0)
 								{
 									reason = that->_serializer.deserializeOne<std::string>(packet->stream);
 								}

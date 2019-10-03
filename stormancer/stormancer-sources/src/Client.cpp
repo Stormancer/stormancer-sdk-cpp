@@ -128,6 +128,8 @@ namespace Stormancer
 			}
 			_dependencyResolver = builder.build();
 
+			_dependencyResolver.resolve<IActionDispatcher>()->start();
+
 			std::vector<std::shared_ptr<IRequestModule>> modules{ std::static_pointer_cast<IRequestModule>(_dependencyResolver.resolve<P2PRequestModule>()) };
 
 			RequestProcessor::Initialize(_dependencyResolver.resolve<RequestProcessor>(), modules);
@@ -202,11 +204,8 @@ namespace Stormancer
 
 			_metadata["protocol"] = "3";
 
-			auto actionDispatcher = _dependencyResolver.resolve<IActionDispatcher>();
-			actionDispatcher->start();
 			_disconnectionTce = pplx::task_completion_event<void>();
 			_initialized = true;
-			_dependencyResolver.resolve<IActionDispatcher>()->start();
 
 			if (std::strcmp(_config->_headersVersion, Version::getVersionString()) != 0)
 			{
