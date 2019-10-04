@@ -1114,23 +1114,20 @@ namespace Stormancer
 				std::shared_ptr<Scene> getScene() const { return _partyScene; }
 				std::string id() const { return _partyScene->id(); }
 
+				// Returns true if this is a new request, false if there already is a pending request for this recipient
 				bool registerInvitationRequest(std::string recipientId, InvitationRequest& request)
 				{
 					std::lock_guard<std::mutex> lg(_invitationsMutex);
+
 					auto it = _pendingInvitationRequests.find(recipientId);
 					request = _pendingInvitationRequests[recipientId];
 					if (it == _pendingInvitationRequests.end())
 					{
-
-
 						return true;
 					}
 					else
 					{
-
-
 						return false;
-
 					}
 				}
 
@@ -1143,10 +1140,6 @@ namespace Stormancer
 						_pendingInvitationRequests[recipientId].cts.cancel();
 						_pendingInvitationRequests.erase(recipientId);
 					}
-					/*else //No invitation is successfully canceled.
-					{
-						throw std::runtime_error(&("Could not cancel a party invitation as there none pending for " + recipientId)[0]);
-					}*/
 				}
 
 				~PartyContainer()
@@ -1410,15 +1403,12 @@ namespace Stormancer
 						return pendingInvitations;
 					}
 
-
-
 					std::lock_guard<std::recursive_mutex> lg(_invitationsMutex);
 					for (const auto& it : _party->get()->_pendingInvitationRequests)
 					{
 						pendingInvitations.push_back(it.first);
 					}
 					return pendingInvitations;
-
 				}
 
 				// Not const because of mutex lock
@@ -1528,9 +1518,8 @@ namespace Stormancer
 
 							auto partyId = party->id();
 
-
 							InvitationRequest request;
-							auto newRequest = party->registerInvitationRequest(recipient, request);
+							auto isNewRequest = party->registerInvitationRequest(recipient, request);
 
 							std::weak_ptr<PartyContainer> wParty(party);
 							if (ct.is_cancelable())
@@ -1544,15 +1533,12 @@ namespace Stormancer
 									});
 							}
 
-
-							if (!newRequest)
+							if (!isNewRequest)
 							{
 								return request.task;
 							}
 							else
 							{
-
-
 								auto requestTask = users->sendRequestToUser<void>(recipient, "party.invite", request.cts.get_token(), partyId)
 									.then([recipient, wParty]
 										{
@@ -1564,12 +1550,17 @@ namespace Stormancer
 								request.task = requestTask;
 								return requestTask;
 							}
-
 						});
 				}
 
 				pplx::task<void> cancelPartyInvitation(std::string recipient)
 				{
+					if (!isInParty())
+					{
+						// If we are idempotent, I guess this is not an error
+						return pplx::task_from_result();
+					}
+
 					return _party->then([recipient](std::shared_ptr<PartyContainer> party)
 						{
 							party->closeInvitationRequest(recipient);
@@ -1767,18 +1758,20 @@ namespace Stormancer
 
 					auto party = std::make_shared<PartyContainer>(
 						scene,
-						partyService->LeftParty.subscribe([wPartyManagement, sceneId](MemberDisconnectionReason reason) {
-							if (auto partyManagement = wPartyManagement.lock())
+						partyService->LeftParty.subscribe([wPartyManagement, sceneId](MemberDisconnectionReason reason)
 							{
-								pplx::task<void> handlersTask = pplx::task_from_result();
-								auto logger = partyManagement->_logger;
-								for (auto handler : partyManagement->_eventHandlers)
+								if (auto partyManagement = wPartyManagement.lock())
 								{
-									// Capture a shared_ptr because the handlers could do important cleanup and need access to PartyApi
-									handlersTask = handlersTask.then([partyManagement, sceneId, handler]
-										{
-											return handler->onLeavingParty(partyManagement, sceneId);
-										}).then([logger](pplx::task<void> task)
+									pplx::task<void> handlersTask = pplx::task_from_result();
+									auto logger = partyManagement->_logger;
+									for (auto handler : partyManagement->_eventHandlers)
+									{
+										// Capture a shared_ptr because the handlers could do important cleanup and need access to PartyApi
+										handlersTask = handlersTask.then([partyManagement, sceneId, handler]
+											{
+												return handler->onLeavingParty(partyManagement, sceneId);
+											})
+											.then([logger](pplx::task<void> task)
 											{
 												// As these handlers could do important cleanup (e.g leaving a session), it is important that we run all of them even if some fail
 												// This is why I handle errors for each of them
@@ -1791,16 +1784,17 @@ namespace Stormancer
 													logger->log(LogLevel::Error, "Party_Impl::OnLeftParty", "An exception was thrown by an onLeavingParty handler", ex);
 												}
 											});
-								}
+									}
 
-								if (partyManagement->isInParty())
-								{
-									partyManagement->_party = nullptr;
-									partyManagement->_onLeftParty(reason);
+									if (partyManagement->isInParty())
+									{
+										partyManagement->_party = nullptr;
+										partyManagement->_onLeftParty(reason);
+									}
 								}
-							}
 							}),
-						partyService->UpdatedPartyMembers.subscribe([wPartyManagement](std::vector<PartyUserDto> partyUsers) {
+						partyService->UpdatedPartyMembers.subscribe([wPartyManagement](std::vector<PartyUserDto> partyUsers)
+							{
 								if (auto partyManagement = wPartyManagement.lock())
 								{
 									if (partyManagement->isInParty())
@@ -1809,7 +1803,8 @@ namespace Stormancer
 									}
 								}
 							}),
-								partyService->UpdatedPartySettings.subscribe([wPartyManagement](PartySettings settings) {
+						partyService->UpdatedPartySettings.subscribe([wPartyManagement](PartySettings settings)
+							{
 								if (auto partyManagement = wPartyManagement.lock())
 								{
 									if (partyManagement->isInParty())
@@ -1817,8 +1812,8 @@ namespace Stormancer
 										partyManagement->_onUpdatedPartySettings(settings);
 									}
 								}
-									})
-								);
+							})
+					);
 
 					return partyService->waitForPartyReady().then([party] { return party; });
 				}
