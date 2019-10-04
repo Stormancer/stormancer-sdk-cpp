@@ -35,11 +35,18 @@ namespace Stormancer
 			Loading = 6
 		};
 
+		namespace details
+		{
+			class GameFinderService;
+		}
+
 		struct GameFinderResponse
 		{
-			std::string connectionToken;
+			friend class details::GameFinderService;
 
-			Packetisp_ptr packet;
+		public:
+
+			std::string connectionToken;
 
 			template<typename TData>
 			TData readData()
@@ -54,6 +61,10 @@ namespace Stormancer
 				Serializer serializer;
 				return serializer.deserialize<TData...>(packet->stream, tData...);
 			}
+
+		private:
+
+			Packetisp_ptr packet;
 		};
 
 		struct GameFinderStatusChangedEvent
@@ -200,13 +211,6 @@ namespace Stormancer
 
 		namespace details
 		{
-			struct GameFinderResponseDto
-			{
-				std::string connectionToken;
-
-				MSGPACK_DEFINE(connectionToken);
-			};
-
 			class GameFinderService : public std::enable_shared_from_this<GameFinderService>
 			{
 			public:
@@ -248,10 +252,10 @@ namespace Stormancer
 							{
 							case GameFinderStatus::Success:
 							{
-								auto dto = that->_serializer.deserializeOne<GameFinderResponseDto>(packet->stream);
+								auto connectionToken = that->_serializer.deserializeOne<std::string>(packet->stream);
 
 								GameFinderResponse response;
-								response.connectionToken = dto.connectionToken;
+								response.connectionToken = connectionToken;
 								response.packet = packet;
 
 								that->GameFound(response);
