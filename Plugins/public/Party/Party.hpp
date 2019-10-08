@@ -1624,7 +1624,7 @@ namespace Stormancer
 							}
 							return pplx::task_from_result();
 						});
-					_gameFinder->subsribeGameFinderStateChanged([wThat](GameFinder::GameFinderStatusChangedEvent evt)
+					_subscriptions.push_back(_gameFinder->subsribeGameFinderStateChanged([wThat](GameFinder::GameFinderStatusChangedEvent evt)
 						{
 							if (auto that = wThat.lock())
 							{
@@ -1641,8 +1641,8 @@ namespace Stormancer
 									}
 								}
 							}
-						});
-					_gameFinder->subsribeGameFound([wThat](GameFinder::GameFoundEvent evt)
+						}));
+					_subscriptions.push_back(_gameFinder->subsribeGameFound([wThat](GameFinder::GameFoundEvent evt)
 						{
 							if (auto that = wThat.lock())
 							{
@@ -1651,8 +1651,8 @@ namespace Stormancer
 									that->_onGameFound(evt.data);
 								}
 							}
-						});
-					_gameFinder->subscribeFindGameFailed([wThat](GameFinder::FindGameFailedEvent evt)
+						}));
+					_subscriptions.push_back(_gameFinder->subscribeFindGameFailed([wThat](GameFinder::FindGameFailedEvent evt)
 						{
 							if (auto that = wThat.lock())
 							{
@@ -1661,7 +1661,7 @@ namespace Stormancer
 									that->_onGameFinderFailure(PartyGameFinderFailure{ evt.reason });
 								}
 							}
-						});
+						}));
 				}
 
 			private:
@@ -1869,6 +1869,8 @@ namespace Stormancer
 				std::shared_ptr<IActionDispatcher> _dispatcher;
 				std::vector<std::shared_ptr<IPartyEventHandler>> _eventHandlers;
 				std::shared_ptr<Stormancer::GameFinder::GameFinderApi> _gameFinder;
+				// Things Party_Impl is subscibed to, that outlive the party scene (e.g GameFinder events)
+				std::vector<Subscription> _subscriptions;
 			};
 		}
 
