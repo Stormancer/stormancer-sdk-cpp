@@ -247,11 +247,10 @@ namespace Stormancer
 			if (it == _pendingRequests.end())
 			{
 #ifdef STORMANCER_LOG_RPC
-				auto idStr = std::to_string(id);
+				auto idStr = std::to_string(_currentId);
 				_logger->log(LogLevel::Trace, "RpcService", "Create RPC", idStr.c_str());
 #endif
 				return _currentId;
-				break;
 			}
 		}
 

@@ -190,7 +190,7 @@ private:
 
 		int numClients = 10;
 		tester.logger()->log(LogLevel::Info, "TestParty", "Connecting with "+std::to_string(numClients)+" clients...");
-		auto clients = makeClients(tester, numClients, false).get();
+		auto clients = makeClients(tester, numClients, true).get();
 		tester.logger()->log(LogLevel::Info, "TestParty", "Done");
 
 		tester.logger()->log(LogLevel::Info, "TestParty", "testCreateParty");
@@ -211,7 +211,7 @@ private:
 
 		tester.logger()->log(LogLevel::Info, "TestParty", "testFindGame");
 		tester.logger()->log(LogLevel::Info, "TestParty::testFindGame", "Creating "+ std::to_string(numClients)+" more clients...");
-		auto clients2 = makeClients(tester, numClients, false).get();
+		auto clients2 = makeClients(tester, numClients, true).get();
 		tester.logger()->log(LogLevel::Info, "TestParty::testFindGame", "Putting them all into a party...");
 		testCreateParty(clients2[0]).get();
 		testInvitations(clients2[0], clients2.begin() + 1, clients2.end(), tester).get();
@@ -686,10 +686,28 @@ private:
 		std::vector<pplx::task<void>> tasks;
 		tasks.reserve(clients1.size() + clients2.size());
 
+
 		std::transform(clients1.begin(), clients1.end(), std::back_inserter(tasks), memberFindGame);
 		std::transform(clients2.begin(), clients2.end(), std::back_inserter(tasks), memberFindGame);
 
-		return taskFailAfterTimeout(when_all_handle_exceptions(tasks), "GameFinder request timed out after " + std::to_string(findGameTimeout.count()) + " seconds", findGameTimeout);
+		return taskFailAfterTimeout(when_all_handle_exceptions(tasks), "GameFinder request timed out after " + std::to_string(findGameTimeout.count()) + " seconds", findGameTimeout)
+			.then([clients1, clients2]
+		{
+			using namespace Stormancer;
+			using namespace TestHelpers;
+			// All members should be back to NotReady
+			std::vector<pplx::task<void>> membersTasks;
+
+			auto members1 = getParty(clients1[0])->getPartyMembers();
+			std::for_each(members1.begin(), members1.end(), [](auto& member) { member.partyUserStatus = Party::PartyUserStatus::NotReady; });
+			auto members2 = getParty(clients2[0])->getPartyMembers();
+			std::for_each(members2.begin(), members2.end(), [](auto& member) { member.partyUserStatus = Party::PartyUserStatus::NotReady; });
+
+			membersTasks.push_back(awaitMembersConsistency(clients1, members1, std::chrono::seconds(10)));
+			membersTasks.push_back(awaitMembersConsistency(clients2, members2, std::chrono::seconds(10)));
+
+			return when_all_handle_exceptions(membersTasks);
+		});
 	}
 
 	static pplx::task<void> memberFindGame(std::shared_ptr<Stormancer::IClient> client)
