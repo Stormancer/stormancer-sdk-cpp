@@ -17,6 +17,11 @@ Changed
 
 - All use of Peer Id in the client library has been replaced with Session Id. This is required for Stormancer server 2.9 and up. Note that compatibility with 2.8 is broken as a result.
   If you need 2.8 compatibility, please use v1.8_.
+  
+Fixed
+*****
+
+- Disconnect From Scene system requests issued from server to client are now properly handled.
 
 .. _v1.8:
 

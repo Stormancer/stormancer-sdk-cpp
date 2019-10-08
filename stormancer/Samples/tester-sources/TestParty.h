@@ -54,12 +54,15 @@ private:
 		}
 	};
 
-	static pplx::task<std::shared_ptr<Stormancer::IClient>> makeClient(const Stormancer::Tester& tester, Stormancer::IPlugin* additionalPlugin = nullptr)
+	static pplx::task<std::shared_ptr<Stormancer::IClient>> makeClient(const Stormancer::Tester& tester, bool useLogger, Stormancer::IPlugin* additionalPlugin = nullptr)
 	{
 		using namespace Stormancer;
 
 		auto conf = Configuration::create(tester.endpoint(), tester.account(), tester.application());
-		conf->logger = tester.logger();
+		if (useLogger)
+		{
+			conf->logger = tester.logger();
+		}
 		conf->addPlugin(new Users::UsersPlugin);
 		conf->addPlugin(new GameFinder::GameFinderPlugin);
 		conf->addPlugin(new Party::PartyPlugin);
@@ -80,12 +83,12 @@ private:
 		return users->login().then([client] { return client; });
 	}
 
-	static pplx::task<std::vector<std::shared_ptr<Stormancer::IClient>>> makeClients(const Stormancer::Tester& tester, int count)
+	static pplx::task<std::vector<std::shared_ptr<Stormancer::IClient>>> makeClients(const Stormancer::Tester& tester, int count, bool useLogger = true)
 	{
 		std::vector<pplx::task<std::shared_ptr<Stormancer::IClient>>> clientTasks;
 		for (int i = 0; i < count; i++)
 		{
-			clientTasks.push_back(makeClient(tester));
+			clientTasks.push_back(makeClient(tester, useLogger));
 		}
 
 		return pplx::when_all(clientTasks.begin(), clientTasks.end())
@@ -108,7 +111,7 @@ private:
 		using namespace Stormancer;
 		tester.logger()->log(LogLevel::Info, "TestParty", "testCreatePartyBadRequest");
 
-		auto client = makeClient(tester).get();
+		auto client = makeClient(tester, false).get();
 
 		auto party = client->dependencyResolver().resolve<Party::PartyApi>();
 		assertex(!party->isInParty(), "I should not be in a party initially");
@@ -134,7 +137,7 @@ private:
 
 		tester.logger()->log(LogLevel::Info, "TestParty", "testPartyEventHandler");
 
-		auto client = makeClient(tester, new TestPartyEventHandlerFailure::Plugin).get();
+		auto client = makeClient(tester, false, new TestPartyEventHandlerFailure::Plugin).get();
 		auto party = client->dependencyResolver().resolve<Party::PartyApi>();
 		auto eventHandler = client->dependencyResolver().resolve<TestPartyEventHandlerFailure>();
 
@@ -187,7 +190,7 @@ private:
 
 		int numClients = 10;
 		tester.logger()->log(LogLevel::Info, "TestParty", "Connecting with "+std::to_string(numClients)+" clients...");
-		auto clients = makeClients(tester, numClients).get();
+		auto clients = makeClients(tester, numClients, false).get();
 		tester.logger()->log(LogLevel::Info, "TestParty", "Done");
 
 		tester.logger()->log(LogLevel::Info, "TestParty", "testCreateParty");
@@ -208,13 +211,17 @@ private:
 
 		tester.logger()->log(LogLevel::Info, "TestParty", "testFindGame");
 		tester.logger()->log(LogLevel::Info, "TestParty::testFindGame", "Creating "+ std::to_string(numClients)+" more clients...");
-		auto clients2 = makeClients(tester, numClients).get();
+		auto clients2 = makeClients(tester, numClients, false).get();
 		tester.logger()->log(LogLevel::Info, "TestParty::testFindGame", "Putting them all into a party...");
 		testCreateParty(clients2[0]).get();
 		testInvitations(clients2[0], clients2.begin() + 1, clients2.end(), tester).get();
 		tester.logger()->log(LogLevel::Info, "TestParty::testFindGame", "Running a GameFinder request for both parties...");
 		testFindGame(clients, clients2).get();
 		tester.logger()->log(LogLevel::Info, "TestParty", "testFindGame PASSED");
+
+		tester.logger()->log(LogLevel::Info, "TestParty", "testKickPlayer");
+		testKickPlayer(clients).get();
+		tester.logger()->log(LogLevel::Info, "TestParty", "testKickPlayer PASSED");
 	}
 
 	static pplx::task<void> testCreateParty(std::shared_ptr<Stormancer::IClient> client)
@@ -506,7 +513,7 @@ private:
 			assertex(invites.size() == 1, "User " + recipientId + " should have only 1 invite");
 
 			recipient->dependencyResolver().resolve<ILogger>()->log(LogLevel::Debug, "testInvitation", "User connecting to party", recipientId);
-			return taskFailAfterTimeout(party2->joinParty(invites[0]), "JoinParty did not complete in time for user "+recipientId, std::chrono::seconds(10));
+			return taskFailAfterTimeout(party2->joinParty(invites[0]), "JoinParty did not complete in time for user "+recipientId, std::chrono::seconds(15));
 		})
 			.then([=](pplx::task<void> task)
 		{
@@ -707,6 +714,52 @@ private:
 		{
 			return pplx::create_task(gameFoundTce).then([sub, sub2] {});
 		});
+	}
+
+	static pplx::task<void> testKickPlayer(const std::vector<std::shared_ptr<Stormancer::IClient>>& clients)
+	{
+		using namespace Stormancer;
+		using namespace TestHelpers;
+
+		std::vector<std::shared_ptr<Party::PartyApi>> parties;
+		parties.reserve(clients.size());
+
+		std::transform(clients.begin(), clients.end(), std::back_inserter(parties), [](const auto& client) { return getParty(client); });
+
+		auto leader = *std::find_if(parties.begin(), parties.end(), [](const auto& party) { return party->isLeader(); });
+		auto toBeKicked = *std::find_if(parties.begin(), parties.end(), [](const auto& party) { return !party->isLeader(); });
+
+		auto expectedMembers = toBeKicked->getPartyMembers();
+		expectedMembers.erase(std::remove_if(expectedMembers.begin(), expectedMembers.end(), [&](const auto& member) { return member.userId == toBeKicked->getLocalMember().userId; }));
+
+		pplx::task_completion_event<void> kickedTce;
+		auto sub = toBeKicked->subscribeOnLeftParty([kickedTce](Party::MemberDisconnectionReason reason)
+		{
+			if (reason == Party::MemberDisconnectionReason::Kicked)
+			{
+				kickedTce.set();
+			}
+			else
+			{
+				kickedTce.set_exception(std::runtime_error("Wrong LeftParty reason: expected Kicked, got " + std::to_string(static_cast<int>(reason))));
+			}
+		});
+		failAfterTimeout(kickedTce, "Member was not kicked in time", std::chrono::seconds(6));
+
+		std::vector<std::shared_ptr<Stormancer::IClient>> remainingClients;
+		remainingClients.reserve(clients.size() - 1);
+
+		std::copy_if(clients.begin(), clients.end(), std::back_inserter(remainingClients), [&](const auto& client)
+		{
+			return getParty(client)->getLocalMember().userId != toBeKicked->getLocalMember().userId;
+		});
+
+		auto kickTask = leader->kickPlayer(toBeKicked->getLocalMember().userId);
+		return when_all_handle_exceptions(std::vector<pplx::task<void>>{
+			kickTask,
+			pplx::create_task(kickedTce),
+			awaitMembersConsistency(remainingClients, expectedMembers, std::chrono::seconds(5))
+		}).then([sub] {});
 	}
 
 	static void assertex(bool condition, const std::string& msg)

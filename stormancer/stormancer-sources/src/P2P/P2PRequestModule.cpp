@@ -160,44 +160,56 @@ namespace Stormancer
 		});
 
 		builder.service((byte)SystemRequestIDTypes::ID_DISCONNECT_FROM_SCENE, [logger, serializer, wClient](std::shared_ptr<RequestContext> ctx) {
-			P2PDisconnectFromSceneMessage disconnectRequest;
-			serializer->deserialize(ctx->inputStream(), disconnectRequest);
-			
-			if (auto client = wClient.lock())
+			// Server and P2P use different message types for this request
+			if (ctx->packet()->connection->metadata("type") == "server")
 			{
-				return client->getConnectedScene(disconnectRequest.sceneId)
-					.then([ctx, wClient, disconnectRequest, serializer, logger](pplx::task<std::shared_ptr<Scene>> task)
+				auto sceneId = serializer->deserializeOne<std::string>(ctx->inputStream());
+				auto reason = serializer->deserializeOne<std::string>(ctx->inputStream());
+				auto handle = serializer->deserializeOne<byte>(ctx->inputStream());
+
+				if (auto client = wClient.lock())
 				{
-					std::shared_ptr<Scene> scene;
-					try
-					{
-						scene = task.get();
-					}
-					catch (const std::exception& ex)
-					{
-						// Do nothing if the scene does not exist
-						logger->log(LogLevel::Warn, "P2PRequestModule", "Scene not found while remote peer requests disconnection", ex.what());
-					}
-
-					if (scene)
-					{
-						std::static_pointer_cast<Scene_Impl>(scene)->raisePeerDisconnected(ctx->packet()->connection->sessionId());
-					}
-
-					P2PDisconnectFromSceneMessage disconnectResponse;
-					disconnectResponse.sceneId = disconnectRequest.sceneId;
-					disconnectResponse.reason = "Requested by remote peer";
-					ctx->send([serializer, disconnectResponse](obytestream& stream)
-					{
-						serializer->serialize(stream, disconnectResponse);
-					});
-				});
+					return client->disconnect(ctx->packet()->connection, handle, true, reason);
+				}
 			}
 			else
 			{
-				// Do nothing if the client does not exist
-				return pplx::task_from_result();
+				P2PDisconnectFromSceneMessage disconnectRequest;
+				serializer->deserialize(ctx->inputStream(), disconnectRequest);
+				if (auto client = wClient.lock())
+				{
+					return client->getConnectedScene(disconnectRequest.sceneId)
+						.then([ctx, wClient, disconnectRequest, serializer, logger](pplx::task<std::shared_ptr<Scene>> task)
+					{
+						std::shared_ptr<Scene> scene;
+						try
+						{
+							scene = task.get();
+						}
+						catch (const std::exception& ex)
+						{
+							// Do nothing if the scene does not exist
+							logger->log(LogLevel::Warn, "P2PRequestModule", "Scene not found while remote peer requests disconnection", ex.what());
+						}
+
+						if (scene)
+						{
+							std::static_pointer_cast<Scene_Impl>(scene)->raisePeerDisconnected(ctx->packet()->connection->sessionId());
+						}
+
+						P2PDisconnectFromSceneMessage disconnectResponse;
+						disconnectResponse.sceneId = disconnectRequest.sceneId;
+						disconnectResponse.reason = "Requested by remote peer";
+						ctx->send([serializer, disconnectResponse](obytestream& stream)
+						{
+							serializer->serialize(stream, disconnectResponse);
+						});
+					});
+				}
 			}
+			
+			// Do nothing if the client does not exist
+			return pplx::task_from_result();
 		});
 
 		builder.service((byte)SystemRequestIDTypes::ID_P2P_CREATE_SESSION, [serializer, sessions,connections](std::shared_ptr<RequestContext> ctx)
