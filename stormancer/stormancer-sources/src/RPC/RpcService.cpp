@@ -235,8 +235,6 @@ namespace Stormancer
 
 	uint16 RpcService::reserveId()
 	{
-		static uint16 id = 0;
-
 		uint32 i = 0;
 
 		std::lock_guard<std::mutex> lock(_pendingRequestsMutex);
@@ -244,15 +242,15 @@ namespace Stormancer
 		while (i <= 0xffff)
 		{
 			i++;
-			id++;
-			auto it = _pendingRequests.find(id);
+			_currentId++;
+			auto it = _pendingRequests.find(_currentId);
 			if (it == _pendingRequests.end())
 			{
 #ifdef STORMANCER_LOG_RPC
 				auto idStr = std::to_string(id);
 				_logger->log(LogLevel::Trace, "RpcService", "Create RPC", idStr.c_str());
 #endif
-				return id;
+				return _currentId;
 				break;
 			}
 		}

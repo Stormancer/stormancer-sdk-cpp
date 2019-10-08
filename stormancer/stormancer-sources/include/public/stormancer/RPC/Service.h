@@ -149,6 +149,7 @@ namespace Stormancer
 		Serializer _serializer;
 		const std::string _rpcServerChannelIdentifier = "RPC_server";
 		std::shared_ptr<Stormancer::ILogger> _logger;
+		uint16 _currentId = 0;
 
 #pragma endregion
 	};
