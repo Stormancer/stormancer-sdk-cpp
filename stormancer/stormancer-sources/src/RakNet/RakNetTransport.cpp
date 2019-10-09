@@ -205,7 +205,7 @@ namespace Stormancer
 							
 								p2pConnecInfos.parentId = rq.parentId;
 								p2pConnecInfos.p2pSessionId = rq.p2pSessionId;
-								p2pConnecInfos.peerSessionId = rq.peerSessionId;
+								p2pConnecInfos.peerSessionId = _handler->currentSessionId;
 								p2pConnecInfos.isRequest = true;
 
 								obytestream stream;
@@ -218,7 +218,7 @@ namespace Stormancer
 								char* dataPtr = reinterpret_cast<char*>(stream.startPtr());
 								int dataSize = static_cast<int>(stream.currentPosition());
 
-								_logger->log(LogLevel::Trace, "RakNetTransport", "sending Advertise peer request parentid=" + rq.parentId + " p2psessionId=" + rq.p2pSessionId+ " peerSessionId="+rq.peerSessionId);
+								_logger->log(LogLevel::Trace, "RakNetTransport", "sending Advertise peer request parentid=" + p2pConnecInfos.parentId + " p2psessionId=" + p2pConnecInfos.p2pSessionId + " peerSessionId="+ p2pConnecInfos.peerSessionId);
 								_peer->Send(dataPtr, dataSize, PacketPriority::MEDIUM_PRIORITY, PacketReliability::RELIABLE, 0, rakNetPacket->guid, false);
 							}
 						}

@@ -190,7 +190,7 @@ private:
 
 		int numClients = 10;
 		tester.logger()->log(LogLevel::Info, "TestParty", "Connecting with "+std::to_string(numClients)+" clients...");
-		auto clients = makeClients(tester, numClients, true).get();
+		auto clients = makeClients(tester, numClients, false).get();
 		tester.logger()->log(LogLevel::Info, "TestParty", "Done");
 
 		tester.logger()->log(LogLevel::Info, "TestParty", "testCreateParty");
@@ -211,7 +211,7 @@ private:
 
 		tester.logger()->log(LogLevel::Info, "TestParty", "testFindGame");
 		tester.logger()->log(LogLevel::Info, "TestParty::testFindGame", "Creating "+ std::to_string(numClients)+" more clients...");
-		auto clients2 = makeClients(tester, numClients, true).get();
+		auto clients2 = makeClients(tester, numClients, false).get();
 		tester.logger()->log(LogLevel::Info, "TestParty::testFindGame", "Putting them all into a party...");
 		testCreateParty(clients2[0]).get();
 		testInvitations(clients2[0], clients2.begin() + 1, clients2.end(), tester).get();
@@ -568,21 +568,11 @@ private:
 		auto logger = tester.logger();
 		for (auto client = recipientsFirst; client != recipientsEnd; client++)
 		{
-			auto clientId = (*client)->dependencyResolver().template resolve<Users::UsersApi>()->userId();
-			tasks.push_back(testInvitation(sender, *client).then([logger, clientId]
-			{
-				logger->log(LogLevel::Debug, "testInvitations", "Invite complete", clientId);
-			}));
-			tasks.push_back(awaitMembersConsistency(*client, users, std::chrono::seconds(15)).then([logger, clientId]
-			{
-				logger->log(LogLevel::Debug, "testInvitations", "MemberConsistency complete recipient", clientId);
-			}));
+			tasks.push_back(testInvitation(sender, *client));
+			tasks.push_back(awaitMembersConsistency(*client, users, std::chrono::seconds(15)));
 		}
-		auto senderId = sender->dependencyResolver().resolve<Users::UsersApi>()->userId();
-		tasks.push_back(awaitMembersConsistency(sender, users, std::chrono::seconds(15)).then([logger, senderId]
-		{
-			logger->log(LogLevel::Debug, "testInvitations", "MemberConsistency complete sender", senderId);
-		}));
+
+		tasks.push_back(awaitMembersConsistency(sender, users, std::chrono::seconds(15)));
 
 		return pplx::when_all(tasks.begin(), tasks.end())
 			.then([tasks](pplx::task<void> task)
