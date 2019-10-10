@@ -17,7 +17,9 @@ Changed
 
 - All use of Peer Id in the client library has been replaced with Session Id. This is required for Stormancer server 2.9 and up. Note that compatibility with 2.8 is broken as a result.
   If you need 2.8 compatibility, please use v1.8_.
-  
+- *Party* Plugin: Updates to the party state, made by calling methods like ``PartyApi::updatePlayerStatus()``, are now immediately applied locally, rather than after the server responds.
+  The local state can auto-correct if there is a divergence with the server.
+
 Fixed
 *****
 
