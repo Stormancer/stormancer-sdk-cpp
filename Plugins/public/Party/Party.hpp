@@ -1352,7 +1352,8 @@ namespace Stormancer
 					}
 
 					auto wPartyManagement = this->weak_from_this();
-					auto partyTask = leaveParty().then([wPartyManagement, token]
+					auto partyTask = _leavePartyTask
+						.then([wPartyManagement, token]
 						{
 							if (auto partyManagment = wPartyManagement.lock())
 							{
@@ -1376,19 +1377,19 @@ namespace Stormancer
 								}
 							}, _dispatcher);
 
-						auto userTask = partyTask.then([wPartyManagement](std::shared_ptr<PartyContainer>)
+					auto userTask = partyTask.then([wPartyManagement](std::shared_ptr<PartyContainer>)
+						{
+							if (auto that = wPartyManagement.lock())
 							{
-								if (auto that = wPartyManagement.lock())
-								{
-									// Wait for the party task to be complete before triggering these events, to stay consistent with isInParty()
-									that->_onJoinedParty();
-									that->_onUpdatedPartyMembers(that->getPartyMembers());
-									that->_onUpdatedPartySettings(that->getPartySettings());
-								}
-							}, _dispatcher);
+								// Wait for the party task to be complete before triggering these events, to stay consistent with isInParty()
+								that->_onJoinedParty();
+								that->_onUpdatedPartyMembers(that->getPartyMembers());
+								that->_onUpdatedPartySettings(that->getPartySettings());
+							}
+						}, _dispatcher);
 
-						this->_party = std::make_shared<pplx::task<std::shared_ptr<PartyContainer>>>(partyTask);
-						return userTask;
+					this->_party = std::make_shared<pplx::task<std::shared_ptr<PartyContainer>>>(partyTask);
+					return userTask;
 				}
 
 				pplx::task<void> joinParty(const PartyInvitation& invitation) override
@@ -1426,11 +1427,25 @@ namespace Stormancer
 
 					auto party = *_party;
 					_party = nullptr;
-					std::weak_ptr<Party_Impl> wpartyManagement = this->weak_from_this();
-					return party.then([wpartyManagement](std::shared_ptr<PartyContainer> party)
+					auto logger = _logger;
+					_leavePartyTask = party
+						.then([](std::shared_ptr<PartyContainer> party)
 						{
 							return party->getScene()->disconnect();
+						})
+						.then([logger](pplx::task<void> task)
+						{
+							try
+							{
+								task.wait();
+							}
+							catch (const std::exception& ex)
+							{
+								logger->log(LogLevel::Debug, "PartyApi::leaveParty", "An error occurred while leaving the party", ex);
+							}
+							catch (...) {}
 						});
+					return _leavePartyTask;
 				}
 
 				bool isInParty() const override
@@ -1976,6 +1991,7 @@ namespace Stormancer
 				std::shared_ptr<Stormancer::GameFinder::GameFinderApi> _gameFinder;
 				// Things Party_Impl is subscibed to, that outlive the party scene (e.g GameFinder events)
 				std::vector<Subscription> _subscriptions;
+				pplx::task<void> _leavePartyTask = pplx::task_from_result();
 			};
 		}
 
