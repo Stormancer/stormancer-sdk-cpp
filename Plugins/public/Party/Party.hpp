@@ -542,6 +542,9 @@ namespace Stormancer
 			{
 			public:
 
+				static constexpr const char* METADATA_KEY = "stormancer.party";
+				static constexpr const char* PROTOCOL_VERSION = "2019-08-30.1";
+
 				PartyService(std::weak_ptr<Scene> scene)
 					: _scene(scene)
 					, _logger(scene.lock()->dependencyResolver().resolve<ILogger>())
@@ -549,7 +552,10 @@ namespace Stormancer
 					, _gameFinder(scene.lock()->dependencyResolver().resolve<Stormancer::GameFinder::GameFinderApi>())
 					, _dispatcher(scene.lock()->dependencyResolver().resolve<IActionDispatcher>())
 					, _myUserId(scene.lock()->dependencyResolver().resolve<Stormancer::Users::UsersApi>()->userId())
-				{}
+				{
+					auto serverVersion = _scene.lock()->getHostMetadata(METADATA_KEY);
+					_logger->log(LogLevel::Info, "PartyService", "Protocol version: client=" + std::string(PROTOCOL_VERSION) + ", server=" + serverVersion);
+				}
 
 				~PartyService()
 				{
@@ -1275,13 +1281,18 @@ namespace Stormancer
 
 			class PartyManagementService : public std::enable_shared_from_this<PartyManagementService>
 			{
-
 			public:
 
+				static constexpr const char* METADATA_KEY = "stormancer.partymanagement";
+				static constexpr const char* PROTOCOL_VERSION = "2019-08-30.1";
+
 				PartyManagementService(std::shared_ptr<Scene> scene)
-					: _logger(scene->dependencyResolver().resolve<ILogger>())
-					, _scene(scene)
-				{}
+					: _scene(scene)
+				{
+					auto logger = scene->dependencyResolver().resolve<ILogger>();
+					auto serverVersion = scene->getHostMetadata(METADATA_KEY);
+					logger->log(LogLevel::Info, "PartyManagementService", "Protocol version: client=" + std::string(PROTOCOL_VERSION) + ", server=" + serverVersion);
+				}
 
 				pplx::task<std::string> createParty(const  PartyRequestDto& partyRequestDto)
 				{
@@ -1290,11 +1301,7 @@ namespace Stormancer
 				}
 
 			private:
-				std::shared_ptr<ILogger> _logger;
 				std::weak_ptr<Scene> _scene;
-
-				//Internal callbacks
-				std::function<void(RpcRequestContext_ptr requestContext)> _onCreateSession;
 			};
 
 			class Party_Impl : public ClientAPI<Party_Impl>, public PartyApi
@@ -1997,21 +2004,20 @@ namespace Stormancer
 
 		class PartyPlugin : public IPlugin
 		{
-			static constexpr const char* PARTY_VERSION = "2019-08-30.1";
-			static constexpr const char* PARTYMANAGEMENT_VERSION = "2019-08-30.1";
-			static constexpr const char* PARTY_KEY = "stormancer.party";
-			static constexpr const char* PARTYMANAGEMENT_KEY = "stormancer.partymanagement";
+		public:
+			static constexpr const char* PARTY_PLUGIN_VERSION = "2019-10-11.1";
 
+		private:
 			void registerSceneDependencies(ContainerBuilder& builder, std::shared_ptr<Scene> scene) override
 			{
-				auto version = scene->getHostMetadata(PARTY_KEY);
-				if (version == PARTY_VERSION)
+				auto version = scene->getHostMetadata(details::PartyService::METADATA_KEY);
+				if (!version.empty())
 				{
 					builder.registerDependency<details::PartyService, Scene>().singleInstance();
 				}
 
-				version = scene->getHostMetadata(PARTYMANAGEMENT_KEY);
-				if (version == PARTYMANAGEMENT_VERSION)
+				version = scene->getHostMetadata(details::PartyManagementService::METADATA_KEY);
+				if (!version.empty())
 				{
 					builder.registerDependency<details::PartyManagementService, Scene>().singleInstance();
 				}
@@ -2019,7 +2025,7 @@ namespace Stormancer
 
 			void sceneCreated(std::shared_ptr<Scene> scene) override
 			{
-				if (scene->getHostMetadata(PARTY_KEY) == PARTY_VERSION)
+				if (!scene->getHostMetadata(details::PartyService::METADATA_KEY).empty())
 				{
 					scene->dependencyResolver().resolve<details::PartyService>()->initialize();
 				}
@@ -2043,8 +2049,11 @@ namespace Stormancer
 
 			void clientCreated(std::shared_ptr<IClient> client) override
 			{
-				client->setMedatata(PARTY_KEY, PARTY_VERSION);
-				client->setMedatata(PARTYMANAGEMENT_KEY, PARTYMANAGEMENT_VERSION);
+				client->setMedatata(details::PartyService::METADATA_KEY, details::PartyService::PROTOCOL_VERSION);
+				client->setMedatata(details::PartyManagementService::METADATA_KEY, details::PartyManagementService::PROTOCOL_VERSION);
+				
+				auto logger = client->dependencyResolver().resolve<ILogger>();
+				logger->log(LogLevel::Info, "PartyPlugin", "Registered Party plugin, version", PARTY_PLUGIN_VERSION);
 			}
 		};
 	}
