@@ -542,7 +542,13 @@ namespace Stormancer
 			{
 			public:
 
+				// stormancer.party => <protocol version>
+				// stormancer.party.revision => <server revision>
+				// Revision is server-side only. It is independent from protocol version. Revision changes when a modification is made to server code (e.g bugfix).
+				// Protocol version changes when a change to the communication protocol is made.
+				// Protocol versions between client and server are not obligated to match.
 				static constexpr const char* METADATA_KEY = "stormancer.party";
+				static constexpr const char* REVISION_METADATA_KEY = "stormancer.party.revision";
 				static constexpr const char* PROTOCOL_VERSION = "2019-08-30.1";
 
 				PartyService(std::weak_ptr<Scene> scene)
@@ -553,8 +559,10 @@ namespace Stormancer
 					, _dispatcher(scene.lock()->dependencyResolver().resolve<IActionDispatcher>())
 					, _myUserId(scene.lock()->dependencyResolver().resolve<Stormancer::Users::UsersApi>()->userId())
 				{
-					auto serverVersion = _scene.lock()->getHostMetadata(METADATA_KEY);
-					_logger->log(LogLevel::Info, "PartyService", "Protocol version: client=" + std::string(PROTOCOL_VERSION) + ", server=" + serverVersion);
+					auto serverProtocolVersion = _scene.lock()->getHostMetadata(METADATA_KEY);
+					auto serverRevision = _scene.lock()->getHostMetadata(REVISION_METADATA_KEY);
+					_logger->log(LogLevel::Info, "PartyService", "Protocol version: client=" + std::string(PROTOCOL_VERSION) + ", server=" + serverProtocolVersion);
+					_logger->log(LogLevel::Info, "PartyService", "Server revision=" + serverRevision);
 				}
 
 				~PartyService()
@@ -2005,7 +2013,14 @@ namespace Stormancer
 		class PartyPlugin : public IPlugin
 		{
 		public:
-			static constexpr const char* PARTY_PLUGIN_VERSION = "2019-10-11.1";
+			/// <summary>
+			/// Plugin-wide version, to increment every time there is a meaningful change (e.g bugfix...)
+			/// </summary>
+			/// <remarks>
+			/// Unlike protocol versions, its only purpose is to help debugging.
+			/// </remarks>
+			static constexpr const char* PARTY_PLUGIN_VERSION = "2019-10-11.2";
+			static constexpr const char* PLUGIN_METADATA_KEY = "stormancer.party.plugin";
 
 		private:
 			void registerSceneDependencies(ContainerBuilder& builder, std::shared_ptr<Scene> scene) override
@@ -2051,6 +2066,7 @@ namespace Stormancer
 			{
 				client->setMedatata(details::PartyService::METADATA_KEY, details::PartyService::PROTOCOL_VERSION);
 				client->setMedatata(details::PartyManagementService::METADATA_KEY, details::PartyManagementService::PROTOCOL_VERSION);
+				client->setMedatata(PLUGIN_METADATA_KEY, PARTY_PLUGIN_VERSION);
 				
 				auto logger = client->dependencyResolver().resolve<ILogger>();
 				logger->log(LogLevel::Info, "PartyPlugin", "Registered Party plugin, version", PARTY_PLUGIN_VERSION);
