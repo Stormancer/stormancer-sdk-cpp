@@ -28,20 +28,11 @@ namespace Stormancer
 			public:
 
 				SteamService(std::shared_ptr<Configuration> config, std::shared_ptr<IScheduler> scheduler)
+					: _wScheduler(scheduler)
+					, _wActionDispatcher(config->actionDispatcher)
 				{
 					_initAndRunSteam = config->additionalParameters.find(ConfigFieldInitAndRun) != config->additionalParameters.end() ? (config->additionalParameters.at(ConfigFieldInitAndRun) == "true") : false;
 					_forcedTicket = config->additionalParameters.find(ConfigFieldForcedTicket) != config->additionalParameters.end() ? config->additionalParameters.at(ConfigFieldForcedTicket) : "";
-
-					if (_initAndRunSteam)
-					{
-						scheduler->schedulePeriodic(100, [actionDispatcher = config->actionDispatcher]()
-						{
-							pplx::create_task([]()
-							{
-								SteamAPI_RunCallbacks();
-							}, actionDispatcher);
-						}, _cts.get_token());
-					}
 				}
 
 				~SteamService()
@@ -59,11 +50,30 @@ namespace Stormancer
 					return _forcedTicket;
 				}
 
+				void init()
+				{
+					auto scheduler = _wScheduler.lock();
+					auto actionDispatcher = _wActionDispatcher.lock();
+
+					if (_initAndRunSteam && scheduler && actionDispatcher)
+					{
+						scheduler->schedulePeriodic(100, [actionDispatcher = actionDispatcher]()
+						{
+							pplx::create_task([]()
+							{
+								SteamAPI_RunCallbacks();
+							}, actionDispatcher);
+						}, _cts.get_token());
+					}
+				}
+
 			private:
 
 				bool _initAndRunSteam = false;
 				std::string _forcedTicket;
 				pplx::cancellation_token_source _cts;
+				std::weak_ptr<IScheduler> _wScheduler;
+				std::weak_ptr<IActionDispatcher> _wActionDispatcher;
 			};
 		}
 
@@ -176,11 +186,12 @@ namespace Stormancer
 
 			void clientCreated(std::shared_ptr<IClient> client)
 			{
-				client->dependencyResolver().resolve<Details::SteamService>(); // Create the single instance steam service
+				auto steamService = client->dependencyResolver().resolve<Details::SteamService>();
+				steamService->init();
 			}
 		};
 
-		void SteamAuthenticationEventHandler::onAuthSessionTicket(GetAuthSessionTicketResponse_t* pCallback)
+		inline void SteamAuthenticationEventHandler::onAuthSessionTicket(GetAuthSessionTicketResponse_t* pCallback)
 		{
 			std::lock_guard<std::recursive_mutex> lg(_mutex);
 
