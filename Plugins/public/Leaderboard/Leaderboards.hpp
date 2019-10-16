@@ -1,8 +1,6 @@
 #pragma once
 #include "Users/ClientAPI.hpp"
 #include "stormancer/IPlugin.h"
-#include "stormancer/Scene.h"
-#include "stormancer/RPC/Service.h"
 
 namespace Stormancer
 {
@@ -25,9 +23,10 @@ namespace Stormancer
 		struct ScoreFilter
 		{
 			ComparisonOperator type;
-			int32 value = 0;
+			std::string path;
+			float value = 0;
 
-			MSGPACK_DEFINE(type, value);
+			MSGPACK_DEFINE(type, path, value);
 		};
 
 		struct FieldFilter
@@ -54,12 +53,14 @@ namespace Stormancer
 			///</summary>
 			std::string scorePath;
 
-			
+
 			MSGPACK_DEFINE(startId, scoreFilters, fieldFilters, size, skip, leaderboardName, friendsIds, order, scorePath);
 		};
 		template<typename T>
 		struct Score
 		{
+
+
 			std::string id;
 			T scores;
 			int64 createdOn = 0;
@@ -88,22 +89,25 @@ namespace Stormancer
 			MSGPACK_DEFINE(leaderboardName, results, next, previous, total);
 		};
 
-		
+
 
 		class LeaderboardPlugin;
-		
+
 		namespace details
 		{
 			class LeaderboardService
 			{
 			public:
 
-				LeaderboardService(std::weak_ptr<Scene> scene, std::shared_ptr<RpcService> rpc)
-					: _scene(scene)
-					, _rpcService(rpc)
-				{
-				}
 
+
+				LeaderboardService(std::weak_ptr<Scene> scene, std::shared_ptr<RpcService> rpc)
+				{
+					_scene = scene;
+
+					_rpcService = rpc;
+
+				}
 				//Query a leaderboard
 				template<typename T>
 				pplx::task<LeaderboardResult<T>> query(LeaderboardQuery query)
@@ -118,11 +122,16 @@ namespace Stormancer
 					return _rpcService->rpc<LeaderboardResult<T>>("leaderboard.cursor", cursor);
 				}
 
+
 			private:
+
 
 				std::weak_ptr<Scene> _scene;
 				std::shared_ptr<RpcService> _rpcService;
+
 			};
+
+
 		}
 
 		class Leaderboard : public Stormancer::ClientAPI<Leaderboard>
@@ -139,7 +148,7 @@ namespace Stormancer
 			pplx::task<LeaderboardResult<T>> query(LeaderboardQuery query)
 			{
 				return getLeaderboardService()
-					.then([query](std::shared_ptr<details::LeaderboardService> service)
+					.then([query](std::shared_ptr<Stormancer::Leaderboards::details::LeaderboardService> service)
 						{
 							return service->query<T>(query);
 						});
@@ -150,10 +159,16 @@ namespace Stormancer
 			pplx::task<LeaderboardResult<T>> query(const std::string& cursor)
 			{
 				return getLeaderboardService()
-					.then([cursor](std::shared_ptr<details::LeaderboardService> service)
+					.then([cursor](std::shared_ptr<Stormancer::Leaderboards::details::LeaderboardService> service)
 						{
 							return service->query<T>(cursor);
 						});
+			}
+
+		private:
+			pplx::task<std::shared_ptr<Stormancer::Leaderboards::details::LeaderboardService>> getLeaderboardService()
+			{
+				return this->getService<Stormancer::Leaderboards::details::LeaderboardService>("stormancer.plugins.leaderboards");
 			}
 		};
 
