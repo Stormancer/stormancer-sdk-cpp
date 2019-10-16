@@ -296,10 +296,10 @@ namespace Stormancer
 		auto request = getPendingRequest(packet);
 		if (request)
 		{
-#ifdef STORMANCER_LOG_RPC
+ 
 			auto idStr = std::to_string(request->id);
 			_logger->log(LogLevel::Trace, "RpcService", "RPC next", "id: " + idStr + ", route: " + request->route);
-#endif
+
 			request->observer.on_next(packet);
 			request->waitingForDataTce.set();
 		}
@@ -310,10 +310,10 @@ namespace Stormancer
 		auto request = getPendingRequest(packet);
 		if (request)
 		{
-#ifdef STORMANCER_LOG_RPC
+
 			auto idStr = std::to_string(request->id);
 			_logger->log(LogLevel::Trace, "RpcService", "RPC error", "id: " + idStr + ", route: " + request->route);
-#endif
+
 			request->hasCompleted = true;
 
 			std::string msg = _serializer.deserializeOne<std::string>(packet->stream);
@@ -335,11 +335,11 @@ namespace Stormancer
 		auto request = getPendingRequest(packet);
 		if (request)
 		{
-#ifdef STORMANCER_LOG_RPC
+
 			auto idStr = std::to_string(request->id);
 			std::string messageSentStr = std::string() + "messageSent: " + (messageSent ? "true" : "false");
 			_logger->log(LogLevel::Trace, "RpcService", "RPC complete", "id: " + idStr + ", route: " + request->route + ", " + messageSentStr);
-#endif
+
 			request->hasCompleted = true;
 
 			pplx::task<void> waitingForDataTask = pplx::create_task(request->waitingForDataTce);

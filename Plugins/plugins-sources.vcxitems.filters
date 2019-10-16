@@ -31,12 +31,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Invitations\InvitationsPlugin.cpp">
       <Filter>private\Invitations</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Leaderboard\LeaderboardPlugin.cpp">
-      <Filter>private\Leaderboard</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Leaderboard\LeaderboardService.cpp">
-      <Filter>private\Leaderboard</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)private\PlayerReport\PlayerReportPlugin.cpp">
       <Filter>private\PlayerReport</Filter>
     </ClCompile>
@@ -120,12 +114,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Leaderboard\Leaderboard_Impl.h">
-      <Filter>private\Leaderboard</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Leaderboard\LeaderboardService.h">
-      <Filter>private\Leaderboard</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\AssetsStorage\AssetsStorageDto.h">
       <Filter>public\AssetsStorage</Filter>
     </ClInclude>
@@ -152,9 +140,6 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Invitations\InvitationsPlugin.h">
       <Filter>public\Invitations</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\Leaderboard.h">
-      <Filter>public\Leaderboard</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\PlayerData\PlayerDataService.h">
       <Filter>public\PlayerData</Filter>
@@ -279,12 +264,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Helloworld\HelloworldPlugin.h">
       <Filter>public\Helloworld</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\LeaderboardModels.h">
-      <Filter>public\Leaderboard</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\LeaderboardPlugin.h">
-      <Filter>public\Leaderboard</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Profile\ProfilePrivateModels.h">
       <Filter>private\Profile</Filter>
     </ClInclude>
@@ -335,6 +314,9 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameFinder\GameFinder.hpp">
       <Filter>public\GameFinder</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\Leaderboards.hpp">
+      <Filter>public\Leaderboard</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -406,9 +388,6 @@
     </Filter>
     <Filter Include="private\Invitations">
       <UniqueIdentifier>{74d72b69-01eb-4b8b-bed3-ca932dc2e366}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="private\Leaderboard">
-      <UniqueIdentifier>{505ca0d9-e105-4f2d-b559-30c95aa5c303}</UniqueIdentifier>
     </Filter>
     <Filter Include="private\Members">
       <UniqueIdentifier>{878f93cd-5420-4e25-9bb1-3a793df49f91}</UniqueIdentifier>

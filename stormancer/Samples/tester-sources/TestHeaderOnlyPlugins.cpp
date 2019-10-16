@@ -9,3 +9,4 @@
 #include "Party/Party.hpp"
 #include "GameFinder/GameFinder.hpp"
 #include "ServerPool/ServerPools.hpp"
+#include "Leaderboard/Leaderboards.hpp"

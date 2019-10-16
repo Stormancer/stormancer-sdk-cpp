@@ -35,8 +35,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)private\InAppNotification\InAppNotification_Impl.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Invitations\Invitations.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Invitations\InvitationsPlugin.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Leaderboard\LeaderboardPlugin.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Leaderboard\LeaderboardService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Members\OrganizationsContainer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Members\OrganizationsPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Members\OrganizationsService.cpp" />
@@ -66,8 +64,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameFinder\GameFinder.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameSession\Gamesessions.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Helloworld\Helloworld.hpp" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\LeaderboardModels.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\LeaderboardPlugin.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\Leaderboards.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Messaging\Messaging.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Messaging\MessagingModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Party\Party.hpp" />
@@ -89,8 +86,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)private\InAppNotification\InAppNotificationPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\InAppNotification\InAppNotificationService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\InAppNotification\InAppNotification_Impl.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Leaderboard\LeaderboardService.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Leaderboard\Leaderboard_Impl.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Members\OrganizationsContainer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Members\OrganizationsPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Members\OrganizationsService.h" />
@@ -112,7 +107,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\InAppNotification\InAppNotificationModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Invitations\Invitations.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Invitations\InvitationsPlugin.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\Leaderboard.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Members\Organizations.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Persistence\PersistenceModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Persistence\PersistenceService.h" />
