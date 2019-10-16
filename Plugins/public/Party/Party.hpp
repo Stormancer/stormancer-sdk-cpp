@@ -1530,7 +1530,7 @@ namespace Stormancer
 					return _party->get()->isLeader();
 				}
 
-				std::vector<std::string> getSentPendingInvitations()
+				std::vector<std::string> getSentPendingInvitations() override
 				{
 					std::vector<std::string> pendingInvitations;
 					if (!_party || !_party->is_done())
@@ -1688,7 +1688,7 @@ namespace Stormancer
 						});
 				}
 
-				pplx::task<void> cancelPartyInvitation(std::string recipient)
+				pplx::task<void> cancelPartyInvitation(std::string recipient) override
 				{
 					if (!isInParty())
 					{
