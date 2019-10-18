@@ -34,7 +34,10 @@ namespace Stormancer
 		_tests.push_back([this]() { test_Ping_Cluster(); });
 		_tests.push_back([this]() { test_clean(); });
 		_tests.push_back([this]() { test_users(); });
-		//_tests.push_back([this]() { test_party(); });
+#ifdef _WIN32
+		// Currently, this test doesn't work on platforms that don't have native ppl support, because of too many clients.
+		_tests.push_back([this]() { test_party(); });
+#endif
 
 		for (const auto& test : get_static_tests())
 		{
