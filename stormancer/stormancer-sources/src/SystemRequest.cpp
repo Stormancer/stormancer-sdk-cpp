@@ -47,28 +47,6 @@ namespace Stormancer
 		return false;
 	}
 
-	bool SystemRequest::trySetException(const std::exception& ex)
-	{
-		if (!_complete)
-		{
-			bool shouldSet = false;
-			{
-				std::lock_guard<std::recursive_mutex> lg(_mutex);
-				if (!_complete)
-				{
-					_complete = true;
-					shouldSet = true;
-				}
-			}
-			if (shouldSet)
-			{
-				_tce.set_exception(ex);
-				return true;
-			}
-		}
-		return false;
-	}
-
 	pplx::task<Packet_ptr> SystemRequest::getTask(pplx::task_options options) const
 	{
 		return pplx::create_task(_tce, options);

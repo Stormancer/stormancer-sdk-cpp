@@ -34,7 +34,12 @@ namespace Stormancer
 		_tests.push_back([this]() { test_Ping_Cluster(); });
 		_tests.push_back([this]() { test_clean(); });
 		_tests.push_back([this]() { test_users(); });
-		_tests.push_back([this]() { test_party(); });
+		//_tests.push_back([this]() { test_party(); });
+
+		for (const auto& test : get_static_tests())
+		{
+			_tests.emplace_back([this, test]() { test(*this); });
+		}
 
 		// Some platforms require a Client to be created before using pplx::task
 		test_create();
@@ -332,23 +337,21 @@ namespace Stormancer
 					{
 						onConnectionRejected(p);
 					});
-			}).then([this, client2](std::shared_ptr<Scene>)
+			}).then([client2](std::shared_ptr<Scene>)
 				{
 					return client2->connectToPublicScene("test-connection-rejected-scene");
 				}).then([](pplx::task<std::shared_ptr<Scene>> task)
 					{
 						try
 						{
-
 							task.get();
-
 						}
 						catch (const std::exception& ex)
 						{
 							std::string msg(ex.what());
 							if (msg != "Rejected")
 							{
-								throw std::runtime_error("Wrong exception message: " + msg + ", should be 'Rejected'");
+								throw std::runtime_error("Wrong exception message: '" + msg + "', should be 'Rejected'");
 							}
 							return;
 						}

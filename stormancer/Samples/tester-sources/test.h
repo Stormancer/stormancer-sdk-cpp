@@ -13,6 +13,19 @@ namespace Stormancer
 	{
 	public:
 
+#pragma region public_static_methods
+
+		static void add_test(std::function<void(const Tester&)> test)
+		{
+			get_static_tests().push_back([movedTest = std::move(test)](Tester& tester)
+			{
+				movedTest(tester);
+				tester.execNextTest();
+			});
+		}
+
+#pragma endregion
+
 #pragma region public_methods
 
 		Tester(std::string endpoint, std::string account, std::string application, std::string sceneId)
@@ -88,6 +101,17 @@ namespace Stormancer
 		void test_streams();
 		void test_users();
 		void test_party();
+
+#pragma endregion
+
+#pragma region private_static_members
+
+		// This is a getter to avoid initialization ordering issues
+		static std::vector<std::function<void(Tester&)>>& get_static_tests()
+		{
+			static std::vector<std::function<void(Tester&)>> static_vector;
+			return static_vector;
+		}
 
 #pragma endregion
 

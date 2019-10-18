@@ -18,7 +18,31 @@ namespace Stormancer
 		byte operation() const;
 		bool completed() const;
 		bool trySet(Packet_ptr packet);
-		bool trySetException(const std::exception& ex);
+
+		// This methos needs to be templated to avoid slicing the exception.
+		template<typename TEx>
+		bool trySetException(TEx exception)
+		{
+			if (!_complete)
+			{
+				bool shouldSet = false;
+				{
+					std::lock_guard<std::recursive_mutex> lg(_mutex);
+					if (!_complete)
+					{
+						_complete = true;
+						shouldSet = true;
+					}
+				}
+				if (shouldSet)
+				{
+					_tce.set_exception(exception);
+					return true;
+				}
+			}
+			return false;
+		}
+
 		pplx::task<Packet_ptr> getTask(pplx::task_options options) const;
 		pplx::cancellation_token getToken() const;
 		void setLastRefresh(std::chrono::system_clock::time_point lastRefresh);
