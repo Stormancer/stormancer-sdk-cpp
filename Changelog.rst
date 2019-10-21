@@ -24,6 +24,8 @@ Fixed
 *****
 
 - Disconnect From Scene system requests issued from server to client are now properly handled.
+- System Request error messages sent from the server are now properly forwarded up to the calling client code across all platforms.
+- Prevent a rare crash in RakNetTransport during client disconnection.
 
 .. _v1.8:
 

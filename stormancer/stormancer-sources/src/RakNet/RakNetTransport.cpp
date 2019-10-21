@@ -431,7 +431,9 @@ namespace Stormancer
 						}
 					}
 					}
-					if (rakNetPacket && _peer->IsActive())
+					// The transport might have been stopped (and thus, the _peer deleted) as a result of the packet processed above.
+					// Do not try to access _peer in this case.
+					if (_peer && rakNetPacket && _peer->IsActive())
 					{
 						_peer->DeallocatePacket(rakNetPacket);
 						rakNetPacket = nullptr;
