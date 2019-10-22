@@ -160,7 +160,7 @@ namespace Stormancer
 		try
 		{
 			RakNet::Packet* rakNetPacket = nullptr;
-			while ((rakNetPacket = _peer->Receive()) != nullptr)
+			while (_peer && (rakNetPacket = _peer->Receive()) != nullptr)
 			{
 				if (rakNetPacket->length == 0)
 				{
