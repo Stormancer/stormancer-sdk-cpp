@@ -618,37 +618,7 @@ namespace Stormancer
 					update.memberStatus.emplace_back(MemberStatusUpdate{ _myUserId, newStatus });
 					applyMemberStatusUpdate(update);
 
-					MemberStatusUpdateRequest request;
-					request.desiredStatus = newStatus;
-					request.localSettingsVersion = _state.settings.settingsVersionNumber;
-
-					if (request.desiredStatus == PartyUserStatus::NotReady)
-					{
-						return syncStateOnError(_rpcService->rpc<void>("party.updategamefinderplayerstatus", request));
-					}
-
-					// When setting our status to Ready, we need to account for the case when the settings change during the ready RPC
-					std::weak_ptr<PartyService> wThat = this->shared_from_this();
-					return syncStateOnError(_gameFinderConnectionTask.then([request, wThat](pplx::task<void> task)
-						{
-							// I let GameFinder connection errors propagate as unspecified errors to the caller.
-							// I don't see any good in creating a specific error type for these, since they most likely mean there's a bug
-							task.wait();
-
-							if (auto that = wThat.lock())
-							{
-								std::lock_guard<std::recursive_mutex> lg(that->_stateMutex);
-
-								if (request.localSettingsVersion != that->_state.settings.settingsVersionNumber)
-								{
-									throw std::runtime_error(PartyError::Str::SettingsOutdated);
-								}
-
-								return that->_rpcService->rpc<void>("party.updategamefinderplayerstatus", request);
-							}
-
-							return pplx::task_from_result();
-						}));
+					return syncStateOnError(updatePlayerStatusWithRetries(newStatus));
 				}
 
 				/// 
@@ -953,35 +923,108 @@ namespace Stormancer
 				// This returns void because we must not block on it (or else we would cause a timeout in party update RPC)
 				void syncPartyState()
 				{
-					if (_isPendingStateSync)
+					syncPartyStateTask().then([](pplx::task<void> task)
 					{
-						return;
-					}
-					_isPendingStateSync = true;
-					auto logger = _logger;
+						try { task.get(); }
+						catch (...) {}
+					});
+				}
+
+				pplx::task<void> syncPartyStateTaskWithRetries()
+				{
 					std::weak_ptr<PartyService> wThat = this->shared_from_this();
-					_rpcService->rpc("party.getpartystate").then([logger, wThat](pplx::task<void> task)
+					return _rpcService->rpc("party.getpartystate").then([wThat](pplx::task<void> task)
+					{
+						try
 						{
-							bool success = true;
-							try
+							task.get();
+						}
+						catch (const std::exception& ex)
+						{
+							if (auto that = wThat.lock())
 							{
-								success = task.wait() == pplx::completed;
-							}
-							catch (const std::exception& ex)
-							{
-								logger->log(LogLevel::Error, "PartyService::syncPartyState", "Error in party.getpartystate RPC", ex);
-								success = false;
-							}
-							// In case of success, _isPendingStateSync is reset in the party.getPartyStateResponse handler.
-							if (!success)
-							{
-								if (auto that = wThat.lock())
+								that->_logger->log(LogLevel::Error, "PartyService::syncPartyStateTaskWithRetries", "An error occurred during syncPartyState, retrying", ex);
+								return taskDelay(std::chrono::milliseconds(200))
+									.then([wThat]
 								{
-									std::lock_guard<std::recursive_mutex> lg(that->_stateMutex);
-									that->_isPendingStateSync = false;
+									if (auto that = wThat.lock())
+									{
+										return that->syncPartyStateTaskWithRetries();
+									}
+									return pplx::task_from_result();
+								});
+							}
+						}
+						return pplx::task_from_result();
+					});
+				}
+
+				pplx::task<void> syncPartyStateTask()
+				{
+					std::lock_guard<std::recursive_mutex> lg(_stateMutex);
+
+					if (_stateSyncRequest.is_done())
+					{
+						_stateSyncRequest = syncPartyStateTaskWithRetries();
+					}
+
+					return _stateSyncRequest;
+				}
+
+				pplx::task<void> updatePlayerStatusWithRetries(const PartyUserStatus newStatus)
+				{
+					std::lock_guard<std::recursive_mutex> lg(_stateMutex);
+
+					MemberStatusUpdateRequest request;
+					request.desiredStatus = newStatus;
+					request.localSettingsVersion = _state.settings.settingsVersionNumber;
+
+					// If the player wants to be Ready, we must make sure they are connected to the game finder beforehand
+					pplx::task<void> preliminaryTask = pplx::task_from_result();
+					if (newStatus == PartyUserStatus::Ready)
+					{
+						preliminaryTask = _gameFinderConnectionTask;
+					}
+
+					std::weak_ptr<PartyService> wThat = this->shared_from_this();
+					return preliminaryTask.then([wThat, request]
+					{
+						if (auto that = wThat.lock())
+						{
+							return that->_rpcService->rpc<void>("party.updategamefinderplayerstatus", request);
+						}
+						return pplx::task_from_result();
+					}).then([wThat, newStatus](pplx::task<void> task)
+					{
+						try
+						{
+							task.get();
+						}
+						catch (const std::exception& ex)
+						{
+							if (auto that = wThat.lock())
+							{
+								if (strcmp(ex.what(), PartyError::Str::SettingsOutdated) == 0)
+								{
+									that->_logger->log(LogLevel::Debug, "PartyService::updatePlayerStatusWithRetries", "Local settings outdated ; retrying");
+									return that->syncPartyStateTask()
+										.then([wThat, newStatus]
+									{
+										if (auto that = wThat.lock())
+										{
+											return that->updatePlayerStatusWithRetries(newStatus);
+										}
+										return pplx::task_from_result();
+									});
+								}
+								else
+								{
+									throw;
 								}
 							}
-						});
+						}
+						return pplx::task_from_result();
+					});
 				}
 
 				pplx::task<void> handlePartyStateResponse(RpcRequestContext_ptr ctx)
@@ -994,7 +1037,6 @@ namespace Stormancer
 					updateLeader();
 					updateGameFinder();
 					_partyStateReceived.set();
-					_isPendingStateSync = false;
 					this->UpdatedPartySettings(_state.settings);
 					this->UpdatedPartyMembers(_state.members);
 
@@ -1193,7 +1235,7 @@ namespace Stormancer
 				pplx::cancellation_token_source _gameFinderConnectionCts;
 				// Used to signal to client code when the party is ready
 				pplx::task_completion_event<void> _partyStateReceived;
-				bool _isPendingStateSync = false;
+				pplx::task<void> _stateSyncRequest = pplx::task_from_result();
 			};
 
 			class PartyContainer
@@ -2014,12 +2056,12 @@ namespace Stormancer
 		{
 		public:
 			/// <summary>
-			/// Plugin-wide version, to increment every time there is a meaningful change (e.g bugfix...)
+			/// Plugin-wide revision, to increment every time there is a meaningful change (e.g bugfix...)
 			/// </summary>
 			/// <remarks>
 			/// Unlike protocol versions, its only purpose is to help debugging.
 			/// </remarks>
-			static constexpr const char* PARTY_PLUGIN_VERSION = "2019-10-11.2";
+			static constexpr const char* PARTY_PLUGIN_REVISION = "2019-10-23.1";
 			static constexpr const char* PLUGIN_METADATA_KEY = "stormancer.party.plugin";
 
 		private:
@@ -2066,10 +2108,10 @@ namespace Stormancer
 			{
 				client->setMedatata(details::PartyService::METADATA_KEY, details::PartyService::PROTOCOL_VERSION);
 				client->setMedatata(details::PartyManagementService::METADATA_KEY, details::PartyManagementService::PROTOCOL_VERSION);
-				client->setMedatata(PLUGIN_METADATA_KEY, PARTY_PLUGIN_VERSION);
+				client->setMedatata(PLUGIN_METADATA_KEY, PARTY_PLUGIN_REVISION);
 				
 				auto logger = client->dependencyResolver().resolve<ILogger>();
-				logger->log(LogLevel::Info, "PartyPlugin", "Registered Party plugin, version", PARTY_PLUGIN_VERSION);
+				logger->log(LogLevel::Info, "PartyPlugin", "Registered Party plugin, revision", PARTY_PLUGIN_REVISION);
 			}
 		};
 	}
