@@ -549,7 +549,7 @@ namespace Stormancer
 				// Protocol versions between client and server are not obligated to match.
 				static constexpr const char* METADATA_KEY = "stormancer.party";
 				static constexpr const char* REVISION_METADATA_KEY = "stormancer.party.revision";
-				static constexpr const char* PROTOCOL_VERSION = "2019-08-30.1";
+				static constexpr const char* PROTOCOL_VERSION = "2019-10-23.1";
 
 				PartyService(std::weak_ptr<Scene> scene)
 					: _scene(scene)
@@ -559,9 +559,9 @@ namespace Stormancer
 					, _dispatcher(scene.lock()->dependencyResolver().resolve<IActionDispatcher>())
 					, _myUserId(scene.lock()->dependencyResolver().resolve<Stormancer::Users::UsersApi>()->userId())
 				{
-					auto serverProtocolVersion = _scene.lock()->getHostMetadata(METADATA_KEY);
+					_serverProtocolVersion = _scene.lock()->getHostMetadata(METADATA_KEY);
 					auto serverRevision = _scene.lock()->getHostMetadata(REVISION_METADATA_KEY);
-					_logger->log(LogLevel::Info, "PartyService", "Protocol version: client=" + std::string(PROTOCOL_VERSION) + ", server=" + serverProtocolVersion);
+					_logger->log(LogLevel::Info, "PartyService", "Protocol version: client=" + std::string(PROTOCOL_VERSION) + ", server=" + _serverProtocolVersion);
 					_logger->log(LogLevel::Info, "PartyService", "Server revision=" + serverRevision);
 				}
 
@@ -930,10 +930,29 @@ namespace Stormancer
 					});
 				}
 
+				pplx::task<void> getPartyStateImpl()
+				{
+					if (_serverProtocolVersion == "2019-08-30.1")
+					{
+						return _rpcService->rpc("party.getpartystate");
+					}
+					else
+					{
+						std::weak_ptr<PartyService> wThat = this->shared_from_this();
+						return _rpcService->rpc<PartyState>("party.getpartystate2").then([wThat](PartyState state)
+						{
+							if (auto that = wThat.lock())
+							{
+								that->applyPartyStateResponse(state);
+							}
+						});
+					}
+				}
+
 				pplx::task<void> syncPartyStateTaskWithRetries()
 				{
 					std::weak_ptr<PartyService> wThat = this->shared_from_this();
-					return _rpcService->rpc("party.getpartystate").then([wThat](pplx::task<void> task)
+					return getPartyStateImpl().then([wThat](pplx::task<void> task)
 					{
 						try
 						{
@@ -1031,16 +1050,23 @@ namespace Stormancer
 				{
 					std::lock_guard<std::recursive_mutex> lg(_stateMutex);
 
-					_state = ctx->readObject<PartyState>();
-					_logger->log(LogLevel::Trace, "PartyService::handlePartyStateResponse", "Received party state, version = " + std::to_string(_state.version));
+					applyPartyStateResponse(ctx->readObject<PartyState>());
+
+					return pplx::task_from_result();
+				}
+
+				void applyPartyStateResponse(PartyState state)
+				{
+					std::lock_guard<std::recursive_mutex> lg(_stateMutex);
+
+					_state = std::move(state);
+					_logger->log(LogLevel::Trace, "PartyService::applyPartyStateResponse", "Received party state, version = " + std::to_string(_state.version));
 
 					updateLeader();
 					updateGameFinder();
 					_partyStateReceived.set();
 					this->UpdatedPartySettings(_state.settings);
 					this->UpdatedPartyMembers(_state.members);
-
-					return pplx::task_from_result();
 				}
 
 				void applySettingsUpdate(const PartySettingsInternal& update)
@@ -1236,6 +1262,7 @@ namespace Stormancer
 				// Used to signal to client code when the party is ready
 				pplx::task_completion_event<void> _partyStateReceived;
 				pplx::task<void> _stateSyncRequest = pplx::task_from_result();
+				std::string _serverProtocolVersion;
 			};
 
 			class PartyContainer
@@ -2061,7 +2088,7 @@ namespace Stormancer
 			/// <remarks>
 			/// Unlike protocol versions, its only purpose is to help debugging.
 			/// </remarks>
-			static constexpr const char* PARTY_PLUGIN_REVISION = "2019-10-23.1";
+			static constexpr const char* PARTY_PLUGIN_REVISION = "2019-10-23.2";
 			static constexpr const char* PLUGIN_METADATA_KEY = "stormancer.party.plugin";
 
 		private:
