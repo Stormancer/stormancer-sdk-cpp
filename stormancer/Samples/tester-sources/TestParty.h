@@ -862,6 +862,13 @@ private:
 			tasks.push_back(awaitMembersConsistency(clients, desiredMembers));
 			tasks.push_back(awaitSettingsConsistency(clients, desiredSettings));
 			return when_all_handle_exceptions(tasks);
+		})
+			.then([parties]
+		{
+			// Reset everyone to NotReady so that the next tests do not fail
+			std::vector<pplx::task<void>> tasks;
+			std::transform(parties.begin(), parties.end(), std::back_inserter(tasks), [](auto party) { return party->updatePlayerStatus(Stormancer::Party::PartyUserStatus::NotReady); });
+			return when_all_handle_exceptions(tasks);
 		});
 	}
 
