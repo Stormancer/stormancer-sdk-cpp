@@ -434,6 +434,15 @@ namespace Stormancer
 			virtual ~IPartyEventHandler() = default;
 
 			/// <summary>
+			/// This event is fired during the initialization of a party scene that is being joined.
+			/// </summary>
+			/// <remarks>
+			/// This event enables you to add handlers for custom routes and server-to-client RPCs.
+			/// </remarks>
+			/// <param name="partyScene">Scene of the party you are currently joining.</param>
+			virtual void onPartySceneInitialization(std::shared_ptr<Scene> partyScene) {}
+
+			/// <summary>
 			/// This event is fired when a Party has been joined, before the completion of createParty()/joinParty() tasks.
 			/// </summary>
 			/// <remarks>
@@ -446,7 +455,10 @@ namespace Stormancer
 			/// A task that should complete when your custom operation is done.
 			/// If this task is faulted or canceled, the user will be disconnected from the party immediately.
 			/// </returns>
-			virtual pplx::task<void> onJoiningParty(std::shared_ptr<PartyApi> party, std::string partySceneId) = 0;
+			virtual pplx::task<void> onJoiningParty(std::shared_ptr<PartyApi> party, std::string partySceneId)
+			{
+				return pplx::task_from_result();
+			}
 
 			/// <summary>
 			/// This event is fired upon leaving the Party you were previously in.
@@ -461,7 +473,10 @@ namespace Stormancer
 			/// <returns>
 			/// A task that should complete when your custom operation is done.
 			/// </returns>
-			virtual pplx::task<void> onLeavingParty(std::shared_ptr<PartyApi> party, std::string partySceneId) = 0;
+			virtual pplx::task<void> onLeavingParty(std::shared_ptr<PartyApi> party, std::string partySceneId)
+			{
+				return pplx::task_from_result();
+			}
 		};
 
 		namespace details
@@ -1889,12 +1904,28 @@ namespace Stormancer
 				Event<GameFinder::GameFinderResponse> _onGameFound;
 				Event<PartyGameFinderFailure> _onGameFinderFailure;
 
+				void runSceneInitEventHandlers(std::shared_ptr<Scene> scene)
+				{
+					for (const auto& handler : _eventHandlers)
+					{
+						handler->onPartySceneInitialization(scene);
+					}
+				}
+
 				pplx::task<std::shared_ptr<PartyContainer>> getPartySceneByToken(const std::string& token)
 				{
 					auto users = _users.lock();
 					auto wThat = this->weak_from_this();
 
-					return users->connectToPrivateSceneByToken(token).then([wThat](std::shared_ptr<Scene> scene)
+					return users->connectToPrivateSceneByToken(token,
+						[wThat](std::shared_ptr<Scene> scene)
+						{
+							if (auto that = wThat.lock())
+							{
+								that->runSceneInitEventHandlers(scene);
+							}
+						})
+						.then([wThat](std::shared_ptr<Scene> scene)
 						{
 							auto that = wThat.lock();
 							if (!that)

@@ -54,6 +54,44 @@ private:
 		}
 	};
 
+	class TestPartyEventHandler : public Stormancer::Party::IPartyEventHandler
+	{
+	public:
+		class Plugin : public Stormancer::IPlugin
+		{
+			void registerClientDependencies(Stormancer::ContainerBuilder& builder)
+			{
+				builder.registerDependency<TestPartyEventHandler>().as<Stormancer::Party::IPartyEventHandler>().asSelf().singleInstance();
+			}
+		};
+
+		pplx::task<void> awaitUpdatingSettings()
+		{
+			return pplx::create_task(updatingSettingsTce);
+		}
+
+		void completeSettingsRdv()
+		{
+			rdvCompleteTce.set();
+		}
+
+	private:
+		void onPartySceneInitialization(std::shared_ptr<Stormancer::Scene> scene) override
+		{
+			auto rpc = scene->dependencyResolver().resolve<Stormancer::RpcService>();
+
+			rpc->addProcedure("test.party.updateSettingsRdv", [this](Stormancer::RpcRequestContext_ptr ctx)
+			{
+				updatingSettingsTce.set();
+				return pplx::create_task(rdvCompleteTce);
+			});
+		}
+
+		pplx::task_completion_event<void> updatingSettingsTce;
+		pplx::task_completion_event<void> rdvCompleteTce;
+	};
+
+
 	static pplx::task<std::shared_ptr<Stormancer::IClient>> makeClient(const Stormancer::Tester& tester, bool useLogger, Stormancer::IPlugin* additionalPlugin = nullptr)
 	{
 		using namespace Stormancer;
@@ -66,6 +104,7 @@ private:
 		conf->addPlugin(new Users::UsersPlugin);
 		conf->addPlugin(new GameFinder::GameFinderPlugin);
 		conf->addPlugin(new Party::PartyPlugin);
+		conf->addPlugin(new TestPartyEventHandler::Plugin);
 		if (additionalPlugin)
 		{
 			conf->addPlugin(additionalPlugin);
@@ -218,6 +257,10 @@ private:
 		tester.logger()->log(LogLevel::Info, "TestParty::testFindGame", "Running a GameFinder request for both parties...");
 		testFindGame(clients, clients2).get();
 		tester.logger()->log(LogLevel::Info, "TestParty", "testFindGame PASSED");
+
+		tester.logger()->log(LogLevel::Info, "TestParty", "testChangeGameFinderWhileSetReady");
+		testChangeGameFinderWhileSetReady(clients).get();
+		tester.logger()->log(LogLevel::Info, "TestParty", "testChangeGameFinderWhileSetReady PASSED");
 
 		tester.logger()->log(LogLevel::Info, "TestParty", "testKickPlayer");
 		testKickPlayer(clients).get();
@@ -768,6 +811,58 @@ private:
 			pplx::create_task(kickedTce),
 			awaitMembersConsistency(remainingClients, expectedMembers, std::chrono::seconds(5))
 		}).then([sub] {});
+	}
+
+	static std::vector<std::shared_ptr<Stormancer::Party::PartyApi>> getParties(const std::vector<std::shared_ptr<Stormancer::IClient>>& clients)
+	{
+		std::vector<std::shared_ptr<Stormancer::Party::PartyApi>> parties;
+		parties.reserve(clients.size());
+
+		std::transform(clients.begin(), clients.end(), std::back_inserter(parties), [](const auto& client) { return getParty(client); });
+		return parties;
+	}
+
+	static pplx::task<void> testChangeGameFinderWhileSetReady(const std::vector<std::shared_ptr<Stormancer::IClient>>& clients)
+	{
+		using namespace Stormancer;
+		using namespace TestHelpers;
+
+		auto parties = getParties(clients);
+		int leader = getLeader(clients);
+		std::vector<pplx::task<void>> tasks;
+
+		auto settings = parties[leader]->getPartySettings();
+		settings.customData = "testChangeGameFinderSettingsOutdated";
+		tasks.push_back(taskFailAfterTimeout(parties[leader]->updatePartySettings(settings), "updatePartySettings took too long", std::chrono::seconds(10)));
+
+		std::vector<Party::PartyUserDto> desiredMembers;
+		auto desiredSettings = parties[leader]->getPartySettings();
+		desiredSettings.customData = "testChangeGameFinderSettingsOutdated";
+		desiredSettings.gameFinderName = "testGameFinder2";
+
+		for (auto client : clients)
+		{
+			auto handler = client->dependencyResolver().resolve<TestPartyEventHandler>();
+			tasks.push_back(taskFailAfterTimeout(handler->awaitUpdatingSettings(), "awaitUpdatingSettings took too long", std::chrono::seconds(10))
+				.then([tasks, client, handler]
+			{
+				auto task = getParty(client)->updatePlayerStatus(Party::PartyUserStatus::Ready);
+				handler->completeSettingsRdv();
+				return taskFailAfterTimeout(task, "updatePlayerStatus took too long", std::chrono::seconds(10));
+			}));
+			auto member = getParty(client)->getLocalMember();
+			member.partyUserStatus = Party::PartyUserStatus::Ready;
+			desiredMembers.push_back(member);
+		}
+
+		return when_all_handle_exceptions(tasks)
+			.then([desiredMembers, desiredSettings, clients]
+		{
+			std::vector<pplx::task<void>> tasks;
+			tasks.push_back(awaitMembersConsistency(clients, desiredMembers));
+			tasks.push_back(awaitSettingsConsistency(clients, desiredSettings));
+			return when_all_handle_exceptions(tasks);
+		});
 	}
 
 	static void assertex(bool condition, const std::string& msg)
