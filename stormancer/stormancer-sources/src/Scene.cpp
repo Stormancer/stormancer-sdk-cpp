@@ -242,9 +242,9 @@ namespace Stormancer
 			throw std::runtime_error("The client is deleted.");
 		}
 
-		if (_connectionState != ConnectionState::Disconnected && _connectionState != ConnectionState::Connecting)
+		if (_connectionState != ConnectionState::Disconnected)
 		{
-			throw std::runtime_error("A route cannot be added to a scene already connected.");
+			throw std::runtime_error("You have to add routes on a scene in disconnected state.");
 		}
 
 		if (routeName.size() == 0 || routeName[0] == '@')
