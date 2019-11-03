@@ -60,6 +60,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Messaging\MessagingService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Messaging\Messaging_Impl.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Profile\ProfilePrivateModels.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Chat\Chat.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Friends\Friends.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameFinder\GameFinder.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\GameSession\Gamesessions.hpp" />

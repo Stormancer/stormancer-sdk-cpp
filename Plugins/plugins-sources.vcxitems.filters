@@ -318,6 +318,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Leaderboard\Leaderboards.hpp">
       <Filter>public\Leaderboard</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\Chat\Chat.hpp">
+      <Filter>public\Chat</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="private">
@@ -442,6 +445,9 @@
     </Filter>
     <Filter Include="public\ServerPools">
       <UniqueIdentifier>{3a512558-20ec-4972-9300-5a2adb0010d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="public\Chat">
+      <UniqueIdentifier>{1d089a81-25df-475c-ac41-33ad7af004bc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -101,6 +101,7 @@ namespace Stormancer
 		void test_streams();
 		void test_users();
 		void test_party();
+		void test_leaderboard();
 
 #pragma endregion
 

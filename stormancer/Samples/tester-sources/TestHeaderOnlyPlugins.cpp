@@ -10,3 +10,4 @@
 #include "GameFinder/GameFinder.hpp"
 #include "ServerPool/ServerPools.hpp"
 #include "Leaderboard/Leaderboards.hpp"
+#include "Chat/Chat.hpp"

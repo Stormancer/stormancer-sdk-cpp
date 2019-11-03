@@ -24,6 +24,7 @@ namespace Stormancer
 		_tests.push_back([this]() { test_rpc_server_exception(); });
 		_tests.push_back([this]() { test_rpc_server_clientException(); });
 		_tests.push_back([this]() { test_rpc_client(); });
+		_tests.push_back([this]() { test_leaderboard(); });
 		_tests.push_back([this]() { test_createScenes(); });
 		_tests.push_back([this]() { test_s2s(); });
 		_tests.push_back([this]() { test_rpc_client_cancel(); });
@@ -598,7 +599,36 @@ namespace Stormancer
 				serializer.serialize(stream, "rpc");
 			});
 	}
+	void Tester::test_leaderboard()
+	{
+		_logger->log(LogLevel::Info, "test_leaderboard", "leaderboard");
 
+		auto scene = _sceneMain.lock();
+		if (!scene)
+		{
+			_logger->log(LogLevel::Error, "StormancerWrapper", "scene deleted");
+			return;
+		}
+
+		auto rpcService = scene->dependencyResolver().resolve<RpcService>();
+
+		rpcService->rpc("testLeaderboard")
+			.then([this](pplx::task<void> t)
+				{
+					try
+					{
+						t.get();
+						_logger->log(LogLevel::Info,"testLeaderboard succeeded","");
+
+						execNextTest();
+
+					}
+					catch (const std::exception & ex)
+					{
+						_logger->log(LogLevel::Error, "test_leaderboard", "An exception occured", ex.what());
+					}
+				});
+	}
 	void Tester::test_s2s()
 	{
 		_logger->log(LogLevel::Info, "test_rpc_client", "S2S");
