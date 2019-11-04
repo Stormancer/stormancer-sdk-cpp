@@ -24,7 +24,7 @@ namespace Stormancer
 		_tests.push_back([this]() { test_rpc_server_exception(); });
 		_tests.push_back([this]() { test_rpc_server_clientException(); });
 		_tests.push_back([this]() { test_rpc_client(); });
-		_tests.push_back([this]() { test_leaderboard(); });
+		//_tests.push_back([this]() { test_leaderboard(); });
 		_tests.push_back([this]() { test_createScenes(); });
 		_tests.push_back([this]() { test_s2s(); });
 		_tests.push_back([this]() { test_rpc_client_cancel(); });

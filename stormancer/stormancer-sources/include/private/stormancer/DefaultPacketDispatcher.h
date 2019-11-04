@@ -10,7 +10,7 @@
 namespace Stormancer
 {
 	/// Dispatch the packets to the handlers based on their id.
-	class DefaultPacketDispatcher : public IPacketDispatcher
+	class DefaultPacketDispatcher : public IPacketDispatcher, public std::enable_shared_from_this<DefaultPacketDispatcher>
 	{
 	public:
 

@@ -924,22 +924,12 @@ namespace Stormancer
 
 			}
 
-
 			void sceneCreated(std::shared_ptr<Scene> scene) override
 			{
 				auto name = scene->getHostMetadata("stormancer.gamesession");
 				if (name.length() > 0)
 				{
 					scene->dependencyResolver().resolve<details::GameSessionService>()->initialize();
-				}
-			}
-
-			void sceneConnecting(std::shared_ptr<Scene> scene) override
-			{
-				auto name = scene->getHostMetadata("stormancer.gamesession");
-				if (name.length() > 0)
-				{
-
 					scene->dependencyResolver().resolve<GameSession>()->onConnectingToScene(scene);
 				}
 			}
@@ -965,5 +955,4 @@ namespace Stormancer
 		};
 
 	}
-
 }
