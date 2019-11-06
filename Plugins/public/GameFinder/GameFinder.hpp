@@ -364,7 +364,7 @@ namespace Stormancer
 					};
 
 					std::weak_ptr<GameFinderService> wThat = this->shared_from_this();
-					return _rpcService.lock()->rpc("gamefinder.find", streamWriter2)
+					return _rpcService->rpc("gamefinder.find", streamWriter2)
 						.then([wThat](pplx::task<void> res)
 					{
 						// If the RPC fails (e.g. because of a disconnection), we might not have received a failed/canceled status update.
@@ -401,7 +401,7 @@ namespace Stormancer
 				}
 
 				std::weak_ptr<Scene> _scene;
-				std::weak_ptr<RpcService> _rpcService;
+				std::shared_ptr<RpcService> _rpcService;
 
 				pplx::cancellation_token_source _gameFinderCTS;
 
