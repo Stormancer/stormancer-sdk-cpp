@@ -12,6 +12,11 @@ This project does not currently adhere to semantic versioning.
 Unreleased
 ----------
 
+Added
+*****
+
+- Dependency Injection: Added the ability to register named dependencies, using the method ``RegistrationHandle::named()``. Such dependencies can then be retrieved with ``DependencyScope::resolveNamed()``.
+
 Changed
 *******
 

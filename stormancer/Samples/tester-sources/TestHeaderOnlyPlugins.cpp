@@ -11,3 +11,4 @@
 #include "ServerPool/ServerPools.hpp"
 #include "Leaderboard/Leaderboards.hpp"
 #include "Chat/Chat.hpp"
+#include "ServiceStatus/ServiceStatus.hpp"

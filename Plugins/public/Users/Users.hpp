@@ -102,8 +102,9 @@ namespace Stormancer
 			bool success;
 			std::string userId;
 			std::string username;
+			std::unordered_map<std::string, std::string> authentications;
 
-			MSGPACK_DEFINE(errorMsg, success, userId, username);
+			MSGPACK_DEFINE(errorMsg, success, userId, username,authentications);
 		};
 
 		struct OperationCtx
@@ -194,6 +195,14 @@ namespace Stormancer
 		};
 
 		/// <summary>
+		/// Represents login information about the user
+		/// </summary>
+		struct LoginContext
+		{
+			std::string userId;
+		};
+
+		/// <summary>
 		/// Run custom code to provide or modify authentication credentials.
 		/// </summary>
 		/// <remarks>
@@ -228,7 +237,10 @@ namespace Stormancer
 			/// A pplx::task&lt;void&gt; that should complete when the processing that you needed to do is done.
 			/// You must not modify <c>context</c> after this task has completed, or else you would run into a race condition.
 			/// </returns>
-			virtual pplx::task<void> retrieveCredentials(const CredientialsContext& context) = 0;
+			virtual pplx::task<void> retrieveCredentials(const CredientialsContext&)
+			{
+				return pplx::task_from_result();
+			}
 
 			/// <summary>
 			/// Fulfill a request from the server to renew credentials for a specific authentication provider.
@@ -250,6 +262,23 @@ namespace Stormancer
 			/// You must not modify <c>context</c> after this task has completed, or else you would run into a race condition.
 			/// </returns>
 			virtual pplx::task<void> renewCredentials(const CredentialsRenewalContext& /*context*/)
+			{
+				return pplx::task_from_result();
+			}
+
+
+			/// <summary>
+			/// Function called after the user successfully logged in.
+			/// </summary>
+			virtual void OnLoggedIn(LoginResult)
+			{
+			}
+
+			/// <summary>
+			/// Function called before the user logs out from the authentication system.
+			/// </summary>
+			/// <returns></returns>
+			virtual pplx::task<void> OnLoggingOut()
 			{
 				return pplx::task_from_result();
 			}
@@ -280,7 +309,7 @@ namespace Stormancer
 		};
 
 		/// <summary>
-		/// The main class to leverage Users functionality.
+		/// Class that provides functions that interacts with the user and authentication systems. 
 		/// </summary>
 		class UsersApi : public std::enable_shared_from_this<UsersApi>
 		{
@@ -656,13 +685,32 @@ namespace Stormancer
 			/// \deprecated Use <c>IAuthenticationEventHandler</c> instead.
 			std::function<pplx::task<AuthParameters>()> getCredentialsCallback;
 
-			//Returns the current authentication status of the user: The list of authentication providers that successfully 
-			pplx::task<std::unordered_map<std::string, std::string>> getAuthenticationStatus(pplx::cancellation_token ct = pplx::cancellation_token::none())
+			const std::unordered_map<std::string, std::string> currentAuthenticationStatus() const
 			{
-				return getAuthenticationScene().then([ct](std::shared_ptr<Scene> scene) {
+				return _currentStatus;
+			}
+
+			/// <summary>
+			/// Refreshes the current authentication status of the user from the server
+			/// </summary>
+			/// <remarks>
+			/// The status is a map of providerId=>userPlatformId entries.
+			/// </remarks>
+			pplx::task<std::unordered_map<std::string, std::string>> refreshAuthenticationStatus(pplx::cancellation_token ct = pplx::cancellation_token::none())
+			{
+				std::weak_ptr<UsersApi> wThis = this->shared_from_this();
+				return getAuthenticationScene().then([ct, wThis](std::shared_ptr<Scene> scene) {
 
 					auto rpc = scene->dependencyResolver().resolve<RpcService>();
-					return rpc->rpc<std::unordered_map<std::string, std::string>>("Authentication.GetStatus", ct);
+
+					return rpc->rpc<std::unordered_map<std::string, std::string>>("Authentication.GetStatus", ct).then([wThis](std::unordered_map<std::string, std::string> status) {
+
+						if (auto that = wThis.lock())
+						{
+							that->_currentStatus = status;
+						}
+						return status;
+					});
 				});
 			}
 
@@ -693,8 +741,19 @@ namespace Stormancer
 					{
 						throw PointerDeletedException("client destroyed");
 					}
-
-					return that->getAuthenticationStatus(ct);
+					if (r.success)
+					{
+						that->_currentStatus = r.authentications;
+					}
+					else
+					{
+						throw std::runtime_error("authentication.failed?reason="+r.errorMsg);
+					}
+					for (auto h : that->_authenticationEventHandlers)
+					{
+						h->OnLoggedIn(r);
+					}
+					return that->currentAuthenticationStatus();
 				});
 			}
 
@@ -753,6 +812,7 @@ namespace Stormancer
 
 		private:
 
+			std::unordered_map<std::string, std::string> _currentStatus;
 			static constexpr int RETRY_COUNTER_MAX = 100;
 
 #pragma region private_methods
@@ -963,9 +1023,21 @@ namespace Stormancer
 						}
 						else
 						{
+							that->_currentStatus = result.authentications;
 							that->_userId = result.userId;
 							that->_username = result.username;
 							that->setConnectionState(GameConnectionState::Authenticated);
+							for (auto h : that->_authenticationEventHandlers)
+							{
+								try
+								{
+									h->OnLoggedIn(result);
+								}
+								catch (std::exception&)
+								{
+
+								}
+							}
 						}
 
 						return scene;

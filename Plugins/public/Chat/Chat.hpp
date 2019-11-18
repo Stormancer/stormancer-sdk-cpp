@@ -5,37 +5,86 @@
 
 namespace Stormancer
 {
+	/// <summary>
+	/// Modular chat API
+	/// </summary>
+	/// <remarks>
+	/// The chat API doesn't support connecting to a chat. It detects instead chat functionalities installed on scenes when the game client connect to them.
+	/// Other plugins (party, Gamesession, guild...) are responsible of managing connection to the scene implementing a chatroom.
+	/// </remarks>
 	namespace Chat
 	{
 		class ChatPlugin;
 
+		/// <summary>
+		/// Represents the status of a chat user
+		/// </summary>
 		enum class UserStatus
 		{
 			Connected,
 			Disconnected,
 		};
 
+		/// <summary>
+		/// Represents information about a chat user.
+		/// </summary>
+		struct ChatUserInfoDto
+		{
+			/// <summary>
+			/// Id of the user.
+			/// </summary>
+			std::string userId;
+
+			/// <summary>
+			/// Id of the session of the user
+			/// </summary>
+			std::string sessionId;
+
+			/// <summary>
+			/// Status of the user (connected or disconnected)
+			/// </summary>
+			UserStatus status;
+
+			/// <summary>
+			/// Metadata associated to the user
+			/// </summary>
+			std::unordered_map<std::string, std::string> metadata;
+
+			MSGPACK_DEFINE(userId, sessionId, status, metadata)
+		};
+		/// <summary>
+		/// Represents the body of a chat message.
+		/// </summary>
+		struct ChatMessageDto
+		{
+			/// <summary>
+			/// Content of the chat message
+			/// </summary>
+			std::string message;
+
+			/// <summary>
+			/// Optional metadata associated with the message.
+			/// </summary>
+			std::unordered_map<std::string, std::string> metadata;
+
+			/// <summary>
+			/// Time the message was produced.
+			/// </summary>
+			uint64 timestamp;
+
+			/// <summary>
+			/// Informations about the message author.
+			/// </summary>
+			ChatUserInfoDto userInfos;
+
+			MSGPACK_DEFINE(message, metadata, timestamp, userInfos)
+
+		};
+
 		namespace details
 		{
 
-			struct ChatUserInfoDto
-			{
-				std::string userId;
-				std::string sessionId;
-				UserStatus status;
-				std::unordered_map<std::string, std::string> metadata;
-				MSGPACK_DEFINE(userId, sessionId, status, metadata)
-			};
-			struct ChatMessageDto
-			{
-				std::string message;
-				std::unordered_map<std::string, std::string> metadata;
-				uint64 timestamp;
-				ChatUserInfoDto userInfos;
-
-				MSGPACK_DEFINE(message, metadata, timestamp, userInfos)
-
-			};
+			
 			
 			
 
@@ -117,25 +166,55 @@ namespace Stormancer
 				Stormancer::Event<ChatUserInfoDto>::Subscription statusChangedSubscription;
 			};
 		}
-
-
+		/// <summary>
+		/// Represents a chat message.
+		/// </summary>
 		struct ChatMsg
 		{
+			/// <summary>
+			/// Id of the scene that produced the message.
+			/// </summary>
 			std::string sceneId;
-			details::ChatMessageDto message;
+
+			/// <summary>
+			/// Body of the chat message.
+			/// </summary>
+			ChatMessageDto message;
 		};
+
+		/// <summary>
+		/// Represents a chat user status update
+		/// </summary>
 		struct StatusUpdate
 		{
 			std::string sceneId;
-			details::ChatUserInfoDto user;
+			ChatUserInfoDto user;
 		};
 
+		/// <summary>
+		/// Chat API
+		/// </summary>
+		/// <remarks>
+		/// This class regroups event and API for all chat rooms the client is connected.
+		/// </remarks>
+		/// <example>
+		/// auto chat = client->dependencyResolver.resolve&lt;Stormancer::Chat::Chat&gt;();
+		/// 
+		/// </example>
 		class Chat : public std::enable_shared_from_this<Chat>
 		{
 			friend class ChatPlugin;
 		public:
 
 			Chat() {}
+
+			/// <summary>
+			/// Sends a message to a chat room
+			/// </summary>
+			/// <param name="id">Id of the chat room (scene id)</param>
+			/// <param name="message">Message sent to the chat room</param>
+			/// <param name="metadata">Optional message metadata</param>
+			/// <returns>A task that completes when the server acknolewdged the message.</returns>
 			pplx::task<void> send(std::string id, std::string message, std::unordered_map<std::string, std::string> metadata)
 			{
 				auto it = _channels.find(id);
@@ -153,7 +232,7 @@ namespace Stormancer
 				{
 					return pplx::task_from_exception<std::vector<ChatMsg>>(std::runtime_error(("notConnected?scene=" + id).c_str()));
 				}
-				return it->second.service->getHistory(startTimestamp, endTimestamp).then([id](std::vector<details::ChatMessageDto> messages)
+				return it->second.service->getHistory(startTimestamp, endTimestamp).then([id](std::vector<ChatMessageDto> messages)
 				{
 					std::vector<ChatMsg> result;
 					for (auto message : messages)
@@ -192,7 +271,7 @@ namespace Stormancer
 				std::weak_ptr<Chat> wThis = this->shared_from_this();
 				//Always capture weak references, and NEVER 'this'. As the callback is going to be executed asynchronously,
 				//who knows what may have happened to the object behind the this pointer since it was captured?
-				container.msgReceivedSubscription = service->msgReceived.subscribe([wThis, id](details::ChatMessageDto dto) {
+				container.msgReceivedSubscription = service->msgReceived.subscribe([wThis, id](ChatMessageDto dto) {
 					auto that = wThis.lock();
 					//If this is valid, forward the event.
 					if (that)
@@ -205,7 +284,7 @@ namespace Stormancer
 					}
 				});
 
-				container.statusChangedSubscription = service->statusChanged.subscribe([wThis, id](details::ChatUserInfoDto dto) {
+				container.statusChangedSubscription = service->statusChanged.subscribe([wThis, id](ChatUserInfoDto dto) {
 
 					auto that = wThis.lock();
 					//If this is valid, forward the event.

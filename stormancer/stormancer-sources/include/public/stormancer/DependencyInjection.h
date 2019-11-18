@@ -35,7 +35,7 @@ namespace Stormancer
 	{
 		std::function<std::shared_ptr<void>(const DependencyScope&)> factory;
 		RegistrationId id;
-		std::vector<uint64> typesRegisteredAs;
+		std::vector<std::pair<uint64, std::string>> typesRegisteredAs;
 		DependencyLifetime lifetime = DependencyLifetime::InstancePerRequest;
 		std::string scopeTagToMatch;
 		uint64 actualType;
@@ -71,15 +71,7 @@ namespace Stormancer
 		template<typename TAs>
 		RegistrationHandle& as()
 		{
-			static_assert(std::is_convertible<T*, TAs*>::value, "You tried to register a dependency as a type it cannot be converted to.");
-
-			uint64 typeHash = getTypeHash<TAs>();
-			if (std::find(_data.typesRegisteredAs.begin(), _data.typesRegisteredAs.end(), typeHash) == _data.typesRegisteredAs.end())
-			{
-				_data.typesRegisteredAs.push_back(typeHash);
-			}
-
-			return *this;
+			return namedInternal<TAs>("");
 		}
 
 		/// <summary>
@@ -92,6 +84,37 @@ namespace Stormancer
 		RegistrationHandle& asSelf()
 		{
 			return as<T>();
+		}
+
+		/// <summary>
+		/// Register this dependency as a given type, with a given name.
+		/// </summary>
+		/// <remarks>
+		/// You can call this method with as many types as you like, as long as the actual type of the dependency
+		/// can be converted to <c>TAs*</c> (this is checked statically, and generates a compile error if it cannot).
+		/// Dependencies are registered as the type given to <c>ContainerBuilder::registerDependency()</c> by default.
+		/// This method allows to override this behavior, and add more types to register the dependency as,
+		/// in addition to specifying a name to identify this dependency for <c>TAs</c>.
+		/// </remarks>
+		/// <typeparam name="TAs">Type to register this dependency as.</typeparam>
+		/// <param name="name">Name of the dependency for the type <c>TAs</c>.</param>
+		/// <returns>A reference to the same handle, to enable chaining calls in a "fluent API" fashion.</returns>
+		/// <example>
+		/// Registering a dependency of type <c>MyDep</c> as type <c>IMyDep</c> with name <c>"mycustomname"</c>, and resolving this dependency.
+		/// <code>
+		/// ContainerBuilder builder;
+		/// builder.registerDependency&lt;MyDep&gt;().named&lt;IMyDep&gt;("mycustomname");
+		/// auto scope = builder.build();
+		/// auto dep = scope.resolveNamed&lt;IMyDep&gt;("mycustomname");
+		/// </code></example>
+		template<typename TAs>
+		RegistrationHandle& named(std::string name)
+		{
+			if (name.empty())
+			{
+				throw std::invalid_argument("name cannot be empty");
+			}
+			return namedInternal<TAs>(std::move(name));
 		}
 
 		/// <summary>
@@ -147,6 +170,20 @@ namespace Stormancer
 		}
 
 	private:
+
+		template<typename TAs>
+		RegistrationHandle& namedInternal(std::string name)
+		{
+			static_assert(std::is_convertible<T*, TAs*>::value, "You tried to register a dependency as a type it cannot be converted to.");
+
+			auto namePair = std::make_pair(getTypeHash<TAs>(), std::move(name));
+			if (std::find(_data.typesRegisteredAs.begin(), _data.typesRegisteredAs.end(), namePair) == _data.typesRegisteredAs.end())
+			{
+				_data.typesRegisteredAs.push_back(std::move(namePair));
+			}
+
+			return *this;
+		}
 
 		RegistrationHandle(RegistrationData& data)
 			: _data(data)
@@ -212,7 +249,7 @@ namespace Stormancer
 		std::shared_ptr<T> resolve() const
 		{
 			uint64 typeHash = getTypeHash<T>();
-			auto instance = resolveInternal(typeHash);
+			auto instance = resolveInternal(typeHash, "");
 			return std::static_pointer_cast<T>(instance);
 		}
 
@@ -237,6 +274,32 @@ namespace Stormancer
 			results.reserve(instances.size());
 			std::transform(instances.begin(), instances.end(), std::back_inserter(results), [](const std::shared_ptr<void>& ptr) { return std::static_pointer_cast<T>(ptr); });
 			return results;
+		}
+
+		/// <summary>
+		/// Retrieve the dependency named <paramref name="name"></paramref> that was registered for the type <c>T</c>.
+		/// </summary>
+		/// <remarks>
+		/// If needed, the dependency will be instantiated according to its lifetime options.
+		/// See <c>RegistrationHandle</c> for more details on those.
+		/// </remarks>
+		/// <seealso cref="RegistrationHandle::named()"/>
+		/// <exception cref="Stormancer::DependencyResolutionException">
+		/// If no dependency registration could be found for type <c>T</c>, or if the registration could not be instantiated.
+		/// The exception's message will contain details about the error.
+		/// </exception>
+		/// <returns>A <c>shared_ptr</c> containing the instance of the dependency that was resolved.</returns>
+		template<typename T>
+		std::shared_ptr<T> resolveNamed(const std::string& name) const
+		{
+			if (name.empty())
+			{
+				throw std::invalid_argument("name cannot be empty");
+			}
+
+			uint64 typeHash = getTypeHash<T>();
+			auto instance = resolveInternal(typeHash, name);
+			return std::static_pointer_cast<T>(instance);
 		}
 
 		/// <summary>
@@ -294,7 +357,7 @@ namespace Stormancer
 
 		void throwIfNotValid() const;
 
-		std::shared_ptr<void> resolveInternal(uint64 typeHash) const;
+		std::shared_ptr<void> resolveInternal(uint64 typeHash, const std::string& name) const;
 		std::vector<std::shared_ptr<void>> resolveAllInternal(uint64 typeHash) const;
 
 		std::shared_ptr<DependencyScopeImpl> _impl;

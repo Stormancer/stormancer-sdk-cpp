@@ -54,6 +54,7 @@ public:
 		testSameTypeInChild();
 		testMultipleRegsForSameConcreteType();
 		testRegisterCtor();
+		testNamed();
 	}
 
 private:
@@ -246,5 +247,26 @@ private:
 
 		auto e = child.resolve<E>();
 		assertex(e->allAs.size() == 2, "The E object should have been constructed with two instances of type A, but contains only " + std::to_string(e->allAs.size()));
+	}
+
+	static void testNamed()
+	{
+		using namespace Stormancer;
+		ContainerBuilder builder;
+		builder.registerDependency<B>().named<A>("b");
+
+		auto scope = builder.build();
+		try
+		{
+			scope.resolve<A>();
+			throw std::runtime_error("The dependency should not be accessible through resolve(), only resolveNamed()");
+		}
+		catch (const DependencyResolutionException&)
+		{
+		}
+
+		assertex(scope.resolveAll<A>().size() == 0, "The dependency should not be accessible through resolveAll(), only resolveNamed()");
+
+		scope.resolveNamed<A>("b");
 	}
 };

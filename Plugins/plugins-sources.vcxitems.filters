@@ -321,6 +321,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Chat\Chat.hpp">
       <Filter>public\Chat</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\ServiceStatus\ServiceStatus.hpp">
+      <Filter>public\ServiceStatus</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="private">
@@ -448,6 +451,9 @@
     </Filter>
     <Filter Include="public\Chat">
       <UniqueIdentifier>{1d089a81-25df-475c-ac41-33ad7af004bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="public\ServiceStatus">
+      <UniqueIdentifier>{8a76c8b8-d74b-4051-9ca4-b91d5c0f7a65}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

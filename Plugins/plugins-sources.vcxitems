@@ -118,6 +118,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Profile\ProfileModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Profile\Profiles.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Servers\Servers.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)public\ServiceStatus\ServiceStatus.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Steam\Steam.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Tunnels\Tunnels.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Users\ClientAPI.hpp" />

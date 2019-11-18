@@ -40,31 +40,37 @@ namespace Stormancer
 			, _baseId(builder._registrationCounter)
 		{}
 
-		void resolveInternal(uint64 typeHash, const DependencyScope& requestingScope, std::vector<std::shared_ptr<void>>& instances, bool resolveSingle)
+		void resolveInternal(uint64 typeHash, const std::string& name, const DependencyScope& requestingScope, std::vector<std::shared_ptr<void>>& instances, bool resolveSingle)
 		{
 			auto parent = tryLockParent();
+			bool found = false;
 			auto localRegsIt = _registrations.find(typeHash);
 			if (localRegsIt != _registrations.end())
 			{
-				auto& localRegs = localRegsIt->second;
-				if (resolveSingle)
+				auto localRegsNameIt = localRegsIt->second.find(name);
+				if (localRegsNameIt != localRegsIt->second.end())
 				{
-					auto instance = instantiateRegistration(localRegs.back(), requestingScope, true);
-					instances.push_back(instance);
-					return;
-				}
-				for (const auto& reg : localRegs)
-				{
-					auto instance = instantiateRegistration(reg, requestingScope, false);
-					if (instance)
+					found = true;
+					auto& localRegs = localRegsNameIt->second;
+					if (resolveSingle)
 					{
+						auto instance = instantiateRegistration(localRegs.back(), requestingScope, true);
 						instances.push_back(instance);
+						return;
+					}
+					for (const auto& reg : localRegs)
+					{
+						auto instance = instantiateRegistration(reg, requestingScope, false);
+						if (instance)
+						{
+							instances.push_back(instance);
+						}
 					}
 				}
 			}
-			if (parent && (!resolveSingle || localRegsIt == _registrations.end()))
+			if (parent && (!resolveSingle || !found))
 			{
-				parent->resolveInternal(typeHash, requestingScope, instances, resolveSingle);
+				parent->resolveInternal(typeHash, name, requestingScope, instances, resolveSingle);
 			}
 		}
 
@@ -143,19 +149,19 @@ namespace Stormancer
 			return instance;
 		}
 
-		static std::unordered_map<uint64, std::vector<RegistrationInternal>> buildRegistrations(const ContainerBuilder& builder)
+		static std::unordered_map<uint64, std::unordered_map<std::string, std::vector<RegistrationInternal>>> buildRegistrations(const ContainerBuilder& builder)
 		{
-			std::unordered_map<uint64, std::vector<RegistrationInternal>> registrations;
+			std::unordered_map<uint64, std::unordered_map<std::string, std::vector<RegistrationInternal>>> registrations;
 			for (const auto& registration : builder._registrations)
 			{
 				for (auto type : registration.typesRegisteredAs)
 				{
-					registrations[type].emplace_back(registration);
+					registrations[type.first][type.second].emplace_back(registration);
 				}
 				// If as() was not called, register the dependency as its original type
 				if (registration.typesRegisteredAs.empty())
 				{
-					registrations[registration.actualType].emplace_back(registration);
+					registrations[registration.actualType][""].emplace_back(registration);
 				}
 			}
 			return registrations;
@@ -171,7 +177,7 @@ namespace Stormancer
 			return parent;
 		}
 
-		const std::unordered_map<uint64, std::vector<RegistrationInternal>> _registrations;
+		const std::unordered_map<uint64, std::unordered_map<std::string, std::vector<RegistrationInternal>>> _registrations;
 		std::unordered_map<RegistrationId, std::shared_ptr<void>> _localInstances;
 
 		std::string _tag;
@@ -211,13 +217,13 @@ namespace Stormancer
 		return _impl->beginLifetimeScope(tag, builder);
 	}
 
-	std::shared_ptr<void> DependencyScope::resolveInternal(uint64 typeHash) const
+	std::shared_ptr<void> DependencyScope::resolveInternal(uint64 typeHash, const std::string& name) const
 	{
 		throwIfNotValid();
 
 		std::vector<std::shared_ptr<void>> instances;
 
-		_impl->resolveInternal(typeHash, *this, instances, true);
+		_impl->resolveInternal(typeHash, name, *this, instances, true);
 		if (instances.empty())
 		{
 			throw DependencyResolutionException("Dependency not found");
@@ -231,7 +237,7 @@ namespace Stormancer
 
 		std::vector<std::shared_ptr<void>> instances;
 
-		_impl->resolveInternal(typeHash, *this, instances, false);
+		_impl->resolveInternal(typeHash, "", *this, instances, false);
 		return instances;
 	}
 

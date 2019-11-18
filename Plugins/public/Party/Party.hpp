@@ -297,6 +297,10 @@ namespace Stormancer
 			/// <returns>A vector of user ids to which invitations have been sent but not yet accepted or refused.</returns>
 			virtual std::vector<std::string> getSentPendingInvitations() = 0;
 
+			virtual void sendInvitation(const std::string& recipient) = 0;
+
+			virtual void cancelInvitation(const std::string& recipient) = 0;
+
 			/// <summary>
 			/// Register a callback to be run when the party leader changes the party settings.
 			/// </summary>
@@ -501,7 +505,7 @@ namespace Stormancer
 			struct InvitationRequest
 			{
 				pplx::cancellation_token_source cts;
-				pplx::task<void> task;
+				pplx::task<void> task = pplx::task_from_result();
 			};
 
 			struct PartyState
@@ -553,6 +557,31 @@ namespace Stormancer
 				MSGPACK_DEFINE(userId, reason)
 			};
 
+			inline bool tryParseVersion(const char* version, int& outVersionNumber)
+			{
+				int year = 0, month = 0, day = 0, revision = 0;
+				int numMatches = std::sscanf(version, "%4d-%2d-%2d.%d", &year, &month, &day, &revision);
+
+				if (numMatches != 4 || 
+					year < 2019 || month < 1 || month > 12 || day < 1 || day > 31 || revision < 1)
+				{
+					return false;
+				}
+				// Make a decimal number out of the version string
+				outVersionNumber = revision + (day * 10) + (month * 1000) + (year * 100000);
+				return true;
+			}
+
+			inline int parseVersion(const char* version)
+			{
+				int versionInt = 0;
+				if (!tryParseVersion(version, versionInt))
+				{
+					throw std::runtime_error("Could not parse version");
+				}
+				return versionInt;
+			}
+
 			class PartyService : public std::enable_shared_from_this<PartyService>
 			{
 			public:
@@ -564,7 +593,13 @@ namespace Stormancer
 				// Protocol versions between client and server are not obligated to match.
 				static constexpr const char* METADATA_KEY = "stormancer.party";
 				static constexpr const char* REVISION_METADATA_KEY = "stormancer.party.revision";
-				static constexpr const char* PROTOCOL_VERSION = "2019-10-23.1";
+				static constexpr const char* PROTOCOL_VERSION = "2019-11-18.1";
+
+				static int getProtocolVersionInt()
+				{
+					static int protocolVersionInt = parseVersion(PROTOCOL_VERSION);
+					return protocolVersionInt;
+				}
 
 				PartyService(std::weak_ptr<Scene> scene)
 					: _scene(scene)
@@ -572,12 +607,14 @@ namespace Stormancer
 					, _rpcService(_scene.lock()->dependencyResolver().resolve<RpcService>())
 					, _gameFinder(scene.lock()->dependencyResolver().resolve<Stormancer::GameFinder::GameFinderApi>())
 					, _dispatcher(scene.lock()->dependencyResolver().resolve<IActionDispatcher>())
-					, _myUserId(scene.lock()->dependencyResolver().resolve<Stormancer::Users::UsersApi>()->userId())
+					, _users(scene.lock()->dependencyResolver().resolve<Users::UsersApi>())
+					, _myUserId(_users->userId())
 				{
-					_serverProtocolVersion = _scene.lock()->getHostMetadata(METADATA_KEY);
+					auto serverProtocolVersion = _scene.lock()->getHostMetadata(METADATA_KEY);
 					auto serverRevision = _scene.lock()->getHostMetadata(REVISION_METADATA_KEY);
-					_logger->log(LogLevel::Info, "PartyService", "Protocol version: client=" + std::string(PROTOCOL_VERSION) + ", server=" + _serverProtocolVersion);
+					_logger->log(LogLevel::Info, "PartyService", "Protocol version: client=" + std::string(PROTOCOL_VERSION) + ", server=" + serverProtocolVersion);
 					_logger->log(LogLevel::Info, "PartyService", "Server revision=" + serverRevision);
+					tryParseVersion(serverProtocolVersion.c_str(), _serverProtocolVersion);
 				}
 
 				~PartyService()
@@ -684,6 +721,19 @@ namespace Stormancer
 					}
 
 					return pplx::task_from_exception<void>(std::runtime_error(PartyError::Str::Unauthorized));
+				}
+
+				pplx::task<void> sendInvitation(const std::string& recipientId, pplx::cancellation_token ct)
+				{
+					static const int sendInvitationVersion = parseVersion("2019-11-18.1");
+					if (_serverProtocolVersion >= sendInvitationVersion)
+					{
+						return _rpcService->rpc<void>("party.sendinvitation", ct, recipientId);
+					}
+					else
+					{
+						return _users->sendRequestToUser<void>(recipientId, "party.invite", ct, _scene.lock()->id());
+					}
 				}
 
 				///
@@ -947,7 +997,8 @@ namespace Stormancer
 
 				pplx::task<void> getPartyStateImpl()
 				{
-					if (_serverProtocolVersion == "2019-08-30.1")
+					static const int originalGetPartyStateVersion = parseVersion("2019-08-30.1");
+					if (_serverProtocolVersion == originalGetPartyStateVersion)
 					{
 						return _rpcService->rpc("party.getpartystate");
 					}
@@ -1266,6 +1317,7 @@ namespace Stormancer
 				std::shared_ptr<RpcService> _rpcService;
 				std::shared_ptr<Stormancer::GameFinder::GameFinderApi> _gameFinder;
 				std::shared_ptr<IActionDispatcher> _dispatcher;
+				std::shared_ptr<Users::UsersApi> _users;
 
 				std::string _myUserId;
 				// Synchronize async state update, as well as getters.
@@ -1277,10 +1329,10 @@ namespace Stormancer
 				// Used to signal to client code when the party is ready
 				pplx::task_completion_event<void> _partyStateReceived;
 				pplx::task<void> _stateSyncRequest = pplx::task_from_result();
-				std::string _serverProtocolVersion;
+				int _serverProtocolVersion = 0;
 			};
 
-			class PartyContainer
+			class PartyContainer : public std::enable_shared_from_this<PartyContainer>
 			{
 				friend class Party_Impl;
 			public:
@@ -1320,43 +1372,102 @@ namespace Stormancer
 
 				std::shared_ptr<Scene> getScene() const { return _partyScene; }
 				std::string id() const { return _partyScene->id(); }
+				std::shared_ptr<PartyService> partyService() const { return _partyService; }
 
-				// Returns true if this is a new request, false if there already is a pending request for this recipient
-				bool registerInvitationRequest(std::string recipientId, InvitationRequest& request)
+				pplx::task<void> sendInvitation(const std::string& recipientId)
 				{
-					std::lock_guard<std::mutex> lg(_invitationsMutex);
+					std::lock_guard<std::recursive_mutex> lg(_invitationsMutex);
 
-					auto it = _pendingInvitationRequests.find(recipientId);
-					request = _pendingInvitationRequests[recipientId];
-					if (it == _pendingInvitationRequests.end())
+					auto requestIt = _pendingInvitationRequests.find(recipientId);
+					auto cancellationIt = _pendingInvitationCancellations.find(recipientId);
+					if (cancellationIt != _pendingInvitationCancellations.end() && requestIt != _pendingInvitationRequests.end())
 					{
-						return true;
+						// If there are both a pending cancellation and a pending request for the recipient,
+						// it means a new request has been made which is currently awaiting cancellation of a previous request.
+						// In this case, don't do anything - avoid piling up requests for the same user 
+						return requestIt->second.task;
 					}
-					else
+
+					pplx::task<void> cancellationTask = cancelInvitation(recipientId);
+					auto& request = _pendingInvitationRequests[recipientId];
+					auto token = request.cts.get_token();
+					std::weak_ptr<PartyContainer> wThat(this->shared_from_this());
+					auto returnTask = cancellationTask.then([wThat, recipientId, token](pplx::task<void> task)
 					{
-						return false;
-					}
+						try { task.wait(); }
+						catch (...) {}
+						if (auto that = wThat.lock())
+						{
+							return that->_partyService->sendInvitation(recipientId, token);
+						}
+						return pplx::task_from_result();
+					});
+					request.task = returnTask.then([wThat, recipientId](pplx::task<void> task)
+					{
+						try
+						{
+							task.get();
+						}
+						catch (...)
+						{
+							if (auto that = wThat.lock())
+							{
+								std::lock_guard<std::recursive_mutex> lg(that->_invitationsMutex);
+								that->_pendingInvitationRequests.erase(recipientId);
+							}
+						}
+					});
+					return returnTask;
 				}
 
-				void closeInvitationRequest(std::string recipientId)
+				pplx::task<void> cancelInvitation(const std::string& recipientId)
 				{
-					std::lock_guard<std::mutex> lg(_invitationsMutex);
+					std::lock_guard<std::recursive_mutex> lg(_invitationsMutex);
 
-					if (_pendingInvitationRequests.find(recipientId) != _pendingInvitationRequests.end())
+					auto cancellation = _pendingInvitationCancellations.find(recipientId);
+					if (cancellation != _pendingInvitationCancellations.end())
 					{
-						_pendingInvitationRequests[recipientId].cts.cancel();
-						_pendingInvitationRequests.erase(recipientId);
+						return cancellation->second;
 					}
+
+					auto invitationIt = _pendingInvitationRequests.find(recipientId);
+					if (invitationIt != _pendingInvitationRequests.end())
+					{
+						auto invitation = invitationIt->second;
+						_pendingInvitationRequests.erase(invitationIt);
+
+						invitation.cts.cancel();
+						std::weak_ptr<PartyContainer> wThat = this->shared_from_this();
+						_pendingInvitationCancellations[recipientId] = invitation.task.then([wThat, recipientId](pplx::task<void> task)
+						{
+							try { task.wait(); }
+							catch (...) {}
+							if (auto that = wThat.lock())
+							{
+								std::lock_guard<std::recursive_mutex> lg(that->_invitationsMutex);
+								that->_pendingInvitationCancellations.erase(recipientId);
+							}
+						});
+						return invitation.task;
+					}
+					return pplx::task_from_result();
 				}
 
-				~PartyContainer()
+				std::vector<std::string> getPendingInvitations() const
 				{
-					std::lock_guard<std::mutex> lg(_invitationsMutex);
+					std::lock_guard<std::recursive_mutex> lg(_invitationsMutex);
 
-					for (auto& request : _pendingInvitationRequests)
-					{
-						request.second.cts.cancel();
-					}
+					std::vector<std::string> invitations;
+					invitations.reserve(_pendingInvitationRequests.size());
+
+					std::transform(
+						_pendingInvitationRequests.begin(),
+						_pendingInvitationRequests.end(),
+						std::back_inserter(invitations),
+						[](const auto& kvp) { return kvp.first; }
+					);
+
+					return invitations;
 				}
 
 			private:
@@ -1368,7 +1479,8 @@ namespace Stormancer
 				Event<PartySettings>::Subscription UpdatedPartySettingsSubscription;
 
 				std::unordered_map<std::string, InvitationRequest> _pendingInvitationRequests;
-				std::mutex _invitationsMutex;
+				std::unordered_map<std::string, pplx::task<void>> _pendingInvitationCancellations;
+				mutable std::recursive_mutex _invitationsMutex;
 			};
 
 			class PartyManagementService : public std::enable_shared_from_this<PartyManagementService>
@@ -1412,6 +1524,7 @@ namespace Stormancer
 					, _dispatcher(dispatcher)
 					, _eventHandlers(eventHandlers)
 					, _gameFinder(gameFinder)
+					, _legacyInviteCt(pplx::cancellation_token::none())
 				{}
 
 				pplx::task<void> createParty(const PartyRequestDto& partySettings) override
@@ -1470,7 +1583,7 @@ namespace Stormancer
 								{
 									if (auto that = wPartyManagement.lock())
 									{
-										that->_party = nullptr;
+										that->setPartySafe(nullptr);
 									}
 									throw;
 								}
@@ -1487,7 +1600,7 @@ namespace Stormancer
 							}
 						}, _dispatcher);
 
-					this->_party = std::make_shared<pplx::task<std::shared_ptr<PartyContainer>>>(partyTask);
+					setPartySafe(std::make_shared<pplx::task<std::shared_ptr<PartyContainer>>>(partyTask));
 					return userTask;
 				}
 
@@ -1519,6 +1632,7 @@ namespace Stormancer
 
 				pplx::task<void> leaveParty() override
 				{
+					std::lock_guard<std::recursive_mutex> lg(_partyMutex);
 					if (!_party)
 					{
 						return pplx::task_from_result();
@@ -1549,28 +1663,30 @@ namespace Stormancer
 
 				bool isInParty() const override
 				{
-					return _party != nullptr && _party->is_done();
+					return tryGetParty() != nullptr;
 				}
 
 				std::vector<PartyUserDto> getPartyMembers() const override
 				{
-					if (!isInParty())
+					auto party = tryGetParty();
+					if (!party)
 					{
 						throw std::runtime_error(PartyError::Str::NotInParty);
 					}
 
-					return _party->get()->members();
+					return party->members();
 				}
 
 				PartyUserDto getLocalMember() const override
 				{
-					if (!isInParty())
+					auto party = tryGetParty();
+					if (!party)
 					{
 						throw std::runtime_error(PartyError::Str::NotInParty);
 					}
 
 					auto myId = _users.lock()->userId();
-					auto members = _party->get()->members();
+					auto members = party->members();
 					auto it = std::find_if(members.begin(), members.end(), [&myId](const PartyUserDto& user)
 						{
 							return user.userId == myId;
@@ -1586,48 +1702,46 @@ namespace Stormancer
 
 				PartySettings getPartySettings() const override
 				{
-					if (!isInParty())
+					auto party = tryGetParty();
+					if (!party)
 					{
 						throw std::runtime_error(PartyError::Str::NotInParty);
 					}
 
-					return _party->get()->settings();
+					return party->settings();
 				}
 
 				std::string getPartyLeaderId() const override
 				{
-					if (!isInParty())
+					auto party = tryGetParty();
+					if (!party)
 					{
 						throw std::runtime_error(PartyError::Str::NotInParty);
 					}
 
-					return _party->get()->leaderId();
+					return party->leaderId();
 				}
 
 				bool isLeader() const override
 				{
-					if (!isInParty())
+					auto party = tryGetParty();
+					if (!party)
 					{
 						throw std::runtime_error(PartyError::Str::NotInParty);
 					}
 
-					return _party->get()->isLeader();
+					return party->isLeader();
 				}
 
 				std::vector<std::string> getSentPendingInvitations() override
 				{
-					std::vector<std::string> pendingInvitations;
-					if (!_party || !_party->is_done())
+					auto party = tryGetParty();
+					if (!party)
 					{
-						return pendingInvitations;
+						return std::vector<std::string>();
 					}
 
-					std::lock_guard<std::recursive_mutex> lg(_invitationsMutex);
-					for (const auto& it : _party->get()->_pendingInvitationRequests)
-					{
-						pendingInvitations.push_back(it.first);
-					}
-					return pendingInvitations;
+					return party->getPendingInvitations();
 				}
 
 				// Not const because of mutex lock
@@ -1647,21 +1761,19 @@ namespace Stormancer
 
 				pplx::task<void> updatePlayerStatus(PartyUserStatus playerStatus) override
 				{
-					if (!isInParty())
+					auto party = tryGetParty();
+					if (!party)
 					{
 						return pplx::task_from_exception<void>(std::runtime_error(PartyError::Str::NotInParty));
 					}
 
-					return _party->then([playerStatus](std::shared_ptr<PartyContainer> party)
-						{
-							auto partyService = party->getScene()->dependencyResolver().resolve<PartyService>();
-							return partyService->updatePlayerStatus(playerStatus);
-						});
+					return party->partyService()->updatePlayerStatus(playerStatus);
 				}
 
 				pplx::task<void> updatePartySettings(PartySettings partySettingsDto) override
 				{
-					if (!isInParty())
+					auto party = tryGetParty();
+					if (!party)
 					{
 						return pplx::task_from_exception<void>(std::runtime_error(PartyError::Str::NotInParty));
 					}
@@ -1671,119 +1783,124 @@ namespace Stormancer
 						partySettingsDto.customData = "{}";
 					}
 
-					return _party->then([partySettingsDto](std::shared_ptr<PartyContainer> party) {
-						auto partyService = party->getScene()->dependencyResolver().resolve<PartyService>();
-						return partyService->updatePartySettings(partySettingsDto);
-						});
+					return party->partyService()->updatePartySettings(partySettingsDto);
 				}
 
 				pplx::task<void> updatePlayerData(std::string data) override
 				{
-					if (!isInParty())
+					auto party = tryGetParty();
+					if (!party)
 					{
 						return pplx::task_from_exception<void>(std::runtime_error(PartyError::Str::NotInParty));
 					}
 
-					return _party->then([data](std::shared_ptr<PartyContainer> party)
-						{
-							auto partyService = party->getScene()->dependencyResolver().resolve<PartyService>();
-							return partyService->updatePlayerData(data);
-						});
+					return party->partyService()->updatePlayerData(data);
 				}
 
 				pplx::task<void> promoteLeader(std::string userId) override
 				{
-					if (!isInParty())
+					auto party = tryGetParty();
+					if (!party)
 					{
 						return pplx::task_from_exception<void>(std::runtime_error(PartyError::Str::NotInParty));
 					}
 
-					return _party->then([userId](std::shared_ptr<PartyContainer> party) {
-						std::shared_ptr<PartyService> partyService = party->getScene()->dependencyResolver().resolve<PartyService>();
-						return partyService->promoteLeader(userId);
-						});
+					return party->partyService()->promoteLeader(userId);
 				}
 
 				pplx::task<void> kickPlayer(std::string userId) override
 				{
-					if (!isInParty())
+					auto party = tryGetParty();
+					if (!party)
 					{
 						return pplx::task_from_exception<void>(std::runtime_error(PartyError::Str::NotInParty));
 					}
 
-					return _party->then([userId](std::shared_ptr<PartyContainer> party) {
-						std::shared_ptr<PartyService> partyService = party->getScene()->dependencyResolver().resolve<PartyService>();
-						return partyService->kickPlayer(userId);
-						});
+					return party->partyService()->kickPlayer(userId);
 				}
 
 				pplx::task<void> invitePlayer(const std::string& recipient, pplx::cancellation_token ct) override
 				{
-					if (!isInParty())
+					auto party = tryGetParty();
+					if (!party)
 					{
-						return pplx::task_from_exception<void>(std::runtime_error(PartyError::Str::NotInParty));
+						throw std::runtime_error(PartyError::Str::NotInParty);
 					}
 
-					auto wUsers = _users;
-					auto wThat = this->weak_from_this();
-					return _party->then([wUsers, wThat, recipient, ct](std::shared_ptr<PartyContainer> party)
+					if (_legacyInviteCt.is_cancelable())
+					{
+						_legacyInviteCt.deregister_callback(_legacyInviteCtRegistration);
+					}
+
+					if (ct.is_cancelable())
+					{
+						_legacyInviteCt = ct;
+						std::weak_ptr<Party_Impl> wThat(this->shared_from_this());
+						_legacyInviteCtRegistration = ct.register_callback([recipient, wThat]
 						{
-							auto users = wUsers.lock();
-							auto that = wThat.lock();
-							if (!users || !that)
+							if (auto that = wThat.lock())
 							{
-								return pplx::task_from_result();
-							}
-
-							auto partyId = party->id();
-
-							InvitationRequest request;
-							auto isNewRequest = party->registerInvitationRequest(recipient, request);
-
-							std::weak_ptr<PartyContainer> wParty(party);
-							if (ct.is_cancelable())
-							{
-								ct.register_callback([recipient, wParty]
-									{
-										if (auto party = wParty.lock())
-										{
-											party->closeInvitationRequest(recipient);
-										}
-									});
-							}
-
-							if (!isNewRequest)
-							{
-								return request.task;
-							}
-							else
-							{
-								auto requestTask = users->sendRequestToUser<void>(recipient, "party.invite", request.cts.get_token(), partyId)
-									.then([recipient, wParty]
-										{
-											if (auto party = wParty.lock())
-											{
-												party->closeInvitationRequest(recipient);
-											}
-										});
-								request.task = requestTask;
-								return requestTask;
+								that->cancelInvitation(recipient);
 							}
 						});
+					}
+
+					return party->sendInvitation(recipient);
 				}
 
 				pplx::task<void> cancelPartyInvitation(std::string recipient) override
 				{
-					if (!isInParty())
+					auto party = tryGetParty();
+					if (!party)
 					{
-						// If we are idempotent, I guess this is not an error
 						return pplx::task_from_result();
 					}
 
-					return _party->then([recipient](std::shared_ptr<PartyContainer> party)
+					return party->cancelInvitation(recipient);
+				}
+
+				void sendInvitation(const std::string& recipient) override
+				{
+					auto party = tryGetParty();
+					if (!party)
+					{
+						throw std::runtime_error(PartyError::Str::NotInParty);
+					}
+
+					auto logger = _logger;
+					party->sendInvitation(recipient).then([logger, recipient](pplx::task<void> task)
+					{
+						try
 						{
-							party->closeInvitationRequest(recipient);
-						});
+							task.wait();
+						}
+						catch (const std::exception& ex)
+						{
+							logger->log(LogLevel::Error, "PartyApi::sendInvitation", "Could not send an invitation to " + recipient, ex);
+						}
+					});
+				}
+
+				void cancelInvitation(const std::string& recipient) override
+				{
+					auto party = tryGetParty();
+					if (!party)
+					{
+						return;
+					}
+
+					auto logger = _logger;
+					party->cancelInvitation(recipient).then([logger, recipient](pplx::task<void> task)
+					{
+						try
+						{
+							task.wait();
+						}
+						catch (const std::exception& ex)
+						{
+							logger->log(LogLevel::Error, "PartyApi::cancelInvitation", "Error while canceling invitation to " + recipient, ex);
+						}
+					});
 				}
 
 				Event<PartySettings>::Subscription subscribeOnUpdatedPartySettings(std::function<void(PartySettings)> callback) override
@@ -1904,6 +2021,24 @@ namespace Stormancer
 				Event<GameFinder::GameFinderResponse> _onGameFound;
 				Event<PartyGameFinderFailure> _onGameFinderFailure;
 
+				std::shared_ptr<PartyContainer> tryGetParty() const
+				{
+					std::lock_guard<std::recursive_mutex> lg(_partyMutex);
+
+					if (_party && _party->is_done())
+					{
+						return _party->get();
+					}
+					return nullptr;
+				}
+
+				void setPartySafe(std::shared_ptr<pplx::task<std::shared_ptr<PartyContainer>>> party)
+				{
+					std::lock_guard<std::recursive_mutex> lg(_partyMutex);
+
+					_party = party;
+				}
+
 				void runSceneInitEventHandlers(std::shared_ptr<Scene> scene)
 				{
 					for (const auto& handler : _eventHandlers)
@@ -2023,7 +2158,7 @@ namespace Stormancer
 
 									if (partyManagement->isInParty())
 									{
-										partyManagement->_party = nullptr;
+										partyManagement->setPartySafe(nullptr);
 										partyManagement->_onLeftParty(reason);
 									}
 								}
@@ -2097,6 +2232,8 @@ namespace Stormancer
 				}
 
 				std::shared_ptr<ILogger> _logger;
+				// This mutex protects the _party member.
+				mutable std::recursive_mutex _partyMutex;
 				std::shared_ptr<pplx::task<std::shared_ptr<PartyContainer>>> _party;
 				std::unordered_map<std::string, InvitePair> _invitations;
 				// Recursive mutex needed because the user can call getPendingInvitations() while in a callback where the mutex is already held
@@ -2107,6 +2244,9 @@ namespace Stormancer
 				// Things Party_Impl is subscibed to, that outlive the party scene (e.g GameFinder events)
 				std::vector<Subscription> _subscriptions;
 				pplx::task<void> _leavePartyTask = pplx::task_from_result();
+				// TODO remove when deprecated invitePlayer API is removed
+				pplx::cancellation_token _legacyInviteCt;
+				pplx::cancellation_token_registration _legacyInviteCtRegistration;
 			};
 		}
 
@@ -2119,7 +2259,7 @@ namespace Stormancer
 			/// <remarks>
 			/// Unlike protocol versions, its only purpose is to help debugging.
 			/// </remarks>
-			static constexpr const char* PARTY_PLUGIN_REVISION = "2019-10-23.2";
+			static constexpr const char* PARTY_PLUGIN_REVISION = "2019-11-18.1";
 			static constexpr const char* PLUGIN_METADATA_KEY = "stormancer.party.plugin";
 
 		private:

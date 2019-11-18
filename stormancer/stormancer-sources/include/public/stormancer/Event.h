@@ -9,7 +9,14 @@
 
 namespace Stormancer
 {
-	/// Event on which we can subscribe
+	/// <summary>
+	/// Represents an subscrible event
+	/// </summary>
+	/// <remarks>
+	/// When subscribing to events with the subsribe() function, a subscription object is returned. 
+	/// The lifetime of the subscription is directly tied to the lifetime of this object. When all copies of the object is destroyed,
+	/// the provided callback gets unsubscribed from the event automatically.
+	/// </remarks>
 	template<typename... TParams>
 	class Event
 	{
