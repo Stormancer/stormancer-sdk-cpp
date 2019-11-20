@@ -3,6 +3,7 @@
 #include "stormancer/IPlugin.h"
 #include "stormancer/msgpack_define.h"
 #include "stormancer/ITokenHandler.h"
+#include "stormancer/Utilities/TaskUtilities.h"
 
 namespace Stormancer
 {
@@ -501,11 +502,12 @@ namespace Stormancer
 			{
 				friend class ::Stormancer::GameSessions::GameSessionsPlugin;
 			public:
-				GameSession_Impl(std::weak_ptr<IClient> client, std::shared_ptr<ITokenHandler> tokens, std::shared_ptr<ILogger> logger)
+				GameSession_Impl(std::weak_ptr<IClient> client, std::shared_ptr<ITokenHandler> tokens, std::shared_ptr<ILogger> logger, std::shared_ptr<IActionDispatcher> dispatcher)
 					: _logger(logger)
 					, _tokens(tokens)
 					, _wClient(client)
 					, _currentGameSession(nullptr)
+					, _dispatcher(dispatcher)
 				{
 				}
 
@@ -669,19 +671,25 @@ namespace Stormancer
 
 				pplx::task<void> setPlayerReady(const std::string& data, pplx::cancellation_token ct)
 				{
-					return getCurrentGameSession(ct)
-						.then([data](std::shared_ptr<Scene> scene)
+					if (auto dispatcher = _dispatcher.lock())
+					{
+						return getCurrentGameSession(ct).then([data](std::shared_ptr<Scene> scene)
+						{
+							if (scene)
 							{
-								if (scene)
-								{
-									auto gameSessionService = scene->dependencyResolver().resolve<GameSessionService>();
-									gameSessionService->ready(data);
-								}
-								else
-								{
-									throw std::runtime_error("Not connected to any game session");
-								}
-							});
+								auto gameSessionService = scene->dependencyResolver().resolve<GameSessionService>();
+								gameSessionService->ready(data);
+							}
+							else
+							{
+								throw std::runtime_error("Not connected to any game session");
+							}
+						}, dispatcher);
+					}
+					else
+					{
+						STORM_RETURN_TASK_FROM_EXCEPTION(void, PointerDeletedException());
+					}
 				}
 
 				pplx::task<Packetisp_ptr> postResult(const StreamWriter& streamWriter, pplx::cancellation_token ct)
@@ -898,7 +906,7 @@ namespace Stormancer
 				//Fields
 				std::shared_ptr<ILogger> _logger;
 				std::shared_ptr<ITokenHandler> _tokens;
-
+				std::weak_ptr<IActionDispatcher> _dispatcher;
 				std::weak_ptr<IClient> _wClient;
 				std::shared_ptr<GameSessionContainer> _currentGameSession;
 				std::mutex _lock;
@@ -924,12 +932,22 @@ namespace Stormancer
 
 			}
 
+
 			void sceneCreated(std::shared_ptr<Scene> scene) override
 			{
 				auto name = scene->getHostMetadata("stormancer.gamesession");
 				if (name.length() > 0)
 				{
 					scene->dependencyResolver().resolve<details::GameSessionService>()->initialize();
+				}
+			}
+
+			void sceneConnecting(std::shared_ptr<Scene> scene) override
+			{
+				auto name = scene->getHostMetadata("stormancer.gamesession");
+				if (name.length() > 0)
+				{
+
 					scene->dependencyResolver().resolve<GameSession>()->onConnectingToScene(scene);
 				}
 			}
@@ -950,9 +968,8 @@ namespace Stormancer
 
 			void registerClientDependencies(ContainerBuilder& builder) override
 			{
-				builder.registerDependency < details::GameSession_Impl, IClient, ITokenHandler, ILogger >().as<GameSession>().singleInstance();
+				builder.registerDependency < details::GameSession_Impl, IClient, ITokenHandler, ILogger,IActionDispatcher >().as<GameSession>().singleInstance();
 			}
 		};
-
 	}
 }

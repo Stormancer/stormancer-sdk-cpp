@@ -49,15 +49,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)private\BugReport\BugReportService.cpp">
       <Filter>private\BugReport</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\GameSession\GameSessionPlugin.cpp">
-      <Filter>private\GameSession</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\GameSession\GameSessionService.cpp">
-      <Filter>private\GameSession</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\GameSession\GameSession_Impl.cpp">
-      <Filter>private\GameSession</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Members\Organizations_Impl.cpp">
       <Filter>private\Members</Filter>
     </ClCompile>
@@ -165,15 +156,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)private\GameRecovery\GameRecoveryService.h">
       <Filter>private\GameRecovery</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\GameSession\GameSession.h">
-      <Filter>public\GameSession</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\GameSession\GameSession_Impl.h">
-      <Filter>private\GameSession</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\GameSession\GameSessionService.h">
-      <Filter>private\GameSession</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Members\Organizations.h">
       <Filter>public\Members</Filter>
     </ClInclude>
@@ -227,12 +209,6 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\PlayerReport\PlayerReportService.h">
       <Filter>public\PlayerReport</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\GameSession\GameSessionModels.h">
-      <Filter>public\GameSession</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\GameSession\GameSessionPlugin.h">
-      <Filter>public\GameSession</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Profile\ProfileModels.h">
       <Filter>public\Profile</Filter>
@@ -382,9 +358,6 @@
     </Filter>
     <Filter Include="private\GameRecovery">
       <UniqueIdentifier>{e469410b-38cc-46d4-b169-1e93e6414175}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="private\GameSession">
-      <UniqueIdentifier>{cf9ed693-9672-4c8b-9514-ea0bedf1a5fb}</UniqueIdentifier>
     </Filter>
     <Filter Include="private\GameVersion">
       <UniqueIdentifier>{91181cda-5c57-49b3-ace8-54942f9597f0}</UniqueIdentifier>

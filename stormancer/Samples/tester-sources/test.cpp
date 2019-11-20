@@ -100,22 +100,6 @@ namespace Stormancer
 		return stateStr;
 	}
 
-	void Tester::onEcho(Packetisp_ptr packet)
-	{
-		Serializer serializer;
-		auto message = serializer.deserializeOne<std::string>(packet->stream);
-
-		if (message == _echoMessage)
-		{
-			_logger->log(LogLevel::Debug, "onMessage", "ECHO OK");
-			execNextTest();
-		}
-		else
-		{
-			_logger->log(LogLevel::Error, "onMessage", "ECHO failed");
-		}
-	}
-
 	void Tester::onMessage(Packetisp_ptr packet)
 	{
 		Serializer serializer;
@@ -271,9 +255,17 @@ namespace Stormancer
 									});
 							}
 						});
-					scene->addRoute("echo.out", [this](Packetisp_ptr p)
+					scene->addRoute<std::string>("echo.out", [this](const std::string& message)
 					{
-						onEcho(p);
+						if (message == _echoMessage)
+						{
+							_logger->log(LogLevel::Debug, "onMessage", "ECHO OK");
+							execNextTest();
+						}
+						else
+						{
+							_logger->log(LogLevel::Error, "onMessage", "ECHO failed");
+						}
 					});
 					scene->addRoute("message", [this](Packetisp_ptr p)
 					{

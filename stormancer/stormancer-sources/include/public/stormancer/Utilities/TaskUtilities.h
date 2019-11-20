@@ -4,6 +4,16 @@
 #include "stormancer/Tasks.h"
 #include "stormancer/TimerThread.h"
 
+#define STORM_RETURN_TASK_FROM_EXCEPTION(TaskType, Exception) \
+try \
+{ \
+	throw Exception; \
+} \
+catch (const std::exception& ex) \
+{ \
+	return pplx::task_from_exception<TaskType>(ex); \
+}
+
 namespace Stormancer
 {
 	using namespace std::chrono_literals;

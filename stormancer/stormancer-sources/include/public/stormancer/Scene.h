@@ -59,6 +59,20 @@ namespace Stormancer
 			const std::unordered_map<std::string, std::string>& metadata = std::unordered_map<std::string, std::string>()
 		) = 0;
 
+		template<typename Arg>
+		void addRoute(
+			const std::string& routeName,
+			std::function<void(const Arg& t)> handler,
+			MessageOriginFilter origin = MessageOriginFilter::Host,
+			const std::unordered_map<std::string, std::string>& metadata = std::unordered_map<std::string, std::string>()
+		)
+		{
+			addRoute(routeName, [handler](Packetisp_ptr packet)
+			{
+				handler(packet->readObject<Arg>());
+			}, origin, metadata);
+		}
+
 		/// Send a packet to a route.
 		/// \param peerFilter Peer receiver.
 		/// \param routeName Route name.

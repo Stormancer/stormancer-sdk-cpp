@@ -1,26 +1,25 @@
 #pragma once
 
+#include "Users/ClientAPI.hpp"
+#include "Users/Users.hpp"
 #include "stormancer/StormancerTypes.h"
 #include "stormancer/msgpack_define.h"
-#include "Users/ClientAPI.hpp"
 #include "stormancer/Event.h"
 #include "stormancer/Tasks.h"
 #include "stormancer/IPlugin.h"
 #include "stormancer/Scene.h"
 #include "stormancer/Utilities/PointerUtilities.h"
-//#include "Users/Users.hpp"
 #include <unordered_map>
 #include <functional>
 #include <string>
 #include <vector>
 #include <memory>
-#include "Users/Users.hpp"
 
 namespace Stormancer
 {
 	namespace Friends
 	{
-		enum class FriendStatus : int
+		enum class FriendStatus
 		{
 			Online = 0,
 			Away = 1,
@@ -46,10 +45,18 @@ namespace Stormancer
 			MSGPACK_DEFINE(userId, details, lastConnected, status, tags)
 		};
 
+		enum class FriendListUpdateOperationInternal
+		{
+			Add = 0,
+			Remove = 1,
+			Update = 2,
+			UpdateStatus = 3
+		};
+
 		struct FriendListUpdateDto
 		{
 			std::string itemId;
-			std::string operation;
+			FriendListUpdateOperationInternal operation;
 			Friend data;
 
 			MSGPACK_DEFINE(itemId, operation, data)
@@ -59,7 +66,7 @@ namespace Stormancer
 		{
 			Add = 0,
 			Remove = 1,
-			Update = 2,
+			Update = 2
 		};
 
 		/// <summary>
@@ -67,7 +74,7 @@ namespace Stormancer
 		/// </summary>
 		struct FriendListUpdatedEvent
 		{
-			FriendListUpdateOperation op;
+			FriendListUpdateOperation operation;
 			std::shared_ptr<Friend> value;
 		};
 
@@ -96,7 +103,7 @@ namespace Stormancer
 			/// <remarks>
 			/// If false, friends is empty.
 			/// </remarks>
-			bool isReady;
+			bool isReady = false;
 
 			/// <summary>
 			/// List of friends indexed by id
@@ -172,11 +179,17 @@ namespace Stormancer
 			/// <param name="callback">Callback called when the event is fired.</param>
 			/// <returns>An object that controls the lifetime of the event subscription. If all copies of this object are destroyed, the callbeck is automatically unregistered.</returns>
 			virtual Event<FriendListUpdatedEvent>::Subscription subscribeFriendListUpdatedEvent(std::function<void(FriendListUpdatedEvent)> callback) = 0;
+
+			/// <summary>
+			/// Ask the friend list for a full refresh. This should be called only in platform events when users are added or removed from the user friend list.
+			/// </summary>
+			/// <returns>A task which terminate when the server has returned the friend list and the local plugin processed the changes localy.</returns>
+			virtual pplx::task<void> refresh() = 0;
 		};
 
 		namespace details
 		{
-			class FriendsService
+			class FriendsService : public std::enable_shared_from_this<FriendsService>
 			{
 			public:
 
@@ -192,10 +205,17 @@ namespace Stormancer
 
 				void initialize()
 				{
-					_scene.lock()->addRoute("friends.notification", [this](Packetisp_ptr packet)
+					std::weak_ptr<FriendsService> wFriendsService = this->shared_from_this();
+					_scene.lock()->addRoute<std::vector<FriendListUpdateDto>>("friends.notification", [wFriendsService](std::vector<FriendListUpdateDto> friendUpdates)
 					{
-							auto update = packet->readObject<FriendListUpdateDto>();
-							this->onFriendNotification(update);
+						if (auto friendsService = wFriendsService.lock())
+						{
+							for (auto friendUpdate : friendUpdates)
+							{
+								friendsService->onFriendNotification(friendUpdate);
+							}
+							friendsService->_isLoaded = true;
+						}
 					});
 				}
 
@@ -219,90 +239,139 @@ namespace Stormancer
 					return _rpcService->rpc<void, FriendListStatusConfig, std::string >("friends.setstatus", status, details);
 				}
 
+				pplx::task<void> refresh()
+				{
+					std::weak_ptr<FriendsService> wFriendsService = this->shared_from_this();
+					return _rpcService->rpc<std::unordered_map<std::string, Friend>>("friends.refresh")
+						.then([wFriendsService](std::unordered_map<std::string, Friend> newFriends)
+					{
+						if (auto friendsService = wFriendsService.lock())
+						{
+							auto& friends = friendsService->friends;
+							auto oldFriends = friends;
+
+							for (auto oldFriendIt : oldFriends)
+							{
+								if (newFriends.find(oldFriendIt.first) == newFriends.end())
+								{
+									// REMOVE
+									friends.erase(oldFriendIt.first);
+									friendsService->friendListChanged(FriendListUpdatedEvent{ FriendListUpdateOperation::Remove, oldFriendIt.second });
+								}
+							}
+
+							for (auto newFriend : newFriends)
+							{
+								auto friendIt = oldFriends.find(newFriend.first);
+								if (friendIt == oldFriends.end())
+								{
+									// ADD
+									auto fr = friends[newFriend.first] = std::make_shared<Friend>(newFriend.second);
+									friendsService->friendListChanged(FriendListUpdatedEvent{ FriendListUpdateOperation::Add, fr });
+								}
+								else
+								{
+									// UPDATE
+									auto fr = friendIt->second;
+									if (fr)
+									{
+										fr->status = newFriend.second.status;
+										fr->details = newFriend.second.details;
+										fr->lastConnected = newFriend.second.lastConnected;
+										fr->userId = newFriend.second.userId;
+										friendsService->friendListChanged(FriendListUpdatedEvent{ FriendListUpdateOperation::Update, fr });
+									}
+								}
+							}
+						}
+					});
+				}
+
+				bool isLoaded()
+				{
+					return _isLoaded;
+				}
+
 			private:
 
-				void onFriendNotification(const FriendListUpdateDto &update)
+				void onFriendNotification(const FriendListUpdateDto& update)
 				{
-					auto operation = update.operation;
-					if (operation == "remove")
+					switch (update.operation)
 					{
+					case FriendListUpdateOperationInternal::Remove:
 						onFriendRemove(update);
-					}
-					else if (operation == "update")
-					{
+						break;
+					case FriendListUpdateOperationInternal::Update:
 						onFriendUpdate(update);
-					}
-					else if (operation == "add")
-					{
+						break;
+					case FriendListUpdateOperationInternal::Add:
 						onFriendAdd(update);
-					}
-					else if (operation == "update.status")
-					{
+						break;
+					case FriendListUpdateOperationInternal::UpdateStatus:
 						onFriendUpdateStatus(update);
-					}
-					else
-					{
-						_logger->log(LogLevel::Error, "friends", "Unknown friends operation: " + update.operation);
+						break;
+					default:
+						_logger->log(LogLevel::Error, "friends", "Unknown friends operation: " + std::to_string((int)update.operation));
+						break;
 					}
 				}
 
-				void onFriendAdd(const FriendListUpdateDto &update)
+				void onFriendAdd(const FriendListUpdateDto& update)
 				{
 					auto fr = std::make_shared<Friend>(update.data);
 					friends[update.itemId] = fr;
-					FriendListUpdatedEvent ev;
-					ev.op = FriendListUpdateOperation::Add;
-					ev.value = fr;
-					friendListChanged(ev);
+					friendListChanged(FriendListUpdatedEvent{ FriendListUpdateOperation::Add, fr });
 				}
 
-				void onFriendUpdate(const FriendListUpdateDto &update)
+				void onFriendUpdate(const FriendListUpdateDto& update)
 				{
-					auto fr = friends[update.itemId];
-					if (fr)
+					auto friendIt = friends.find(update.itemId);
+					if (friendIt != friends.end())
 					{
-						fr->status = update.data.status;
-						fr->details = update.data.details;
-						fr->lastConnected = update.data.lastConnected;
-						fr->userId = update.data.userId;
-
-
-						FriendListUpdatedEvent ev;
-						ev.op = FriendListUpdateOperation::Update;
-						ev.value = fr;
-						friendListChanged(ev);
+						auto fr = friendIt->second;
+						if (fr)
+						{
+							fr->status = update.data.status;
+							fr->details = update.data.details;
+							fr->lastConnected = update.data.lastConnected;
+							fr->userId = update.data.userId;
+							friendListChanged(FriendListUpdatedEvent{ FriendListUpdateOperation::Update, fr });
+						}
 					}
 				}
 
-				void onFriendUpdateStatus(const FriendListUpdateDto &update)
+				void onFriendUpdateStatus(const FriendListUpdateDto& update)
 				{
-					auto fr = friends[update.itemId];
-					if (fr)
+					auto friendIt = friends.find(update.itemId);
+					if (friendIt != friends.end())
 					{
-						fr->status = update.data.status;
-						FriendListUpdatedEvent ev;
-						ev.op = FriendListUpdateOperation::Update;
-						ev.value = fr;
-						friendListChanged(ev);
+						auto fr = friendIt->second;
+						if (fr)
+						{
+							fr->status = update.data.status;
+							friendListChanged(FriendListUpdatedEvent{ FriendListUpdateOperation::Update, fr });
+						}
 					}
 				}
 
-				void onFriendRemove(const FriendListUpdateDto &update)
+				void onFriendRemove(const FriendListUpdateDto& update)
 				{
-					auto fr = friends[update.itemId];
-					if (fr)
+					auto friendIt = friends.find(update.itemId);
+					if (friendIt != friends.end())
 					{
-						friends.erase(update.itemId);
-						FriendListUpdatedEvent ev;
-						ev.op = FriendListUpdateOperation::Add;
-						ev.value = fr;
-						friendListChanged(ev);
+						auto fr = friendIt->second;
+						if (fr)
+						{
+							friends.erase(update.itemId);
+							friendListChanged(FriendListUpdatedEvent{ FriendListUpdateOperation::Remove, fr });
+						}
 					}
 				}
 
 				std::weak_ptr<Scene> _scene;
 				std::shared_ptr<ILogger> _logger;
 				std::shared_ptr<RpcService> _rpcService;
+				bool _isLoaded = false;
 			};
 
 			class Friends_Impl : public ClientAPI<Friends_Impl>, public ::Stormancer::Friends::Friends, public ::Stormancer::Users::IAuthenticationEventHandler
@@ -317,13 +386,13 @@ namespace Stormancer
 
 				FriendsResult friends() override
 				{
-					FriendsResult  result;
-					auto service = getFriendService();
-					if (service.is_done())
+					FriendsResult result;
+					if (isLoaded())
 					{
+						auto service = getFriendService();
 						result.isReady = true;
 						auto friends = service.get()->friends;
-						
+
 						for (auto& handler : this->_friendsEventHandlers)
 						{
 							handler->getFriends(friends);
@@ -337,12 +406,12 @@ namespace Stormancer
 					}
 
 					return result;
-					
 				}
 
 				bool isLoaded() override
 				{
-					return getFriendService().is_done();
+					auto task = getFriendService();
+					return task.is_done() && task.get()->isLoaded();
 				}
 
 				pplx::task<void> inviteFriend(std::string userId) override
@@ -365,6 +434,14 @@ namespace Stormancer
 					return getFriendService().then([status, details](std::shared_ptr<FriendsService> s) {return s->setStatus(status, details); });
 				}
 
+				virtual pplx::task<void> refresh() override
+				{
+					return getFriendService().then([](std::shared_ptr<FriendsService> s)
+					{
+						return s->refresh();
+					});
+				}
+
 				Subscription subscribeFriendListUpdatedEvent(std::function<void(FriendListUpdatedEvent)> callback) override
 				{
 					return friendListChanged.subscribe(callback);
@@ -380,15 +457,15 @@ namespace Stormancer
 					{
 						auto wThat = that->weak_from_this();
 						that->_friendListChangedSubscription = friends->friendListChanged.subscribe([wThat](FriendListUpdatedEvent ev)
+						{
+							auto that = wThat.lock();
+							if (!that)
 							{
-								auto that = wThat.lock();
-								if (!that)
-								{
-									throw std::runtime_error("destroyed");
-								}
+								throw std::runtime_error("destroyed");
+							}
 
-								that->friendListChanged(ev);
-							});
+							that->friendListChanged(ev);
+						});
 					};
 
 					auto cleanup = [](auto that, auto type) {
@@ -433,5 +510,6 @@ namespace Stormancer
 	}
 }
 
+MSGPACK_ADD_ENUM(Stormancer::Friends::FriendListUpdateOperationInternal);
 MSGPACK_ADD_ENUM(Stormancer::Friends::FriendStatus);
 MSGPACK_ADD_ENUM(Stormancer::Friends::FriendListStatusConfig);

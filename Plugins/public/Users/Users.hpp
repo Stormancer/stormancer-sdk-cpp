@@ -104,7 +104,7 @@ namespace Stormancer
 			std::string username;
 			std::unordered_map<std::string, std::string> authentications;
 
-			MSGPACK_DEFINE(errorMsg, success, userId, username,authentications);
+			MSGPACK_DEFINE(errorMsg, success, userId, username, authentications);
 		};
 
 		struct OperationCtx
@@ -747,7 +747,7 @@ namespace Stormancer
 					}
 					else
 					{
-						throw std::runtime_error("authentication.failed?reason="+r.errorMsg);
+						throw std::runtime_error("authentication.failed?reason=" + r.errorMsg);
 					}
 					for (auto h : that->_authenticationEventHandlers)
 					{
