@@ -505,9 +505,9 @@ namespace Stormancer
 				GameSession_Impl(std::weak_ptr<IClient> client, std::shared_ptr<ITokenHandler> tokens, std::shared_ptr<ILogger> logger, std::shared_ptr<IActionDispatcher> dispatcher)
 					: _logger(logger)
 					, _tokens(tokens)
+					, _dispatcher(dispatcher)
 					, _wClient(client)
 					, _currentGameSession(nullptr)
-					, _dispatcher(dispatcher)
 				{
 				}
 

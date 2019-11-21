@@ -12,7 +12,7 @@ namespace Stormancer
 	struct RecoverableGame;
 	class GameRecoveryService;
 
-	class GameRecovery_Impl : public ClientAPI<GameRecovery_Impl>, public GameRecovery
+	class GameRecovery_Impl : public ClientAPI<GameRecovery_Impl, GameRecoveryService>, public GameRecovery
 	{
 	public:
 		GameRecovery_Impl(std::weak_ptr<Users::UsersApi> users);

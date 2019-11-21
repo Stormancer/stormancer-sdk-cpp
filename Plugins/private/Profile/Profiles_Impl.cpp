@@ -9,7 +9,10 @@ namespace Stormancer
 {
 	const std::unordered_map<std::string, std::string> Profiles::defaultDisplayOptions = { { "character", "details" } };
 
-	Profiles_Impl::Profiles_Impl(std::weak_ptr<Users::UsersApi> users) : ClientAPI(users) {}
+	Profiles_Impl::Profiles_Impl(std::weak_ptr<Users::UsersApi> users)
+		: ClientAPI(users, "stormancer.profiles")
+	{
+	}
 
 	pplx::task<std::unordered_map<std::string, Profile>> Profiles_Impl::getProfiles(const std::list<std::string>& userIds, const std::unordered_map<std::string, std::string>& displayOptions)
 	{
@@ -66,6 +69,6 @@ namespace Stormancer
 
 	pplx::task<std::shared_ptr<ProfileService>> Profiles_Impl::getProfileService()
 	{
-		return this->template getService<ProfileService>("stormancer.profiles");
+		return this->getService();
 	}
 }

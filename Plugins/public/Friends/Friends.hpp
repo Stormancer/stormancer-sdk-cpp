@@ -374,12 +374,12 @@ namespace Stormancer
 				bool _isLoaded = false;
 			};
 
-			class Friends_Impl : public ClientAPI<Friends_Impl>, public ::Stormancer::Friends::Friends, public ::Stormancer::Users::IAuthenticationEventHandler
+			class Friends_Impl : public ClientAPI<Friends_Impl, FriendsService>, public ::Stormancer::Friends::Friends, public ::Stormancer::Users::IAuthenticationEventHandler
 			{
 			public:
 
 				Friends_Impl(std::weak_ptr<Users::UsersApi> users, std::vector<std::shared_ptr<IFriendsEventHandler>> friendsEventHandlers)
-					: ClientAPI(users)
+					: ClientAPI(users, "stormancer.friends")
 					, _friendsEventHandlers(friendsEventHandlers)
 				{
 				}
@@ -472,7 +472,7 @@ namespace Stormancer
 						that->_friendListChangedSubscription = nullptr;
 					};
 
-					return this->getService<FriendsService>("stormancer.friends", initializer, cleanup);
+					return this->getService(initializer, cleanup);
 				}
 
 				Event<FriendListUpdatedEvent>::Subscription _friendListChangedSubscription;

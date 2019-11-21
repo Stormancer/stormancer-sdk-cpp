@@ -57,18 +57,20 @@ namespace Stormancer
 		};
 
 		class ServerPoolsPlugin;
+
 		namespace details
 		{
-
 			class ServerPoolsService :public std::enable_shared_from_this<ServerPoolsService>
 			{
 				friend class ::Stormancer::ServerPools::ServerPoolsPlugin;
+
 			public:
 				ServerPoolsService(std::shared_ptr<Stormancer::RpcService> rpc)
 					: _rpcService(rpc)
-					
+
 				{
 				}
+
 				template<typename T>
 				pplx::task<GameSessionStartupParameters<T>> setReady()
 				{
@@ -82,11 +84,14 @@ namespace Stormancer
 
 				//Event fired when Stormancer requests a status update from the server
 				std::function<Stormancer::ServerPools::Status()> getStatusCallback;
+
 				//Event fired when the service client receives a shutdown request
 				Stormancer::Event<void> shutdownReceived;
+
 			private:
+
 				std::weak_ptr<Stormancer::RpcService> _rpcService;
-				
+
 				//Initializes the service
 				void initialize(std::shared_ptr<Stormancer::Scene> scene)
 				{
@@ -94,20 +99,20 @@ namespace Stormancer
 					//* We don't prevent this from being destroyed (capturing a shared pointer)
 					//* If destroyed, we don't try to use it in the handler (capturing a this reference directly)
 					std::weak_ptr<ServerPoolsService> wService = this->shared_from_this();
-					scene->addRoute("ServerPool.Shutdown", [wService](Stormancer::Packetisp_ptr packet) {
-
-
+					scene->addRoute("ServerPool.Shutdown", [wService](Stormancer::Packetisp_ptr packet)
+					{
 						auto service = wService.lock();
 						//If service is valid, forward the event.
 						if (service)
 						{
 							service->shutdownReceived();
 						}
+					});
 
-						});
-				
 					auto rpc = _rpcService.lock();
-					rpc->addProcedure("ServerPool.GetStatus", [wService](Stormancer::RpcRequestContext_ptr ctx) {
+
+					rpc->addProcedure("ServerPool.GetStatus", [wService](Stormancer::RpcRequestContext_ptr ctx)
+					{
 						auto service = wService.lock();
 						if (!service)
 						{
@@ -118,49 +123,55 @@ namespace Stormancer
 							ctx->sendValueTemplated(Stormancer::ServerPools::Status::Unknown);
 						}
 						return pplx::task_from_result();
-						});
+					});
 				}
-
 			};
 		}
 
-		class ServerPools : public Stormancer::ClientAPI<ServerPools>
+		class ServerPools : public Stormancer::ClientAPI<ServerPools, details::ServerPoolsService>
 		{
 			friend class ServerPoolsPlugin;
+
 		public:
 
-			ServerPools(std::weak_ptr<Stormancer::Users::UsersApi> auth) : Stormancer::ClientAPI<ServerPools>(auth) {}
+			ServerPools(std::weak_ptr<Stormancer::Users::UsersApi> auth)
+				: Stormancer::ClientAPI<ServerPools, details::ServerPoolsService>(auth, "stormancer.serverPool")
+			{
+			}
 
 			template<typename T>
 			pplx::task<GameSessionStartupParameters<T>> setReady()
 			{
-				return this->getService<details::ServerPoolsService>("stormancer.serverPool")
+				return this->getService()
 					.then([](std::shared_ptr<details::ServerPoolsService> service)
-						{
-							return service->setReady<T>();
-						});
+				{
+					return service->setReady<T>();
+				});
 			}
+
 			Stormancer::Event<void> shutdownReceived;
 
 			//Event fired when Stormancer requests a status update from the server
 			std::function<Stormancer::ServerPools::Status()> getStatusCallback;
 
 		private:
+
 			void onConnecting(std::shared_ptr <details::ServerPoolsService> service)
 			{
 				std::weak_ptr<ServerPools> wThis = this->shared_from_this();
 				//Always capture weak references, and NEVER 'this'. As the callback is going to be executed asynchronously,
 				//who knows what may have happened to the object behind the this pointer since it was captured?
-				shutdownReceivedSubscription = service->shutdownReceived.subscribe([wThis]() {
+				shutdownReceivedSubscription = service->shutdownReceived.subscribe([wThis]()
+				{
 					auto that = wThis.lock();
 					//If this is valid, forward the event.
 					if (that)
 					{
 						that->shutdownReceived();
 					}
-
-					});
-				service->getStatusCallback = [wThis]() {
+				});
+				service->getStatusCallback = [wThis]()
+				{
 					auto that = wThis.lock();
 					if (that && that->getStatusCallback)
 					{
@@ -172,6 +183,7 @@ namespace Stormancer
 					}
 				};
 			}
+
 			void onDisconnecting(std::shared_ptr <details::ServerPoolsService> service)
 			{
 				//Unsubscribe by destroying the subscription
@@ -187,7 +199,6 @@ namespace Stormancer
 
 			void registerSceneDependencies(Stormancer::ContainerBuilder& builder, std::shared_ptr<Stormancer::Scene> scene) override
 			{
-
 				auto name = scene->getHostMetadata("stormancer.serverPool");
 
 				if (!name.empty())
@@ -196,10 +207,10 @@ namespace Stormancer
 						auto instance = std::make_shared<details::ServerPoolsService>(scope.resolve<Stormancer::RpcService>());
 
 						return instance;
-						}).singleInstance();
+					}).singleInstance();
 				}
-
 			}
+
 			void registerClientDependencies(Stormancer::ContainerBuilder& builder) override
 			{
 				builder.registerDependency<ServerPools, Stormancer::Users::UsersApi>().singleInstance();
@@ -211,10 +222,8 @@ namespace Stormancer
 
 				if (!name.empty())
 				{
-
 					auto service = scene->dependencyResolver().resolve<details::ServerPoolsService>();
 					service->initialize(scene);
-
 				}
 			}
 
@@ -242,9 +251,7 @@ namespace Stormancer
 				}
 			}
 		};
-
 	}
-
 }
 
-MSGPACK_ADD_ENUM(Stormancer::ServerPools::Status)
+MSGPACK_ADD_ENUM(Stormancer::ServerPools::Status);

@@ -88,15 +88,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Servers\ServersService.cpp">
       <Filter>private\Servers</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Helloworld\Hello.cpp">
-      <Filter>private\Helloworld</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Helloworld\HelloService.cpp">
-      <Filter>private\Helloworld</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Helloworld\HelloworldPlugin.cpp">
-      <Filter>private\Helloworld</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)private\Messaging\MessagingPlugin.cpp">
       <Filter>private\Messaging</Filter>
     </ClCompile>
@@ -230,15 +221,6 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Servers\ServersModels.h">
       <Filter>public\Servers</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Helloworld\Hello.h">
-      <Filter>public\Helloworld</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Helloworld\HelloService.h">
-      <Filter>private\Helloworld</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Helloworld\HelloworldPlugin.h">
-      <Filter>public\Helloworld</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)private\Profile\ProfilePrivateModels.h">
       <Filter>private\Profile</Filter>
@@ -394,9 +376,6 @@
     </Filter>
     <Filter Include="public\Helloworld">
       <UniqueIdentifier>{8892001d-d908-4b91-b526-443901478931}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="private\Helloworld">
-      <UniqueIdentifier>{fa9c0c66-59a3-4dca-9505-9caf87896fab}</UniqueIdentifier>
     </Filter>
     <Filter Include="private\Messaging">
       <UniqueIdentifier>{8f83ceff-aca7-441b-8249-ce038db2b40d}</UniqueIdentifier>

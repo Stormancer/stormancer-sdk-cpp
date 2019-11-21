@@ -5,14 +5,14 @@
 namespace Stormancer
 {
 
-	Servers_Impl::Servers_Impl(std::weak_ptr<Users::UsersApi> users) : ClientAPI(users)
+	Servers_Impl::Servers_Impl(std::weak_ptr<Users::UsersApi> users)
+		: ClientAPI(users, "stormancer.server")
 	{
-
 	}
 
 	pplx::task<std::shared_ptr<ServersService>> Servers_Impl::getServersService()
 	{
-		return this->getService<ServersService>("stormancer.server");
+		return this->getService();
 	}
 
 	pplx::task<std::vector<Stormancer::ServerDescription>> Servers_Impl::GetServersDescription()

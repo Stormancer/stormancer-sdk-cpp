@@ -59,15 +59,20 @@ namespace Stormancer
 			};
 		}
 
-		class Hello : public Stormancer::ClientAPI<Hello>
+		class Hello : public Stormancer::ClientAPI<Hello, details::HelloService>
 		{
 			friend class HelloworldPlugin;
+
 		public:
 
-			Hello(std::weak_ptr<Users::UsersApi> users) : Stormancer::ClientAPI<Hello>(users) {}
+			Hello(std::weak_ptr<Users::UsersApi> users)
+				: Stormancer::ClientAPI<Hello, details::HelloService>(users, "helloworld")
+			{
+			}
+
 			pplx::task<std::string> world(std::string name)
 			{
-				return this->getService<details::HelloService>("helloworld")
+				return this->getService()
 					.then([name](std::shared_ptr<details::HelloService> hello)
 				{
 					return hello->world(name);
@@ -75,8 +80,8 @@ namespace Stormancer
 			}
 			Stormancer::Event<std::string> helloBackReceived;
 
-
 		private:
+
 			void onConnecting(std::shared_ptr <details::HelloService> service)
 			{
 				std::weak_ptr<Hello> wThis = this->shared_from_this();
@@ -92,6 +97,7 @@ namespace Stormancer
 				
 				});
 			}
+
 			void onDisconnecting(std::shared_ptr <details::HelloService> service)
 			{
 				//Unsubscribe by destroying the subscription

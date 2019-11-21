@@ -8,7 +8,7 @@ namespace Stormancer
 {
 	class ServersService;
 
-	class Servers_Impl: public ClientAPI<Servers_Impl>, public Servers
+	class Servers_Impl: public ClientAPI<Servers_Impl, ServersService>, public Servers
 	{
 	public:
 		Servers_Impl(std::weak_ptr<Users::UsersApi> users);

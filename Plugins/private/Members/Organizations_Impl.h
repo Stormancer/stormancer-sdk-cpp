@@ -6,13 +6,15 @@
 
 namespace Stormancer
 {
+	class OrganizationsService;
+
 	class OrganizationsContainer;
 	namespace Users
 	{
 		class UsersApi;
 	}
 
-	class Organizations_Impl : public ClientAPI<Organizations_Impl>, public Organizations
+	class Organizations_Impl : public ClientAPI<Organizations_Impl, OrganizationsService>, public Organizations
 	{
 	public:
 

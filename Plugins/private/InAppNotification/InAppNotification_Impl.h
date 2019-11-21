@@ -9,7 +9,7 @@
 
 namespace Stormancer
 {
-	class InAppNotification_Impl : public ClientAPI<InAppNotification_Impl>, public InAppNotificationManager
+	class InAppNotification_Impl : public ClientAPI<InAppNotification_Impl, InAppNotificationService>, public InAppNotificationManager
 	{
 	public:
 

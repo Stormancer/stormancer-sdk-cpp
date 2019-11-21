@@ -11,7 +11,7 @@ namespace Stormancer
 		class UsersApi;
 	}
 
-	class Profiles_Impl : public ClientAPI<Profiles_Impl>, public Profiles
+	class Profiles_Impl : public ClientAPI<Profiles_Impl, ProfileService>, public Profiles
 	{
 	public:
 

@@ -1508,7 +1508,7 @@ namespace Stormancer
 				std::weak_ptr<Scene> _scene;
 			};
 
-			class Party_Impl : public ClientAPI<Party_Impl>, public PartyApi
+			class Party_Impl : public ClientAPI<Party_Impl, details::PartyManagementService>, public PartyApi
 			{
 			public:
 
@@ -1519,24 +1519,20 @@ namespace Stormancer
 					std::vector<std::shared_ptr<IPartyEventHandler>> eventHandlers,
 					std::shared_ptr<GameFinder::GameFinderApi> gameFinder
 				)
-					: ClientAPI(users)
+					: ClientAPI<Party_Impl, details::PartyManagementService>(users, "stormancer.plugins.partyManagement")
 					, _logger(logger)
 					, _dispatcher(dispatcher)
 					, _eventHandlers(eventHandlers)
 					, _gameFinder(gameFinder)
 					, _legacyInviteCt(pplx::cancellation_token::none())
-				{}
+				{
+				}
 
 				pplx::task<void> createParty(const PartyRequestDto& partySettings) override
 				{
 					if (_party)
 					{
 						return pplx::task_from_exception<void>(std::runtime_error(PartyError::Str::AlreadyInParty));
-					}
-					auto users = _users.lock();
-					if (!users)
-					{
-						return pplx::task_from_exception<void>(std::runtime_error("destroyed"));
 					}
 
 					auto wThat = this->weak_from_this();
@@ -1619,7 +1615,7 @@ namespace Stormancer
 					}
 
 					auto wThat = this->weak_from_this();
-					return _users.lock()->getSceneConnectionToken("stormancer.plugins.party", invitation.SceneId, pplx::cancellation_token::none())
+					return this->_users.lock()->getSceneConnectionToken("stormancer.plugins.party", invitation.SceneId, pplx::cancellation_token::none())
 						.then([wThat](std::string token)
 							{
 								if (auto that = wThat.lock())
@@ -1685,7 +1681,7 @@ namespace Stormancer
 						throw std::runtime_error(PartyError::Str::NotInParty);
 					}
 
-					auto myId = _users.lock()->userId();
+					auto myId = this->_users.lock()->userId();
 					auto members = party->members();
 					auto it = std::find_if(members.begin(), members.end(), [&myId](const PartyUserDto& user)
 						{
@@ -1835,7 +1831,7 @@ namespace Stormancer
 					if (ct.is_cancelable())
 					{
 						_legacyInviteCt = ct;
-						std::weak_ptr<Party_Impl> wThat(this->shared_from_this());
+						std::weak_ptr<Party_Impl> wThat = this->weak_from_this();
 						_legacyInviteCtRegistration = ct.register_callback([recipient, wThat]
 						{
 							if (auto that = wThat.lock())
@@ -1952,7 +1948,7 @@ namespace Stormancer
 				void initialize()
 				{
 					auto wThat = this->weak_from_this();
-					_users.lock()->setOperationHandler("party.invite", [wThat](Stormancer::Users::OperationCtx& ctx)
+					this->_users.lock()->setOperationHandler("party.invite", [wThat](Stormancer::Users::OperationCtx& ctx)
 						{
 							if (auto that = wThat.lock())
 							{
@@ -2049,7 +2045,7 @@ namespace Stormancer
 
 				pplx::task<std::shared_ptr<PartyContainer>> getPartySceneByToken(const std::string& token)
 				{
-					auto users = _users.lock();
+					auto users = this->_users.lock();
 					auto wThat = this->weak_from_this();
 
 					return users->connectToPrivateSceneByToken(token,
@@ -2106,14 +2102,15 @@ namespace Stormancer
 									});
 							});
 				}
+
 				pplx::task<std::shared_ptr<PartyManagementService>> getPartyManagementService()
 				{
-					return this->getService<PartyManagementService>("stormancer.plugins.partyManagement");
+					return this->getService();
 				}
 
 				pplx::task<std::shared_ptr<PartyContainer>> initPartyFromScene(std::shared_ptr<Scene> scene)
 				{
-					std::weak_ptr<Party_Impl> wPartyManagement = this->shared_from_this();
+					std::weak_ptr<Party_Impl> wPartyManagement = this->weak_from_this();
 					std::shared_ptr<PartyService> partyService;
 					try
 					{
@@ -2211,7 +2208,7 @@ namespace Stormancer
 					}
 					_onInvitationReceived(invitation.invite);
 
-					std::weak_ptr<Party_Impl> wThat(this->shared_from_this());
+					std::weak_ptr<Party_Impl> wThat = this->weak_from_this();
 					auto dispatcher = _dispatcher;
 					ctx.request->cancellationToken().register_callback([wThat, senderId, dispatcher]
 						{

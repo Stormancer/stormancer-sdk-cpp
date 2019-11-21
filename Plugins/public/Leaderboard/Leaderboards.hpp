@@ -134,13 +134,15 @@ namespace Stormancer
 
 		}
 
-		class Leaderboard : public Stormancer::ClientAPI<Leaderboard>
+		class Leaderboard : public Stormancer::ClientAPI<Leaderboard, details::LeaderboardService>
 		{
 		public:
-			Leaderboard(std::weak_ptr<Stormancer::Users::UsersApi> users) : Stormancer::ClientAPI<Leaderboard>(users)
-			{
 
+			Leaderboard(std::weak_ptr<Stormancer::Users::UsersApi> users)
+				: Stormancer::ClientAPI<Leaderboard, details::LeaderboardService>(users, "stormancer.plugins.leaderboards")
+			{
 			}
+
 			~Leaderboard() {}
 
 			//Query a leaderboard
@@ -166,9 +168,10 @@ namespace Stormancer
 			}
 
 		private:
+
 			pplx::task<std::shared_ptr<Stormancer::Leaderboards::details::LeaderboardService>> getLeaderboardService()
 			{
-				return this->getService<Stormancer::Leaderboards::details::LeaderboardService>("stormancer.plugins.leaderboards");
+				return this->getService();
 			}
 		};
 

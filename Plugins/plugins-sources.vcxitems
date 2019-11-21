@@ -23,9 +23,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)private\GameRecovery\GameRecoveryService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\GameVersion\GameVersionPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\GameVersion\GameVersionService.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Helloworld\Hello.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Helloworld\HelloService.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)private\Helloworld\HelloworldPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\InAppNotification\InAppNotificationContainer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\InAppNotification\InAppNotificationPlugin.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)private\InAppNotification\InAppNotificationService.cpp" />
@@ -67,9 +64,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Messaging\MessagingModels.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Party\Party.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Profile\ProfilePlugin.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)private\Helloworld\HelloService.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Helloworld\Hello.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)public\Helloworld\HelloworldPlugin.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\PS4\PS4Plugin.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\ServerPool\ServerPools.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)public\Servers\ServersModels.h" />

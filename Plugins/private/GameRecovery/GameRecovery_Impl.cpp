@@ -7,7 +7,10 @@
 
 namespace Stormancer
 {
-	GameRecovery_Impl::GameRecovery_Impl(std::weak_ptr<Users::UsersApi> users) : ClientAPI(users) {}
+	GameRecovery_Impl::GameRecovery_Impl(std::weak_ptr<Users::UsersApi> users)
+		: ClientAPI(users, "stormancer.gameRecovery")
+	{
+	}
 
 	pplx::task<std::shared_ptr<RecoverableGame>> GameRecovery_Impl::getCurrent()
 	{
@@ -33,10 +36,11 @@ namespace Stormancer
 
 	pplx::task<void> GameRecovery_Impl::cancelCurrent()
 	{
-		return getGRService().then([](std::shared_ptr<GameRecoveryService> gr) {return gr->cancelCurrent(); });
+		return getGRService().then([](std::shared_ptr<GameRecoveryService> gr) { return gr->cancelCurrent(); });
 	}
+
 	pplx::task<std::shared_ptr<GameRecoveryService>> GameRecovery_Impl::getGRService()
 	{
-		return this->getService<GameRecoveryService>("stormancer.gameRecovery");
+		return this->getService();
 	}
 }
