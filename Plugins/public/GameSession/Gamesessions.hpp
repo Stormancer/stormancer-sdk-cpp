@@ -688,7 +688,7 @@ namespace Stormancer
 					}
 					else
 					{
-						STORM_RETURN_TASK_FROM_EXCEPTION(void, PointerDeletedException());
+						STORM_RETURN_TASK_FROM_EXCEPTION(PointerDeletedException(), void);
 					}
 				}
 

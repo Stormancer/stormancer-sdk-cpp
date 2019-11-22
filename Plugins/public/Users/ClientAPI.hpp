@@ -32,7 +32,7 @@ namespace Stormancer
 				auto users = _users.lock();
 				if (!users)
 				{
-					STORM_RETURN_TASK_FROM_EXCEPTION(std::shared_ptr<TService>, std::runtime_error("destroyed"));
+					STORM_RETURN_TASK_FROM_EXCEPTION(std::runtime_error("destroyed"), std::shared_ptr<TService>);
 				}
 
 				std::weak_ptr<TManager> wThat = this->shared_from_this();
@@ -125,7 +125,7 @@ namespace Stormancer
 
 			if (!_serviceTask)
 			{
-				STORM_RETURN_TASK_FROM_EXCEPTION(std::shared_ptr<TService>, std::runtime_error("service not found"));
+				STORM_RETURN_TASK_FROM_EXCEPTION(std::runtime_error("service not found"), std::shared_ptr<TService>);
 			}
 
 			return *_serviceTask;
