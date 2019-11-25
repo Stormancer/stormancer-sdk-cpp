@@ -11090,13 +11090,7 @@ SWIGEXPORT void SWIGSTDCALL CSharp_NetworkIDObject_SetNetworkIDSwigExplicitNetwo
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_NetworkIDObject_director_connect(void *objarg, SwigDirector_NetworkIDObject::SWIG_Callback0_t callback0, SwigDirector_NetworkIDObject::SWIG_Callback1_t callback1, SwigDirector_NetworkIDObject::SWIG_Callback2_t callback2, SwigDirector_NetworkIDObject::SWIG_Callback3_t callback3) {
-  RakNet::NetworkIDObject *obj = (RakNet::NetworkIDObject *)objarg;
-  SwigDirector_NetworkIDObject *director = dynamic_cast<SwigDirector_NetworkIDObject *>(obj);
-  if (director) {
-    director->swig_connect_director(callback0, callback1, callback2, callback3);
-  }
-}
+
 
 
 SWIGEXPORT int SWIGSTDCALL CSharp_NETWORK_ID_MANAGER_HASH_LENGTH_get() {
@@ -15937,13 +15931,6 @@ SWIGEXPORT void SWIGSTDCALL CSharp_FileListTransferCBInterface_OnDereferenceSwig
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_FileListTransferCBInterface_director_connect(void *objarg, SwigDirector_FileListTransferCBInterface::SWIG_Callback0_t callback0, SwigDirector_FileListTransferCBInterface::SWIG_Callback1_t callback1, SwigDirector_FileListTransferCBInterface::SWIG_Callback2_t callback2, SwigDirector_FileListTransferCBInterface::SWIG_Callback3_t callback3, SwigDirector_FileListTransferCBInterface::SWIG_Callback4_t callback4) {
-  RakNet::FileListTransferCBInterface *obj = (RakNet::FileListTransferCBInterface *)objarg;
-  SwigDirector_FileListTransferCBInterface *director = dynamic_cast<SwigDirector_FileListTransferCBInterface *>(obj);
-  if (director) {
-    director->swig_connect_director(callback0, callback1, callback2, callback3, callback4);
-  }
-}
 
 
 SWIGEXPORT void * SWIGSTDCALL CSharp_new_IncrementalReadInterface() {

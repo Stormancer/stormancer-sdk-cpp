@@ -118,6 +118,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\RakNetTransport2.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\RakNetTypes.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\RakNetVersion.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Source\RakNet_wrap.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\RakPeer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\RakPeerInterface.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\RakSleep.h" />
@@ -227,6 +228,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)Source\RakNetStatistics.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Source\RakNetTransport2.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Source\RakNetTypes.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Source\RakNet_wrap.cxx" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Source\RakPeer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Source\RakSleep.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Source\RakString.cpp" />

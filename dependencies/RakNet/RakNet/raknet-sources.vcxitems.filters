@@ -253,6 +253,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)Source\NXIncludes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Source\RakNet_wrap.cxx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\AutopatcherPatchContext.h">
@@ -718,6 +721,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)Source\DirectoryDeltaTransfer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Source\RakNet_wrap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

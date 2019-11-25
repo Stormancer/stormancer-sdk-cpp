@@ -997,10 +997,10 @@ namespace DataStructures
 	template<class KeyType, class DataType, int order>
 		void BPlusTree<KeyType, DataType, order>::PrintLeaf(Page<KeyType, DataType, order> * leaf, int index)
 	{
-		int i;
+		/*int i;
 		RAKNET_DEBUG_PRINTF("%i] SELF=%p\n", index+1, leaf);
 		for (i=0; i < leaf->size; i++)
-			RAKNET_DEBUG_PRINTF(" %i. %i\n", i+1, leaf->data[i]);
+			RAKNET_DEBUG_PRINTF(" %i. %i\n", i+1,(int)leaf->data[i]);*/
 	}
 	template<class KeyType, class DataType, int order>
 		void BPlusTree<KeyType, DataType, order>::PrintLeaves(void)

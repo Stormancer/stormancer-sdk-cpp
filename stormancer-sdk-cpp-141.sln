@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28010.2003
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29509.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "stormancer-sdk-cpp-lib", "stormancer\stormancer-sdk-cpp-141\stormancer-sdk-cpp-141.vcxproj", "{D8CF547F-8B5B-4651-A48F-D6E56EE0B8C1}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -80,6 +80,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "stormancer-sdk-cpp-lib-Linu
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "stormancer_cpp_tester_linux", "stormancer\Samples\stormancer_cpp_tester_linux\stormancer_cpp_tester_linux.vcxproj", "{1D397680-5605-4F9D-A8A2-042D09FBB22B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Raknet-swig-linux", "dependencies\RakNet\RakNet\RakNet-swig-Linux\RakNet-swig-Linux\Raknet-swig-linux.vcxproj", "{74993FCF-AF33-4D03-9652-BCD043EE519B}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		dependencies\msgpack-c\msgpack-sources\msgpack-sources.vcxitems*{0c19b59e-3da0-4aad-ae26-37afff14b74c}*SharedItemsImports = 9
@@ -101,6 +103,7 @@ Global
 		dependencies\libupnp\pthreads\pthreads-sources\pthreads-sources.vcxitems*{6227f51a-1498-4c4a-b213-f6fded605125}*SharedItemsImports = 4
 		dependencies\rxcpp\rxcpp-sources\rxcpp-sources.vcxitems*{64a00b08-47ca-44e4-95d8-5b63076f317d}*SharedItemsImports = 9
 		dependencies\libupnp\build\libupnp-sources-win32\libupnp-sources-win32.vcxitems*{745da240-bf13-47bd-8e03-422e6d83d6d6}*SharedItemsImports = 9
+		dependencies\RakNet\RakNet\raknet-sources.vcxitems*{74993fcf-af33-4d03-9652-bcd043ee519b}*SharedItemsImports = 4
 		Plugins\plugins-sources.vcxitems*{89ce20ea-ace0-44df-8254-e19797639c16}*SharedItemsImports = 9
 		stormancer\Samples\tester-sources\tester-sources.vcxitems*{9781e681-cf17-48ea-bf81-6895f30e10fc}*SharedItemsImports = 9
 		dependencies\RakNet\RakNet\raknet-sources.vcxitems*{bc75cd23-cb75-4233-a305-b7328825a9a5}*SharedItemsImports = 4
@@ -532,6 +535,7 @@ Global
 		{BF042260-99B1-4A39-B2BF-1FF0F19DCFFA}.Release|Linux-x64.ActiveCfg = Release|x64
 		{BF042260-99B1-4A39-B2BF-1FF0F19DCFFA}.Release|Linux-x64.Build.0 = Release|x64
 		{BF042260-99B1-4A39-B2BF-1FF0F19DCFFA}.Release|x64.ActiveCfg = Release|x64
+		{BF042260-99B1-4A39-B2BF-1FF0F19DCFFA}.Release|x64.Build.0 = Release|x64
 		{BF042260-99B1-4A39-B2BF-1FF0F19DCFFA}.Release|x86.ActiveCfg = Release|x86
 		{BF042260-99B1-4A39-B2BF-1FF0F19DCFFA}.Release|x86.Build.0 = Release|x86
 		{EACD6568-2BFE-4611-8F75-3FB3C47A719F}.Debug|Any CPU.ActiveCfg = Debug|x86
@@ -700,6 +704,65 @@ Global
 		{1D397680-5605-4F9D-A8A2-042D09FBB22B}.Release|x64.ActiveCfg = Release|x64
 		{1D397680-5605-4F9D-A8A2-042D09FBB22B}.Release|x86.ActiveCfg = Release|x86
 		{1D397680-5605-4F9D-A8A2-042D09FBB22B}.Release|x86.Build.0 = Release|x86
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.Debug|ARM.ActiveCfg = Debug|ARM
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.Debug|ARM.Build.0 = Debug|ARM
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.Debug|ARM.Deploy.0 = Debug|ARM
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.Debug|ARM64.Build.0 = Debug|ARM64
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.Debug|ARM64.Deploy.0 = Debug|ARM64
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.Debug|Linux-x64.ActiveCfg = Debug|x86
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.Debug|x64.ActiveCfg = Debug|x64
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.Debug|x64.Deploy.0 = Debug|x64
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.Debug|x86.ActiveCfg = Debug|x86
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.Debug|x86.Build.0 = Debug|x86
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.Debug|x86.Deploy.0 = Debug|x86
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4|Any CPU.ActiveCfg = Release|x86
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4|Any CPU.Build.0 = Release|x86
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4|Any CPU.Deploy.0 = Release|x86
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4|ARM.ActiveCfg = Debug|ARM
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4|ARM.Build.0 = Debug|ARM
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4|ARM.Deploy.0 = Debug|ARM
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4|ARM64.ActiveCfg = Debug|ARM64
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4|ARM64.Build.0 = Debug|ARM64
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4|ARM64.Deploy.0 = Debug|ARM64
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4|Linux-x64.ActiveCfg = Release|x86
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4|Linux-x64.Build.0 = Release|x86
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4|Linux-x64.Deploy.0 = Release|x86
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4|x64.ActiveCfg = Debug|x64
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4|x64.Deploy.0 = Debug|x64
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4|x86.ActiveCfg = Debug|x86
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4|x86.Build.0 = Debug|x86
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4|x86.Deploy.0 = Debug|x86
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4-v140|Any CPU.ActiveCfg = Release|x86
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4-v140|Any CPU.Build.0 = Release|x86
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4-v140|Any CPU.Deploy.0 = Release|x86
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4-v140|ARM.ActiveCfg = Debug|ARM
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4-v140|ARM.Build.0 = Debug|ARM
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4-v140|ARM.Deploy.0 = Debug|ARM
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4-v140|ARM64.ActiveCfg = Debug|ARM64
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4-v140|ARM64.Build.0 = Debug|ARM64
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4-v140|ARM64.Deploy.0 = Debug|ARM64
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4-v140|Linux-x64.ActiveCfg = Release|x86
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4-v140|Linux-x64.Build.0 = Release|x86
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4-v140|Linux-x64.Deploy.0 = Release|x86
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4-v140|x64.ActiveCfg = Debug|x64
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4-v140|x64.Deploy.0 = Debug|x64
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4-v140|x86.ActiveCfg = Debug|x86
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4-v140|x86.Build.0 = Debug|x86
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.DebugUE4-v140|x86.Deploy.0 = Debug|x86
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.Release|Any CPU.ActiveCfg = Release|x86
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.Release|ARM.ActiveCfg = Release|ARM
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.Release|ARM.Build.0 = Release|ARM
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.Release|ARM.Deploy.0 = Release|ARM
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.Release|ARM64.ActiveCfg = Release|ARM64
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.Release|ARM64.Build.0 = Release|ARM64
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.Release|ARM64.Deploy.0 = Release|ARM64
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.Release|Linux-x64.ActiveCfg = Release|x86
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.Release|x64.ActiveCfg = Release|x64
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.Release|x86.ActiveCfg = Release|x86
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.Release|x86.Build.0 = Release|x86
+		{74993FCF-AF33-4D03-9652-BCD043EE519B}.Release|x86.Deploy.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -728,6 +791,7 @@ Global
 		{0C19B59E-3DA0-4AAD-AE26-37AFFF14B74C} = {DE483714-925D-43E1-A20C-2699E8F1D3B5}
 		{64A00B08-47CA-44E4-95D8-5B63076F317D} = {DE483714-925D-43E1-A20C-2699E8F1D3B5}
 		{1D397680-5605-4F9D-A8A2-042D09FBB22B} = {D796A1C3-82DC-4845-8F6E-521F9B757D84}
+		{74993FCF-AF33-4D03-9652-BCD043EE519B} = {1E204BE3-9DB3-48B9-97EC-841D5F2A43DF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2D7E8886-7F99-4ED2-A9A1-70A4F40CE705}
